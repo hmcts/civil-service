@@ -35,7 +35,7 @@ public class ClaimantResponseConfirmsToProceedDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(expectedTemplateId);
 
@@ -53,7 +53,7 @@ public class ClaimantResponseConfirmsToProceedDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
 
         String partyName = "party name";

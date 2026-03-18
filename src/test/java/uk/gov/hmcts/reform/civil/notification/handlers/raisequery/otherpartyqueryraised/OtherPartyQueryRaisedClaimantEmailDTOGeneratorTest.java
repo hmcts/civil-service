@@ -23,7 +23,7 @@ class OtherPartyQueryRaisedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplate_whenClaimantIsBilingual() {
-        CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference(BOTH.toString()).build();
+        CaseData caseData = new CaseData().claimantBilingualLanguagePreference(BOTH.toString()).build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyOtherLipPartyWelshPublicQueryRaised()).thenReturn(expectedTemplateId);
 
@@ -34,7 +34,7 @@ class OtherPartyQueryRaisedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplate_whenClaimantIsNotBilingual() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyOtherLipPartyPublicQueryRaised()).thenReturn(expectedTemplateId);
 

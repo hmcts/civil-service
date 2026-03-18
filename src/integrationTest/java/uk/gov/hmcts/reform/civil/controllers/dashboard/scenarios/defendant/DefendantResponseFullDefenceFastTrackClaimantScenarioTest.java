@@ -29,7 +29,7 @@ public class DefendantResponseFullDefenceFastTrackClaimantScenarioTest extends D
 
         String caseId = "1234987";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

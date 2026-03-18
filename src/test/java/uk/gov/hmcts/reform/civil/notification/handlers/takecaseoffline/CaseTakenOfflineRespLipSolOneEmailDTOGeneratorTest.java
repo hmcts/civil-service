@@ -36,7 +36,7 @@ class CaseTakenOfflineRespLipSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldUseEnglishTemplate() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .applicant1Represented(YesOrNo.YES)
             .caseDataLiP(new CaseDataLiP()
@@ -54,7 +54,7 @@ class CaseTakenOfflineRespLipSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldUseWelshTemplate() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .applicant1Represented(YesOrNo.YES)
             .caseDataLiP(new CaseDataLiP()
@@ -81,7 +81,7 @@ class CaseTakenOfflineRespLipSolOneEmailDTOGeneratorTest {
     void shouldAddCustomProperties() {
         String legacyCaseReference = "12345";
         String defendantName = "Defendant Name";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party().setIndividualFirstName("Claimant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
             .respondent1(new Party().setIndividualFirstName("Defendant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
             .legacyCaseReference(legacyCaseReference)

@@ -59,7 +59,7 @@ class MediationCSVLipVLipServiceTest {
     }
 
     private CaseData getCaseData(Party.Type partyType) {
-        return CaseData.builder()
+        return new CaseData()
             .legacyCaseReference(ID)
             .totalClaimAmount(new BigDecimal(9000))
             .applicant1(buildParty(partyType, APPLICANT_COMPANY_NAME, APPLICANT_PHONE_NUMBER, APPLICANT_EMAIL_ADDRESS,

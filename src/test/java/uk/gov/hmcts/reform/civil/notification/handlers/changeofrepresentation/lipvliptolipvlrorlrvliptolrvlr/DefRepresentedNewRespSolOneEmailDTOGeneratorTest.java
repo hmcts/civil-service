@@ -42,7 +42,7 @@ class DefRepresentedNewRespSolOneEmailDTOGeneratorTest {
         when(notificationsProperties.getNotifyDefendantLrAfterNoticeOfChangeTemplate())
             .thenReturn("template-123");
 
-        String templateId = generator.getEmailTemplateId(CaseData.builder().build());
+        String templateId = generator.getEmailTemplateId(new CaseData().build());
 
         assertThat(templateId).isEqualTo("template-123");
     }
@@ -60,7 +60,7 @@ class DefRepresentedNewRespSolOneEmailDTOGeneratorTest {
         when(organisation.getName()).thenReturn("New Legal Rep Org");
         when(organisationService.findOrganisationById(orgId)).thenReturn(Optional.of(organisation));
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(1234567890123456L)
             .respondent1(new Party()
                              .setType(Party.Type.INDIVIDUAL)

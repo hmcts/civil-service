@@ -35,7 +35,7 @@ public class DefendantResponseFullOrPartAdmitInstallmentsScenarioTest extends Da
         BigDecimal totalAmount = new BigDecimal("10000");
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)

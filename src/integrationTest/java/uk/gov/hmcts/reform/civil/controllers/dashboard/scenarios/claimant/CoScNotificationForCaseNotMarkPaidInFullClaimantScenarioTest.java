@@ -27,7 +27,7 @@ public class CoScNotificationForCaseNotMarkPaidInFullClaimantScenarioTest extend
         String caseId = "14323365438241";
         LocalDate coscFullPaymentDate = LocalDate.now();
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

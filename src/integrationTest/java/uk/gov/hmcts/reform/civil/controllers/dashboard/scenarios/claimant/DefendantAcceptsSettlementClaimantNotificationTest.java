@@ -22,7 +22,7 @@ public class DefendantAcceptsSettlementClaimantNotificationTest extends Dashboar
     void should_create_defendant_accepts_settlement_agreement() throws Exception {
 
         String caseId = "123467891212";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.YES))
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))

@@ -25,7 +25,7 @@ public class DefendantNoticeOfDiscontinuanceScenarioTest extends DashboardBaseIn
 
         String caseId = "4321456";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)

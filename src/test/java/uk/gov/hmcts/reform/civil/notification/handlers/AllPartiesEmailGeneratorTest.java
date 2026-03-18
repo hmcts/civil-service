@@ -58,7 +58,7 @@ class AllPartiesEmailGeneratorTest {
 
     @Test
     void shouldNotifyAllParties_whenTwoRespondentRepresentativesFlagIsSet() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent2(new Party())
             .respondent2SameLegalRepresentative(NO)
             .build();

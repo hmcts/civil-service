@@ -288,10 +288,10 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
         }
     }
 
-    private static CaseData.CaseDataBuilder<?, ?> baseBuilder() {
+    private static CaseData baseBuilder() {
         return CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .build()
-                .toBuilder();
+                .copy();
     }
 }

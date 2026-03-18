@@ -72,7 +72,7 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     @Test
     void getEmailTemplateId_feeNotRequired_returnsNoFeeTemplate() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-                .toBuilder()
+                .copy()
                 .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
@@ -92,7 +92,7 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     @Test
     void getEmailTemplateId_paymentSuccess_returnsNoFeeOnSuccess() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-                .toBuilder()
+                .copy()
                 .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .hearingFeePaymentDetails(new PaymentDetails().setStatus(SUCCESS))
                 .build();
@@ -113,7 +113,7 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     @Test
     void getEmailTemplateId_requiresAndNoPayment_returnsFeeTemplate() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-                .toBuilder()
+                .copy()
                 .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .hearingFeePaymentDetails(null)
                 .build();
@@ -139,7 +139,7 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     @Test
     void addCustomProperties_feeNonNull_populatesAllFields() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-                .toBuilder()
+                .copy()
                 .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
@@ -173,7 +173,7 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     @Test
     void addCustomProperties_feeNull_defaultsToZero() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-                .toBuilder()
+                .copy()
                 .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))

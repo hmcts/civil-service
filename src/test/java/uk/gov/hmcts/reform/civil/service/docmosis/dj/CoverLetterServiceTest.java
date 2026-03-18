@@ -61,7 +61,7 @@ class CoverLetterServiceTest {
     @Test
     void shouldGenerateDocumentWithCoverLetter_whenStitchingEnabled() {
         CaseDocument coverLetter = mock(CaseDocument.class);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("001MC001").build();
         Party party = new PartyBuilder().individual().build();
 
@@ -100,7 +100,7 @@ class CoverLetterServiceTest {
             "http://docstore/documents/1234").setDocumentFileName("file.pdf"));
         Document document = new Document().setDocumentUrl("http://docstore/documents/1234").setDocumentFileName("file.pdf");
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("001MC001").build();
         Party party = new PartyBuilder().individual().build();
 
@@ -139,7 +139,7 @@ class CoverLetterServiceTest {
             "http://docstore/documents/1234").setDocumentFileName("file.pdf"));
         Document document = new Document().setDocumentUrl("http://docstore/documents/1234").setDocumentFileName("file.pdf");
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("001MC001").build();
         Party party = new PartyBuilder().individual().build();
 
@@ -171,7 +171,7 @@ class CoverLetterServiceTest {
 
     @Test
     void shouldBuildTemplateDataCorrectly() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("001MC001").build();
         Party party = new PartyBuilder().individual().build();
 
@@ -197,7 +197,7 @@ class CoverLetterServiceTest {
             .setDocumentFileName("file.pdf");
 
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("001MC001").build();
         Party party = new PartyBuilder().individual().build();
 

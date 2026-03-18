@@ -96,7 +96,7 @@ class PartAdmitPayImmediatelyNotificationHandlerTest {
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(new Organisation().setName("Test org name")));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().copy()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -121,7 +121,7 @@ class PartAdmitPayImmediatelyNotificationHandlerTest {
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(new Organisation().setName("Test org name")));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().copy()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -143,7 +143,7 @@ class PartAdmitPayImmediatelyNotificationHandlerTest {
 
     @Test
     void shouldNotSendDefendantEmail_whenInvokedWithNoDefendantEmailAddress() {
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().copy()
             .respondentSolicitor1EmailAddress(null)
             .build();
         CallbackParams params = CallbackParamsBuilder.builder()

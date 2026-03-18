@@ -54,7 +54,7 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldNotify_whenRespondentIsLiPAndHasEmail() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(new Party().setPartyEmail("respondent@example.com")).respondent1Represented(YesOrNo.NO)
             .respondent1PinToPostLRspec(pin)
             .build();
@@ -66,7 +66,7 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotify_whenRespondentIsNotLiP() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(new Party().setPartyEmail("respondent@example.com"))
             .respondent1PinToPostLRspec(pin)
             .build();
@@ -79,7 +79,7 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
     @Test
     void shouldAddPropertiesCorrectly() {
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(new Party().setType(Party.Type.ORGANISATION).setOrganisationName("Mr. Sole Trader"))
             .applicant1(new Party().setType(Party.Type.ORGANISATION).setOrganisationName("Claimant Name"))
             .issueDate(LocalDate.of(2023, 1, 1))
@@ -112,7 +112,7 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailAddress() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(new Party().setType(Party.Type.ORGANISATION).setPartyEmail("respondent@example.com"))
             .build();
 
@@ -123,7 +123,7 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         when(notificationsProperties.getRespondentDefendantResponseForSpec()).thenReturn("template-id");
 
         String templateId = emailDTOGenerator.getEmailTemplateId(caseData);

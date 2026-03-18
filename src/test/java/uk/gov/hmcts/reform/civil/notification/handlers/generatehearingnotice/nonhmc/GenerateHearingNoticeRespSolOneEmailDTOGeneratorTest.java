@@ -50,7 +50,7 @@ class GenerateHearingNoticeRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void getEmailTemplateId_returnsConfiguredValue() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplate())
                 .thenReturn(CONFIGURED_TEMPLATE_ID);
 
@@ -68,7 +68,7 @@ class GenerateHearingNoticeRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void addCustomProperties_addsDateTimeAndDefendantRef() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .hearingDate(HEARING_DATE_VAL)
                 .hearingTimeHourMinute(TIME_FIELD)
                 .solicitorReferences(new SolicitorReferences()

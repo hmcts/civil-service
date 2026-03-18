@@ -62,7 +62,7 @@ class RequestedCourtForClaimDetailsTabTest {
     @Test
     void shouldNotUpdateRequestedCourtDetailsWHenRequestedCourtNull() {
         // Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setRespondent1DQ(
             new Respondent1DQ()
                 .setRespondent1DQRequestedCourt(null)
@@ -87,7 +87,7 @@ class RequestedCourtForClaimDetailsTabTest {
     @Test
     void shouldUpdateRequestedCourtTabDetailsForApplicantUnspec() {
         // Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
         caseData.setApplicant1DQ(
             new Applicant1DQ()
@@ -115,7 +115,7 @@ class RequestedCourtForClaimDetailsTabTest {
     @Test
     void shouldUpdateRequestedCourtTabDetailsForApplicantSpec() {
         // Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
         caseData.setApplicant1DQ(
             new Applicant1DQ()
@@ -143,7 +143,7 @@ class RequestedCourtForClaimDetailsTabTest {
     @Test
     void shouldUpdateRequestedCourtTabDetailsForRespondent1() {
         // Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setRespondent1DQ(
             new Respondent1DQ()
                 .setRespondent1DQRequestedCourt(requestedCourt)
@@ -170,7 +170,7 @@ class RequestedCourtForClaimDetailsTabTest {
     @Test
     void shouldUpdateRequestedCourtTabDetailsForRespondent2() {
         // Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setRespondent2DQ(
             new Respondent2DQ()
                 .setRespondent2DQRequestedCourt(requestedCourt)
@@ -197,7 +197,7 @@ class RequestedCourtForClaimDetailsTabTest {
     @Test
     void shouldUpdateRequestedCourtTabDetailsForRespondent1Spec() {
         // Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setRespondent1DQ(
             new Respondent1DQ()
                 .setRespondent1DQRequestedCourt(requestedCourt)
@@ -224,7 +224,7 @@ class RequestedCourtForClaimDetailsTabTest {
     @Test
     void shouldUpdateRequestedCourtTabDetailsForRespondent2Spec() {
         // Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setRespondent2DQ(
             new Respondent2DQ()
                 .setRespondent2DQRequestedCourt(requestedCourt)

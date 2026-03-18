@@ -57,7 +57,7 @@ class InitiateCoscDefendantDashboardServiceTest {
     @BeforeEach
     void setUp() {
         gaCaseData = new GeneralApplicationCaseData().parentCaseReference("123456");
-        parentCaseData = CaseData.builder().ccdCaseReference(123456L).build();
+        parentCaseData = new CaseData().ccdCaseReference(123456L).build();
 
         when(coscDashboardHelper.getParentCaseData(gaCaseData)).thenReturn(parentCaseData);
     }

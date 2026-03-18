@@ -48,20 +48,20 @@ public class DjLocationAndToggleService {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData toggledCaseData = applyToggleDefaults(caseData);
-        CaseData.CaseDataBuilder<?, ?> builder = toggledCaseData.toBuilder();
+        CaseData updatedData = toggledCaseData.copy();
 
         DynamicList locationsList = buildLocationList(callbackParams, toggledCaseData);
-        builder.disposalHearingMethodInPersonDJ(locationsList);
-        builder.trialHearingMethodInPersonDJ(locationsList);
+        updatedData.setDisposalHearingMethodInPersonDJ(locationsList);
+        updatedData.setTrialHearingMethodInPersonDJ(locationsList);
 
         log.info("Prepared DJ locations/toggles for caseId {}", caseData.getCcdCaseReference());
         if (V_1.equals(callbackParams.getVersion())) {
             DynamicList hearingMethods = buildHearingMethods(callbackParams, toggledCaseData);
-            builder.hearingMethodValuesDisposalHearingDJ(hearingMethods);
-            builder.hearingMethodValuesTrialHearingDJ(hearingMethods);
+            updatedData.setHearingMethodValuesDisposalHearingDJ(hearingMethods);
+            updatedData.setHearingMethodValuesTrialHearingDJ(hearingMethods);
         }
 
-        return builder.build();
+        return updatedData;
     }
 
     public CaseData applyHearingSelections(CaseData caseData, CallbackVersion version) {
@@ -69,7 +69,7 @@ public class DjLocationAndToggleService {
             return caseData;
         }
 
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+        CaseData updatedData = caseData.copy();
 
         if (caseData.getHearingMethodValuesDisposalHearingDJ() != null
             && caseData.getHearingMethodValuesDisposalHearingDJ().getValue() != null) {
@@ -81,26 +81,26 @@ public class DjLocationAndToggleService {
             applyTrialSelection(updatedData, label);
         }
 
-        return updatedData.build();
+        return updatedData;
     }
 
-    private void applyDisposalSelection(CaseData.CaseDataBuilder<?, ?> builder, String label) {
+    private void applyDisposalSelection(CaseData updatedData, String label) {
         if (HearingMethod.IN_PERSON.getLabel().equals(label)) {
-            builder.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
+            updatedData.setDisposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
         } else if (HearingMethod.VIDEO.getLabel().equals(label)) {
-            builder.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
+            updatedData.setDisposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
         } else if (HearingMethod.TELEPHONE.getLabel().equals(label)) {
-            builder.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+            updatedData.setDisposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
         }
     }
 
-    private void applyTrialSelection(CaseData.CaseDataBuilder<?, ?> builder, String label) {
+    private void applyTrialSelection(CaseData updatedData, String label) {
         if (HearingMethod.IN_PERSON.getLabel().equals(label)) {
-            builder.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
+            updatedData.setTrialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
         } else if (HearingMethod.VIDEO.getLabel().equals(label)) {
-            builder.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
+            updatedData.setTrialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
         } else if (HearingMethod.TELEPHONE.getLabel().equals(label)) {
-            builder.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+            updatedData.setTrialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
         }
     }
 
@@ -112,31 +112,31 @@ public class DjLocationAndToggleService {
     }
 
     private CaseData fillDisposalToggle(CaseData caseData) {
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        builder.disposalHearingDisclosureOfDocumentsDJToggle(DEFAULT_TOGGLE);
-        builder.disposalHearingWitnessOfFactDJToggle(DEFAULT_TOGGLE);
-        builder.disposalHearingMedicalEvidenceDJToggle(DEFAULT_TOGGLE);
-        builder.disposalHearingQuestionsToExpertsDJToggle(DEFAULT_TOGGLE);
-        builder.disposalHearingSchedulesOfLossDJToggle(DEFAULT_TOGGLE);
-        builder.disposalHearingStandardDisposalOrderDJToggle(DEFAULT_TOGGLE);
-        builder.disposalHearingFinalDisposalHearingDJToggle(DEFAULT_TOGGLE);
-        builder.disposalHearingBundleDJToggle(DEFAULT_TOGGLE);
-        builder.disposalHearingClaimSettlingDJToggle(DEFAULT_TOGGLE);
-        builder.disposalHearingCostsDJToggle(DEFAULT_TOGGLE);
-        return builder.build();
+        CaseData updatedData = caseData.copy();
+        updatedData.setDisposalHearingDisclosureOfDocumentsDJToggle(DEFAULT_TOGGLE);
+        updatedData.setDisposalHearingWitnessOfFactDJToggle(DEFAULT_TOGGLE);
+        updatedData.setDisposalHearingMedicalEvidenceDJToggle(DEFAULT_TOGGLE);
+        updatedData.setDisposalHearingQuestionsToExpertsDJToggle(DEFAULT_TOGGLE);
+        updatedData.setDisposalHearingSchedulesOfLossDJToggle(DEFAULT_TOGGLE);
+        updatedData.setDisposalHearingStandardDisposalOrderDJToggle(DEFAULT_TOGGLE);
+        updatedData.setDisposalHearingFinalDisposalHearingDJToggle(DEFAULT_TOGGLE);
+        updatedData.setDisposalHearingBundleDJToggle(DEFAULT_TOGGLE);
+        updatedData.setDisposalHearingClaimSettlingDJToggle(DEFAULT_TOGGLE);
+        updatedData.setDisposalHearingCostsDJToggle(DEFAULT_TOGGLE);
+        return updatedData;
     }
 
     private CaseData fillTrialToggle(CaseData caseData) {
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        builder.trialHearingAlternativeDisputeDJToggle(DEFAULT_TOGGLE);
-        builder.trialHearingVariationsDirectionsDJToggle(DEFAULT_TOGGLE);
-        builder.trialHearingSettlementDJToggle(DEFAULT_TOGGLE);
-        builder.trialHearingDisclosureOfDocumentsDJToggle(DEFAULT_TOGGLE);
-        builder.trialHearingWitnessOfFactDJToggle(DEFAULT_TOGGLE);
-        builder.trialHearingSchedulesOfLossDJToggle(DEFAULT_TOGGLE);
-        builder.trialHearingCostsToggle(DEFAULT_TOGGLE);
-        builder.trialHearingTrialDJToggle(DEFAULT_TOGGLE);
-        return builder.build();
+        CaseData updatedData = caseData.copy();
+        updatedData.setTrialHearingAlternativeDisputeDJToggle(DEFAULT_TOGGLE);
+        updatedData.setTrialHearingVariationsDirectionsDJToggle(DEFAULT_TOGGLE);
+        updatedData.setTrialHearingSettlementDJToggle(DEFAULT_TOGGLE);
+        updatedData.setTrialHearingDisclosureOfDocumentsDJToggle(DEFAULT_TOGGLE);
+        updatedData.setTrialHearingWitnessOfFactDJToggle(DEFAULT_TOGGLE);
+        updatedData.setTrialHearingSchedulesOfLossDJToggle(DEFAULT_TOGGLE);
+        updatedData.setTrialHearingCostsToggle(DEFAULT_TOGGLE);
+        updatedData.setTrialHearingTrialDJToggle(DEFAULT_TOGGLE);
+        return updatedData;
     }
 
     private DynamicList buildLocationList(CallbackParams callbackParams, CaseData caseData) {

@@ -198,7 +198,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateSdoDisposal()
-                .build().toBuilder()
+                .build().copy()
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM).build();
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -220,7 +220,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldNotReturnError_WhenAboutToStartIsInvokedNotInJudicialReferral() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .applicant1Represented(NO)
-                .build().toBuilder()
+                .build().copy()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
@@ -237,7 +237,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedWhenNoLips() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
@@ -255,7 +255,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedMintiNotJudicialReferralNotMintiTrack() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .applicant1Represented(NO)
                 .finalOrderAllocateToTrack(YES)
@@ -273,7 +273,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnError_WhenMintiNotEnabledMintiNotJudicialReferralNotMintiTrack() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
@@ -290,7 +290,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnError_WhenMintiEnabledNoJudicialReferralApplicantLip() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .applicant1Represented(NO)
                 .finalOrderAllocateToTrack(YES)
@@ -308,7 +308,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnError_WhenMintiEnabledNoJudicialReferralNoLips() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
@@ -325,7 +325,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldShowTrackAllocationPage_WhenMultiTrack() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
                 .finalOrderAllocateToTrack(YES)
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
@@ -343,7 +343,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNullPreviousSubmittedEventSelections_whenInvokedDownloadOrderTemplate() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
@@ -363,7 +363,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNullPreviousSubmittedEventSelections_whenInvokedFreeForm() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .freeFormRecordedTextArea("text")
                 .freeFormOrderedTextArea("text")
@@ -380,7 +380,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNullPreviousSubmittedEventSelections_whenInvokedAssisted() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderMadeSelection(YES).finalOrderDateHeardComplex(new OrderMade())
                 .finalOrderJudgePapers(List.of(FinalOrdersJudgePapers.CONSIDERED))
@@ -420,7 +420,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedWhenNoLipsAndFlagEnabled() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
                 .claimantBilingualLanguagePreference("BOTH")
@@ -438,7 +438,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedWhenLipsAndFlagEnabledAndRespondentLangExists() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
                 .claimantBilingualLanguagePreference("ENGLISH")
@@ -459,7 +459,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedWhenLipsAndFlagEnabledAndClaimantRespondentLangExists() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
                 .claimantBilingualLanguagePreference("BOTH")
@@ -480,7 +480,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedWhenLipsAndFlagEnabledAndClaimantRespondentLangNotExists() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
                 .claimantBilingualLanguagePreference("ENGLISH")
@@ -509,7 +509,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(7));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder().finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER).build();
+                .build().copy().finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER).build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -541,7 +541,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .thenReturn(LocalDate.now().plusDays(21))//appealChoiceSecondDropdownA and refused
                 .thenReturn(LocalDate.now().plusDays(21)); //appealChoiceSecondDropdownB and refused
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .addRespondent2(YES)
                 .respondent2(new PartyBuilder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
@@ -638,7 +638,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldPopulateFields_whenIsCalledAfterSdoDiffSol() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .addRespondent2(YES)
                 .respondent2(new PartyBuilder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
@@ -677,7 +677,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldThrowError_whenFastTrackNotBeingReallocatedToMintiTrack() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder()
+                .build().copy()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderAllocateToTrack(NO).build();
@@ -692,7 +692,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldThrowError_whenSmallTrackNotBeingReallocatedToMintiTrack() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder()
+                .build().copy()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(NO).build();
@@ -707,7 +707,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldNotThrowError_whenSmallTrackBeingReallocatedToMintiTrack() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder()
+                .build().copy()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
@@ -722,7 +722,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldNotThrowError_whenSmallTrackNotInJudicialReferral() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder()
+                .build().copy()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(NO).build();
@@ -736,7 +736,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldNotThrowError_whenFastTrackBeingReallocatedToMintiTrack() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder()
+                .build().copy()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
@@ -751,7 +751,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldNotThrowError_whenFastTrackBeingReallocatedToMintiTrackMintiEnabledJudicialReferral() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder()
+                .build().copy()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
@@ -766,7 +766,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldNotThrowError_whenFastTrackBeingReallocatedToMintiTrackNoMintiNoJudicialReferral() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder()
+                .build().copy()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
@@ -781,7 +781,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldNotThrowError_whenFastTrackBeingReallocatedToMintiTrackMintiEnabledNotJudicialReferral() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder()
+                .build().copy()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
@@ -796,7 +796,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldNotThrowError_whenFastTrackNotInJudicialReferral() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder()
+                .build().copy()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderAllocateToTrack(NO).build();
@@ -810,7 +810,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldNotThrowError_whenMultiTrackInJudicialReferral() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder()
+                .build().copy()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
                 .finalOrderAllocateToTrack(NO).build();
@@ -824,7 +824,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldNotThrowError_whenMultiTrackAllocateToTrackNoMintiNoJudicialReferral() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder()
+                .build().copy()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
                 .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
@@ -842,7 +842,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             void shouldPopulateDownloadOrderTemplateValues_whenUnspecClaimIntermediateClaim() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                    .build().toBuilder()
+                    .build().copy()
                     .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                     .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
                     .finalOrderAllocateToTrack(NO).build();
@@ -864,7 +864,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             void shouldPopulateDownloadOrderTemplateValues_whenUnspecClaimMultiClaim() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                    .build().toBuilder()
+                    .build().copy()
                     .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                     .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
                     .finalOrderAllocateToTrack(NO).build();
@@ -888,7 +888,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             void shouldPopulateDownloadOrderTemplateValues_whenSpecClaimIntermediateClaim() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                    .build().toBuilder()
+                    .build().copy()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                     .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
                     .finalOrderAllocateToTrack(NO).build();
@@ -910,7 +910,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             void shouldPopulateDownloadOrderTemplateValues_whenSpecClaimMultiClaim() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                    .build().toBuilder()
+                    .build().copy()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                     .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
                     .finalOrderAllocateToTrack(NO).build();
@@ -934,7 +934,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             void shouldDefaultToSmallClaim_whenSpecClaimDJNoClaimTrackMultiClaimAmount() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                    .build().toBuilder()
+                    .build().copy()
                     .totalClaimAmount(BigDecimal.valueOf(1000000))
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -955,7 +955,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             void shouldPopulateDownloadOrderTemplateValues_whenUnspecClaimAllocatedToIntermediateClaim() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                    .build().toBuilder()
+                    .build().copy()
                     .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                     .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                     .finalOrderAllocateToTrack(YES)
@@ -978,7 +978,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             void shouldPopulateDownloadOrderTemplateValues_whenUnspecClaimAllocatedToMultiClaim() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                    .build().toBuilder()
+                    .build().copy()
                     .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                     .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                     .finalOrderAllocateToTrack(YES)
@@ -1003,7 +1003,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             void shouldPopulateDownloadOrderTemplateValues_whenSpecClaimAllocatedToIntermediateClaim() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                    .build().toBuilder()
+                    .build().copy()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                     .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                     .finalOrderAllocateToTrack(YES)
@@ -1026,7 +1026,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             void shouldPopulateDownloadOrderTemplateValues_whenSpecClaimAllocatedToMultiClaim() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                    .build().toBuilder()
+                    .build().copy()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                     .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
                     .finalOrderAllocateToTrack(YES)
@@ -1057,7 +1057,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldNotGenerateAfterHearingTemplateBeforeHearingDate_onMidEventCallback() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used after a hearing"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1071,7 +1071,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldGenerateTemplateBeforeHearing_onMidEventCallback() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used before a hearing/box work"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1086,7 +1086,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldGenerateTemplateFixDateForCCMC_onMidEventCallback() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Fix a date for CCMC"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1101,7 +1101,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldGenerateTemplateFixDateForCMC_onMidEventCallback() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Fix a date for CMC"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1121,7 +1121,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldGenerateAfterHearingTemplateBeforeHearingDate_onMidEventCallback_noDateValidationErrors() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used after a hearing"))
                 .orderAfterHearingDate(new OrderAfterHearingDate()
                                            .setDateType(OrderAfterHearingDateType.SINGLE_DATE)
@@ -1140,7 +1140,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldReturnError_whenSingleDateIsInFuture() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used after a hearing"))
                 .orderAfterHearingDate(new OrderAfterHearingDate()
                                            .setDateType(OrderAfterHearingDateType.SINGLE_DATE)
@@ -1157,7 +1157,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldReturnError_whenDateRangeDatesAreInFuture() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used after a hearing"))
                 .orderAfterHearingDate(new OrderAfterHearingDate()
                                            .setDateType(OrderAfterHearingDateType.DATE_RANGE)
@@ -1175,7 +1175,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldReturnError_whenFromDateIsAfterToDate() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used after a hearing"))
                 .orderAfterHearingDate(new OrderAfterHearingDate()
                                            .setDateType(OrderAfterHearingDateType.DATE_RANGE)
@@ -1198,7 +1198,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldGenerateFreeFormOrder_onMidEventCallback() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1212,7 +1212,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldGenerateAssistedOrder_onMidEventCallback() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders()
                                                                                         .setSingleDate(LocalDate.now().plusDays(2))
@@ -1250,7 +1250,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         static Stream<Arguments> validAssistedOrderDates() {
             return Stream.of(
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders()
                                                                                                 .setSingleDate(LocalDate.now().minusDays(2))
@@ -1258,7 +1258,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 ).build()
             ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderDateHeardComplex(new OrderMade().setDateRangeSelection(new DatesFinalOrders()
                                                                                                .setDateRangeFrom(LocalDate.now().minusDays(5))
@@ -1266,19 +1266,19 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                                                )).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()
                                                              .setDatesToAvoidDateDropdown(new DatesFinalOrders()
                                                                                            .setDatesToAvoidDates(LocalDate.now().plusDays(2)))).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                             .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()
                                     .setDateToDate(LocalDate.now().minusDays(4))
@@ -1286,31 +1286,31 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                     ).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
                                                               .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(14))
                                                               ).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
                                                               .setAssistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(14))
                                                               ).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(new FinalOrderAppeal()).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(new FinalOrderAppeal()
                                                      .setAppealGrantedDropdown(new AppealGrantedRefused()
@@ -1321,7 +1321,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                      ).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(new FinalOrderAppeal()
                                                      .setAppealGrantedDropdown(new AppealGrantedRefused()
@@ -1332,7 +1332,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                      ).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(new FinalOrderAppeal()
                                                      .setAppealRefusedDropdown(new AppealGrantedRefused()
@@ -1343,7 +1343,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                      ).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(new FinalOrderAppeal()
                                                      .setAppealRefusedDropdown(new AppealGrantedRefused()
@@ -1359,7 +1359,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         static Stream<Arguments> invalidAssistedOrderDates() {
             return Stream.of(
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders()
                                                                                                 .setSingleDate(LocalDate.now().plusDays(2))
@@ -1367,7 +1367,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date in Order made may not be later than the established date"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderDateHeardComplex(new OrderMade().setDateRangeSelection(new DatesFinalOrders()
                                                                                                .setDateRangeFrom(LocalDate.now().plusDays(2))
@@ -1376,7 +1376,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date in Order made 'date from' may not be later than the established date"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderDateHeardComplex(new OrderMade().setDateRangeSelection(new DatesFinalOrders()
                                                                                                .setDateRangeFrom(LocalDate.now().minusDays(2))
@@ -1385,7 +1385,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date in Order made 'date to' may not be later than the established date"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderDateHeardComplex(new OrderMade().setDateRangeSelection(new DatesFinalOrders()
                                                                                                .setDateRangeFrom(LocalDate.now().minusDays(20))
@@ -1394,7 +1394,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date range in Order made may not have a 'from date', that is after the 'date to'"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()
                                                              .setDatesToAvoidDateDropdown(new DatesFinalOrders()
@@ -1402,7 +1402,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date in Further hearing may not be before the established date"
                 ),
                 Arguments.of(
-                        CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                                 .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()
                                         .setDateToDate(LocalDate.now().minusDays(5))
@@ -1411,7 +1411,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date range in Further hearing may not have a 'from date', that is after the 'date to'"
                 ),
                 Arguments.of(
-                        CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
                                                               .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(2))
@@ -1420,7 +1420,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date in Make an order for detailed/summary costs may not be before the established date"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
                                                               .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(14))
@@ -1429,7 +1429,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date in Make an order for detailed/summary costs may not be before the established date"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(new FinalOrderAppeal()
                                                      .setAppealGrantedDropdown(new AppealGrantedRefused()
@@ -1441,7 +1441,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date in Appeal notice date may not be before the established date"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(new FinalOrderAppeal()
                                                      .setAppealGrantedDropdown(new AppealGrantedRefused()
@@ -1453,7 +1453,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date in Appeal notice date may not be before the established date"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(new FinalOrderAppeal()
                                                      .setAppealRefusedDropdown(new AppealGrantedRefused()
@@ -1465,7 +1465,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date in Appeal notice date may not be before the established date"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(new FinalOrderAppeal()
                                                      .setAppealRefusedDropdown(new AppealGrantedRefused()
@@ -1477,7 +1477,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date in Appeal notice date may not be before the established date"
                 ),
                 Arguments.of(
-                        CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                                 .finalOrderFurtherHearingComplex(
@@ -1503,7 +1503,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             toggle.add(FinalOrderToggle.SHOW);
             return Stream.of(
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderJudgeHeardFrom(toggle)
                         .finalOrderRepresentation(new FinalOrderRepresentation()
@@ -1516,7 +1516,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                                      )).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .addRespondent2(YES)
                         .respondent2(new PartyBuilder().individual().build())
                         .respondent2SameLegalRepresentative(NO)
@@ -1534,7 +1534,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                                      )).build()
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .addApplicant2(YES)
                         .applicant2(new PartyBuilder().individual().build())
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
@@ -1568,7 +1568,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             toggle.add(FinalOrderToggle.SHOW);
             return Stream.of(
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderJudgeHeardFrom(toggle)
                         .finalOrderRepresentation(new FinalOrderRepresentation()
@@ -1582,7 +1582,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "Judge Heard from: 'Claimant(s) and defendant(s)' section for claimant, requires a selection to be made"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderJudgeHeardFrom(toggle)
                         .finalOrderRepresentation(new FinalOrderRepresentation()
@@ -1596,7 +1596,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "Judge Heard from: 'Claimant(s) and defendant(s)' section for defendant, requires a selection to be made"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .addRespondent2(YES)
                         .respondent2(new PartyBuilder().individual().build())
                         .respondent2SameLegalRepresentative(NO)
@@ -1615,7 +1615,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "Judge Heard from: 'Claimant(s) and defendant(s)' section for second defendant, requires a selection to be made"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                         .addApplicant2(YES)
                         .applicant2(new PartyBuilder().individual().build())
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
@@ -1639,7 +1639,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldReturnErrorNoAlternateCourtSelected_onMidEventCallback() {
             // Given
             DynamicList hearingLocation = dynamicListWithCode();
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()
@@ -1669,7 +1669,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDocumentCollection(new ArrayList<>())
                 .finalOrderDocument(finalOrder)
@@ -1699,13 +1699,13 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDocumentCollection(finalCaseDocuments)
                 .finalOrderDocument(finalOrder)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .build();
-            caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+            caseData = caseData.copy().claimantBilingualLanguagePreference("BOTH").build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1730,13 +1730,13 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDocumentCollection(finalCaseDocuments)
                 .finalOrderDocument(finalOrder)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .build();
-            caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+            caseData = caseData.copy().claimantBilingualLanguagePreference("BOTH").build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1760,13 +1760,13 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDocumentCollection(finalCaseDocuments)
                 .finalOrderDocument(finalOrder)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .build();
-            caseData = caseData.toBuilder().caseDataLiP(new CaseDataLiP()
+            caseData = caseData.copy().caseDataLiP(new CaseDataLiP()
                                             .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                                         .setRespondent1ResponseLanguage("WELSH"))).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1792,7 +1792,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .finalOrderDocumentCollection(finalCaseDocuments)
                 .uploadOrderDocumentFromTemplate(uploadedDocument)
@@ -1819,7 +1819,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_BEFORE_HEARING.getLabel()))
                 .finalOrderDocumentCollection(finalCaseDocuments)
                 .uploadOrderDocumentFromTemplate(uploadedDocument)
@@ -1891,7 +1891,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             finalCaseDocuments.add(element(finalOrder));
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .finalOrderDocumentCollection(finalCaseDocuments)
@@ -1913,7 +1913,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .finalOrderDocument(finalOrder)
@@ -1936,7 +1936,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .freeFormHearingNotes("test text hearing notes free form order")
                 .finalOrderDocument(finalOrder)
@@ -1957,7 +1957,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .finalOrderDocument(finalOrder)
@@ -1979,7 +1979,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(hearingNotes())
@@ -2001,7 +2001,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(hearingNotes())
@@ -2028,7 +2028,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(hearingNotes())
@@ -2056,7 +2056,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(hearingNotes())
@@ -2084,7 +2084,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(hearingNotes())
@@ -2114,7 +2114,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .caseManagementLocation(new CaseLocationCivil()
                                             .setRegion("2")
                                             .setBaseLocation("111"))
@@ -2148,7 +2148,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .caseManagementLocation(new CaseLocationCivil()
                                             .setRegion("2")
                                             .setBaseLocation("111"))
@@ -2176,7 +2176,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(null)
                 .finalOrderDocumentCollection(finalCaseDocuments)
@@ -2199,7 +2199,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(null)
                 .finalOrderDocumentCollection(finalCaseDocuments)
@@ -2222,7 +2222,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .finalOrderDocumentCollection(finalCaseDocuments)
@@ -2247,7 +2247,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             String confirmationHeader = format(HEADER, 1234);
             String confirmationBody = format(BODY_1_V_1, "Mr. John Rambo", "Mr. Sole Trader");
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .ccdCaseReference(1234L)
                 .build();
             // When
@@ -2265,7 +2265,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             String confirmationHeader = format(HEADER, 1234);
             String confirmationBody = format(BODY_1_V_2, "Mr. John Rambo", "Mr. Sole Trader", "Mr. John Rambo");
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build().copy()
                 .ccdCaseReference(1234L)
                 .build();
             // When
@@ -2283,7 +2283,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             String confirmationHeader = format(HEADER, 1234);
             String confirmationBody = format(BODY_2_V_1, "Mr. John Rambo", "Mr. Jason Rambo", "Mr. Sole Trader");
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build().copy()
                 .ccdCaseReference(1234L)
                 .build();
             // When

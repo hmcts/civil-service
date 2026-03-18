@@ -30,7 +30,7 @@ public class NoRemissionHwFScenarioTest extends DashboardBaseIntegrationTest {
         String claimFee = "100";
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .applicant1Represented(YesOrNo.NO)
             .hwfFeeType(FeeType.CLAIMISSUED)
             .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)))

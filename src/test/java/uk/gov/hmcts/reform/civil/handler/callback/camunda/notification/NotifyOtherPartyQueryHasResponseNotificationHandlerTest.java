@@ -241,7 +241,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
         private CaseData createCaseDataWithMultipleFollowUpQueries1v2SameSol() {
             return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
-                .toBuilder()
+                .copy()
                 .respondent1(new PartyBuilder().build())
                 .respondent2(new PartyBuilder().build())
                 .addRespondent2(YesOrNo.YES)
@@ -274,7 +274,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
         private CaseData createCaseDataWithMultipleFollowUpQueries1v1() {
             return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
-                .toBuilder()
+                .copy()
                 .applicantSolicitor1UserDetails(new IdamUserDetails()
                                                     .setEmail("applicant@email.com")
                                                     )
@@ -287,7 +287,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
         private CaseData createCaseDataWithMultipleFollowUpQueries1v1AtStateClaimIssued() {
             return CaseDataBuilder.builder().atStateClaimIssued().build()
-                .toBuilder()
+                .copy()
                 .applicantSolicitor1UserDetails(new IdamUserDetails()
                                                     .setEmail("applicant@email.com")
                                                     )
@@ -300,7 +300,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
         private CaseData createCaseDataWithMultipleFollowUpQueries1v2DiffSol() {
             return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
-                .toBuilder()
+                .copy()
                 .respondent1(new PartyBuilder().build())
                 .respondent2(new PartyBuilder().build())
                 .addRespondent2(YesOrNo.YES)
@@ -358,7 +358,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
             CaseData caseData;
             if (isWelsh) {
-                caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
+                caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().copy()
                     .applicant1Represented(YesOrNo.NO)
                     .claimantBilingualLanguagePreference("WELSH")
                     .respondentSolicitor1EmailAddress("respondent1@email.com")
@@ -367,7 +367,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                                          .setProcessInstanceId("123"))
                     .build();
             } else {
-                caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
+                caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().copy()
                     .applicant1Represented(YesOrNo.NO)
                     .claimantBilingualLanguagePreference("ENGLISH")
                     .respondentSolicitor1EmailAddress("respondent1@email.com")
@@ -404,7 +404,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
             CaseData caseData;
             if (isWelsh) {
-                caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
+                caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().copy()
                     .caseDataLiP(new CaseDataLiP()
                                      .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                                  .setRespondent1ResponseLanguage("WELSH")))
@@ -414,7 +414,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                     .businessProcess(new BusinessProcess().setProcessInstanceId("123"))
                     .build();
             } else {
-                caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
+                caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().copy()
                     .caseDataLiP(new CaseDataLiP()
                                      .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                                  .setRespondent1ResponseLanguage("ENGLSH")))
@@ -450,7 +450,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.YES)
                 .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
@@ -483,7 +483,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.YES)
                 .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
@@ -516,7 +516,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().copy()
                 .applicant1Represented(YesOrNo.NO)
                 .queries(query)
                 .businessProcess(new BusinessProcess()
@@ -547,7 +547,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().copy()
                 .respondent1(new PartyBuilder().build())
                 .respondent2(new PartyBuilder().build())
                 .addRespondent2(YesOrNo.YES)
@@ -590,7 +590,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().copy()
                 .respondent1(new PartyBuilder().build())
                 .respondent2(new PartyBuilder().build())
                 .addRespondent2(YesOrNo.YES)
@@ -624,7 +624,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().copy()
                 .respondent1(new PartyBuilder().build())
                 .respondent2(new PartyBuilder().build())
                 .addRespondent2(YesOrNo.YES)

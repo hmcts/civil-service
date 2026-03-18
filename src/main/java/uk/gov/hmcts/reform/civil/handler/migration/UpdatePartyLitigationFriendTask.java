@@ -87,7 +87,7 @@ public class UpdatePartyLitigationFriendTask extends MigrationTask<LitigationFri
     private CaseData setUpdatedLitigationFriend(CaseData caseData, LitigationFriendCaseReference ref,
                                                 LitigationFriend updatedLitFriend) {
 
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        CaseData builder = caseData.copy();
 
         if (ref.isApplicant1()) {
             builder.applicant1LitigationFriend(updatedLitFriend);

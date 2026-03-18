@@ -30,7 +30,7 @@ public class InMediationScenarioTest extends DashboardBaseIntegrationTest {
         String claimantFirstName = "Clay";
         String claimantLastName = "Mint";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1(new Party()

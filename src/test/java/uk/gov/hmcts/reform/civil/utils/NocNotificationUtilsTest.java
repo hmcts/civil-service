@@ -34,7 +34,7 @@ public class NocNotificationUtilsTest {
 
     @Test
     void testGetPreviousSolicitorEmail() {
-        caseData = CaseData.builder().changeOfRepresentation(change).build();
+        caseData = new CaseData().changeOfRepresentation(change).build();
         assertEquals(TEST_EMAIL, NocNotificationUtils.getPreviousSolicitorEmail(caseData));
     }
 
@@ -44,7 +44,7 @@ public class NocNotificationUtilsTest {
         IdamUserDetails userDetails = new IdamUserDetails().setEmail(TEST_EMAIL);
         OrganisationPolicy organisationPolicy = new OrganisationPolicy()
             .setOrganisation(new Organisation().setOrganisationID(TEST_ORG));
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .applicantSolicitor1UserDetails(userDetails)
             .changeOfRepresentation(change)
             .applicant1OrganisationPolicy(organisationPolicy)
@@ -59,7 +59,7 @@ public class NocNotificationUtilsTest {
         change.setCaseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
         OrganisationPolicy organisationPolicy = new OrganisationPolicy()
             .setOrganisation(new Organisation().setOrganisationID(TEST_ORG));
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .respondentSolicitor1EmailAddress(TEST_EMAIL)
             .changeOfRepresentation(change)
             .respondent1OrganisationPolicy(organisationPolicy)
@@ -75,7 +75,7 @@ public class NocNotificationUtilsTest {
         IdamUserDetails userDetails = new IdamUserDetails().setEmail(TEST_EMAIL);
         OrganisationPolicy organisationPolicy = new OrganisationPolicy()
             .setOrganisation(new Organisation().setOrganisationID(TEST_ORG));
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .applicantSolicitor1UserDetails(userDetails)
             .changeOfRepresentation(change)
             .applicant1OrganisationPolicy(organisationPolicy)
@@ -88,7 +88,7 @@ public class NocNotificationUtilsTest {
     @Test
     void testisOtherParty1LipReturnsTrue() {
         change.setCaseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .changeOfRepresentation(change)
             .build();
 
@@ -100,7 +100,7 @@ public class NocNotificationUtilsTest {
         change.setCaseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
         OrganisationPolicy organisationPolicy = new OrganisationPolicy()
             .setOrganisation(new Organisation().setOrganisationID(TEST_ORG));
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .respondentSolicitor1EmailAddress(TEST_EMAIL)
             .changeOfRepresentation(change)
             .respondent1OrganisationPolicy(organisationPolicy)
@@ -116,7 +116,7 @@ public class NocNotificationUtilsTest {
         IdamUserDetails userDetails = new IdamUserDetails().setEmail(TEST_EMAIL);
         OrganisationPolicy organisationPolicy = new OrganisationPolicy()
             .setOrganisation(new Organisation().setOrganisationID(TEST_ORG));
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .applicantSolicitor1UserDetails(userDetails)
             .changeOfRepresentation(change)
             .addApplicant2(YesOrNo.YES)
@@ -132,7 +132,7 @@ public class NocNotificationUtilsTest {
         change.setCaseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
         OrganisationPolicy organisationPolicy = new OrganisationPolicy()
             .setOrganisation(new Organisation().setOrganisationID(TEST_ORG));
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .respondentSolicitor2EmailAddress(TEST_EMAIL)
             .changeOfRepresentation(change)
             .respondent2OrganisationPolicy(organisationPolicy)
@@ -145,7 +145,7 @@ public class NocNotificationUtilsTest {
     @Test
     void testIsOtherSolicitor2Lip_RespondentSolicitor1() {
         change.setCaseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .changeOfRepresentation(change)
             .build();
 
@@ -155,7 +155,7 @@ public class NocNotificationUtilsTest {
     @Test
     void testIsOtherSolicitor2Lip_RespondentSolicitor2() {
         change.setCaseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .changeOfRepresentation(change)
             .build();
 
@@ -170,7 +170,7 @@ public class NocNotificationUtilsTest {
         Party respondent1 = new Party()
             .setCompanyName(PARTY_2_NAME)
             .setType(Party.Type.COMPANY);
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .applicant1(applicant1)
             .respondent1(respondent1)
             .build();
@@ -186,7 +186,7 @@ public class NocNotificationUtilsTest {
         Party respondent1 = new Party()
             .setCompanyName(PARTY_2_NAME)
             .setType(Party.Type.COMPANY);
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .applicant1(applicant1)
             .applicant2(applicant1)
             .respondent1(respondent1)
@@ -204,7 +204,7 @@ public class NocNotificationUtilsTest {
         Party respondent1 = new Party()
             .setCompanyName(PARTY_2_NAME)
             .setType(Party.Type.COMPANY);
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .applicant1(applicant1)
             .respondent1(respondent1)
             .respondent2(respondent1)
@@ -222,7 +222,7 @@ public class NocNotificationUtilsTest {
         Party respondent1 = new Party()
             .setCompanyName(PARTY_2_NAME)
             .setType(Party.Type.COMPANY);
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .applicant1(applicant1)
             .applicant2(applicant1)
             .respondent1(respondent1)
@@ -235,13 +235,13 @@ public class NocNotificationUtilsTest {
 
     @Test
     void testGetCaseDataWithoutFormerSolicitorEmail() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .changeOfRepresentation(
                 new ChangeOfRepresentation()
                     .setFormerRepresentationEmailAddress("former-sol-email")
                     .setOrganisationToAddID("some org")).build();
 
-        CaseData expected = CaseData.builder()
+        CaseData expected = new CaseData()
             .changeOfRepresentation(
                 new ChangeOfRepresentation()
                     .setOrganisationToAddID("some org")).build();
@@ -254,7 +254,7 @@ public class NocNotificationUtilsTest {
     @Test
     void testIsAppliantLipForRespondentSolicitorChange_trueCondition() {
         // Arrange
-        CaseData caseData = CaseData.builder().applicant1Represented(YesOrNo.NO)
+        CaseData caseData = new CaseData().applicant1Represented(YesOrNo.NO)
             .changeOfRepresentation(new ChangeOfRepresentation()
                                         .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())).build();
 
@@ -268,7 +268,7 @@ public class NocNotificationUtilsTest {
     @Test
     void testApplicantLipEmailForRespondentSolicitorChange() {
         // Arrange
-        CaseData caseData = CaseData.builder().applicant1Represented(YesOrNo.NO)
+        CaseData caseData = new CaseData().applicant1Represented(YesOrNo.NO)
             .changeOfRepresentation(new ChangeOfRepresentation()
                                         .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())).applicant1(new Party().setPartyEmail(TEST_EMAIL)).build();
 

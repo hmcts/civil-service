@@ -43,7 +43,7 @@ class RaiseQueryDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplate_whenDefendantIsNotBilingual() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getQueryRaisedLip()).thenReturn(expectedTemplateId);
 

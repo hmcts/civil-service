@@ -40,7 +40,7 @@ class SdoSmallClaimsDrhTemplateServiceTest {
             .legacyCaseReference("000MC001")
             .atStateNotificationAcknowledged()
             .build()
-            .toBuilder()
+            .copy()
             .sdoR2SmallClaimsHearing(new uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing())
             .build();
 

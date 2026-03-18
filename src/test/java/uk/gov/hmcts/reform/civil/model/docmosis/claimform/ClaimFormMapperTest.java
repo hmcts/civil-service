@@ -73,7 +73,7 @@ class ClaimFormMapperTest {
                               .setEvidenceType("LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE")
                               .setLettersEmailsAndOtherCorrespondenceEvidence("This is Letter"))
         );
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setIndividualLastName(INDIVIDUAL_LAST_NAME)
                             .setIndividualFirstName(INDIVIDUAL_FIRST_NAME)
@@ -110,7 +110,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldDisplay_soleTraderInformation_whenPartiesAreSoleTrader() {
         //Given
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setSoleTraderLastName(INDIVIDUAL_LAST_NAME)
                             .setSoleTraderFirstName(INDIVIDUAL_FIRST_NAME)
@@ -138,7 +138,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldDisplayCompany_whenPartiesAreCompany() {
         //Given
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setCompanyName(COMPANY)
                             .setPartyEmail(EMAIL)
@@ -165,7 +165,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldDisplayOrganisationName_whenPartiesAreOrganisation() {
         //Given
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setOrganisationName(ORGANISATION)
                             .setPartyEmail(EMAIL)
@@ -210,7 +210,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldMapHowInterestWasCalculated_whenInterestOptionExists() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
             .build();
         //When
@@ -231,7 +231,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnDifferentInterestRate_whenItExists() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .sameRateInterestSelection(buildSameRateSelection(INTEREST, null))
             .build();
         //When
@@ -243,7 +243,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnEightPercentInterestRate_whenDifferentRateIsNull() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .sameRateInterestSelection(new SameRateInterestSelection())
             .build();
         //When
@@ -263,7 +263,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnStandardExplanationText_whenNoDifferentRateReason() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .sameRateInterestSelection(new SameRateInterestSelection())
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
@@ -277,7 +277,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnDifferentExplanationText_whenDifferentRateReasonExists() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .sameRateInterestSelection(buildSameRateSelection(null, DIFFERENT_RATE_EXPLANATION))
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
@@ -298,7 +298,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnInterestFromSpecificDate_whenInterestFromSpecificDateExists() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .interestFromSpecificDate(INTEREST_FROM_SPECIFIC_DATE)
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
@@ -311,7 +311,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnInterestFromClaimIssueDate_whenInterestFromSpecificDateIsNull() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .submittedDate(SUBMITTED_DATE)
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
@@ -340,7 +340,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnInterestStartFromClaimIssue_whenInterestClaimFromTypeIsFromClaimSubmitted() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .submittedDate(SUBMITTED_DATE)
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .build();
@@ -355,7 +355,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnSpecificDescriptionForWhenAreYouPlanningInterestFrom_whenInterestClaimFromTypeIsNotFromClaimSubmitted() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .submittedDate(SUBMITTED_DATE)
             .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             .interestFromSpecificDateDescription(DIFFERENT_RATE_EXPLANATION)
@@ -371,7 +371,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnZeroForTotalClaimAmount_whenTotalClaimAmountIsNull() {
         //Given
-        CaseData caseData = CASE_DATA.toBuilder()
+        CaseData caseData = CASE_DATA.copy()
             .claimantUserDetails(
                 new IdamUserDetails().setEmail(EMAIL)
             ).totalClaimAmount(null).build();
@@ -392,7 +392,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnTotalAmountOfClaimWithInterest_whenInterestIsNotNull() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .submittedDate(SUBMITTED_DATE)
             .claimFee(new Fee().setCalculatedAmountInPence(CLAIM_FEE))
             .build();
@@ -407,7 +407,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnEndInterestDate_whenEndDateDescritptionIsNull() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .submittedDate(SUBMITTED_DATE)
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
@@ -420,7 +420,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnNullForEndInterestDate_whenEndDateDescriptionExists() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .submittedDate(SUBMITTED_DATE)
             .breakDownInterestDescription(DIFFERENT_RATE_EXPLANATION)
             .build();
@@ -433,7 +433,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldReturnInterestEndDateDescription_whenBreakDownInterestDescriptionExists() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .submittedDate(SUBMITTED_DATE)
             .breakDownInterestDescription(DIFFERENT_RATE_EXPLANATION)
             .build();
@@ -473,7 +473,7 @@ class ClaimFormMapperTest {
     @Test
     void shouldMapFlightDelayDetails() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
                 .respondent1(new Party()
                         .setCompanyName(COMPANY)
                         .setPartyEmail(EMAIL)
@@ -498,7 +498,7 @@ class ClaimFormMapperTest {
     }
 
     private static CaseData getCaseData() {
-        return CaseData.builder()
+        return new CaseData()
             .legacyCaseReference("000MC038")
             .ccdCaseReference(1234567890123456L)
             .applicant1(new Party()

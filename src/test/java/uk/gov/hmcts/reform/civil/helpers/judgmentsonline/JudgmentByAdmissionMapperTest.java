@@ -71,7 +71,7 @@ class JudgmentByAdmissionMapperTest {
 
     @Test
     void testIfJudgmentByAdmission() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)
             .applicant1Represented(YES)
@@ -107,7 +107,7 @@ class JudgmentByAdmissionMapperTest {
 
     @Test
     void testIfJudgmentByAdmissionLrBulkAdmission() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)
             .applicant1Represented(YES)
@@ -130,7 +130,7 @@ class JudgmentByAdmissionMapperTest {
     @Test
     void testIfJudgmentByPartAdmissionLrPayImmediatelyNotAddInterest() {
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)
             .applicant1Represented(YES)
@@ -153,7 +153,7 @@ class JudgmentByAdmissionMapperTest {
     @Test
     void testIfJudgmentByFullAdmissionLrPayImmeidatelyNotAddInterest() {
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)
             .applicant1Represented(YES)
@@ -181,7 +181,7 @@ class JudgmentByAdmissionMapperTest {
     })
     void testIfJudgmentByAdmission_scenario2(PaymentFrequencyLRspec paymentFrequencyLRspec,
                                              PaymentFrequency paymentFrequency) {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)
             .applicant1Represented(YES)
@@ -228,7 +228,7 @@ class JudgmentByAdmissionMapperTest {
 
     @Test
     void testIfJudgmentByAdmission_scenario3() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)
             .applicant1Represented(YES)
@@ -266,7 +266,7 @@ class JudgmentByAdmissionMapperTest {
 
     @Test
     void testIfJudgmentByAdmission_scenario4_multi_party() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)
             .applicant1Represented(YES)
@@ -308,7 +308,7 @@ class JudgmentByAdmissionMapperTest {
 
     @Test
     void testIfJudgmentByAdmission_scenario5_courtDecisionInFavourClaimantLip() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
@@ -355,7 +355,7 @@ class JudgmentByAdmissionMapperTest {
     })
     void testIfJudgmentByAdmission_scenario6_courtDecisionInFavourClaimantLip(
         PaymentFrequencyClaimantResponseLRspec paymentFrequencyClaimantResponseLRspec, PaymentFrequency paymentFrequency) {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
@@ -399,7 +399,7 @@ class JudgmentByAdmissionMapperTest {
         "120.49,120.49"
     })
     void testIfJudgmentByAdmission_scenario6_rounding(BigDecimal inputAmount, String expectedAmount) {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
@@ -423,7 +423,7 @@ class JudgmentByAdmissionMapperTest {
 
     @Test
     void testIfJudgmentByAdmission_scenario7_courtDecisionInFavourClaimantLip() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
@@ -456,7 +456,7 @@ class JudgmentByAdmissionMapperTest {
 
     @Test
     void testGetInstalmentDetails_ClaimantInFavour_NullAmount() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1(new PartyBuilder().individual().build())
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(null)
@@ -481,7 +481,7 @@ class JudgmentByAdmissionMapperTest {
     })
     void testGetInstalmentDetails_ClaimantInFavour_Frequencies(
         PaymentFrequencyClaimantResponseLRspec repFreq, PaymentFrequency expectedFreq) {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1(new PartyBuilder().individual().build())
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal("100"))
@@ -501,7 +501,7 @@ class JudgmentByAdmissionMapperTest {
 
     @Test
     void testGetInstalmentDetails_Respondent1Plan() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1(new PartyBuilder().individual().build())
             .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
@@ -521,7 +521,7 @@ class JudgmentByAdmissionMapperTest {
 
     @Test
     void testGetInstalmentDetails_Respondent2Plan() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1(new PartyBuilder().individual().build())
             .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
@@ -548,7 +548,7 @@ class JudgmentByAdmissionMapperTest {
     })
     void testGetInstalmentDetails_RespondentPlan_Frequencies(
         PaymentFrequencyLRspec repFreq, PaymentFrequency expectedFreq) {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1(new PartyBuilder().individual().build())
             .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)

@@ -82,7 +82,7 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         return address;
     }
 
-    private static final CaseData CASE_DATA = CaseData.builder()
+    private static final CaseData CASE_DATA = new CaseData()
         .legacyCaseReference(CLAIM_REFERENCE)
         .ccdCaseReference(16543480L)
         .applicant1(new Party()

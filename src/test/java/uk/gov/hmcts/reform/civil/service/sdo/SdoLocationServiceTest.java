@@ -210,7 +210,7 @@ class SdoLocationServiceTest {
 
     @Test
     void shouldClearWaMetadataFieldsOnBuilder() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .taskManagementLocations(new TaskManagementLocationTypes())
             .taskManagementLocationsTab(new TaskManagementLocationTab())
             .caseManagementLocationTab(new TaskManagementLocationTab())

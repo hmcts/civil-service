@@ -28,7 +28,7 @@ public class ClaimSettledCourtDecisionInFavorOfDefendantScenarioTest extends Das
 
         String caseId = "1234899109";
         LocalDateTime responseDeadline = LocalDateTime.now();
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .caseDataLiP(new CaseDataLiP()

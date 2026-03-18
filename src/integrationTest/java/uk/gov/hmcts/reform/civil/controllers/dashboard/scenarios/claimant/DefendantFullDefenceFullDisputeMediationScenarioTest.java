@@ -31,7 +31,7 @@ public class DefendantFullDefenceFullDisputeMediationScenarioTest extends Dashbo
         String caseId = "13165";
         LocalDate paymentDate = OffsetDateTime.now().toLocalDate().plusDays(120);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

@@ -41,7 +41,7 @@ class CarmClaimantEmailDTOGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .ccdCaseReference(Long.valueOf(CASE_REFERENCE))
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
@@ -54,7 +54,7 @@ class CarmClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnSuccessfulEnglishTemplate_whenTaskIdMatches_andClaimantNotBilingual() {
-        CaseData updatedData = caseData.toBuilder()
+        CaseData updatedData = caseData.copy()
             .claimantBilingualLanguagePreference(null)
             .build();
 
@@ -68,7 +68,7 @@ class CarmClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnSuccessfulWelshTemplate_whenTaskIdMatches_andClaimantBilingual() {
-        CaseData updatedData = caseData.toBuilder()
+        CaseData updatedData = caseData.copy()
             .claimantBilingualLanguagePreference(Language.WELSH.getDisplayedValue())
             .build();
 
@@ -81,7 +81,7 @@ class CarmClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnUnsuccessfulEnglishTemplate_whenTaskIdDoesNotMatch_andClaimantNotBilingual() {
-        CaseData updatedData = caseData.toBuilder()
+        CaseData updatedData = caseData.copy()
             .claimantBilingualLanguagePreference(null)
             .build();
 
@@ -94,7 +94,7 @@ class CarmClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnUnsuccessfulWelshTemplate_whenTaskIdDoesNotMatch_andClaimantBilingual() {
-        CaseData updatedData = caseData.toBuilder()
+        CaseData updatedData = caseData.copy()
             .claimantBilingualLanguagePreference(Language.WELSH.getDisplayedValue())
             .build();
 

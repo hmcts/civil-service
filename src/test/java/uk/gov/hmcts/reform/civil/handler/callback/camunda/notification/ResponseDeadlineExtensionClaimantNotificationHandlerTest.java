@@ -111,7 +111,7 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder()
+                .build().copy()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now())
                 .build();
@@ -136,7 +136,7 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder()
+                .build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
@@ -165,7 +165,7 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder()
+                .build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
@@ -195,7 +195,7 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder()
+                .build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)

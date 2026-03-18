@@ -27,7 +27,7 @@ public class CaseProceedsInCasemanRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn(expectedTemplateId);
@@ -52,7 +52,7 @@ public class CaseProceedsInCasemanRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldNotClaimNotified() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
     }
 }

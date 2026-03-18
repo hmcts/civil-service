@@ -31,7 +31,7 @@ class CaseTakenOfflineAppSolOne1EmailDTOGeneratorTest {
 
     @Test
     void shouldUseNoApplicantResponseTemplate_whenAllConditionsTrue_applicantYes() {
-        CaseData data = CaseData.builder()
+        CaseData data = new CaseData()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1Represented(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.YES)
@@ -52,7 +52,7 @@ class CaseTakenOfflineAppSolOne1EmailDTOGeneratorTest {
 
     @Test
     void shouldUseNoApplicantResponseTemplate_whenApplicantRepresentedNull() {
-        CaseData data = CaseData.builder()
+        CaseData data = new CaseData()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1Represented(YesOrNo.YES)
                 .applicant1Represented(null)
@@ -73,7 +73,7 @@ class CaseTakenOfflineAppSolOne1EmailDTOGeneratorTest {
 
     @Test
     void shouldUseDefaultTemplate_whenDeadlineMissing() {
-        CaseData data = CaseData.builder()
+        CaseData data = new CaseData()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1Represented(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.YES)
@@ -94,7 +94,7 @@ class CaseTakenOfflineAppSolOne1EmailDTOGeneratorTest {
 
     @Test
     void shouldUseDefaultTemplate_whenRespondentNotRepresented() {
-        CaseData data = CaseData.builder()
+        CaseData data = new CaseData()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.YES)
@@ -115,7 +115,7 @@ class CaseTakenOfflineAppSolOne1EmailDTOGeneratorTest {
 
     @Test
     void shouldUseDefaultTemplate_whenApplicantNotRepresented() {
-        CaseData data = CaseData.builder()
+        CaseData data = new CaseData()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1Represented(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.NO)
@@ -136,7 +136,7 @@ class CaseTakenOfflineAppSolOne1EmailDTOGeneratorTest {
 
     @Test
     void shouldUseDefaultTemplate_whenScenarioNotOneVOne() {
-        CaseData data = CaseData.builder()
+        CaseData data = new CaseData()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1Represented(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.YES)
@@ -157,7 +157,7 @@ class CaseTakenOfflineAppSolOne1EmailDTOGeneratorTest {
 
     @Test
     void shouldUseDefaultTemplate_whenCategoryNotSpecClaim() {
-        CaseData data = CaseData.builder()
+        CaseData data = new CaseData()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .respondent1Represented(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.YES)

@@ -25,7 +25,7 @@ public class DjOrderDetailsService {
     public CaseData populateTrialDisposalScreen(DirectionsOrderTaskContext context) {
         CallbackParams callbackParams = context.callbackParams();
         CaseData caseData = locationAndToggleService.prepareLocationsAndToggles(context);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseData caseDataBuilder = caseData.copy();
 
         UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String judgeNameTitle = userDetails.getFullName();

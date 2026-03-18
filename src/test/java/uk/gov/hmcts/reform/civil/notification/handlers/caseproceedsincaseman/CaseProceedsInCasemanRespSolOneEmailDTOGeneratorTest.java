@@ -28,7 +28,7 @@ public class CaseProceedsInCasemanRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenIsNotLipvLROneVOne() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn(expectedTemplateId);
@@ -40,7 +40,7 @@ public class CaseProceedsInCasemanRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenIsLipvLROneVOne() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1Represented(NO)
             .build();
         String expectedTemplateId = "template-id";
@@ -79,7 +79,7 @@ public class CaseProceedsInCasemanRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotifyWhenNotTakenOfflineByStaffAfterClaimIssueAndNotClaimNotified() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
     }
 }

@@ -33,7 +33,7 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
         String caseId = "11234949494";
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1ResponseDeadline(responseDeadline.atStartOfDay())

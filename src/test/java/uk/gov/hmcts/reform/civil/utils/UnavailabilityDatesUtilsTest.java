@@ -466,7 +466,7 @@ public class UnavailabilityDatesUtilsTest {
                 .respondent1DQ(respondent1DQ)
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            CaseData builder = caseData.copy();
 
             UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData, builder);
 
@@ -498,7 +498,7 @@ public class UnavailabilityDatesUtilsTest {
                 .respondent2DQ(respondent2DQ)
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            CaseData builder = caseData.copy();
 
             UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData, builder);
 
@@ -530,7 +530,7 @@ public class UnavailabilityDatesUtilsTest {
                 .applicant1DQ(applicant1DQ)
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            CaseData builder = caseData.copy();
 
             UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData, builder);
 
@@ -567,7 +567,7 @@ public class UnavailabilityDatesUtilsTest {
                 .applicant1DQ(applicant1DQ)
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            CaseData builder = caseData.copy();
 
             UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData, builder);
 
@@ -602,7 +602,7 @@ public class UnavailabilityDatesUtilsTest {
                                 .setUnavailableDates(new ArrayList<>(existingDates)))
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            CaseData builder = caseData.copy();
 
             UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData, builder);
 
@@ -643,7 +643,7 @@ public class UnavailabilityDatesUtilsTest {
                 .applicant1DQ(applicant1DQ)
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            CaseData builder = caseData.copy();
 
             UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData, builder);
 

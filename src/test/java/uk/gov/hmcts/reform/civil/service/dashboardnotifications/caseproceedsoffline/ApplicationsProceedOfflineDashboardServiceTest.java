@@ -43,7 +43,7 @@ class ApplicationsProceedOfflineDashboardServiceTest {
         List<Element<GeneralApplication>> generalApplications =
                 wrapElements(new GeneralApplication());
 
-        return CaseDataBuilder.builder().build().toBuilder()
+        return CaseDataBuilder.builder().build().copy()
                 .ccdCaseReference(1234L)
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(generalApplications)
@@ -122,7 +122,7 @@ class ApplicationsProceedOfflineDashboardServiceTest {
     @Test
     void shouldSkipWhenStateNotProceedingOffline() {
         CaseData caseData =
-                baseCaseData().toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
+                baseCaseData().copy().ccdState(CaseState.JUDICIAL_REFERRAL).build();
         dashboardService.lip = true;
 
         dashboardService.notify(caseData, "auth");

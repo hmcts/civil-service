@@ -40,12 +40,12 @@ public final class StrategyTestDataFactory {
         return CaseDataBuilder.builder().getDefaultJudgment1v2DivergentCase();
     }
 
-    public static CaseData.CaseDataBuilder<?, ?> defaultJudgment1v1Builder() {
-        return defaultJudgment1v1Case().toBuilder();
+    public static CaseData defaultJudgment1v1Builder() {
+        return defaultJudgment1v1Case().copy();
     }
 
-    public static CaseData.CaseDataBuilder<?, ?> defaultJudgment1v2Builder() {
-        return defaultJudgment1v2Case().toBuilder();
+    public static CaseData defaultJudgment1v2Builder() {
+        return defaultJudgment1v2Case().copy();
     }
 
     private static Party individualRespondent(String lastName) {

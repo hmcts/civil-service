@@ -26,7 +26,7 @@ class SpecCaseOfflineClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         when(helper.getClaimantTemplateForLipVLRSpecClaims(caseData)).thenReturn("template-id-123");
 
         String result = generator.getEmailTemplateId(caseData);
@@ -50,7 +50,7 @@ class SpecCaseOfflineClaimantEmailDTOGeneratorTest {
             .setIndividualFirstName("Jane")
             .setIndividualLastName("Doe");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(applicant1)
             .build();
 

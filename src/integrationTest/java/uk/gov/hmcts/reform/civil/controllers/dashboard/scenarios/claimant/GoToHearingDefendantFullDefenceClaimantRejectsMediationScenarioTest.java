@@ -26,7 +26,7 @@ public class GoToHearingDefendantFullDefenceClaimantRejectsMediationScenarioTest
     void should_create_go_to_hearing_scenario() throws Exception {
 
         String caseId = "5123456789";
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .ccdState(CaseState.JUDICIAL_REFERRAL)

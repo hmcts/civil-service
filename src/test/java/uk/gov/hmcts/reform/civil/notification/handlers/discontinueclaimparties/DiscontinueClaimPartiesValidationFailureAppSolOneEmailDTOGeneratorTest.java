@@ -54,7 +54,7 @@ public class DiscontinueClaimPartiesValidationFailureAppSolOneEmailDTOGeneratorT
     void shouldReturnEmailTemplateId() {
         when(notificationsProperties.getNotifyClaimantLrValidationDiscontinuanceFailureTemplate()).thenReturn(TEMPLATE_ID);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String result = generator.getEmailTemplateId(caseData);
 
         assertThat(result).isEqualTo(TEMPLATE_ID);
@@ -82,7 +82,7 @@ public class DiscontinueClaimPartiesValidationFailureAppSolOneEmailDTOGeneratorT
 
     @Test
     void shouldNotifyReturnFalse_whenConfirmOrderGivesPermissionYes() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .confirmOrderGivesPermission(ConfirmOrderGivesPermission.YES)
             .build();
 
@@ -91,7 +91,7 @@ public class DiscontinueClaimPartiesValidationFailureAppSolOneEmailDTOGeneratorT
 
     @Test
     void shouldNotifyReturnTrue_whenConfirmOrderGivesPermissionNotYes() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .confirmOrderGivesPermission(ConfirmOrderGivesPermission.NO)
             .build();
 

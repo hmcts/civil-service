@@ -91,7 +91,7 @@ class DjTrialTemplateServiceTest {
             .thenAnswer(invocation -> LocalDate.of(2025, 2, 1)
                 .plusWeeks(invocation.getArgument(0, Integer.class)));
         DjTrialNarrativeService trialNarrativeService = new DjTrialNarrativeService(witnessDeadlineService);
-        CaseData caseData = baseCase.toBuilder()
+        CaseData caseData = baseCase.copy()
             .trialHearingWitnessOfFactDJ(trialNarrativeService.buildWitnessOfFact())
             .build();
 
@@ -159,7 +159,7 @@ class DjTrialTemplateServiceTest {
         DjBuildingDisputeDirectionsService buildingService = new DjBuildingDisputeDirectionsService(deadlineService);
         DjClinicalDirectionsService clinicalService = new DjClinicalDirectionsService(deadlineService);
 
-        return baseCase.toBuilder()
+        return baseCase.copy()
             .trialBuildingDispute(buildingService.buildTrialBuildingDispute())
             .trialHousingDisrepair(buildingService.buildTrialHousingDisrepair())
             .trialClinicalNegligence(clinicalService.buildTrialClinicalNegligence())

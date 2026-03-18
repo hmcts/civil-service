@@ -173,7 +173,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotReturnReturnErrors_WhenAboutToStartIsInvokedByAdminUserWhileCaseInAwaitingApplicantIntentionState() {
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().build().copy()
                 .applicant1(new Party()
                                 .setType(COMPANY)
                                 .setCompanyName("Test Inc"))
@@ -209,7 +209,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @EnumSource(value = CaseState.class, names = {"AWAITING_RESPONDENT_ACKNOWLEDGEMENT", "AWAITING_APPLICANT_INTENTION"})
         void shouldReturnErrors_WhenAboutToStartIsInvokedByNonAdminUserWhileCaseInAwaitingRespondentAcknowledgementState(CaseState states) {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().build().copy()
                 .ccdState(states)
                 .ccdCaseReference(123L)
                 .build();
@@ -227,7 +227,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotReturnErrors_WhenAboutToStartIsInvokedByNonAdminUserWhileCaseInANonAwaitingApplicantIntentionState() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().build().copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L)
                 .build();
@@ -253,7 +253,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -295,7 +295,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -337,7 +337,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -375,7 +375,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -412,7 +412,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -457,7 +457,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -498,7 +498,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -536,7 +536,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -584,7 +584,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -626,7 +626,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -670,7 +670,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setCompanyName("Test Inc"))
                 .applicant1Represented(YES)
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -725,7 +725,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -769,7 +769,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -813,7 +813,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setType(COMPANY)
                                  .setCompanyName("Test Inc"))
                 .build()
-                .toBuilder()
+                .copy()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L).build();
 
@@ -1343,13 +1343,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData caseDataBefore = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .respondent1(respondent).build()
-                .toBuilder()
+                .copy()
                 .respondent1DetailsForClaimDetailsTab(respondent.setFlags(respondent1Flags))
                 .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
                 .caseNamePublic("John Rambo v Dis Guy")
                 .build();
 
-            CaseData updated = caseDataBefore.toBuilder()
+            CaseData updated = caseDataBefore.copy()
                 .updateDetailsForm(new UpdateDetailsForm()
                                        .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_ID)))
                                        .setPartyChosenId(DEFENDANT_ONE_ID))
@@ -1396,7 +1396,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             Flags applicant1Flags = new Flags().setPartyName("applicant1name").setRoleOnCase("applicant1");
             Flags applicant2Flags = new Flags().setPartyName("applicant2name").setRoleOnCase("applicant2");
 
-            CaseData caseDataBefore = CaseData.builder()
+            CaseData caseDataBefore = new CaseData()
                 .applicant1(new Party().setFlags(applicant1Flags))
                 .applicant2(new Party().setFlags(applicant2Flags))
                 .respondent1(new Party().setFlags(respondent1Flags))
@@ -1412,7 +1412,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})
             void shouldCopyFlagsForApplicants(String partyChosenId) {
                 // Fix: Include all parties with their types to avoid NullPointerException
-                CaseData caseData = CaseData.builder()
+                CaseData caseData = new CaseData()
                     .applicant1(new Party()
                                     .setType(INDIVIDUAL)// Using static import
                                     .setIndividualFirstName("John")
@@ -1452,7 +1452,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
             void shouldCopyFlagsForRespondents(String partyChosenId) {
                 // Fix: Include all parties with their types to avoid NullPointerException
-                CaseData caseData = CaseData.builder()
+                CaseData caseData = new CaseData()
                     .applicant1(new Party()
                                     .setType(INDIVIDUAL)// Using static import
                                     .setIndividualFirstName("John")
@@ -2029,12 +2029,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
                     .addRespondent2LitigationFriend()
-                    .buildClaimIssuedPaymentCaseData().toBuilder()
+                    .buildClaimIssuedPaymentCaseData().copy()
                     .respondent2SameLegalRepresentative(YES)
                     .build();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-                CaseData caseData = caseDataBefore.toBuilder()
+                CaseData caseData = caseDataBefore.copy()
                     .updateDetailsForm(new UpdateDetailsForm()
                                            .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
@@ -2057,13 +2057,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
                     .addRespondent2LitigationFriend()
-                    .buildClaimIssuedPaymentCaseData().toBuilder()
+                    .buildClaimIssuedPaymentCaseData().copy()
                     .respondent2SameLegalRepresentative(null)
                     .build();
                 ;
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-                CaseData caseData = caseDataBefore.toBuilder()
+                CaseData caseData = caseDataBefore.copy()
                     .updateDetailsForm(new UpdateDetailsForm()
                                            .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
@@ -2087,7 +2087,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-                CaseData caseData = caseDataBefore.toBuilder()
+                CaseData caseData = caseDataBefore.copy()
                     .updateDetailsForm(new UpdateDetailsForm()
                                            .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
@@ -2109,12 +2109,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent2(new Party().setType(INDIVIDUAL))
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
-                    .buildClaimIssuedPaymentCaseData().toBuilder()
+                    .buildClaimIssuedPaymentCaseData().copy()
                     .respondent2SameLegalRepresentative(YES)
                     .build();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-                CaseData caseData = caseDataBefore.toBuilder()
+                CaseData caseData = caseDataBefore.copy()
                     .updateDetailsForm(new UpdateDetailsForm()
                                            .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
@@ -2137,7 +2137,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-                CaseData caseData = caseDataBefore.toBuilder()
+                CaseData caseData = caseDataBefore.copy()
                     .updateDetailsForm(new UpdateDetailsForm()
                                            .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
@@ -2161,7 +2161,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-                CaseData caseData = caseDataBefore.toBuilder()
+                CaseData caseData = caseDataBefore.copy()
                     .updateDetailsForm(new UpdateDetailsForm()
                                            .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
@@ -2522,7 +2522,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 UpdatePartyDetailsForm expert2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("Name2");
 
                 // Create CaseData - try using toBuilder() if available
-                CaseData caseData = CaseData.builder()
+                CaseData caseData = new CaseData()
                     .updateDetailsForm(new UpdateDetailsForm()
                                            .setUpdateExpertsDetailsForm(wrapElements(expert, expert2)))
                     .build();
@@ -2546,7 +2546,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 UpdatePartyDetailsForm expert2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("Name2").setPartyId(
                     "id");
 
-                CaseData caseData = CaseData.builder()
+                CaseData caseData = new CaseData()
                     .updateDetailsForm(new UpdateDetailsForm()
                                            .setUpdateExpertsDetailsForm(wrapElements(expert, expert2)))
                     .build();
@@ -2565,7 +2565,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     "id");
                 UpdatePartyDetailsForm expert2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("Name2");
 
-                CaseData caseData = CaseData.builder()
+                CaseData caseData = new CaseData()
                     .updateDetailsForm(new UpdateDetailsForm()
                                            .setUpdateExpertsDetailsForm(wrapElements(expert, expert2)))
                     .build();
@@ -2589,7 +2589,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     "id");
                 UpdatePartyDetailsForm party2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("Name2");
 
-                CaseData caseData = CaseData.builder()
+                CaseData caseData = new CaseData()
                     .updateDetailsForm(new UpdateDetailsForm()
                                            .setUpdateWitnessesDetailsForm(wrapElements(party, party2)))
                     .build();
@@ -2613,7 +2613,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 UpdatePartyDetailsForm party2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("Name2").setPartyId(
                     "id");
 
-                CaseData caseData = CaseData.builder()
+                CaseData caseData = new CaseData()
                     .updateDetailsForm(new UpdateDetailsForm()
                                            .setUpdateWitnessesDetailsForm(wrapElements(party, party2)))
                     .build();
@@ -2632,7 +2632,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     "id");
                 UpdatePartyDetailsForm party2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("Name2");
 
-                CaseData caseData = CaseData.builder()
+                CaseData caseData = new CaseData()
                     .updateDetailsForm(new UpdateDetailsForm()
                                            .setUpdateWitnessesDetailsForm(wrapElements(party, party2)))
                     .build();

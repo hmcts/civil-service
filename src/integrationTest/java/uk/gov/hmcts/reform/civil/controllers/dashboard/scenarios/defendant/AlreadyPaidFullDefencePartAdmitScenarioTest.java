@@ -32,7 +32,7 @@ public class AlreadyPaidFullDefencePartAdmitScenarioTest extends DashboardBaseIn
 
         String caseId = "131631";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
@@ -74,7 +74,7 @@ public class AlreadyPaidFullDefencePartAdmitScenarioTest extends DashboardBaseIn
 
         String caseId = "131632";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)

@@ -28,7 +28,7 @@ public class CaseInfoGroupTest {
         SolicitorReferences solicitorReferences = new SolicitorReferences()
             .setApplicantSolicitor1Reference("ClaimantRef")
             .setRespondentSolicitor1Reference("DefendantRef");
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(1234567890123456L)
             .applicant1(applicant1)
             .applicant2(applicant2)
@@ -53,7 +53,7 @@ public class CaseInfoGroupTest {
     void shouldPopulateCaseInfo_WhenOnlySingleClaimantAndDefendantPresent() {
         Party applicant1 = new Party().setPartyName("Claimant 1").setType(Type.COMPANY);
         Party respondent1 = new Party().setPartyName("Defendant 1").setType(Type.COMPANY);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(1234567890123456L)
             .applicant1(applicant1)
             .respondent1(respondent1)
@@ -78,7 +78,7 @@ public class CaseInfoGroupTest {
     void shouldPopulateCaseInfo_WhenSolicitorReferencesAreAbsent() {
         Party applicant1 = new Party().setPartyName("Claimant 1").setType(Type.COMPANY);
         Party respondent1 = new Party().setPartyName("Defendant 1").setType(Type.COMPANY);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(1234567890123456L)
             .applicant1(applicant1)
             .respondent1(respondent1)

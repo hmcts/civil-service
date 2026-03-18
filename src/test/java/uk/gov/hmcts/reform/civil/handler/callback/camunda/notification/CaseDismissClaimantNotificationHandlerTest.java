@@ -97,7 +97,7 @@ class CaseDismissClaimantNotificationHandlerTest {
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@example.com"))
             .claimantBilingualLanguagePreference(isClaimantBilingual ? Language.BOTH.toString()
                                                      : Language.ENGLISH.toString())
-            .build().toBuilder()
+            .build().copy()
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(respondentLip))
             .build();

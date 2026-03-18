@@ -37,7 +37,7 @@ public class CreateSDORespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenSpecNotEANotBilingual() {
         String baseLocation = "base location";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation(baseLocation))
             .build();
@@ -55,7 +55,7 @@ public class CreateSDORespSolTwoEmailDTOGeneratorTest {
     void shouldReturnCorrectEmailTemplateIdWhenSpecBilingual() {
         CaseDataLiP caseDataLiP = new CaseDataLiP()
             .setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(BOTH.toString()));
-        CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).caseDataLiP(caseDataLiP).build();
+        CaseData caseData = new CaseData().caseAccessCategory(SPEC_CLAIM).caseDataLiP(caseDataLiP).build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getSdoOrderedSpecBilingual()).thenReturn(expectedTemplateId);
@@ -68,7 +68,7 @@ public class CreateSDORespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenSpecEA() {
         String baseLocation = "base location";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation(baseLocation))
             .build();
@@ -84,7 +84,7 @@ public class CreateSDORespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenUnspec() {
-        CaseData caseData = CaseData.builder().caseAccessCategory(UNSPEC_CLAIM).build();
+        CaseData caseData = new CaseData().caseAccessCategory(UNSPEC_CLAIM).build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getSdoOrdered()).thenReturn(expectedTemplateId);

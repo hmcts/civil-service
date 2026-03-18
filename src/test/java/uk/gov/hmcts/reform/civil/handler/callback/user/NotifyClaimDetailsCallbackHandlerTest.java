@@ -998,7 +998,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(any()))
                 .thenReturn(List.of());
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .cosNotifyClaimDetails1(new CertificateOfService().setCosDocSaved(YES))
                 .build();
 
@@ -1015,7 +1015,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(any()))
                 .thenReturn(List.of());
 
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1029,7 +1029,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(any()))
                 .thenReturn(List.of());
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .defendant1LIPAtClaimIssued(NO)
                 .defendant2LIPAtClaimIssued(NO)
                 .cosNotifyClaimDetails2(new CertificateOfService().setCosDocSaved(YES))
@@ -1048,7 +1048,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(any()))
                 .thenReturn(List.of());
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .defendant1LIPAtClaimIssued(NO)
                 .defendant2LIPAtClaimIssued(NO)
                 .build();
@@ -1069,7 +1069,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             boolean confirmationForLip = ReflectionTestUtils.invokeMethod(
                 handler,
                 "isConfirmationForLip",
-                CaseData.builder()
+                new CaseData()
                     .defendant1LIPAtClaimIssued(NO)
                     .defendant2LIPAtClaimIssued(NO)
                     .build()
@@ -1083,7 +1083,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             boolean bothDefendantLip = ReflectionTestUtils.invokeMethod(
                 handler,
                 "isBothDefendantLip",
-                CaseData.builder()
+                new CaseData()
                     .defendant2LIPAtClaimIssued(YES)
                     .build()
             );
@@ -1096,7 +1096,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             boolean bothDefendantLip = ReflectionTestUtils.invokeMethod(
                 handler,
                 "isBothDefendantLip",
-                CaseData.builder()
+                new CaseData()
                     .defendant1LIPAtClaimIssued(YES)
                     .defendant2LIPAtClaimIssued(NO)
                     .build()
@@ -1110,7 +1110,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             boolean bothDefendantLip = ReflectionTestUtils.invokeMethod(
                 handler,
                 "isBothDefendantLip",
-                CaseData.builder()
+                new CaseData()
                     .defendant1LIPAtClaimIssued(YES)
                     .build()
             );
@@ -1124,7 +1124,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             boolean sameDateOfService = ReflectionTestUtils.invokeMethod(
                 handler,
                 "isBothDefendantWithSameDateOfService",
-                CaseData.builder()
+                new CaseData()
                     .cosNotifyClaimDetails1(new CertificateOfService()
                                                 .setCosDateDeemedServedForDefendant(today))
                     .build()
@@ -1138,7 +1138,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDateTime now = LocalDateTime.of(2024, 1, 10, 10, 0);
             when(time.now()).thenReturn(now);
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .cosNotifyClaimDetails1(new CertificateOfService())
                 .cosNotifyClaimDetails2(new CertificateOfService())
                 .build();
@@ -1160,7 +1160,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate defendant1DeemedDate = LocalDate.of(2024, 1, 12);
             LocalDate defendant2DeemedDate = LocalDate.of(2024, 1, 11);
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .cosNotifyClaimDetails1(new CertificateOfService()
                                             .setCosDateDeemedServedForDefendant(defendant1DeemedDate))
                 .cosNotifyClaimDetails2(new CertificateOfService()
@@ -1184,7 +1184,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate defendant1DeemedDate = LocalDate.of(2024, 1, 10);
             LocalDate defendant2DeemedDate = LocalDate.of(2024, 1, 11);
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .cosNotifyClaimDetails1(new CertificateOfService()
                                             .setCosDateDeemedServedForDefendant(defendant1DeemedDate))
                 .cosNotifyClaimDetails2(new CertificateOfService()
@@ -1210,7 +1210,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             List<Element<Document>> evidence = new ArrayList<>();
             evidence.add(element(evidenceDocument));
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .cosNotifyClaimDetails1(new CertificateOfService().setCosEvidenceDocument(evidence))
                 .servedDocumentFiles(null)
                 .build();

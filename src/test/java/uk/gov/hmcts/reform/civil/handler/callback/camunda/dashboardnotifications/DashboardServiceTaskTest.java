@@ -34,7 +34,7 @@ class DashboardServiceTaskTest {
 
     @Test
     void executeShouldDelegateToNotifyDashboardWithContextValues() {
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+        CaseData caseData = new CaseData().ccdCaseReference(1L).build();
         when(context.caseData()).thenReturn(caseData);
         when(context.authToken()).thenReturn(AUTH_TOKEN);
 
@@ -45,7 +45,7 @@ class DashboardServiceTaskTest {
 
     @Test
     void executeShouldRequireAuthToken() {
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+        CaseData caseData = new CaseData().ccdCaseReference(1L).build();
         when(context.caseData()).thenReturn(caseData);
         when(context.authToken()).thenReturn(null);
 

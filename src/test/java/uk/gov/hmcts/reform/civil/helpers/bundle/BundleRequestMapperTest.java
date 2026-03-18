@@ -146,7 +146,7 @@ class BundleRequestMapperTest {
 
     @Test
     void shouldHandleEmptyCaseDataGracefully() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(1L)
             .applicant1(party("applicant1"))
             .respondent1(party("respondent1"))
@@ -161,7 +161,7 @@ class BundleRequestMapperTest {
 
     @Test
     void shouldHandleSingleApplicantAndRespondent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(1L)
             .addApplicant2(YesOrNo.NO)
             .addRespondent2(YesOrNo.NO)

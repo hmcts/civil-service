@@ -84,7 +84,7 @@ class DirectionsQuestionnaireLipGeneratorTest {
     @Test
     void shouldSuccessfullyGenerateRespondentList() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().copy()
             .applicant1(new Party()
                 .setPartyEmail("email")
                 .setCompanyName("company")
@@ -111,7 +111,7 @@ class DirectionsQuestionnaireLipGeneratorTest {
         Address correspondenceAddress = new Address();
         correspondenceAddress.setAddressLine1("ds");
         correspondenceAddress.setPostCode("SN28AX");
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().copy()
             .caseDataLiP(new CaseDataLiP()
                 .setRespondent1LiPResponse(new RespondentLiPResponse()
                     .setRespondent1LiPCorrespondenceAddress(correspondenceAddress)))
@@ -137,7 +137,7 @@ class DirectionsQuestionnaireLipGeneratorTest {
     @Test
     void shouldGenerateHearingLipRequirements_whenTheyExist() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().copy()
             .caseDataLiP(new CaseDataLiP()
                 .setRespondent1LiPResponse(
                     new RespondentLiPResponse()
@@ -176,7 +176,7 @@ class DirectionsQuestionnaireLipGeneratorTest {
     @Test
     void shouldGenerateLipExtraDetails_whenTheyExist() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().copy()
             .caseDataLiP(new CaseDataLiP()
                 .setRespondent1LiPResponse(
                     new RespondentLiPResponse()
@@ -194,7 +194,7 @@ class DirectionsQuestionnaireLipGeneratorTest {
     @Test
     void shouldGenerateLipGiveEvidenceYourselfConfirmDetails_whenTheyExist() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().copy()
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(
                                  new RespondentLiPResponse()
@@ -230,7 +230,7 @@ class DirectionsQuestionnaireLipGeneratorTest {
     @Test
     void shouldGenerateLipExperts_whenReportExpertsExist() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().copy()
             .caseDataLiP(new CaseDataLiP()
                 .setRespondent1LiPResponse(
                     new RespondentLiPResponse()
@@ -263,7 +263,7 @@ class DirectionsQuestionnaireLipGeneratorTest {
     @Test
     void shouldGenerateLipExpertsWithEmptyFields_whenReportExpertsDoNotExist() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().copy()
             .caseDataLiP(new CaseDataLiP()
                 .setRespondent1LiPResponse(
                     new RespondentLiPResponse()
@@ -294,7 +294,7 @@ class DirectionsQuestionnaireLipGeneratorTest {
     void shouldReturnLipTemplate_whenRespondentNotRepresented() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
-            .build().toBuilder()
+            .build().copy()
             .respondent1Represented(YesOrNo.NO)
             .build();
 
@@ -309,7 +309,7 @@ class DirectionsQuestionnaireLipGeneratorTest {
     void shouldCallSuperTemplateId_whenRespondentRepresented() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
-            .build().toBuilder()
+            .build().copy()
             .respondent1Represented(YesOrNo.YES)
             .build();
 

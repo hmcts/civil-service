@@ -38,7 +38,7 @@ public class DecisionOutcomeCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse changeState(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
+        CaseData caseData = callbackParams.getCaseData().copy()
             .build();
         caseData.setBusinessProcess(BusinessProcess.ready(MOVE_TO_DECISION_OUTCOME));
 

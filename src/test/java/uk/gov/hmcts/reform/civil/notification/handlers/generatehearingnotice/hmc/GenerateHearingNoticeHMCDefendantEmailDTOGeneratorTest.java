@@ -85,7 +85,7 @@ class GenerateHearingNoticeHMCDefendantEmailDTOGeneratorTest {
         LocalDate hearingDate = LocalDate.of(2025, 7, 15);
         LocalDateTime hearingStartDateTime = LocalDateTime.of(2025, 7, 15, 14, 0);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("000DC001")
             .hearingDate(hearingDate)
             .businessProcess(new BusinessProcess()

@@ -55,7 +55,7 @@ class DashboardScenarioServiceTest {
                 "AdditionalFalse", false
             );
 
-            CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
+            CaseData caseData = new CaseData().ccdCaseReference(123L).build();
 
             scenarioService.record(caseData, AUTH_TOKEN);
 
@@ -95,7 +95,7 @@ class DashboardScenarioServiceTest {
             scenarioService.shouldRecordExtra = false;
             scenarioService.additionalScenarios = Map.of("Additional", false);
 
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
 
             scenarioService.record(caseData, AUTH_TOKEN);
 

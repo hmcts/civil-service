@@ -55,7 +55,7 @@ class MediationUpdateAllPartiesEmailGeneratorTest {
     @InjectMocks
     private MediationUpdateAllPartiesEmailGenerator generator;
 
-    private final CaseData caseData = CaseData.builder().ccdCaseReference(123456789L).build();
+    private final CaseData caseData = new CaseData().ccdCaseReference(123456789L).build();
     private final String taskId = "some-task-id";
 
     @Test

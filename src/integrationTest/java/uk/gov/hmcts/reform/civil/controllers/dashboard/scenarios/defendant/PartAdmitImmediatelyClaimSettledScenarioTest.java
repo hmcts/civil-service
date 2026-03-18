@@ -26,7 +26,7 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends DashboardBaseI
     void should_create_scenario_for_part_admit_immediate_accepted() throws Exception {
 
         String caseId = "90123456781";
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)

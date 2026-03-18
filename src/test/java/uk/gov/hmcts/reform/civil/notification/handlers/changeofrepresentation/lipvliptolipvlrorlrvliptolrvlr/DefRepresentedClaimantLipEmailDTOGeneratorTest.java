@@ -34,7 +34,7 @@ class DefRepresentedClaimantLipEmailDTOGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .ccdCaseReference(1234567890123456L)
             .legacyCaseReference("LEGACY123456")
             .applicant1(new Party()
@@ -54,7 +54,7 @@ class DefRepresentedClaimantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnBilingualTemplateIdIfClaimantIsBilingual() {
-        CaseData bilingualCaseData = caseData.toBuilder()
+        CaseData bilingualCaseData = caseData.copy()
             .claimantBilingualLanguagePreference(Language.WELSH.getDisplayedValue()).build();
         when(notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC())
             .thenReturn("bilingual-template-id");
@@ -66,7 +66,7 @@ class DefRepresentedClaimantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnDefaultTemplateIdIfClaimantIsNotBilingual() {
-        CaseData monoCaseData = caseData.toBuilder()
+        CaseData monoCaseData = caseData.copy()
             .claimantBilingualLanguagePreference(Language.ENGLISH.getDisplayedValue()).build();
         when(notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate())
             .thenReturn("default-template-id");

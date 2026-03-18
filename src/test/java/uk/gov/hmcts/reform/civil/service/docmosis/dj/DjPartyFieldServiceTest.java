@@ -36,7 +36,7 @@ class DjPartyFieldServiceTest {
     void shouldResolveRespondent2WhenSelected() {
         Party respondent2 = baseRespondent("Second", "Resp");
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1(baseRespondent("Resp", "One"))
             .respondent2(respondent2)
             .respondent1Represented(YesOrNo.YES)
@@ -55,11 +55,11 @@ class DjPartyFieldServiceTest {
         assertThat(service.hasApplicantPartyName(caseData)).isTrue();
     }
 
-    private CaseData.CaseDataBuilder<?, ?> baseCaseDataBuilder() {
+    private CaseData baseCaseDataBuilder() {
         Party respondent1 = baseRespondent("Resp", "One");
         Party respondent2 = baseRespondent("Resp", "Two");
 
-        return CaseDataBuilder.builder().build().toBuilder()
+        return CaseDataBuilder.builder().build().copy()
             .respondent1(respondent1)
             .respondent2(respondent2)
             .respondent1Represented(YesOrNo.YES)

@@ -61,8 +61,8 @@ public class GeneratePipLetterHandler extends CallbackHandler {
     private CallbackResponse generatePipLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime claimNotificationDate = time.now();
-        final CaseData.CaseDataBuilder<?, ?> caseDataBuilder =
-                caseData.toBuilder().claimNotificationDate(claimNotificationDate);
+        final CaseData caseDataBuilder =
+                caseData.copy().claimNotificationDate(claimNotificationDate);
 
         if (caseData.isRespondent1LiP()) {
             generateAndPrintPipLetter(callbackParams);

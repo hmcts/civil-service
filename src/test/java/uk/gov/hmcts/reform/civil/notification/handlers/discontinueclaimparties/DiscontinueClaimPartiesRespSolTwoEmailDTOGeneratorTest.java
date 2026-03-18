@@ -54,7 +54,7 @@ class DiscontinueClaimPartiesRespSolTwoEmailDTOGeneratorTest {
     void shouldReturnEmailTemplateId() {
         when(notificationsProperties.getNotifyClaimDiscontinuedLRTemplate()).thenReturn(TEMPLATE_ID);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String result = generator.getEmailTemplateId(caseData);
 
         assertThat(TEMPLATE_ID).isEqualTo(result);
@@ -83,7 +83,7 @@ class DiscontinueClaimPartiesRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnLRTemplateIdWhenShouldNotifyIsTrue() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.YES)
             .build();
 

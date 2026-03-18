@@ -29,13 +29,13 @@ class UpdatePartyWitnessTaskTest {
 
     @Test
     void shouldThrowExceptionWhenCaseReferenceIsNull() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         assertThrows(IllegalArgumentException.class, () -> task.migrateCaseData(caseData, null));
     }
 
     @Test
     void shouldThrowExceptionWhenCaseReferenceValueIsNull() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         CaseReference caseRef = caseReference(null);
         assertThrows(IllegalArgumentException.class, () -> task.migrateCaseData(caseData, caseRef));
     }
@@ -45,7 +45,7 @@ class UpdatePartyWitnessTaskTest {
         PartyFlagStructure witness1 = new PartyFlagStructure().setFirstName(null).setLastName(null);
         PartyFlagStructure witness2 = new PartyFlagStructure().setFirstName("Alice").setLastName(null);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicantWitnesses(List.of(
                 new Element<PartyFlagStructure>().setValue(witness1),
                 new Element<PartyFlagStructure>().setValue(witness2)
@@ -68,7 +68,7 @@ class UpdatePartyWitnessTaskTest {
     void shouldUpdateRespondent1WitnessesWithTBCWhenNamesAreNull() {
         PartyFlagStructure witness = new PartyFlagStructure().setFirstName(null).setLastName("Smith");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Witnesses(List.of(new Element<PartyFlagStructure>().setValue(witness)))
             .build();
 
@@ -84,7 +84,7 @@ class UpdatePartyWitnessTaskTest {
     void shouldUpdateRespondent2WitnessesWithTBCWhenNamesAreNull() {
         PartyFlagStructure witness = new PartyFlagStructure().setFirstName("Bob").setLastName(null);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent2Witnesses(List.of(new Element<PartyFlagStructure>().setValue(witness)))
             .build();
 
@@ -110,7 +110,7 @@ class UpdatePartyWitnessTaskTest {
 
         Witnesses dqWitnesses = new Witnesses().setDetails(dqElements);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1DQ(new Applicant1DQ().setApplicant1DQWitnesses(dqWitnesses))
             .applicant2DQ(new Applicant2DQ().setApplicant2DQWitnesses(dqWitnesses))
             .respondent1DQ(new Respondent1DQ().setRespondent1DQWitnesses(dqWitnesses))
@@ -139,7 +139,7 @@ class UpdatePartyWitnessTaskTest {
             .setPartyID(null)
             ;
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicantWitnesses(List.of(new Element<PartyFlagStructure>().setValue(witness)))
             .build();
 
@@ -162,7 +162,7 @@ class UpdatePartyWitnessTaskTest {
             .setPartyID("existing-id-001")
             ;
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Witnesses(List.of(new Element<PartyFlagStructure>().setValue(witness)))
             .build();
 
@@ -177,7 +177,7 @@ class UpdatePartyWitnessTaskTest {
 
     @Test
     void shouldHandleNullListsGracefully() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicantWitnesses(null)
             .respondent1Witnesses(null)
             .respondent2Witnesses(null)

@@ -30,7 +30,7 @@ public class DefendantAttendsOrRepresentedTextBuilderTest {
     void testDefendantOneNotAttendingText() {
         for (FinalOrdersClaimantDefendantNotAttending finalOrdersClaimantDefendantNotAttending : List.of(
             FinalOrdersClaimantDefendantNotAttending.values())) {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderRecitals(null)
                 .finalOrderRepresentation(new FinalOrderRepresentation().setTypeRepresentationComplex(
                     new ClaimantAndDefendantHeard().setTrialProcedureComplex(new TrialNoticeProcedure().setListDef(
@@ -61,7 +61,7 @@ public class DefendantAttendsOrRepresentedTextBuilderTest {
     void testDefendantTwoNotAttendingText() {
         for (FinalOrdersClaimantDefendantNotAttending finalOrdersClaimantDefendantNotAttending : List.of(
             FinalOrdersClaimantDefendantNotAttending.values())) {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
@@ -95,7 +95,7 @@ public class DefendantAttendsOrRepresentedTextBuilderTest {
     void testDefendantOneAttendsOrRepresentedTextBuilder() {
         for (FinalOrdersDefendantRepresentationList finalOrdersDefendantRepresentationList : List.of(
             FinalOrdersDefendantRepresentationList.values())) {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderRecitals(null)
                 .finalOrderRepresentation(new FinalOrderRepresentation().setTypeRepresentationComplex(
                     new ClaimantAndDefendantHeard().setTypeRepresentationDefendantList(
@@ -119,7 +119,7 @@ public class DefendantAttendsOrRepresentedTextBuilderTest {
     void testDefendantTwoAttendsOrRepresentedTextBuilder() {
         for (FinalOrdersDefendantRepresentationList finalOrdersDefendantRepresentationList : List.of(
             FinalOrdersDefendantRepresentationList.values())) {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)

@@ -67,7 +67,7 @@ public class UpdatePartyDetailsTask extends MigrationTask<PartyDetailsCaseRefere
     }
 
     private CaseData setParty(CaseData caseData, PartyDetailsCaseReference ref, Party updatedParty) {
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        CaseData builder = caseData.copy();
 
         if (ref.isApplicant1()) {
             builder.applicant1(updatedParty);

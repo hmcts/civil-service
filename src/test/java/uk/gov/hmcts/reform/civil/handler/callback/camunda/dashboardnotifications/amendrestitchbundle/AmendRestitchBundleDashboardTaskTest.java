@@ -25,7 +25,7 @@ class AmendRestitchBundleDashboardTaskTest {
     @Mock
     private DashboardTaskContext context;
 
-    private final CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+    private final CaseData caseData = new CaseData().ccdCaseReference(1L).build();
 
     @BeforeEach
     void setupContext() {

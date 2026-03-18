@@ -35,7 +35,7 @@ class ClaimantConfirmProceedRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateWhenApplicantOneProceedAndDefendantNoCOnline_FastClaim() {
-        CaseData caseData = CaseData.builder().respondent1Represented(YesOrNo.YES)
+        CaseData caseData = new CaseData().respondent1Represented(YesOrNo.YES)
             .applicant1Represented(YesOrNo.NO)
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .responseClaimTrack(FAST_CLAIM.name()).build();
@@ -50,7 +50,7 @@ class ClaimantConfirmProceedRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateWhenApplicantOneProceedAndIsClaimProceed_SmallClaim() {
-        CaseData caseData = CaseData.builder().respondent1Represented(YesOrNo.YES)
+        CaseData caseData = new CaseData().respondent1Represented(YesOrNo.YES)
             .applicant1Represented(YesOrNo.NO)
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .caseDataLiP(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.NO))
@@ -69,7 +69,7 @@ class ClaimantConfirmProceedRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateWhenNoProceed() {
-        CaseData caseData = CaseData.builder().respondent1Represented(YesOrNo.YES)
+        CaseData caseData = new CaseData().respondent1Represented(YesOrNo.YES)
             .applicant1Represented(YesOrNo.NO)
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .responseClaimTrack(FAST_CLAIM.name())
@@ -89,7 +89,7 @@ class ClaimantConfirmProceedRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateWhenMediationRequired() {
-        CaseData caseData = CaseData.builder().respondent1Represented(YesOrNo.YES)
+        CaseData caseData = new CaseData().respondent1Represented(YesOrNo.YES)
             .applicant1Represented(YesOrNo.NO)
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .responseClaimTrack(SMALL_CLAIM)

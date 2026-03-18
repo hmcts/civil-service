@@ -25,7 +25,7 @@ public class CoscFeePaidCaseNotMarkedFullPaidDefendantScenarioTest extends Dashb
         String caseId = "14323345634568241";
         LocalDate hearingDueDate = LocalDate.now().minusDays(1);
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(NO)

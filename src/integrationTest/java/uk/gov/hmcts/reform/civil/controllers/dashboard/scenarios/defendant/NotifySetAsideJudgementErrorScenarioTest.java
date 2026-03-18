@@ -26,7 +26,7 @@ public class NotifySetAsideJudgementErrorScenarioTest extends DashboardBaseInteg
 
         String caseId = "720111";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)

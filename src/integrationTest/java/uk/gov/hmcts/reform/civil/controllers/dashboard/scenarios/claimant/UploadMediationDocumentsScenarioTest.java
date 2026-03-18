@@ -36,7 +36,7 @@ public class UploadMediationDocumentsScenarioTest extends DashboardBaseIntegrati
         final List<TaskList> taskListDefendantExpected = MockTaskList.getUploadMediationTaskListViewMediationAvailableMock("DEFENDANT", caseId);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .respondent1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
@@ -72,7 +72,7 @@ public class UploadMediationDocumentsScenarioTest extends DashboardBaseIntegrati
         final List<TaskList> taskListDefendantExpected = MockTaskList.getUploadMediationTaskListViewMediationAvailableMock("DEFENDANT", caseId);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .respondent1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")

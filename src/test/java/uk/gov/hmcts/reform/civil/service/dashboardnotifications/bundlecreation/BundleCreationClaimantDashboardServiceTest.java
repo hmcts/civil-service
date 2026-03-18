@@ -42,7 +42,7 @@ class BundleCreationClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioForLipClaimant() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(1234L)
             .build();
@@ -59,7 +59,7 @@ class BundleCreationClaimantDashboardServiceTest {
 
     @Test
     void shouldSkipRepresentedClaimant() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .applicant1Represented(YesOrNo.YES)
             .ccdCaseReference(1234L)
             .build();

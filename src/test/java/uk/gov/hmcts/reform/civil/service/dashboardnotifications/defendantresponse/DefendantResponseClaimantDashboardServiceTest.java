@@ -351,7 +351,7 @@ class DefendantResponseClaimantDashboardServiceTest {
         boolean result = ReflectionTestUtils.invokeMethod(service, "shouldRecordScenario", caseData);
         assertThat(result).isTrue();
 
-        CaseData representedCase = caseData.toBuilder()
+        CaseData representedCase = caseData.copy()
             .applicant1Represented(YesOrNo.YES)
             .build();
         result = ReflectionTestUtils.invokeMethod(service, "shouldRecordScenario", representedCase);

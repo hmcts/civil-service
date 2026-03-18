@@ -57,7 +57,7 @@ public class BundleUpdatedDefendantScenarioTest extends DashboardBaseIntegration
         );
 
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(12325480L)
             .respondent1Represented(respondentRepresented)
@@ -69,7 +69,7 @@ public class BundleUpdatedDefendantScenarioTest extends DashboardBaseIntegration
             .build();
 
         if (isFastTrack) {
-            caseData = caseData.toBuilder().drawDirectionsOrderRequired(YesOrNo.YES)
+            caseData = caseData.copy().drawDirectionsOrderRequired(YesOrNo.YES)
                 .drawDirectionsOrderSmallClaims(YesOrNo.NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .orderType(OrderType.DECIDE_DAMAGES)

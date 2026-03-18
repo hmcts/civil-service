@@ -39,7 +39,7 @@ class DjDocumentServiceTest {
 
     @Test
     void shouldGenerateCaseDocumentWhenDocmosisReturnsDocument() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .legacyCaseReference("001")
             .build();
         when(generator.generate(caseData, AUTH)).thenReturn(document);

@@ -39,7 +39,7 @@ public class ClaimantDefendantAgreedMediationDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenRespondentResponseBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(
                 new CaseDataLiP()
                     .setRespondent1LiPResponse(
@@ -58,7 +58,7 @@ public class ClaimantDefendantAgreedMediationDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenNotRespondentResponseBilingual() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplate()).thenReturn(expectedTemplateId);
@@ -77,7 +77,7 @@ public class ClaimantDefendantAgreedMediationDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
 
         String partyName = "party name";

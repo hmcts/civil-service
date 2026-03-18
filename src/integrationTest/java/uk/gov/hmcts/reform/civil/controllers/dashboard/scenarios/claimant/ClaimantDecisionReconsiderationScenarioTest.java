@@ -24,7 +24,7 @@ public class ClaimantDecisionReconsiderationScenarioTest extends DashboardBaseIn
 
         String caseId = "720111";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

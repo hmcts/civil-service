@@ -34,7 +34,7 @@ public class DefendantFullDefenceFullDisputeClaimantCarmScenarioTest extends Das
         LocalDate applicantResponseDeadline = OffsetDateTime.now().toLocalDate().plusDays(120);
         String caseId = "13165";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

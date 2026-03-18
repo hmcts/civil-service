@@ -109,7 +109,7 @@ class DJApplicantReceivedNotificationHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Received email
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .addRespondent2(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -132,7 +132,7 @@ class DJApplicantReceivedNotificationHandlerTest {
                 .thenReturn("test-template-received-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YES)
@@ -159,7 +159,7 @@ class DJApplicantReceivedNotificationHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Requested email
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YES)
@@ -187,7 +187,7 @@ class DJApplicantReceivedNotificationHandlerTest {
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //send Received email
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
@@ -217,7 +217,7 @@ class DJApplicantReceivedNotificationHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                     .applicant1(new PartyBuilder().individual().build())
                     .respondent1(new PartyBuilder().soleTrader().build())
                     .respondent1Represented(YesOrNo.NO)

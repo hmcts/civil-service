@@ -29,7 +29,7 @@ class SpecCaseOfflineHelperTest {
 
     @Test
     void shouldReturnBilingualTemplate_whenClaimantIsBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(Language.BOTH.toString())
             .build();
@@ -42,7 +42,7 @@ class SpecCaseOfflineHelperTest {
 
     @Test
     void shouldReturnCounterClaimTemplate_when1v1AndCounterClaim() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
             .respondent2(null)
             .respondentResponseIsSame(YES)
@@ -76,7 +76,7 @@ class SpecCaseOfflineHelperTest {
 
     @Test
     void shouldReturnRespondentCounterClaimTemplate_whenCounterClaimAndSingleResponse() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
             .respondent2(null)
             .respondentResponseIsSame(YES)
@@ -91,7 +91,7 @@ class SpecCaseOfflineHelperTest {
 
     @Test
     void shouldReturnRespondentDefaultTemplate_whenNotCounterClaim() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent2(null)
             .build();
@@ -105,7 +105,7 @@ class SpecCaseOfflineHelperTest {
 
     @Test
     void shouldReturnMapFor1v1CaseInNotificationProperties() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .build();
 

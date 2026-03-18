@@ -149,7 +149,7 @@ class SetAsideJudgmentsOnlineMapperTest {
     void testIfSetAsideApplicationDateUpdatedCorrectly() {
 
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-        CaseData updatedCaseData = caseData.toBuilder()
+        CaseData updatedCaseData = caseData.copy()
             .activeJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData))
             .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)
             .joSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)

@@ -152,7 +152,7 @@ class OrgPolicyUtilsTest {
     class AddMissingOrgPolicies {
         @Test
         void shouldPopulateGivenCaseDataBuilderWithExpectedRespondentOrgPolicies_whenBothDoNotExist() {
-            var caseDataBuilder = CaseData.builder();
+            var caseDataBuilder = new CaseData();
 
             var caseData = caseDataBuilder.build();
             OrgPolicyUtils.addMissingOrgPolicies(caseData);
@@ -171,7 +171,7 @@ class OrgPolicyUtilsTest {
         @Test
         void shouldNotOverwriteRespondent1OrgPolicy_whenItExists() {
             var caseDataBuilder =
-                CaseData.builder().respondent1OrganisationPolicy(
+                new CaseData().respondent1OrganisationPolicy(
                     new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RES1-EXISTING]"));
 
             var caseData = caseDataBuilder.build();
@@ -191,7 +191,7 @@ class OrgPolicyUtilsTest {
         @Test
         void shouldNotOverwriteRespondent2OrgPolicy_whenItExists() {
             var caseDataBuilder =
-                CaseData.builder().respondent2OrganisationPolicy(
+                new CaseData().respondent2OrganisationPolicy(
                     new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RES2-EXISTING]"));
 
             var caseData = caseDataBuilder.build();
@@ -211,7 +211,7 @@ class OrgPolicyUtilsTest {
         @Test
         void shouldNotOverwriteRespondentOrgPolicies_whenBothExist() {
             var caseDataBuilder =
-                CaseData.builder()
+                new CaseData()
                     .respondent1OrganisationPolicy(
                         new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RES1-EXISTING]"))
                     .respondent2OrganisationPolicy(

@@ -27,7 +27,7 @@ public class StayLiftedDefendantScenarioTest extends DashboardBaseIntegrationTes
 
         String caseId = "7123454456455465";
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .ccdState(CaseState.CASE_PROGRESSION)

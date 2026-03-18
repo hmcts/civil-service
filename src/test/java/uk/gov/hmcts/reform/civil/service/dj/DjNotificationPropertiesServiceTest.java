@@ -60,7 +60,7 @@ class DjNotificationPropertiesServiceTest {
     void shouldBuildClaimantPropertiesUsingOrganisationName() {
         uk.gov.hmcts.reform.ccd.model.Organisation ccdOrganisation = new uk.gov.hmcts.reform.ccd.model.Organisation();
         ccdOrganisation.setOrganisationID("Org1");
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
             .applicant1(new PartyBuilder().individual().build())
@@ -82,7 +82,7 @@ class DjNotificationPropertiesServiceTest {
 
     @Test
     void shouldFallbackToPartyNameWhenOrganisationMissing() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
             .respondent1(new PartyBuilder().individual().build())
@@ -97,7 +97,7 @@ class DjNotificationPropertiesServiceTest {
     void shouldBuildDefendant2PropertiesUsingOrganisationPolicy() {
         uk.gov.hmcts.reform.ccd.model.Organisation ccdOrganisation = new uk.gov.hmcts.reform.ccd.model.Organisation();
         ccdOrganisation.setOrganisationID("Org2");
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
             .respondent2(new PartyBuilder().individual().build())
@@ -117,7 +117,7 @@ class DjNotificationPropertiesServiceTest {
     void shouldFallbackToRespondent1OrganisationWhenSameSolicitor() {
         uk.gov.hmcts.reform.ccd.model.Organisation ccdOrganisation = new uk.gov.hmcts.reform.ccd.model.Organisation();
         ccdOrganisation.setOrganisationID("OrgShared");
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
             .respondent2SameLegalRepresentative(YesOrNo.YES)

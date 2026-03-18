@@ -91,7 +91,7 @@ class LocationServiceTest {
     void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefDataCaseDiscontinued() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CaseState.CASE_DISCONTINUED, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
-                                          respondent2DQ).toBuilder()
+                                          respondent2DQ).copy()
             .previousCCDState(null).build();
         when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(new ArrayList<>(List.of()));
 
@@ -110,7 +110,7 @@ class LocationServiceTest {
     void shouldNotThrowException_whenApplicationMadeAfterSDOMainCaseCMLInRefData() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CaseState.CASE_DISCONTINUED, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
-                                          respondent2DQ).toBuilder()
+                                          respondent2DQ).copy()
             .previousCCDState(null).build();
         when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(getSampleCourLocationsRefObjectPostSdoNotInRefData());
 

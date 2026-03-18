@@ -101,7 +101,7 @@ class BundleCreationTriggerEventHandlerTest {
                                       List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs,
                                       List<Element<CaseDocument>> systemGeneratedCaseDocuments,
                                       ServedDocumentFiles servedDocumentFiles) {
-        return CaseData.builder().ccdCaseReference(1L)
+        return new CaseData().ccdCaseReference(1L)
             .documentWitnessStatement(witnessEvidenceDocs)
             .documentWitnessSummary(witnessEvidenceDocs)
             .documentHearsayNotice(witnessEvidenceDocs)

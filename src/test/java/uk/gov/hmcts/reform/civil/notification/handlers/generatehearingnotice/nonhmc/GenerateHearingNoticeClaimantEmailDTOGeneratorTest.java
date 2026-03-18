@@ -52,7 +52,7 @@ class GenerateHearingNoticeClaimantEmailDTOGeneratorTest {
     void shouldReturnEnglishTemplate_whenNotBilingual() {
         CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .build().toBuilder()
+                .build().copy()
                 .claimantBilingualLanguagePreference(null)
                 .build();
 
@@ -68,7 +68,7 @@ class GenerateHearingNoticeClaimantEmailDTOGeneratorTest {
     void shouldReturnWelshTemplate_whenBilingual() {
         CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .build().toBuilder()
+                .build().copy()
                 .claimantBilingualLanguagePreference(Language.BOTH.getDisplayedValue())
                 .applicant1(new Party().setIndividualFirstName("Claimant")
                             .setIndividualLastName("Org").setType(Party.Type.INDIVIDUAL))
@@ -101,7 +101,7 @@ class GenerateHearingNoticeClaimantEmailDTOGeneratorTest {
 
             CaseData caseData1 = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .build().toBuilder()
+                    .build().copy()
                     .hearingTimeHourMinute(TIME_1015)
                     .hearingDate(DATE_2025_07_04)
                     .applicant1(new Party().setIndividualFirstName("Claimant")
@@ -127,7 +127,7 @@ class GenerateHearingNoticeClaimantEmailDTOGeneratorTest {
 
             CaseData caseData2 = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .build().toBuilder()
+                    .build().copy()
                     .hearingTimeHourMinute(TIME_0800)
                     .hearingDate(DATE_2025_12_01)
                     .applicant1(new Party().setIndividualFirstName("Claimant")

@@ -77,7 +77,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenNotLipFullDefenceProceed() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1SettleClaim(YES))
@@ -91,7 +91,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssuedUnrepresentedDefendant()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
@@ -106,7 +106,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssuedUnrepresentedDefendant()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(new RespondentLiPResponse()
@@ -121,7 +121,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssuedUnrepresentedDefendant()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(FAST_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
@@ -136,7 +136,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1Represented(NO)
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1LiPResponseCarm(new MediationLiPCarm()
@@ -151,7 +151,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1Represented(NO)
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip()))
@@ -164,7 +164,7 @@ public class FullDefenceTransitionBuilderTest {
     void shouldReturnFalse_whenCarmApplicableForClaimantLipUnspecCase() {
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1Represented(NO)
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1LiPResponseCarm(new MediationLiPCarm()
@@ -179,7 +179,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .app1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
@@ -192,7 +192,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
@@ -205,7 +205,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .resp2MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
@@ -218,7 +218,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(FAST_CLAIM.name())
             .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
@@ -230,7 +230,7 @@ public class FullDefenceTransitionBuilderTest {
     void shouldReturnFalse_whenCarmApplicableUnspecClaim() {
         CaseData caseData = CaseDataBuilder.builder()
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(FAST_CLAIM.name())
             .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
@@ -324,13 +324,13 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenUnspec_false() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenNotSmall_false() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .build();
         assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));
@@ -338,7 +338,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenAllAgreedToLrMediationSpec_1v1() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .build();
@@ -353,7 +353,7 @@ public class FullDefenceTransitionBuilderTest {
         );
 
         defClaim.forEach((whoAgrees, expected) -> {
-            CaseData cd = caseData.toBuilder()
+            CaseData cd = caseData.copy()
                 .responseClaimMediationSpecRequired(whoAgrees[0])
                 .applicant1ClaimMediationSpecRequired(new SmallClaimMedicalLRspec(whoAgrees[1]))
                 .build();
@@ -363,7 +363,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenAllAgreedToLrMediationSpec_1v2SS() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .respondent2(new Party())
@@ -380,7 +380,7 @@ public class FullDefenceTransitionBuilderTest {
         );
 
         defClaim.forEach((whoAgrees, expected) -> {
-            CaseData cd = caseData.toBuilder()
+            CaseData cd = caseData.copy()
                 .responseClaimMediationSpecRequired(whoAgrees[0])
                 .applicant1ClaimMediationSpecRequired(new SmallClaimMedicalLRspec(whoAgrees[1]))
                 .build();
@@ -390,7 +390,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenAllAgreedToLrMediationSpec_1v2DS() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .respondent2(new Party())
@@ -411,7 +411,7 @@ public class FullDefenceTransitionBuilderTest {
         );
 
         defClaim.forEach((whoAgrees, expected) -> {
-            CaseData cd = caseData.toBuilder()
+            CaseData cd = caseData.copy()
                 .responseClaimMediationSpecRequired(whoAgrees[0])
                 .responseClaimMediationSpec2Required(whoAgrees[1])
                 .applicant1ClaimMediationSpecRequired(new SmallClaimMedicalLRspec(whoAgrees[2]))
@@ -422,7 +422,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenAllAgreedToLrMediationSpec_2v1() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .build();
@@ -441,7 +441,7 @@ public class FullDefenceTransitionBuilderTest {
         );
 
         defClaim.forEach((whoAgrees, expected) -> {
-            CaseData cd = caseData.toBuilder()
+            CaseData cd = caseData.copy()
                 .responseClaimMediationSpecRequired(whoAgrees[0])
                 .applicant1ClaimMediationSpecRequired(new SmallClaimMedicalLRspec(whoAgrees[1]))
                 .applicantMPClaimMediationSpecRequired(new SmallClaimMedicalLRspec(whoAgrees[2]))
@@ -452,7 +452,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenClaimantAgreedToLipMediation() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
@@ -592,7 +592,7 @@ public class FullDefenceTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenDefendantHasNotPaid() {
         CaseData caseData = CaseDataBuilder.builder()
-            .build().toBuilder()
+            .build().copy()
             .applicant1FullDefenceConfirmAmountPaidSpec(NO)
             .build();
 
@@ -602,7 +602,7 @@ public class FullDefenceTransitionBuilderTest {
     @Test
     void shouldReturnFalse_whenDefendantHasPaid() {
         CaseData caseData = CaseDataBuilder.builder()
-            .build().toBuilder()
+            .build().copy()
             .applicant1FullDefenceConfirmAmountPaidSpec(YES)
             .build();
 
@@ -620,7 +620,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenSpecClaimAndApplicant1SettleClaimIsNo() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1SettleClaim(NO))
@@ -631,7 +631,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenNotSpecClaimOrApplicant1SettleClaimIsNotNo() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1SettleClaim(YES))
@@ -639,7 +639,7 @@ public class FullDefenceTransitionBuilderTest {
 
         assertFalse(LipPredicate.fullDefenceProceed.test(caseData));
 
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1SettleClaim(NO))
@@ -650,7 +650,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenGetCarmEnabledForLipCase() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1LiPResponseCarm(new MediationLiPCarm()
                                                             .setIsMediationContactNameCorrect(YES)))
@@ -661,7 +661,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenGetCarmEnabledForLipCase() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip()))
             .build();
@@ -671,7 +671,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenGetCarmEnabledForCase() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .app1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
@@ -680,7 +680,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenGetCarmEnabledForCaseDefendant1() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
@@ -689,7 +689,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenGetCarmEnabledForCaseDefendant2() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .resp2MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
@@ -698,7 +698,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenGetCarmEnabledForCase() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .build();
 
         assertFalse(MediationPredicate.isCarmEnabledForCase.test(caseData));
@@ -766,7 +766,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenCaseAccessCategoryIsNotSpecClaim() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.YES)
@@ -777,7 +777,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenResponseClaimTrackIsNotSmallClaim() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(FAST_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.YES)
@@ -788,7 +788,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenResponseClaimMediationSpecRequiredIsNo() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.NO)
@@ -799,7 +799,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenRespondent2ExistsAndNotAgreedToMediationSpec() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.YES)
@@ -813,7 +813,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenApplicant1NotAgreedToMediationSpec() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.YES)
@@ -825,7 +825,7 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenApplicantMPNotAgreedToMediationSpec() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.YES)

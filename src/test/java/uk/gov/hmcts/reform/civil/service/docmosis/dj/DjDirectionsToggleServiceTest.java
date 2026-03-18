@@ -27,7 +27,7 @@ class DjDirectionsToggleServiceTest {
         DisposalHearingAddNewDirectionsDJ direction = new DisposalHearingAddNewDirectionsDJ();
         Element<DisposalHearingAddNewDirectionsDJ> element = new Element<>();
         element.setValue(direction);
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .disposalHearingAddNewDirectionsDJ(List.of(element))
             .build();
         assertThat(service.hasAdditionalDirections(caseData)).isTrue();

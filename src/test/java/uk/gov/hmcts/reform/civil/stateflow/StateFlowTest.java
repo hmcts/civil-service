@@ -88,7 +88,7 @@ class StateFlowTest {
             when(mockedStateMachine.getExtendedState()).thenReturn(mockedExtendedState);
             when(mockedStateMachine.startReactively()).thenReturn(mockedMono);
 
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
 
             StateFlow stateFlow = new StateFlow(mockedStateMachine);
 

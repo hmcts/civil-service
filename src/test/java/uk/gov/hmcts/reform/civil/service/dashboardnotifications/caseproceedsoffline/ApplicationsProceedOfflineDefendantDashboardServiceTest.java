@@ -59,7 +59,7 @@ class ApplicationsProceedOfflineDefendantDashboardServiceTest {
             new GADetailsRespondentSol().setCaseState("Awaiting Respondent Response")
         );
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .ccdCaseReference(5555L)
             .respondent1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
@@ -93,7 +93,7 @@ class ApplicationsProceedOfflineDefendantDashboardServiceTest {
             new GADetailsRespondentSol().setCaseState("Application Dismissed")
         );
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .ccdCaseReference(5555L)
             .respondent1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
@@ -113,7 +113,7 @@ class ApplicationsProceedOfflineDefendantDashboardServiceTest {
 
     @Test
     void shouldNotRecordWhenNotLip() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .ccdCaseReference(5555L)
             .respondent1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES)

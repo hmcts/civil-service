@@ -38,7 +38,7 @@ class CaseProceedOfflineClaimantScenarioServiceTest {
 
     @Test
     void shouldResolvePrimaryScenario() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         assertThat(service.resolvePrimaryScenario(caseData))
                 .isEqualTo(
@@ -50,7 +50,7 @@ class CaseProceedOfflineClaimantScenarioServiceTest {
     void shouldResolveAdditionalScenarios() {
         List<Element<GeneralApplication>> generalApplications =
                 wrapElements(new GeneralApplication());
-        CaseData caseData = CaseData.builder().generalApplications(generalApplications).build();
+        CaseData caseData = new CaseData().generalApplications(generalApplications).build();
 
         Map<String, Boolean> scenarios = service.resolveAdditionalScenarios(caseData);
 
@@ -69,14 +69,14 @@ class CaseProceedOfflineClaimantScenarioServiceTest {
     @Test
     void shouldRecordScenarioInCaseProgressionOnlyForLip() {
         CaseData lipCase =
-                CaseData.builder()
+                new CaseData()
                         .applicant1Represented(YesOrNo.NO)
                         .respondent1Represented(YesOrNo.NO)
                         .ccdCaseReference(1L)
                         .previousCCDState(CaseState.CASE_PROGRESSION)
                         .build();
 
-        CaseData nonLipCase = lipCase.toBuilder().applicant1Represented(YesOrNo.YES).build();
+        CaseData nonLipCase = lipCase.copy().applicant1Represented(YesOrNo.YES).build();
 
         assertThat(service.shouldRecordScenarioInCaseProgression(lipCase)).isTrue();
         assertThat(service.shouldRecordScenarioInCaseProgression(nonLipCase)).isFalse();

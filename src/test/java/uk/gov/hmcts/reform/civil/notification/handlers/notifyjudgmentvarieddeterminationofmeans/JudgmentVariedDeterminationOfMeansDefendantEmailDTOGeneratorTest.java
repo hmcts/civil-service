@@ -50,7 +50,7 @@ class JudgmentVariedDeterminationOfMeansDefendantEmailDTOGeneratorTest {
     @Test
     void shouldReturnLipTemplateIdWhenClaimantIsBilingual() {
         CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
                 .caseDataLiP(new CaseDataLiP()
                         .setRespondent1LiPResponse(new RespondentLiPResponse()
                                 .setRespondent1ResponseLanguage(Language.BOTH.toString())))
@@ -65,7 +65,7 @@ class JudgmentVariedDeterminationOfMeansDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnRespondent1EmailAddress() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .respondent1(new Party().setPartyEmail(RESPONDENT_EMAIL))
                 .build();
 
@@ -75,7 +75,7 @@ class JudgmentVariedDeterminationOfMeansDefendantEmailDTOGeneratorTest {
     @Test
     void shouldPickCorrectTemplateAndCustomProperties() {
         CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
                 .applicant1(new Party().setPartyEmail(APPLICANT_EMAIL).setCompanyName(APPLICANT_NAME).setType(Party.Type.COMPANY))
                 .respondent1Represented(YesOrNo.NO)
                 .respondent1(new Party().setPartyEmail(RESPONDENT_EMAIL).setCompanyName(RESPONDENT_NAME).setType(Party.Type.COMPANY))

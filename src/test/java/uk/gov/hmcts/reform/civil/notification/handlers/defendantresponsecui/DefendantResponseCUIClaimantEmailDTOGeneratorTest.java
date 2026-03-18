@@ -41,7 +41,7 @@ public class DefendantResponseCUIClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplate() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyLiPClaimantDefendantResponded()).thenReturn(expectedTemplateId);
@@ -53,7 +53,7 @@ public class DefendantResponseCUIClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnWelshEmailTemplate() {
-        CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference("BOTH").build();
+        CaseData caseData = new CaseData().claimantBilingualLanguagePreference("BOTH").build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyLiPClaimantDefendantRespondedWelshLip()).thenReturn(expectedTemplateId);
@@ -74,7 +74,7 @@ public class DefendantResponseCUIClaimantEmailDTOGeneratorTest {
     void shouldReturnCorrectCustomProperties() {
         Party party = new Party();
         String legacyCaseReference = "legacy case reference";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference(legacyCaseReference)
             .applicant1(party)
             .respondent1(party)
@@ -97,14 +97,14 @@ public class DefendantResponseCUIClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyWhenApplicantIsLipAndRespondentResponseNotBilingual() {
-        CaseData caseData = CaseData.builder().applicant1Represented(NO).build();
+        CaseData caseData = new CaseData().applicant1Represented(NO).build();
 
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isTrue();
     }
 
     @Test
     void shouldNotNotifyWhenRespondentResponseIsBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1Represented(NO)
             .caseDataLiP(
                 new CaseDataLiP()
@@ -119,14 +119,14 @@ public class DefendantResponseCUIClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotifyWhenApplicantIsNotLip() {
-        CaseData caseData = CaseData.builder().applicant1Represented(YES).build();
+        CaseData caseData = new CaseData().applicant1Represented(YES).build();
 
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
     }
 
     @Test
     void shouldNotNotifyWhenApplicantIsNotLipAndRespondentResponseIsBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1Represented(YES)
             .caseDataLiP(
                 new CaseDataLiP()

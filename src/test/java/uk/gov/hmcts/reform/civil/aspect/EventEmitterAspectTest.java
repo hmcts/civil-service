@@ -298,6 +298,6 @@ class EventEmitterAspectTest {
     }
 
     private CaseData buildCaseDataWithBusinessProcessStatus(BusinessProcessStatus status) {
-        return CaseData.builder().businessProcess(new BusinessProcess().setStatus(status)).build();
+        return new CaseData().businessProcess(new BusinessProcess().setStatus(status)).build();
     }
 }

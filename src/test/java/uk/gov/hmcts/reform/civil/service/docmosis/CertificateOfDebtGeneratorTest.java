@@ -67,7 +67,7 @@ class CertificateOfDebtGeneratorTest {
             .thenReturn(COSC_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().copy()
             .build();
 
         CaseDocument caseDoc = certificateOfDebtGenerator.generateDoc(caseData, BEARER_TOKEN, CERTIFICATE_OF_DEBT_PAYMENT);
@@ -89,7 +89,7 @@ class CertificateOfDebtGeneratorTest {
             .thenReturn(COSC_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc().toBuilder()
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc().copy()
             .build();
 
         CaseDocument caseDoc = certificateOfDebtGenerator.generateDoc(caseData, BEARER_TOKEN, CERTIFICATE_OF_DEBT_PAYMENT);
@@ -111,7 +111,7 @@ class CertificateOfDebtGeneratorTest {
             .thenReturn(COSC_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().copy()
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                          .setRespondent1ResponseLanguage(Language.BOTH.toString())))

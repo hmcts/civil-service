@@ -119,7 +119,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         ));
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder()
+            .copy()
             .applicantSolicitor1UserDetails(new IdamUserDetails()
                                                 .setEmail("applicant@email.com")
                                                 )
@@ -151,7 +151,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         ));
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder()
+            .copy()
             .applicantSolicitor1UserDetails(new IdamUserDetails()
                                                 .setEmail("applicant@email.com")
                                                 )
@@ -439,7 +439,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any()
             )).thenReturn(List.of(CaseRole.CLAIMANT.toString()));
             OffsetDateTime now = OffsetDateTime.now();
-            CaseData caseData = createCaseDataWithQueries(now).toBuilder()
+            CaseData caseData = createCaseDataWithQueries(now).copy()
                 .applicant1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -464,7 +464,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             )).thenReturn(List.of(CaseRole.CLAIMANT.toString()));
             OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .applicant1Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -490,7 +490,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
                 .respondent1Represented(YesOrNo.NO)
                 .build();
@@ -516,7 +516,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             )).thenReturn(List.of(CaseRole.DEFENDANT.toString()));
             OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .respondent1Represented(YesOrNo.NO)
                 .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
                 .caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(

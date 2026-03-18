@@ -62,7 +62,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
 
         @Test
         void shouldRecordScenario_whenInvokedForCase() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
                 .ccdCaseReference(1234L)
@@ -86,7 +86,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
         void shouldRecordQMScenario_whenInvokedForCaseWithOpenApplicantCitizenQuery() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
                 .includesApplicantCitizenQueryFollowUp(OffsetDateTime.now())
-                .build().toBuilder()
+                .build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
                 .ccdCaseReference(1234L)

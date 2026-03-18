@@ -51,7 +51,7 @@ class RemoveCaseNoteTaskTest {
         element.setId(noteId);
         caseNotes.add(element);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseNotes(caseNotes)
             .build();
 
@@ -77,7 +77,7 @@ class RemoveCaseNoteTaskTest {
         element2.setId(UUID.randomUUID());
         caseNotes.add(element2);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseNotes(caseNotes)
             .build();
 
@@ -99,7 +99,7 @@ class RemoveCaseNoteTaskTest {
         element.setId(noteId);
         caseNotes.add(element);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseNotes(caseNotes)
             .build();
 
@@ -113,7 +113,7 @@ class RemoveCaseNoteTaskTest {
 
     @Test
     void shouldHandleNullCaseNotes() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         CaseNoteReference caseNoteReference = caseNoteReference("123", UUID.randomUUID().toString());
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);

@@ -107,7 +107,7 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1(new Party().setType(Party.Type.COMPANY).setCompanyName(DEFENDANT_PARTY_NAME).setPartyEmail(
                     DEFENDANT_LIP_EMAIL_ADDRESS))
                 .applicant1(new Party().setType(Party.Type.COMPANY).setCompanyName(CLAIMANT_ORG_NAME))
@@ -150,7 +150,7 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             given(notificationsProperties.getNotifyDefendantLRClaimantSettleTheClaimTemplate()).willReturn(EMAIL_TEMPLATE_LR);
 
             //Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1(new Party().setType(Party.Type.COMPANY))
                 .applicant1(new Party().setType(Party.Type.COMPANY).setCompanyName(CLAIMANT_ORG_NAME))
                 .respondent1Represented(YesOrNo.YES)
@@ -192,7 +192,7 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
         @Test
         void shouldOnlySendNotificationToDefendantLR_whenLiPvLRandDefendantHasEmail() {
             //Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1(new Party().setType(Party.Type.COMPANY).setCompanyName(DEFENDANT_PARTY_NAME).setPartyEmail(
                     DEFENDANT_LIP_EMAIL_ADDRESS))
                 .respondent1Represented(YesOrNo.YES)

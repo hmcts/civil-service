@@ -26,7 +26,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnNull_whenBothApplicant1NotFount() throws IOException {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(new Party()
                              .setType(Party.Type.INDIVIDUAL)
                              .setIndividualTitle("Mr.")
@@ -40,7 +40,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenBothPartiesAreIndividuals() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualTitle("Mr.")
@@ -59,7 +59,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenMultiApplicant() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualTitle("Mr.")
@@ -84,7 +84,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenMultiApplicantAndApplicant2HaveLF() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualTitle("Mr.")
@@ -111,7 +111,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenMultiApplicantAndApplicant1HaveLF() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualTitle("Mr.")
@@ -138,7 +138,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenMultiApplicantAndBothApplicantsHaveLF() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualTitle("Mr.")
@@ -167,7 +167,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenMultiApplicantAndBothApplicantsAndRespondent1HaveLF() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualTitle("Mr.")
@@ -200,7 +200,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenMultiRespondentAndBothApplicantAndRespondentsHaveLF() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualTitle("Mr.")
@@ -233,7 +233,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenMultiRespondent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualTitle("Mr.")
@@ -259,7 +259,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenApplicantIsSoleTrader() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.SOLE_TRADER)
                             .setSoleTraderTitle("Mrs.")
@@ -280,7 +280,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenRespondentIsSoleTrader() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualTitle("Mr.")
@@ -299,7 +299,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenBothAreSoleTrader() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.SOLE_TRADER)
                             .setSoleTraderFirstName("Georgina")
@@ -320,7 +320,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenRespondentHasLitigationFriend() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualTitle("Mr.")
@@ -343,7 +343,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenApplicantHasLitigationFriend() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualTitle("Mr.")
@@ -365,7 +365,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnCaseName_whenBothHasLitigationFriend() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualTitle("Mr.")
@@ -392,7 +392,7 @@ class DocmosisTemplateDataUtilsTest {
 
         @Test
         void shouldPopulateNotProvided_whenSolicitorReferencesIsNull() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .solicitorReferences(null)
                 .respondentSolicitor2Reference(null)
                 .build();
@@ -408,7 +408,7 @@ class DocmosisTemplateDataUtilsTest {
         @Test
         void shouldPopulateNotProvided_whenSolicitorReferencesMissing() {
             SolicitorReferences solicitorReferences = new SolicitorReferences();
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .solicitorReferences(solicitorReferences)
                 .respondentSolicitor2Reference(null)
                 .build();
@@ -426,7 +426,7 @@ class DocmosisTemplateDataUtilsTest {
             SolicitorReferences solicitorReferences = new SolicitorReferences()
                 .setApplicantSolicitor1Reference("Applicant ref")
                 .setRespondentSolicitor1Reference("Respondent ref");
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .solicitorReferences(solicitorReferences)
                 .respondentSolicitor2Reference("Respondent 2 ref")
                 .build();
@@ -444,7 +444,7 @@ class DocmosisTemplateDataUtilsTest {
         void shouldPopulateNotProvided_whenOneReferencesNotAvailable() {
             SolicitorReferences solicitorReferences = new SolicitorReferences()
                 .setApplicantSolicitor1Reference("Applicant ref");
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .solicitorReferences(solicitorReferences)
                 .build();
 
@@ -461,7 +461,7 @@ class DocmosisTemplateDataUtilsTest {
 
     @Test
     void shouldReturnEmptyForMissingCaseReference() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .build();
         String formattedCaseReference = formatCcdCaseReference(caseData);
         assertThat(formattedCaseReference).isEmpty();
@@ -480,7 +480,7 @@ class DocmosisTemplateDataUtilsTest {
     @ParameterizedTest
     @MethodSource("testCaseReferenceData")
     void shouldReturnFormattedReference(Long inputCaseReference, String expectedCaseReference) {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(inputCaseReference)
             .build();
         String formattedCaseReference = formatCcdCaseReference(caseData);

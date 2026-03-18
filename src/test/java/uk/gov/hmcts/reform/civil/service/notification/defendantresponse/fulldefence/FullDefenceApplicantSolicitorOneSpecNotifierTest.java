@@ -83,7 +83,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
         LocalDate whenWillPay = LocalDate.now().plusMonths(1);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .build().toBuilder()
+            .build().copy()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
@@ -91,7 +91,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
                 .setWhenWillThisAmountBePaid(whenWillPay)
             )
             .build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+        caseData = caseData.copy().caseAccessCategory(SPEC_CLAIM).build();
 
         when(notificationsProperties.getClaimantSolicitorDefendantResponseForSpec())
             .thenReturn("spec-claimant-template-id");
@@ -116,7 +116,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
         LocalDate whenWillPay = LocalDate.now().plusMonths(1);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .build().toBuilder()
+            .build().copy()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
@@ -125,7 +125,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
                     .setWhenWillThisAmountBePaid(whenWillPay)
             )
             .build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+        caseData = caseData.copy().caseAccessCategory(SPEC_CLAIM).build();
 
         when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
 
@@ -149,7 +149,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .build().toBuilder()
+            .build().copy()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
@@ -158,7 +158,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
                     .setWhenWillThisAmountBePaid(whenWillPay)
             )
             .build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+        caseData = caseData.copy().caseAccessCategory(SPEC_CLAIM).build();
 
         when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
 
@@ -180,11 +180,11 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
     void shouldNotifyApplicantLipSpecFullDefence_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .build().toBuilder()
+            .build().copy()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1Represented(YesOrNo.NO)
             .build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+        caseData = caseData.copy().caseAccessCategory(SPEC_CLAIM).build();
 
         when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn(
             "templateImm-id");
@@ -207,12 +207,12 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
     void shouldNotifyApplicantLipSpecFullDefenceForBilingual_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .build().toBuilder()
+            .build().copy()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(Language.BOTH.toString())
             .build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+        caseData = caseData.copy().caseAccessCategory(SPEC_CLAIM).build();
 
         when(notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()).thenReturn(
             "templateImm-bilingual-id");
@@ -237,7 +237,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .build().toBuilder()
+            .build().copy()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
@@ -246,7 +246,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
                     .setWhenWillThisAmountBePaid(whenWillPay)
             )
             .build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+        caseData = caseData.copy().caseAccessCategory(SPEC_CLAIM).build();
 
         when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
 
@@ -270,7 +270,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
         LocalDate whenWillPay = LocalDate.now().plusMonths(1);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .build().toBuilder()
+            .build().copy()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
@@ -279,7 +279,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
                     .setWhenWillThisAmountBePaid(whenWillPay)
             )
             .build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+        caseData = caseData.copy().caseAccessCategory(SPEC_CLAIM).build();
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn("templateImm-id-jo");
 

@@ -30,7 +30,7 @@ public class ClaimIssueHwfFullRemissionGrantedScenarioTest extends DashboardBase
 
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(45500)))

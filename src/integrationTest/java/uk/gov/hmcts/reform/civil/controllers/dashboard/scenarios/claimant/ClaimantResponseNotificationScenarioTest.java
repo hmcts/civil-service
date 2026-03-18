@@ -24,7 +24,7 @@ public class ClaimantResponseNotificationScenarioTest extends DashboardBaseInteg
     void shouldCreateNotification_forClaimantWhenClaimantProceedsCarm() throws Exception {
         String caseId = "901234567891";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .applicant1Represented(YesOrNo.NO)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
@@ -58,7 +58,7 @@ public class ClaimantResponseNotificationScenarioTest extends DashboardBaseInteg
     void shouldCreateNotification_forClaimantWhenClaimantProceeds() throws Exception {
         String caseId = "901234567892";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .applicant1Represented(YesOrNo.NO)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))

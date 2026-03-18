@@ -27,7 +27,7 @@ public class CourtFavoursClaimantSettlementAgreementScenarioTest extends Dashboa
     void should_create_scenario_for_court_favours_defendant_sign_settlement_agreement() throws Exception {
 
         String caseId = "12348991011";
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)

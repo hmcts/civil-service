@@ -36,7 +36,7 @@ public class ClaimantResponseNotAgreedRepaymentClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()).thenReturn(expectedTemplateId);
 
@@ -55,7 +55,7 @@ public class ClaimantResponseNotAgreedRepaymentClaimantEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         String legacyCaseReference = "case reference";
-        CaseData caseData = CaseData.builder().legacyCaseReference(legacyCaseReference).build();
+        CaseData caseData = new CaseData().legacyCaseReference(legacyCaseReference).build();
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
 
         String partyName = "party name";

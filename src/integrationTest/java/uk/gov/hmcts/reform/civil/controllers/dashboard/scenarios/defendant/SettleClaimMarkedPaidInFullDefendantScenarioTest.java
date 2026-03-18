@@ -26,7 +26,7 @@ public class SettleClaimMarkedPaidInFullDefendantScenarioTest extends DashboardB
         String caseId = "12348991013";
         LocalDate paidInFullDate = LocalDate.now();
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .markPaidConsent(MarkPaidConsentList.YES)

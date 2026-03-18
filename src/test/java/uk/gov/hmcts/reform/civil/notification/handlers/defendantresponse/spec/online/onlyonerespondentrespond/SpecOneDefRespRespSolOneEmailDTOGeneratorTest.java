@@ -24,7 +24,7 @@ class SpecOneDefRespRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldNotify_whenDQAndResponseTypeArePresent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1DQ(new Respondent1DQ())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .build();
@@ -34,7 +34,7 @@ class SpecOneDefRespRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotify_whenDQIsMissing() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .build();
 
@@ -43,7 +43,7 @@ class SpecOneDefRespRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotify_whenResponseTypeIsMissing() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1DQ(new Respondent1DQ())
             .build();
 
@@ -52,7 +52,7 @@ class SpecOneDefRespRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotify_whenBothDQAndResponseTypeAreMissing() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();
     }

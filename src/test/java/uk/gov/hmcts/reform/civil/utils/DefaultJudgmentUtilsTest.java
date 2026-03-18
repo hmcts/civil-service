@@ -16,7 +16,7 @@ public class DefaultJudgmentUtilsTest {
 
     @Test
     void shouldReturnFixedCost_whenClaimAmountIsInZeroInstalment() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .addRespondent2(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(10)).build();
         BigDecimal result = calculateFixedCosts(caseData);
@@ -25,7 +25,7 @@ public class DefaultJudgmentUtilsTest {
 
     @Test
     void shouldReturnFixedCost_whenClaimAmountIsInFirstInstalment() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .addRespondent2(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(30)).build();
         BigDecimal result = calculateFixedCosts(caseData);
@@ -34,7 +34,7 @@ public class DefaultJudgmentUtilsTest {
 
     @Test
     void shouldReturnFixedCost_whenClaimAmountIsInSecondInstalment() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .addRespondent2(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(560)).build();
         BigDecimal result = calculateFixedCosts(caseData);
@@ -43,7 +43,7 @@ public class DefaultJudgmentUtilsTest {
 
     @Test
     void shouldReturnFixedCost_whenClaimAmountIsInThirdInstalment() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .addRespondent2(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(2000)).build();
         BigDecimal result = calculateFixedCosts(caseData);
@@ -52,7 +52,7 @@ public class DefaultJudgmentUtilsTest {
 
     @Test
     void shouldReturnFixedCost_whenClaimAmountIsInFourthInstalment() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .addRespondent2(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(8000)).build();
         BigDecimal result = calculateFixedCosts(caseData);
@@ -61,7 +61,7 @@ public class DefaultJudgmentUtilsTest {
 
     @Test
     void shouldReturnFixedCost_whenClaimAmountIsBetween25And26() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .addRespondent2(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal("25.50")).build();
         BigDecimal result = calculateFixedCosts(caseData);
@@ -70,7 +70,7 @@ public class DefaultJudgmentUtilsTest {
 
     @Test
     void shouldReturnFixedCost_whenClaimAmountIsBetween5kAnd5001() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .addRespondent2(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal("5000.50")).build();
         BigDecimal result = calculateFixedCosts(caseData);
@@ -79,7 +79,7 @@ public class DefaultJudgmentUtilsTest {
 
     @Test
     void shouldReturnFixedCostOnEntry_whenJudgmentAmountIsMoreThan5000() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .addRespondent2(YesOrNo.NO)
             .claimFixedCostsOnEntryDJ(YesOrNo.YES)
             .fixedCosts(new FixedCosts()
@@ -92,7 +92,7 @@ public class DefaultJudgmentUtilsTest {
 
     @Test
     void shouldReturnFixedCostOnEntry_whenJudgmentAmountIsMoreThan25LessThan5000() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .addRespondent2(YesOrNo.NO)
             .claimFixedCostsOnEntryDJ(YesOrNo.YES)
             .fixedCosts(new FixedCosts()
@@ -105,7 +105,7 @@ public class DefaultJudgmentUtilsTest {
 
     @Test
     void shouldReturnFixedCostOnEntry_whenJudgmentAmountIsUpto25() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .addRespondent2(YesOrNo.NO)
             .claimFixedCostsOnEntryDJ(YesOrNo.YES)
             .fixedCosts(new FixedCosts()

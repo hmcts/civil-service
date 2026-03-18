@@ -21,7 +21,7 @@ class DjDisposalTemplateFieldServiceTest {
         element.setLabel("Central Court");
         DynamicList list = new DynamicList();
         list.setValue(element);
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .disposalHearingMethodInPersonDJ(list)
             .build();
 
@@ -42,7 +42,7 @@ class DjDisposalTemplateFieldServiceTest {
     void shouldReturnHearingDurationFromCaseData() {
         DisposalHearingFinalDisposalHearingDJ hearing = new DisposalHearingFinalDisposalHearingDJ();
         hearing.setTime(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES);
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .disposalHearingFinalDisposalHearingDJ(hearing)
             .build();
 

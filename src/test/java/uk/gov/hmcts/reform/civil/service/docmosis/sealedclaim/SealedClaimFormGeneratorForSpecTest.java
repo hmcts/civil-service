@@ -107,7 +107,7 @@ class  SealedClaimFormGeneratorForSpecTest {
 
     @Test
     void generateSealedClaimForm1v1() {
-        CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
             .build();
 
@@ -127,7 +127,7 @@ class  SealedClaimFormGeneratorForSpecTest {
 
     @Test
     void generateSealedClaimForm1v2SameSolicitor() {
-        CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
             .respondent2(new Party()
                              .setType(Party.Type.COMPANY)
@@ -156,7 +156,7 @@ class  SealedClaimFormGeneratorForSpecTest {
 
     @Test
     void generateSealedClaimForm1v2DifferentSolicitor() {
-        CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
             .respondent2(new Party()
                              .setType(Party.Type.COMPANY)
@@ -183,7 +183,7 @@ class  SealedClaimFormGeneratorForSpecTest {
 
     @Test
     void generateSealedClaimForm1v2Respondent1LIP() {
-        CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
             .respondent2(new Party()
                              .setType(Party.Type.COMPANY)
@@ -211,7 +211,7 @@ class  SealedClaimFormGeneratorForSpecTest {
 
     @Test
     void generateSealedClaimForm1v2Respondent2LIP() {
-        CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
             .respondent2(new Party()
                              .setType(Party.Type.COMPANY)
@@ -239,7 +239,7 @@ class  SealedClaimFormGeneratorForSpecTest {
 
     @Test
     void generateSealedClaimForm2v1() {
-        CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
             .applicant2(new Party()
                             .setType(Party.Type.COMPANY)
@@ -260,16 +260,16 @@ class  SealedClaimFormGeneratorForSpecTest {
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2_2V1));
     }
 
-    private CaseData.CaseDataBuilder getBaseCaseDataBuilder() {
+    private CaseData getBaseCaseDataBuilder() {
         return CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder()
+            .copy()
             .totalClaimAmount(BigDecimal.valueOf(850_00))
             .claimFee(new Fee()
                           .setCalculatedAmountInPence(BigDecimal.valueOf(70_00))
                           );
     }
 
-    private CaseData.CaseDataBuilder getCaseDataBuilderWithAllDetails() {
+    private CaseData getCaseDataBuilderWithAllDetails() {
         List<TimelineOfEvents> timelines = new ArrayList<>();
         timelines.add(new TimelineOfEvents(
             new TimelineOfEventDetails(LocalDate.now(), "test timeline"),
@@ -277,7 +277,7 @@ class  SealedClaimFormGeneratorForSpecTest {
         ));
 
         return CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder()
+            .copy()
             .totalClaimAmount(BigDecimal.valueOf(850_00))
             .claimFee(new Fee()
                           .setCalculatedAmountInPence(BigDecimal.valueOf(70_00))
@@ -297,7 +297,7 @@ class  SealedClaimFormGeneratorForSpecTest {
     @Test
     void generateSealedClaimForm1v1WithAllFields() {
 
-        CaseData.CaseDataBuilder caseBuilder = getCaseDataBuilderWithAllDetails();
+        CaseData caseBuilder = getCaseDataBuilderWithAllDetails();
         CaseData caseData = caseBuilder
             .build();
 
@@ -317,7 +317,7 @@ class  SealedClaimFormGeneratorForSpecTest {
     @Test
     void generateSealedClaimForm1v1_whenBulkClaimNoInterest() {
         when(featureToggleService.isBulkClaimEnabled()).thenReturn(true);
-        CaseData.CaseDataBuilder<?, ?> caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
             .specRespondent1Represented(YesOrNo.NO)
             .sdtRequestIdFromSdt("1234")
@@ -337,7 +337,7 @@ class  SealedClaimFormGeneratorForSpecTest {
     @Test
     void generateSealedClaimForm1v1_whenBulkClaimWithInterest() {
         when(featureToggleService.isBulkClaimEnabled()).thenReturn(true);
-        CaseData.CaseDataBuilder<?, ?> caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
             .specRespondent1Represented(YesOrNo.NO)
             .sdtRequestIdFromSdt("1234")

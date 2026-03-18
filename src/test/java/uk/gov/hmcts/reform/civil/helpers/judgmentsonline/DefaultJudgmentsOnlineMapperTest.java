@@ -99,7 +99,7 @@ class DefaultJudgmentsOnlineMapperTest {
     @Test
     void testIfDefaultJudgmentIsMarkedActive_1v1_scenario1() {
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .partialPayment(YesOrNo.YES)
             .partialPaymentAmount("10")
@@ -138,7 +138,7 @@ class DefaultJudgmentsOnlineMapperTest {
     @Test
     void testIfDefaultJudgmentIsMarkedActive_1v1_scenario2() {
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .partialPayment(YesOrNo.YES)
             .partialPaymentAmount("10")

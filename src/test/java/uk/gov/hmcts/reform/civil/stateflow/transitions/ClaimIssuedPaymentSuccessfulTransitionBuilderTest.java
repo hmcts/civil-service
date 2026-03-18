@@ -100,13 +100,13 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
     @Test
     void shouldReturnTrue_forOneVsOneCase() {
         CaseData caseData = CaseDataBuilder.builder()
-            .setClaimTypeToSpecClaim().build().toBuilder().build();
+            .setClaimTypeToSpecClaim().build().copy().build();
         assertTrue(ClaimPredicate.isOneVOne.test(caseData));
     }
 
     @Test
     public void when1v2ssIssued_thenPendingClaimIssued() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .issueDate(LocalDate.now())
             .respondent1Represented(YES)
             .respondent1OrgRegistered(YES)
@@ -121,7 +121,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
 
     @Test
     public void when1v2dsIssued_thenPendingClaimIssued() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .issueDate(LocalDate.now())
             .respondent1Represented(YES)
             .respondent1OrgRegistered(YES)
@@ -137,7 +137,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
 
     @Test
     public void whenXv1Issued_thenPendingClaimIssued() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .issueDate(LocalDate.now())
             .respondent1Represented(YES)
             .respondent1OrgRegistered(YES)

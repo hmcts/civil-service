@@ -27,7 +27,7 @@ class GenerateOrderCOOAppSolEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenAppSolGetTemplateIsInvoked() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn(expectedTemplateId);
 

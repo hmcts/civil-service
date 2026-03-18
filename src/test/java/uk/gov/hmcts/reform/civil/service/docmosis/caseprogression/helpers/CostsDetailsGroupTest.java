@@ -32,7 +32,7 @@ public class CostsDetailsGroupTest {
 
     @Test
     void shouldPopulateCostsDetails_WhenAllFieldsArePresent() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
             .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
                                                   .setMakeAnOrderForCostsYesOrNo(YES)
@@ -58,7 +58,7 @@ public class CostsDetailsGroupTest {
 
     @Test
     void shouldReturnNull_WhenSummarilyAssessedCostsAreNotPresent() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
             .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
                                                   .setMakeAnOrderForCostsYesOrNo(YES))
@@ -73,7 +73,7 @@ public class CostsDetailsGroupTest {
 
     @Test
     void testPopulateInterimPaymentText() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
                                                   .setAssistedOrderAssessmentThirdDropdownAmount(BigDecimal.valueOf(
                     10000L)))
@@ -86,12 +86,12 @@ public class CostsDetailsGroupTest {
 
     @Test
     void testPopulateSummarilyAssessedText() {
-        CaseData caseDataClaimant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseDataClaimant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
                                                   .setMakeAnOrderForCostsList(CLAIMANT)
                                                   .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L)))
             .build();
-        CaseData caseDataDefendant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseDataDefendant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
                                                   .setMakeAnOrderForCostsList(DEFENDANT)
                                                   .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L)))
@@ -112,12 +112,12 @@ public class CostsDetailsGroupTest {
 
     @Test
     void testPopulateDetailedAssessmentText() {
-        CaseData caseDataClaimant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseDataClaimant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
                                                   .setAssistedOrderAssessmentSecondDropdownList1(INDEMNITY_BASIS)
                                                   .setMakeAnOrderForCostsList(CLAIMANT))
             .build();
-        CaseData caseDataDefendant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseDataDefendant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
                                                   .setAssistedOrderAssessmentSecondDropdownList1(COSTS)
                                                   .setMakeAnOrderForCostsList(DEFENDANT))

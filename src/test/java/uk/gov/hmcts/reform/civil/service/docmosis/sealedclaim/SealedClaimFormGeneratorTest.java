@@ -276,7 +276,7 @@ class SealedClaimFormGeneratorTest {
 
         @Test
         void whenCaseIsAtClaimDetailsNotified_shouldGetSealedClaimFormDataFor1V1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .applicant1LitigationFriend(new LitigationFriend().setFirstName("applicant")
                                                 .setLastName("LF")
                                                 )
@@ -293,7 +293,7 @@ class SealedClaimFormGeneratorTest {
         void whenCaseIsAtClaimDetailsNotified_shouldGetSealedClaimFormDataFor1V2DifferentSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .multiPartyClaimTwoDefendantSolicitors().build().toBuilder()
+                .multiPartyClaimTwoDefendantSolicitors().build().copy()
                 .applicant1LitigationFriend(new LitigationFriend().setFirstName("applicant")
                                                 .setLastName("LF")
                                                 )
@@ -311,7 +311,7 @@ class SealedClaimFormGeneratorTest {
         void whenCaseIsAtClaimDetailsNotified_shouldGetSealedClaimFormDataFor2V1() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .multiPartyClaimTwoApplicants().build().toBuilder()
+                .multiPartyClaimTwoApplicants().build().copy()
                 .applicant1LitigationFriend(new LitigationFriend().setFirstName("applicant")
                                                 .setLastName("LF")
                                                 )
@@ -331,7 +331,7 @@ class SealedClaimFormGeneratorTest {
         void whenCaseIsAtClaimDetailsNotified_shouldGetSealedClaimFormDataFor1V2SameSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .multiPartyClaimOneDefendantSolicitor().build().toBuilder()
+                .multiPartyClaimOneDefendantSolicitor().build().copy()
                 .applicant1LitigationFriend(new LitigationFriend().setFirstName("applicant")
                                                 .setLastName("LF")
                                                 )

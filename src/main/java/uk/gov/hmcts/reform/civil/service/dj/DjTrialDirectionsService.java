@@ -16,28 +16,27 @@ public class DjTrialDirectionsService {
     private final DjSpecialistDirectionsService specialistDirectionsService;
     private final DjWelshLanguageService welshLanguageService;
 
-    public void populateTrialDirections(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, String judgeNameTitle) {
-        caseDataBuilder.trialHearingJudgesRecitalDJ(trialNarrativeService.buildJudgesRecital(judgeNameTitle));
-        caseDataBuilder.trialHearingDisclosureOfDocumentsDJ(trialNarrativeService.buildDisclosureOfDocuments());
-        caseDataBuilder.trialHearingWitnessOfFactDJ(trialNarrativeService.buildWitnessOfFact());
-        caseDataBuilder.trialHearingSchedulesOfLossDJ(trialNarrativeService.buildSchedulesOfLoss());
-        caseDataBuilder.trialHearingTrialDJ(trialNarrativeService.buildTrialHearingTrial());
-        caseDataBuilder.trialHearingTimeDJ(trialNarrativeService.buildTrialHearingTime());
+    public void populateTrialDirections(CaseData caseData, String judgeNameTitle) {
+        caseData.setTrialHearingJudgesRecitalDJ(trialNarrativeService.buildJudgesRecital(judgeNameTitle));
+        caseData.setTrialHearingDisclosureOfDocumentsDJ(trialNarrativeService.buildDisclosureOfDocuments());
+        caseData.setTrialHearingWitnessOfFactDJ(trialNarrativeService.buildWitnessOfFact());
+        caseData.setTrialHearingSchedulesOfLossDJ(trialNarrativeService.buildSchedulesOfLoss());
+        caseData.setTrialHearingTrialDJ(trialNarrativeService.buildTrialHearingTrial());
+        caseData.setTrialHearingTimeDJ(trialNarrativeService.buildTrialHearingTime());
 
         LocalDate trialOrderDeadline = trialDeadlineService.workingDaysFromNow(5);
-        caseDataBuilder.trialOrderMadeWithoutHearingDJ(
+        caseData.setTrialOrderMadeWithoutHearingDJ(
             new TrialOrderMadeWithoutHearingDJ()
                 .setInput(welshLanguageService.buildOrderMadeWithoutHearingText(trialOrderDeadline))
         );
 
-        caseDataBuilder.trialHearingNotesDJ(trialNarrativeService.buildTrialHearingNotes());
+        caseData.setTrialHearingNotesDJ(trialNarrativeService.buildTrialHearingNotes());
 
-        specialistDirectionsService.populateSpecialistDirections(caseDataBuilder);
+        specialistDirectionsService.populateSpecialistDirections(caseData);
 
-        caseDataBuilder.sdoR2TrialWelshLanguageDJ(
-            welshLanguageService.buildWelshUsage());
+        caseData.setSdoR2TrialWelshLanguageDJ(welshLanguageService.buildWelshUsage());
 
-        caseDataBuilder.trialHearingDisclosureOfDocumentsDJ(
+        caseData.setTrialHearingDisclosureOfDocumentsDJ(
             trialNarrativeService.buildUpdatedDisclosureOfDocuments());
     }
 }

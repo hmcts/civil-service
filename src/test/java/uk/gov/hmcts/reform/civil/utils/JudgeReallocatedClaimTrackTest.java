@@ -21,7 +21,7 @@ class JudgeReallocatedClaimTrackTest {
 
     @Test
     void hasJudgeReallocatedTrackTest_shouldBeTrueWhenJudgeReallocatedSpec() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .finalOrderAllocateToTrack(YesOrNo.YES)
             .build();
@@ -31,7 +31,7 @@ class JudgeReallocatedClaimTrackTest {
 
     @Test
     void hasJudgeReallocatedTrackTest_shouldBeTrueWhenJudgeReallocatedUnSpec() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .finalOrderAllocateToTrack(YesOrNo.YES)
             .build();
@@ -41,7 +41,7 @@ class JudgeReallocatedClaimTrackTest {
 
     @Test
     void hasJudgeReallocatedTrackTest_shouldBeTrueWhenNotJudgeReallocatedSpec_butAlreadyMinti() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .build();
@@ -51,7 +51,7 @@ class JudgeReallocatedClaimTrackTest {
 
     @Test
     void hasJudgeReallocatedTrackTest_shouldBeTrueWhenNotJudgeReallocatedUnSpec_butAlreadyMinti() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
             .build();

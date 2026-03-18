@@ -27,7 +27,7 @@ class GenerateOrderCOOResp2EmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenRespSolTwoGetTemplateIsInvoked() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn(expectedTemplateId);
 

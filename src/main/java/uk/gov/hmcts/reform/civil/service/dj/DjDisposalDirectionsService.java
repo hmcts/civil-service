@@ -15,29 +15,28 @@ public class DjDisposalDirectionsService {
     private final DjWelshLanguageService welshLanguageService;
     private final DjDisposalNarrativeService disposalNarrativeService;
 
-    public void populateDisposalDirections(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, String judgeNameTitle) {
-        caseDataBuilder.disposalHearingJudgesRecitalDJ(
+    public void populateDisposalDirections(CaseData caseData, String judgeNameTitle) {
+        caseData.setDisposalHearingJudgesRecitalDJ(
             disposalNarrativeService.buildJudgesRecital(judgeNameTitle));
-        caseDataBuilder.disposalHearingDisclosureOfDocumentsDJ(
+        caseData.setDisposalHearingDisclosureOfDocumentsDJ(
             disposalNarrativeService.buildDisclosureOfDocuments());
-        caseDataBuilder.disposalHearingWitnessOfFactDJ(disposalNarrativeService.buildWitnessOfFact());
-        caseDataBuilder.disposalHearingMedicalEvidenceDJ(disposalNarrativeService.buildMedicalEvidence());
-        caseDataBuilder.disposalHearingQuestionsToExpertsDJ(disposalNarrativeService.buildQuestionsToExperts());
-        caseDataBuilder.disposalHearingSchedulesOfLossDJ(disposalNarrativeService.buildSchedulesOfLoss());
-        caseDataBuilder.disposalHearingFinalDisposalHearingDJ(disposalNarrativeService.buildFinalDisposalHearing());
-        caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(
+        caseData.setDisposalHearingWitnessOfFactDJ(disposalNarrativeService.buildWitnessOfFact());
+        caseData.setDisposalHearingMedicalEvidenceDJ(disposalNarrativeService.buildMedicalEvidence());
+        caseData.setDisposalHearingQuestionsToExpertsDJ(disposalNarrativeService.buildQuestionsToExperts());
+        caseData.setDisposalHearingSchedulesOfLossDJ(disposalNarrativeService.buildSchedulesOfLoss());
+        caseData.setDisposalHearingFinalDisposalHearingDJ(disposalNarrativeService.buildFinalDisposalHearing());
+        caseData.setDisposalHearingFinalDisposalHearingTimeDJ(
             disposalNarrativeService.buildFinalDisposalHearingTime());
-        caseDataBuilder.disposalHearingBundleDJ(disposalNarrativeService.buildBundle());
-        caseDataBuilder.disposalHearingNotesDJ(disposalNarrativeService.buildNotes());
+        caseData.setDisposalHearingBundleDJ(disposalNarrativeService.buildBundle());
+        caseData.setDisposalHearingNotesDJ(disposalNarrativeService.buildNotes());
 
         // copy of disposalHearingNotesDJ field to update order made without hearing field without breaking
         // existing cases
         LocalDate orderDeadline = deadlineService.workingDaysFromNow(5);
-        caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(
+        caseData.setDisposalHearingOrderMadeWithoutHearingDJ(
             new DisposalHearingOrderMadeWithoutHearingDJ()
                 .setInput(welshLanguageService.buildOrderMadeWithoutHearingText(orderDeadline)));
 
-        caseDataBuilder.sdoR2DisposalHearingWelshLanguageDJ(
-            welshLanguageService.buildWelshUsage());
+        caseData.setSdoR2DisposalHearingWelshLanguageDJ(welshLanguageService.buildWelshUsage());
     }
 }

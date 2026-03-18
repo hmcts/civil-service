@@ -309,7 +309,7 @@ public class HearingsPartyMapperTest {
             .addApplicant1OrgIndividual("Applicant One", "Hearing Attendee")
             .addRespondent1OrgIndividual("Respondent One", "Hearing Attendee")
             .build()
-            .toBuilder()
+            .copy()
             .applicant1(new Party()
                             .setPartyID(APPLICANT_PARTY_ID)
                             .setCompanyName(APPLICANT_COMPANY_NAME)
@@ -981,7 +981,7 @@ public class HearingsPartyMapperTest {
             .atStateApplicantRespondToDefenceAndProceed()
             .addApplicant1ExpertsAndWitnesses()
             .addRespondent1ExpertsAndWitnesses()
-            .build().toBuilder()
+            .build().copy()
             .applicant1OrganisationPolicy(new uk.gov.hmcts.reform.ccd.model.OrganisationPolicy().setOrgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]")).build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(

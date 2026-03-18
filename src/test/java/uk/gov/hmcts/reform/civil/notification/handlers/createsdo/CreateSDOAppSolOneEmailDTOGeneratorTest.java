@@ -35,7 +35,7 @@ public class CreateSDOAppSolOneEmailDTOGeneratorTest {
     void shouldReturnCorrectEmailTemplateIdWhenSpec() {
         String baseLocation = "base location";
         CaseLocationCivil caseLocation = new CaseLocationCivil().setBaseLocation(baseLocation);
-        CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).caseManagementLocation(caseLocation).build();
+        CaseData caseData = new CaseData().caseAccessCategory(SPEC_CLAIM).caseManagementLocation(caseLocation).build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getSdoOrderedSpec()).thenReturn(expectedTemplateId);
@@ -50,7 +50,7 @@ public class CreateSDOAppSolOneEmailDTOGeneratorTest {
     void shouldReturnCorrectEmailTemplateIdWhenSpecAndEA() {
         String baseLocation = "base location";
         CaseLocationCivil caseLocation = new CaseLocationCivil().setBaseLocation(baseLocation);
-        CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).caseManagementLocation(caseLocation).build();
+        CaseData caseData = new CaseData().caseAccessCategory(SPEC_CLAIM).caseManagementLocation(caseLocation).build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getSdoOrderedSpecEa()).thenReturn(expectedTemplateId);
@@ -63,7 +63,7 @@ public class CreateSDOAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenUnspec() {
-        CaseData caseData = CaseData.builder().caseAccessCategory(UNSPEC_CLAIM).build();
+        CaseData caseData = new CaseData().caseAccessCategory(UNSPEC_CLAIM).build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getSdoOrdered()).thenReturn(expectedTemplateId);

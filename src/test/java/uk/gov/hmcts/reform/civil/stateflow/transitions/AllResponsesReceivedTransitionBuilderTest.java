@@ -88,7 +88,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
     @Test
     void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotificationAcknowledgement1v2() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateTwoRespondentsFullDefenceAfterNotificationAcknowledgement().build().toBuilder()
+            .atStateTwoRespondentsFullDefenceAfterNotificationAcknowledgement().build().copy()
             .build();
 
         Predicate<CaseData> predicate = ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE)
@@ -147,7 +147,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
     @Test
     void shouldReturnFalse_whenPredicateFullDefenceBothNotFullDefence() {
         CaseData caseData = caseDataBuilder
-            .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
+            .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().copy()
             .respondent1ClaimResponseType(COUNTER_CLAIM)
             .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
             .build();
@@ -158,7 +158,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenPredicateFullDefenceAndOneFullDefence() {
         CaseData caseData = caseDataBuilder
-            .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
+            .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().copy()
             .respondent1ClaimResponseType(FULL_DEFENCE)
             .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
             .build();
@@ -169,7 +169,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenPredicateFullDefenceAndBothFullDefence() {
         CaseData caseData = caseDataBuilder
-            .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
+            .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().copy()
             .respondent1ClaimResponseType(FULL_DEFENCE)
             .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
             .build();
@@ -265,7 +265,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenDefendantResponse() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseType(RespondentResponseType.FULL_ADMISSION)
             .respondent1ResponseDate(LocalDateTime.now())
             .build();
@@ -275,7 +275,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenNoDefendantResponse() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_ADMISSION).test(caseData));
     }
@@ -315,7 +315,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenResponseDateIsNull_fullDefence() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ResponseDate(null)
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .build();
@@ -325,7 +325,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenClaimResponseTypeIsNotFullDefence() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
             .build();
@@ -335,7 +335,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenResponseDateIsNull_fullAdmission() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ResponseDate(null)
             .respondent1ClaimResponseType(RespondentResponseType.FULL_ADMISSION)
             .build();
@@ -345,7 +345,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenClaimResponseTypeIsNotFullAdmission() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
             .build();
@@ -355,7 +355,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenResponseDateIsNull_partAdmission() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ResponseDate(null)
             .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
             .build();
@@ -365,7 +365,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenClaimResponseTypeIsNotPartAdmission() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .build();
@@ -375,7 +375,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenGetPredicateForResponseTypeIsCalledWithFullDefenceAndScenarioIsOneVTwoOneLegalRep() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)

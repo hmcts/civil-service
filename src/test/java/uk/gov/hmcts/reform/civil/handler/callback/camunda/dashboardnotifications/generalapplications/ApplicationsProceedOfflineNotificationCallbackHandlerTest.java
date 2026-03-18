@@ -78,7 +78,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
             when(toggleService.isLipVLipEnabled()).thenReturn(false);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
+                .of(ABOUT_TO_SUBMIT, new CaseData().build())
                 .build();
 
             handler.handle(callbackParams);
@@ -113,7 +113,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         void shouldEmptyResponse_whenMainCaseIsNotOffline() {
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
+                .build().copy()
                 .ccdCaseReference(1234L)
                 .ccdState(CASE_ISSUED)
                 .build();
@@ -130,7 +130,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         void shouldEmptyResponse_whenGeneralApplicationsIsNull() {
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
+                .build().copy()
                 .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(null)
@@ -148,7 +148,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         void shouldEmptyResponse_whenGeneralApplicationsIsEmpty() {
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
+                .build().copy()
                 .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(new ArrayList<>())
@@ -169,7 +169,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                     .setCaseLink(new CaseLink("12345678")));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
+                .build().copy()
                 .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
@@ -191,7 +191,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                     .setCaseLink(new CaseLink("12345678")));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
+                .build().copy()
                 .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
@@ -213,7 +213,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                     .setCaseLink(new CaseLink("12345678")));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
+                .build().copy()
                 .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
@@ -241,7 +241,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                     .setCaseLink(new CaseLink("12345678")));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
+                .build().copy()
                 .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
@@ -274,7 +274,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                     .setCaseState("Awaiting Respondent Response"));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
+                .build().copy()
                 .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
@@ -304,7 +304,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                     .setCaseLink(new CaseLink("12345678")));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
+                .build().copy()
                 .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
@@ -332,7 +332,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                     .setCaseLink(new CaseLink("12345678")));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
+                .build().copy()
                 .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
@@ -365,7 +365,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                     .setCaseState("Awaiting Respondent Response"));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
+                .build().copy()
                 .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)

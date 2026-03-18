@@ -25,7 +25,7 @@ class RaisingClaimAgainstLitigantInPersonForSpecAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         when(notificationsProperties.getClaimantSolicitorSpecCaseWillProgressOffline()).thenReturn(TEMPLATE_ID);
 
         String templateId = generator.getEmailTemplateId(caseData);

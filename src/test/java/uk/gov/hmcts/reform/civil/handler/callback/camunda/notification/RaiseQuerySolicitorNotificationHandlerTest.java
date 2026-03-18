@@ -182,7 +182,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             )).thenReturn(List.of(CaseRole.CLAIMANT.toString()));
             when(notificationsProperties.getQueryRaisedLip()).thenReturn(TEMPLATE_ID);
             CaseData caseData =
-                createCaseDataWithQueries().toBuilder()
+                createCaseDataWithQueries().copy()
                     .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualFirstName("a")
                                     .setIndividualLastName("b").setPartyEmail("applicant@email.com"))
                     .applicant1Represented(YesOrNo.NO)
@@ -214,7 +214,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             )).thenReturn(List.of(CaseRole.CLAIMANT.toString()));
             when(notificationsProperties.getQueryRaisedLipBilingual()).thenReturn(TEMPLATE_ID);
             CaseData caseData =
-                createCaseDataWithQueries().toBuilder()
+                createCaseDataWithQueries().copy()
                     .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualFirstName("a")
                                     .setIndividualLastName("b").setPartyEmail("applicant@email.com"))
                     .qmLatestQuery(createLatestQuery("4"))
@@ -247,7 +247,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             )).thenReturn(List.of(CaseRole.DEFENDANT.toString()));
             when(notificationsProperties.getQueryRaisedLip()).thenReturn(TEMPLATE_ID);
             CaseData caseData =
-                createCaseDataWithQueries().toBuilder()
+                createCaseDataWithQueries().copy()
                     .respondent1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualFirstName("a")
                                      .setIndividualLastName("b").setPartyEmail("applicant@email.com"))
                     .qmLatestQuery(createLatestQuery("5"))
@@ -283,7 +283,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         ));
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder()
+            .copy()
             .applicantSolicitor1UserDetails(new IdamUserDetails()
                                                 .setEmail("applicant@email.com")
                                                 )

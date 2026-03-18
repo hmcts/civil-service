@@ -38,7 +38,7 @@ class CaseTakenOfflineAppLipSolOne1EmailDTOGeneratorTest {
 
     @Test
     void shouldUseEnglishTemplate() {
-        CaseData data = CaseData.builder()
+        CaseData data = new CaseData()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .applicant1Represented(YesOrNo.YES)
                 .applicant1ResponseDeadline(LocalDateTime.now().plusDays(1))
@@ -58,7 +58,7 @@ class CaseTakenOfflineAppLipSolOne1EmailDTOGeneratorTest {
 
     @Test
     void shouldUseWelshTemplate() {
-        CaseData data = CaseData.builder()
+        CaseData data = new CaseData()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .applicant1Represented(YesOrNo.YES)
             .claimantBilingualLanguagePreference(Language.WELSH.toString())
@@ -87,7 +87,7 @@ class CaseTakenOfflineAppLipSolOne1EmailDTOGeneratorTest {
     void shouldAddCustomProperties() {
         Party party = new Party();
         String caseReference = "1111";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party().setIndividualFirstName("Claimant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
             .respondent1(new Party().setIndividualFirstName("Defendant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
             .legacyCaseReference(caseReference)

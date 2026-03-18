@@ -16,7 +16,7 @@ class DjNarrativeServiceTest {
 
     @Test
     void shouldBuildHeaderWithClaimNumber() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .legacyCaseReference(CLAIM_NUMBER)
             .build();
 
@@ -60,7 +60,7 @@ class DjNarrativeServiceTest {
             .multiPartyClaimOneDefendantSolicitor()
             .legacyCaseReference(CLAIM_NUMBER)
             .build()
-            .toBuilder()
+            .copy()
             .defendantDetails(dynamicListWithValue())
             .build();
 

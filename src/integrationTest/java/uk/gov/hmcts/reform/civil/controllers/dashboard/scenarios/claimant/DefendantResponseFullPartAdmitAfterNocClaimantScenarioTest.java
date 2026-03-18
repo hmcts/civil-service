@@ -34,7 +34,7 @@ public class DefendantResponseFullPartAdmitAfterNocClaimantScenarioTest extends 
         String caseId = "11234949494";
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .applicant1ResponseDeadline(LocalDateTime.of(2025, 5, 13, 16, 0))
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .changeOfRepresentation(new ChangeOfRepresentation())

@@ -136,7 +136,7 @@ class NotifyApplicant1GenericTemplateHandlerTest {
                             .setType(Party.Type.INDIVIDUAL))
             .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson")
                              .setType(Party.Type.INDIVIDUAL)).build();
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+        caseData = caseData.copy().claimantBilingualLanguagePreference("BOTH").build();
 
         when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(
             BILINGUAL_TEMPLATE_ID);

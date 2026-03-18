@@ -89,7 +89,7 @@ class CourtOfficerOrderGeneratorTest {
                  .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER)))
             .thenReturn(COURT_OFFICER_ORDER_DOC);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .courtOfficerOrdered("apples and bananas")
             .hearingLocation(new DynamicList().setValue(DynamicListElement.dynamicElement("A hearing location")))
             .caseManagementLocation(caseManagementLocation)
@@ -109,7 +109,7 @@ class CourtOfficerOrderGeneratorTest {
                  .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER)))
             .thenReturn(COURT_OFFICER_ORDER_DOC);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .courtOfficerOrdered("apples and bananas")
             .applicant2(new Party().setPartyName("applicant2").setType(Party.Type.INDIVIDUAL))
             .caseManagementLocation(caseManagementLocation)
@@ -129,7 +129,7 @@ class CourtOfficerOrderGeneratorTest {
                  .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER)))
             .thenReturn(COURT_OFFICER_ORDER_DOC);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .courtOfficerOrdered("apples and bananas")
             .respondent2(new Party().setPartyName("respondent2").setType(Party.Type.INDIVIDUAL))
             .caseManagementLocation(caseManagementLocation)
@@ -150,7 +150,7 @@ class CourtOfficerOrderGeneratorTest {
             .thenReturn(COURT_OFFICER_ORDER_DOC);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenThrow(IllegalArgumentException.class);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("1111111"))
             .build();
 

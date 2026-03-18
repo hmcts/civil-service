@@ -87,7 +87,7 @@ class GenerateHearingNoticeDefendantEmailDTOGeneratorTest {
 
     @Test
     void addCustomProperties_populatesCaseRefDateAndTime() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .legacyCaseReference(CASE_REF)
                 .hearingDate(HEARING_DATE_VAL)
                 .hearingTimeHourMinute(TIME_ARG)

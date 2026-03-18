@@ -50,7 +50,7 @@ public class ContactInformationUpdatedCallbackHandler extends CallbackHandler {
         updateCamundaVars(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().contactDetailsUpdatedEvent(null).build().toMap(objectMapper))
+            .data(caseData.copy().contactDetailsUpdatedEvent(null).build().toMap(objectMapper))
             .build();
     }
 

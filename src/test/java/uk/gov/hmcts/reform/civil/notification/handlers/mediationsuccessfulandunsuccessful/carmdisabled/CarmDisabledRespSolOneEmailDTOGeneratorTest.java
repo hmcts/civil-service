@@ -42,7 +42,7 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualFirstName("Alice")
@@ -90,7 +90,7 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnTrueForShouldNotify_whenLipvLROneVOneIsTrue() {
-        CaseData caseDataWithFlag = CaseData.builder()
+        CaseData caseDataWithFlag = new CaseData()
             .respondent1Represented(YesOrNo.YES)
             .applicant1Represented(YesOrNo.NO)
             .build();
@@ -102,7 +102,7 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnFalseForShouldNotify_whenLipvLROneVOneIsFalse() {
-        CaseData caseDataWithFlag = CaseData.builder()
+        CaseData caseDataWithFlag = new CaseData()
             .respondent1Represented(YesOrNo.NO)
             .build();
 

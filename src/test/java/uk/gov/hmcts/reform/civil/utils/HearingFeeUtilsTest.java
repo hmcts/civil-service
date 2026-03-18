@@ -69,7 +69,7 @@ class HearingFeeUtilsTest {
         AllocatedTrack allocatedTrack = getAllocatedTrack(track);
         BigDecimal feeInPence = new BigDecimal(expectedFee);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .build().toBuilder()
+            .build().copy()
             .allocatedTrack(allocatedTrack)
             .build();
 
@@ -89,7 +89,7 @@ class HearingFeeUtilsTest {
     @Test
     void shouldThrowException_whenInvalidClaimTrack() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .build().toBuilder()
+            .build().copy()
             .build();
 
         assertThrows(IllegalArgumentException.class, () -> calculateAndApplyFee(hearingFeesService, caseData, "bananas"));

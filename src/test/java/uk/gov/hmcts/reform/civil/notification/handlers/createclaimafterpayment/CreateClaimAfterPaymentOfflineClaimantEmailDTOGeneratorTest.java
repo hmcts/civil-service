@@ -64,7 +64,7 @@ public class CreateClaimAfterPaymentOfflineClaimantEmailDTOGeneratorTest {
 
     @Test
     void addProperties_returnsOnlyLipProps_whenLipvLROneVOne() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .applicant1(new Party().setCompanyName("Applicant 1").setType(Party.Type.COMPANY))
                 .respondent1(new Party().setCompanyName("Respondent 1").setType(Party.Type.COMPANY))
                 .build();

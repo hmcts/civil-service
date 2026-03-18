@@ -77,7 +77,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         claimantResponse.setParentId("123457");
         CaseQueriesCollection claimantQueries = new CaseQueriesCollection();
         claimantQueries.setCaseMessages(wrapElements(List.of(claimantQuery, claimantResponse)));
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(
                 new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
                 )
@@ -127,7 +127,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         defendantResponse.setParentId("123457");
         CaseQueriesCollection defendantQueries = new CaseQueriesCollection();
         defendantQueries.setCaseMessages(wrapElements(List.of(defendantQuery, defendantResponse)));
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .qmLatestQuery(createLatestQuery("queryId"))
             .queries(defendantQueries)
             .legacyCaseReference("reference")

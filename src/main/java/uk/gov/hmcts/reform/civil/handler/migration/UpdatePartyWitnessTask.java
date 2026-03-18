@@ -75,7 +75,7 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
         Respondent1DQ updateRespondent1DQ = updateRespondent1DQWitness(caseData.getRespondent1DQ(), updateWitness);
         Respondent2DQ updateRespondent2DQ = updateRespondent2DQWitness(caseData.getRespondent2DQ(), updateWitness);
 
-        return caseData.toBuilder()
+        return caseData.copy()
             .applicantWitnesses(updatedApplicantWitness)
             .respondent1Witnesses(updatedRespondent1Witness)
             .respondent2Witnesses(updatedRespondent2Witness)

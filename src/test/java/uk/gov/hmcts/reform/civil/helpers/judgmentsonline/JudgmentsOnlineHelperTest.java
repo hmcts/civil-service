@@ -55,7 +55,7 @@ public class JudgmentsOnlineHelperTest {
     @Test
     void checkIfNonDivergent() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued().build().toBuilder()
+            .atStateClaimIssued().build().copy()
             .applicant1(new PartyBuilder().individual().build())
             .respondent1(new PartyBuilder().individual().build())
             .respondent2(new PartyBuilder().individual().build())
@@ -69,7 +69,7 @@ public class JudgmentsOnlineHelperTest {
     @Test
     void checkIfDivergent() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued().build().toBuilder()
+            .atStateClaimIssued().build().copy()
             .applicant1(new PartyBuilder().individual().build())
             .respondent1(new PartyBuilder().individual().build())
             .respondent2(new PartyBuilder().individual().build())
@@ -83,7 +83,7 @@ public class JudgmentsOnlineHelperTest {
     @Test
     void testCostOfJudgmentForDJ() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued().build().toBuilder()
+            .atStateClaimIssued().build().copy()
             .repaymentSummaryObject(
                 REPAYMENT_SUMMARY_OBJECT)
             .build();
@@ -94,7 +94,7 @@ public class JudgmentsOnlineHelperTest {
     @Test
     void testPartialPayment() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued().build().toBuilder()
+            .atStateClaimIssued().build().copy()
             .repaymentSummaryObject(
                 REPAYMENT_SUMMARY_OBJECT)
             .partialPayment(YES)

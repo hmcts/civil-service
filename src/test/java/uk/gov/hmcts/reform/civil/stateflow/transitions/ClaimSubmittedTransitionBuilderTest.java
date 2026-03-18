@@ -80,7 +80,7 @@ class ClaimSubmittedTransitionBuilderTest {
         result = claimSubmittedTransitionBuilder.buildTransitions();
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+        caseData = caseData.copy().claimantBilingualLanguagePreference("BOTH").build();
         assertThat(getCaseFlags(result.get(6), caseData)).hasSize(3).contains(
             entry(FlowFlag.LIP_CASE.name(), true),
             entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
@@ -167,7 +167,7 @@ class ClaimSubmittedTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenCaseDataIsBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .claimantBilingualLanguagePreference("BOTH")
             .build();
         assertTrue(LanguagePredicate.claimantIsBilingual.test(caseData));
@@ -175,7 +175,7 @@ class ClaimSubmittedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenCaseDataIsNotBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .claimantBilingualLanguagePreference(null)
             .build();
         assertFalse(LanguagePredicate.claimantIsBilingual.test(caseData));
@@ -214,7 +214,7 @@ class ClaimSubmittedTransitionBuilderTest {
         CaseDataLiP caseDataLiP = new CaseDataLiP()
             .setHelpWithFees(helpWithFees);
 
-        return CaseData.builder()
+        return new CaseData()
             .caseDataLiP(caseDataLiP)
             .build();
     }

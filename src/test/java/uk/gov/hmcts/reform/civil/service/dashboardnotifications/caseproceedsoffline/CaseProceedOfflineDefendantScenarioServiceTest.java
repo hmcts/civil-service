@@ -40,7 +40,7 @@ class CaseProceedOfflineDefendantScenarioServiceTest {
     @Test
     void shouldResolvePrimaryScenarioForFastTrackJudgment() {
         CaseData fastTrack =
-                CaseData.builder()
+                new CaseData()
                         .ccdCaseReference(1L)
                         .activeJudgment(new JudgmentDetails())
                         .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
@@ -51,11 +51,11 @@ class CaseProceedOfflineDefendantScenarioServiceTest {
                         SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK
                                 .getScenario());
 
-        CaseData judgment = fastTrack.toBuilder().responseClaimTrack(null).build();
+        CaseData judgment = fastTrack.copy().responseClaimTrack(null).build();
         assertThat(service.resolvePrimaryScenario(judgment))
                 .isEqualTo(SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario());
 
-        CaseData noJudgment = CaseData.builder().build();
+        CaseData noJudgment = new CaseData().build();
         assertThat(service.resolvePrimaryScenario(noJudgment))
                 .isEqualTo(
                         SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES
@@ -65,7 +65,7 @@ class CaseProceedOfflineDefendantScenarioServiceTest {
     @Test
     void shouldResolveAdditionalScenarios() {
         CaseData caseData =
-                CaseData.builder()
+                new CaseData()
                         .generalApplications(wrapElements(new GeneralApplication()))
                         .build();
 
@@ -83,14 +83,14 @@ class CaseProceedOfflineDefendantScenarioServiceTest {
     @Test
     void shouldRecordScenarioInCaseProgressionOnlyWhenEligible() {
         CaseData eligible =
-                CaseData.builder()
+                new CaseData()
                         .ccdCaseReference(1L)
                         .respondent1Represented(YesOrNo.NO)
                         .applicant1Represented(YesOrNo.NO)
                         .previousCCDState(CaseState.CASE_PROGRESSION)
                         .build();
 
-        CaseData ineligible = eligible.toBuilder().respondent1Represented(YesOrNo.YES).build();
+        CaseData ineligible = eligible.copy().respondent1Represented(YesOrNo.YES).build();
 
         assertThat(service.shouldRecordScenarioInCaseProgression(eligible)).isTrue();
         assertThat(service.shouldRecordScenarioInCaseProgression(ineligible)).isFalse();

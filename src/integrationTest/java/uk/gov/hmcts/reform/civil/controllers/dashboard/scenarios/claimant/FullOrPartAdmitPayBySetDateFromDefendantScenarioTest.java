@@ -33,7 +33,7 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
@@ -86,7 +86,7 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
         String caseId = "720138";
         LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

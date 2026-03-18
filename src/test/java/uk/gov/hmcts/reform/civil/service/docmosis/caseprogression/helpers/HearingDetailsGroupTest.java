@@ -40,7 +40,7 @@ public class HearingDetailsGroupTest {
     @Test
     void shouldPopulateHearingDetails_whenAllFieldsArePresent() {
         LocalDate datesToAvoid = LocalDate.of(2023, 11, 25);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderFurtherHearingToggle(toggleList)
             .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()
                                                  .setHearingMethodList(IN_PERSON)
@@ -68,7 +68,7 @@ public class HearingDetailsGroupTest {
     @Test
     void testGetFurtherHearingLength() {
         for (HearingLengthFinalOrderList hearingLengthFinalOrderList : List.of(HearingLengthFinalOrderList.values())) {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderRecitals(null)
                 .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing().setLengthList(
                         hearingLengthFinalOrderList)
@@ -92,7 +92,7 @@ public class HearingDetailsGroupTest {
 
     @Test
     void testGetFurtherHearingLengthOther() {
-        CaseData minCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData minCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderRecitals(null)
             .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing().setLengthList(HearingLengthFinalOrderList.OTHER)
                                                  .setLengthListOther(new CaseHearingLengthElement()
@@ -102,7 +102,7 @@ public class HearingDetailsGroupTest {
         String response = hearingDetailsPopulator.getFurtherHearingLength(minCaseData);
         Assertions.assertEquals("30 minutes", response);
 
-        CaseData hourCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData hourCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderRecitals(null)
             .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing().setLengthList(HearingLengthFinalOrderList.OTHER)
                                                  .setLengthListOther(new CaseHearingLengthElement()
@@ -113,7 +113,7 @@ public class HearingDetailsGroupTest {
         response = hearingDetailsPopulator.getFurtherHearingLength(hourCaseData);
         Assertions.assertEquals("1 hours ", response);
 
-        CaseData dayCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData dayCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderRecitals(null)
             .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing().setLengthList(HearingLengthFinalOrderList.OTHER)
                                                  .setLengthListOther(new CaseHearingLengthElement()
@@ -127,7 +127,7 @@ public class HearingDetailsGroupTest {
 
     @Test
     void testGetFurtherHearingLengthWhenNull() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderRecitals(null)
             .finalOrderFurtherHearingComplex(null).build();
 
@@ -137,7 +137,7 @@ public class HearingDetailsGroupTest {
 
     @Test
     void testGetFurtherHearingFromDate() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderRecitals(null)
             .finalOrderFurtherHearingToggle(toggleList)
             .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing().setListFromDate(LocalDate.of(2022, 12,
@@ -151,7 +151,7 @@ public class HearingDetailsGroupTest {
 
     @Test
     void testGetFurtherHearingToDate() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderRecitals(null)
             .finalOrderFurtherHearingToggle(toggleList)
             .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing().setDateToDate(LocalDate.of(2022, 12,
@@ -165,14 +165,14 @@ public class HearingDetailsGroupTest {
 
     @Test
     void testIsDefaultCourt() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderFurtherHearingToggle(toggleList)
             .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()
                                                  .setHearingLocationList(new DynamicList()
                                                                             .setValue(new DynamicListElement()
                                                                                           .setCode("LOCATION_LIST"))))
             .build();
-        CaseData caseDataWhenFalse = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseDataWhenFalse = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderFurtherHearingToggle(toggleList)
             .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()
                                                  .setHearingLocationList(new DynamicList()

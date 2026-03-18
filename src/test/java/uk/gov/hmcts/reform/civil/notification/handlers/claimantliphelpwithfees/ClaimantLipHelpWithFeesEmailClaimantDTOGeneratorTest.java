@@ -48,7 +48,7 @@ class ClaimantLipHelpWithFeesEmailClaimantDTOGeneratorTest {
         caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .build()
-                .toBuilder()
+                .copy()
                 .legacyCaseReference(LEGACY_REFERENCE)
                 .claimantUserDetails(
                         new IdamUserDetails().setEmail(EMAIL)
@@ -90,7 +90,7 @@ class ClaimantLipHelpWithFeesEmailClaimantDTOGeneratorTest {
         when(notificationsProperties.getNotifyClaimantLipHelpWithFeesWelsh())
                 .thenReturn(WELSH_TEMPLATE);
 
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .build();
 

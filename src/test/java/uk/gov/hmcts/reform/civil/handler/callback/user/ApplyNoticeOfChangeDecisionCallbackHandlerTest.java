@@ -100,7 +100,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
             void shouldApplyNoticeOfChange_whenInvokedByRespondent1For1v1LiP() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                     .changeOrganisationRequestField(false, false, "1234", null, REQUESTER_EMAIL)
-                    .build().toBuilder().respondent1OrganisationIDCopy(null).build();
+                    .build().copy().respondent1OrganisationIDCopy(null).build();
 
                 executeTest(caseData, RESPONDENT_ONE_ORG_POLICY);
             }
@@ -189,7 +189,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
             void shouldApplyNoticeOfChange_whenInvokedByRespondent2For1v2DSLiP() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v2Respondent2LiP()
                     .changeOrganisationRequestField(false, true, "1234", null, REQUESTER_EMAIL)
-                    .build().toBuilder().respondent2OrganisationIDCopy(null).build();
+                    .build().copy().respondent2OrganisationIDCopy(null).build();
 
                 executeTest(caseData, RESPONDENT_TWO_ORG_POLICY);
             }
@@ -296,14 +296,14 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
             ChangeOrganisationRequest request = createRequest(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
             request.setOrganisationToRemove(new Organisation().setOrganisationID(ORG_ID));
 
-            assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request))
+            assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(new CaseData().build(), request))
                 .isEqualTo(ORG_ID);
         }
 
         @Test
         void testGetChangedOrgReturnsRespondent1OrgIdCopy() {
             ChangeOrganisationRequest request = createRequest(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
-            CaseData caseData = CaseData.builder().respondent1OrganisationIDCopy(ORG_ID).build();
+            CaseData caseData = new CaseData().respondent1OrganisationIDCopy(ORG_ID).build();
 
             assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(caseData, request)).isEqualTo(ORG_ID);
         }
@@ -311,7 +311,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
         @Test
         void testGetChangedOrgReturnsRespondent2OrgIdCopy() {
             ChangeOrganisationRequest request = createRequest(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
-            CaseData caseData = CaseData.builder().respondent2OrganisationIDCopy(ORG_ID).build();
+            CaseData caseData = new CaseData().respondent2OrganisationIDCopy(ORG_ID).build();
 
             assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(caseData, request)).isEqualTo(ORG_ID);
         }
@@ -320,28 +320,28 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
         void testGetChangedOrgReturnsRespondent1OrgIdCopyNull() {
             ChangeOrganisationRequest request = createRequest(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
 
-            assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request)).isNull();
+            assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(new CaseData().build(), request)).isNull();
         }
 
         @Test
         void testGetChangedOrgReturnsRespondent2OrgIdCopyNull() {
             ChangeOrganisationRequest request = createRequest(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
 
-            assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request)).isNull();
+            assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(new CaseData().build(), request)).isNull();
         }
 
         @Test
         void testGetChangedOrgApplicant() {
             ChangeOrganisationRequest request = createRequest(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
 
-            assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request)).isNull();
+            assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(new CaseData().build(), request)).isNull();
         }
 
         @Test
         void testGetChangedOrgReturnsNullForUnknownCaseRole() {
             ChangeOrganisationRequest request = createRequest("[UNKNOWN-ROLE]");
 
-            assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request)).isNull();
+            assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(new CaseData().build(), request)).isNull();
         }
 
         private ChangeOrganisationRequest createRequest(String caseRole) {
@@ -379,7 +379,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
                 handler,
                 "getFormerEmail",
                 CaseRole.APPLICANTSOLICITORONE.getFormattedName(),
-                CaseData.builder().build()
+                new CaseData().build()
             );
 
             assertThat(formerEmail).isNull();
@@ -391,7 +391,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
                 handler,
                 "getFormerEmail",
                 CaseRole.RESPONDENTSOLICITORTWO.getFormattedName(),
-                CaseData.builder().respondentSolicitor2EmailAddress("res2@example.com").build()
+                new CaseData().respondentSolicitor2EmailAddress("res2@example.com").build()
             );
 
             assertThat(formerEmail).isEqualTo("res2@example.com");
@@ -405,7 +405,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
                 handler,
                 "getFormerEmail",
                 CaseRole.APPLICANTSOLICITORONE.getFormattedName(),
-                CaseData.builder().applicantSolicitor1UserDetails(userDetails).build()
+                new CaseData().applicantSolicitor1UserDetails(userDetails).build()
             );
 
             assertThat(formerEmail).isEqualTo("applicant@example.com");
@@ -422,7 +422,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
                 handler,
                 "getChangeOfRepresentation",
                 request,
-                CaseData.builder()
+                new CaseData()
                     .respondent2OrganisationIDCopy("copy-org-id-2")
                     .respondentSolicitor2EmailAddress("res2@example.com")
                     .build()

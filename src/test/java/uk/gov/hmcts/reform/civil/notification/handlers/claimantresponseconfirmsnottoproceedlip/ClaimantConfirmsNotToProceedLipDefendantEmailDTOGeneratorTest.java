@@ -48,7 +48,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenCaseIsPartAdmitPayImmediatelyAccepted() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YES)
             .showResponseOneVOneFlag(ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
@@ -64,7 +64,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenLipVLipEnabledAndClaimantDontWantToProceedWithFulLDefenceFD() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .applicant1ProceedWithClaim(NO)
             .build();
@@ -80,7 +80,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenLipVLipEnabledAndClaimantDontWantToProceedWithFulLDefenceFDBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .applicant1ProceedWithClaim(NO)
             .caseDataLiP(
@@ -102,7 +102,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenLipVLipDisabledAndNotClaimantDontWantToProceedWithFulLDefence() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn(expectedTemplateId);
@@ -115,7 +115,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenLipVLipEnabledAndNotClaimantDontWantToProceedWithFulLDefence() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn(expectedTemplateId);
@@ -128,7 +128,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenLipVLipDisabledAndClaimantDontWantToProceedWithFulLDefence() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .applicant1ProceedWithClaim(NO)
             .build();
@@ -153,7 +153,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
     void shouldReturnCorrectCustomPropertiesWhenLipVLipEnabledAndClaimantDontWantToProceedWithFulLDefenceFD() {
         Party party = new Party();
         String legacyCaseNumber = "legacyCaseNumber";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .applicant1ProceedWithClaim(NO)
             .legacyCaseReference(legacyCaseNumber)
@@ -180,7 +180,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
     void shouldReturnCorrectCustomPropertiesWhenCaseIsPartAdmitPayImmediatelyAccepted() {
         Party party = new Party();
         String legacyCaseNumber = "legacyCaseNumber";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YES)
             .showResponseOneVOneFlag(ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
@@ -205,7 +205,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectCustomPropertiesWhenIsNotPartAdmitPayImmediatelyAcceptedAndNotClaimantDontWantToProceedWithFulLDefenceFD() {
         Party party = new Party();
-        CaseData caseData = CaseData.builder().respondent1(party).build();
+        CaseData caseData = new CaseData().respondent1(party).build();
 
         String partyName = "partyName";
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
@@ -223,7 +223,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectCustomPropertiesWhenIsNotPartAdmitPayImmediatelyAcceptedAndLipVLipDisabled() {
         Party party = new Party();
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .applicant1ProceedWithClaim(NO)
             .respondent1(party)

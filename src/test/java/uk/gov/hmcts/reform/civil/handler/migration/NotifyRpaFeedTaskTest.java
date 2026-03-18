@@ -52,7 +52,7 @@ class NotifyRpaFeedTaskTest {
         given(userConfig.getPassword()).willReturn(password);
         given(userService.getAccessToken(userName, password)).willReturn(accessToken);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         notifyRpaFeedTask.migrateCaseData(caseData, caseReference);
 
         verify(roboticsNotifier).notifyRobotics(caseData, accessToken);
@@ -72,7 +72,7 @@ class NotifyRpaFeedTaskTest {
         given(userConfig.getPassword()).willReturn(password);
         given(userService.getAccessToken(userName, password)).willReturn(accessToken);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         notifyRpaFeedTask.migrateCaseData(caseData, caseReference);
 
         verifyNoInteractions(roboticsNotifier);
@@ -93,7 +93,7 @@ class NotifyRpaFeedTaskTest {
         given(userConfig.getPassword()).willReturn(password);
         given(userService.getAccessToken(userName, password)).willReturn(accessToken);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         notifyRpaFeedTask.migrateCaseData(caseData, caseReference);
 
         verify(defaultJudgmentRoboticsNotifier).notifyRobotics(caseData, accessToken);

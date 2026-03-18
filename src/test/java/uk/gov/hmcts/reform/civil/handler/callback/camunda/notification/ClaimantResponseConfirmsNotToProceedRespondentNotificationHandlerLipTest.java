@@ -130,7 +130,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
                 .applicant1Represented(YES)
                 .responseClaimTrack(SMALL_CLAIM.name())
                 .applicant1ProceedWithClaim(NO)
-                .build().toBuilder()
+                .build().copy()
                 .defenceRouteRequired(DISPUTES_THE_CLAIM)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -160,7 +160,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
                 .responseClaimTrack(SMALL_CLAIM.name())
                 .applicant1ProceedWithClaim(NO)
                 .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")))
-                .build().toBuilder()
+                .build().copy()
                 .defenceRouteRequired(DISPUTES_THE_CLAIM)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -186,7 +186,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
                 .setClaimTypeToSpecClaim()
                 .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
                 .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
-                .build().toBuilder().respondent1Represented(NO).build();
+                .build().copy().respondent1Represented(NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_LIP")
                     .build()).build();

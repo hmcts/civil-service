@@ -54,7 +54,7 @@ class RoboticsRespondentResponseSupportTest {
             .multiPartyClaimTwoApplicants()
             .atStateApplicant2RespondToDefenceAndProceed_2v1()
             .build()
-            .toBuilder()
+            .copy()
             .respondent1ClaimResponseType(null)
             .respondent1ClaimResponseTypeForSpec(null)
             .build();

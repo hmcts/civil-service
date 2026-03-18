@@ -27,7 +27,7 @@ public class ClaimantEndsClaimFullDefenceFullDisputeScenarioTest extends Dashboa
         String caseId = "1234678912";
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

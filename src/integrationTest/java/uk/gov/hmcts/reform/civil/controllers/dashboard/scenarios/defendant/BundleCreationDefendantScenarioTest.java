@@ -24,7 +24,7 @@ public class BundleCreationDefendantScenarioTest extends DashboardBaseIntegratio
     void should_create_bundle_created_scenario_when_trial_ready() throws Exception {
         String caseId = "12349854";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyRespondent1().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
@@ -62,7 +62,7 @@ public class BundleCreationDefendantScenarioTest extends DashboardBaseIntegratio
     void should_create_bundle_created_scenario_when_small_claims() throws Exception {
         String caseId = "17849854";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
@@ -96,7 +96,7 @@ public class BundleCreationDefendantScenarioTest extends DashboardBaseIntegratio
     void should_create_bundle_created_scenario_when_fast_track() throws Exception {
         String caseId = "12310493";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)

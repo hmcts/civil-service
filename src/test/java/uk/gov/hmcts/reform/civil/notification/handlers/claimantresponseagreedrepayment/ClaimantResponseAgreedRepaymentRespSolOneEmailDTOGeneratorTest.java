@@ -26,7 +26,7 @@ public class ClaimantResponseAgreedRepaymentRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getRespondentSolicitorCcjNotificationTemplate()).thenReturn(expectedTemplateId);
 

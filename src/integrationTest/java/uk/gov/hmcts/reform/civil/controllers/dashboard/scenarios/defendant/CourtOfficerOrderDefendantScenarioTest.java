@@ -25,7 +25,7 @@ public class CourtOfficerOrderDefendantScenarioTest extends DashboardBaseIntegra
         String caseId = "72016577145";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-                .toBuilder()
+                .copy()
                 .legacyCaseReference("reference")
                 .ccdCaseReference(Long.valueOf(caseId))
                 .respondent1Represented(YesOrNo.NO)
@@ -58,7 +58,7 @@ public class CourtOfficerOrderDefendantScenarioTest extends DashboardBaseIntegra
         String caseId = "72016577183";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)

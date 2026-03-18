@@ -24,7 +24,7 @@ public class ClaimIntentMediationSuccessfulDefendantScenarioTest extends Dashboa
 
         String caseId = String.valueOf(System.currentTimeMillis());
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .respondent1Represented(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))

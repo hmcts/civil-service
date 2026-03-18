@@ -61,7 +61,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventProcessorTest {
     void shouldCreateClaimantDashboardNotifications() {
         LocalDate whenWillThisAmountBePaid = LocalDate.now().plusDays(5);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
-        CaseData updated = caseData.toBuilder()
+        CaseData updated = caseData.copy()
             .ccdCaseReference(CASE_ID)
             .totalClaimAmount(BigDecimal.valueOf(124.67))
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()

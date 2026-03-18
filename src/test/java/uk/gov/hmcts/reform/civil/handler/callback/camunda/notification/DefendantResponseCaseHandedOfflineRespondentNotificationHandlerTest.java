@@ -611,7 +611,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                     .build();
                 caseData = caseData
-                    .toBuilder()
+                    .copy()
                     .caseAccessCategory(SPEC_CLAIM)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -640,7 +640,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                     .build();
                 caseData = caseData
-                    .toBuilder()
+                    .copy()
                     .caseAccessCategory(SPEC_CLAIM)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

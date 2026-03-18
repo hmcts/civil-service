@@ -35,7 +35,7 @@ class DefendantResponseRespSolOneEmailDTOGeneratorTest {
         String expectedTemplateId = "some-template-id";
         when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn(expectedTemplateId);
 
-        String actualTemplateId = generator.getEmailTemplateId(CaseData.builder().build());
+        String actualTemplateId = generator.getEmailTemplateId(new CaseData().build());
 
         assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
     }
@@ -52,7 +52,7 @@ class DefendantResponseRespSolOneEmailDTOGeneratorTest {
             .setIndividualLastName("Doe")
             .setType(Party.Type.INDIVIDUAL);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(respondent)
             .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
             .build();
@@ -75,7 +75,7 @@ class DefendantResponseRespSolOneEmailDTOGeneratorTest {
             .setCompanyName("Beta Ltd")
             .setType(Party.Type.COMPANY);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(respondent1)
             .respondent2(respondent2)
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
@@ -92,7 +92,7 @@ class DefendantResponseRespSolOneEmailDTOGeneratorTest {
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn(expectedTemplateId);
 
-        String result = generator.getEmailTemplateId(CaseData.builder().build());
+        String result = generator.getEmailTemplateId(new CaseData().build());
 
         assertThat(result).isEqualTo(expectedTemplateId);
         verify(notificationsProperties).getClaimantSolicitorDefendantResponseFullDefence();

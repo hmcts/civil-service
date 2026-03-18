@@ -29,7 +29,7 @@ class CaseProceedOfflineAppSolEmailDTOGeneratorTest {
         String expectedTemplateId = "template-id-123";
         when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn(expectedTemplateId);
 
-        String actualTemplateId = generator.getEmailTemplateId(CaseData.builder().build());
+        String actualTemplateId = generator.getEmailTemplateId(new CaseData().build());
 
         assertEquals(expectedTemplateId, actualTemplateId);
     }

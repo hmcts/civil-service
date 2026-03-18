@@ -49,7 +49,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
         String caseId = "72014545415";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
@@ -85,7 +85,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
         String caseId = "72014545415";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
@@ -124,7 +124,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
         String caseId = "72014545415";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
@@ -160,7 +160,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
         String caseId = "72014545415332";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
@@ -204,7 +204,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
         String caseId = "7201458805332";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

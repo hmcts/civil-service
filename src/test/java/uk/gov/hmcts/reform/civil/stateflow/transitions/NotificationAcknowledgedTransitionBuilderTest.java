@@ -220,7 +220,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
     void reasonNotSuitableForSdo() {
         ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
         reasonNotSuitableSDO.setInput("Test");
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .reasonNotSuitableSDO(reasonNotSuitableSDO)
             .build();
         assertTrue(TakenOfflinePredicate.sdoNotSuitable.test(caseData));
@@ -228,7 +228,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
 
     @Test
     void reasonNotSuitableForSdo_shouldReturnFalse_whenNoReason() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .reasonNotSuitableSDO(null)
             .build();
         assertFalse(TakenOfflinePredicate.sdoNotSuitable.test(caseData));

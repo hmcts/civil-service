@@ -26,7 +26,7 @@ public class DefendantFullDefenceFullDisputeWithMediationScenarioTest extends  D
 
         String caseId = "720111";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-                .toBuilder()
+                .copy()
                 .legacyCaseReference("reference")
                 .ccdCaseReference(Long.valueOf(caseId))
                 .respondent1Represented(YesOrNo.NO)

@@ -45,7 +45,7 @@ public class SdoLegalAdviserDefendantScenarioTest extends DashboardBaseIntegrati
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .responseClaimTrack("SMALL_CLAIM")
             .totalClaimAmount(BigDecimal.valueOf(500))
             .legacyCaseReference("reference")

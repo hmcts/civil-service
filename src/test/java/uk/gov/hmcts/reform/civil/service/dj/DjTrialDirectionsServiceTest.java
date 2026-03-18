@@ -81,7 +81,7 @@ class DjTrialDirectionsServiceTest {
 
     @Test
     void shouldPopulateTrialDirections() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseDataBuilder.builder().build().toBuilder();
+        CaseData builder = CaseDataBuilder.builder().build().copy();
 
         service.populateTrialDirections(builder, JUDGE_NAME);
 

@@ -26,7 +26,7 @@ public class GoToHearingScenarioTest extends DashboardBaseIntegrationTest {
     void should_create_go_to_hearing_scenario() throws Exception {
 
         String caseId = "51234567891";
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

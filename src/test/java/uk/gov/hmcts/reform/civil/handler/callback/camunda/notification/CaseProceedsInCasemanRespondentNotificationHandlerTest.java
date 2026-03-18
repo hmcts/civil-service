@@ -154,7 +154,7 @@ class CaseProceedsInCasemanRespondentNotificationHandlerTest extends BaseCallbac
                 .thenReturn(Optional.of(new Organisation().setName("org name")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-                .toBuilder()
+                .copy()
                 .respondentSolicitor2EmailAddress("respondentsolicitor2@example.com")
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();

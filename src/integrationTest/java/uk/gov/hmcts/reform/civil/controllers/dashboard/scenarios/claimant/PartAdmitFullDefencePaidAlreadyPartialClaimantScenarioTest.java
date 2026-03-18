@@ -35,7 +35,7 @@ public class PartAdmitFullDefencePaidAlreadyPartialClaimantScenarioTest extends 
         String caseId = "12345673";
         LocalDate paymentDate = OffsetDateTime.now().toLocalDate().minusDays(5);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
-            .toBuilder()
+            .copy()
             .responseClaimTrack("SMALL_CLAIM")
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
@@ -86,7 +86,7 @@ public class PartAdmitFullDefencePaidAlreadyPartialClaimantScenarioTest extends 
         String caseId = "12345674";
         LocalDate paymentDate = OffsetDateTime.now().toLocalDate().minusDays(5);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .responseClaimTrack("SMALL_CLAIM")
             .ccdCaseReference(Long.valueOf(caseId))

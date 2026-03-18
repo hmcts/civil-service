@@ -111,7 +111,7 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified().build().toBuilder()
+                .atStateClaimDetailsNotified().build().copy()
                 .applicant1ResponseDeadline(LocalDateTime.now())
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .build();
@@ -134,7 +134,7 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified().build().toBuilder()
+                .atStateClaimDetailsNotified().build().copy()
                 .applicant1ResponseDeadline(LocalDateTime.now())
                 .respondent1Represented(YesOrNo.NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -160,7 +160,7 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .build().toBuilder()
+                .build().copy()
                 .applicant1ResponseDeadline(LocalDateTime.now())
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .build();

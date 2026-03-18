@@ -24,7 +24,7 @@ class ClaimantResponseCuiRejectPayAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvoked() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyClaimantLrTemplate()).thenReturn(expectedTemplateId);
 

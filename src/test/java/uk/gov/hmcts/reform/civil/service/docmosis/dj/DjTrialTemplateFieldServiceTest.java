@@ -20,7 +20,7 @@ class DjTrialTemplateFieldServiceTest {
     void shouldShowCreditHireDetailsWhenTogglePresent() {
         SdoDJR2TrialCreditHire creditHire = new SdoDJR2TrialCreditHire();
         creditHire.setDetailsShowToggle(List.of(AddOrRemoveToggle.ADD));
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .sdoDJR2TrialCreditHire(creditHire)
             .build();
 
@@ -37,7 +37,7 @@ class DjTrialTemplateFieldServiceTest {
     void shouldExposeDateToToggleFlag() {
         TrialHearingTimeDJ hearingTime = new TrialHearingTimeDJ();
         hearingTime.setDateToToggle(List.of(DateToShowToggle.SHOW));
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .trialHearingTimeDJ(hearingTime)
             .build();
 

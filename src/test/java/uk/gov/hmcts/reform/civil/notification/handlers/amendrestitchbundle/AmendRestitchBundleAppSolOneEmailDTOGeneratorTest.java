@@ -41,7 +41,7 @@ public class AmendRestitchBundleAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyLRBundleRestitched()).thenReturn(expectedTemplateId);
 
@@ -60,7 +60,7 @@ public class AmendRestitchBundleAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         Party party = new Party();
-        CaseData caseData = CaseData.builder().applicant1(party).build();
+        CaseData caseData = new CaseData().applicant1(party).build();
 
         String allPartyNames = "all party names";
         String applicantName = "applicant name";

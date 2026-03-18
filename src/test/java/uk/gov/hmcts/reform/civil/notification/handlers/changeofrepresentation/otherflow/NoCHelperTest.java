@@ -60,7 +60,7 @@ class NoCHelperTest {
 
     @BeforeEach
     void setUp() {
-        baseCaseData = CaseData.builder()
+        baseCaseData = new CaseData()
             .ccdCaseReference(1234567890123456L)
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)

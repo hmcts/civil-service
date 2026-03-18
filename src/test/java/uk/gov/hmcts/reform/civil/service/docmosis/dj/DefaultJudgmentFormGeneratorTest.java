@@ -176,7 +176,7 @@ class DefaultJudgmentFormGeneratorTest {
         when(interestCalculator.calculateInterest(any(CaseData.class)))
             .thenReturn(new BigDecimal(10));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .totalClaimAmount(new BigDecimal(2000))
             .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
@@ -204,7 +204,7 @@ class DefaultJudgmentFormGeneratorTest {
         when(interestCalculator.calculateInterest(any(CaseData.class)))
             .thenReturn(new BigDecimal(10));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .totalClaimAmount(new BigDecimal(2000))
             .fixedCosts(new FixedCosts()
                 .setClaimFixedCosts(YesOrNo.YES)
@@ -234,7 +234,7 @@ class DefaultJudgmentFormGeneratorTest {
         when(interestCalculator.calculateInterest(any(CaseData.class)))
             .thenReturn(new BigDecimal(10));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .totalClaimAmount(new BigDecimal(2000))
             .fixedCosts(new FixedCosts()
                 .setClaimFixedCosts(YesOrNo.YES)

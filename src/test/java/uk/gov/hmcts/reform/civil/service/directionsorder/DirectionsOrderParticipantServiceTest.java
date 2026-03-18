@@ -25,7 +25,7 @@ class DirectionsOrderParticipantServiceTest {
     void shouldFormatOneVTwoParticipants() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .build().toBuilder()
+            .build().copy()
             .respondent2(new PartyBuilder().individual("Jane").build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)

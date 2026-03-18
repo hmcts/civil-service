@@ -89,7 +89,7 @@ class DQGeneratorFormBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondent2DQWithFixedRecoverableCosts()
-            .build().toBuilder()
+            .build().copy()
             .respondent2(new PartyBuilder()
                              .individual()
                              .legalRepHeading()
@@ -112,7 +112,7 @@ class DQGeneratorFormBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentPartAdmissionSpec()
             .respondent1DQ()
-            .build().toBuilder()
+            .build().copy()
             .build();
 
         DirectionsQuestionnaireForm result =
@@ -131,7 +131,7 @@ class DQGeneratorFormBuilderTest {
             .respondent2DQWithFixedRecoverableCosts()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .legacyCaseReference("reference")
-            .build().toBuilder()
+            .build().copy()
             .respondent2(new PartyBuilder()
                              .individual()
                              .legalRepHeading()
@@ -197,7 +197,7 @@ class DQGeneratorFormBuilderTest {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData caseData =
             CaseDataBuilder.builder().respondent1Represented(YesOrNo.YES).applicant1Represented(YesOrNo.NO)
-                .claimantBilingualLanguagePreference("BOTH").build().toBuilder().ccdState(
+                .claimantBilingualLanguagePreference("BOTH").build().copy().ccdState(
                     CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
         boolean result = dqGeneratorFormBuilder.isRespondentState(caseData);
         assertTrue(result);
@@ -209,7 +209,7 @@ class DQGeneratorFormBuilderTest {
         when(state.getName()).thenReturn(FULL_ADMISSION.fullName());
         CaseData caseData =
             CaseDataBuilder.builder().respondent1Represented(YesOrNo.YES).applicant1Represented(YesOrNo.NO)
-                .claimantBilingualLanguagePreference("BOTH").build().toBuilder().ccdState(
+                .claimantBilingualLanguagePreference("BOTH").build().copy().ccdState(
                     CaseState.CASE_DISMISSED).build();
         boolean result = dqGeneratorFormBuilder.isRespondentState(caseData);
         assertFalse(result);
@@ -220,7 +220,7 @@ class DQGeneratorFormBuilderTest {
         when(state.getName()).thenReturn(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA.fullName());
         CaseData caseData =
             CaseDataBuilder.builder().respondent1Represented(YesOrNo.YES).applicant1Represented(YesOrNo.NO)
-                .claimantBilingualLanguagePreference("BOTH").build().toBuilder().ccdState(
+                .claimantBilingualLanguagePreference("BOTH").build().copy().ccdState(
                     CaseState.CASE_DISMISSED).build();
 
         Exception exception = assertThrows(
@@ -240,7 +240,7 @@ class DQGeneratorFormBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
             .respondent1DQ()
-            .build().toBuilder()
+            .build().copy()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .build();
 

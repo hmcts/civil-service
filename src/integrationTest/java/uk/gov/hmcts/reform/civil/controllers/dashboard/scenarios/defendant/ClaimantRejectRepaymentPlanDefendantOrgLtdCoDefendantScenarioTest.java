@@ -31,7 +31,7 @@ public class ClaimantRejectRepaymentPlanDefendantOrgLtdCoDefendantScenarioTest e
         String caseId = "50211";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
@@ -76,7 +76,7 @@ public class ClaimantRejectRepaymentPlanDefendantOrgLtdCoDefendantScenarioTest e
         LocalDate firstRepaymentDate = OffsetDateTime.now().toLocalDate();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-                .toBuilder()
+                .copy()
                 .legacyCaseReference("reference")
                 .ccdCaseReference(Long.valueOf(caseId))
                 .respondent1Represented(YesOrNo.NO)

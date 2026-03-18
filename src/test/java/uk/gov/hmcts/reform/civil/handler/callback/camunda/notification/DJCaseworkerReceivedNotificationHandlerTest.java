@@ -88,7 +88,7 @@ class DJCaseworkerReceivedNotificationHandlerTest {
 
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
-                .build().toBuilder()
+                .build().copy()
                 .totalClaimAmount(new BigDecimal(1000))
                 .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
                 .paymentConfirmationDecisionSpec(YesOrNo.YES)
@@ -121,7 +121,7 @@ class DJCaseworkerReceivedNotificationHandlerTest {
                                 .setCode("CODE"));
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
-                .build().toBuilder()
+                .build().copy()
                 .addRespondent2(YesOrNo.NO)
                 .totalClaimAmount(new BigDecimal(1000))
                 .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)

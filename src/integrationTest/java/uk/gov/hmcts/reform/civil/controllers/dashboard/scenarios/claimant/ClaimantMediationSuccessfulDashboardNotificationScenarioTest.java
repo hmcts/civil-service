@@ -31,7 +31,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
 
         String caseId = String.valueOf(System.currentTimeMillis());
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
@@ -77,7 +77,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
 
         String caseId = String.valueOf(System.currentTimeMillis());
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))

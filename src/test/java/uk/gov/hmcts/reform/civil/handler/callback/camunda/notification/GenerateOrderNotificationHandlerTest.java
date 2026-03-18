@@ -191,7 +191,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .respondent2(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("Resp 2").setPartyEmail("respondentsolicitor2@example.com"))
                 .respondentSolicitor2EmailAddress("respondentsolicitor2@example.com")
                 .build();
@@ -216,7 +216,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //given: case where respondent1 Lip has email and callback for notify respondent1 is triggered
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
@@ -240,7 +240,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //given: case where respondent1 Lip has email and callback for notify respondent1 is triggered
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .caseDataLiP(new CaseDataLiP()
                                  .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                              .setRespondent1ResponseLanguage(Language.BOTH.toString())))
@@ -267,7 +267,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //given: case where respondent1 Lip has email and callback for notify respondent1 is triggered
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .caseDataLiP(new CaseDataLiP()
                                  .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                              .setRespondent1ResponseLanguage(Language.BOTH.toString())))
@@ -293,7 +293,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //given: case where respondent2 Lip has email and callback for notify respondent2 is triggered
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .respondent2Represented(YesOrNo.NO)
                 .respondent2(new Party()
@@ -324,7 +324,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //given: case where respondent2 Lip has email and callback for notify respondent2 is triggered
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .respondent1Represented(YesOrNo.NO)
                 .respondent2Represented(YesOrNo.NO)
@@ -356,7 +356,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //given: case where applicant Lip has email and notify for applicant is called
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .applicant1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
@@ -380,7 +380,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //given: case where applicant Lip has email & a bilingual flag is on and notify for applicant is called
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .applicant1Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference("BOTH").build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -405,7 +405,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //given: case where applicant Lip has email & a bilingual flag is on and notify for applicant is called
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .applicant1Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference("BOTH").build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -424,7 +424,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotNotify_whenRespondent2SameSolicitor() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -438,7 +438,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotNotify_whenEmailIsEmpty() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(""))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -453,7 +453,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldGetLegalOrganizationName_whenOrganisationIsPresent() {
             when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .applicant1OrganisationPolicy(new OrganisationPolicy()
                                                   .setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation()
                                                                     .setOrganisationID("ID")))
@@ -478,7 +478,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldGetLegalOrganizationName_whenOrganisationIsNotPresent() {
             when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .applicant1OrganisationPolicy(new OrganisationPolicy()
                                                   .setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation()
                                                                     .setOrganisationID("ID")))
@@ -503,7 +503,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldGetLegalOrganizationName_whenPolicyIsNull() {
             when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .applicant1OrganisationPolicy(null)
                 .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth().setName("SOT Name"))
                 .build();
@@ -525,7 +525,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldGetLegalOrganizationName_whenOrganisationIsNull() {
             when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(null))
                 .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth().setName("SOT Name"))
                 .build();
@@ -622,7 +622,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotNotifyRespondent2_whenSameSolicitor() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -648,7 +648,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()
@@ -672,7 +672,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .respondent2Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
@@ -706,7 +706,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .respondent2Represented(YesOrNo.NO)
                 .respondent2(new Party()

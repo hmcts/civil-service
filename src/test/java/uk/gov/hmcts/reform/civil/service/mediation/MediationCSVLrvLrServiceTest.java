@@ -90,7 +90,7 @@ class MediationCSVLrvLrServiceTest {
             default -> throw new IllegalArgumentException("Invalid party type");
         };
 
-        return CaseData.builder()
+        return new CaseData()
             .legacyCaseReference(ID)
             .totalClaimAmount(new BigDecimal(TOTAL_AMOUNT))
             .applicant1(applicantParty)

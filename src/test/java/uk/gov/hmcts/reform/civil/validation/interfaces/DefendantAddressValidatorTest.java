@@ -36,7 +36,7 @@ public class DefendantAddressValidatorTest {
 
     @Test
     void doNothing_whenAddressCorrect() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         CallbackParams params = new CallbackParams()
             .caseData(caseData);
 
@@ -55,7 +55,7 @@ public class DefendantAddressValidatorTest {
         Address address = new Address();
         address.setPostCode("postcode");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO)
             .specAoSApplicantCorrespondenceAddressdetails(address)
             .build();

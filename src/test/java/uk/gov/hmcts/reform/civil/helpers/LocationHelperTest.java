@@ -47,7 +47,7 @@ class LocationHelperTest {
 
     @Test
     void thereIsAMatchingLocation() {
-        CaseData updatedData = CaseData.builder().build();
+        CaseData updatedData = new CaseData().build();
         List<LocationRefData> locations = List.of(new LocationRefData()
                                                       .setCourtLocationCode("123")
                                                       .setRegionId("regionId")
@@ -67,7 +67,7 @@ class LocationHelperTest {
 
     @Test
     void whenSpecDefendantIsPerson_courtIsDefendantsPreferred() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(10000))
             .applicant1(new Party()
@@ -93,7 +93,7 @@ class LocationHelperTest {
 
     @Test
     void whenLessThan1000AndSpecifiedClaim_locationIsCcmcc() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .claimValue(new ClaimValue()
                             .setStatementOfValueInPennies(BigDecimal.valueOf(1000_00)))
@@ -121,7 +121,7 @@ class LocationHelperTest {
 
     @Test
     void whenLessThan1000AndDuringSdo_locationIsPreferredLocation() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(999))
             .applicant1(new Party()
@@ -147,7 +147,7 @@ class LocationHelperTest {
 
     @Test
     void whenDefendantIsPerson_courtIsClaimantsPreferredAsUnspec() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(new ClaimValue()
                             .setStatementOfValueInPennies(BigDecimal.valueOf(10000_00)))
@@ -171,7 +171,7 @@ class LocationHelperTest {
 
     @Test
     void whenSpecDefendantIsGroup_courtIsClaimantsPreferred() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(10000))
             .applicant1(new Party()
@@ -197,7 +197,7 @@ class LocationHelperTest {
 
     @Test
     void whenUnspecDefendantIsGroup_courtIsClaimantsPreferred() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(new ClaimValue()
                             .setStatementOfValueInPennies(BigDecimal.valueOf(10000_00)))
@@ -221,7 +221,7 @@ class LocationHelperTest {
 
     @Test
     void whenUnspecDefendant1IndividualDefendant2Company_thenCourtIsClaimants() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(new ClaimValue()
                             .setStatementOfValueInPennies(BigDecimal.valueOf(10000_00)))
@@ -256,7 +256,7 @@ class LocationHelperTest {
 
     @Test
     void whenSpecDefendantIsPersonAndDefendant2IsPerson_courtIsWhoRespondedFirst() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(10000))
             .applicant1(new Party()
@@ -301,12 +301,12 @@ class LocationHelperTest {
     static Stream<Arguments> whenDefendant1IsLeadDefendant() {
         return Stream.of(
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .respondent2ResponseDate(null)
                     .build()
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent1(new Party().setType(Party.Type.INDIVIDUAL))
                     .respondent2(new Party().setType(Party.Type.INDIVIDUAL))
@@ -314,7 +314,7 @@ class LocationHelperTest {
                     .build()
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent1(new Party().setType(Party.Type.INDIVIDUAL))
                     .respondent2(new Party().setType(Party.Type.COMPANY))
@@ -334,7 +334,7 @@ class LocationHelperTest {
     static Stream<Arguments> whenDefendant2IsLeadDefendant() {
         return Stream.of(
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .respondent2ResponseDate(LocalDateTime.now().minusDays(1))
                     .respondent1(new Party().setType(Party.Type.INDIVIDUAL))
                     .respondent2(new Party().setType(Party.Type.INDIVIDUAL))
@@ -342,7 +342,7 @@ class LocationHelperTest {
                     .build()
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent1(new Party().setType(Party.Type.COMPANY))
                     .respondent2(new Party().setType(Party.Type.INDIVIDUAL))
@@ -350,7 +350,7 @@ class LocationHelperTest {
                     .build()
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .respondent2ResponseDate(LocalDateTime.now().minusDays(1))
                     .respondent1(new Party().setType(Party.Type.INDIVIDUAL))
                     .respondent2(new Party().setType(Party.Type.INDIVIDUAL))

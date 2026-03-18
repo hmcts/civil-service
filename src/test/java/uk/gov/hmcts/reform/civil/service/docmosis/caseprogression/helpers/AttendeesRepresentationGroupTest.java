@@ -75,7 +75,7 @@ public class AttendeesRepresentationGroupTest {
     @Test
     void shouldReturnCorrectOtherRepresentedText_WhenDetailsArePresent() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build().toBuilder()
+            .atStateNotificationAcknowledged().build().copy()
             .finalOrderRepresentation(new FinalOrderRepresentation()
                                           .setTypeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
                                           .setTypeRepresentationOtherComplex(new ClaimantAndDefendantHeard()

@@ -40,7 +40,7 @@ class ClaimDismissedRespSolTwoEmailGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(claimDismissedEmailTemplater.getTemplateId(caseData)).thenReturn(expectedTemplateId);
 
@@ -58,7 +58,7 @@ class ClaimDismissedRespSolTwoEmailGeneratorTest {
 
     @Test
     void shouldNotifyWhen1V2NoTheSameLegalRepAndClaimDismissedDateIsGiven() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .claimDismissedDate(LocalDateTime.now())
             .build();
         multiPartyScenarioMock.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
@@ -70,7 +70,7 @@ class ClaimDismissedRespSolTwoEmailGeneratorTest {
 
     @Test
     void shouldNotNotifyWhen1V2AndSameLegalRep() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .claimDismissedDate(LocalDateTime.now())
             .build();
         multiPartyScenarioMock.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(false);
@@ -82,7 +82,7 @@ class ClaimDismissedRespSolTwoEmailGeneratorTest {
 
     @Test
     void shouldNotNotifyWhen1V2AndSameLegalRepAndClaimDismissedDateIsNotGiven() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .claimDismissedDate(null)
             .build();
         multiPartyScenarioMock.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
@@ -94,7 +94,7 @@ class ClaimDismissedRespSolTwoEmailGeneratorTest {
 
     @Test
     void shouldNotNotifyWhenClaimDismissedDateGivenAnd1V2DiffRepsButResp2IsLiP() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .claimDismissedDate(LocalDateTime.now())
             .respondent2Represented(YesOrNo.NO)
             .build();

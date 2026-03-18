@@ -40,7 +40,7 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvoked() {
-        CaseData caseData = CaseData.builder().caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+        CaseData caseData = new CaseData().caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
             new RespondentLiPResponse().setRespondent1ResponseLanguage(WELSH.toString()))).build();
         String expectedTemplateId = "template-id";
 
@@ -53,7 +53,7 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvokedAndBilingual() {
-        CaseData caseData = CaseData.builder().caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+        CaseData caseData = new CaseData().caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
             new RespondentLiPResponse().setRespondent1ResponseLanguage(ENGLISH.toString()))).build();
         String expectedTemplateId = "template-id";
 
@@ -66,7 +66,7 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnNoEmailOperation_whenDefendantGetTemplateNocDisabledClaimantBilingual() {
-        CaseData caseData = CaseData.builder().caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+        CaseData caseData = new CaseData().caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
             new RespondentLiPResponse().setRespondent1ResponseLanguage(ENGLISH.toString())))
             .claimantBilingualLanguagePreference(WELSH.toString()).build();
         when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(false);
@@ -78,7 +78,7 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnNoEmailOperation_whenDefendantGetTemplateIsInvokedAndClaimantBilingualAndProceedNoPartAdmit() {
-        CaseData caseData = CaseData.builder().caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+        CaseData caseData = new CaseData().caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
                 new RespondentLiPResponse().setRespondent1ResponseLanguage(ENGLISH.toString())))
             .claimantBilingualLanguagePreference(WELSH.toString())
             .applicant1ProceedWithClaim(YesOrNo.YES)
@@ -108,7 +108,7 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
             .setIndividualLastName("Smith")
             .setType(Party.Type.INDIVIDUAL);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference(legacyCaseReference)
             .respondent1(respondent)
             .build();

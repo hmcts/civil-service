@@ -18,7 +18,7 @@ class DjValidationServiceTest {
         TrialHearingWitnessOfFact witnessOfFact = new TrialHearingWitnessOfFact();
         witnessOfFact.setInput2("-1");
         witnessOfFact.setInput3("0");
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .trialHearingWitnessOfFactDJ(witnessOfFact)
             .build();
 
@@ -32,7 +32,7 @@ class DjValidationServiceTest {
         TrialHearingWitnessOfFact witnessOfFact = new TrialHearingWitnessOfFact();
         witnessOfFact.setInput2("2");
         witnessOfFact.setInput3("3");
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .trialHearingWitnessOfFactDJ(witnessOfFact)
             .build();
 

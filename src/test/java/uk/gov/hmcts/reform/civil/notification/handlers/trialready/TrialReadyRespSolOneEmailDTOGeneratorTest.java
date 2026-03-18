@@ -38,7 +38,7 @@ public class TrialReadyRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplate() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getOtherPartyTrialReady()).thenReturn(expectedTemplateId);
 
@@ -56,7 +56,7 @@ public class TrialReadyRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder().hearingDate(LocalDate.of(2025, 5, 9)).build();
+        CaseData caseData = new CaseData().hearingDate(LocalDate.of(2025, 5, 9)).build();
 
         String legalOrg = "legal org";
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);

@@ -23,7 +23,7 @@ class CaseHandledOffLineApplicantSolicitorNotifierFactoryTest {
 
     @Test
     void whenSpecCase_shouldReturnSpecNotifier() {
-        CaseData data = CaseData.builder().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
+        CaseData data = new CaseData().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
         var notifier = caseHandledOffLineApplicantSolicitorNotifierFactory.getCaseHandledOfflineSolicitorNotifier(data);
 
@@ -32,7 +32,7 @@ class CaseHandledOffLineApplicantSolicitorNotifierFactoryTest {
 
     @Test
     void whenUnspecCase_shouldReturnUnspecNotifier() {
-        CaseData data = CaseData.builder().caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
+        CaseData data = new CaseData().caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
 
         var notifier = caseHandledOffLineApplicantSolicitorNotifierFactory.getCaseHandledOfflineSolicitorNotifier(data);
 

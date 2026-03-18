@@ -35,7 +35,7 @@ class DiscontinueClaimPartiesDefendantEmailDTOGeneratorTest {
     void shouldReturnEmailTemplateId() {
         when(notificationsProperties.getNotifyClaimDiscontinuedLipTemplate()).thenReturn(TEMPLATE_ID);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String result = generator.getEmailTemplateId(caseData);
 
         assertThat(result).isEqualTo(TEMPLATE_ID);

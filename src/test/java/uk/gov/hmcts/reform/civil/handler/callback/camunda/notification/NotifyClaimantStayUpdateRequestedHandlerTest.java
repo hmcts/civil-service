@@ -94,7 +94,7 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
 
     @Test
     void checkCamundaActivityTest() {
-        caseData = caseData.toBuilder().build();
+        caseData = caseData.copy().build();
         CallbackParams params = new CallbackParams().caseData(caseData);
         var response = handler.camundaActivityId(params);
         assertEquals("NotifyClaimantStayUpdateRequested", response);
@@ -108,7 +108,7 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
 
     @Test
     void sendNotificationShouldSendEmail() {
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
         CallbackParams params = new CallbackParams().caseData(caseData);
@@ -147,7 +147,7 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
         when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
         when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(language)
             .build();

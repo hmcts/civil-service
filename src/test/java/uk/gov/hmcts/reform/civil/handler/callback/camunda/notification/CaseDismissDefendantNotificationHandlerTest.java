@@ -94,7 +94,7 @@ class CaseDismissDefendantNotificationHandlerTest {
         return commonCaseData()
             .respondent1Represented(isRespondentLiP ? YesOrNo.NO : YesOrNo.YES)
 
-            .build().toBuilder()
+            .build().copy()
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(respondentLip))
             .respondent2(!isRespondent1 ? new Party().setIndividualFirstName("John").setIndividualLastName("Johnson")

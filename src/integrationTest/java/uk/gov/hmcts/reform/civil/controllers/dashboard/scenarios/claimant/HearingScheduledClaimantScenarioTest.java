@@ -57,7 +57,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
         DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
         DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "8123456781";
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
@@ -145,7 +145,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
         DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
         DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "8123456781";
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
@@ -229,7 +229,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
         DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
         DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "503206541654";
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDate(LocalDate.of(2024, 4, 1))
@@ -309,7 +309,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
         DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
         DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "8123456781";
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDueDate(LocalDate.of(2024, 4, 1))

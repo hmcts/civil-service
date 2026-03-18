@@ -55,7 +55,7 @@ class UpdatePartyDetailsTaskTest {
                 .setOrganisationName("OldOrg");
         };
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
+        CaseData caseDataBuilder = new CaseData();
         switch (scenario.roleField) {
             case "applicant1" -> caseDataBuilder.applicant1(existing);
             case "applicant2" -> caseDataBuilder.applicant2(existing);
@@ -124,7 +124,7 @@ class UpdatePartyDetailsTaskTest {
 
     @Test
     void migrateCaseData_shouldThrow_whenCaseReferenceIsNull() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         IllegalArgumentException ex = assertThrows(
             IllegalArgumentException.class,
             () -> task.migrateCaseData(caseData, null)
@@ -134,7 +134,7 @@ class UpdatePartyDetailsTaskTest {
 
     @Test
     void migrateCaseData_shouldThrow_whenPartyRoleNotFound() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         PartyDetailsCaseReference ref = new PartyDetailsCaseReference();
         ref.setCaseReference("123");
         ref.setParty(new Party());
@@ -151,7 +151,7 @@ class UpdatePartyDetailsTaskTest {
         Party existing = new Party()
             .setIndividualFirstName("John");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(existing)
             .build();
 

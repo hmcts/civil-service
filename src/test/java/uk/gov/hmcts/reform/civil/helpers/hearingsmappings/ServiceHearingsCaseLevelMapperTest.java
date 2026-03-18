@@ -228,7 +228,7 @@ public class ServiceHearingsCaseLevelMapperTest {
         @Test
         void shouldReturnExpectedPublicCaseName_whenCaseNamePublicExists() {
             var expected = "A Somebody vs Somebody else";
-            var caseData = CaseData.builder()
+            var caseData = new CaseData()
                 .caseNamePublic(expected)
                 .applicant1(applicant1)
                 .respondent1(respondent1)
@@ -242,7 +242,7 @@ public class ServiceHearingsCaseLevelMapperTest {
         @Test
         void shouldReturnExpectedPublicCaseName_whenCaseNamePublicDoesNotExist() {
             var expected = "Applicant One v Respondent One";
-            var caseData = CaseData.builder()
+            var caseData = new CaseData()
                 .applicant1(applicant1)
                 .respondent1(respondent1)
                 .build();

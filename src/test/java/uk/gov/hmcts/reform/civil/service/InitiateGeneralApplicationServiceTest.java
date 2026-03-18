@@ -496,7 +496,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldPopulateGaForLips_LRVsLIPQueryManagementOff() {
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
+            .getTestCaseDataForConsentUnconsentCheck(null).copy()
             .applicant1Represented(YES).respondent1Represented(NO).respondent2Represented(NO).build();
 
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()
@@ -521,7 +521,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldPopulateGaForLips_LRVsLIPQueryManagementOn() {
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
+            .getTestCaseDataForConsentUnconsentCheck(null).copy()
             .applicant1Represented(YES).respondent1Represented(NO).respondent2Represented(NO).build();
 
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()
@@ -546,9 +546,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldPopulateGaForLips_LRVsLIPCaseSettled() {
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
+            .getTestCaseDataForConsentUnconsentCheck(null).copy()
             .applicant1Represented(YES).respondent1Represented(NO).respondent2Represented(NO).build()
-            .toBuilder().ccdState(CASE_SETTLED).previousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
+            .copy().ccdState(CASE_SETTLED).previousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
 
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), new CallbackParams().toString());
@@ -713,7 +713,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(new GARespondentOrderAgreement().setHasAgreed(NO))
-            .toBuilder().ccdState(CASE_SETTLED).previousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
+            .copy().ccdState(CASE_SETTLED).previousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
 
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), new CallbackParams().toString());
@@ -794,7 +794,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(new GARespondentOrderAgreement().setHasAgreed(NO))
-            .toBuilder().ccdState(CASE_DISCONTINUED).previousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
+            .copy().ccdState(CASE_DISCONTINUED).previousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
 
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), new CallbackParams().toString());
@@ -975,7 +975,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(locationService.getWorkAllocationLocation(any(), anyString())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CASE_DISCONTINUED, UNSPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ,
-                                          respondent2DQ).toBuilder().previousCCDState(CASE_ISSUED).build();
+                                          respondent2DQ).copy().previousCCDState(CASE_ISSUED).build();
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), new CallbackParams().toString());
 
@@ -1042,7 +1042,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMadeForSpecOrgClaimantCaseDiscontinued() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CASE_DISCONTINUED, SPEC_CLAIM, ORGANISATION, applicant1DQ, respondent1DQ,
-                                          respondent2DQ).toBuilder().previousCCDState(null).build();
+                                          respondent2DQ).copy().previousCCDState(null).build();
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()
@@ -1073,7 +1073,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null)
-            .toBuilder()
+            .copy()
             .applicant1Represented(YES).respondent1Represented(NO).build();
 
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()
@@ -1091,7 +1091,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null)
-            .toBuilder()
+            .copy()
             .applicant1Represented(YES).respondent1Represented(YES).respondent2Represented(NO).build();
 
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()
@@ -1109,7 +1109,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null)
-            .toBuilder()
+            .copy()
             .applicant1Represented(NO).respondent1Represented(YES).build();
 
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()

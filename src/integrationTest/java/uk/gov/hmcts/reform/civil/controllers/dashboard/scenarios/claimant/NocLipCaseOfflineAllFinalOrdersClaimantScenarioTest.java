@@ -43,7 +43,7 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
             .setState(JudgmentState.ISSUED);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .previousCCDState(All_FINAL_ORDERS_ISSUED)

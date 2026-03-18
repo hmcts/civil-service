@@ -52,7 +52,7 @@ class MigrateCaseQueriesTaskTest {
         oldCollection.setPartyName("Old Party");
         oldCollection.setCaseMessages(messages);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .qmApplicantSolicitorQueries(oldCollection)
             .build();
 
@@ -68,7 +68,7 @@ class MigrateCaseQueriesTaskTest {
 
     @Test
     void shouldNotMigrateWhenNoOldCaseQueriesExist() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         CaseReference caseReference = caseReference("123");
 
         CaseData result = task.migrateCaseData(caseData, caseReference);

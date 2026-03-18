@@ -26,7 +26,7 @@ public class ClaimIssueHwfInfoRequiredScenarioTest extends DashboardBaseIntegrat
         String caseId = "12346780";
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .applicant1Represented(YesOrNo.NO)
             .hwfFeeType(FeeType.CLAIMISSUED)
             .claimIssuedHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(MORE_INFORMATION_HWF))

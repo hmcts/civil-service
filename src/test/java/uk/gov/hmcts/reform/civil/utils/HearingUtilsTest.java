@@ -98,7 +98,7 @@ class HearingUtilsTest {
             .setNotes("test notes")
             .setDate(LocalDate.now())
             ;
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .disposalHearingHearingNotes("test notes")
             .build();
 
@@ -113,7 +113,7 @@ class HearingUtilsTest {
             .setNotes("test notes")
             .setDate(LocalDate.now())
             ;
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .fastTrackHearingNotes(new FastTrackHearingNotes().setInput("test notes"))
             .build();
 
@@ -128,7 +128,7 @@ class HearingUtilsTest {
             .setNotes("test notes")
             .setDate(LocalDate.now())
             ;
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .disposalHearingHearingNotesDJ(new DisposalHearingHearingNotesDJ().setInput("test notes"))
             .build();
 
@@ -143,7 +143,7 @@ class HearingUtilsTest {
             .setNotes("test notes")
             .setDate(LocalDate.now())
             ;
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .sdoHearingNotes(new SDOHearingNotes("test notes"))
             .build();
 
@@ -158,7 +158,7 @@ class HearingUtilsTest {
             .setNotes("test notes")
             .setDate(LocalDate.now())
             ;
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .trialHearingHearingNotesDJ(new TrialHearingHearingNotesDJ().setInput("test notes"))
             .build();
 
@@ -169,7 +169,7 @@ class HearingUtilsTest {
 
     @Test
     void shouldReturnNull_whenNoSupportedNoteFieldsAreProvided() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         HearingNotes actual = HearingUtils.getHearingNotes(caseData);
 
@@ -179,7 +179,7 @@ class HearingUtilsTest {
     @Test
     void shouldReturnClaimantVDefendant_whenIs1v1Claim() {
         // Given
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .applicant1(new Party().setIndividualLastName("Doe").setType(Party.Type.INDIVIDUAL))
                 .respondent1(new Party().setCompanyName("Company").setType(Party.Type.COMPANY))
                 .build();

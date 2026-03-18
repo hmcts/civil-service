@@ -49,7 +49,7 @@ public class AmendRestitchBundleClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenBilingual() {
-        CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference(BOTH.toString()).build();
+        CaseData caseData = new CaseData().claimantBilingualLanguagePreference(BOTH.toString()).build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(expectedTemplateId);
@@ -61,7 +61,7 @@ public class AmendRestitchBundleClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenNotBilingual() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(expectedTemplateId);
@@ -74,7 +74,7 @@ public class AmendRestitchBundleClaimantEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         Party party = new Party();
-        CaseData caseData = CaseData.builder().applicant1(party).build();
+        CaseData caseData = new CaseData().applicant1(party).build();
 
         String allPartyNames = "all party names";
         String applicantName = "applicant name";

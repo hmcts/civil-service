@@ -77,7 +77,7 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
                 new GeneralApplication().setCaseLink(new CaseLink("12345678"))
             );
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .ccdCaseReference(1234L)
                 .generalApplications(gaApplications)
@@ -113,7 +113,7 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
         void shouldRecordScenario_whenCaseProgressionEnabledAndActiveJudgment() {
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().copy()
                 .ccdCaseReference(5555L)
                 .respondent1Represented(YesOrNo.NO)
                 .activeJudgment(new JudgmentDetails())
@@ -133,7 +133,7 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
 
         @Test
         void shouldRecordScenario_whenFastTrackActiveJudgment() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().copy()
                 .ccdCaseReference(9999L)
                 .respondent1Represented(YesOrNo.NO)
                 .activeJudgment(new JudgmentDetails())
@@ -157,7 +157,7 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
                 .includesRespondentCitizenQueryFollowUp(OffsetDateTime.now())
-                .build().toBuilder()
+                .build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .ccdCaseReference(1111L)
                 .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)

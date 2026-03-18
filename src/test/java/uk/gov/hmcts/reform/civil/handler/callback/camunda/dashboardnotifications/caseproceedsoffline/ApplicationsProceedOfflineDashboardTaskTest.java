@@ -25,7 +25,7 @@ class ApplicationsProceedOfflineDashboardTaskTest {
     @Mock
     private DashboardTaskContext context;
 
-    private final CaseData caseData = CaseData.builder().ccdCaseReference(3L).build();
+    private final CaseData caseData = new CaseData().ccdCaseReference(3L).build();
 
     @BeforeEach
     void setupContext() {

@@ -26,7 +26,7 @@ public class DjPrePopulateTask implements DirectionsOrderCallbackTask {
     public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
         log.info("DJ pre-populate task for caseId {}", caseData.getCcdCaseReference());
-        CaseData updated = caseData.toBuilder()
+        CaseData updated = caseData.copy()
             .applicantVRespondentText(participantService.buildApplicantVRespondentText(caseData))
             .build();
         return new DirectionsOrderTaskResult(updated, Collections.emptyList(), null);

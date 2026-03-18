@@ -25,7 +25,7 @@ public class CoScNotificationForCasePaidInFullGenerateCertificateDefendantScenar
 
         String caseId = "14323365438241";
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(NO)

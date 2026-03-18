@@ -48,8 +48,9 @@ public class JudgeFinalOrderFormPopulatorTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .hearingLocation(new DynamicList().setValue(DynamicListElement.dynamicElement("hearing-location"))).build();
+        caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
+            .hearingLocation(new DynamicList()
+                                 .setValue(DynamicListElement.dynamicElement("hearing-location"))).build();
     }
 
     @Test

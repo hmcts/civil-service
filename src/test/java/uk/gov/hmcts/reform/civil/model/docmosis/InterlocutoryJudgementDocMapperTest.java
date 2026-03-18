@@ -82,7 +82,7 @@ public class InterlocutoryJudgementDocMapperTest {
 
         //Given
         caseData = getCaseData();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .build();
 
@@ -101,7 +101,7 @@ public class InterlocutoryJudgementDocMapperTest {
 
         //Given
         caseData = getCaseData();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .build();
 
@@ -120,7 +120,7 @@ public class InterlocutoryJudgementDocMapperTest {
 
         //Given
         caseData = getCaseData();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
                                                .setWhenWillThisAmountBePaid(LocalDate.of(2024, 10, 10))
@@ -139,7 +139,7 @@ public class InterlocutoryJudgementDocMapperTest {
 
         //Given
         caseData = getCaseData();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
             .applicant1RequestedPaymentDateForDefendantSpec(new PaymentBySetDate()
                                                                 .setPaymentSetDate(LocalDate.of(2024, 1, 1))
@@ -158,7 +158,7 @@ public class InterlocutoryJudgementDocMapperTest {
 
         //Given
         caseData = getCaseData();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
             .build();
         given(calculatorService.calculateExtendedDeadline(
@@ -178,7 +178,7 @@ public class InterlocutoryJudgementDocMapperTest {
 
         //Given
         caseData = getCaseData();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1LiPResponse(new ClaimantLiPResponse()
                                                         .setApplicant1RejectedRepaymentReason("Rejected in test")))
@@ -206,7 +206,7 @@ public class InterlocutoryJudgementDocMapperTest {
     }
 
     private static CaseData getCaseData() {
-        return CaseData.builder()
+        return new CaseData()
             .issueDate(ISSUE_DATE)
             .legacyCaseReference(CLAIM_NUMBER)
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)

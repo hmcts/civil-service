@@ -43,7 +43,7 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectAddress() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .applicant1Represented(YesOrNo.NO)
                 .applicant1(new Party().setPartyEmail(APPLICANT_LIP_EMAIL))
                 .build();
@@ -52,14 +52,14 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldUseLipTemplate() {
-        CaseData caseData = CaseData.builder().applicant1Represented(YesOrNo.NO).build();
+        CaseData caseData = new CaseData().applicant1Represented(YesOrNo.NO).build();
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(LIP_TEMPLATE_ID);
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(LIP_TEMPLATE_ID);
     }
 
     @Test
     void shouldUseBilingualLip() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .applicant1Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .build();
@@ -69,7 +69,7 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .applicant1(new Party().setCompanyName("Applicant").setPartyEmail(APPLICANT_LIP_EMAIL).setType(Party.Type.COMPANY))
                 .respondent1(new Party().setCompanyName("Respondent").setPartyEmail("respondent@example.com").setType(Party.Type.COMPANY))
                 .applicant1Represented(YesOrNo.NO)

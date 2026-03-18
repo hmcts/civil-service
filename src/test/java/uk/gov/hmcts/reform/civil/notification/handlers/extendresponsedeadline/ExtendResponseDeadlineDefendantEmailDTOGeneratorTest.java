@@ -40,7 +40,7 @@ public class ExtendResponseDeadlineDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(
                 new CaseDataLiP()
                     .setRespondent1LiPResponse(
@@ -59,7 +59,7 @@ public class ExtendResponseDeadlineDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenNotBilingual() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getRespondentDeadlineExtension()).thenReturn(expectedTemplateId);
@@ -81,7 +81,7 @@ public class ExtendResponseDeadlineDefendantEmailDTOGeneratorTest {
         Party respondent = new Party().setCompanyName("Respondent Name").setType(Party.Type.COMPANY);
         Party claimant = new Party().setCompanyName("Claimant Name").setType(Party.Type.COMPANY);
         LocalDate responseDeadline = LocalDate.of(2025, 6, 20);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .respondent1(respondent)
                 .applicant1(claimant)
                 .respondentSolicitor1AgreedDeadlineExtension(responseDeadline)

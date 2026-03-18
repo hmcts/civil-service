@@ -33,7 +33,7 @@ class CreateCaseFlagsHandlerTest extends BaseCallbackHandlerTest {
     void shouldUpdateUrgentFlagWhenActiveAndCodeMatches() {
         FlagDetail flagDetail = new FlagDetail().setFlagCode("CF0007").setStatus("Active");
         Flags flags = new Flags().setDetails(ElementUtils.wrapElements(flagDetail));
-        CaseData caseData = CaseData.builder().caseFlags(flags).build();
+        CaseData caseData = new CaseData().caseFlags(flags).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -44,7 +44,7 @@ class CreateCaseFlagsHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotUpdateUrgentFlagWhenActiveAndCodeMatches() {
         FlagDetail flagDetail = new FlagDetail().setFlagCode("CF0008").setStatus("Active");
         Flags flags = new Flags().setDetails(ElementUtils.wrapElements(flagDetail));
-        CaseData caseData = CaseData.builder().caseFlags(flags).build();
+        CaseData caseData = new CaseData().caseFlags(flags).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

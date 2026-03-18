@@ -104,31 +104,31 @@ public abstract class JudgmentOnlineMapper {
         }
     }
 
-    public void updateJudgmentTabDataWithActiveJudgment(JudgmentDetails activeJudgment, CaseData.CaseDataBuilder<?, ?> caseDataBuilder, BigDecimal interest) {
-        caseDataBuilder.joIsLiveJudgmentExists(YesOrNo.YES);
-        caseDataBuilder.joIsDisplayInJudgmentTab(YesOrNo.YES);
-        caseDataBuilder.joDefendantName1(activeJudgment.getDefendant1Name());
-        caseDataBuilder.joDefendantName2(activeJudgment.getDefendant2Name());
-        caseDataBuilder.joPaymentPlanSelected(activeJudgment.getPaymentPlan().getType());
-        caseDataBuilder.joState(activeJudgment.getState());
+    public void updateJudgmentTabDataWithActiveJudgment(JudgmentDetails activeJudgment, CaseData caseData, BigDecimal interest) {
+        caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+        caseData.setJoIsDisplayInJudgmentTab(YesOrNo.YES);
+        caseData.setJoDefendantName1(activeJudgment.getDefendant1Name());
+        caseData.setJoDefendantName2(activeJudgment.getDefendant2Name());
+        caseData.setJoPaymentPlanSelected(activeJudgment.getPaymentPlan().getType());
+        caseData.setJoState(activeJudgment.getState());
         if (null != activeJudgment.getPaymentPlan()
             && PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(activeJudgment.getPaymentPlan().getType())) {
-            caseDataBuilder.joRepaymentAmount(activeJudgment.getInstalmentDetails().getAmount());
-            caseDataBuilder.joRepaymentStartDate(activeJudgment.getInstalmentDetails().getStartDate());
-            caseDataBuilder.joRepaymentFrequency(activeJudgment.getInstalmentDetails().getPaymentFrequency());
+            caseData.setJoRepaymentAmount(activeJudgment.getInstalmentDetails().getAmount());
+            caseData.setJoRepaymentStartDate(activeJudgment.getInstalmentDetails().getStartDate());
+            caseData.setJoRepaymentFrequency(activeJudgment.getInstalmentDetails().getPaymentFrequency());
         } else {
-            caseDataBuilder.joRepaymentAmount(null);
-            caseDataBuilder.joRepaymentStartDate(null);
-            caseDataBuilder.joRepaymentFrequency(null);
+            caseData.setJoRepaymentAmount(null);
+            caseData.setJoRepaymentStartDate(null);
+            caseData.setJoRepaymentFrequency(null);
         }
 
         if (JudgmentState.CANCELLED.equals(activeJudgment.getState())
             || JudgmentState.SATISFIED.equals(activeJudgment.getState())) {
-            caseDataBuilder.joIssueDate(activeJudgment.getIssueDate());
-            caseDataBuilder.joFullyPaymentMadeDate(activeJudgment.getFullyPaymentMadeDate());
+            caseData.setJoIssueDate(activeJudgment.getIssueDate());
+            caseData.setJoFullyPaymentMadeDate(activeJudgment.getFullyPaymentMadeDate());
         }
-        caseDataBuilder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest))
-            .joJudgementByAdmissionIssueDate(time.now());
+        caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest));
+        caseData.setJoJudgementByAdmissionIssueDate(time.now());
     }
 
     protected abstract JudgmentState getJudgmentState(CaseData caseData);

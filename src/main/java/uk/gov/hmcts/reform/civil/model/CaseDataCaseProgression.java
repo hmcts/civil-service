@@ -2,11 +2,9 @@ package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -91,7 +89,6 @@ import java.util.List;
 import static java.util.Optional.ofNullable;
 
 @Accessors(chain = true)
-@SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = false)
 @Data
 public class CaseDataCaseProgression extends CivilCaseData implements MappableObject {
@@ -225,7 +222,6 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
     private  OrderOnCourtsList orderOnCourtsList;
     private  String freeFormHearingNotes;
     private CaseDocument finalOrderDocument;
-    @Builder.Default
     private List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
 
     // Court officer order
@@ -266,7 +262,6 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
     private HearingOtherComments applicantHearingOtherComments;
     private HearingOtherComments respondent1HearingOtherComments;
     private HearingOtherComments respondent2HearingOtherComments;
-    @Builder.Default
     private  List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
     // // MINTI case prog
@@ -441,6 +436,12 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
      * Defendant has requested a reconsideration of the SDO.
      */
     private YesOrNo orderRequestedForReviewDefendant;
+
+    @Override
+    @JsonIgnore
+    public CaseDataCaseProgression copy() {
+        return copyInto(new CaseDataCaseProgression());
+    }
 
     @JsonIgnore
     public String getHearingLocationText() {

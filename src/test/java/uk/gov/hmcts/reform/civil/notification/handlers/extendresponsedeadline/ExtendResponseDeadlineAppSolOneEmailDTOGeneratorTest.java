@@ -42,7 +42,7 @@ public class ExtendResponseDeadlineAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getClaimantDeadlineExtension()).thenReturn(expectedTemplateId);
 
@@ -64,7 +64,7 @@ public class ExtendResponseDeadlineAppSolOneEmailDTOGeneratorTest {
         String appLegalOrgName = "applicant-legal-org-name";
         LocalDate agreedExtensionDate = LocalDate.of(2025, 6, 20);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(party)
             .respondentSolicitor1AgreedDeadlineExtension(agreedExtensionDate)
             .build();

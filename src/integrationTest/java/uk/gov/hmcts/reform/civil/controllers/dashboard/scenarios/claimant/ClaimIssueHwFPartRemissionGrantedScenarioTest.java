@@ -28,7 +28,7 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends DashboardBase
         String caseId = "12346783";
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .hwfFeeType(FeeType.CLAIMISSUED)
             .applicant1Represented(YesOrNo.NO)
             .claimIssuedHwfDetails(new HelpWithFeesDetails()

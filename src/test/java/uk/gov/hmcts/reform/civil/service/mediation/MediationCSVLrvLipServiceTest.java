@@ -71,7 +71,7 @@ class MediationCSVLrvLipServiceTest {
     }
 
     private CaseData getCaseData(Party.Type partyType) {
-        return CaseData.builder()
+        return new CaseData()
             .legacyCaseReference(ID)
             .totalClaimAmount(new BigDecimal(TOTAL_AMOUNT))
             .applicant1(buildParty(Party.Type.COMPANY, "Applicant company name", "0011001100", "applicant@company.com", null, null, null, null, null))

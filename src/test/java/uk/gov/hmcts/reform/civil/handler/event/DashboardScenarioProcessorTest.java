@@ -63,7 +63,7 @@ class DashboardScenarioProcessorTest {
     @Test
     void createDashboardScenario_shouldCallDashboardService() {
         CaseDetails caseDetails = CaseDetails.builder().build();
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(123L)
             .build();
 

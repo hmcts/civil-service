@@ -41,7 +41,7 @@ public class ClaimantResponseConfirmsToProceedRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldGetEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         String expectedTemplateId = "template-id";
         when(helper.getTemplate(caseData, false)).thenReturn(expectedTemplateId);
@@ -60,7 +60,7 @@ public class ClaimantResponseConfirmsToProceedRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomPropertiesWhenUnspec() {
-        CaseData caseData = CaseData.builder().caseAccessCategory(UNSPEC_CLAIM).build();
+        CaseData caseData = new CaseData().caseAccessCategory(UNSPEC_CLAIM).build();
 
         String legalOrg = "legal org";
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
@@ -78,7 +78,7 @@ public class ClaimantResponseConfirmsToProceedRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomPropertiesWhenSpec() {
-        CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).build();
+        CaseData caseData = new CaseData().caseAccessCategory(SPEC_CLAIM).build();
 
         String legalOrg = "legal org";
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);

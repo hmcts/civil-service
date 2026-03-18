@@ -262,7 +262,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldSubmitEventSuccessfullyForCaseWorker() {
         CaseDetails caseDetails = CaseDetails.builder().build();
-        CaseData caseData = CaseData.builder().ccdCaseReference(1990L).build();
+        CaseData caseData = new CaseData().ccdCaseReference(1990L).build();
         when(caseworkerCaseEventService.submitEventForNewClaimCaseWorker(any())).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails))
             .thenReturn(caseData);

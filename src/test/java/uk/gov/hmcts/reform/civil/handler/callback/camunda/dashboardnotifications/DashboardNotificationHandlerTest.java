@@ -39,7 +39,7 @@ class DashboardNotificationHandlerTest {
 
     @BeforeEach
     void setup() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(123L)
             .businessProcess(new BusinessProcess().setActivityId(TASK_ID))
             .build();

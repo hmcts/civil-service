@@ -23,7 +23,7 @@ public class TrialArrangementsCheckClaimantScenarioTest extends DashboardBaseInt
 
         String caseId = "10002348";
         CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseNotFullDefenceReceived().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
@@ -57,7 +57,7 @@ public class TrialArrangementsCheckClaimantScenarioTest extends DashboardBaseInt
 
         String caseId = "10002348";
         CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseNotFullDefenceReceived().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
@@ -86,7 +86,7 @@ public class TrialArrangementsCheckClaimantScenarioTest extends DashboardBaseInt
 
         String caseId = "10002348";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

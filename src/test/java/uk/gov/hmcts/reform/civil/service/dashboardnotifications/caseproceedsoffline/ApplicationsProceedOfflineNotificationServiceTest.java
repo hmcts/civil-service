@@ -25,7 +25,7 @@ class ApplicationsProceedOfflineNotificationServiceTest {
     private ApplicationsProceedOfflineNotificationService service;
 
     private static CaseData baseCaseData() {
-        return CaseDataBuilder.builder().build().toBuilder()
+        return CaseDataBuilder.builder().build().copy()
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .ccdCaseReference(1234L)
             .build();
@@ -52,7 +52,7 @@ class ApplicationsProceedOfflineNotificationServiceTest {
     @Test
     void shouldSkipWhenCaseNotOffline() {
 
-        CaseData nonProceed = baseCaseData().toBuilder().ccdState(CaseState.All_FINAL_ORDERS_ISSUED).build();
+        CaseData nonProceed = baseCaseData().copy().ccdState(CaseState.All_FINAL_ORDERS_ISSUED).build();
 
         service.notifyClaimant(nonProceed, "token");
         service.notifyDefendant(nonProceed, "token");

@@ -46,7 +46,7 @@ class DQResponseDocumentUtilsTest {
         @Test
         void shouldReturnEmptyListWhenDQIsNull() {
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1DQ(null)
                 .applicant1ResponseDate(LocalDateTime.now())
                 .build();
@@ -60,7 +60,7 @@ class DQResponseDocumentUtilsTest {
         @Test
         void shouldReturnEmptyListWhenDQHasNoDocuments() {
             Applicant1DQ dq = new Applicant1DQ();
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1DQ(dq)
                 .applicant1ResponseDate(LocalDateTime.now())
                 .build();
@@ -78,7 +78,7 @@ class DQResponseDocumentUtilsTest {
             Applicant1DQ dq = new Applicant1DQ()
                 .setApplicant1DQDraftDirections(document);
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1DQ(dq)
                 .applicant1ResponseDate(LocalDateTime.now())
                 .build();
@@ -100,7 +100,7 @@ class DQResponseDocumentUtilsTest {
         @Test
         void shouldNotAssignCategoryIdWhenNoDocumentsAdded() {
             Applicant1DQ dq = new Applicant1DQ();
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1DQ(dq)
                 .applicant1ResponseDate(LocalDateTime.now())
                 .build();
@@ -117,7 +117,7 @@ class DQResponseDocumentUtilsTest {
 
         @Test
         void shouldReturnEmptyListWhenBothRespondentDQsAreNull() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1ResponseDate(LocalDateTime.now())
                 .respondent2ResponseDate(LocalDateTime.now())
                 .build();
@@ -135,7 +135,7 @@ class DQResponseDocumentUtilsTest {
             Respondent1DQ respondent1DQ = new Respondent1DQ()
                 .setRespondent1DQDraftDirections(document);
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1DQ(respondent1DQ)
                 .respondent1ResponseDate(LocalDateTime.now())
                 .build();
@@ -161,7 +161,7 @@ class DQResponseDocumentUtilsTest {
             Respondent2DQ respondent2DQ = new Respondent2DQ()
                 .setRespondent2DQDraftDirections(document);
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent2DQ(respondent2DQ)
                 .respondent2ResponseDate(LocalDateTime.now())
                 .build();
@@ -191,7 +191,7 @@ class DQResponseDocumentUtilsTest {
             Respondent2DQ respondent2DQ = new Respondent2DQ()
                 .setRespondent2DQDraftDirections(document2);
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
                 .respondent1ResponseDate(LocalDateTime.now())

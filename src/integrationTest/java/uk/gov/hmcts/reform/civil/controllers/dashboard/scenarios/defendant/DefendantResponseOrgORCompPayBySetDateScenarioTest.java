@@ -33,7 +33,7 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
         LocalDate whenWillPay = LocalDate.now().plusMonths(1);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1(new Party().setType(Party.Type.INDIVIDUAL)
@@ -93,7 +93,7 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
         LocalDate whenWillPay = LocalDate.now().plusMonths(1);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1(new Party().setType(Party.Type.INDIVIDUAL)

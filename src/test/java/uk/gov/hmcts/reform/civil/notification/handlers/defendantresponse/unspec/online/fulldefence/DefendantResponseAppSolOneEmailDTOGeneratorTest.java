@@ -34,7 +34,7 @@ class DefendantResponseAppSolOneEmailDTOGeneratorTest {
     void shouldAddRespondentNameAndAllocatedTrack_OneVOneScenario() {
         Party respondent = new Party().setType(Party.Type.INDIVIDUAL)
             .setIndividualFirstName("John").setIndividualLastName("Doe");
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(respondent)
             .allocatedTrack(AllocatedTrack.FAST_CLAIM)
             .build();
@@ -50,7 +50,7 @@ class DefendantResponseAppSolOneEmailDTOGeneratorTest {
         Party respondent1 = new Party().setType(Party.Type.INDIVIDUAL).setIndividualFirstName("Alice").setIndividualLastName("Smith");
         Party respondent2 = new Party().setType(Party.Type.COMPANY).setCompanyName("Beta Ltd");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(respondent1)
             .respondent2(respondent2)
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
@@ -69,7 +69,7 @@ class DefendantResponseAppSolOneEmailDTOGeneratorTest {
         when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn(expectedTemplateId);
 
         // When
-        String result = generator.getEmailTemplateId(CaseData.builder().build());
+        String result = generator.getEmailTemplateId(new CaseData().build());
 
         // Then
         assertThat(result).isEqualTo(expectedTemplateId);

@@ -101,7 +101,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
 
     @Test
     void checkCamundaActivityDefendantTest() {
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
         CallbackParams params = new CallbackParams().caseData(caseData)
@@ -112,7 +112,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
 
     @Test
     void checkCamundaActivityDefendant2Test() {
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
         CallbackParams params = new CallbackParams().caseData(caseData)
@@ -131,7 +131,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
     @ParameterizedTest
     @MethodSource("provideCaseData")
     void sendNotificationShouldSendEmail(boolean isDefendant2, CaseEvent caseEvent) {
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .respondentSolicitor1EmailAddress("defendant@hmcts.net")
             .respondentSolicitor2EmailAddress("defendant2@hmcts.net")
             .respondent1Represented(YesOrNo.YES)
@@ -178,7 +178,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
         when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         RespondentLiPResponse respondentLip = new RespondentLiPResponse()
             .setRespondent1ResponseLanguage(language);
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .respondent1Represented(YesOrNo.NO)
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(respondentLip))

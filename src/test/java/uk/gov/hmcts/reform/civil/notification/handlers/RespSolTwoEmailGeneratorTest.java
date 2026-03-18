@@ -43,7 +43,7 @@ class RespSolTwoEmailGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailAddress() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondentSolicitor2EmailAddress("test@example.com").build();
 
         String emailAddress = emailGenerator.getEmailAddress(caseData);
@@ -53,7 +53,7 @@ class RespSolTwoEmailGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
         notificationUtilsMockedStatic.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, Boolean.FALSE, organisationService))
             .thenReturn(RESPONDENT_LEGAL_ORG_NAME);
@@ -67,7 +67,7 @@ class RespSolTwoEmailGeneratorTest {
 
     @Test
     void shouldReturnNotifyAsFalse_WhenTwoLRsAreInvolved() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .build();
         Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
         assertThat(shouldNotify).isFalse();
@@ -75,7 +75,7 @@ class RespSolTwoEmailGeneratorTest {
 
     @Test
     void shouldReturnNotifyAsTrue_WhenTwoLRsAreNotInvolved() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent2(new Party())
             .respondent2SameLegalRepresentative(NO)
             .build();

@@ -36,7 +36,7 @@ public class ClaimantResponseConfirmsToProceedEmailHelperTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenCaseIsUnspecAndNotMultiClaim() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .allocatedTrack(SMALL_CLAIM)
             .build();
@@ -51,7 +51,7 @@ public class ClaimantResponseConfirmsToProceedEmailHelperTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenCaseIsUnspecAndMultiClaimAndMultiOrIntermediateTrackEnabled() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .allocatedTrack(MULTI_CLAIM)
             .build();
@@ -67,7 +67,7 @@ public class ClaimantResponseConfirmsToProceedEmailHelperTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenCaseIsUnspecAndMultiClaimAndNotMultiOrIntermediateTrackEnabled() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .allocatedTrack(MULTI_CLAIM)
             .build();
@@ -83,7 +83,7 @@ public class ClaimantResponseConfirmsToProceedEmailHelperTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateForApplicantWhenCaseIsSpecAndProceedsWithAction() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .allocatedTrack(SMALL_CLAIM)
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
@@ -100,7 +100,7 @@ public class ClaimantResponseConfirmsToProceedEmailHelperTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateForApplicantWhenCaseIsSpecAndNotProceedsWithAction() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .allocatedTrack(SMALL_CLAIM)
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
@@ -116,7 +116,7 @@ public class ClaimantResponseConfirmsToProceedEmailHelperTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateForRespondentWhenCaseIsSpecAndProceedsWithAction() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .allocatedTrack(SMALL_CLAIM)
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
@@ -133,7 +133,7 @@ public class ClaimantResponseConfirmsToProceedEmailHelperTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateForRespondentWhenCaseIsSpecAndNotProceedsWithAction() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .allocatedTrack(SMALL_CLAIM)
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
@@ -149,7 +149,7 @@ public class ClaimantResponseConfirmsToProceedEmailHelperTest {
 
     @Test
     void shouldProceedWithActionWhenRespondent2ClaimResponseTypeForSpecIsFullDefence() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .allocatedTrack(SMALL_CLAIM)
             .respondent2ClaimResponseTypeForSpec(FULL_DEFENCE)
@@ -166,7 +166,7 @@ public class ClaimantResponseConfirmsToProceedEmailHelperTest {
 
     @Test
     void shouldNotProceedWithActionWhenClaimResponseTypeIsNotFullDefence() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .allocatedTrack(SMALL_CLAIM)
             .responseClaimMediationSpecRequired(NO)

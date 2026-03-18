@@ -27,7 +27,7 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
     void should_create_defendant_response_claimant_dashboard_welsh_scenario() throws Exception {
         String caseId = "123452";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .applicant1Represented(YesOrNo.NO)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
@@ -71,7 +71,7 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         String caseId = "123452";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .applicant1Represented(YesOrNo.NO)
             .respondent1ResponseDeadline(LocalDateTime.MAX)
             .legacyCaseReference("reference")

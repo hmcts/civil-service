@@ -24,7 +24,7 @@ public class GoToHearingDefendantPartAdmitScenarioTest extends DashboardBaseInte
     void should_create_go_to_hearing_scenario_defendant_part_admit() throws Exception {
 
         String caseId = "90123456783";
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .ccdState(CaseState.JUDICIAL_REFERRAL)

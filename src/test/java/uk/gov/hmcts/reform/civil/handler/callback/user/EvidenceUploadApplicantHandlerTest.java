@@ -95,7 +95,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private CoreCaseDataService coreCaseDataService;
     @MockBean
-    CaseData.CaseDataBuilder caseDataBuilder;
+    CaseData caseDataBuilder;
     @MockBean
     private FeatureToggleService featureToggleService;
     @Autowired

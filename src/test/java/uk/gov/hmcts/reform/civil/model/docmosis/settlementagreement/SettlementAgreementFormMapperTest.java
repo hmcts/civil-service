@@ -43,7 +43,7 @@ public class SettlementAgreementFormMapperTest {
     @Test
     void shouldGenerateSettlementAgreementDoc_whenRepaymentTypeInstallments() {
         //Given
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
                 .respondent1RepaymentPlan(new RepaymentPlanLRspec()
                         .setFirstRepaymentDate(LocalDate.now().plusDays(5))
@@ -59,7 +59,7 @@ public class SettlementAgreementFormMapperTest {
     }
 
     private static CaseData getCaseData() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .applicant1(new Party()
                         .setIndividualLastName(INDIVIDUAL_LAST_NAME)
                         .setIndividualFirstName(INDIVIDUAL_FIRST_NAME)

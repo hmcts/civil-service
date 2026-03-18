@@ -42,7 +42,7 @@ public class SettlementNoResponseFromDefendantTest extends DashboardBaseIntegrat
         BigDecimal installmentAmount = new BigDecimal("100");
         BigDecimal totalAmount = new BigDecimal("10000");
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

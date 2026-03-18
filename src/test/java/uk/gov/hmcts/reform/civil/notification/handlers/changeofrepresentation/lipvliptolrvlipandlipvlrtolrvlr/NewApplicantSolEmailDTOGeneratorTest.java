@@ -39,7 +39,7 @@ class NewApplicantSolEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         when(notificationsProperties.getNoticeOfChangeApplicantLipSolicitorTemplate()).thenReturn(TEMPLATE_ID);
 
         String result = generator.getEmailTemplateId(caseData);
@@ -56,7 +56,7 @@ class NewApplicantSolEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(1234567890123456L)
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)

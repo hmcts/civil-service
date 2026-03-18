@@ -78,7 +78,7 @@ class PartAdmissionTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenPartAdmitClaimIsSettled() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
@@ -89,7 +89,7 @@ class PartAdmissionTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenIsPartAdmitClaimSpecIsFalse() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
@@ -100,7 +100,7 @@ class PartAdmissionTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenIsClaimantIntentionSettlePartAdmitIsFalse() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
@@ -111,7 +111,7 @@ class PartAdmissionTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenIsClaimantConfirmAmountPaidPartAdmitIsFalse() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
@@ -122,7 +122,7 @@ class PartAdmissionTransitionBuilderTest {
 
     @Test
     void isPartAdmitPayImmediatelyAccepted_thenTrue() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
@@ -133,7 +133,7 @@ class PartAdmissionTransitionBuilderTest {
 
     @Test
     void isClaimantNotSettlePartAdmitClaimDefendantNotPaidClaimantRejects_thenTrue() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
@@ -144,7 +144,7 @@ class PartAdmissionTransitionBuilderTest {
 
     @Test
     void isClaimantNotSettlePartAdmitClaimStatesPaidRejectsPA_thenTrue() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
@@ -155,7 +155,7 @@ class PartAdmissionTransitionBuilderTest {
 
     @Test
     void isClaimantNotSettlePartAdmitClaimStatesPaidButNotPaid_thenTrue() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
@@ -166,14 +166,14 @@ class PartAdmissionTransitionBuilderTest {
 
     @Test
     void isPartAdmitPayImmediatelyAccepted_thenFalse() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         assertFalse(PaymentPredicate.payImmediatelyAcceptedPartAdmit.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenCaseAccessCategoryIsNotSpecClaim() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
@@ -184,7 +184,7 @@ class PartAdmissionTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenApplicant1AcceptAdmitAmountPaidSpecIsNotYes() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
@@ -195,7 +195,7 @@ class PartAdmissionTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenShowResponseOneVOneFlagIsNull() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
             .showResponseOneVOneFlag(null)
@@ -206,7 +206,7 @@ class PartAdmissionTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenShowResponseOneVOneFlagIsNotOneVOnePartAdmitPayImmediately() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE)
@@ -220,7 +220,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssuedUnrepresentedDefendant()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
@@ -235,7 +235,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssuedUnrepresentedDefendant()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(new RespondentLiPResponse()
@@ -250,7 +250,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssuedUnrepresentedDefendant()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(FAST_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
@@ -265,7 +265,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1Represented(NO)
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .respondent2(new Party())
             .respondent1Represented(YES)
             .responseClaimTrack(SMALL_CLAIM.name())
@@ -282,7 +282,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1Represented(YES)
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .respondent2(new Party())
             .respondent1Represented(NO)
             .responseClaimTrack(SMALL_CLAIM.name())
@@ -299,7 +299,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1Represented(NO)
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1LiPResponseCarm(new MediationLiPCarm()
@@ -314,7 +314,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1Represented(NO)
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip()))
@@ -327,7 +327,7 @@ class PartAdmissionTransitionBuilderTest {
     void shouldReturnFalse_whenCarmApplicableForClaimantLipUnspecCase() {
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1Represented(NO)
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1LiPResponseCarm(new MediationLiPCarm()
@@ -342,7 +342,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .app1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
@@ -355,7 +355,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
@@ -368,7 +368,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .resp2MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
@@ -381,7 +381,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .respondent1Represented(NO)
             .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
@@ -395,7 +395,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .applicant1Represented(NO)
             .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
@@ -409,7 +409,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(FAST_CLAIM.name())
             .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
@@ -421,7 +421,7 @@ class PartAdmissionTransitionBuilderTest {
     void shouldReturnFalse_whenCarmApplicableUnspecClaim() {
         CaseData caseData = CaseDataBuilder.builder()
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
-            .build().toBuilder()
+            .build().copy()
             .responseClaimTrack(SMALL_CLAIM.name())
             .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
@@ -434,7 +434,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1SettleClaim(YES))
             .build();
@@ -447,7 +447,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1LiPResponseCarm(new MediationLiPCarm()
                                                             .setIsMediationContactNameCorrect(YES)))
@@ -461,7 +461,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
                                                                       .setIsMediationContactNameCorrect(YES)))
@@ -475,7 +475,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
             .setClaimTypeToSpecClaim()
-            .build().toBuilder()
+            .build().copy()
             .build();
 
         assertFalse(MediationPredicate.isCarmEnabledForCase.test(caseData));
@@ -485,7 +485,7 @@ class PartAdmissionTransitionBuilderTest {
     void shouldReturnTrue_whenCarmEnabledOnLRClaimApplicant() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
-            .build().toBuilder()
+            .build().copy()
             .app1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
@@ -496,7 +496,7 @@ class PartAdmissionTransitionBuilderTest {
     void shouldReturnTrue_whenCarmEnabledOnLRClaimDefendant1() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
-            .build().toBuilder()
+            .build().copy()
             .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
@@ -507,7 +507,7 @@ class PartAdmissionTransitionBuilderTest {
     void shouldReturnTrue_whenCarmEnabledOnLRClaimDefendant2() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
-            .build().toBuilder()
+            .build().copy()
             .resp2MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
@@ -523,7 +523,7 @@ class PartAdmissionTransitionBuilderTest {
     })
     void shouldReturnFalseForOneVOnePartAdmit(ResponseOneVOneShowTag tag) {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued().build().toBuilder()
+            .atStateClaimIssued().build().copy()
             .showResponseOneVOneFlag(tag)
             .build();
 
@@ -533,7 +533,7 @@ class PartAdmissionTransitionBuilderTest {
     @Test
     void shouldReturnTrueIfNotOneVOnePartAdmit() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued().build().toBuilder()
+            .atStateClaimIssued().build().copy()
             .build();
 
         assertTrue(isNotPartAdmissionPaymentState.test(caseData));

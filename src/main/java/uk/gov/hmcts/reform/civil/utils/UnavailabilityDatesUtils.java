@@ -156,7 +156,7 @@ public class UnavailabilityDatesUtils {
         return updatedUnavailableDates;
     }
 
-    public static void copyDatesIntoListingTabFields(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    public static void copyDatesIntoListingTabFields(CaseData caseData, CaseData updatedData) {
         // if unavailable dates exist but listingTab fields are null
         if (caseData.getApplicant1().getUnavailableDates() != null
             && caseData.getApplicant1UnavailableDatesForTab() == null) {
@@ -242,7 +242,7 @@ public class UnavailabilityDatesUtils {
             && YES.equals(caseData.getApplicant1DQ().getHearing().getUnavailableDatesRequired());
     }
 
-    private static void copyDatesIntoListingTabFieldsForApplicant(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, Boolean isApplicant1) {
+    private static void copyDatesIntoListingTabFieldsForApplicant(CaseData caseData, CaseData updatedData, Boolean isApplicant1) {
         String eventAdded = null;
         LocalDate dateAdded = null;
 
@@ -264,13 +264,11 @@ public class UnavailabilityDatesUtils {
         );
 
         if (isApplicant1) {
-            updatedData
-                .applicant1(caseData.getApplicant1().copy().setUnavailableDates(dates))
-                .applicant1UnavailableDatesForTab(dates);
+            updatedData.setApplicant1(caseData.getApplicant1().copy().setUnavailableDates(dates));
+            updatedData.setApplicant1UnavailableDatesForTab(dates);
         } else {
-            updatedData
-                .applicant2(caseData.getApplicant2().copy().setUnavailableDates(dates))
-                .applicant2UnavailableDatesForTab(dates);
+            updatedData.setApplicant2(caseData.getApplicant2().copy().setUnavailableDates(dates));
+            updatedData.setApplicant2UnavailableDatesForTab(dates);
         }
     }
 
@@ -302,7 +300,7 @@ public class UnavailabilityDatesUtils {
         }
     }
 
-    private static void copyDatesIntoListingTabFieldsForRespondent1(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private static void copyDatesIntoListingTabFieldsForRespondent1(CaseData caseData, CaseData updatedData) {
         String eventAdded = null;
         LocalDate dateAdded = null;
 
@@ -321,9 +319,8 @@ public class UnavailabilityDatesUtils {
             dateAdded
         );
 
-        updatedData
-            .respondent1(caseData.getRespondent1().copy().setUnavailableDates(dates))
-            .respondent1UnavailableDatesForTab(dates);
+        updatedData.setRespondent1(caseData.getRespondent1().copy().setUnavailableDates(dates));
+        updatedData.setRespondent1UnavailableDatesForTab(dates);
     }
 
     private static void copyDatesIntoListingTabFieldsForRespondent1(CaseData caseData) {
@@ -347,7 +344,7 @@ public class UnavailabilityDatesUtils {
         caseData.setRespondent1UnavailableDatesForTab(dates);
     }
 
-    private static void copyDatesIntoListingTabFieldsForRespondent2(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private static void copyDatesIntoListingTabFieldsForRespondent2(CaseData caseData, CaseData updatedData) {
         String eventAdded = null;
         LocalDate dateAdded = null;
 
@@ -366,9 +363,8 @@ public class UnavailabilityDatesUtils {
             dateAdded
         );
 
-        updatedData
-            .respondent2(caseData.getRespondent2().copy().setUnavailableDates(dates))
-            .respondent2UnavailableDatesForTab(dates);
+        updatedData.setRespondent2(caseData.getRespondent2().copy().setUnavailableDates(dates));
+        updatedData.setRespondent2UnavailableDatesForTab(dates);
     }
 
     private static void copyDatesIntoListingTabFieldsForRespondent2(CaseData caseData) {

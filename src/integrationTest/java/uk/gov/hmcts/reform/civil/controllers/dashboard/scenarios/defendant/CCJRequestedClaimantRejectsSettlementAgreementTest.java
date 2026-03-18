@@ -26,7 +26,7 @@ public class CCJRequestedClaimantRejectsSettlementAgreementTest extends Dashboar
 
         String caseId = "13076";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .ccdCaseReference(Long.valueOf(caseId))
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1LiPResponse(new ClaimantLiPResponse().setApplicant1SignedSettlementAgreement(YesOrNo.YES))

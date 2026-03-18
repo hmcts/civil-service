@@ -22,7 +22,7 @@ class SettleClaimMarkedPaidInFullDashboardTaskTest {
     @Mock
     private DashboardTaskContext context;
 
-    private final CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
+    private final CaseData caseData = new CaseData().ccdCaseReference(123L).build();
 
     @BeforeEach
     void setUp() {

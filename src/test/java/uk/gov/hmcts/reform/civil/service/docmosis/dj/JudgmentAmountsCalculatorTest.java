@@ -36,7 +36,7 @@ class JudgmentAmountsCalculatorTest {
     @Test
     void shouldGetPartialPaymentInPoundsFromCaseData() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued().build().toBuilder()
+            .atStateClaimIssued().build().copy()
             .partialPaymentAmount("15000")
             .build();
 
@@ -62,7 +62,7 @@ class JudgmentAmountsCalculatorTest {
 
     @Test
     void shouldReturnClaimFeeWithFixedCosts_whenFixedCostsAreProvided() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
             .fixedCosts(new FixedCosts()
                 .setFixedCostAmount("1000")
@@ -78,7 +78,7 @@ class JudgmentAmountsCalculatorTest {
 
     @Test
     void shouldReturnClaimFeeWithCalculatedFixedCostsOnDJEntry_whenFixedCostsAreProvided() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
             .totalClaimAmount(new BigDecimal("5000"))
             .fixedCosts(new FixedCosts()
@@ -98,7 +98,7 @@ class JudgmentAmountsCalculatorTest {
 
     @Test
     void shouldReturnClaimFeeWithFixedCosts_whenFixedCostsAreProvidedAndPaymentConfirmationDecisionNo() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .paymentConfirmationDecisionSpec(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal("5000"))
             .fixedCosts(new FixedCosts()
@@ -116,7 +116,7 @@ class JudgmentAmountsCalculatorTest {
 
     @Test
     void shouldReturnDebtAmountWithInterest_whenInterestIsCalculated() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .totalClaimAmount(new BigDecimal("1000"))
             .build();
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(new BigDecimal("50.00"));
@@ -128,7 +128,7 @@ class JudgmentAmountsCalculatorTest {
 
     @Test
     void shouldReturnDebtAmountWithPartialPaymentDeducted_whenPartialPaymentIsProvided() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .totalClaimAmount(new BigDecimal("1000"))
             .partialPaymentAmount("20000")
             .build();
@@ -141,7 +141,7 @@ class JudgmentAmountsCalculatorTest {
 
     @Test
     void shouldReturnZeroDebtAmount_whenTotalClaimAmountAndInterestAreZero() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .totalClaimAmount(BigDecimal.ZERO)
             .build();
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.ZERO);

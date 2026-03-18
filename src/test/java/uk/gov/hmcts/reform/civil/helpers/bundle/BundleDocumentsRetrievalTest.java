@@ -48,7 +48,7 @@ class BundleDocumentsRetrievalTest {
 
     @Test
     void shouldReturnCorrectParticularsOfClaimName_forSpecClaim() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .issueDate(LocalDate.of(2023, 12, 4))
             .build();
@@ -68,7 +68,7 @@ class BundleDocumentsRetrievalTest {
 
         PartyType partyType = PartyType.CLAIMANT1;
         EvidenceUploadType evidenceUploadFiles = EvidenceUploadType.NOTICE_OF_INTENTION;
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         Document documentTest = new Document("testUrl", "binUrl",
             "Name", "hash", null,
@@ -130,7 +130,7 @@ class BundleDocumentsRetrievalTest {
                 .setDocumentFileName("Name")
         );
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party().setIndividualFirstName("James").setIndividualLastName("Gordon").setType(Party.Type.INDIVIDUAL))
             .documentExpertReport(new ArrayList<>())
             .documentQuestionsRes2(listOfDocs)
@@ -176,7 +176,7 @@ class BundleDocumentsRetrievalTest {
 
         PartyType partyType = PartyType.CLAIMANT1;
         EvidenceUploadType evidenceUploadFiles = EvidenceUploadType.EXPERT_REPORT;
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         BundleFileNameList bundleFileNameList = BundleFileNameList.CASE_SUMMARY_FILE_DISPLAY_NAME;
         Set<String> allExpertsNames = Set.of("Expert1", "Expert2");
 

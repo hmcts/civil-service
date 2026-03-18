@@ -174,7 +174,7 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCoScApplicationStatusValue_whenInvoked() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1Represented(YesOrNo.NO)
                 .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
                 .build();
@@ -191,7 +191,7 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotUpdateCoScApplicationStatusValue_whenInvoked() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1Represented(YesOrNo.NO)
                 .build();
 

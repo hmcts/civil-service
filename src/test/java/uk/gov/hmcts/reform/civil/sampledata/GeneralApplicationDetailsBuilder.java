@@ -96,7 +96,7 @@ public class GeneralApplicationDetailsBuilder {
         } else {
             gaUrgencyRequirement.setGeneralAppUrgency(NO);
         }
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(new OrganisationPolicy()
                                                .setOrganisation(new Organisation()
@@ -145,7 +145,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataForApplicationFee(CaseData caseData, boolean isConsented,
                                                      boolean isWithNotice) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseData caseDataBuilder = caseData.copy();
         if (!isConsented) {
             caseDataBuilder.generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
                     .generalAppInformOtherParty(new GAInformOtherParty()
@@ -202,7 +202,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseData(CaseData caseData) {
 
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .respondent2OrganisationPolicy(new OrganisationPolicy()
@@ -268,7 +268,7 @@ public class GeneralApplicationDetailsBuilder {
                                                boolean withGADetailsResp2, boolean withGADetailsMaster,
                                                Map<String, String> applicationIdStatus) {
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.caseManagementLocation(new CaseLocationCivil().setBaseLocation("00000")
                                                    .setRegion("2"));
         caseDataBuilder.locationName("locationOfRegion2");
@@ -315,7 +315,7 @@ public class GeneralApplicationDetailsBuilder {
                                                boolean withGADetailsResp2, boolean withGADetailsMaster,
                                                Map<String, String> applicationIdStatus) {
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.caseManagementLocation(new CaseLocationCivil().setBaseLocation("000000")
                                                    .setRegion("2"));
         caseDataBuilder.respondent1Represented(NO);
@@ -374,7 +374,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataWithEmptyPreferredLocation(CaseData caseData) {
 
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .respondent2OrganisationPolicy(new OrganisationPolicy()
@@ -438,7 +438,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataWithEmptyCollectionOfApps(CaseData caseData) {
         CaseLocationCivil caseManagementLoc = new CaseLocationCivil().setRegion("1").setBaseLocation("22222");
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .caseAccessCategory(SPEC_CLAIM)
             .claimDismissedDeadline(LocalDateTime.now().plusMonths(6))
@@ -527,7 +527,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement respondentOrderAgreement) {
-        return CaseData.builder()
+        return new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .allocatedTrack(AllocatedTrack.FAST_CLAIM)
             .ccdState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
@@ -618,7 +618,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataForCaseManagementLocation(CaseCategory caseType, CaseState caseState) {
-        return CaseData.builder()
+        return new CaseData()
             .caseAccessCategory(caseType)
             .ccdState(caseState)
             .ccdCaseReference(1234L)
@@ -709,7 +709,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataForStatementOfTruthCheck(GARespondentOrderAgreement respondentOrderAgreement) {
-        return CaseData.builder()
+        return new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .ccdState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
@@ -799,7 +799,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataSPEC(CaseCategory claimType) {
         CaseLocationCivil caseManagementLoc = new CaseLocationCivil().setRegion("1").setBaseLocation("22222");
-        return CaseData.builder()
+        return new CaseData()
             .ccdCaseReference(1234L)
             .caseAccessCategory(claimType)
             .submittedDate(LocalDateTime.of(2025, 5, 5, 0, 0, 0))
@@ -893,7 +893,7 @@ public class GeneralApplicationDetailsBuilder {
                                                  Respondent1DQ respondent1DQ,
                                                  Respondent2DQ respondent2DQ) {
         CaseLocationCivil caseManagementLoc = new CaseLocationCivil().setRegion("1").setBaseLocation("22222");
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
+        CaseData builder = new CaseData()
                 .caseAccessCategory(claimType)
                 .ccdCaseReference(1234L)
                 .courtLocation(new CourtLocation().setCaseLocation(new CaseLocationCivil()
@@ -987,7 +987,7 @@ public class GeneralApplicationDetailsBuilder {
                                                  Party.Type respondent1Type,
                                                  Applicant1DQ applicant1DQ,
                                                  Respondent1DQ respondent1DQ) {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
+        CaseData builder = new CaseData()
             .ccdCaseReference(1234L)
             .courtLocation(new CourtLocation().setCaseLocation(new CaseLocationCivil()
                                                                     .setRegion("2")
@@ -1083,7 +1083,7 @@ public class GeneralApplicationDetailsBuilder {
                                              .setBaseLocation("11111")));
         CaseLocationCivil caseManagementLoc = new CaseLocationCivil().setRegion("1").setBaseLocation("22222");
         return getCaseDataForWorkAllocation1V1(null, SPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ)
-                .toBuilder().caseManagementLocation(caseManagementLoc).build();
+                .copy().caseManagementLocation(caseManagementLoc).build();
     }
 
     public CaseData getMultiCaseDataForWorkAllocationForOne_V_Two(CaseState state,
@@ -1092,7 +1092,7 @@ public class GeneralApplicationDetailsBuilder {
                                                  Applicant1DQ applicant1DQ,
                                                  Respondent1DQ respondent1DQ,
                                                  Respondent2DQ respondent2DQ) {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
+        CaseData builder = new CaseData()
             .ccdCaseReference(1234L)
             .courtLocation(new CourtLocation().setCaseLocation(new CaseLocationCivil()
                                                                     .setRegion("2")
@@ -1228,7 +1228,7 @@ public class GeneralApplicationDetailsBuilder {
                                                                               .setUnavailableTrialRequiredYesOrNo(YES)
                                                                               .setSupportRequirementLanguageInterpreter(STRING_CONSTANT));
         return getTestCaseDataWithEmptyCollectionOfApps(caseData)
-                .toBuilder()
+                .copy()
                 .generalApplications(wrapElements(application))
                 .build();
     }
@@ -1315,7 +1315,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataWithGeneralOrderPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .generalAppEvidenceDocument(wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
@@ -1325,7 +1325,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataWithGeneralOrderStaffPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
-        return caseData.toBuilder()
+        return caseData.copy()
                 .ccdCaseReference(1234L)
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .generalAppEvidenceDocument(wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
@@ -1334,7 +1334,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataWithDismissalOrderPDFDocument(CaseData caseData) {
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .generalAppEvidenceDocument(wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
@@ -1343,7 +1343,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataWithDismissalOrderStaffPDFDocument(CaseData caseData) {
-        return caseData.toBuilder()
+        return caseData.copy()
                 .ccdCaseReference(1234L)
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .generalAppEvidenceDocument(wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
@@ -1354,7 +1354,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataWithDirectionOrderPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .generalAppEvidenceDocument(wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
@@ -1366,7 +1366,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataWithDirectionResponseDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .generalAppEvidenceDocument(wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
@@ -1378,7 +1378,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataWithConsentOrderPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .consentOrderDocument(singletonList(new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
@@ -1391,7 +1391,7 @@ public class GeneralApplicationDetailsBuilder {
         List<Element<CaseDocument>> draftDocs = newArrayList();
         draftDocs.add(new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument));
         draftDocs.add(new Element<CaseDocument>().setId(UUID.fromString(uid)).setValue(pdfDocument));
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .gaDraftDocument(draftDocs)
@@ -1403,7 +1403,7 @@ public class GeneralApplicationDetailsBuilder {
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
         List<Element<CaseDocument>> draftDocs = newArrayList();
         draftDocs.add(new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument));
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .gaDraftDocument(draftDocs)
@@ -1413,7 +1413,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataWithAdditionalDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .gaAddlDoc(singletonList(new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
@@ -1426,7 +1426,7 @@ public class GeneralApplicationDetailsBuilder {
         List<Element<CaseDocument>> directionOrderDocStaff = new ArrayList<>();
         directionOrderDocStaff.add(new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument));
 
-        return caseData.toBuilder()
+        return caseData.copy()
                 .ccdCaseReference(1234L)
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .generalAppEvidenceDocument(wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
@@ -1438,7 +1438,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataWithConsentOrderStaffPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .consentOrderDocStaff(singletonList(new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
@@ -1448,7 +1448,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataWithDraftStaffPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .gaDraftDocStaff(singletonList(new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
@@ -1458,7 +1458,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataWithAddlDocStaffPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
-        return caseData.toBuilder()
+        return caseData.copy()
             .ccdCaseReference(1234L)
             .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
             .gaAddlDocStaff(singletonList(new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
@@ -1467,7 +1467,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataWithHearingNoticeDocumentPDFDocument(CaseData caseData) {
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
-        return caseData.toBuilder()
+        return caseData.copy()
                 .ccdCaseReference(1234L)
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .hearingNoticeDocument(singletonList(new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
@@ -1476,7 +1476,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataWithHearingNoticeStaffDocumentPDFDocument(CaseData caseData) {
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
-        return caseData.toBuilder()
+        return caseData.copy()
                 .ccdCaseReference(1234L)
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .hearingNoticeDocStaff(singletonList(new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
@@ -1484,8 +1484,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTriggerGeneralApplicationTestData() {
-        return CaseData
-                .builder()
+        return new CaseData()
                 .ccdCaseReference(1L)
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
@@ -1536,8 +1535,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getVaryJudgmentWithN245TestData() {
         CaseLocationCivil caseManagementLoc = new CaseLocationCivil().setRegion("1").setBaseLocation("22222");
-        return CaseData
-                .builder()
+        return new CaseData()
                 .ccdCaseReference(1L)
                 .caseAccessCategory(SPEC_CLAIM)
                 .responseClaimTrack("SMALL_CLAIM")

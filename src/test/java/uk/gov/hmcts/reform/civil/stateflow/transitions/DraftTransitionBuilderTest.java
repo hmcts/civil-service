@@ -329,7 +329,7 @@ public class DraftTransitionBuilderTest {
         when(mockFeatureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(mockFeatureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(NO)
             .specRespondent1Represented(NO)
             .applicant1Represented(NO)

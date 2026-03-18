@@ -396,7 +396,7 @@ public class CaseDataBuilderUnspec {
 
     public CaseData build() {
 
-        return CaseData.builder()
+        return new CaseData()
             // Create Claim
             .legacyCaseReference(legacyCaseReference)
             .solicitorReferences(solicitorReferences)

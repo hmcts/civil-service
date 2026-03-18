@@ -160,7 +160,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
                 .atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .build().toBuilder()
+                .build().copy()
                 .responseClaimMediationSpecRequired(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -242,7 +242,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
                 .atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .build().toBuilder()
+                .build().copy()
                 .responseClaimMediationSpecRequired(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

@@ -31,7 +31,7 @@ public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest ex
         String caseId = "11234949493";
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .responseClaimTrack(SMALL_CLAIM.name())

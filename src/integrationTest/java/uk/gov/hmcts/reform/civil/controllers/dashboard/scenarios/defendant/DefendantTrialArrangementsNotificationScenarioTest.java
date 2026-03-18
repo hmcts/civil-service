@@ -28,7 +28,7 @@ public class DefendantTrialArrangementsNotificationScenarioTest extends Dashboar
 
         String caseId = "1234";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .respondent1Represented(NO)
             .ccdCaseReference(Long.valueOf(caseId))

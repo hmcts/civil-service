@@ -216,7 +216,7 @@ public class SdoGeneratorServiceTest {
             .atStateNotificationAcknowledged()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .build()
-            .toBuilder()
+            .copy()
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
             .build();
@@ -247,7 +247,7 @@ public class SdoGeneratorServiceTest {
             .atStateNotificationAcknowledged()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .build()
-            .toBuilder()
+            .copy()
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
@@ -283,7 +283,7 @@ public class SdoGeneratorServiceTest {
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .atSmallSmallClaimsFlightDelayInputs()
             .build()
-            .toBuilder()
+            .copy()
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
             .smallClaims(List.of(SmallTrack.smallClaimFlightDelay))
@@ -332,12 +332,12 @@ public class SdoGeneratorServiceTest {
             .atStateNotificationAcknowledged()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .build()
-            .toBuilder()
+            .copy()
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .smallClaimsMethodInPerson(formValue)
-            .build().toBuilder()
+            .build().copy()
             .smallClaimsMediationSectionStatement(
                 new SmallClaimsMediation().setInput("mediation representation")
             )
@@ -371,7 +371,7 @@ public class SdoGeneratorServiceTest {
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .atStateSdoFastTrackTrial()
             .build()
-            .toBuilder()
+            .copy()
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .build();
@@ -441,7 +441,7 @@ public class SdoGeneratorServiceTest {
         SdoFastTrackSpecialistDirectionsService specialistService =
             new SdoFastTrackSpecialistDirectionsService(deadlineService, mockFeatureToggleService);
 
-        CaseData caseData = baseCase.toBuilder()
+        CaseData caseData = baseCase.copy()
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .fastTrackTrialBundleToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
@@ -463,7 +463,7 @@ public class SdoGeneratorServiceTest {
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .atStateSdoDisposal()
             .build()
-            .toBuilder()
+            .copy()
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(YesOrNo.NO)
             .orderType(OrderType.DISPOSAL)
@@ -509,7 +509,7 @@ public class SdoGeneratorServiceTest {
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .atStateSdoDisposal()
             .build()
-            .toBuilder()
+            .copy()
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(YesOrNo.NO)
             .orderType(OrderType.DISPOSAL)
@@ -546,13 +546,13 @@ public class SdoGeneratorServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimDraft()
             .build()
-            .toBuilder()
+            .copy()
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .fastClaims(fastTrackList)
             .build();
 
-        caseData  = prePopulateNihlFields(caseData.toBuilder());
+        caseData  = prePopulateNihlFields(caseData.copy());
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         verify(documentManagementService)
@@ -572,7 +572,7 @@ public class SdoGeneratorServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimDraft()
             .build()
-            .toBuilder()
+            .copy()
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(YesOrNo.NO)
             .orderType(OrderType.DECIDE_DAMAGES)
@@ -580,7 +580,7 @@ public class SdoGeneratorServiceTest {
             .trialAdditionalDirectionsForFastTrack(fastTrackList)
             .build();
 
-        caseData  = prePopulateNihlFields(caseData.toBuilder());
+        caseData  = prePopulateNihlFields(caseData.copy());
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         //assertThat(caseDocument).isNotNull();
@@ -588,7 +588,7 @@ public class SdoGeneratorServiceTest {
             .uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER));
     }
 
-    private CaseData prePopulateNihlFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private CaseData prePopulateNihlFields(CaseData updatedData) {
 
         Category inPerson = new Category();
         inPerson.setCategoryKey("HearingChannel");
@@ -783,7 +783,7 @@ public class SdoGeneratorServiceTest {
             .atStateNotificationAcknowledged()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .build()
-            .toBuilder()
+            .copy()
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
             .drawDirectionsOrderRequired(NO)
             .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
@@ -808,7 +808,7 @@ public class SdoGeneratorServiceTest {
             .atStateNotificationAcknowledged()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .build()
-            .toBuilder()
+            .copy()
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
             .drawDirectionsOrderRequired(NO)
             .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))

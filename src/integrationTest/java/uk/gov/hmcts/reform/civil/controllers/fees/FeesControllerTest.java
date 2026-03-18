@@ -58,7 +58,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     public void shouldReturnClaimInterestToDate() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(new BigDecimal("0.1"));
         doPost(BEARER_TOKEN, caseData, FEES_CLAIM_CALCULATE_INTEREST_URL, caseData)
             .andExpect(content().json("0.1"))

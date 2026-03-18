@@ -44,7 +44,7 @@ public class AmendRestitchBundleDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(
                 new CaseDataLiP()
                     .setRespondent1LiPResponse(
@@ -63,7 +63,7 @@ public class AmendRestitchBundleDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenNotBilingual() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(expectedTemplateId);
@@ -83,7 +83,7 @@ public class AmendRestitchBundleDefendantEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         Party party = new Party();
-        CaseData caseData = CaseData.builder().respondent1(party).build();
+        CaseData caseData = new CaseData().respondent1(party).build();
 
         String allPartyNames = "all party names";
         String respondentName = "respondent name";

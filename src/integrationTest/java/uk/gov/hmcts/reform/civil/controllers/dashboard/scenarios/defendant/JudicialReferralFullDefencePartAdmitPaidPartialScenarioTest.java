@@ -26,7 +26,7 @@ public class JudicialReferralFullDefencePartAdmitPaidPartialScenarioTest extends
     void should_create_scenario_for_judicial_referral_full_defence_or_part_admit_paid_partial_amount() throws Exception {
 
         String caseId = "90123456782";
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .ccdState(CaseState.JUDICIAL_REFERRAL)

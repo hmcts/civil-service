@@ -24,7 +24,7 @@ public class RespondentMediationServiceTest {
 
     @Test
     void whenNotSmallClaim() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .build();
         DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
@@ -33,7 +33,7 @@ public class RespondentMediationServiceTest {
 
     @Test
     void whenResponseTypeIsIncorrect() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
             .build();

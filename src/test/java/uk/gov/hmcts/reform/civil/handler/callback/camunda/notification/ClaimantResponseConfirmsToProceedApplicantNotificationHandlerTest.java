@@ -84,7 +84,7 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
         @Test
         void shouldNotifyLipApplicant_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-                .toBuilder().applicant1Represented(YesOrNo.NO).build();
+                .copy().applicant1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED")
                     .build()).build();
@@ -102,7 +102,7 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
         @Test
         void shouldNotifyLipApplicantBilingual_whenClaimIsBilingual() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                     .respondent1Represented(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.NO)
                     .claimantBilingualLanguagePreference(Language.BOTH.toString())

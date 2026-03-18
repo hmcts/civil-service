@@ -25,7 +25,7 @@ public class ClaimFullDefenceProceedDefendantNoMediationScenarioTest extends Das
         String caseId = "12348991013";
 
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentPartAdmissionSpec().build().toBuilder()
+            .atStateRespondentPartAdmissionSpec().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .ccdState(CaseState.JUDICIAL_REFERRAL)

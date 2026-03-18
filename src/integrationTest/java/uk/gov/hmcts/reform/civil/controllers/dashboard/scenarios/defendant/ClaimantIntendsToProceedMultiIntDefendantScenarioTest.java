@@ -27,7 +27,7 @@ public class ClaimantIntendsToProceedMultiIntDefendantScenarioTest extends Dashb
         String caseId = "1674364636586679";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
@@ -60,7 +60,7 @@ public class ClaimantIntendsToProceedMultiIntDefendantScenarioTest extends Dashb
         String caseId = "1674364636586679";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)

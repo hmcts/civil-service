@@ -384,7 +384,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
         ResponseDocument responseDocument = new ResponseDocument(document);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1DefenceResponseDocumentSpec(responseDocument)
             .build();
 

@@ -2976,7 +2976,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1Only1FullDefence() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().copy()
                 .respondent1ClaimResponseType(COUNTER_CLAIM)
                 .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
                 .build();
@@ -2991,7 +2991,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1BothFullDefence() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().copy()
                 .respondent1ClaimResponseType(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
                 .build();
@@ -3006,7 +3006,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmission() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().copy()
                 .respondent1ClaimResponseType(COUNTER_CLAIM)
                 .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
                 .build();

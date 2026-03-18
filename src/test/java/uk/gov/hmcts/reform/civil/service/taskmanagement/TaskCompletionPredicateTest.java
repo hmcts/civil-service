@@ -21,7 +21,7 @@ class TaskCompletionPredicateTest {
 
     @Test
     void shouldReturnTrueWhenAllConditionsAreMet() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .lastMessage(new Message().setMessageId(MESSAGE_ID))
             .build();
         Task task = new Task()
@@ -34,7 +34,7 @@ class TaskCompletionPredicateTest {
 
     @Test
     void shouldReturnFalseWhenAdditionalPropertiesAreNull() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .lastMessage(new Message().setMessageId(MESSAGE_ID))
             .build();
         Task task = new Task()
@@ -47,7 +47,7 @@ class TaskCompletionPredicateTest {
 
     @Test
     void shouldReturnFalseWhenTaskTaskPermissionsDoNotContainClaim() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .lastMessage(new Message().setMessageId(MESSAGE_ID))
             .build();
         Task task = new Task()
@@ -60,7 +60,7 @@ class TaskCompletionPredicateTest {
 
     @Test
     void shouldReturnFalseWhenMessageIdsDoNotMatch() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .lastMessage(new Message().setMessageId(MESSAGE_ID))
             .build();
         Task task = new Task()
@@ -73,7 +73,7 @@ class TaskCompletionPredicateTest {
 
     @Test
     void shouldReturnFalseWhenMessageIdIsNull() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .lastMessage(new Message().setMessageId(null))
             .build();
         Task task = new Task()

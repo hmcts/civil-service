@@ -16,7 +16,7 @@ class DefRespCaseOfflineHelperTest {
 
     @Test
     void shouldReturnReasonFor1v1() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .build();
 
@@ -27,7 +27,7 @@ class DefRespCaseOfflineHelperTest {
 
     @Test
     void shouldReturnConcatenatedReasonFor2v1LiP() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
@@ -50,7 +50,7 @@ class DefRespCaseOfflineHelperTest {
 
     @Test
     void shouldReturn1v2ResponseFieldsForLiP() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .respondent1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualFirstName("John").setIndividualLastName("Smith"))
             .respondent2(new Party().setType(Party.Type.COMPANY).setCompanyName("ABC Ltd"))

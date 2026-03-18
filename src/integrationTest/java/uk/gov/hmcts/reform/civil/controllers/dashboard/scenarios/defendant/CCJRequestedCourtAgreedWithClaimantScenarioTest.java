@@ -33,7 +33,7 @@ public class CCJRequestedCourtAgreedWithClaimantScenarioTest extends DashboardBa
         CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
             .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
             .setCcjPaymentPaidSomeOption(YesOrNo.YES);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .ccdState(CaseState.CASE_SETTLED)

@@ -25,7 +25,7 @@ class CcjRequestedDashboardTaskTest {
     @Mock
     private DashboardTaskContext context;
 
-    private final CaseData caseData = CaseData.builder().ccdCaseReference(22L).build();
+    private final CaseData caseData = new CaseData().setCcdCaseReference(22L).build();
 
     @BeforeEach
     void setupContext() {

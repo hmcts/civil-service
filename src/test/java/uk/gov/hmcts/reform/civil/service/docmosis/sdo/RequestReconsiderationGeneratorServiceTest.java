@@ -74,7 +74,7 @@ class RequestReconsiderationGeneratorServiceTest {
             .atStateSdoFastTrackTrial()
             .atReconsiderationUpheld()
             .build()
-            .toBuilder()
+            .copy()
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .build();
 

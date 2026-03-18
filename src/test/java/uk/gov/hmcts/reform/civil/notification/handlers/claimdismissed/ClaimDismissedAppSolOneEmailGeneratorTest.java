@@ -26,7 +26,7 @@ class ClaimDismissedAppSolOneEmailGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(claimDismissedEmailTemplater.getTemplateId(caseData)).thenReturn(expectedTemplateId);
 

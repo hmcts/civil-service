@@ -28,7 +28,7 @@ public class ClaimantTrialArrangementsNotificationScenarioTest extends Dashboard
 
         String caseId = "1234987";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .applicant1Represented(NO)
             .drawDirectionsOrderRequired(YesOrNo.YES)

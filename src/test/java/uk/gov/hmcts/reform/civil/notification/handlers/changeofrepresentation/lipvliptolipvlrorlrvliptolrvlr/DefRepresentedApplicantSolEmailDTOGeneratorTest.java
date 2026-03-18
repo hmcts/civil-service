@@ -45,7 +45,7 @@ class DefRepresentedApplicantSolEmailDTOGeneratorTest {
     void shouldReturnCorrectEmailTemplateId() {
         when(notificationsProperties.getNoticeOfChangeOtherParties()).thenReturn("template-id-123");
 
-        String result = generator.getEmailTemplateId(CaseData.builder().build());
+        String result = generator.getEmailTemplateId(new CaseData().build());
 
         assertThat(result).isEqualTo("template-id-123");
     }
@@ -65,7 +65,7 @@ class DefRepresentedApplicantSolEmailDTOGeneratorTest {
         when(organisation.getName()).thenReturn(newSolName);
         when(organisationService.findOrganisationById(orgId)).thenReturn(Optional.of(organisation));
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(1234567890L)
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)

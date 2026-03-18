@@ -110,7 +110,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when1v1() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .respondent1(respondent1)
                 .build();
@@ -122,7 +122,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when1v1_withApplicantLipFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .respondent1(respondent1)
                 .applicant1LitigationFriend(applicant1LitigationFriend)
@@ -149,7 +149,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when1v2() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .respondent1(respondent1)
                 .respondent2(respondent2)
@@ -162,7 +162,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when1v2_withApplicantLipFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .respondent1(respondent1)
                 .respondent2(respondent2)
@@ -177,7 +177,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when1v2_withRespondent1LipFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .respondent1(respondent1)
                 .respondent2(respondent2)
@@ -192,7 +192,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when1v2_withRespondent2LipFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .respondent1(respondent1)
                 .respondent2(respondent2)
@@ -207,7 +207,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when1v2_withApplicantLipFriend_andRespondent1LipFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .respondent1(respondent1)
                 .respondent2(respondent2)
@@ -224,7 +224,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when1v2_withApplicantLipFriend_andRespondent2LipFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .respondent1(respondent1)
                 .respondent2(respondent2)
@@ -241,7 +241,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when1v2_withRespondent1LipFriend_andRespondent2LipFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .respondent1(respondent1)
                 .respondent2(respondent2)
@@ -257,7 +257,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when1v2_withApplicantLipFriend_andRespondent1LipFriend_andRespondent2LipFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .respondent1(respondent1)
                 .respondent2(respondent2)
@@ -275,7 +275,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when2v1() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .applicant2(applicant2)
                 .respondent1(respondent1)
@@ -288,7 +288,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when2v1_withApplicant1LitFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .applicant2(applicant2)
                 .respondent1(respondent1)
@@ -302,7 +302,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when2v1_withApplicant2LitFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .applicant2(applicant2)
                 .respondent1(respondent1)
@@ -316,7 +316,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when2v1_withRespondent1LitFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .applicant2(applicant2)
                 .respondent1(respondent1)
@@ -330,7 +330,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when2v1_withApplicant1LitFriend_andApplicant2LitFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .applicant2(applicant2)
                 .respondent1(respondent1)
@@ -346,7 +346,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when2v1_withApplicant1LitFriend_andRespondent1LitFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .applicant2(applicant2)
                 .respondent1(respondent1)
@@ -362,7 +362,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when2v1_withApplicant2LitFriend_andRespondent1LitFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .applicant2(applicant2)
                 .respondent1(respondent1)
@@ -378,7 +378,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnCaseName_when2v1_withApplicant1LitFriend_andApplicant2LitFriend_andRespondent1LitFriend() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1(applicant1)
                 .applicant2(applicant2)
                 .respondent1(respondent1)

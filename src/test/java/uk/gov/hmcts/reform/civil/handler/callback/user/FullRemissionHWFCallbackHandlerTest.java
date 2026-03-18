@@ -50,7 +50,7 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
             claimFee.setCalculatedAmountInPence(BigDecimal.valueOf(10000));
             claimFee.setCode("OOOCM002");
             HelpWithFeesDetails claimIssuedHwfDetails = new HelpWithFeesDetails();
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
             caseData.setClaimFee(claimFee);
             caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
             caseData.setHwfFeeType(FeeType.CLAIMISSUED);
@@ -68,7 +68,7 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
             Fee claimFee = new Fee();
             claimFee.setCalculatedAmountInPence(BigDecimal.valueOf(10000));
             claimFee.setCode("OOOCM002");
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
             caseData.setClaimFee(claimFee);
             caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
@@ -85,7 +85,7 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
             Fee hearingFee = new Fee();
             hearingFee.setCalculatedAmountInPence(BigDecimal.valueOf(30000));
             HelpWithFeesDetails hearingHwfDetails = new HelpWithFeesDetails();
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
             caseData.setHearingReferenceNumber("000HN001");
             caseData.setHearingFee(hearingFee);
             caseData.setHearingHwfDetails(hearingHwfDetails);
@@ -103,7 +103,7 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
         void shouldUpdateFullRemissionDataWithDetailsNull_HearingFee() {
             Fee hearingFee = new Fee();
             hearingFee.setCalculatedAmountInPence(BigDecimal.valueOf(30000));
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
             caseData.setHearingReferenceNumber("000HN001");
             caseData.setHearingFee(hearingFee);
             caseData.setHwfFeeType(FeeType.HEARING);
@@ -122,7 +122,7 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
             claimFee.setCalculatedAmountInPence(BigDecimal.ZERO);
             claimFee.setCode("OOOCM002");
             HelpWithFeesDetails claimIssuedHwfDetails = new HelpWithFeesDetails();
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
             caseData.setClaimFee(claimFee);
             caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
             caseData.setHwfFeeType(FeeType.CLAIMISSUED);
@@ -139,7 +139,7 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
             Fee hearingFee = new Fee();
             hearingFee.setCalculatedAmountInPence(BigDecimal.ZERO);
             HelpWithFeesDetails hearingHwfDetails = new HelpWithFeesDetails();
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
             caseData.setHearingReferenceNumber("000HN001");
             caseData.setHearingFee(hearingFee);
             caseData.setHearingHwfDetails(hearingHwfDetails);

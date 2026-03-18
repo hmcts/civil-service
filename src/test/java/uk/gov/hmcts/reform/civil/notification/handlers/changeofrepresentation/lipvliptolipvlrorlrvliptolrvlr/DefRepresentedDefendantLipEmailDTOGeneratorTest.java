@@ -35,7 +35,7 @@ class DefRepresentedDefendantLipEmailDTOGeneratorTest {
 
     @BeforeEach
     void setup() {
-        baseCaseData = CaseData.builder()
+        baseCaseData = new CaseData()
             .ccdCaseReference(1234567890123456L)
             .legacyCaseReference("LEGACY123456")
             .respondent1(new Party()
@@ -49,7 +49,7 @@ class DefRepresentedDefendantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnBilingualTemplateIdIfRespondentResponseIsBilingual() {
-        CaseData bilingualCaseData = baseCaseData.toBuilder()
+        CaseData bilingualCaseData = baseCaseData.copy()
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                          .setRespondent1ResponseLanguage(Language.WELSH.toString())))
@@ -65,7 +65,7 @@ class DefRepresentedDefendantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnDefaultTemplateIdIfRespondentResponseIsNotBilingual() {
-        CaseData monoCaseData = baseCaseData.toBuilder()
+        CaseData monoCaseData = baseCaseData.copy()
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                          .setRespondent1ResponseLanguage(Language.ENGLISH.toString())))
@@ -97,7 +97,7 @@ class DefRepresentedDefendantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldAlwaysReturnTrueForShouldNotify() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         Boolean result = generator.getShouldNotify(caseData);
         assertThat(result).isTrue();
     }

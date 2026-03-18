@@ -114,7 +114,7 @@ public class JudgementByAdmissionIssuedClaimantScenarioTest extends  DashboardBa
 
     private CaseData getCaseData(String caseId) {
         return CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

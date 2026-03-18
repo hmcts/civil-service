@@ -94,7 +94,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
-            caseData = caseData.toBuilder().applicantSolicitor1UserDetails(new IdamUserDetails()
+            caseData = caseData.copy().applicantSolicitor1UserDetails(new IdamUserDetails()
                                                                                             .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                                                                                             .setEmail("applicantsolicitor@example.com")
                                                                                             )
@@ -129,7 +129,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .applicant1(new Party()
                                 .setIndividualFirstName("Applicant1").setIndividualLastName("ApplicantLastName").setPartyName("Applicant1")
                                 .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))

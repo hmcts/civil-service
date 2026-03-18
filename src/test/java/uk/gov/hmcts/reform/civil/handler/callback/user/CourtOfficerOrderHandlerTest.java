@@ -109,7 +109,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateValues_whenInvoked() {
             when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(7));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -143,7 +143,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssignCategoryId_whenInvoked() {
             String fileName = LocalDate.now() + "_Court OfficerName.pdf";
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .courtOfficerFurtherHearingComplex(new FinalOrderFurtherHearing()
                                                        .setListFromDate(null))
                 .build();
@@ -170,7 +170,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotReturnError_whenNoDate() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .courtOfficerFurtherHearingComplex(new FinalOrderFurtherHearing()
                                                        .setListFromDate(null))
                 .build();
@@ -182,7 +182,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNoError_whenDateInFuture() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .courtOfficerFurtherHearingComplex(new FinalOrderFurtherHearing()
                                                        .setListFromDate(LocalDate.now().plusDays(7)))
                 .build();
@@ -194,7 +194,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldError_whenDateInPast() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .courtOfficerFurtherHearingComplex(new FinalOrderFurtherHearing()
                                                        .setListFromDate(LocalDate.now().minusDays(7)))
                 .build();
@@ -212,7 +212,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateConfirmationHeader_WhenSubmitted() {
             // Given
             String confirmationHeader = format(HEADER, 1234567);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .ccdCaseReference(1234567L).build();
             // When
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);

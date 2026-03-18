@@ -42,7 +42,7 @@ class RespSolOneEmailGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailAddress() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondentSolicitor1EmailAddress("test@example.com").build();
 
         String emailAddress = emailGenerator.getEmailAddress(caseData);
@@ -52,7 +52,7 @@ class RespSolOneEmailGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
         notificationUtilsMockedStatic.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, Boolean.TRUE, organisationService))
             .thenReturn(RESPONDENT_LEGAL_ORG_NAME);
@@ -66,7 +66,7 @@ class RespSolOneEmailGeneratorTest {
 
     @Test
     void shouldReturnNotifyAsTrue_WhenApplicantRepresented() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.YES)
             .build();
         Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
@@ -75,7 +75,7 @@ class RespSolOneEmailGeneratorTest {
 
     @Test
     void shouldReturnNotifyAsTrue_WhenSpecApplicantRepresented() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .specRespondent1Represented(YesOrNo.YES)
             .build();
         Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
@@ -84,7 +84,7 @@ class RespSolOneEmailGeneratorTest {
 
     @Test
     void shouldReturnNotifyAsFalse_WhenApplicantIsLip() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.NO)
             .build();
         Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
@@ -93,7 +93,7 @@ class RespSolOneEmailGeneratorTest {
 
     @Test
     void shouldReturnNotifyAsTrue_WhenSpecApplicantIsLip() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .specRespondent1Represented(YesOrNo.YES)
             .build();
         Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);

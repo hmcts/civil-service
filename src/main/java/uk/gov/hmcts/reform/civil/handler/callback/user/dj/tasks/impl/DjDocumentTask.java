@@ -52,7 +52,7 @@ public class DjDocumentTask implements DirectionsOrderCallbackTask {
     private DirectionsOrderTaskResult buildResult(CaseData caseData, CaseDocument document) {
         djDocumentService.assignCategory(document, "caseManagementOrders");
         log.info("Generated DJ order document for caseId {}", caseData.getCcdCaseReference());
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+        CaseData builder = caseData.copy()
             .orderSDODocumentDJ(document.getDocumentLink())
             .orderSDODocumentDJCollection(List.of(toElement(document)))
             .disposalHearingMethodInPersonDJ(trimList(caseData.getDisposalHearingMethodInPersonDJ()))

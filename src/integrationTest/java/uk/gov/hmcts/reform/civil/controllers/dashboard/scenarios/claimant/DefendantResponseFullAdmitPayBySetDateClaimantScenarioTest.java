@@ -32,7 +32,7 @@ public class DefendantResponseFullAdmitPayBySetDateClaimantScenarioTest extends 
         String caseId = "12348";
         LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate().plusDays(5);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .responseClaimTrack("SMALL_CLAIM")
             .ccdCaseReference(Long.valueOf(caseId))

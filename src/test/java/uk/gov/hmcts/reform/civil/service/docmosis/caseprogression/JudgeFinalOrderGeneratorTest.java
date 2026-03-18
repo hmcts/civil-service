@@ -185,7 +185,7 @@ class JudgeFinalOrderGeneratorTest {
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenThrow(IllegalArgumentException.class);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("00000888"))
             .build();
@@ -203,7 +203,7 @@ class JudgeFinalOrderGeneratorTest {
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(new JudgeFinalOrderForm().setInitiativeDate(appealDate));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
             .caseManagementLocation(caseManagementLocation)
             .build();
@@ -223,7 +223,7 @@ class JudgeFinalOrderGeneratorTest {
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(new JudgeFinalOrderForm().setInitiativeDate(appealDate));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .solicitorReferences(null)
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
             .caseManagementLocation(caseManagementLocation)
@@ -244,7 +244,7 @@ class JudgeFinalOrderGeneratorTest {
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(new JudgeFinalOrderForm().setInitiativeDate(appealDate));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
             .orderOnCourtInitiative(new FreeFormOrderValues().setOnInitiativeSelectionTextArea("test")
                                      .setOnInitiativeSelectionDate(LocalDate.now()))
@@ -266,7 +266,7 @@ class JudgeFinalOrderGeneratorTest {
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(new JudgeFinalOrderForm().setInitiativeDate(appealDate));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
             .ccdState(CaseState.CASE_PROGRESSION)
             .orderWithoutNotice(new FreeFormOrderValues().setWithoutNoticeSelectionTextArea("test without notice")
@@ -295,7 +295,7 @@ class JudgeFinalOrderGeneratorTest {
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(new JudgeFinalOrderForm().setInitiativeDate(appealDate));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .caseManagementLocation(caseManagementLocation)
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
             .ccdState(CaseState.CASE_PROGRESSION)
@@ -327,7 +327,7 @@ class JudgeFinalOrderGeneratorTest {
         when(appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
             new JudgeFinalOrderForm().setInitiativeDate(appealDate));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .ccdState(CaseState.CASE_PROGRESSION)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             // Order made section
@@ -376,7 +376,7 @@ class JudgeFinalOrderGeneratorTest {
         when(appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
             new JudgeFinalOrderForm().setInitiativeDate(appealDate));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .ccdState(CaseState.CASE_PROGRESSION)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             // Order made section
@@ -445,7 +445,7 @@ class JudgeFinalOrderGeneratorTest {
         DynamicList dynamicList = new DynamicList().setListItems(Collections.singletonList(dynamicListElement)).setValue(dynamicListElement);
         List<FinalOrdersJudgePapers> finalOrdersJudgePapersList =
             new ArrayList<>(Arrays.asList(FinalOrdersJudgePapers.CONSIDERED));
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .caseManagementLocation(caseManagementLocation)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             // Order made section
@@ -510,21 +510,21 @@ class JudgeFinalOrderGeneratorTest {
 
     @Test
     void testGetInitiativeTextWithoutNotice() {
-        CaseData caseDataInitiative = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseDataInitiative = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
             .orderMadeOnDetailsOrderCourt(new OrderMadeOnDetails().setOwnInitiativeText("test initiative text"))
             .build();
         String responseInitiative = generator.getInitiativeOrWithoutNotice(caseDataInitiative);
         assertEquals("test initiative text", responseInitiative);
 
-        CaseData caseDataWithoutNotice = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseDataWithoutNotice = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .orderMadeOnDetailsList(OrderMadeOnTypes.WITHOUT_NOTICE)
             .orderMadeOnDetailsOrderWithoutNotice(new OrderMadeOnDetailsOrderWithoutNotice().setWithOutNoticeText("test without notice text"))
             .build();
         String responseWithoutNotice = generator.getInitiativeOrWithoutNotice(caseDataWithoutNotice);
         assertEquals("test without notice text", responseWithoutNotice);
 
-        CaseData caseDataWhenNone = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseDataWhenNone = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .orderMadeOnDetailsList(OrderMadeOnTypes.NONE)
             .build();
         String responseWhenNone = generator.getInitiativeOrWithoutNotice(caseDataWhenNone);

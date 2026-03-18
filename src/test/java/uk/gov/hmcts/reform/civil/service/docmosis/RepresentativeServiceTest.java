@@ -162,7 +162,7 @@ class RepresentativeServiceTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
-                .build().toBuilder()
+                .build().copy()
                 .caseAccessCategory(SPEC_CLAIM)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .specRespondentCorrespondenceAddressdetails(respondentSolicitorServiceAddress)

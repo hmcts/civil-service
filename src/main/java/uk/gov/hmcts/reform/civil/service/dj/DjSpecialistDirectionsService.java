@@ -12,16 +12,16 @@ public class DjSpecialistDirectionsService {
 
     private final DjSpecialistNarrativeService narrativeService;
 
-    public void populateSpecialistDirections(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        caseDataBuilder.trialBuildingDispute(narrativeService.buildTrialBuildingDispute());
-        caseDataBuilder.trialClinicalNegligence(narrativeService.buildTrialClinicalNegligence());
-        caseDataBuilder.sdoDJR2TrialCreditHire(narrativeService.buildCreditHireDirections());
-        caseDataBuilder.trialPersonalInjury(narrativeService.buildTrialPersonalInjury());
+    public void populateSpecialistDirections(CaseData caseData) {
+        caseData.setTrialBuildingDispute(narrativeService.buildTrialBuildingDispute());
+        caseData.setTrialClinicalNegligence(narrativeService.buildTrialClinicalNegligence());
+        caseData.setSdoDJR2TrialCreditHire(narrativeService.buildCreditHireDirections());
+        caseData.setTrialPersonalInjury(narrativeService.buildTrialPersonalInjury());
 
         TrialRoadTrafficAccident roadTrafficAccident = narrativeService.buildTrialRoadTrafficAccident();
-        caseDataBuilder.trialRoadTrafficAccident(roadTrafficAccident);
+        caseData.setTrialRoadTrafficAccident(roadTrafficAccident);
 
         TrialHousingDisrepair housingDisrepair = narrativeService.buildTrialHousingDisrepair();
-        caseDataBuilder.trialHousingDisrepair(housingDisrepair);
+        caseData.setTrialHousingDisrepair(housingDisrepair);
     }
 }

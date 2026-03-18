@@ -23,7 +23,7 @@ class CaseProceedOfflineScenarioServiceTest {
 
     @Test
     void shouldReturnTrueWhenPreviousStateIsCaseProgressionGroup() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .previousCCDState(CaseState.CASE_PROGRESSION)
             .build();
 
@@ -32,14 +32,14 @@ class CaseProceedOfflineScenarioServiceTest {
 
     @Test
     void shouldReturnFalseWhenNoPreviousState() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         assertThat(scenarioService.isInCaseProgression(caseData)).isFalse();
     }
 
     @Test
     void shouldReturnFalseWhenPreviousStateNotInAllowedList() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .previousCCDState(CaseState.CASE_SETTLED)
             .build();
 

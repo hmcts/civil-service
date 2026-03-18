@@ -26,7 +26,7 @@ public class ClaimIssueHwfInvalidRefScenarioTest extends DashboardBaseIntegratio
         String caseId = "12346781";
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .applicant1Represented(YesOrNo.NO)
             .hwfFeeType(FeeType.CLAIMISSUED)
             .claimIssuedHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(INVALID_HWF_REFERENCE))

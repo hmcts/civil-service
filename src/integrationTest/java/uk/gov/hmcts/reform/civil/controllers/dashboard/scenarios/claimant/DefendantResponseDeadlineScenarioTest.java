@@ -28,7 +28,7 @@ public class DefendantResponseDeadlineScenarioTest extends DashboardBaseIntegrat
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         String defendantName = "Mr. Sole Trader";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-                .toBuilder()
+                .copy()
                 .legacyCaseReference("reference")
                 .ccdCaseReference(Long.valueOf(caseId))
                 .respondent1(new Party().setType(Party.Type.INDIVIDUAL)

@@ -75,7 +75,7 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
         Respondent1DQ updateRespondent1DQ = updateRespondent1DQExperts(caseData.getRespondent1DQ(), updateExpert);
         Respondent2DQ updateRespondent2DQ = updateRespondent2DQExperts(caseData.getRespondent2DQ(), updateExpert);
 
-        return caseData.toBuilder()
+        return caseData.copy()
             .applicantExperts(updatedApplicantExperts)
             .respondent1Experts(updatedRespondent1Experts)
             .respondent2Experts(updatedRespondent2Experts)

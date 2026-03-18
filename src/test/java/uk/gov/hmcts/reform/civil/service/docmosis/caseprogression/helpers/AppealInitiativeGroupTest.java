@@ -30,7 +30,7 @@ public class AppealInitiativeGroupTest {
 
     @Test
     void shouldPopulateAppealDetails_WhenAppealGrantedAndCircuitCourt() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderAppealComplex(new FinalOrderAppeal()
                                          .setApplicationList(ApplicationAppealList.GRANTED)
                                          .setAppealGrantedDropdown(new AppealGrantedRefused()
@@ -50,7 +50,7 @@ public class AppealInitiativeGroupTest {
     @Test
     void shouldPopulateAppealDetails_WhenAppealRefusedAndCircuitCourt() {
         LocalDate appealRefusedDate = LocalDate.now().plusDays(5);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderAppealComplex(new FinalOrderAppeal()
                                          .setApplicationList(ApplicationAppealList.REFUSED)
                                          .setAppealRefusedDropdown(new AppealGrantedRefused()
@@ -69,7 +69,7 @@ public class AppealInitiativeGroupTest {
     @Test
     void shouldPopulateAppealDetails_WhenAppealOtherCases_AndHighCourt() {
         LocalDate appealRefusedDate = LocalDate.now().plusDays(5);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderAppealComplex(new FinalOrderAppeal()
                                          .setApplicationList(ApplicationAppealList.HIGH_COURT)
                                          .setAppealRefusedDropdown(new AppealGrantedRefused()
@@ -86,7 +86,7 @@ public class AppealInitiativeGroupTest {
 
     @Test
     void testGetAppealFor() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderRecitals(null)
             .finalOrderAppealComplex(new FinalOrderAppeal().setList(AppealList.CLAIMANT)).build();
         String response = appealInitiativePopulator.getAppealFor(caseData);
@@ -95,7 +95,7 @@ public class AppealInitiativeGroupTest {
 
     @Test
     void testGetAppealForOthers() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderRecitals(null)
             .finalOrderAppealComplex(new FinalOrderAppeal().setOtherText("test").setList(AppealList.OTHER)).build();
         String response = appealInitiativePopulator.getAppealFor(caseData);
@@ -112,7 +112,7 @@ public class AppealInitiativeGroupTest {
     static Stream<Arguments> testCircuitOrHighCourtData() {
         return Stream.of(
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.REFUSED)
                                                  .setAppealRefusedDropdown(new AppealGrantedRefused()
@@ -121,7 +121,7 @@ public class AppealInitiativeGroupTest {
                 "a"
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.GRANTED)
                                                  .setAppealGrantedDropdown(new AppealGrantedRefused()
@@ -130,7 +130,7 @@ public class AppealInitiativeGroupTest {
                 "a"
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.REFUSED)
                                                  .setAppealRefusedDropdown(new AppealGrantedRefused()
@@ -139,7 +139,7 @@ public class AppealInitiativeGroupTest {
                 "b"
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.GRANTED)
                                                  .setAppealGrantedDropdown(new AppealGrantedRefused()
@@ -160,7 +160,7 @@ public class AppealInitiativeGroupTest {
     static Stream<Arguments> testGetAppealDateData() {
         return Stream.of(
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.REFUSED)
                                                  .setAppealRefusedDropdown(new AppealGrantedRefused()
@@ -173,7 +173,7 @@ public class AppealInitiativeGroupTest {
                 LocalDate.now().plusDays(1)
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.GRANTED)
                                                  .setAppealGrantedDropdown(new AppealGrantedRefused()
@@ -186,7 +186,7 @@ public class AppealInitiativeGroupTest {
                 LocalDate.now().plusDays(10)
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.REFUSED)
                                                  .setAppealRefusedDropdown(new AppealGrantedRefused()
@@ -199,7 +199,7 @@ public class AppealInitiativeGroupTest {
                 LocalDate.now().plusDays(5)
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.GRANTED)
                                                  .setAppealGrantedDropdown(new AppealGrantedRefused()

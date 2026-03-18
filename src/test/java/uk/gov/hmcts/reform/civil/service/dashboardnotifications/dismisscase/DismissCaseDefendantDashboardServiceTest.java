@@ -50,7 +50,7 @@ class DismissCaseDefendantDashboardServiceTest {
 
     @Test
     void shouldNotifyDefendantWhenEligible() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YesOrNo.NO)
             .ccdCaseReference(8888L)
             .build();
@@ -70,7 +70,7 @@ class DismissCaseDefendantDashboardServiceTest {
     @Test
     void shouldRecordQueryScenarioWhenApplicable() {
         CaseData caseData = CaseDataBuilder.builder().includesRespondentCitizenQueryFollowUp(OffsetDateTime.now())
-            .build().toBuilder()
+            .build().copy()
             .respondent1Represented(YesOrNo.NO)
             .ccdCaseReference(8888L)
             .build();

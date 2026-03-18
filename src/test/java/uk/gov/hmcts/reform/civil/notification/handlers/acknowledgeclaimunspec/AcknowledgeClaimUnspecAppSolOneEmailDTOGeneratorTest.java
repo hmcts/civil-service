@@ -42,7 +42,7 @@ class AcknowledgeClaimUnspecAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenAppSolGetTemplateIsInvoked() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getRespondentSolicitorAcknowledgeClaim()).thenReturn(expectedTemplateId);
 
@@ -60,7 +60,7 @@ class AcknowledgeClaimUnspecAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnAppSolTemplateProperties_whenCustomPropsCalled() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         Map<String, String> properties = new HashMap<>();
         Map<String, String> addedProperties = Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, "TestOrg",

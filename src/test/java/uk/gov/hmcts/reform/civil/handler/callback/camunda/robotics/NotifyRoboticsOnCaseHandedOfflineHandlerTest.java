@@ -28,7 +28,7 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
 
     @Test
     void whenAboutToSubmitCallbackInvoked_thenCallDefaultJudgementRoboticsNotifier() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         CallbackParams params = new CallbackParams().caseData(caseData)
             .type(CallbackType.ABOUT_TO_SUBMIT).params(Map.of(
                 CallbackParams.Params.BEARER_TOKEN, TOKEN));

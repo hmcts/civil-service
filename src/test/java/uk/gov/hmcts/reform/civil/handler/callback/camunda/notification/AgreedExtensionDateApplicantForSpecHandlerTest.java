@@ -143,7 +143,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
 
             @Test
             void shouldNotifyApplicantLiP_whenInvoked() {
-                caseData = caseData.toBuilder()
+                caseData = caseData.copy()
                     .applicant1Represented(NO).build();
                 when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://localhost:3001/");
                 when(notificationsProperties.getClaimantLipDeadlineExtension())
@@ -165,7 +165,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
 
             @Test
             void shouldNotifyApplicantLiPInWelsh_whenInvoked() {
-                caseData = caseData.toBuilder()
+                caseData = caseData.copy()
                     .applicant1Represented(NO)
                     .claimantBilingualLanguagePreference("BOTH").build();
                 when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://localhost:3001/");

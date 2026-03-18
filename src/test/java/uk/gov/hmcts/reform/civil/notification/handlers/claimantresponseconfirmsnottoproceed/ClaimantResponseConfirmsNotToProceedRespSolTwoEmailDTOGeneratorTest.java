@@ -46,7 +46,7 @@ public class ClaimantResponseConfirmsNotToProceedRespSolTwoEmailDTOGeneratorTest
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenCaseIsUnspec() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .build();
         String expectedTemplateId = "template-id";
@@ -60,7 +60,7 @@ public class ClaimantResponseConfirmsNotToProceedRespSolTwoEmailDTOGeneratorTest
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenCaseIsSpecAndPartAdmitPayImmediatelyAccepted() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YES)
             .showResponseOneVOneFlag(ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
@@ -76,7 +76,7 @@ public class ClaimantResponseConfirmsNotToProceedRespSolTwoEmailDTOGeneratorTest
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenCaseIsSpecAndNotPartAdmitPayImmediatelyAccepted() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .build();
         String expectedTemplateId = "template-id";
@@ -99,7 +99,7 @@ public class ClaimantResponseConfirmsNotToProceedRespSolTwoEmailDTOGeneratorTest
     void shouldAddCustomPropertiesWhenCaseIsUnspec() {
         OrganisationPolicy organisationPolicy = new OrganisationPolicy();
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .respondent2OrganisationPolicy(organisationPolicy)
             .build();
@@ -122,7 +122,7 @@ public class ClaimantResponseConfirmsNotToProceedRespSolTwoEmailDTOGeneratorTest
     void shouldAddCustomPropertiesWhenCaseIsSpecAndNotPartAdmitPayImmediatelyAccepted() {
         OrganisationPolicy organisationPolicy = new OrganisationPolicy();
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .respondent2OrganisationPolicy(organisationPolicy)
             .build();
@@ -151,7 +151,7 @@ public class ClaimantResponseConfirmsNotToProceedRespSolTwoEmailDTOGeneratorTest
     void shouldAddCustomPropertiesWhenCaseIsSpecAndPartAdmitPayImmediatelyAccepted() {
         OrganisationPolicy organisationPolicy = new OrganisationPolicy();
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YES)
             .respondent1OrganisationPolicy(organisationPolicy)

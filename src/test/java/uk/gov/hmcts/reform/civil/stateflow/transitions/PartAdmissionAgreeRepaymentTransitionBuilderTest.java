@@ -51,7 +51,7 @@ class PartAdmissionAgreeRepaymentTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenDefendantLipNocAfterJBA() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.NO)
             .takenOfflineDate(LocalDateTime.now())
             .activeJudgment(new JudgmentDetails().setType(JudgmentType.JUDGMENT_BY_ADMISSION))
@@ -63,7 +63,7 @@ class PartAdmissionAgreeRepaymentTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenCaseTakeOfflineByStaff() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .takenOfflineByStaffDate(LocalDateTime.now())
             .build();
 

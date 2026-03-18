@@ -32,7 +32,7 @@ class ClaimantRespConfirmProceedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvoked() {
-        CaseData caseData = CaseData.builder().applicant1(new Party()).applicant1Represented(YesOrNo.NO)
+        CaseData caseData = new CaseData().applicant1(new Party()).applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(Language.BOTH.getDisplayedValue()).build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()).thenReturn(expectedTemplateId);
@@ -44,7 +44,7 @@ class ClaimantRespConfirmProceedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvokedAndBilingual() {
-        CaseData caseData = CaseData.builder().applicant1(new Party()).applicant1Represented(YesOrNo.NO)
+        CaseData caseData = new CaseData().applicant1(new Party()).applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(Language.ENGLISH.getDisplayedValue()).build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn(expectedTemplateId);
@@ -71,7 +71,7 @@ class ClaimantRespConfirmProceedClaimantEmailDTOGeneratorTest {
             .setIndividualLastName("Doe")
             .setType(Party.Type.INDIVIDUAL);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference(legacyCaseReference)
             .applicant1(applicant)
             .build();

@@ -31,7 +31,7 @@ class DashboardTaskContextTest {
 
     @Test
     void shouldExposeCivilCaseDataAndCaseType() {
-        CaseData civilCaseData = CaseData.builder().build();
+        CaseData civilCaseData = new CaseData().build();
         CallbackParams callbackParams = new CallbackParams()
             .caseData(civilCaseData)
             .isGeneralApplicationCaseType(false)
@@ -46,7 +46,7 @@ class DashboardTaskContextTest {
 
     @Test
     void shouldReturnNullTokenWhenMissing() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         CallbackParams params = new CallbackParams()
             .caseData(caseData);
 

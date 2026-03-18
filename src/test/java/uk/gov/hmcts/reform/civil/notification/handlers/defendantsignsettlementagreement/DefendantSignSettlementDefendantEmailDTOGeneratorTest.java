@@ -46,7 +46,7 @@ public class DefendantSignSettlementDefendantEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenDefendantSignedSettlementAgreement() {
         CaseDataLiP caseDataLiP = new CaseDataLiP().setRespondentSignSettlementAgreement(YES);
-        CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).build();
+        CaseData caseData = new CaseData().caseDataLiP(caseDataLiP).build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getNotifyRespondentForSignedSettlementAgreement()).thenReturn(expectedTemplateId);
@@ -59,7 +59,7 @@ public class DefendantSignSettlementDefendantEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenDefendantSignedSettlementNotAgreed() {
         CaseDataLiP caseDataLiP = new CaseDataLiP().setRespondentSignSettlementAgreement(NO);
-        CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).build();
+        CaseData caseData = new CaseData().caseDataLiP(caseDataLiP).build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getNotifyRespondentForNotAgreedSignSettlement()).thenReturn(expectedTemplateId);
@@ -80,7 +80,7 @@ public class DefendantSignSettlementDefendantEmailDTOGeneratorTest {
     void shouldAddCustomProperties() {
         Party party = new Party();
         String caseReference = "caseReference";
-        CaseData caseData = CaseData.builder().applicant1(party).respondent1(party).legacyCaseReference(caseReference).build();
+        CaseData caseData = new CaseData().applicant1(party).respondent1(party).legacyCaseReference(caseReference).build();
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
 
         String partyName = "party name";
@@ -103,7 +103,7 @@ public class DefendantSignSettlementDefendantEmailDTOGeneratorTest {
     @Test
     void shouldNotifyIfRespondentLipAndDefendantSignedSettlementNotAgreed() {
         CaseDataLiP caseDataLiP = new CaseDataLiP().setRespondentSignSettlementAgreement(NO);
-        CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).respondent1Represented(NO).build();
+        CaseData caseData = new CaseData().caseDataLiP(caseDataLiP).respondent1Represented(NO).build();
 
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isTrue();
     }
@@ -111,14 +111,14 @@ public class DefendantSignSettlementDefendantEmailDTOGeneratorTest {
     @Test
     void shouldNotifyIfRespondentLipAndDefendantSignedSettlementAgreement() {
         CaseDataLiP caseDataLiP = new CaseDataLiP().setRespondentSignSettlementAgreement(YES);
-        CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).respondent1Represented(NO).build();
+        CaseData caseData = new CaseData().caseDataLiP(caseDataLiP).respondent1Represented(NO).build();
 
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isTrue();
     }
 
     @Test
     void shouldNotNotifyIfRespondentIsRepresented() {
-        CaseData caseData = CaseData.builder().respondent1Represented(YES).build();
+        CaseData caseData = new CaseData().respondent1Represented(YES).build();
 
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
     }

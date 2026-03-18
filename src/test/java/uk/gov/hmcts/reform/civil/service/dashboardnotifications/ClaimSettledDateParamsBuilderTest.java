@@ -33,7 +33,7 @@ class ClaimSettledDateParamsBuilderTest {
     @Test
     void shouldAddClaimSettledDateParamsWhenPresent() {
 
-        caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
+        caseData = caseData.copy().respondent1ResponseDeadline(null)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondToClaim(new RespondToClaim()
                 .setHowMuchWasPaid(new BigDecimal("100050"))

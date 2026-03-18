@@ -96,7 +96,7 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
         @Test
         void shouldNotifyRespondentSolicitor1_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .respondentSolicitor1EmailAddress("respondent1@example.com")
                 .respondentSolicitor2EmailAddress("respondent2@example.com")
                 .legacyCaseReference("000DC001")
@@ -135,7 +135,7 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .respondentSolicitor1EmailAddress("respondent1@example.com")
                 .respondentSolicitor2EmailAddress("respondent2@example.com")
                 .legacyCaseReference("000DC001")
@@ -177,7 +177,7 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
 
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .applicant1(new Party()
                                 .setIndividualFirstName("Applicant1").setIndividualLastName("ApplicantLastName").setPartyName("Applicant1")
                                 .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))

@@ -26,7 +26,7 @@ public class CaseProceedsInCasemanAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateed() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn(expectedTemplateId);
 

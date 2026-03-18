@@ -29,7 +29,7 @@ class ClaimDismissedRespSolOneEmailGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(claimDismissedEmailTemplater.getTemplateId(caseData)).thenReturn(expectedTemplateId);
 
@@ -47,7 +47,7 @@ class ClaimDismissedRespSolOneEmailGeneratorTest {
 
     @Test
     void shouldReturnCorrectShouldNotify() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.YES)
             .claimDismissedDate(LocalDateTime.now())
             .build();
@@ -59,7 +59,7 @@ class ClaimDismissedRespSolOneEmailGeneratorTest {
 
     @Test
     void shouldNotNotifyForLip() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.NO)
             .claimDismissedDate(LocalDateTime.now())
             .build();
@@ -71,7 +71,7 @@ class ClaimDismissedRespSolOneEmailGeneratorTest {
 
     @Test
     void shouldNotifyForRespondentSolcitorWhenClaimDismissedDateGiven() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.YES)
             .claimDismissedDate(LocalDateTime.now())
             .build();
@@ -83,7 +83,7 @@ class ClaimDismissedRespSolOneEmailGeneratorTest {
 
     @Test
     void shouldNotNotifyForRespondentSolcitorWhenClaimDismissedDateNotGiven() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.YES)
             .claimDismissedDate(null)
             .build();

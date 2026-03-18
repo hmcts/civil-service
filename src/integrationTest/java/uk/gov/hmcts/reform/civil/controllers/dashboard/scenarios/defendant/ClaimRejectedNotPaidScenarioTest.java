@@ -26,7 +26,7 @@ public class ClaimRejectedNotPaidScenarioTest extends DashboardBaseIntegrationTe
     void should_create_scenario_for_claimant_reject_for_not_paid_defendant_notification() throws Exception {
 
         String caseId = "12348991010";
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .ccdState(CaseState.JUDICIAL_REFERRAL)

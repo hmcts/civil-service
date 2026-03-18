@@ -27,7 +27,7 @@ public class TrialReadyClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenBilingual() {
-        CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference(BOTH.toString()).build();
+        CaseData caseData = new CaseData().claimantBilingualLanguagePreference(BOTH.toString()).build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(expectedTemplateId);
@@ -39,7 +39,7 @@ public class TrialReadyClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenNotBilingual() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(expectedTemplateId);

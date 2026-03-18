@@ -23,7 +23,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
 

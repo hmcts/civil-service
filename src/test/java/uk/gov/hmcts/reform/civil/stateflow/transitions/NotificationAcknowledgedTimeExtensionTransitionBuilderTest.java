@@ -60,7 +60,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
             .atStateNotificationAcknowledgedTimeExtension_1v2DS()
             .build();
 
-        CaseData caseData = baseCaseData.toBuilder()
+        CaseData caseData = baseCaseData.copy()
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .takenOfflineByStaffDate(null)
             .build();
@@ -76,7 +76,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
             .atStateNotificationAcknowledgedTimeExtension_1v2DS()
             .build();
 
-        CaseData caseData = baseCaseData.toBuilder()
+        CaseData caseData = baseCaseData.copy()
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .takenOfflineByStaffDate(LocalDateTime.now())
             .build();

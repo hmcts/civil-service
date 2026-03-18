@@ -78,7 +78,7 @@ public class LiPRequestReconsiderationGeneratorServiceTest {
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .atStateSdoFastTrackTrial()
             .build()
-            .toBuilder()
+            .copy()
             .reasonForReconsiderationApplicant(applicantReason)
             .build();
 
@@ -104,7 +104,7 @@ public class LiPRequestReconsiderationGeneratorServiceTest {
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .atStateSdoFastTrackTrial()
             .build()
-            .toBuilder()
+            .copy()
             .reasonForReconsiderationRespondent1(respondentReason)
             .build();
 

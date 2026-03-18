@@ -30,7 +30,7 @@ class SpecCaseOfflineRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         when(caseOfflineHelper.getRespTemplateForSpecClaims(caseData)).thenReturn("resp-template-id");
 
         String result = generator.getEmailTemplateId(caseData);
@@ -47,7 +47,7 @@ class SpecCaseOfflineRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddRespondentOrgNameToProperties() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedOrgName = "Defendant Org Ltd";
 
         Map<String, String> baseProperties = new HashMap<>();

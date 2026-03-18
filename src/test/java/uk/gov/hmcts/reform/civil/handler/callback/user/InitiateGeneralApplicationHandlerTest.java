@@ -1520,8 +1520,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private CaseData getEmptyTestCase(CaseData caseData) {
-        return caseData.toBuilder()
-            .build();
+        return caseData.copy();
     }
 
     private CaseData getReadyTestCaseData(CaseData caseData, boolean multipleGenAppTypes) {
@@ -1565,8 +1564,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                  .setStatus(BusinessProcessStatus.READY))
             ;
         return getEmptyTestCase(caseData)
-            .toBuilder()
-            .generalApplications(wrapElements(application))
+            .setGeneralApplications(wrapElements(application))
             .build();
     }
 

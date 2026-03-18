@@ -86,7 +86,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         applicantMessage.setCreatedBy("applicant");
         CaseQueriesCollection applicantCitizenQuery = new CaseQueriesCollection();
         applicantCitizenQuery.setCaseMessages(wrapElements(applicantMessage));
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(
                 new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
                 )
@@ -144,7 +144,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         defendantMessage.setCreatedBy("defendant");
         CaseQueriesCollection defendantCitizenQuery = new CaseQueriesCollection();
         defendantCitizenQuery.setCaseMessages(wrapElements(defendantMessage));
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(
                 new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
                 )
@@ -205,7 +205,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         defendantMessage2.setCreatedBy("defendant");
         CaseQueriesCollection defendantCitizenQuery = new CaseQueriesCollection();
         defendantCitizenQuery.setCaseMessages(wrapElements(List.of(defendantMessage, defendantMessage2)));
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(
                 new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
                 )
@@ -261,7 +261,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         claimantMessage2.setCreatedBy("claimant");
         CaseQueriesCollection applicantCitizenQuery = new CaseQueriesCollection();
         applicantCitizenQuery.setCaseMessages(wrapElements(List.of(claimantMessage, claimantMessage2)));
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(
                 new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
                 )

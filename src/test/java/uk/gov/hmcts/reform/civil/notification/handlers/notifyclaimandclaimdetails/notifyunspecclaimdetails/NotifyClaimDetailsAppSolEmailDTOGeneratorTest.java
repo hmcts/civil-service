@@ -32,7 +32,7 @@ class NotifyClaimDetailsAppSolEmailDTOGeneratorTest {
     @InjectMocks
     private NotifyClaimDetailsAppSolEmailDTOGenerator generator;
 
-    private final CaseData caseData = CaseData.builder().build();
+    private final CaseData caseData = new CaseData().build();
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {

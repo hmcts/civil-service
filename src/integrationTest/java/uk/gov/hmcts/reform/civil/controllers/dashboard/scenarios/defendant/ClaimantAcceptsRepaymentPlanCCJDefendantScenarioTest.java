@@ -26,7 +26,7 @@ public class ClaimantAcceptsRepaymentPlanCCJDefendantScenarioTest extends Dashbo
         String caseId = "12345147677";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)

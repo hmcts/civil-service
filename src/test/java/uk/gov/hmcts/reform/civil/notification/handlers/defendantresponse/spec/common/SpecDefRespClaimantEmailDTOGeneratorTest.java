@@ -26,7 +26,7 @@ class SpecDefRespClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "some-template-id";
         when(emailHelper.getLipTemplate(caseData)).thenReturn(expectedTemplateId);
 
@@ -45,7 +45,7 @@ class SpecDefRespClaimantEmailDTOGeneratorTest {
     @Test
     void shouldAddClaimantNameToProperties() {
         String claimantName = "Jane Doe";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party()
                             .setType(Party.Type.INDIVIDUAL)
                             .setIndividualFirstName("Jane")

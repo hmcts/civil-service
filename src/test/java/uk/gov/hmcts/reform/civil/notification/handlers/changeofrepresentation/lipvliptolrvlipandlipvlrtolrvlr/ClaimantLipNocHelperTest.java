@@ -28,7 +28,7 @@ class ClaimantLipNocHelperTest {
             .setIndividualFirstName("Jane")
             .setPartyName("Jane Defendant");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(applicant)
             .respondent1(respondent)
             .legacyCaseReference("000MC001")

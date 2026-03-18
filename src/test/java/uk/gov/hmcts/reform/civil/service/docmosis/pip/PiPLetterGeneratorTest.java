@@ -157,7 +157,7 @@ class PiPLetterGeneratorTest {
     }
 
     private CaseData buildCaseData(YesOrNo respondent1Represented, ServedDocumentFiles servedDocumentFiles) {
-        return CaseData.builder()
+        return new CaseData()
             .legacyCaseReference(CLAIM_REFERENCE)
             .ccdCaseReference(1234123412341234L)
             .applicant1(new Party()

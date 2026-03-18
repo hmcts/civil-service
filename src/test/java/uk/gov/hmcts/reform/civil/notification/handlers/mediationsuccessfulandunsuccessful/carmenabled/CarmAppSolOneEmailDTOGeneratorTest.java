@@ -49,7 +49,7 @@ class CarmAppSolOneEmailDTOGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .ccdCaseReference(12345L)
             .applicant1(new Party().setPartyName("Applicant One"))
             .respondent1(new Party()
@@ -146,7 +146,7 @@ class CarmAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties_whenNotOneVTwoScenario() {
-        CaseData baseCaseData = caseData.toBuilder()
+        CaseData baseCaseData = caseData.copy()
             .respondent2(null)
             .build();
         try (MockedStatic<NotificationUtils> notificationUtilsMockedStatic = mockStatic(NotificationUtils.class)) {

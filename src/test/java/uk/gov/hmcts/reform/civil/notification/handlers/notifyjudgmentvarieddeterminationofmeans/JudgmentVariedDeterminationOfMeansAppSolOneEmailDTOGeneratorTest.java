@@ -41,7 +41,7 @@ class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailAddress() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@example.com"))
                 .build();
 
@@ -50,7 +50,7 @@ class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         when(notificationsProperties.getNotifyClaimantJudgmentVariedDeterminationOfMeansTemplate()).thenReturn(TEMPLATE_ID);
 
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(TEMPLATE_ID);
@@ -58,7 +58,7 @@ class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomPropertiesCorrectly() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .ccdCaseReference(CCD_CASE_REFERENCE)
                 .applicant1OrganisationPolicy(new OrganisationPolicy())
                 .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth().setName("Legal Org Name"))

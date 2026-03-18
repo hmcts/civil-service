@@ -55,7 +55,7 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
     @Test
     void shouldReturnNull_whenRepaymentOptionIsNotRepaymentPlan() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
             .build();
 
@@ -70,7 +70,7 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
     void shouldReturnRepaymentPlan_whenAcceptedPlanIsTrueAndRespondent1PlanExists() {
         // Given
         LocalDate firstRepaymentDate = LocalDate.now().plusDays(1);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .respondent1RepaymentPlan(new RepaymentPlanLRspec()
@@ -95,7 +95,7 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
     void shouldReturnRepaymentPlan_whenClaimantAcceptsCourtProposedPlan() {
         // Given
         LocalDate firstRepaymentDate = LocalDate.now().plusDays(1);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
             .caseDataLiP(new CaseDataLiP()
@@ -124,7 +124,7 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
     void shouldReturnRepaymentPlan_whenAcceptedPlanIsTrueAndRespondent2PlanExists() {
         // Given
         LocalDate firstRepaymentDate = LocalDate.now().plusDays(1);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
             .respondent1RepaymentPlan(null)
@@ -149,7 +149,7 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
     @Test
     void shouldReturnNull_whenAcceptedPlanIsTrueButNoRespondentPlanExists() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .respondent1RepaymentPlan(null)
@@ -167,7 +167,7 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
     void shouldReturnRepaymentPlan_whenAcceptedPlanIsFalse() {
         // Given
         LocalDate firstRepaymentDate = LocalDate.now().plusDays(1);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)

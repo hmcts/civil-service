@@ -23,7 +23,7 @@ class ChangeSubmittedDateMigrationTaskTest {
     @Test
     void shouldUpdateSubmittedDateSuccessfully() {
         // Arrange
-        CaseData caseData = CaseData.builder().submittedDate(LocalDateTime.of(2024, 8, 6, 12, 0)).build();
+        CaseData caseData = new CaseData().submittedDate(LocalDateTime.of(2024, 8, 6, 12, 0)).build();
         CaseReference caseReference = mock(CaseReference.class);
 
         // Act

@@ -77,7 +77,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_hasResponsePending_whenGetStatus_thenReturnNoResponse() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .build();
 
@@ -88,7 +88,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_hwf_claim_submit_whenGetStatus_thenReturnNoResponse() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .hwfFeeType(FeeType.CLAIMISSUED)
             .ccdState(CaseState.PENDING_CASE_ISSUED)
             .build();
@@ -100,7 +100,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_isEligibleForCCJ_whenGetStatus_thenReturnEligibleForCCJStatus() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ResponseDeadline(LocalDateTime.of(2022, 2, 2, 16, 0))
@@ -113,7 +113,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_respondentDeadlineHasPassed_whenGetStatus_thenReturnEligibleForCCJStatus() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .respondent1ResponseDeadline(LocalDate.now().minusDays(1).atTime(16, 0, 0))
             .build();
@@ -125,7 +125,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_isEligibleForCCJ_whenGetStatus_thenReturnDefaultJudgementStatus() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .ccdState(All_FINAL_ORDERS_ISSUED)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ResponseDeadline(LocalDateTime.of(2022, 2, 2, 16, 0))
@@ -139,7 +139,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_hasResponseDueToday_whenGetStatus_thenReturnResponseDueNow() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDeadline(LocalDate.now().atTime(10, 0, 0))
             .build();
 
@@ -150,7 +150,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_moreTimeRequested_whenGetStatus_thenReturnMoreTimeRequested() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .respondent1TimeExtensionDate(LocalDateTime.now().plusDays(30))
@@ -190,7 +190,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_claimantConfirmedDefendantPaid_whenGetStatus_thenReturnClaimantAcceptedStatesPaid() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1CourtOrderPayment(new PaymentUponCourtOrder(YesOrNo.NO, Collections.emptyList()))
@@ -204,7 +204,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_caseStateSettled_whenGetStatus_thenReturnSettledClaimant() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .ccdState(CaseState.CASE_SETTLED)
             .build();
 
@@ -215,7 +215,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_caseStateSettled_whenGetStatus_thenReturnSettledDefendant() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .ccdState(CaseState.CASE_SETTLED)
             .build();
 
@@ -226,7 +226,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_claimantRequestedCountyCourtJudgement_whenGetStatus_thenReturnRequestedCountryCourtJudgement() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .respondent1ResponseDate(LocalDateTime.now())
             .applicant1DQ(new Applicant1DQ().setApplicant1DQRequestedCourt(new RequestedCourt()))
@@ -239,7 +239,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_claimantRequestedCountyCourtJudgementCui_whenGetStatus_thenReturnRequestedCountryCourtJudgement() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .ccjPaymentDetails(new CCJPaymentDetails()
                                    .setCcjJudgmentStatement("test"))
             .build();
@@ -251,7 +251,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_claimantAcceptedAdmission_whenGetStatus_thenReturnRelevantStatus() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -265,7 +265,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_defendantRespondedWithPartAdmit_whenGetStatus_thenReturnRelevantStatus() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -277,7 +277,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_hearingNoticeDocumentIssued_whenGetStatus_thenReturnHearingFormGenerated() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
             .ccdState(CaseState.HEARING_READINESS)
@@ -294,7 +294,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_hearingNoticeDocumentIssuedForAutoHearingNotice_whenGetStatus_thenReturnHearingFormGenerated() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
             .ccdState(CaseState.HEARING_READINESS)
@@ -311,7 +311,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_hearingNoticeDocumentIssuedAndRelisted_whenGetStatus_thenReturnHearingFormGeneratedRelisting() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
             .ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
@@ -328,7 +328,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_hearingNoticeDocumentIssuedAndRelisted_AutoHearingNotice_whenGetStatus_thenReturnHearingFormGeneratedRelisting() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
             .ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
@@ -345,7 +345,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_mediation_whenGetSatus_mediationSuccessful() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .mediation(new Mediation().setMediationSuccessful(new MediationSuccessful().setMediationAgreement(new MediationAgreementDocument())
                                                     )
@@ -359,7 +359,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_mediation_whenGetStatus_mediationUnsuccessful() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .respondent1ResponseDate(LocalDateTime.now())
             .mediation(new Mediation().setUnsuccessfulMediationReason("this is a reason")
@@ -373,7 +373,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_mediation_whenGetStatus_mediationPending() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .ccdState(CaseState.IN_MEDIATION)
             .mediation(new Mediation().setMediationSuccessful(new MediationSuccessful())
@@ -386,7 +386,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_court_whenGetStatus_courtReview() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -399,7 +399,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_court_whenGetStatus_courtReview_when_claimantIntendsToProceedMinti() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -415,7 +415,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_respondentFullDefenceAndApplicantNotProceedsWithClaim_whenGetStatus_claimEnded() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -428,7 +428,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_applicantRejectPartialAdmit_whenGetStatus_rejectOffer() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
@@ -441,7 +441,7 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     private static CaseData getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec paymentMethod) {
-        return CaseData.builder()
+        return new CaseData()
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -459,8 +459,9 @@ class CcdClaimStatusDashboardFactoryTest {
                 .setCreatedDatetime(LocalDateTime.now())
                 .setDocumentType(SDO_ORDER)
         );
-        DynamicListElement selectedCourt = new DynamicListElement().setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
-        CaseData claim = CaseData.builder()
+        DynamicListElement selectedCourt = new DynamicListElement()
+            .setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .systemGeneratedCaseDocuments(List.of(document))
             .ccdState(CaseState.CASE_PROGRESSION)
@@ -476,7 +477,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_FullDefenceAndClaimantDontWantToProceed_whenGetStatus_claimEnded() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .build();
@@ -488,7 +489,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_claimantRejectsDefendantsPaymentPlan() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
@@ -502,7 +503,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void givenClaimStatusInProcessHeritageSystem_WhenGetStatus_thenReturnDefendantPartAdmit() {
 
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .takenOfflineDate(LocalDateTime.now())
@@ -519,7 +520,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void givenClaimStatusInPendingCaseIssuedAndHWFNoRemission_WhenGetStatus_thenReturnHwfNoRemission() {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(NO_REMISSION_HWF);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdState(CaseState.PENDING_CASE_ISSUED)
             .claimIssuedHwfDetails(hwfeeDetails)
             .hwfFeeType(
@@ -542,7 +543,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void givenClaimStatusInHearingReadinessAndHWFNoRemission_WhenGetStatus_thenReturnHwfNoRemission() {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(NO_REMISSION_HWF);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfeeDetails)
             .hwfFeeType(
@@ -564,7 +565,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void givenClaimStatusInPendingCaseIssuedAndHWFPartialRemission_WhenGetStatus_thenReturnHwfPartialRemission() {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdState(CaseState.PENDING_CASE_ISSUED)
             .claimIssuedHwfDetails(hwfeeDetails)
             .hwfFeeType(
@@ -586,7 +587,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void givenClaimStatusInHearingReadinessAndHWFNoRemission_WhenGetStatus_thenReturnHwfPartialRemission() {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfeeDetails)
             .hwfFeeType(
@@ -608,7 +609,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void givenClaimStatusInPendingCaseIssuedAndHWFUpdateRefNumber_WhenGetStatus_thenReturnHwfUpdateRefNumber() {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdState(CaseState.PENDING_CASE_ISSUED)
             .claimIssuedHwfDetails(hwfeeDetails)
             .hwfFeeType(
@@ -630,7 +631,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void givenClaimStatusInHearingReadinessAndHWFUpdateRefNumber_WhenGetStatus_thenReturnHwfUpdateRefNumber() {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfeeDetails)
             .hwfFeeType(
@@ -652,7 +653,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void givenClaimStatusInPendingCaseIssuedAndHWFInvalidRefNumber_WhenGetStatus_thenReturnHwfInvalidRefNumber() {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(INVALID_HWF_REFERENCE);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdState(CaseState.PENDING_CASE_ISSUED)
             .claimIssuedHwfDetails(hwfeeDetails)
             .hwfFeeType(
@@ -674,7 +675,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void givenClaimStatusInHearingReadinessAndHWFInvalidRefNumber_WhenGetStatus_thenReturnHwfInvalidRefNumber() {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(INVALID_HWF_REFERENCE);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfeeDetails)
             .hwfFeeType(
@@ -696,7 +697,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void givenClaimStatusInHearingReadinessAndHWFFeePaymentOutcome_WhenGetStatus_thenReturnHearingFeePaidStatus() {
         HelpWithFeesDetails hwfDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(CaseEvent.FULL_REMISSION_HWF);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfDetails)
             .applicant1Represented(YesOrNo.NO)
@@ -720,7 +721,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void givenBilingualLanguageIsWelsh_ClaimantIntentDocUploadPending_thenReturnDocUploadStatus() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1ResponseDate(LocalDateTime.now())
@@ -734,7 +735,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_claimantRejectsDefendantsPaymentPlan_RequestedJudgeDecision_WhenGetStatus_thenReturnAwaitingJudgeReview() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
@@ -753,7 +754,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_responseAdmitPayImmediately_whenGetStatus_thenReturnResponeByPost() {
         CaseData claim = getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
-        CaseData updatedClaim = claim.toBuilder().takenOfflineDate(LocalDateTime.now())
+        CaseData updatedClaim = claim.copy().takenOfflineDate(LocalDateTime.now())
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).previousCCDState(CaseState.AWAITING_APPLICANT_INTENTION).build();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
@@ -764,7 +765,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_responseAdmitPayBySetDate_whenGetStatus_thenReturnResponeByPost() {
         CaseData claim = getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
-        CaseData updatedClaim = claim.toBuilder().takenOfflineDate(LocalDateTime.now()).ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+        CaseData updatedClaim = claim.copy().takenOfflineDate(LocalDateTime.now()).ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .previousCCDState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         DashboardClaimStatus status =
@@ -778,7 +779,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_defendantHasNoticeOfChange_whenGetStatus_thenReturnDefendantNoticeOfChangeApply() {
-        CaseData claim = CaseData.builder().takenOfflineDate(LocalDateTime.now()).ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+        CaseData claim = new CaseData().takenOfflineDate(LocalDateTime.now()).ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .businessProcess(new BusinessProcess()
                                  .setStatus(BusinessProcessStatus.FINISHED)
                                  .setCamundaEvent(CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name()))
@@ -796,14 +797,12 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_defaultJudgementStatusIssuedByClaimant_thenReturnDefaultJudgementStatus() {
         CaseData claim =
-            CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
-                .activeJudgment(new JudgmentDetails().setType(JudgmentType.DEFAULT_JUDGMENT).setIssueDate(LocalDate.now())
-                                    .setState(JudgmentState.ISSUED))
-                .defaultJudgmentDocuments(List.of(
-                    new Element<CaseDocument>().setValue(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
-                                       .setCreatedDatetime(LocalDateTime.now()))
-                ))
-                .build();
+            new CaseData().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1)).activeJudgment(
+                new JudgmentDetails().setType(JudgmentType.DEFAULT_JUDGMENT).setIssueDate(LocalDate.now())
+                    .setState(JudgmentState.ISSUED)).defaultJudgmentDocuments(List.of(
+                        new Element<CaseDocument>()
+                            .setValue(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
+                                           .setCreatedDatetime(LocalDateTime.now())))).build();
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(
                 new CcdDashboardDefendantClaimMatcher(
@@ -816,9 +815,10 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_defaultJudgementStatusIssuedByClaimant_thenReturnDefaultJudgementStatus_WhenJOFlagIsOff() {
         CaseData claim =
-            CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
+            new CaseData().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
                 .defaultJudgmentDocuments(List.of(
-                    new Element<CaseDocument>().setValue(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
+                    new Element<CaseDocument>()
+                        .setValue(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
                                    .setCreatedDatetime(LocalDateTime.now()))))
                 .build();
         DashboardClaimStatus status =
@@ -831,7 +831,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_caseDismissed_whenGetStatus_thenReturnCaseDismissed() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .ccdState(CaseState.CASE_DISMISSED)
             .build();
 
@@ -843,7 +843,8 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_sdoIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        CaseData claim = CaseData.builder().preTranslationDocuments(List.of(new Element<CaseDocument>().setValue(new CaseDocument()
+        CaseData claim = new CaseData().preTranslationDocuments(List.of(new Element<CaseDocument>()
+                                                                                .setValue(new CaseDocument()
                                                                                            .setDocumentType(SDO_ORDER))))
             .ccdState(CaseState.CASE_PROGRESSION)
             .build();
@@ -857,7 +858,8 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_decisionMadeIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        CaseData claim = CaseData.builder().preTranslationDocuments(List.of(new Element<CaseDocument>().setValue(new CaseDocument()
+        CaseData claim = new CaseData().preTranslationDocuments(List.of(new Element<CaseDocument>()
+                                                                                .setValue(new CaseDocument()
                                                                                            .setDocumentType(
                                                                                                DECISION_MADE_ON_APPLICATIONS))))
             .ccdState(CaseState.CASE_PROGRESSION)
@@ -871,7 +873,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_caseDiscontinued_whenGetStatus_thenReturnCaseDiscontinued() {
-        CaseData claim = CaseData.builder()
+        CaseData claim = new CaseData()
             .ccdState(CaseState.CASE_DISCONTINUED)
             .build();
 

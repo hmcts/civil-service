@@ -233,7 +233,7 @@ public class EditJudgmentsOnlineMapperTest {
             .setCcjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
             .setCcjJudgmentTotalStillOwed(BigDecimal.valueOf(150));
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)
             .applicant1Represented(YES)

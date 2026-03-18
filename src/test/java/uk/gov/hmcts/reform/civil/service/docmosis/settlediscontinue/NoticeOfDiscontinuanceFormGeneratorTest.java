@@ -101,7 +101,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE)))
                 .thenReturn(caseDocument);
 
-        CaseData caseData = getCaseData().toBuilder()
+        CaseData caseData = getCaseData().copy()
             .respondent1DQ(new Respondent1DQ()
                                .setRespondent1DQLanguage(new WelshLanguageRequirements()
                                                              .setCourt(Language.WELSH)))
@@ -308,7 +308,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
     }
 
     private CaseData getCaseData() {
-        return CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+        return CaseDataBuilder.builder().atStateClaimIssued().build().copy()
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .respondent1(new PartyBuilder().individual().build().setIndividualFirstName("John").setIndividualLastName("Doe"))
                 .respondent2(new PartyBuilder().individual().build().setIndividualFirstName("Lily").setIndividualLastName("Potter"))

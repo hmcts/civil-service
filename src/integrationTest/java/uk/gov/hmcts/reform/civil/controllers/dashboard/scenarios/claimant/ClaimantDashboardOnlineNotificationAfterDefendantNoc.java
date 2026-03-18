@@ -29,7 +29,7 @@ public class ClaimantDashboardOnlineNotificationAfterDefendantNoc extends Dashbo
         String caseId = "15673456";
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(45500)))

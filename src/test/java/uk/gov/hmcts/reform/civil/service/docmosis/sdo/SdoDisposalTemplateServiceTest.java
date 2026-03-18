@@ -45,7 +45,7 @@ class SdoDisposalTemplateServiceTest {
         location.setSiteName("Court A");
         when(locationHelper.getHearingLocation(any(), eq(caseData), any())).thenReturn(location);
 
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .disposalHearingHearingTime(
                 new uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime()
                     .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)

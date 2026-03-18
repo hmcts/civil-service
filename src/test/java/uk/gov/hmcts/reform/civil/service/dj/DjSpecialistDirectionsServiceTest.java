@@ -44,7 +44,7 @@ class DjSpecialistDirectionsServiceTest {
         when(narrativeService.buildTrialHousingDisrepair()).thenReturn(housingDisrepair);
 
         CaseData caseData = CaseDataBuilder.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        CaseData builder = caseData.copy();
 
         service.populateSpecialistDirections(builder);
 

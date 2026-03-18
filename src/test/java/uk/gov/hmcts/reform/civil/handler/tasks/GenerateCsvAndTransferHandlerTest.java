@@ -113,7 +113,7 @@ class GenerateCsvAndTransferHandlerTest {
     }
 
     private CaseData getCaseData(Long ccdId, LocalDate claimMovedDate) {
-        return CaseData.builder()
+        return new CaseData()
             .ccdCaseReference(ccdId)
             .legacyCaseReference("11111111111111")
             .ccdState(IN_MEDIATION)

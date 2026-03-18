@@ -32,7 +32,7 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
         String caseId = String.valueOf(System.currentTimeMillis());
         System.out.println(caseId);
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)

@@ -27,7 +27,7 @@ class CreateSdoClaimantDashboardTaskTest {
 
     @Test
     void shouldDelegateToCreateSdoClaimantDashboardService() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String authToken = "token";
 
         when(context.caseData()).thenReturn(caseData);

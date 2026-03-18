@@ -26,7 +26,7 @@ public class HelpWithFeeDashboardNoticeHandlerIntegrationTest  extends Dashboard
         String caseId = "12345188432991";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

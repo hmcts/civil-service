@@ -37,7 +37,7 @@ class JudgmentPaidInFullOnlineMapperTest {
             .setIssueDate(issueDate)
             .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IMMEDIATELY));
 
-        CaseData caseData = CaseData.builder().activeJudgment(activeJudgment).build();
+        CaseData caseData = new CaseData().activeJudgment(activeJudgment).build();
 
         JudgmentDetails updatedJudgment = judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData, paymentDate);
 
@@ -58,7 +58,7 @@ class JudgmentPaidInFullOnlineMapperTest {
         JudgmentPaidInFull paidInFull = new JudgmentPaidInFull();
         paidInFull.setDateOfFullPaymentMade(defaultPaymentDate);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .activeJudgment(activeJudgment)
             .joJudgmentPaidInFull(paidInFull)
             .build();
@@ -79,7 +79,7 @@ class JudgmentPaidInFullOnlineMapperTest {
             .setIssueDate(issueDate)
             .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IMMEDIATELY));
 
-        CaseData caseData = CaseData.builder().activeJudgment(activeJudgment).build();
+        CaseData caseData = new CaseData().activeJudgment(activeJudgment).build();
 
         JudgmentDetails updatedJudgment = judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData, paymentDate);
 
@@ -98,7 +98,7 @@ class JudgmentPaidInFullOnlineMapperTest {
             .setIssueDate(issueDate)
             .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IMMEDIATELY));
 
-        CaseData caseData = CaseData.builder().activeJudgment(activeJudgment).build();
+        CaseData caseData = new CaseData().activeJudgment(activeJudgment).build();
 
         JudgmentDetails updatedJudgment = judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData, paymentDate);
 
@@ -116,7 +116,7 @@ class JudgmentPaidInFullOnlineMapperTest {
             .setIssueDate(issueDate)
             .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IMMEDIATELY));
 
-        CaseData caseData = CaseData.builder().activeJudgment(activeJudgment).build();
+        CaseData caseData = new CaseData().activeJudgment(activeJudgment).build();
 
         JudgmentDetails updatedJudgment = judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData, paymentDate);
 
@@ -132,7 +132,7 @@ class JudgmentPaidInFullOnlineMapperTest {
             .setIssueDate(issueDate)
             .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IMMEDIATELY));
 
-        CaseData caseData = CaseData.builder().activeJudgment(activeJudgment).build();
+        CaseData caseData = new CaseData().activeJudgment(activeJudgment).build();
 
         JudgmentDetails updatedJudgment = judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData, paymentDate);
 

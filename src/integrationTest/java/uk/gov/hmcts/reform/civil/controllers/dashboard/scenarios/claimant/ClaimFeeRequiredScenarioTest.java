@@ -30,7 +30,7 @@ public class ClaimFeeRequiredScenarioTest extends DashboardBaseIntegrationTest {
 
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(7000)))
@@ -101,7 +101,7 @@ public class ClaimFeeRequiredScenarioTest extends DashboardBaseIntegrationTest {
 
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(7000)))

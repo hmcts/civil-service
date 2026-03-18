@@ -262,7 +262,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
                 .build();
-            caseData = caseData.toBuilder().defenceRouteRequired(HAS_PAID_THE_AMOUNT_CLAIMED).build();
+            caseData = caseData.copy().defenceRouteRequired(HAS_PAID_THE_AMOUNT_CLAIMED).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
                     .build()).build();
@@ -329,7 +329,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 .caseDataLip(new CaseDataLiP()
                                  .setApplicant1SettleClaim(NO))
                 .build();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .respondent1Represented(NO)
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
@@ -370,7 +370,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 .caseDataLip(new CaseDataLiP()
                                  .setApplicant1SettleClaim(YES))
                 .build();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .respondent1Represented(NO)
                 .applicant1ProceedWithClaim(NO)
                 .applicant1Represented(NO)
@@ -409,7 +409,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 .caseDataLip(new CaseDataLiP()
                                  .setApplicant1SettleClaim(YES))
                 .build();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .applicant1ProceedWithClaim(NO)
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
@@ -446,7 +446,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .build();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .respondent1Represented(NO)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
                 .applicant1Represented(NO)
@@ -473,7 +473,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 BILINGUAL_RESPONDENT_EMAIL_TEMPLATE);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
-                .build().toBuilder()
+                .build().copy()
                 .caseDataLiP(new CaseDataLiP()
                                  .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                              .setRespondent1ResponseLanguage(Language.BOTH.toString())))

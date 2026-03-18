@@ -29,7 +29,7 @@ public class HearingFeeHwfNumberUpdatedScenarioTest extends DashboardBaseIntegra
 
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(false).build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))

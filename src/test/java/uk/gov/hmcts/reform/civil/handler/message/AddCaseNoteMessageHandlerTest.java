@@ -59,7 +59,7 @@ class AddCaseNoteMessageHandlerTest {
     @Test
     public void shouldPublishEventWhenReceivingHandleableMessage() {
         CaseDetails details = CaseDetails.builder().id(Long.parseLong(CASE_ID)).build();
-        CaseData data = CaseData.builder().build();
+        CaseData data = new CaseData().build();
         when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RPA_ON_CONTINUOUS_FEED)).thenReturn(startEventResponse(details));
         when(caseDetailsConverter.toCaseData(eq(details))).thenReturn(data);
         when(userService.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
@@ -86,7 +86,7 @@ class AddCaseNoteMessageHandlerTest {
     @Test
     public void shouldPublishCustomEventObjectToAppInsights_onFailure() {
         CaseDetails details = CaseDetails.builder().id(Long.parseLong(CASE_ID)).build();
-        CaseData data = CaseData.builder().build();
+        CaseData data = new CaseData().build();
         when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RPA_ON_CONTINUOUS_FEED)).thenReturn(startEventResponse(details));
         when(caseDetailsConverter.toCaseData(eq(details))).thenReturn(data);
         when(userService.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);

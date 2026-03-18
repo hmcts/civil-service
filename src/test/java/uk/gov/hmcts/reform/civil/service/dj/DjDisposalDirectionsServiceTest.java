@@ -55,7 +55,7 @@ class DjDisposalDirectionsServiceTest {
     @Test
     void shouldPopulateDisposalDirections() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        CaseData builder = caseData.copy();
 
         service.populateDisposalDirections(builder, JUDGE_NAME);
 

@@ -27,7 +27,7 @@ public class ClaimantAcceptDefendantSettlementAgreementScenarioTest extends Dash
     void should_create_scenario_for_claimant_accept_defendant_plan_settlement_agreement() throws Exception {
 
         String caseId = "90123456785";
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .ccdState(CaseState.JUDICIAL_REFERRAL)

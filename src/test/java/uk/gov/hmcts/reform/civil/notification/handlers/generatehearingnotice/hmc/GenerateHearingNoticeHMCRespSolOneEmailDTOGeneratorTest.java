@@ -57,7 +57,7 @@ class GenerateHearingNoticeHMCRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void getEmailTemplateId_returnsHmcTemplate() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC())
                 .thenReturn(HMC_TEMPLATE);
 
@@ -75,7 +75,7 @@ class GenerateHearingNoticeHMCRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void addCustomProperties_populatesDateTimeAndDefendantRef() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .hearingDate(HEARING_DATE_VALUE)
                 .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .solicitorReferences(new SolicitorReferences()

@@ -26,7 +26,7 @@ class UpdatePartyLitigationFriendTaskTest {
             .setHasSameAddressAsLitigant(YesOrNo.NO)
             ;
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1LitigationFriend(existing)
             .build();
 
@@ -54,7 +54,7 @@ class UpdatePartyLitigationFriendTaskTest {
         LitigationFriend existing = new LitigationFriend().setFirstName("OldA2");
         LitigationFriend update = new LitigationFriend().setFirstName("NewA2");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant2LitigationFriend(existing)
             .build();
 
@@ -73,7 +73,7 @@ class UpdatePartyLitigationFriendTaskTest {
         LitigationFriend existing = new LitigationFriend().setFirstName("OldR1");
         LitigationFriend update = new LitigationFriend().setFirstName("NewR1");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1LitigationFriend(existing)
             .build();
 
@@ -92,7 +92,7 @@ class UpdatePartyLitigationFriendTaskTest {
         LitigationFriend existing = new LitigationFriend().setFirstName("OldR2");
         LitigationFriend update = new LitigationFriend().setFirstName("NewR2");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent2LitigationFriend(existing)
             .build();
 
@@ -108,7 +108,7 @@ class UpdatePartyLitigationFriendTaskTest {
 
     @Test
     void migrateCaseData_shouldThrow_whenCaseReferenceIsNull() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         IllegalArgumentException ex = assertThrows(
             IllegalArgumentException.class,
@@ -120,7 +120,7 @@ class UpdatePartyLitigationFriendTaskTest {
 
     @Test
     void migrateCaseData_shouldThrow_whenLitigationFriendNotFound() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         LitigationFriendCaseReference caseRef = new LitigationFriendCaseReference();
         caseRef.setCaseReference("123");
@@ -137,7 +137,7 @@ class UpdatePartyLitigationFriendTaskTest {
     @Test
     void migrateCaseData_shouldThrow_whenNoPartyFlagsSet() {
         LitigationFriend existing = new LitigationFriend().setFirstName("Old");
-        CaseData caseData = CaseData.builder().applicant1LitigationFriend(existing).build();
+        CaseData caseData = new CaseData().applicant1LitigationFriend(existing).build();
 
         LitigationFriendCaseReference caseRef = new LitigationFriendCaseReference();
         caseRef.setCaseReference("XYZ123");

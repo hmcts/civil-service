@@ -98,7 +98,7 @@ public class TranslatedOrderNoticeUploadedClaimantNotificationHandlerTest extend
 
             CaseData caseData = CaseDataBuilder.builder()
                     .atStatePendingClaimIssued()
-                    .build().toBuilder()
+                    .build().copy()
                     .applicant1Represented(YesOrNo.NO)
                     .claimantBilingualLanguagePreference("BOTH")
                     .build();
@@ -141,7 +141,7 @@ public class TranslatedOrderNoticeUploadedClaimantNotificationHandlerTest extend
         // Given
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
-            .build().toBuilder()
+            .build().copy()
             .applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference("ENGLISH")
             .build();

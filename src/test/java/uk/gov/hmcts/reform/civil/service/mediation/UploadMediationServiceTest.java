@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 @ExtendWith(MockitoExtension.class)
 public class UploadMediationServiceTest {
 
-    public static final CaseData CASE_DATA = CaseData.builder()
+    public static final CaseData CASE_DATA = new CaseData()
         .legacyCaseReference("reference")
         .ccdCaseReference(1234L)
         .build();

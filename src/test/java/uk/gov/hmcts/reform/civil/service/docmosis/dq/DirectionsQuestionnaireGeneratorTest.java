@@ -2815,7 +2815,7 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build()
-                .toBuilder()
+                .copy()
                 .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
                 .build();
 
@@ -2842,7 +2842,7 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceWithHearingSupport()
                 .build()
-                .toBuilder()
+                .copy()
                 .businessProcess(new BusinessProcess().setCamundaEvent("DEFENDANT_RESPONSE"))
                 .build();
 

@@ -26,7 +26,7 @@ public class JudgmentAdmissionUtilsTest {
                 .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
                 .setCcjJudgmentLipInterest(BigDecimal.valueOf(300))
                 .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(0));
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
@@ -46,7 +46,7 @@ public class JudgmentAdmissionUtilsTest {
                 .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
                 .setCcjJudgmentLipInterest(BigDecimal.valueOf(300))
                 .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(0));
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
@@ -61,7 +61,7 @@ public class JudgmentAdmissionUtilsTest {
 
     @Test
     public void shouldReturnFalse_whenPartAdmitRepaymentRejected() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
@@ -75,7 +75,7 @@ public class JudgmentAdmissionUtilsTest {
 
     @Test
     public void shouldReturnTrue_CcjRequestedAndClaimantAcceptCourtDecision() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
@@ -93,7 +93,7 @@ public class JudgmentAdmissionUtilsTest {
 
     @Test
     public void shouldReturnTrue_CcjRequestedAndCourtDecisionInFavourOfClaimant() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
@@ -111,7 +111,7 @@ public class JudgmentAdmissionUtilsTest {
 
     @Test
     public void shouldReturnTrue_SignSettlementRequestedAndCourtDecisionInFavourOfClaimant() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)

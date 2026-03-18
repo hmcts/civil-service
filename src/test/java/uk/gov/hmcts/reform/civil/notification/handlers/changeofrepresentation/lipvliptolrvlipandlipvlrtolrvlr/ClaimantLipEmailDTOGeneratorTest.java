@@ -32,7 +32,7 @@ class ClaimantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnEnglishTemplateIdWhenNotBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .claimantBilingualLanguagePreference(Language.ENGLISH.getDisplayedValue())
             .build();
 
@@ -45,7 +45,7 @@ class ClaimantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnWelshTemplateIdWhenBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .claimantBilingualLanguagePreference(Language.WELSH.getDisplayedValue())
             .build();
 
@@ -64,7 +64,7 @@ class ClaimantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         Map<String, String> initialProps = new HashMap<>();
         Map<String, String> lipProps = Map.of("key1", "value1");
 
@@ -83,7 +83,7 @@ class ClaimantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldAlwaysReturnTrueForShouldNotify() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         Boolean result = claimantLipEmailDTOGenerator.getShouldNotify(caseData);
         assertThat(result).isTrue();
     }

@@ -130,7 +130,7 @@ public class CaseDetailsBuilder {
     }
 
     public CaseDetailsBuilder atStateFullDefenceSpec() {
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().copy()
             .caseAccessCategory(SPEC_CLAIM)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -142,7 +142,7 @@ public class CaseDetailsBuilder {
     }
 
     public CaseDetailsBuilder atStateFullAdmitSpec() {
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().copy()
             .caseAccessCategory(SPEC_CLAIM)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -154,7 +154,7 @@ public class CaseDetailsBuilder {
     }
 
     public CaseDetailsBuilder atStatePartAdmitSpec() {
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().copy()
             .caseAccessCategory(SPEC_CLAIM)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -166,7 +166,7 @@ public class CaseDetailsBuilder {
     }
 
     public CaseDetailsBuilder atStateDecisionOutcome() {
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build().copy()
             .hearingDate(LocalDate.now())
             .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
             .build();

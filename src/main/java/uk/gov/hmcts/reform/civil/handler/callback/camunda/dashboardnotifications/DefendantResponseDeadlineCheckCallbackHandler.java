@@ -34,7 +34,7 @@ public class DefendantResponseDeadlineCheckCallbackHandler extends CallbackHandl
     }
 
     private CallbackResponse setRespondentResponseDeadlineChecked(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
+        CaseData caseData = callbackParams.getCaseData().copy()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_DEADLINE_CHECK))
             .respondent1ResponseDeadlineChecked(YES)
             .build();

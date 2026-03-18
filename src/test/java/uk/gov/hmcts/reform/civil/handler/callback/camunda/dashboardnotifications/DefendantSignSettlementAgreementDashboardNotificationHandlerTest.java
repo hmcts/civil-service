@@ -69,7 +69,7 @@ class DefendantSignSettlementAgreementDashboardNotificationHandlerTest extends B
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(
                 new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
                 )
@@ -100,7 +100,7 @@ class DefendantSignSettlementAgreementDashboardNotificationHandlerTest extends B
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(
                 new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.YES
                 )

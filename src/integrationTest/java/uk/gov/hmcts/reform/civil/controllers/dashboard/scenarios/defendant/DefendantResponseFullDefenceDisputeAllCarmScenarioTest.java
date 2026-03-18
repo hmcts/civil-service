@@ -33,7 +33,7 @@ public class DefendantResponseFullDefenceDisputeAllCarmScenarioTest extends Dash
         String caseId = "12345188432";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)

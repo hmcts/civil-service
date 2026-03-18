@@ -51,7 +51,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldSendJudgmentDetailsWhenCaseEventIsSendJudgmentDetailsCJES() {
         String processId = "process-id";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .businessProcess(new BusinessProcess().setProcessInstanceId(processId))
             .joIsRegisteredWithRTL(YES)
             .joJudgmentRecordReason(DETERMINATION_OF_MEANS)
@@ -72,7 +72,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldSendJudgmentDetailsWhenNoRecordedReasonAndCaseEventIsSendJudgmentDetailsCJES() {
         String processId = "process-id";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .businessProcess(new BusinessProcess().setProcessInstanceId(processId))
             .joIsRegisteredWithRTL(YES)
             .activeJudgment(new JudgmentDetails()
@@ -92,7 +92,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotSendJudgmentDetails_whenRTLisNo() {
         String processId = "process-id";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .businessProcess(new BusinessProcess().setProcessInstanceId(processId))
             .joIsRegisteredWithRTL(YES)
             .joJudgmentRecordReason(DETERMINATION_OF_MEANS)
@@ -113,7 +113,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldSendJudgmentDetailsWhenCaseEventIsSendJudgmentDetailsCjesSetAside() {
         String processId = "process-id";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .businessProcess(new BusinessProcess().setProcessInstanceId(processId))
             .joIsRegisteredWithRTL(YES)
             .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)
@@ -134,7 +134,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotSendJudgmentDetailsSA_WhenRTLisNo() {
         String processId = "process-id";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .businessProcess(new BusinessProcess().setProcessInstanceId(processId))
             .joIsRegisteredWithRTL(YES)
             .joSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR)
@@ -155,7 +155,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotSendJudgmentDetailsWhenIsRegisteredWithRTLIsNull() {
         String processId = "process-id";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .businessProcess(new BusinessProcess().setProcessInstanceId(processId))
             .joSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR)
             .build();

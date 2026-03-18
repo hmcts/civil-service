@@ -36,7 +36,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
         PaymentFrequencyLRspec frequency = PaymentFrequencyLRspec.ONCE_ONE_WEEK;
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1(new Party().setType(Party.Type.INDIVIDUAL)
@@ -99,7 +99,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
         LocalDate firstRepaymentDate = OffsetDateTime.now().toLocalDate();
         PaymentFrequencyLRspec frequency = PaymentFrequencyLRspec.ONCE_ONE_WEEK;
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1(new PartyBuilder().company().build())

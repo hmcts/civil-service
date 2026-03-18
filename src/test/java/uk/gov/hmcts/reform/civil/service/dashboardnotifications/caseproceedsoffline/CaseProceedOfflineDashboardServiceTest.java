@@ -44,7 +44,7 @@ class CaseProceedOfflineDashboardServiceTest {
     @Test
     void shouldRecordScenarioWhenCaseManStateEligible() {
         dashboardService.casemanEligible = true;
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(123L)
             .previousCCDState(CaseState.AWAITING_APPLICANT_INTENTION)
             .build();
@@ -64,7 +64,7 @@ class CaseProceedOfflineDashboardServiceTest {
     @Test
     void shouldRecordScenarioWhenProgressionStateEligible() {
         dashboardService.progressionEligible = true;
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(456L)
             .previousCCDState(CaseState.CASE_PROGRESSION)
             .build();
@@ -81,7 +81,7 @@ class CaseProceedOfflineDashboardServiceTest {
 
     @Test
     void shouldSkipWhenNotEligible() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(999L)
             .build();
 

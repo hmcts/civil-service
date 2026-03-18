@@ -25,7 +25,7 @@ public class DefendantRequestMoreTimeScenarioTest extends DashboardBaseIntegrati
 
         String caseId = "12349";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .respondent1ResponseDeadline(LocalDateTime.of(2024, 4, 1, 12, 0))
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

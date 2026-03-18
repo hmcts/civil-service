@@ -30,7 +30,7 @@ class GenerateOrderCOODefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnNotifyLipUpdateTemplate_whenGetEmailTemplateId_withoutTaskId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         String result = generator.getEmailTemplateId(caseData);
 

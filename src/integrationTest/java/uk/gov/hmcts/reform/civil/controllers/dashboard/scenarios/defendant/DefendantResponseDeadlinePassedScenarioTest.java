@@ -23,7 +23,7 @@ public class DefendantResponseDeadlinePassedScenarioTest extends DashboardBaseIn
 
         String caseId = "10002348";
         CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseNotFullDefenceReceived().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1(new Party().setType(Party.Type.INDIVIDUAL)

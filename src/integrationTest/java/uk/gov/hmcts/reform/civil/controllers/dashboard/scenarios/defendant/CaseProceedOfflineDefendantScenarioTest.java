@@ -27,7 +27,7 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
         String caseId = "72016577145";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-                .toBuilder()
+                .copy()
                 .legacyCaseReference("reference")
                 .ccdCaseReference(Long.valueOf(caseId))
                 .respondent1Represented(YesOrNo.NO)
@@ -66,7 +66,7 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
         String caseId = "72016577333";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)

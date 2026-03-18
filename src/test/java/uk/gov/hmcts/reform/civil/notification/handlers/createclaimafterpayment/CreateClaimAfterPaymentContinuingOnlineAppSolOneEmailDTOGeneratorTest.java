@@ -38,7 +38,7 @@ class CreateClaimAfterPaymentContinuingOnlineAppSolOneEmailDTOGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder()
+        caseData = new CaseData()
                 .issueDate(LocalDate.of(2023, 10, 1))
                 .claimNotificationDeadline(LocalDate.of(2023, 10, 15).atStartOfDay())
                 .applicant1(new Party()

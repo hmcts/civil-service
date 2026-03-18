@@ -46,7 +46,7 @@ public class ClaimantResponseConfirmsNotToProceedAppSolOneEmailDTOGeneratorTest 
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenCaseIsUnspec() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .build();
         String expectedTemplateId = "template-id";
@@ -60,7 +60,7 @@ public class ClaimantResponseConfirmsNotToProceedAppSolOneEmailDTOGeneratorTest 
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenCaseIsSpecAndPartAdmitPayImmediatelyAccepted() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YES)
             .showResponseOneVOneFlag(ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
@@ -76,7 +76,7 @@ public class ClaimantResponseConfirmsNotToProceedAppSolOneEmailDTOGeneratorTest 
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenCaseIsSpecAndNotPartAdmitPayImmediatelyAccepted() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .build();
         String expectedTemplateId = "template-id";
@@ -97,7 +97,7 @@ public class ClaimantResponseConfirmsNotToProceedAppSolOneEmailDTOGeneratorTest 
 
     @Test
     void shouldAddCustomPropertiesWhenCaseIsUnspec() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .build();
 
@@ -117,7 +117,7 @@ public class ClaimantResponseConfirmsNotToProceedAppSolOneEmailDTOGeneratorTest 
 
     @Test
     void shouldAddCustomPropertiesWhenCaseIsSpecAndNotPartAdmitPayImmediatelyAccepted() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .build();
 
@@ -145,7 +145,7 @@ public class ClaimantResponseConfirmsNotToProceedAppSolOneEmailDTOGeneratorTest 
     void shouldAddCustomPropertiesWhenCaseIsSpecAndPartAdmitPayImmediatelyAccepted() {
         OrganisationPolicy organisationPolicy = new OrganisationPolicy();
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YES)
             .respondent1OrganisationPolicy(organisationPolicy)

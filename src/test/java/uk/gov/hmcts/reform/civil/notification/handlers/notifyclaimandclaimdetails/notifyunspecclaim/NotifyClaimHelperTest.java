@@ -41,7 +41,7 @@ class NotifyClaimHelperTest {
     void shouldReturnCorrectCustomProperties() {
         LocalDateTime deadline = LocalDateTime.of(2025, 6, 1, 0, 0);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .claimDetailsNotificationDeadline(deadline)
             .build();
 
@@ -58,7 +58,7 @@ class NotifyClaimHelperTest {
         DynamicListElement selected = new DynamicListElement().setLabel(targetDefendant);
         DynamicList list = new DynamicList().setValue(selected);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .defendantSolicitorNotifyClaimOptions(list)
             .build();
 
@@ -72,7 +72,7 @@ class NotifyClaimHelperTest {
         DynamicListElement selected = new DynamicListElement().setLabel("Both");
         DynamicList list = new DynamicList().setValue(selected);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .defendantSolicitorNotifyClaimOptions(list)
             .build();
 

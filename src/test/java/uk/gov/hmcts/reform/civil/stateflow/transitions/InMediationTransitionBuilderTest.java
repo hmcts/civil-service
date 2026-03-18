@@ -97,7 +97,7 @@ public class InMediationTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
             .takenOfflineByStaff()
-            .build().toBuilder()
+            .build().copy()
             .mediation(new Mediation())
             .build();
 

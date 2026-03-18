@@ -15,7 +15,7 @@ class DjHearingMethodFieldServiceTest {
 
     @Test
     void shouldResolveTelephoneFromDisposal() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .disposalHearingMethodTelephoneHearingDJ(HearingMethodTelephoneHearingDJ.telephoneTheCourt)
             .build();
 
@@ -24,7 +24,7 @@ class DjHearingMethodFieldServiceTest {
 
     @Test
     void shouldFallbackToTrialTelephone() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .trialHearingMethodTelephoneHearingDJ(HearingMethodTelephoneHearingDJ.telephoneTheDefendant)
             .build();
 
@@ -33,7 +33,7 @@ class DjHearingMethodFieldServiceTest {
 
     @Test
     void shouldResolveVideoFromDisposal() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .disposalHearingMethodVideoConferenceHearingDJ(HearingMethodVideoConferenceDJ.videoTheCourt)
             .build();
 
@@ -42,7 +42,7 @@ class DjHearingMethodFieldServiceTest {
 
     @Test
     void shouldFallbackToTrialVideo() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .trialHearingMethodVideoConferenceHearingDJ(HearingMethodVideoConferenceDJ.videoTheDefendant)
             .build();
 

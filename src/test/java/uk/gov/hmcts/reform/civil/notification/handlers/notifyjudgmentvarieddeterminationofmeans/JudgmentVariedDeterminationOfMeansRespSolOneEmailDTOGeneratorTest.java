@@ -43,14 +43,14 @@ class JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGeneratorTest {
         when(notificationsProperties.getNotifyDefendantJudgmentVariedDeterminationOfMeansTemplate())
                 .thenReturn(TEMPLATE_ID);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(TEMPLATE_ID);
         assertThat(generator.getReferenceTemplate()).isEqualTo(DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
     }
 
     @Test
     void shouldAddCustomPropertiesCorrectly() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .ccdCaseReference(CLAIM_REF)
                 .respondent1Represented(YesOrNo.YES)
                 .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("F1")))

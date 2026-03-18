@@ -92,7 +92,7 @@ class NotifyClaimantStayLiftedHandlerTest {
             .applicant1Represented(isClaimantLiP ? YesOrNo.NO : YesOrNo.YES)
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@example.com"))
             .claimantBilingualLanguagePreference(claimantBilingualLanguagePreference)
-            .build().toBuilder()
+            .build().copy()
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(respondentLip))
             .build();
@@ -125,7 +125,7 @@ class NotifyClaimantStayLiftedHandlerTest {
 
     @Test
     void checkCamundaActivityTest() {
-        caseData = caseData.toBuilder().build();
+        caseData = caseData.copy().build();
         CallbackParams params = new CallbackParams().caseData(caseData);
         var response = handler.camundaActivityId(params);
         assertEquals("NotifyClaimantStayLifted", response);
@@ -143,7 +143,7 @@ class NotifyClaimantStayLiftedHandlerTest {
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
         CallbackParams params = new CallbackParams().caseData(caseData);

@@ -35,7 +35,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends D
     void should_create_full_admit_pay_immediately_no_payment_scenario() throws Exception {
         String caseId = "1234678912136";
         LocalDate whenWillThisAmountBePaid = LocalDate.now().plusDays(5);
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build().toBuilder()
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build().copy()
             .ccdCaseReference(Long.valueOf(caseId))
             .totalClaimAmount(BigDecimal.valueOf(124.67))
             .applicant1(new Party().setIndividualFirstName("Dave").setIndividualLastName("Indent").setType(Party.Type.INDIVIDUAL))

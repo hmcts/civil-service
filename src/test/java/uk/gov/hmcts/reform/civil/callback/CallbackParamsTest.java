@@ -32,7 +32,7 @@ class CallbackParamsTest {
 
         @Test
         void shouldThrowIllegalStateExceptionWhenCaseDataIsCaseData() {
-            final CaseData caseData = CaseData.builder().build();
+            final CaseData caseData = new CaseData().build();
             final CallbackParams callbackParams = new CallbackParams()
                 .caseData(caseData);
             assertThrows(IllegalStateException.class, callbackParams::getGeneralApplicationCaseData);
@@ -60,7 +60,7 @@ class CallbackParamsTest {
 
         @Test
         void shouldThrowIllegalStateExceptionWhenCaseDataBeforeIsCaseData() {
-            final CaseData caseData = CaseData.builder().build();
+            final CaseData caseData = new CaseData().build();
             final CallbackParams callbackParams = new CallbackParams()
                 .caseDataBefore(caseData);
             assertThrows(IllegalStateException.class, callbackParams::getGeneralApplicationCaseDataBefore);
@@ -72,7 +72,7 @@ class CallbackParamsTest {
 
         @Test
         void shouldReturnCaseDataWhenCaseDataIsCaseData() {
-            final CaseData caseData = CaseData.builder().build();
+            final CaseData caseData = new CaseData().build();
             final CallbackParams callbackParams = new CallbackParams()
                 .caseData(caseData);
 
@@ -100,7 +100,7 @@ class CallbackParamsTest {
 
         @Test
         void shouldReturnCaseDataWhenCaseDataBeforeIsCaseData() {
-            final CaseData caseData = CaseData.builder().build();
+            final CaseData caseData = new CaseData().build();
             final CallbackParams callbackParams = new CallbackParams()
                 .caseDataBefore(caseData);
 

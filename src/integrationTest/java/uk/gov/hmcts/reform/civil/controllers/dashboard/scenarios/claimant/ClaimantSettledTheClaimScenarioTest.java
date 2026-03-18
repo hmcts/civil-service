@@ -25,7 +25,7 @@ public class ClaimantSettledTheClaimScenarioTest extends DashboardBaseIntegratio
 
         String caseId = "55551111";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .applicant1Represented(YesOrNo.NO)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))

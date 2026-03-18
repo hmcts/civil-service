@@ -31,7 +31,7 @@ class HearingFeeUnpaidDefendantEmailDTOGeneratorTest {
     @Test
     void shouldReturnBilingualTemplateId_whenRespondentResponseIsBilingual() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build()
-                .toBuilder().caseDataLiP(new CaseDataLiP()
+                .copy().caseDataLiP(new CaseDataLiP()
                         .setRespondent1LiPResponse(new RespondentLiPResponse()
                                 .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();
@@ -46,7 +46,7 @@ class HearingFeeUnpaidDefendantEmailDTOGeneratorTest {
     @Test
     void shouldReturnDefaultTemplateId_whenRespondentResponseIsNotBilingual() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build()
-                .toBuilder().build();
+                .copy().build();
 
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
 

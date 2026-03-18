@@ -27,7 +27,7 @@ public class DefendantResponseFullDefenceFullDisputeFastTrackScenarioTest extend
         String caseId = "13200";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)

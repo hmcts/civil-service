@@ -37,7 +37,7 @@ public class PartAdmitAcceptedClaimantScenarioTest extends DashboardBaseIntegrat
             .applicant1AcceptPartAdmitPaymentPlanSpec(null)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500))
-            .build().toBuilder()
+            .build().copy()
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
                                                .setWhenWillThisAmountBePaid(LocalDate.of(2024, 3, 19))
                                                )

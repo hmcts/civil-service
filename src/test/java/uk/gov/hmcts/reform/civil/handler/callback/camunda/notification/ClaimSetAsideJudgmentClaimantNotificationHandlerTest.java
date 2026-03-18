@@ -132,7 +132,7 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().copy()
                 .applicant1(new Party()
                                 .setIndividualFirstName("Applicant1")
                                 .setIndividualLastName("ApplicantLastName").setPartyName("Applicant1")

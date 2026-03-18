@@ -32,7 +32,7 @@ public class RequestForReconsiderationRecipientDefendantScenarioTest extends Das
         String caseId = "7201415645434333";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .responseClaimTrack("SMALL_CLAIM")
             .totalClaimAmount(BigDecimal.valueOf(500))
             .legacyCaseReference("reference")

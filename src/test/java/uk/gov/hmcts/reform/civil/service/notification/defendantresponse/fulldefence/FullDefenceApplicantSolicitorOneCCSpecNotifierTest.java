@@ -89,7 +89,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
     void sendNotificationToSolicitorSpec_shouldNotifyRespondentSolicitorSpecDef1v1() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+        caseData = caseData.copy().caseAccessCategory(SPEC_CLAIM)
             .respondent1DQ(new Respondent1DQ())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .build();
@@ -110,7 +110,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
     @Test
     void shouldGetRecipientEmail() {
         // Given
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondentSolicitor1EmailAddress("solicitor1@example.com")
             .build();
 
@@ -127,7 +127,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
         when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
             .thenReturn("template-id");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("12345")
             .ccdCaseReference(CASE_ID)
             .respondent1ResponseDate(null)
@@ -154,7 +154,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
     @Test
     void shouldGetLegalOrganisationName() {
         // Given
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1DQ(null)
             .respondent2OrganisationPolicy(
                 new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("org-id")))
@@ -175,7 +175,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
     void sendNotificationToSolicitorSpecPart_shouldNotifyRespondentSolicitorSpecDef1v1() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+        caseData = caseData.copy().caseAccessCategory(SPEC_CLAIM)
             .respondent1DQ(new Respondent1DQ())
             .applicant1Represented(YesOrNo.YES)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)

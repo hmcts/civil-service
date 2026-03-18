@@ -36,7 +36,7 @@ public class ChangeSubmittedDateMigrationTask extends MigrationTask<CaseReferenc
             throw new IllegalArgumentException("CaseData and CaseReference must not be null");
         } else {
             // Example logic: Set the submitted date to a fixed date for demonstration purposes
-            return caseData.toBuilder().submittedDate(LocalDateTime.now()).build();
+            return caseData.copy().submittedDate(LocalDateTime.now()).build();
         }
     }
 }

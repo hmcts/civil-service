@@ -53,7 +53,7 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplateId() {
         when(notificationsProperties.getRespondentDefendantResponseForSpec()).thenReturn(TEMPLATE_ID);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         String templateId = generator.getEmailTemplateId(caseData);
 
@@ -71,7 +71,7 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGeneratorTest {
     void shouldReturnCorrectNotificationProperties() {
         when(pinInPostConfiguration.getRespondToClaimUrl()).thenReturn(RESPOND_TO_CLAIM_URL);
         when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn(CUI_FRONT_END_URL);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .respondent1(new Party().setCompanyName(RESPONDENT_NAME).setType(Party.Type.COMPANY))
                 .applicant1(new Party().setCompanyName(CLAIMANT_NAME).setType(Party.Type.COMPANY))
                 .legacyCaseReference(LEGACY_CASE_REFERENCE)
@@ -100,7 +100,7 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotify_whenRespondentIsLiPAndEmailPresent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.NO)
             .respondent1(new Party()
                              .setPartyEmail("defendant@email.com"))
@@ -111,7 +111,7 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotify_whenRespondentIsNotLiP() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.YES)
             .respondent1(new Party()
                              .setPartyEmail("defendant@email.com"))
@@ -122,7 +122,7 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotify_whenRespondentEmailIsNull() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Represented(YesOrNo.NO)
             .respondent1(new Party())
             .build();

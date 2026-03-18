@@ -41,7 +41,7 @@ public class DefendantTwoEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailAddress() {
         String email = "test@example.com";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent2(new Party().setPartyEmail(email))
             .build();
 
@@ -52,7 +52,7 @@ public class DefendantTwoEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         Party party = new Party();
-        CaseData caseData = CaseData.builder().respondent2(party).build();
+        CaseData caseData = new CaseData().respondent2(party).build();
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
 
         String allPartyNames = "all party names";
@@ -73,14 +73,14 @@ public class DefendantTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnNotifyAsTrueWhenRespondent2IsLip() {
-        CaseData caseData = CaseData.builder().respondent2Represented(NO).build();
+        CaseData caseData = new CaseData().respondent2Represented(NO).build();
         Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
         assertThat(shouldNotify).isTrue();
     }
 
     @Test
     void shouldReturnNotifyAsFalseWhenRespondent2Represented() {
-        CaseData caseData = CaseData.builder().respondent2Represented(YES).build();
+        CaseData caseData = new CaseData().respondent2Represented(YES).build();
         Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
         assertThat(shouldNotify).isFalse();
     }

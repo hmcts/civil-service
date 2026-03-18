@@ -47,7 +47,7 @@ public class DefendantResponseCUIAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenNotFullDefence() {
-        CaseData caseData = CaseData.builder().respondent1ClaimResponseTypeForSpec(PART_ADMISSION).build();
+        CaseData caseData = new CaseData().respondent1ClaimResponseTypeForSpec(PART_ADMISSION).build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getRespondentLipFullAdmitOrPartAdmitTemplate()).thenReturn(expectedTemplateId);
@@ -59,7 +59,7 @@ public class DefendantResponseCUIAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenFullDefenceAndResponseClaimMediationSpecRequired() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .responseClaimMediationSpecRequired(YES)
             .build();
@@ -74,7 +74,7 @@ public class DefendantResponseCUIAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenFullDefenceAndNoResponseClaimMediationSpecRequired() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .responseClaimMediationSpecRequired(NO)
             .build();
@@ -97,7 +97,7 @@ public class DefendantResponseCUIAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectCustomProperties() {
         Party party = new Party();
-        CaseData caseData = CaseData.builder().respondent1(party).build();
+        CaseData caseData = new CaseData().respondent1(party).build();
 
         String legalOrg = "legal org";
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
@@ -121,14 +121,14 @@ public class DefendantResponseCUIAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyWhenApplicantIsRepresentedAndRespondentResponseIsNotBilingual() {
-        CaseData caseData = CaseData.builder().applicant1Represented(YES).build();
+        CaseData caseData = new CaseData().applicant1Represented(YES).build();
 
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isTrue();
     }
 
     @Test
     void shouldNotNotifyWhenRespondentResponseIsBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1Represented(YES)
             .caseDataLiP(
                 new CaseDataLiP()
@@ -143,14 +143,14 @@ public class DefendantResponseCUIAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotifyWhenApplicantIsNotRepresented() {
-        CaseData caseData = CaseData.builder().applicant1Represented(NO).build();
+        CaseData caseData = new CaseData().applicant1Represented(NO).build();
 
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
     }
 
     @Test
     void shouldNotNotifyWhenApplicantIsNotRepresentedAndRespondentResponseIsBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1Represented(NO)
             .caseDataLiP(
                 new CaseDataLiP()

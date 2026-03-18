@@ -26,7 +26,7 @@ class RetriggerDashboardScenarioTaskTest {
     @Test
     void migrateCaseData_shouldCallProcessorWithCorrectCaseReference() {
         // Arrange
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         DashboardScenarioCaseReference caseReference = new DashboardScenarioCaseReference();
         caseReference.setCaseReference("12345");
         caseReference.setDashboardScenario("Scenario.AAA6.ClaimantIntent.FullAdmit.Claimant");
@@ -41,7 +41,7 @@ class RetriggerDashboardScenarioTaskTest {
 
     @Test
     void migrateCaseData_shouldThrowException_whenCaseReferenceIsNull() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         DashboardScenarioCaseReference caseReference = null;
 
         Exception exception = assertThrows(IllegalArgumentException.class,
@@ -52,7 +52,7 @@ class RetriggerDashboardScenarioTaskTest {
 
     @Test
     void migrateCaseData_shouldThrowException_whenCaseReferenceValueIsNull() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         DashboardScenarioCaseReference caseReference = new DashboardScenarioCaseReference();
         caseReference.setCaseReference(null);
 

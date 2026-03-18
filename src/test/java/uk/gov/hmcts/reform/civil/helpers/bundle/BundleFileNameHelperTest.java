@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BundleFileNameHelperTest {
 
-    private CaseData caseData = CaseData.builder().ccdCaseReference(1L)
+    private CaseData caseData = new CaseData().ccdCaseReference(1L)
             .documentWitnessStatement(getWitnessDocs())
             .documentWitnessSummary(getWitnessDocs())
             .documentHearsayNotice(getWitnessDocs())

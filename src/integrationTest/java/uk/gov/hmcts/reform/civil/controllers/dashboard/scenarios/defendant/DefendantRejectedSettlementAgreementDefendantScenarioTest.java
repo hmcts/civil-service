@@ -22,7 +22,7 @@ public class DefendantRejectedSettlementAgreementDefendantScenarioTest extends D
     void should_defendant_rejected_settlement_agreement_scenario() throws Exception {
 
         String caseId = "90123456784";
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .caseDataLiP(

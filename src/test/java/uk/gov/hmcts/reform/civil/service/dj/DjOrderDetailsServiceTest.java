@@ -52,7 +52,7 @@ class DjOrderDetailsServiceTest {
 
     @Test
     void shouldPopulateDisposalAndTrialDirections() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .legacyCaseReference("MC001")
             .build();
         DirectionsOrderTaskContext context = new DirectionsOrderTaskContext(
@@ -67,7 +67,7 @@ class DjOrderDetailsServiceTest {
 
         service.populateTrialDisposalScreen(context);
 
-        ArgumentCaptor<CaseData.CaseDataBuilder> builderCaptor = ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
+        ArgumentCaptor<CaseData> builderCaptor = ArgumentCaptor.forClass(CaseData.class);
         verify(disposalDirectionsService).populateDisposalDirections(builderCaptor.capture(), org.mockito.Mockito.eq(JUDGE));
         verify(trialDirectionsService).populateTrialDirections(builderCaptor.capture(), org.mockito.Mockito.eq(JUDGE));
         assertThat(builderCaptor.getAllValues()).hasSize(2);

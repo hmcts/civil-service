@@ -5,11 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -93,7 +91,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Accessors(chain = true)
-@SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = false)
 @Data
 public class CaseDataParent extends CaseDataCaseProgression implements MappableObject {
@@ -134,7 +131,6 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     @Deprecated
     private  LocalDateTime addLegalRepDeadline;
 
-    @Builder.Default
     private  List<Value<Document>> caseDocuments = new ArrayList<>();
     private  String caseDocument1Name;
     //TrialReadiness
@@ -280,7 +276,6 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private  YesOrNo neitherCompanyNorOrganisation;
     private  RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteGeneric;
     private  List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspecGeneric;
-    @Builder.Default
     private  Set<DefendantResponseShowTag> showConditionFlags = new HashSet<>();
 
     /**
@@ -611,6 +606,12 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     @JsonIgnore
     public boolean applicant1SuggestedPayByInstalments() {
         return applicant1RepaymentOptionForDefendantSpec == PaymentType.REPAYMENT_PLAN;
+    }
+
+    @Override
+    @JsonIgnore
+    public CaseDataParent copy() {
+        return copyInto(new CaseDataParent());
     }
 
     @JsonIgnore

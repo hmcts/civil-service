@@ -33,7 +33,7 @@ public class ClaimantDefendantAgreedMediationRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn(expectedTemplateId);
 
@@ -51,7 +51,7 @@ public class ClaimantDefendantAgreedMediationRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyWhenSendMediationNotificationDefendant2LRCarmIsTrue() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
@@ -67,7 +67,7 @@ public class ClaimantDefendantAgreedMediationRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotifyWhenSendMediationNotificationDefendant2LRCarmIsFalse() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(false);
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);

@@ -29,7 +29,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
         String caseId = "14323241";
         LocalDate hearingDueDate = LocalDate.now().minusDays(1);
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(NO)
@@ -78,7 +78,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
         String caseId = "14323240";
         LocalDate hearingDueDate = LocalDate.now().minusDays(1);
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(NO)
@@ -121,7 +121,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
         String caseId = "14323242";
         LocalDate hearingDueDate = LocalDate.now().minusDays(1);
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyApplicant().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(NO)

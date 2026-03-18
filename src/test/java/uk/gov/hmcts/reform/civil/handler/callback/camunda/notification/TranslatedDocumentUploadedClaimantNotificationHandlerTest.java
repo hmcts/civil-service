@@ -126,7 +126,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                     .atStatePendingClaimIssued()
-                    .build().toBuilder()
+                    .build().copy()
                     .respondent1Represented(YesOrNo.NO)
                     .specRespondent1Represented(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.NO)
@@ -158,7 +158,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued()
-                .build().toBuilder()
+                .build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)

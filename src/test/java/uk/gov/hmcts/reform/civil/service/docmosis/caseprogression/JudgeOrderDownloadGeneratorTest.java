@@ -129,16 +129,20 @@ class JudgeOrderDownloadGeneratorTest {
     })
     void getDownloadTemplate(String templateToUse) {
         if (templateToUse.equals(BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING)) {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement.dynamicElement(templateToUse)))
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
+                .finalOrderDownloadTemplateOptions(new DynamicList()
+                                                       .setValue(DynamicListElement.dynamicElement(templateToUse))
+                                                       )
                 .orderAfterHearingDate(new OrderAfterHearingDate()
                                            .setDateType(OrderAfterHearingDateType.BESPOKE_RANGE)
                                            .setBespokeDates("12-01-2025, 14-12-2024 to 19-12-2024"))
                 .build();
             judgeOrderDownloadGenerator.getDownloadTemplate(caseData, "auth");
         } else {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement.dynamicElement(templateToUse)))
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
+                .finalOrderDownloadTemplateOptions(new DynamicList()
+                                                       .setValue(DynamicListElement.dynamicElement(templateToUse))
+                                                       )
                 .build();
             judgeOrderDownloadGenerator.getDownloadTemplate(caseData, "auth");
         }
@@ -171,14 +175,14 @@ class JudgeOrderDownloadGeneratorTest {
     static Stream<Arguments> testData() {
         return Stream.of(
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAllocateToTrack(YES)
                     .finalOrderTrackAllocation(MULTI_CLAIM)
                     .build(),
                 "This case is allocated to the multi-track."
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAllocateToTrack(YES)
                     .finalOrderTrackAllocation(INTERMEDIATE_CLAIM)
                     .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
@@ -189,7 +193,7 @@ class JudgeOrderDownloadGeneratorTest {
                 format(INTERMEDIATE_WITH_BAND_WITH_REASON, "2", "reasons")
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAllocateToTrack(YES)
                     .finalOrderTrackAllocation(INTERMEDIATE_CLAIM)
                     .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
@@ -199,7 +203,7 @@ class JudgeOrderDownloadGeneratorTest {
                 format(INTERMEDIATE_WITH_BAND_NO_REASON, "1")
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAllocateToTrack(YES)
                     .finalOrderTrackAllocation(INTERMEDIATE_CLAIM)
                     .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
@@ -208,7 +212,7 @@ class JudgeOrderDownloadGeneratorTest {
                 INTERMEDIATE_NO_BAND_NO_REASON
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAllocateToTrack(YES)
                     .finalOrderTrackAllocation(INTERMEDIATE_CLAIM)
                     .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
@@ -218,7 +222,7 @@ class JudgeOrderDownloadGeneratorTest {
                 format(INTERMEDIATE_NO_BAND_WITH_REASON, "reasons")
             ),
             Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                     .finalOrderAllocateToTrack(NO)
                     .build(),
                 null
@@ -235,7 +239,7 @@ class JudgeOrderDownloadGeneratorTest {
     })
     void getComplexityBandIntermediate(String bandToUse) {
         ComplexityBand band = ComplexityBand.valueOf(bandToUse);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                            .setAssignComplexityBand(YES)
                                                            .setBand(band))
@@ -267,7 +271,7 @@ class JudgeOrderDownloadGeneratorTest {
             .thenReturn(BLANK_TEMPLATE_BEFORE_HEARING);
         when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
             .finalOrderAllocateToTrack(YES)
             .finalOrderTrackAllocation(INTERMEDIATE_CLAIM)
@@ -275,8 +279,10 @@ class JudgeOrderDownloadGeneratorTest {
                                                            .setAssignComplexityBand(YES)
                                                            .setBand(ComplexityBand.BAND_2)
                                                            .setReasons("important reasons"))
-            .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement
-                                                              .dynamicElement("Blank template to be used before a hearing/box work")))
+            .finalOrderDownloadTemplateOptions(new DynamicList()
+                                                   .setValue(DynamicListElement
+                                                              .dynamicElement("Blank template to be used before a hearing/box work"))
+                                                   )
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
@@ -293,12 +299,14 @@ class JudgeOrderDownloadGeneratorTest {
             .thenReturn(BLANK_TEMPLATE_BEFORE_HEARING);
         when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
             .finalOrderAllocateToTrack(YES)
             .finalOrderTrackAllocation(SMALL_CLAIM)
-            .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement
-                                                              .dynamicElement("Blank template to be used before a hearing/box work")))
+            .finalOrderDownloadTemplateOptions(new DynamicList()
+                                                   .setValue(DynamicListElement
+                                                              .dynamicElement("Blank template to be used before a hearing/box work"))
+                                                   )
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
@@ -315,12 +323,14 @@ class JudgeOrderDownloadGeneratorTest {
             .thenReturn(BLANK_TEMPLATE_AFTER_HEARING);
         when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
             .finalOrderAllocateToTrack(YES)
             .finalOrderTrackAllocation(SMALL_CLAIM)
-            .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement
-                                                              .dynamicElement("Blank template to be used after a hearing")))
+            .finalOrderDownloadTemplateOptions(new DynamicList()
+                                                   .setValue(DynamicListElement
+                                                              .dynamicElement("Blank template to be used after a hearing"))
+                                                   )
             .orderAfterHearingDate(new OrderAfterHearingDate()
                                        .setDateType(OrderAfterHearingDateType.BESPOKE_RANGE)
                                        .setBespokeDates("12-01-2025, 14-12-2024 to 19-12-2024"))
@@ -340,7 +350,7 @@ class JudgeOrderDownloadGeneratorTest {
             .thenReturn(FIX_DATE_CMC);
         when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
             .finalOrderAllocateToTrack(YES)
             .finalOrderTrackAllocation(INTERMEDIATE_CLAIM)
@@ -348,8 +358,10 @@ class JudgeOrderDownloadGeneratorTest {
                                                            .setAssignComplexityBand(YES)
                                                            .setBand(ComplexityBand.BAND_2)
                                                            .setReasons("important reasons"))
-            .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement
-                                                              .dynamicElement("Fix a date for CMC")))
+            .finalOrderDownloadTemplateOptions(new DynamicList()
+                                                   .setValue(DynamicListElement
+                                                              .dynamicElement("Fix a date for CMC"))
+                                                   )
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
@@ -366,12 +378,14 @@ class JudgeOrderDownloadGeneratorTest {
             .thenReturn(FIX_DATE_CCMC);
         when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
             .finalOrderAllocateToTrack(YES)
             .finalOrderTrackAllocation(MULTI_CLAIM)
-            .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement
-                                                              .dynamicElement("Fix a date for CCMC")))
+            .finalOrderDownloadTemplateOptions(new DynamicList()
+                                                   .setValue(DynamicListElement
+                                                              .dynamicElement("Fix a date for CCMC"))
+                                                   )
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);

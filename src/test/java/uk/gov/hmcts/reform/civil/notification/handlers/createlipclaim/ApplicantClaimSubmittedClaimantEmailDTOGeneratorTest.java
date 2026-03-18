@@ -50,7 +50,7 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenHWFReferenceNumberIsPresent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .caseDataLiP(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber(HELP_WITH_FEES_REFERENCE_NUMBER)))
                 .build();
 
@@ -64,7 +64,7 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantIsBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .claimantBilingualLanguagePreference(Language.WELSH.name())
                 .build();
 
@@ -78,7 +78,7 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnBilingualTemplateId_whenClaimantIsBilingualAndHWFReferenceNumberIsPresent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .claimantBilingualLanguagePreference(Language.WELSH.name())
                 .caseDataLiP(new CaseDataLiP()
                         .setHelpWithFees(new HelpWithFees()
@@ -95,7 +95,7 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnPayClaimFeeTemplateId_whenClaimantIsNotBilingualAndNoHWFReferenceNumber() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .claimantBilingualLanguagePreference(null)
                 .caseDataLiP(new CaseDataLiP()
                         .setHelpWithFees(new HelpWithFees()
@@ -114,7 +114,7 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
     void shouldAddCustomProperties() {
         Map<String, String> properties = new HashMap<>();
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .applicant1(new Party().setCompanyName("Claimant Name").setType(Party.Type.COMPANY))
                 .respondent1(new Party().setCompanyName("Defendant Name").setType(Party.Type.COMPANY))
                 .build();

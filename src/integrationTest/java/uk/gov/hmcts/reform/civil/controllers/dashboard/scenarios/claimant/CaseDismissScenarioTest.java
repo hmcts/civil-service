@@ -24,7 +24,7 @@ public class CaseDismissScenarioTest extends DashboardBaseIntegrationTest {
     void should_create_more_time_requested_scenario() throws Exception {
         String caseId = "12349";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .respondent1ResponseDeadline(LocalDateTime.of(2024, 4, 1, 12, 0))
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

@@ -36,7 +36,7 @@ class SpecDefRespRespSolTwoEmailDTOGeneratorTest {
         Party respondent2 = new Party().setType(Party.Type.INDIVIDUAL)
             .setIndividualFirstName("Joe")
             .setIndividualLastName("Brown");
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent2(respondent2)
             .build();
 

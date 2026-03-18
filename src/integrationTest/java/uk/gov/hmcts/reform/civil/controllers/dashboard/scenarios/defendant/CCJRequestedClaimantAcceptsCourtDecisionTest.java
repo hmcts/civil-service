@@ -26,7 +26,7 @@ public class CCJRequestedClaimantAcceptsCourtDecisionTest extends DashboardBaseI
 
         String caseId = "13074";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
             .caseDataLiP(new CaseDataLiP()

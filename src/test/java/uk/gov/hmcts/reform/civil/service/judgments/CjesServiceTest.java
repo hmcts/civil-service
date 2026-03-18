@@ -69,7 +69,7 @@ class CjesServiceTest {
         String caseId = String.valueOf(System.currentTimeMillis());
         String legacyCcdReference = "reference";
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .ccdCaseReference(Long.valueOf(caseId))
             .legacyCaseReference(legacyCcdReference)

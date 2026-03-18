@@ -22,7 +22,7 @@ public class EnglishDefendantResponseWelshTranslationScenarioTest extends Dashbo
 
         String caseId = "123451";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-                .toBuilder()
+                .copy()
                 .applicant1Represented(YesOrNo.NO)
                 .legacyCaseReference("reference")
                 .ccdCaseReference(Long.valueOf(caseId))

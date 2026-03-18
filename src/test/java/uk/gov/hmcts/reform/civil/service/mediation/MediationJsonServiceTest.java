@@ -538,7 +538,7 @@ public class MediationJsonServiceTest {
             respondent1DQ.setRespondent1DQVulnerabilityQuestions(vulnerabilityAdjustmentRequired(YES));
             Applicant1DQ applicant1DQ = new Applicant1DQ();
             applicant1DQ.setApplicant1DQHearingSupport(supportRequired(NO));
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .respondent1DQ(respondent1DQ)
                 .applicant1DQ(applicant1DQ)
                 .build();

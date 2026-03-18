@@ -26,7 +26,7 @@ public class HearingFeePaidClaimantScenarioTest extends DashboardBaseIntegration
     void should_create_fee_payment_outcome_scenario_when_payment_via_phone() throws Exception {
         String caseId = "7834212";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().applicant1Represented((YesOrNo.NO)).build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hwfFeeType(FeeType.HEARING)
@@ -63,11 +63,11 @@ public class HearingFeePaidClaimantScenarioTest extends DashboardBaseIntegration
     void should_create_fee_payment_outcome_scenario_when_payment_via_gov_pay() throws Exception {
         String caseId = "7834212";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().applicant1Represented((YesOrNo.NO)).build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
-        caseData = caseData.toBuilder().hearingFeePaymentDetails(new PaymentDetails().setStatus(SUCCESS).setReference("REFERENCE")).build();
+        caseData = caseData.copy().hearingFeePaymentDetails(new PaymentDetails().setStatus(SUCCESS).setReference("REFERENCE")).build();
 
         handler.handle(callbackParams(caseData));
 

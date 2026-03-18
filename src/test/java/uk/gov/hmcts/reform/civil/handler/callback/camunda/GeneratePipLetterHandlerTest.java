@@ -66,7 +66,7 @@ class GeneratePipLetterHandlerTest {
         when(pipLetterGenerator.downloadLetter(any(CaseData.class), any(String.class), anyList()))
                 .thenReturn(new byte[]{1, 2, 3, 4});
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .legacyCaseReference("12345")
                 .ccdCaseReference(12345L)
                 .respondent1(new Party().setPartyName("Test Respondent").setType(Party.Type.COMPANY))

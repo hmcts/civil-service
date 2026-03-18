@@ -30,7 +30,7 @@ class ClaimantResponseCuiRejectPayClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvoked() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()).thenReturn(expectedTemplateId);
 
@@ -41,7 +41,7 @@ class ClaimantResponseCuiRejectPayClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("12345")
             .applicant1(new Party().setPartyName("Claimant Name").setIndividualFirstName("Claimant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
             .respondent1(new Party().setPartyName("Defendant Name").setIndividualFirstName("Defendant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))

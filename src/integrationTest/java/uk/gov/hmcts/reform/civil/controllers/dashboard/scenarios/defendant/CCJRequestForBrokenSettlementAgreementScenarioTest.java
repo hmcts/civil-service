@@ -29,7 +29,7 @@ public class CCJRequestForBrokenSettlementAgreementScenarioTest extends Dashboar
         String caseId = "1674364636586678";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
@@ -72,7 +72,7 @@ public class CCJRequestForBrokenSettlementAgreementScenarioTest extends Dashboar
         String caseId = "1674364636586678";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)

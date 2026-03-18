@@ -34,7 +34,7 @@ class CarmDisabledClaimantEmailDTOGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder()
+        caseData = new CaseData()
             .legacyCaseReference("000LR001")
             .applicant1(new Party().setIndividualFirstName("Alice").setIndividualLastName("Smith").setType(Party.Type.INDIVIDUAL))
             .respondent1(new Party().setIndividualFirstName("Bob").setIndividualLastName("Jones").setType(Party.Type.INDIVIDUAL))
@@ -53,7 +53,7 @@ class CarmDisabledClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnMediationSuccessfulWelshTemplate_whenTaskIdMatches_andClaimantIsBilingual() {
-        CaseData updatedData = caseData.toBuilder()
+        CaseData updatedData = caseData.copy()
             .claimantBilingualLanguagePreference(Language.WELSH.getDisplayedValue()).build();
         when(notificationsProperties.getNotifyApplicantLiPMediationSuccessfulWelshTemplate())
             .thenReturn("template-success-welsh");
@@ -75,7 +75,7 @@ class CarmDisabledClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnMediationUnsuccessfulWelshTemplate_whenTaskIdDoesNotMatch_andClaimantIsBilingual() {
-        CaseData updatedData = caseData.toBuilder()
+        CaseData updatedData = caseData.copy()
             .claimantBilingualLanguagePreference(Language.WELSH.getDisplayedValue()).build();
         when(notificationsProperties.getMediationUnsuccessfulClaimantLIPWelshTemplate())
             .thenReturn("template-failure-welsh");

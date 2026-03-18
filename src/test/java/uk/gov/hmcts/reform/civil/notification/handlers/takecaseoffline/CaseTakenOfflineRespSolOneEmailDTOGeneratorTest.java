@@ -25,7 +25,7 @@ class CaseTakenOfflineRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn(TEMPLATE_ID);
 

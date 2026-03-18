@@ -97,7 +97,7 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         void shouldDoNothingWhenLipVLipToggleDisabled() {
             when(toggleService.isLipVLipEnabled()).thenReturn(false);
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .ccdCaseReference(12345L)
                 .build();
 

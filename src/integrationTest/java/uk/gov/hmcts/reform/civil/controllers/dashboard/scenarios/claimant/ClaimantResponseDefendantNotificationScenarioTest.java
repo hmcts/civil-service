@@ -33,7 +33,7 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
     void shouldCreateNotification_forDefendantWhenClaimantProceedsCarm() throws Exception {
         String caseId = String.valueOf(System.currentTimeMillis());
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(NO)
@@ -67,7 +67,7 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
     void shouldCreateNotification_forDefendantWhenClaimantProceeds() throws Exception {
         String caseId = String.valueOf(System.currentTimeMillis());
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(NO)
@@ -108,7 +108,7 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
         String caseId = String.valueOf(System.currentTimeMillis());
         LocalDate whenWillThisAmountBePaid = LocalDate.now().plusDays(5);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .totalClaimAmount(BigDecimal.valueOf(9000))

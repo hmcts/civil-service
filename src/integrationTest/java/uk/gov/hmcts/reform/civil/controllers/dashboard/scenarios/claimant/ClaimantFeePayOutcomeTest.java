@@ -23,7 +23,7 @@ public class ClaimantFeePayOutcomeTest extends DashboardBaseIntegrationTest {
     void should_create_fee_payment_outcome_scenario() throws Exception {
         String caseId = "7834212";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hwfFeeType(FeeType.CLAIMISSUED)

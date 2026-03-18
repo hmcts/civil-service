@@ -26,7 +26,7 @@ public class ClaimIssueHwfNumUpdatedScenarioTest extends DashboardBaseIntegratio
         String caseId = "12346782";
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .applicant1Represented(YesOrNo.NO)
             .hwfFeeType(FeeType.CLAIMISSUED)
             .claimIssuedHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER))

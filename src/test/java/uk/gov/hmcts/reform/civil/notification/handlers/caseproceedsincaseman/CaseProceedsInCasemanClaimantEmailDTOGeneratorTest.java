@@ -37,7 +37,7 @@ public class CaseProceedsInCasemanClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenBilingual() {
-        CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference(BOTH.toString()).build();
+        CaseData caseData = new CaseData().claimantBilingualLanguagePreference(BOTH.toString()).build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()).thenReturn(expectedTemplateId);
@@ -49,7 +49,7 @@ public class CaseProceedsInCasemanClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenNotBilingual() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn(expectedTemplateId);
@@ -68,7 +68,7 @@ public class CaseProceedsInCasemanClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotifyWhenNotLipvLROneVOne() {
-        CaseData caseData = CaseData.builder().applicant1Represented(NO).respondent1Represented(NO).build();
+        CaseData caseData = new CaseData().applicant1Represented(NO).respondent1Represented(NO).build();
         boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
 
         assertThat(shouldNotify).isFalse();
@@ -76,7 +76,7 @@ public class CaseProceedsInCasemanClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyWhenLipvLROneVOne() {
-        CaseData caseData = CaseData.builder().applicant1Represented(NO).respondent1Represented(YES).build();
+        CaseData caseData = new CaseData().applicant1Represented(NO).respondent1Represented(YES).build();
         boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
 
         assertThat(shouldNotify).isTrue();
@@ -85,7 +85,7 @@ public class CaseProceedsInCasemanClaimantEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         Party party = new Party();
-        CaseData caseData = CaseData.builder().applicant1(party).build();
+        CaseData caseData = new CaseData().applicant1(party).build();
 
         String name = "name";
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);

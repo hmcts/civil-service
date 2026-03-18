@@ -36,7 +36,7 @@ public class BundleTestUtil {
     private static final String TEST_FILE_NAME = "testFileName.pdf";
 
     public static CaseData getCaseDataWithNoId() {
-        return CaseData.builder().ccdCaseReference(1L)
+        return new CaseData().ccdCaseReference(1L)
             .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocsNoId())
             .applicant1(new Party().setIndividualLastName("lastname").setIndividualFirstName("cl1Fname").setPartyName(
                 "applicant1").setType(Party.Type.INDIVIDUAL))
@@ -55,7 +55,7 @@ public class BundleTestUtil {
     }
 
     public static CaseData getCaseData() {
-        return CaseData.builder().ccdCaseReference(1L)
+        return new CaseData().ccdCaseReference(1L)
             .documentWitnessStatement(getWitnessDocs())
             .documentWitnessStatementApp2(getWitnessDocs())
             .documentWitnessStatementRes(getWitnessDocs())
@@ -124,7 +124,7 @@ public class BundleTestUtil {
     }
 
     public static CaseData getCaseDataNoCategoryId() {
-        return CaseData.builder().ccdCaseReference(1L)
+        return new CaseData().ccdCaseReference(1L)
             .documentWitnessStatement(getWitnessDocsCategoryId())
             .documentWitnessStatementApp2(getWitnessDocsCategoryId())
             .documentWitnessStatementRes(getWitnessDocsCategoryId())

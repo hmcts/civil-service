@@ -49,7 +49,7 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
     private static final String CLAIMANT_EMAIL_ADDRESS = "individual.claimant@email.com";
     private static final String REFERENCE = "claim-submission-lip-claimant-notification-000DC001";
     private static final String TEMPLATE_ID = "template-id";
-    private CaseData caseData = CaseData.builder()
+    private CaseData caseData = new CaseData()
         .applicant1(new Party()
                         .setIndividualTitle("Mr.")
                         .setIndividualFirstName("Claimant")
@@ -123,7 +123,7 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
         when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         // Given
         caseData.getApplicant1().setPartyEmail(null);
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .claimantUserDetails(new IdamUserDetails()
                                      )
             .build();

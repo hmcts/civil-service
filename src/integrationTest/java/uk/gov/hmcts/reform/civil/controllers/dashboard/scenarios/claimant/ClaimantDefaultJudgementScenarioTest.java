@@ -25,7 +25,7 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
 
         String caseId = "720111";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
@@ -56,7 +56,7 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
 
         String caseId = "720112";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

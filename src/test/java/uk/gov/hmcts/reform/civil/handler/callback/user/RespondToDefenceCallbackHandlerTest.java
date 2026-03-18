@@ -409,7 +409,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenUnavailableDatesNotRequired() {
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
             Hearing hearing = new Hearing();
             hearing.setUnavailableDatesRequired(NO);
             Applicant1DQ applicant1DQ = new Applicant1DQ();

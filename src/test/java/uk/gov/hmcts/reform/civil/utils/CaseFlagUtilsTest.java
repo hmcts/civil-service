@@ -169,7 +169,7 @@ class CaseFlagUtilsTest {
             Expert expert2 = new Expert().setPartyID("partyId2").setFirstName("Second").setLastName("expert");
             Expert expert3 = new Expert().setPartyID("partyId3").setFirstName("Third").setLastName("experto");
 
-            CaseData updatedCaseData = caseData.toBuilder()
+            CaseData updatedCaseData = caseData.copy()
                 .respondent1DQ(new Respondent1DQ()
                                    .setRespondent1DQExperts(new Experts()
                                                                 .setDetails(wrapElements(expert1, expert2))))
@@ -228,7 +228,7 @@ class CaseFlagUtilsTest {
             Witness witness2 = new Witness().setPartyID("partyId2").setFirstName("Second").setLastName("witness");
             Witness witness3 = new Witness().setPartyID("partyId3").setFirstName("Third").setLastName("witnessy");
 
-            CaseData updatedCaseData = caseData.toBuilder()
+            CaseData updatedCaseData = caseData.copy()
                 .respondent1DQ(new Respondent1DQ()
                                    .setRespondent1DQWitnesses(new Witnesses()
                                                                   .setDetails(wrapElements(witness1, witness2))))
@@ -287,7 +287,7 @@ class CaseFlagUtilsTest {
             Witness witness2 = new Witness().setPartyID("partyId2").setFirstName("Second").setLastName("witness");
             Witness witness3 = new Witness().setPartyID("partyId3").setFirstName("Third").setLastName("witnessy");
 
-            CaseData updatedCaseData = caseData.toBuilder()
+            CaseData updatedCaseData = caseData.copy()
                 .applicant1DQ(new Applicant1DQ()
                                   .setApplicant1DQWitnesses(new Witnesses()
                                                                 .setDetails(wrapElements(witness1, witness2))))
@@ -342,7 +342,7 @@ class CaseFlagUtilsTest {
             Expert expert2 = new Expert().setPartyID("partyId2").setFirstName("Second").setLastName("expert");
             Expert expert3 = new Expert().setPartyID("partyId3").setFirstName("Third").setLastName("expert");
 
-            CaseData updatedCaseData = caseData.toBuilder()
+            CaseData updatedCaseData = caseData.copy()
                 .applicant1DQ(new Applicant1DQ()
                                   .setApplicant1DQExperts(new Experts()
                                                               .setDetails(wrapElements(expert1, expert2))))

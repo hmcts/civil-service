@@ -58,7 +58,7 @@ class RespondentTemplateForDQGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .build()
-            .toBuilder()
+            .copy()
             .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
             .build();
 
@@ -81,7 +81,7 @@ class RespondentTemplateForDQGeneratorTest {
             .respondent2DQ()
             .respondent2SameLegalRepresentative(YES)
             .build()
-            .toBuilder()
+            .copy()
             .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
             .build();
 
@@ -104,7 +104,7 @@ class RespondentTemplateForDQGeneratorTest {
             .respondent2SameLegalRepresentative(YES)
             .responseClaimTrack(FAST_CLAIM.name())
             .build()
-            .toBuilder()
+            .copy()
             .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
             .build();
 

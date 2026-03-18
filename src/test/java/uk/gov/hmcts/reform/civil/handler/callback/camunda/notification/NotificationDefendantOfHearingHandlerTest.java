@@ -121,7 +121,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -152,7 +152,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -184,7 +184,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -216,7 +216,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -253,7 +253,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -290,7 +290,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -324,7 +324,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .hearingTimeHourMinute("1100")
                 .applicant1Represented(YesOrNo.NO)
@@ -370,7 +370,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
@@ -413,7 +413,7 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .caseDataLip(new CaseDataLiP()
                                  .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                              .setRespondent1ResponseLanguage(Language.BOTH.toString())))
-                .atStateClaimDetailsNotified().build().toBuilder()
+                .atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .hearingTimeHourMinute("1100")
                 .applicant1Represented(YesOrNo.NO)
@@ -453,7 +453,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .hearingTimeHourMinute("1100")
                 .applicant1Represented(YesOrNo.NO)
@@ -498,7 +498,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .hearingTimeHourMinute("1100")
                 .applicant1Represented(YesOrNo.NO)
@@ -543,7 +543,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .hearingTimeHourMinute("1100")
                 .applicant1Represented(YesOrNo.NO)
@@ -596,7 +596,7 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .thenReturn("test-template-no-fee-defendant-id-hmc");
 
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
@@ -622,7 +622,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .respondentSolicitor2EmailAddress("respondent2email@hmcts.net")
@@ -630,7 +630,7 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .addRespondent2(YesOrNo.YES)
                 .respondent2(new Party().setType(Party.Type.COMPANY).setCompanyName("Party2"))
                 .businessProcess(new BusinessProcess().setProcessInstanceId(""))
-                .build().toBuilder()
+                .build().copy()
                 .respondentSolicitor2Reference("6789").build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT2_HEARING_HMC").build()).build();

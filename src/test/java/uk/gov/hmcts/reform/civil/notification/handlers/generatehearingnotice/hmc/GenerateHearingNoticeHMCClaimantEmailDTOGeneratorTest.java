@@ -38,7 +38,7 @@ class GenerateHearingNoticeHMCClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateId_whenClaimantIsBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .claimantBilingualLanguagePreference(Language.BOTH.toString())
             .build();
 
@@ -53,7 +53,7 @@ class GenerateHearingNoticeHMCClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateId_whenClaimantIsNotBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
             .build();
 
@@ -77,7 +77,7 @@ class GenerateHearingNoticeHMCClaimantEmailDTOGeneratorTest {
         LocalDate hearingDate = LocalDate.of(2025, 7, 15);
         LocalDateTime hearingStartDateTime = LocalDateTime.of(2025, 7, 15, 14, 0);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .hearingDate(hearingDate)
             .businessProcess(new BusinessProcess()
                                  .setProcessInstanceId(processInstanceId))

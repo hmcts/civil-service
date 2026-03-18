@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -108,7 +107,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Accessors(chain = true)
-@SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = false)
 @Data
 public class CivilCaseData extends BaseCaseData implements MappableObject {
@@ -155,7 +153,6 @@ public class CivilCaseData extends BaseCaseData implements MappableObject {
     private List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
-    @Builder.Default
     private  List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
@@ -267,4 +264,10 @@ public class CivilCaseData extends BaseCaseData implements MappableObject {
 
     //default judgement SDO R2 fields for trial
     private SdoDJR2TrialCreditHire sdoDJR2TrialCreditHire;
+
+    @JsonIgnore
+    @Override
+    public CivilCaseData copy() {
+        return copyInto(new CivilCaseData());
+    }
 }

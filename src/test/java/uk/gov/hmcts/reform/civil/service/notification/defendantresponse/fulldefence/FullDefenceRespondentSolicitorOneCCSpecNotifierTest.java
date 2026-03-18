@@ -89,7 +89,7 @@ class FullDefenceRespondentSolicitorOneCCSpecNotifierTest {
     void shouldNotifyRespondentSolicitorSpecDef1_whenInvokedWithCcEvent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+        caseData = caseData.copy().caseAccessCategory(SPEC_CLAIM)
             .respondent1DQ(new Respondent1DQ())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .build();
@@ -111,7 +111,7 @@ class FullDefenceRespondentSolicitorOneCCSpecNotifierTest {
     void shouldNotifyRespondentSolicitorSpecDef1SecondScenerio_whenInvokedWithCcEvent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+        caseData = caseData.copy().caseAccessCategory(SPEC_CLAIM)
             .respondent2DQ(new Respondent2DQ())
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent2(new Party().setType(Party.Type.COMPANY).setCompanyName("my company"))

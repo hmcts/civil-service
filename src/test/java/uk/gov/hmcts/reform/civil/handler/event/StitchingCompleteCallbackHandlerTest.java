@@ -70,7 +70,7 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
             .setStitchedDocument(Optional.of(new Document()
                                               .setDocumentUrl("url")
                                               .setDocumentFileName("name")))));
-        CaseData caseData = CaseData.builder().caseBundles(caseBundles).build();
+        CaseData caseData = new CaseData().caseBundles(caseBundles).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNull();
@@ -88,7 +88,7 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
             .setStitchedDocument(Optional.of(new Document()
                                               .setDocumentUrl("url")
                                               .setDocumentFileName("name")))));
-        CaseData caseData = CaseData.builder().caseBundles(caseBundles)
+        CaseData caseData = new CaseData().caseBundles(caseBundles)
             .bundleEvent("BUNDLE_CREATED_NOTIFICATION").build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
@@ -102,7 +102,7 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
     @ParameterizedTest
     @MethodSource("provideBundlesForLatestBundleTest")
     void shouldReturnLatestBundle(List<IdValue<Bundle>> bundles, Optional<Bundle> expectedLatestBundle) {
-        CaseData caseData = CaseData.builder().caseBundles(bundles).build();
+        CaseData caseData = new CaseData().caseBundles(bundles).build();
         Optional<Bundle> latestBundle = StitchingCompleteCallbackHandler.getLatestBundle(caseData);
         assertThat(latestBundle).isEqualTo(expectedLatestBundle);
     }
@@ -153,24 +153,24 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
 
         return Stream.of(
             Arguments.of(
-                CaseData.builder().applicantDocsUploadedAfterBundle(docsUploadedAfterBundle)
+                new CaseData().applicantDocsUploadedAfterBundle(docsUploadedAfterBundle)
                     .respondentDocsUploadedAfterBundle(docsUploadedAfterBundle)
                     .caseBundles(List.of(new IdValue<>("1", bundleSuccess))).build(),
                 null,
                 null
             ),
             Arguments.of(
-                CaseData.builder().applicantDocsUploadedAfterBundle(docsUploadedAfterBundle)
+                new CaseData().applicantDocsUploadedAfterBundle(docsUploadedAfterBundle)
                     .respondentDocsUploadedAfterBundle(docsUploadedAfterBundle)
                     .caseBundles(List.of(new IdValue<>("1", bundleFailed))).build(),
                 YesOrNo.YES,
                 null
             ),
-            Arguments.of(CaseData.builder().applicantDocsUploadedAfterBundle(docsUploadedAfterBundle)
+            Arguments.of(new CaseData().applicantDocsUploadedAfterBundle(docsUploadedAfterBundle)
                              .respondentDocsUploadedAfterBundle(docsUploadedAfterBundle)
                              .caseBundles(List.of(new IdValue<>("1", bundleSuccess))).bundleEvent(
                     "BUNDLE_CREATED_NOTIFICATION").build(), null, "BUNDLE_CREATION_NOTIFICATION"),
-            Arguments.of(CaseData.builder().applicantDocsUploadedAfterBundle(docsUploadedAfterBundle)
+            Arguments.of(new CaseData().applicantDocsUploadedAfterBundle(docsUploadedAfterBundle)
                              .respondentDocsUploadedAfterBundle(docsUploadedAfterBundle)
                              .caseBundles(List.of(new IdValue<>("1", bundleSuccess))).bundleEvent(
                     "AMEND_RESTITCH_BUNDLE").build(), null, "AMEND_RESTITCH_BUNDLE")

@@ -30,7 +30,7 @@ class SpecDefRespEmailHelperTest {
 
     @Test
     void shouldReturnImmediatelyTemplate_whenFullAdmissionAndImmediatePayment() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .build();
@@ -154,7 +154,7 @@ class SpecDefRespEmailHelperTest {
 
     @Test
     void shouldReturnImmediatelyTemplate_whenFullAdmissionAndImmediatePayment_judgmentOnlineFlagEnabled() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .build();

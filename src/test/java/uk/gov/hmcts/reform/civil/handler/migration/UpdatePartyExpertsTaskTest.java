@@ -29,13 +29,13 @@ class UpdatePartyExpertsTaskTest {
 
     @Test
     void shouldThrowExceptionWhenCaseReferenceIsNull() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         assertThrows(IllegalArgumentException.class, () -> task.migrateCaseData(caseData, null));
     }
 
     @Test
     void shouldThrowExceptionWhenCaseReferenceValueIsNull() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         CaseReference caseRef = caseReference(null);
         assertThrows(IllegalArgumentException.class, () -> task.migrateCaseData(caseData, caseRef));
     }
@@ -45,7 +45,7 @@ class UpdatePartyExpertsTaskTest {
         PartyFlagStructure expert1 = new PartyFlagStructure().setFirstName(null).setLastName(null);
         PartyFlagStructure expert2 = new PartyFlagStructure().setFirstName("John").setLastName(null);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicantExperts(List.of(
                 new Element<PartyFlagStructure>().setValue(expert1),
                 new Element<PartyFlagStructure>().setValue(expert2)
@@ -68,7 +68,7 @@ class UpdatePartyExpertsTaskTest {
     void shouldUpdateRespondent1ExpertsWithTBCWhenNamesAreNull() {
         PartyFlagStructure expert = new PartyFlagStructure().setFirstName(null).setLastName("Smith");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1Experts(List.of(new Element<PartyFlagStructure>().setValue(expert)))
             .build();
 
@@ -85,7 +85,7 @@ class UpdatePartyExpertsTaskTest {
     void shouldUpdateRespondent2ExpertsWithTBCWhenNamesAreNull() {
         PartyFlagStructure expert = new PartyFlagStructure().setFirstName("Bob").setLastName(null);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent2Experts(List.of(new Element<PartyFlagStructure>().setValue(expert)))
             .build();
 
@@ -109,7 +109,7 @@ class UpdatePartyExpertsTaskTest {
         );
         Experts dqExperts = new Experts().setDetails(dqExpertElements);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1DQ(new Applicant1DQ().setApplicant1DQExperts(dqExperts))
             .applicant2DQ(new Applicant2DQ().setApplicant2DQExperts(dqExperts))
             .respondent1DQ(new Respondent1DQ().setRespondent1DQExperts(dqExperts))
@@ -139,7 +139,7 @@ class UpdatePartyExpertsTaskTest {
             .setPartyID(null)
             ;
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicantExperts(List.of(new Element<PartyFlagStructure>().setValue(expert)))
             .build();
 
@@ -159,7 +159,7 @@ class UpdatePartyExpertsTaskTest {
             .setPartyID("existing-id-123")
             ;
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicantExperts(List.of(new Element<PartyFlagStructure>().setValue(expert)))
             .build();
 
@@ -173,7 +173,7 @@ class UpdatePartyExpertsTaskTest {
 
     @Test
     void shouldHandleNullListsGracefully() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicantExperts(null)
             .respondent1Experts(null)
             .respondent2Experts(null)

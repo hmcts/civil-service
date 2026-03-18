@@ -109,7 +109,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v1() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -142,7 +142,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v1HMC() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
@@ -183,7 +183,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitorWithoutFee_whenInvoked1v1DisposalHearingHMC() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
@@ -227,7 +227,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v1WithNoFee() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -263,7 +263,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked1v1WithNoFeeHMC() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
@@ -308,7 +308,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithSpecClaim() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC().build().copy()
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
@@ -352,7 +352,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v1WithNoSolicitorReferences() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -386,7 +386,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v2() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -421,7 +421,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd2v1() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -454,7 +454,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedNoFeeAnd1v1() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -488,7 +488,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedNoFeeAnd1v1HearingOther() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -519,7 +519,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedNoFeeAnd1v1HearingOtherAfterRetrigger() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -553,7 +553,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedNoFeeAnd1v2() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -589,7 +589,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedNoFeeAnd2v1() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -630,7 +630,7 @@ class NotificationClaimantOfHearingHandlerTest {
                 .thenReturn("test-template-claimant-lip-id");
 
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .hearingTimeHourMinute("1030")
                 .applicant1Represented(YesOrNo.NO)
@@ -668,7 +668,7 @@ class NotificationClaimantOfHearingHandlerTest {
                 .thenReturn("test-template-claimant-lip-id");
 
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .applicant1Represented(YesOrNo.NO)
                 .claimantUserDetails(new IdamUserDetails().setEmail("applicant1@example.com"))
@@ -699,7 +699,7 @@ class NotificationClaimantOfHearingHandlerTest {
                 .thenReturn("test-template-claimant-lip-welsh-id");
 
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .hearingTimeHourMinute("1030")
                 .applicant1Represented(YesOrNo.NO)
@@ -724,7 +724,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithFailedPayment() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -758,7 +758,7 @@ class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedRelistingAndOther() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")

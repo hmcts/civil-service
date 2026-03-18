@@ -24,7 +24,7 @@ public class TellUsSettledDefendantScenarioTest extends DashboardBaseIntegration
 
         String caseId = "55551122";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .caseDataLiP(new CaseDataLiP()

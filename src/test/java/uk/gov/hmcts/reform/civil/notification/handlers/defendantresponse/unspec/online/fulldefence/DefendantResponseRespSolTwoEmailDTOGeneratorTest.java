@@ -34,7 +34,7 @@ class DefendantResponseRespSolTwoEmailDTOGeneratorTest {
         String expectedTemplateId = "sol-litigation-friend-template";
         when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn(expectedTemplateId);
 
-        String actualTemplateId = generator.getEmailTemplateId(CaseData.builder().build());
+        String actualTemplateId = generator.getEmailTemplateId(new CaseData().build());
 
         assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
     }
@@ -55,7 +55,7 @@ class DefendantResponseRespSolTwoEmailDTOGeneratorTest {
             .setCompanyName("Beta Corp")
             .setType(Party.Type.COMPANY);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(respondent1)
             .respondent2(respondent2)
             .allocatedTrack(AllocatedTrack.FAST_CLAIM)

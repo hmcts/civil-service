@@ -29,7 +29,7 @@ public class EvidenceUploadedClaimantScenarioTest extends DashboardBaseIntegrati
         String caseId = "14323241";
         LocalDate hearingDueDate = LocalDate.now().minusDays(1);
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(NO)
@@ -65,7 +65,7 @@ public class EvidenceUploadedClaimantScenarioTest extends DashboardBaseIntegrati
         String caseId = "14323241";
         LocalDate hearingDueDate = LocalDate.now().minusDays(1);
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(NO)

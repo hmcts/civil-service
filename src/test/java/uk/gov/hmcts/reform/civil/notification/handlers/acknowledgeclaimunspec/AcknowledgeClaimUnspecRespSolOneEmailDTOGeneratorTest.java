@@ -39,7 +39,7 @@ class AcknowledgeClaimUnspecRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenAppSolGetTemplateIsInvoked() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getRespondentSolicitorAcknowledgeClaim()).thenReturn(expectedTemplateId);
 
@@ -57,7 +57,7 @@ class AcknowledgeClaimUnspecRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnAppSolTemplateProperties_whenCustomPropsCalled() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         Map<String, String> properties = new HashMap<>();
         Map<String, String> addedProperties = Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, "TestOrg",
@@ -77,21 +77,21 @@ class AcknowledgeClaimUnspecRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyReturnFalse_whenResp1IsNotAcknowledged() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(false);
         assertThat(emailGenerator.getShouldNotify(caseData)).isFalse();
     }
 
     @Test
     void shouldNotifyReturnFalse_whenResp1IsAcknowledgedButIsLiP() {
-        CaseData caseData = CaseData.builder().respondent1Represented(NO).build();
+        CaseData caseData = new CaseData().respondent1Represented(NO).build();
         when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(true);
         assertThat(emailGenerator.getShouldNotify(caseData)).isFalse();
     }
 
     @Test
     void shouldNotifyReturnTrue_whenResp1AcknowledgedAndNotLiP() {
-        CaseData caseData = CaseData.builder().respondent1Represented(YES).build();
+        CaseData caseData = new CaseData().respondent1Represented(YES).build();
         when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(true);
         assertThat(emailGenerator.getShouldNotify(caseData)).isTrue();
     }

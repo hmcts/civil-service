@@ -295,7 +295,7 @@ public class CaseFlagsToHearingValueMapperTest {
             .setHearingRelevant(YES)
             .setFlagCode("RA0042");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(new Party().setFlags(new Flags()
                                                   .setDetails(wrapElements(flagDetail1))))
             .respondent1(new Party().setFlags(new Flags()

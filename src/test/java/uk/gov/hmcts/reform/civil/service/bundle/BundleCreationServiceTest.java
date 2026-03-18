@@ -77,7 +77,7 @@ class BundleCreationServiceTest {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = setupSystemGeneratedCaseDocs();
         ServedDocumentFiles servedDocumentFiles = setupParticularsOfClaimDocs();
 
-        caseData = CaseData.builder().ccdCaseReference(1L)
+        caseData = new CaseData().ccdCaseReference(1L)
             .documentWitnessStatement(witnessEvidenceDocs)
             .documentWitnessSummary(witnessEvidenceDocs)
             .documentHearsayNotice(witnessEvidenceDocs)

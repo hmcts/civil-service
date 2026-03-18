@@ -263,7 +263,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
     @PactTestFor(pactMethod = "getFeeForGAWithNotice")
     public void verifyFeeForGAWithNotice() {
         Fee fee = generalAppFeesService.getFeeForGA(
-            CaseData.builder().generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.NO))
+            new CaseData().generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.NO))
                 .generalAppType(
                     new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT)))
                 .build());
@@ -275,7 +275,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
     @PactTestFor(pactMethod = "getFeeForConsentWithOrWithout")
     public void verifyFeeForConsentWithOrWithout() {
         Fee fee = generalAppFeesService.getFeeForGA(
-            CaseData.builder().generalAppType(
+            new CaseData().generalAppType(
                     new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT)))
                 .build());
         assertThat(fee.getCode(), is(equalTo("FEE0446")));
@@ -287,7 +287,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
     public void verifyFeeForAppToVaryOrSuspend() {
 
         Fee fee = generalAppFeesService.getFeeForGA(
-            CaseData.builder().generalAppType(
+            new CaseData().generalAppType(
                     new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)))
                 .build());
         assertThat(fee.getCode(), is(equalTo("FEE0447")));

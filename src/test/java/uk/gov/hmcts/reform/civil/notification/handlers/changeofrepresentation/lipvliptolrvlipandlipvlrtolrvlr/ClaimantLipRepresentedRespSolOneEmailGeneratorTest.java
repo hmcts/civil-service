@@ -48,14 +48,14 @@ class ClaimantLipRepresentedRespSolOneEmailGeneratorTest {
         String expectedTemplateId = "template-id-123";
         when(notificationsProperties.getNoticeOfChangeOtherParties()).thenReturn(expectedTemplateId);
 
-        String actual = generator.getEmailTemplateId(CaseData.builder().build());
+        String actual = generator.getEmailTemplateId(new CaseData().build());
 
         assertEquals(expectedTemplateId, actual);
     }
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .ccdCaseReference(1234567890123456L)
             .issueDate(LocalDate.of(2023, 1, 15))
             .changeOfRepresentation(new ChangeOfRepresentation()

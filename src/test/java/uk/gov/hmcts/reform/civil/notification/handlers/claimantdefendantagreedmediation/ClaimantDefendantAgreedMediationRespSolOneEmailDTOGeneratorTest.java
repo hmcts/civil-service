@@ -44,7 +44,7 @@ public class ClaimantDefendantAgreedMediationRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenCarmIsEnabled() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
         when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn(expectedTemplateId);
@@ -56,7 +56,7 @@ public class ClaimantDefendantAgreedMediationRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenCarmIsNotEnabled() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(false);
         when(notificationsProperties.getNotifyRespondentLRMediationAgreementTemplate()).thenReturn(expectedTemplateId);
@@ -75,7 +75,7 @@ public class ClaimantDefendantAgreedMediationRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         String partyName = "party name";
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);

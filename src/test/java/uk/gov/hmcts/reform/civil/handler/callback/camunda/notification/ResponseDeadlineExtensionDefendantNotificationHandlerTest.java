@@ -103,7 +103,7 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
                                 .setType(Party.Type.COMPANY)
                                 .setCompanyName("Bad guys ltd"))
                 .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now())
-                .build().toBuilder()
+                .build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -148,7 +148,7 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
                 .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now())
                 .respondent1OrgRegistered(null)
                 .specRespondent1Represented(YesOrNo.NO)
-                .build().toBuilder()
+                .build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();

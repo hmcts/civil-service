@@ -101,7 +101,7 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandlerTest exten
 
             CaseData caseData = CaseDataBuilder.builder()
                     .atStatePendingClaimIssued()
-                    .build().toBuilder()
+                    .build().copy()
                     .respondent1Represented(YesOrNo.NO)
                     .caseDataLiP(new CaseDataLiP()
                                      .setRespondent1LiPResponse(new RespondentLiPResponse()
@@ -128,7 +128,7 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandlerTest exten
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued()
-                .build().toBuilder()
+                .build().copy()
                 .respondent1Represented(YesOrNo.NO)
                 .caseDataLiP(new CaseDataLiP()
                                  .setRespondent1LiPResponse(new RespondentLiPResponse()

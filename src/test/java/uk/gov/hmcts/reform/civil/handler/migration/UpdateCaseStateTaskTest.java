@@ -36,7 +36,7 @@ class UpdateCaseStateTaskTest {
 
     @Test
     void migrateCaseData_shouldReturnSameCaseData() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         CaseReference caseReference = new CaseReference("12345");
 
         CaseData result = updateCaseStateTask.migrateCaseData(caseData, caseReference);

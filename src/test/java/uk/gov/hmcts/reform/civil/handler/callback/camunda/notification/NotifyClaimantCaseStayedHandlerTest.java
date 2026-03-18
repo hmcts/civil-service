@@ -91,7 +91,7 @@ class NotifyClaimantCaseStayedHandlerTest {
     @ParameterizedTest
     @MethodSource("provideCaseData")
     void sendNotificationShouldSendEmail(boolean isApplicantLiP, boolean isClaimantBilingual, String template, String email) {
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .applicant1Represented(isApplicantLiP ? YesOrNo.NO : YesOrNo.YES)
             .claimantBilingualLanguagePreference(isClaimantBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString())
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(email))

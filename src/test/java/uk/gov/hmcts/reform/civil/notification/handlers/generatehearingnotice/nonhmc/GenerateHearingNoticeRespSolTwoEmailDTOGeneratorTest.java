@@ -52,7 +52,7 @@ class GenerateHearingNoticeRespSolTwoEmailDTOGeneratorTest {
         when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplate())
                 .thenReturn(CONFIG_TEMPLATE_ID);
 
-        String actual = generator.getEmailTemplateId(CaseData.builder().build());
+        String actual = generator.getEmailTemplateId(new CaseData().build());
 
         assertEquals(CONFIG_TEMPLATE_ID, actual);
         verify(notificationsProperties).getHearingListedNoFeeDefendantLrTemplate();
@@ -66,7 +66,7 @@ class GenerateHearingNoticeRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void addCustomProperties_withReference_populatesAllFields() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .hearingDate(HEARING_DATE_VAL)
                 .hearingTimeHourMinute(TIME_FIELD)
                 .respondentSolicitor2Reference(RESP2_REF)
@@ -100,7 +100,7 @@ class GenerateHearingNoticeRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void addCustomProperties_withoutReference_setsEmptyString() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .hearingDate(HEARING_DATE_VAL)
                 .hearingTimeHourMinute(TIME_FIELD)
                 .respondentSolicitor2Reference(null)

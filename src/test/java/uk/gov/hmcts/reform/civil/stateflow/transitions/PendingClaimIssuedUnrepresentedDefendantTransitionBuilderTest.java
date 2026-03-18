@@ -125,13 +125,13 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenEitherDefendant1LIPAtClaimIssuedOrDefendant2LIPAtClaimIssuedIsYes() {
-        CaseData caseData1 = CaseData.builder()
+        CaseData caseData1 = new CaseData()
             .defendant1LIPAtClaimIssued(YES)
             .build();
 
         assertTrue(LipPredicate.certificateOfServiceEnabled.test(caseData1));
 
-        CaseData caseData2 = CaseData.builder()
+        CaseData caseData2 = new CaseData()
             .defendant2LIPAtClaimIssued(YES)
             .build();
 

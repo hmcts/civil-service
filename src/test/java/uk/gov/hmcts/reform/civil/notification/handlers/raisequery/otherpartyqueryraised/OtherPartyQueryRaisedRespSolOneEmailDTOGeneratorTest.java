@@ -22,7 +22,7 @@ class OtherPartyQueryRaisedRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplate() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyOtherPartyPublicQueryRaised()).thenReturn(expectedTemplateId);
 

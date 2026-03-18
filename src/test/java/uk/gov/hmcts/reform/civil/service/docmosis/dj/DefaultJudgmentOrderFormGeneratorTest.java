@@ -277,7 +277,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
-                .toBuilder()
+                .copy()
                 .disposalHearingBundleDJ(disposalHearingBundle)
                 .build();
 
@@ -302,7 +302,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
-                .toBuilder()
+                .copy()
                 .disposalHearingBundleDJ(disposalHearingBundle)
                 .build();
 
@@ -326,7 +326,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
-                .toBuilder()
+                .copy()
                 .disposalHearingBundleDJ(disposalHearingBundle)
                 .build();
 
@@ -350,7 +350,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
-                .toBuilder()
+                .copy()
                 .disposalHearingBundleDJ(disposalHearingBundle)
                 .build();
 
@@ -373,7 +373,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
-                .toBuilder()
+                .copy()
                 .disposalHearingBundleDJ(disposalHearingBundle)
                 .build();
 
@@ -395,7 +395,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
-                .toBuilder()
+                .copy()
                 .disposalHearingBundleDJ(disposalHearingBundle)
                 .build();
 
@@ -417,7 +417,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
-                .toBuilder()
+                .copy()
                 .disposalHearingBundleDJ(disposalHearingBundle)
                 .build();
 

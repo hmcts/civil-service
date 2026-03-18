@@ -43,7 +43,7 @@ class SdoNihlTemplateServiceTest {
             .legacyCaseReference("000MC001")
             .atStateNotificationAcknowledged()
             .build()
-            .toBuilder()
+            .copy()
             .sdoAltDisputeResolution(buildAltDisputeResolution())
             .sdoVariationOfDirections(buildVariationOfDirections())
             .sdoR2Settlement(buildSettlement())

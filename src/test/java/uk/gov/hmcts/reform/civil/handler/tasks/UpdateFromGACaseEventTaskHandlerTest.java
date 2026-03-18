@@ -497,7 +497,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         String uid = "f000aa01-0451-4000-b000-000000000000";
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDetails(
-                CaseData.builder().build(),
+                new CaseData().build(),
                 false,
                 false,
                 true, true,

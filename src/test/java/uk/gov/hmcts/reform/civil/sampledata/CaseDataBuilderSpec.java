@@ -608,7 +608,7 @@ public class CaseDataBuilderSpec {
     }
 
     public CaseData build() {
-        return CaseData.builder()
+        return new CaseData()
             // Create Claim
             .caseAccessCategory(caseAccessCategory)
             .legacyCaseReference(legacyCaseReference)

@@ -35,10 +35,10 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_NoChanges() {
-            CaseData current = CaseData.builder()
+            CaseData current = new CaseData()
                 .applicant1(new PartyBuilder().individual().build())
                 .build();
-            CaseData updated = CaseData.builder()
+            CaseData updated = new CaseData()
                 .applicant1(new PartyBuilder().individual().build())
                 .build();
 
@@ -47,10 +47,10 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Applicant1Changes() {
-            CaseData current = CaseData.builder()
+            CaseData current = new CaseData()
                 .applicant1(new PartyBuilder().company().build().setCompanyName("Company One"))
                 .build();
-            CaseData updated = CaseData.builder()
+            CaseData updated = new CaseData()
                 .applicant1(new PartyBuilder().company().build().setCompanyName("Company Two"))
                 .build();
 
@@ -65,12 +65,12 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Applicant2Changes() {
-            CaseData current = CaseData.builder()
+            CaseData current = new CaseData()
                 .applicant2(new PartyBuilder().individual().build()
                                 .setIndividualFirstName("John").setIndividualLastName("Doe"))
                 .build();
 
-            CaseData updated = CaseData.builder()
+            CaseData updated = new CaseData()
                 .applicant2(new PartyBuilder().individual().build()
                                 .setIndividualFirstName("Jane").setIndividualLastName("Smith"))
                 .build();
@@ -86,12 +86,12 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Respondent1Changes() {
-            CaseData current = CaseData.builder()
+            CaseData current = new CaseData()
                 .respondent1(new PartyBuilder().individual().build()
                                  .setIndividualFirstName("John").setIndividualLastName("Doe"))
                 .build();
 
-            CaseData updated = CaseData.builder()
+            CaseData updated = new CaseData()
                 .respondent1(new PartyBuilder().individual().build()
                                  .setIndividualFirstName("Jane").setIndividualLastName("Smith"))
                 .build();
@@ -107,12 +107,12 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Respondent2Changes() {
-            CaseData current = CaseData.builder()
+            CaseData current = new CaseData()
                 .respondent2(new PartyBuilder().individual().build()
                                  .setIndividualFirstName("John").setIndividualLastName("Doe"))
                 .build();
 
-            CaseData updated = CaseData.builder()
+            CaseData updated = new CaseData()
                 .respondent2(new PartyBuilder().individual().build()
                                  .setIndividualFirstName("Jane").setIndividualLastName("Smith"))
                 .build();
@@ -139,8 +139,8 @@ public class PartyDetailsChangedUtilTest {
                 .setPrimaryAddress(address("123 Main St", "City", "Country"))
                 ;
 
-            CaseData caseDataCurrent = CaseData.builder().applicant1LitigationFriend(current).build();
-            CaseData caseDataUpdated = CaseData.builder().applicant1LitigationFriend(updated).build();
+            CaseData caseDataCurrent = new CaseData().applicant1LitigationFriend(current).build();
+            CaseData caseDataUpdated = new CaseData().applicant1LitigationFriend(updated).build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
@@ -167,10 +167,10 @@ public class PartyDetailsChangedUtilTest {
                 .setHasSameAddressAsLitigant(YesOrNo.YES)
                 ;
 
-            CaseData caseDataCurrent = CaseData.builder()
+            CaseData caseDataCurrent = new CaseData()
                 .applicant1(litigant)
                 .applicant1LitigationFriend(current).build();
-            CaseData caseDataUpdated = CaseData.builder()
+            CaseData caseDataUpdated = new CaseData()
                 .applicant1(litigant)
                 .applicant1LitigationFriend(updated).build();
 
@@ -199,10 +199,10 @@ public class PartyDetailsChangedUtilTest {
                 .setPrimaryAddress(address("123 Main St", "City", "Country"))
                 ;
 
-            CaseData caseDataCurrent = CaseData.builder()
+            CaseData caseDataCurrent = new CaseData()
                 .applicant1(litigant)
                 .applicant1LitigationFriend(current).build();
-            CaseData caseDataUpdated = CaseData.builder()
+            CaseData caseDataUpdated = new CaseData()
                 .applicant1(litigant)
                 .applicant1LitigationFriend(updated).build();
 
@@ -228,8 +228,8 @@ public class PartyDetailsChangedUtilTest {
                 .setPrimaryAddress(address("123 Main St", "City", "Country"))
                 ;
 
-            CaseData caseDataCurrent = CaseData.builder().applicant2LitigationFriend(current).build();
-            CaseData caseDataUpdated = CaseData.builder().applicant2LitigationFriend(updated).build();
+            CaseData caseDataCurrent = new CaseData().applicant2LitigationFriend(current).build();
+            CaseData caseDataUpdated = new CaseData().applicant2LitigationFriend(updated).build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
@@ -256,10 +256,10 @@ public class PartyDetailsChangedUtilTest {
                 .setHasSameAddressAsLitigant(YesOrNo.YES)
                 ;
 
-            CaseData caseDataCurrent = CaseData.builder()
+            CaseData caseDataCurrent = new CaseData()
                 .applicant2(litigant)
                 .applicant2LitigationFriend(current).build();
-            CaseData caseDataUpdated = CaseData.builder()
+            CaseData caseDataUpdated = new CaseData()
                 .applicant2(litigant)
                 .applicant2LitigationFriend(updated).build();
 
@@ -288,10 +288,10 @@ public class PartyDetailsChangedUtilTest {
                 .setPrimaryAddress(address("123 Main St", "City", "Country"))
                 ;
 
-            CaseData caseDataCurrent = CaseData.builder()
+            CaseData caseDataCurrent = new CaseData()
                 .applicant2(litigant)
                 .applicant2LitigationFriend(current).build();
-            CaseData caseDataUpdated = CaseData.builder()
+            CaseData caseDataUpdated = new CaseData()
                 .applicant2(litigant)
                 .applicant2LitigationFriend(updated).build();
 
@@ -317,8 +317,8 @@ public class PartyDetailsChangedUtilTest {
                 .setPrimaryAddress(address("123 Main St", "City", "Country"))
                 ;
 
-            CaseData caseDataCurrent = CaseData.builder().respondent1LitigationFriend(current).build();
-            CaseData caseDataUpdated = CaseData.builder().respondent1LitigationFriend(updated).build();
+            CaseData caseDataCurrent = new CaseData().respondent1LitigationFriend(current).build();
+            CaseData caseDataUpdated = new CaseData().respondent1LitigationFriend(updated).build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
@@ -346,10 +346,10 @@ public class PartyDetailsChangedUtilTest {
                 .setHasSameAddressAsLitigant(YesOrNo.YES)
                 ;
 
-            CaseData caseDataCurrent = CaseData.builder()
+            CaseData caseDataCurrent = new CaseData()
                 .respondent1(litigant)
                 .respondent1LitigationFriend(current).build();
-            CaseData caseDataUpdated = CaseData.builder()
+            CaseData caseDataUpdated = new CaseData()
                 .respondent1(litigant)
                 .respondent1LitigationFriend(updated).build();
 
@@ -378,10 +378,10 @@ public class PartyDetailsChangedUtilTest {
                 .setPrimaryAddress(address("123 Main St", "City", "Country"))
                 ;
 
-            CaseData caseDataCurrent = CaseData.builder()
+            CaseData caseDataCurrent = new CaseData()
                 .respondent1(litigant)
                 .respondent1LitigationFriend(current).build();
-            CaseData caseDataUpdated = CaseData.builder()
+            CaseData caseDataUpdated = new CaseData()
                 .respondent1(litigant)
                 .respondent1LitigationFriend(updated).build();
 
@@ -407,8 +407,8 @@ public class PartyDetailsChangedUtilTest {
                 .setPrimaryAddress(address("123 Main St", "City", "Country"))
                 ;
 
-            CaseData caseDataCurrent = CaseData.builder().respondent2LitigationFriend(current).build();
-            CaseData caseDataUpdated = CaseData.builder().respondent2LitigationFriend(updated).build();
+            CaseData caseDataCurrent = new CaseData().respondent2LitigationFriend(current).build();
+            CaseData caseDataUpdated = new CaseData().respondent2LitigationFriend(updated).build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
@@ -437,10 +437,10 @@ public class PartyDetailsChangedUtilTest {
             .setHasSameAddressAsLitigant(YesOrNo.YES)
             ;
 
-        CaseData caseDataCurrent = CaseData.builder()
+        CaseData caseDataCurrent = new CaseData()
             .respondent2(litigant)
             .respondent2LitigationFriend(current).build();
-        CaseData caseDataUpdated = CaseData.builder()
+        CaseData caseDataUpdated = new CaseData()
             .respondent2(litigant)
             .respondent2LitigationFriend(updated).build();
 
@@ -469,10 +469,10 @@ public class PartyDetailsChangedUtilTest {
             .setPrimaryAddress(address("123 Main St", "City", "Country"))
             ;
 
-        CaseData caseDataCurrent = CaseData.builder()
+        CaseData caseDataCurrent = new CaseData()
             .respondent2(litigant)
             .respondent2LitigationFriend(current).build();
-        CaseData caseDataUpdated = CaseData.builder()
+        CaseData caseDataUpdated = new CaseData()
             .respondent2(litigant)
             .respondent2LitigationFriend(updated).build();
 

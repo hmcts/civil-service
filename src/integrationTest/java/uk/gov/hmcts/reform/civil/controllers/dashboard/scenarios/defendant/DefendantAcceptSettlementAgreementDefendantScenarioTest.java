@@ -25,7 +25,7 @@ public class DefendantAcceptSettlementAgreementDefendantScenarioTest extends Das
 
         String caseId = "1234899102";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .caseDataLiP(
                 new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.YES
                 )

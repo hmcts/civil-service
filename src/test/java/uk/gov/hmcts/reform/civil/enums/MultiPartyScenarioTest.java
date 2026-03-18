@@ -34,7 +34,7 @@ class MultiPartyScenarioTest {
     }
 
     private static CaseData get2V1CaseData() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(new PartyBuilder().build())
             .applicant1(new PartyBuilder().build())
             .addApplicant2(YesOrNo.YES)
@@ -45,7 +45,7 @@ class MultiPartyScenarioTest {
 
     @Test
     void shouldReturnOneVTwoTwoRepWhenTwoRespondentsRepresentedByDifferentReps() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(new PartyBuilder().build())
             .respondent2(new PartyBuilder().build())
             .respondent2SameLegalRepresentative(YesOrNo.NO)
@@ -65,7 +65,7 @@ class MultiPartyScenarioTest {
     }
 
     private static CaseData getOneVTwoTwoLegalRepCaseData() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(new PartyBuilder().build())
             .respondent2(new PartyBuilder().build())
             .applicant1(new PartyBuilder().build())
@@ -75,7 +75,7 @@ class MultiPartyScenarioTest {
 
     @Test
     void shouldReturnOneVTwoOneRepWhenTwoRespondentsRepresentedBySameReps() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(new PartyBuilder().build())
             .respondent2(new PartyBuilder().build())
             .addRespondent2(YesOrNo.YES)
@@ -107,7 +107,7 @@ class MultiPartyScenarioTest {
     }
 
     private static CaseData get1V1CaseData() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(new PartyBuilder().build())
             .applicant1(new PartyBuilder().build())
             .build();
@@ -157,7 +157,7 @@ class MultiPartyScenarioTest {
     }
 
     private static CaseData get1V2CaseData() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1(new PartyBuilder().build())
             .respondent2(new PartyBuilder().build())
             .addRespondent2(YesOrNo.YES)

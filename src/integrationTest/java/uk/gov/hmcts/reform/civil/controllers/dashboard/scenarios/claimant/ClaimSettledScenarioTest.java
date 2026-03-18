@@ -36,7 +36,7 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
                                        .setApplicant1SignedSettlementAgreement(YesOrNo.YES));
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

@@ -100,7 +100,7 @@ class DocumentRemovalServiceTest {
 
         @Test
         void testGetCaseDocumentsList_EmptyObject() {
-            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(CaseData.builder()
+            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(new CaseData()
                 .ccdCaseReference(CASE_ID)
                 .build());
             assertEquals(0, result.size());
@@ -108,7 +108,7 @@ class DocumentRemovalServiceTest {
 
         @Test
         void testGetCaseDocumentsList_RootDocument() {
-            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(CaseData.builder()
+            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(new CaseData()
                 .ccdCaseReference(CASE_ID)
                 .decisionOnReconsiderationDocument(buildCaseDocument(
                     "https://example.com/123", "Form-C.pdf", "https://example.com/binary", FIRST_DATE, "user"))
@@ -123,7 +123,7 @@ class DocumentRemovalServiceTest {
 
         @Test
         void testGetCaseDocumentsList_withDuplicateDocument() {
-            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(CaseData.builder()
+            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(new CaseData()
                 .ccdCaseReference(CASE_ID)
                 .decisionOnReconsiderationDocument(buildCaseDocument(
                     "https://example.com/123", "Form-C.pdf", "https://example.com/binary", FIRST_DATE, "user"))
@@ -147,7 +147,7 @@ class DocumentRemovalServiceTest {
             claimantResponseDocuments.add(element(buildCaseDocument(
                 "https://example2.com/456", "Form-D.pdf", "https://example2.com/binary", null, "user")));
 
-            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(CaseData.builder()
+            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(new CaseData()
                 .ccdCaseReference(CASE_ID)
                 .claimantResponseDocuments(claimantResponseDocuments)
                 .build());
@@ -184,7 +184,7 @@ class DocumentRemovalServiceTest {
 
             List<Element<DocumentWithName>> documentsList = wrapElements(documentWithName1, documentWithName2, documentWithName3);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
                 .documentAndNameToAdd(documentsList)
                 .build();
@@ -229,7 +229,7 @@ class DocumentRemovalServiceTest {
             claimantResponseDocuments.add(element(buildCaseDocument(
                 "https://example5.com/131415", "NullDoc.pdf", "https://example5.com/binary", null, "user")));
 
-            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(CaseData.builder()
+            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(new CaseData()
                 .ccdCaseReference(CASE_ID)
                 .documentAndName(documentsList)
                 .claimantResponseDocuments(claimantResponseDocuments)
@@ -264,7 +264,7 @@ class DocumentRemovalServiceTest {
             claimantResponseDocuments.add(element(buildCaseDocument(
                 "https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null, "user")));
 
-            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(CaseData.builder()
+            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(new CaseData()
                 .ccdCaseReference(CASE_ID)
                 .claimantResponseDocuments(claimantResponseDocuments)
                 .build());
@@ -279,7 +279,7 @@ class DocumentRemovalServiceTest {
             claimantResponseDocuments.add(element(buildCaseDocument(
                 "https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null, "Civil")));
 
-            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(CaseData.builder()
+            List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(new CaseData()
                 .ccdCaseReference(CASE_ID)
                 .claimantResponseDocuments(claimantResponseDocuments)
                 .build());
@@ -293,7 +293,7 @@ class DocumentRemovalServiceTest {
     class RemoveDocuments {
         @Test
         void testRemoveDocuments_NoDocuments() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .allPartyNames("Some Name")
                 .build();
             DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
@@ -304,7 +304,7 @@ class DocumentRemovalServiceTest {
 
         @Test
         void testRemoveDocuments_TopLevelDoc() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .ccdCaseReference(CASE_ID)
                 .decisionOnReconsiderationDocument(buildCaseDocument(
                     "https://example1.com/123", "Decision On Reconsideration Doc.pdf", "https://example1.com/binary", null, "user"))
@@ -335,7 +335,7 @@ class DocumentRemovalServiceTest {
 
             claimantResponseDocuments.add(element(buildCaseDocument(
                 "https://example2.com/456", "Form-D.pdf", "https://example2.com/binary", null, "user")));
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .ccdCaseReference(CASE_ID)
                 .claimantResponseDocuments(claimantResponseDocuments)
                 .documentToKeepCollection(List.of(new DocumentToKeepCollection()
@@ -363,7 +363,7 @@ class DocumentRemovalServiceTest {
 
             claimantResponseDocuments.add(element(buildCaseDocument(
                 "https://example2.com/456", "Form-D.pdf", "https://example2.com/binary", null, "user")));
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .ccdCaseReference(CASE_ID)
                 .claimantResponseDocuments(claimantResponseDocuments)
                 .documentToKeepCollection(
@@ -395,7 +395,7 @@ class DocumentRemovalServiceTest {
 
             List<Element<DocumentWithName>> documentsList = wrapElements(documentWithName1, documentWithName2);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
                 .documentAndNameToAdd(documentsList)
                 .documentToKeepCollection(List.of(new DocumentToKeepCollection()
@@ -415,7 +415,7 @@ class DocumentRemovalServiceTest {
 
         @Test
         void shouldFlagSystemGeneratedRemoveDocuments_TopLevelDoc() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .ccdCaseReference(CASE_ID)
                 .decisionOnReconsiderationDocument(buildCaseDocument(
                     "https://example1.com/123", "Decision On Reconsideration Doc.pdf", "https://example1.com/binary", null, "Civil"))
@@ -450,7 +450,7 @@ class DocumentRemovalServiceTest {
                         .setDocumentBinaryUrl("https://example1.com/1234/binary")
                         .setDocumentFileName("Trial-Bundle.pdf")))));
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .ccdCaseReference(CASE_ID)
                 .caseBundles(bundles)
                 .documentToKeepCollection(List.of(new DocumentToKeepCollection()

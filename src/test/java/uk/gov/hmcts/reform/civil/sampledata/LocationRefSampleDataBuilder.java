@@ -39,7 +39,7 @@ public class LocationRefSampleDataBuilder {
     protected static final LocalDate APP_DATE_EPOCH = EPOCH;
 
     protected CaseData getTestCaseData(CaseData caseData) {
-        return caseData.toBuilder()
+        return caseData.copy()
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
                 .generalAppPBADetails(new GAPbaDetails())
@@ -104,7 +104,7 @@ public class LocationRefSampleDataBuilder {
         } else {
             gaUrgencyRequirement.setGeneralAppUrgency(NO);
         }
-        return caseData.toBuilder()
+        return caseData.copy()
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
                 .generalAppPBADetails(new GAPbaDetails())
@@ -177,7 +177,7 @@ public class LocationRefSampleDataBuilder {
         builder.setTrialDateFrom(trialDateFrom);
         builder.setTrialDateTo(trialDateTo);
         builder.setGeneralAppUnavailableDates(unavailabilityDates);
-        return getTestCaseData(CaseDataBuilder.builder().build()).toBuilder()
+        return getTestCaseData(CaseDataBuilder.builder().build()).copy()
                 .generalAppHearingDetails(builder)
                 .build();
     }
@@ -259,7 +259,7 @@ public class LocationRefSampleDataBuilder {
                                         .setHearingPreferencesPreferredType(IN_PERSON)
                                         .setUnavailableTrialRequiredYesOrNo(YES)
                                         .setSupportRequirementLanguageInterpreter(STRING_CONSTANT));
-        return getTestCaseData(caseData).toBuilder()
+        return getTestCaseData(caseData).copy()
                 .generalApplications(wrapElements(application))
                 .build();
     }

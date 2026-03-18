@@ -47,7 +47,7 @@ public class ExtendResponseDeadlineClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenBilingual() {
-        CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference(BOTH.toString()).build();
+        CaseData caseData = new CaseData().claimantBilingualLanguagePreference(BOTH.toString()).build();
 
         when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(true);
         String expectedTemplateId = "template-id";
@@ -61,7 +61,7 @@ public class ExtendResponseDeadlineClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenNotBilingual() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getClaimantLipDeadlineExtension()).thenReturn(expectedTemplateId);
@@ -76,7 +76,7 @@ public class ExtendResponseDeadlineClaimantEmailDTOGeneratorTest {
         Party claimant = new Party().setCompanyName("Claimant Name").setType(Party.Type.COMPANY);
         Party defendant = new Party().setCompanyName("Defendant Name").setType(Party.Type.COMPANY);
         LocalDateTime responseDeadline = LocalDateTime.of(2025, 6, 20, 0, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(claimant)
             .respondent1(defendant)
             .respondent1ResponseDeadline(responseDeadline)
@@ -109,7 +109,7 @@ public class ExtendResponseDeadlineClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnDefaultTemplateIdWhenBilingualButToggleIsOff() {
-        CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference(BOTH.toString()).build();
+        CaseData caseData = new CaseData().claimantBilingualLanguagePreference(BOTH.toString()).build();
         String defaultTemplateId = "default-template";
 
         when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(false);

@@ -42,7 +42,7 @@ public class DefendantChangeOfAddressAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplate() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getRespondentChangeOfAddressNotificationTemplate()).thenReturn(expectedTemplateId);
@@ -62,7 +62,7 @@ public class DefendantChangeOfAddressAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectCustomProperties() {
         Party party = new Party();
-        CaseData caseData = CaseData.builder().respondent1(party).build();
+        CaseData caseData = new CaseData().respondent1(party).build();
 
         String legalOrg = "legal org";
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
@@ -86,25 +86,25 @@ public class DefendantChangeOfAddressAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyWhenApplicantIsRepresentedAndNotSpecAoSApplicantCorrespondenceAddressRequire() {
-        CaseData caseData = CaseData.builder().applicant1Represented(YES).specAoSApplicantCorrespondenceAddressRequired(NO).build();
+        CaseData caseData = new CaseData().applicant1Represented(YES).specAoSApplicantCorrespondenceAddressRequired(NO).build();
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isTrue();
     }
 
     @Test
     void shouldNotNotifyWhenApplicantIsNotRepresented() {
-        CaseData caseData = CaseData.builder().applicant1Represented(NO).specAoSApplicantCorrespondenceAddressRequired(NO).build();
+        CaseData caseData = new CaseData().applicant1Represented(NO).specAoSApplicantCorrespondenceAddressRequired(NO).build();
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
     }
 
     @Test
     void shouldNotNotifyWhenSpecAoSApplicantCorrespondenceAddressRequire() {
-        CaseData caseData = CaseData.builder().applicant1Represented(YES).specAoSApplicantCorrespondenceAddressRequired(YES).build();
+        CaseData caseData = new CaseData().applicant1Represented(YES).specAoSApplicantCorrespondenceAddressRequired(YES).build();
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
     }
 
     @Test
     void shouldNotNotifyWhenApplicantIsNotRepresentedAndSpecAoSApplicantCorrespondenceAddressRequire() {
-        CaseData caseData = CaseData.builder().applicant1Represented(NO).specAoSApplicantCorrespondenceAddressRequired(YES).build();
+        CaseData caseData = new CaseData().applicant1Represented(NO).specAoSApplicantCorrespondenceAddressRequired(YES).build();
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
     }
 }

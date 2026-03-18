@@ -62,7 +62,7 @@ public class FullDefenceProceedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .takenOfflineByStaff()
-            .build().toBuilder()
+            .build().copy()
             .drawDirectionsOrderRequired(YES).build();
 
         assertFalse(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeSdo).test(caseData));

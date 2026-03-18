@@ -46,7 +46,7 @@ public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
 
     CallbackResponse generatePayload(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseData caseDataBuilder = caseData.copy();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
         if (SEND_JUDGMENT_DETAILS_CJES.equals(caseEvent)) {

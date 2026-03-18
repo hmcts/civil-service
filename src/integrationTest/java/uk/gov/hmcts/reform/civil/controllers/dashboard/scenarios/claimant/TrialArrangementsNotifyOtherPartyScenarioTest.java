@@ -43,7 +43,7 @@ public class TrialArrangementsNotifyOtherPartyScenarioTest extends DashboardBase
 
     private CaseData createCaseData(String caseId, YesOrNo applicant1Represented) {
         return CaseDataBuilder.builder().atStateAwaitingResponseNotFullDefenceReceived().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(applicant1Represented)

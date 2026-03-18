@@ -58,7 +58,7 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
         PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
         return CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingFeePaymentDetails(paymentDetails)
@@ -69,7 +69,7 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
         PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
         return CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .trialReadyApplicant(null)
@@ -84,7 +84,7 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
     private CaseData buildCaseDataWithHearingFee(String caseId) {
         return CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .trialReadyApplicant(null)

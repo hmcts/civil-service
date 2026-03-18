@@ -33,7 +33,7 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
         LocalDate paymentDate = LocalDate.of(2024, 3, 27);
         LocalDate deadline = LocalDate.of(2024, 7, 25);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
-            .toBuilder()
+            .copy()
             .responseClaimTrack("SMALL_CLAIM")
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
@@ -92,7 +92,7 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
         LocalDate deadline = LocalDate.of(2024, 7, 25);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .responseClaimTrack("SMALL_CLAIM")
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))

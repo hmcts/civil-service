@@ -17,7 +17,7 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldReturnClaimantSolicitorEmailWhenRepresented() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .applicant1Represented(YesOrNo.YES)
             .applicantSolicitor1UserDetails(userDetails("solicitor@example.com"))
             .build();
@@ -27,7 +27,7 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldReturnClaimantLipEmailWhenUnrepresented() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .applicant1Represented(YesOrNo.NO)
             .claimantUserDetails(userDetails("applicant@example.com"))
             .build();
@@ -37,7 +37,7 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldReturnRespondent1SolicitorEmail() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YesOrNo.YES)
             .respondentSolicitor1EmailAddress("respondentsolicitor@example.com")
             .build();
@@ -47,7 +47,7 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldReturnRespondent1LipEmail() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YesOrNo.NO)
             .defendantUserDetails(userDetails("defendant@example.com"))
             .build();
@@ -57,7 +57,7 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldReturnSharedSolicitorEmailForRespondent2WhenOneLegalRep() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1EmailAddress("sharedsolicitor@example.com")
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .respondent2(new PartyBuilder().individual().build())
@@ -68,7 +68,7 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldReturnRespondent2SolicitorEmailWhenRepresentedSeparately() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent2Represented(YesOrNo.YES)
             .respondentSolicitor2EmailAddress("respondentsolicitor2@example.com")
             .respondent2(new PartyBuilder().individual().build())
@@ -80,7 +80,7 @@ class DjNotificationRecipientServiceTest {
     @Test
     void shouldRequireSelectionForRespondent1Notification() {
         var respondent1 = new PartyBuilder().individual().build();
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YesOrNo.YES)
             .respondent1(respondent1)
             .respondentSolicitor1EmailAddress("respondentsolicitor@example.com")
@@ -93,7 +93,7 @@ class DjNotificationRecipientServiceTest {
     @Test
     void shouldRespectBothDefendantsSelection() {
         var respondent1 = new PartyBuilder().individual().build();
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent1Represented(YesOrNo.YES)
             .respondent1(respondent1)
             .respondentSolicitor1EmailAddress("respondentsolicitor@example.com")
@@ -108,7 +108,7 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldRequireRespondent2FlagBeforeNotifyingSecondRespondent() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().build().copy()
             .respondent2(new PartyBuilder().individual().build())
             .defendantDetails(dynamicSelection("Mr. John Rambo"))
             .addRespondent2(YesOrNo.NO)

@@ -26,7 +26,7 @@ public class ClaimantResponseNotAgreedRepaymentRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyDefendantLrTemplate()).thenReturn(expectedTemplateId);
 

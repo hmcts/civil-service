@@ -24,7 +24,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
     @Test
     public void canEnterOnce() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         CallbackParams params = new CallbackParams()
             .caseData(caseData)
@@ -39,7 +39,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
         BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
         breathingInfo.setEnter(enterInfo);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setBreathing(breathingInfo);
 
         CallbackParams params = new CallbackParams()
@@ -56,7 +56,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         enterInfo.setStart(LocalDate.now().plusDays(1));
         BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
         breathingInfo.setEnter(enterInfo);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setBreathing(breathingInfo);
 
         CallbackParams params = new CallbackParams()
@@ -74,7 +74,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         enterInfo.setStart(LocalDate.now());
         BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
         breathingInfo.setEnter(enterInfo);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setBreathing(breathingInfo);
 
         CallbackParams params = new CallbackParams()
@@ -92,7 +92,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         enterInfo.setExpectedEnd(LocalDate.now());
         BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
         breathingInfo.setEnter(enterInfo);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setBreathing(breathingInfo);
 
         CallbackParams params = new CallbackParams()
@@ -110,7 +110,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         enterInfo.setExpectedEnd(LocalDate.now().plusDays(1));
         BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
         breathingInfo.setEnter(enterInfo);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setBreathing(breathingInfo);
 
         CallbackParams params = new CallbackParams()
@@ -125,7 +125,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void whenSubmitted_thenIncludeHeader() {
         String claimNumber = "claim number";
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         caseData.setLegacyCaseReference(claimNumber);
 
         CallbackParams params = new CallbackParams()
@@ -138,7 +138,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
     @Test
     void testAboutToSubmitCallback() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         CallbackParams params = new CallbackParams()
             .caseData(caseData)

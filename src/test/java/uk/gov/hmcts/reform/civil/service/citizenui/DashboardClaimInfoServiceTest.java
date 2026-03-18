@@ -124,7 +124,7 @@ public class DashboardClaimInfoServiceTest {
         SearchResult searchResult = SearchResult.builder().total(cases.size()).cases(cases).build();
         given(coreCaseDataService.getCCDClaimsForLipDefendant(any(), eq(0))).willReturn(searchResult);
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
-            .willReturn(CaseData.builder()
+            .willReturn(new CaseData()
                             .applicant1(new Party()
                                             .setIndividualFirstName("Harry")
                                             .setIndividualLastName("Porter")
@@ -138,7 +138,7 @@ public class DashboardClaimInfoServiceTest {
                             .build());
 
         given(caseDetailsConverter.toCaseData(CASE_DETAILS_2))
-            .willReturn(CaseData.builder()
+            .willReturn(new CaseData()
                             .applicant1(new Party()
                                             .setIndividualFirstName("Tom")
                                             .setIndividualLastName("Cruise")
@@ -197,7 +197,7 @@ public class DashboardClaimInfoServiceTest {
 
     @Test
     void shouldIncludeResponseDeadlineIfItExists() {
-        given(caseDetailsConverter.toCaseData(CASE_DETAILS)).willReturn(CaseData.builder()
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS)).willReturn(new CaseData()
                                                                             .applicant1(new Party()
                                                                                             .setIndividualFirstName("Harry")
                                                                                             .setIndividualLastName("Porter")
@@ -224,7 +224,7 @@ public class DashboardClaimInfoServiceTest {
     @Test
     void shouldIncludePaymentDateWhenItExists() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
-            .willReturn(CaseData.builder()
+            .willReturn(new CaseData()
                             .applicant1(new Party()
                                             .setIndividualFirstName("Harry")
                                             .setIndividualLastName("Porter")
@@ -253,7 +253,7 @@ public class DashboardClaimInfoServiceTest {
     @Test
     void shouldIncludeCcjCreationDateDateWhenItExists() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
-            .willReturn(CaseData.builder()
+            .willReturn(new CaseData()
                             .applicant1(new Party()
                                             .setIndividualFirstName("Harry")
                                             .setIndividualLastName("Porter")
@@ -278,7 +278,7 @@ public class DashboardClaimInfoServiceTest {
     @Test
     void shouldIncludeCcjCreationDateDateForCcjJourneyWhenActiveJudgmentNotExist() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
-            .willReturn(CaseData.builder()
+            .willReturn(new CaseData()
                             .applicant1(new Party()
                                             .setIndividualFirstName("Harry")
                                             .setIndividualLastName("Porter")
@@ -307,7 +307,7 @@ public class DashboardClaimInfoServiceTest {
     @Test
     void shouldGetThePartPaymentImmediateValue() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
-            .willReturn(CaseData.builder()
+            .willReturn(new CaseData()
                             .applicant1(new Party()
                                             .setIndividualFirstName("Harry")
                                             .setIndividualLastName("Porter")
@@ -399,7 +399,7 @@ public class DashboardClaimInfoServiceTest {
                 .createdDate(createdDate)
                 .build();
             caseDetailsList.add(caseDetail);
-            CaseData caseData = CaseData.builder().submittedDate(createdDate).build();
+            CaseData caseData = new CaseData().submittedDate(createdDate).build();
             given(caseDetailsConverter.toCaseData(caseDetail)).willReturn(caseData);
 
         }
@@ -425,7 +425,7 @@ public class DashboardClaimInfoServiceTest {
     void shouldTranslateSubmitDateToCreateDate() {
         LocalDateTime now = LocalDateTime.now();
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
-            .willReturn(CaseData.builder()
+            .willReturn(new CaseData()
                             .submittedDate(now)
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
@@ -440,7 +440,7 @@ public class DashboardClaimInfoServiceTest {
     @Test
     void shouldIncludeDefaultJudgementIssuedDate() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
-            .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1)).activeJudgment(
+            .willReturn(new CaseData().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1)).activeJudgment(
                     new JudgmentDetails().setIssueDate(LocalDate.now()).setState(JudgmentState.ISSUED)
                         .setType(JudgmentType.DEFAULT_JUDGMENT))
                             .build());
@@ -456,7 +456,7 @@ public class DashboardClaimInfoServiceTest {
     @Test
     void shouldIncludeDefaultJudgementIssuedDate_WhenJOFlagIsOff() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
-            .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
+            .willReturn(new CaseData().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
                             .defaultJudgmentDocuments(List.of(
                                 new Element<CaseDocument>().setValue(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
                                                .setCreatedDatetime(LocalDateTime.now()))))

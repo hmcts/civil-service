@@ -142,7 +142,7 @@ class AcknowledgementOfClaimGeneratorTest {
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_1v2, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
             .thenReturn(CASE_DOCUMENT_1V2);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)
@@ -195,7 +195,7 @@ class AcknowledgementOfClaimGeneratorTest {
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(NO)
@@ -247,7 +247,7 @@ class AcknowledgementOfClaimGeneratorTest {
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .respondent2(new PartyBuilder().individual().build())
             .respondent1AcknowledgeNotificationDate(null)
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
@@ -301,7 +301,7 @@ class AcknowledgementOfClaimGeneratorTest {
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .applicant2(new PartyBuilder().individual().build())
             .respondent1AcknowledgeNotificationDate(null)
             .addApplicant2(YES)
@@ -351,7 +351,7 @@ class AcknowledgementOfClaimGeneratorTest {
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .respondent2(new PartyBuilder().individual().build())
             .respondent1AcknowledgeNotificationDate(LocalDateTime.now())
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now().plusDays(1))
@@ -379,7 +379,7 @@ class AcknowledgementOfClaimGeneratorTest {
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .respondent2(new PartyBuilder().individual().build())
             .respondent1AcknowledgeNotificationDate(LocalDateTime.now().plusDays(1))
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
@@ -402,7 +402,7 @@ class AcknowledgementOfClaimGeneratorTest {
 
         @Test
         void whenCaseIsAtClaimAcknowledge_shouldGetAcknowledgementOfClaimFormData() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .respondent1LitigationFriend(new LitigationFriend().setFullName("LF name"))
                 .build();
 

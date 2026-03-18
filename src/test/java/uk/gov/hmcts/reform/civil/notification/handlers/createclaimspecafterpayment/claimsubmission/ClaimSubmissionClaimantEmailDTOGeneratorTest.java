@@ -31,7 +31,7 @@ class ClaimSubmissionClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         when(notificationsProperties.getNotifyClaimantLipForClaimSubmissionTemplate()).thenReturn(TEMPLATE_ID);
 
         String templateId = generator.getEmailTemplateId(caseData);
@@ -50,7 +50,7 @@ class ClaimSubmissionClaimantEmailDTOGeneratorTest {
     void shouldAddCustomProperties() {
         Party respondent = new Party().setCompanyName("Respondent").setType(Party.Type.COMPANY);
         Party claimant = new Party().setCompanyName("Claimant").setType(Party.Type.COMPANY);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .respondent1(respondent)
                 .applicant1(claimant)
                 .build();

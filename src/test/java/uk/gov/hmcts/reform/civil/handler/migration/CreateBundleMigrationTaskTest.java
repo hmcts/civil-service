@@ -30,7 +30,7 @@ class CreateBundleMigrationTaskTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder().build();
+        caseData = new CaseData().build();
         caseReference = excelCaseReference("1234567890123456");
     }
 

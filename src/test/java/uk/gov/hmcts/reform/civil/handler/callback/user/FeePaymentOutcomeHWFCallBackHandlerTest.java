@@ -103,7 +103,7 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
             feePaymentDetails.setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES);
             HelpWithFeesDetails hearingHwfDetails = new HelpWithFeesDetails();
             hearingHwfDetails.setHwfCaseEvent(FEE_PAYMENT_OUTCOME);
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
             caseData.setFeePaymentOutcomeDetails(feePaymentDetails);
             caseData.setHearingHwfDetails(hearingHwfDetails);
             caseData.setHwfFeeType(FeeType.HEARING);
@@ -127,7 +127,7 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
             feePaymentDetails.setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES);
             HelpWithFeesDetails hearingHwfDetails = new HelpWithFeesDetails();
             hearingHwfDetails.setOutstandingFeeInPounds(BigDecimal.valueOf(100.00));
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
             caseData.setFeePaymentOutcomeDetails(feePaymentDetails);
             caseData.setHwfFeeType(FeeType.HEARING);
             caseData.setHearingHwfDetails(hearingHwfDetails);
@@ -147,7 +147,7 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
             feePaymentDetails.setHwfFullRemissionGrantedForClaimIssue(YesOrNo.YES);
             HelpWithFeesDetails claimIssuedHwfDetails = new HelpWithFeesDetails();
             claimIssuedHwfDetails.setOutstandingFeeInPounds(BigDecimal.valueOf(100.00));
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
             caseData.setFeePaymentOutcomeDetails(feePaymentDetails);
             caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
@@ -161,7 +161,7 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
 
         @Test
         void shouldUpdateBusinessProcess_WhenFeeType_ClaimIssue() {
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = new CaseData().build();
             caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             when(hwfService.updateHwfReferenceNumber(any(CaseData.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));

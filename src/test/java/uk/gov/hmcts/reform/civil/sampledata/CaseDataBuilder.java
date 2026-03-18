@@ -5543,7 +5543,7 @@ public class CaseDataBuilder {
         for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
             for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
                 if (!r1.equals(r2)) {
-                    cases.add(CaseData.builder()
+                    cases.add(new CaseData()
                         .applicant1(applicant1)
                         .applicant2(applicant2)
                         .claimant1ClaimResponseTypeForSpec(r1)
@@ -5823,7 +5823,7 @@ public class CaseDataBuilder {
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(100)).setCode("CODE"))
             .claimIssuedPBADetails(
@@ -5840,7 +5840,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildCuiCaseDataWithFee() {
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(100)).setCode("CODE"))
             .build();
@@ -5849,7 +5849,7 @@ public class CaseDataBuilder {
     public CaseData buildMakePaymentsCaseDataWithoutClaimIssuedPbaDetails() {
         Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .build();
@@ -5858,7 +5858,7 @@ public class CaseDataBuilder {
     public CaseData buildMakePaymentsCaseDataWithoutServiceRequestReference() {
         Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .claimIssuedPBADetails(
                 new SRPbaDetails()
@@ -5875,7 +5875,7 @@ public class CaseDataBuilder {
     public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails() {
         Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .claimIssuedPBADetails(
                 new SRPbaDetails()
@@ -5900,7 +5900,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData withHearingFeePBADetailsPaymentFailed() {
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .hearingFeePBADetails(new SRPbaDetails()
                 .setFee(
@@ -5917,7 +5917,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData withHearingFeePBADetailsPaymentSuccess() {
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .hearingFeePBADetails(new SRPbaDetails()
                 .setFee(
@@ -5934,7 +5934,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData withHearingFeePBADetailsNoPaymentStatus() {
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .claimValue(new ClaimValue()
                 .setStatementOfValueInPennies(BigDecimal.valueOf(10800)))
@@ -5947,7 +5947,7 @@ public class CaseDataBuilder {
     public CaseData buildMakePaymentsCaseDataWithHearingDate() {
         Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .claimIssuedPBADetails(
                 new SRPbaDetails()
@@ -5967,7 +5967,7 @@ public class CaseDataBuilder {
     public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithoutClaimIssuedPbaDetails() {
         Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .claimIssuedPBADetails(
                 new SRPbaDetails()
@@ -5987,7 +5987,7 @@ public class CaseDataBuilder {
     public CaseData buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .hearingDueDate(LocalDate.now().plusWeeks(2))
@@ -5997,7 +5997,7 @@ public class CaseDataBuilder {
     public CaseData buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .claimIssuedPBADetails(
                 new SRPbaDetails()
@@ -6024,7 +6024,7 @@ public class CaseDataBuilder {
     public CaseData buildClaimIssuedPaymentCaseData() {
         Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdState(PENDING_CASE_ISSUED)
             .claimFee(
@@ -6043,7 +6043,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildClaimIssuedPaymentCaseDataWithPba(String pbaAccountNumber) {
-        return this.buildClaimIssuedPaymentCaseData().toBuilder()
+        return this.buildClaimIssuedPaymentCaseData().copy()
             .applicantSolicitor1PbaAccounts(new DynamicList().setValue(DynamicListElement.dynamicElement(pbaAccountNumber)))
             .paymentReference("RC-1234-1234-1234-1234")
             .build();
@@ -6052,7 +6052,7 @@ public class CaseDataBuilder {
     public CaseData buildPaymentFailureCaseData() {
         Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -6078,7 +6078,7 @@ public class CaseDataBuilder {
     public CaseData buildPaymentSuccessfulCaseData() {
         Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -6106,7 +6106,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildJudmentOnlineCaseDataWithPaymentByInstalment() {
-        return build().toBuilder()
+        return build().copy()
             .ccdState(All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .respondent1(new PartyBuilder().individual().build())
@@ -6123,7 +6123,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildJudgmentOnlineCaseDataWithDeterminationMeans() {
-        return build().toBuilder()
+        return build().copy()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .respondent1(new PartyBuilder().individual().build())
             .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
@@ -6139,13 +6139,13 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildJudmentOnlineCaseDataWithConfirmationForReferToJudgeDefenceReceived() {
-        return build().toBuilder()
+        return build().copy()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .confirmReferToJudgeDefenceReceived(List.of(ConfirmationToggle.CONFIRM)).build();
     }
 
     public CaseData buildJudmentOnlineCaseDataWithPaymentImmediately() {
-        return build().toBuilder()
+        return build().copy()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
@@ -6166,7 +6166,7 @@ public class CaseDataBuilder {
         oldAddress.setPostCode("Line 1 test again for more than 35 characters");
         oldAddress.setPostTown("Line 1 test again for more than 35 characters");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdState(All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
@@ -6189,7 +6189,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate() {
-        return build().toBuilder()
+        return build().copy()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .respondent1(new PartyBuilder().organisation().build())
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
@@ -6205,7 +6205,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party() {
-        return build().toBuilder()
+        return build().copy()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .respondent1(new PartyBuilder().organisation().build())
             .addRespondent2(YES)
@@ -6227,7 +6227,7 @@ public class CaseDataBuilder {
         paidInFull.setDateOfFullPaymentMade(LocalDate.now().plusDays(35));
         paidInFull.setConfirmFullPaymentMade(List.of("CONFIRMED"));
 
-        return build().toBuilder()
+        return build().copy()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .respondent1(new PartyBuilder().soleTrader().build())
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
@@ -6244,7 +6244,7 @@ public class CaseDataBuilder {
         paidInFull.setDateOfFullPaymentMade(LocalDate.now().plusDays(15));
         paidInFull.setConfirmFullPaymentMade(List.of("CONFIRMED"));
 
-        return build().toBuilder()
+        return build().copy()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .respondent1(new PartyBuilder().soleTrader().build())
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
@@ -6287,7 +6287,7 @@ public class CaseDataBuilder {
 
     public CaseData getDefaultJudgment1v1Case() {
         atStateNotificationAcknowledged();
-        return build().toBuilder()
+        return build().copy()
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .partialPayment(YesOrNo.YES)
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
@@ -6301,7 +6301,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData getDefaultJudgment1v2DivergentCase() {
-        return CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        return CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .applicant1(new PartyBuilder().individual().build())
             .respondent1(new PartyBuilder().individual().build())
@@ -6323,7 +6323,7 @@ public class CaseDataBuilder {
         paidInFull.setDateOfFullPaymentMade(LocalDate.now().plusDays(15));
         paidInFull.setConfirmFullPaymentMade(List.of("CONFIRMED"));
 
-        return build().toBuilder()
+        return build().copy()
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .partialPayment(YesOrNo.YES)
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
@@ -7459,7 +7459,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData build() {
-        return CaseData.builder()
+        return new CaseData()
             // Create Claim
             .caseNameHmctsInternal(caseNameHmctsInternal)
             .legacyCaseReference(legacyCaseReference)

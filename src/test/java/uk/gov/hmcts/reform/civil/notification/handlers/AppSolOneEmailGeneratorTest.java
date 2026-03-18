@@ -43,7 +43,7 @@ class AppSolOneEmailGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailAddress() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("test@example.com"))
             .build();
 
@@ -54,7 +54,7 @@ class AppSolOneEmailGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
         notificationUtilsMockedStatic.when(() -> NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
             .thenReturn(APPLICANT_LEGAL_ORG_NAME);
@@ -68,7 +68,7 @@ class AppSolOneEmailGeneratorTest {
 
     @Test
     void shouldReturnNotifyAsTrue_WhenApplicantRepresented() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .applicant1Represented(YesOrNo.YES)
                 .build();
         Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
@@ -77,7 +77,7 @@ class AppSolOneEmailGeneratorTest {
 
     @Test
     void shouldReturnNotifyAsFalse_WhenApplicantIsLip() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
                 .applicant1Represented(YesOrNo.NO)
                 .build();
         Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);

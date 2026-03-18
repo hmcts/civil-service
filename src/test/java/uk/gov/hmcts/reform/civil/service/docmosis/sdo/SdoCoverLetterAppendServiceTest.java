@@ -107,7 +107,7 @@ class SdoCoverLetterAppendServiceTest {
     @Test
     void shouldGenerateMailableLetterSuccessfully() {
         // Given
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L).legacyCaseReference("MC0001").build();
+        CaseData caseData = new CaseData().ccdCaseReference(1L).legacyCaseReference("MC0001").build();
 
         // When
         byte[] mailableLetter = coverLetterAppendService.makeSdoDocumentMailable(caseData, BEARER_TOKEN, partyDetails, SDO_ORDER,

@@ -145,7 +145,7 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
             .build();
         caseData = caseData
-            .toBuilder()
+            .copy()
             .caseAccessCategory(SPEC_CLAIM)
             .build();
 

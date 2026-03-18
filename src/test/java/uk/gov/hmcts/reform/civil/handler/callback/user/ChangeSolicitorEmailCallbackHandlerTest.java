@@ -281,7 +281,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
-                .toBuilder()
+                .copy()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .build();
             caseData.setApplicantSolicitor1ServiceAddressRequired(YesOrNo.YES);
@@ -311,7 +311,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
-                .toBuilder()
+                .copy()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .build();
             caseData.setRespondentSolicitor1ServiceAddressRequired(YesOrNo.YES);
@@ -341,7 +341,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
-                .toBuilder()
+                .copy()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .build();
             caseData.setRespondentSolicitor2ServiceAddressRequired(YesOrNo.YES);
@@ -371,7 +371,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
-                .toBuilder()
+                .copy()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondentSolicitor2ServiceAddressRequired(YesOrNo.NO)
                 .respondentSolicitor2ServiceAddress(null)
@@ -439,7 +439,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             OrganisationPolicy applicantPolicy =
                 copyOrganisationPolicy(caseData.getApplicant1OrganisationPolicy())
                     .setOrgPolicyReference("new reference");
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .isApplicant1(YesOrNo.YES)
                 .applicant1OrganisationPolicy(applicantPolicy)
                 .build();
@@ -465,7 +465,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             OrganisationPolicy respondent1Policy =
                 copyOrganisationPolicy(caseData.getRespondent1OrganisationPolicy())
                     .setOrgPolicyReference("new reference");
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .isRespondent1(YesOrNo.YES)
                 .respondent1OrganisationPolicy(respondent1Policy)
                 .build();
@@ -491,7 +491,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             OrganisationPolicy respondent2Policy =
                 copyOrganisationPolicy(caseData.getRespondent2OrganisationPolicy())
                     .setOrgPolicyReference("new reference");
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .isRespondent2(YesOrNo.YES)
                 .respondent2OrganisationPolicy(respondent2Policy)
                 .build();

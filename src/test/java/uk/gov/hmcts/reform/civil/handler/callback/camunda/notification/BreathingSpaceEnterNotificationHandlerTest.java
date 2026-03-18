@@ -77,7 +77,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
                                         .setName(organisationName)
                                         ));
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("legacy ref")
             .ccdCaseReference(CASE_ID)
             .respondent1(new Party()
@@ -132,7 +132,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
                                         .setName(organisationName)
                                         ));
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("legacy ref")
             .ccdCaseReference(CASE_ID)
             .respondent2(new Party()
@@ -186,7 +186,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
             .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
                                         .setName(organisationName)));
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("legacy ref")
             .ccdCaseReference(CASE_ID)
             .respondent2(new Party()
@@ -243,7 +243,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
                                         .setName(organisationName)
                                         ));
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("legacy ref")
             .ccdCaseReference(CASE_ID)
             .respondent2(new Party()
@@ -296,7 +296,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
 
         String solicitorName = "solicitor name";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference("legacy ref")
             .ccdCaseReference(CASE_ID)
             .applicant1(new Party()

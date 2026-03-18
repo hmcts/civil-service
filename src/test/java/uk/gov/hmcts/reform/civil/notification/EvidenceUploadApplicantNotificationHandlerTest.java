@@ -70,13 +70,13 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
     private EvidenceUploadApplicantNotificationHandler handler;
 
     private CaseData createCaseDataWithText() {
-        return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .notificationText(EvidenceUploadApplicantNotificationHandlerTest.NOTIFICATION_TEXT)
             .build();
     }
 
     private CaseData createCaseDataForLip(String notificationText) {
-        return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
             .notificationText(notificationText)
             .applicant1Represented(YesOrNo.NO)
             .applicant1(new Party()
@@ -147,7 +147,7 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
-            CaseData caseData = createCaseDataForLip(NOTIFICATION_TEXT).toBuilder()
+            CaseData caseData = createCaseDataForLip(NOTIFICATION_TEXT).copy()
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .build();
             handler.notifyApplicantEvidenceUpload(caseData);

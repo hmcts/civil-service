@@ -25,7 +25,7 @@ public class StayCaseDefendantScenarioTest extends DashboardBaseIntegrationTest 
     void should_create_stay_case_defendant_scenario() throws Exception {
         String caseId = "720144638756912";
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .ccdState(CaseState.JUDICIAL_REFERRAL)

@@ -63,7 +63,7 @@ public class ClaimantResponseUtilsTest {
     @ParameterizedTest
     @CsvSource({"IMMEDIATELY,Immediately", "SET_DATE,By a set date", "REPAYMENT_PLAN,By instalments"})
     void shouldReturnClaimantRepaymentOption(PaymentType input, String expectedOutput) {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1RepaymentOptionForDefendantSpec(input)
             .build();
 
@@ -87,7 +87,7 @@ public class ClaimantResponseUtilsTest {
 
     @Test
     void shouldReturnDefendantFinalRepaymentDateWhenPartAdmission() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1RepaymentPlan(new RepaymentPlanLRspec().setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
                                           .setFirstRepaymentDate(LocalDate.of(2024, 1, 1))
                                           .setPaymentAmount(BigDecimal.valueOf(10000)))
@@ -105,7 +105,7 @@ public class ClaimantResponseUtilsTest {
     @Test
     void shouldReturnDefendantFinalRepaymentDateWhenFullAdmission() {
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1RepaymentPlan(new RepaymentPlanLRspec().setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
                                           .setFirstRepaymentDate(LocalDate.of(2024, 1, 1))
                                           .setPaymentAmount(new BigDecimal(10000)))
@@ -123,7 +123,7 @@ public class ClaimantResponseUtilsTest {
     @ParameterizedTest
     @CsvSource({"IMMEDIATELY,Immediately", "BY_SET_DATE,By a set date", "SUGGESTION_OF_REPAYMENT_PLAN,By instalments"})
     void shouldReturnDefendantRepaymentOption(RespondentResponsePartAdmissionPaymentTimeLRspec input, String expectedOutput) {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .defenceAdmitPartPaymentTimeRouteRequired(input)
             .build();
 
@@ -134,7 +134,7 @@ public class ClaimantResponseUtilsTest {
     @Test
     void shouldGetTheDefendantAdmittedAmount() {
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1RepaymentPlan(new RepaymentPlanLRspec().setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
                                           .setFirstRepaymentDate(LocalDate.of(2024, 1, 1))
                                           .setPaymentAmount(new BigDecimal(10000)))
@@ -151,7 +151,7 @@ public class ClaimantResponseUtilsTest {
     @Test
     void shouldGetTheDefendantAdmittedAmountWithFixedCosts() {
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1RepaymentPlan(new RepaymentPlanLRspec().setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
                 .setFirstRepaymentDate(LocalDate.of(2024, 1, 1))
                 .setPaymentAmount(new BigDecimal(10000)))
@@ -170,7 +170,7 @@ public class ClaimantResponseUtilsTest {
     @Test
     void shouldGetTheDefendantAdmittedAmountWhenPartAdmit() {
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .issueDate(LocalDate.now())
             .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(2000)))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -185,7 +185,7 @@ public class ClaimantResponseUtilsTest {
     @Test
     void shouldGetTheDefendantAdmittedAmountWhenHWF() {
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .issueDate(LocalDate.now())
             .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(2000)))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)

@@ -47,7 +47,7 @@ public class CjesMapperTest {
             .setDefendant1Dob(LocalDate.of(1980, 1, 1))
             .setDefendant1Address(createMockAddress());
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .ccdCaseReference(Long.valueOf(caseId))
             .legacyCaseReference(legacyCcdReference)
@@ -90,7 +90,7 @@ public class CjesMapperTest {
         String ccdReference = "reference";
         LocalDateTime now = LocalDateTime.now();
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(SPEC_CLAIM)
             .ccdCaseReference(Long.valueOf(caseId))
             .legacyCaseReference(ccdReference)
@@ -126,7 +126,7 @@ public class CjesMapperTest {
             .setDefendant2Dob(LocalDate.of(1990, 2, 2))
             .setDefendant2Address(createMockAddress());
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .ccdCaseReference(Long.valueOf(caseId))
             .legacyCaseReference(ccdReference)
@@ -174,7 +174,7 @@ public class CjesMapperTest {
             .setDefendant2Dob(LocalDate.of(1990, 2, 2))
             .setDefendant2Address(createMockAddress());
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseAccessCategory(UNSPEC_CLAIM)
             .ccdCaseReference(Long.valueOf(caseId))
             .legacyCaseReference(ccdReference)

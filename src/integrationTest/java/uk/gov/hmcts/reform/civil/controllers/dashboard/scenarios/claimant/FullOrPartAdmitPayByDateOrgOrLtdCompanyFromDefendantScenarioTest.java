@@ -33,7 +33,7 @@ public class FullOrPartAdmitPayByDateOrgOrLtdCompanyFromDefendantScenarioTest ex
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
@@ -88,7 +88,7 @@ public class FullOrPartAdmitPayByDateOrgOrLtdCompanyFromDefendantScenarioTest ex
         String caseId = "50321";
         LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
+            .copy()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)

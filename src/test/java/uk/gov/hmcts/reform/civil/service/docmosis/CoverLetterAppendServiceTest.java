@@ -122,7 +122,7 @@ class CoverLetterAppendServiceTest {
     @Test
     void shouldGenerateMailableLetterSuccessfullyForClaimant() {
         // Given
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+        CaseData caseData = new CaseData().ccdCaseReference(1L).build();
 
         // When
         byte[] mailableLetter = coverLetterAppendService.makeDocumentMailable(caseData, BEARER_TOKEN, CLAIMANT, SEALED_CLAIM,
@@ -139,7 +139,7 @@ class CoverLetterAppendServiceTest {
     @Test
     void shouldGenerateMailableLetterSuccessfullyForDefendant_forMultipleDocuments() {
         // Given
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+        CaseData caseData = new CaseData().ccdCaseReference(1L).build();
 
         // When
         byte[] downloadedLetter = coverLetterAppendService.makeDocumentMailable(caseData, BEARER_TOKEN, DEFENDANT, SEALED_CLAIM,
@@ -160,7 +160,7 @@ class CoverLetterAppendServiceTest {
         // Given
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(null, null, null));
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+        CaseData caseData = new CaseData().ccdCaseReference(1L).build();
 
         // Then
         assertThrows(DocumentDownloadException.class, () ->

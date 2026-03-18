@@ -138,7 +138,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
-            CaseData caseData = createCaseDataForLip(NOTIFICATION_TEXT).toBuilder()
+            CaseData caseData = createCaseDataForLip(NOTIFICATION_TEXT).copy()
                 .caseDataLiP(new CaseDataLiP()
                                  .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                              .setRespondent1ResponseLanguage(Language.BOTH.toString())))
@@ -164,7 +164,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
-            CaseData caseData = createCaseDataWithText(NOTIFICATION_TEXT).toBuilder()
+            CaseData caseData = createCaseDataWithText(NOTIFICATION_TEXT).copy()
                 .respondent2(new Party())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
@@ -202,13 +202,13 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
 
         private CaseData createCaseDataWithText(String notificationText) {
             return CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder()
+                .build().copy()
                 .notificationText(notificationText)
                 .build();
         }
 
         private CaseData createCaseDataForLip(String notificationText) {
-            return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().copy()
                 .notificationText(notificationText)
                 .respondent1Represented(YesOrNo.NO)
                 .respondent1(new Party()

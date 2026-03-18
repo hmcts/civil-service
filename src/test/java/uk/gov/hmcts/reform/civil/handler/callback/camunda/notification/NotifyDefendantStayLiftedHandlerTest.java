@@ -102,7 +102,7 @@ class NotifyDefendantStayLiftedHandlerTest {
         @ParameterizedTest
         @MethodSource("provideCaseData")
         void sendNotificationShouldSendEmail(boolean isDefendant2, CaseEvent caseEvent) {
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .respondentSolicitor1EmailAddress("defendant@hmcts.net")
                 .respondentSolicitor2EmailAddress("defendant2@hmcts.net")
                 .respondent1Represented(YesOrNo.YES)
@@ -167,7 +167,7 @@ class NotifyDefendantStayLiftedHandlerTest {
             return commonCaseData()
                 .respondent1Represented(isRespondentLiP ? YesOrNo.NO : YesOrNo.YES)
 
-                .build().toBuilder()
+                .build().copy()
                 .caseDataLiP(new CaseDataLiP()
                                  .setRespondent1LiPResponse(respondentLip))
                 .build();
@@ -256,7 +256,7 @@ class NotifyDefendantStayLiftedHandlerTest {
 
     @Test
     void checkCamundaActivityDefendantTest() {
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
         CallbackParams params = new CallbackParams().caseData(caseData)
@@ -267,7 +267,7 @@ class NotifyDefendantStayLiftedHandlerTest {
 
     @Test
     void checkCamundaActivityDefendant2Test() {
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
         CallbackParams params = new CallbackParams().caseData(caseData)

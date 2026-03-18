@@ -33,7 +33,7 @@ class SpecDefRespAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddWhenWillBePaidImmediatelyWhenFullAdmissionAndImmediatePayment() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
@@ -65,7 +65,7 @@ class SpecDefRespAppSolOneEmailDTOGeneratorTest {
             .setType(Party.Type.INDIVIDUAL)
             .setIndividualFirstName("Jane")
             .setIndividualLastName("Doe");
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(applicant)
             .defenceAdmitPartPaymentTimeRouteRequired(null)
             .build();

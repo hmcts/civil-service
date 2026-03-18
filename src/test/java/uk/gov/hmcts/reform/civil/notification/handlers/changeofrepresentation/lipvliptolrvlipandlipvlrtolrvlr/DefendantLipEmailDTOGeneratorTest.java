@@ -30,7 +30,7 @@ class DefendantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         when(notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate()).thenReturn(TEMPLATE_ID);
 
         String result = defendantLipEmailDTOGenerator.getEmailTemplateId(caseData);
@@ -47,7 +47,7 @@ class DefendantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomPropertiesUsingHelper() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         Map<String, String> baseProperties = new HashMap<>();
         Map<String, String> helperProperties = Map.of("respondentName", "Jane Doe");
 

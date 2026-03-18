@@ -95,7 +95,7 @@ class NotifyDefendantCaseStayedHandlerTest {
     @ParameterizedTest
     @MethodSource("provideCaseData")
     void sendNotificationShouldSendEmail(boolean isRespondentLiP, boolean isRespondentBilingual, boolean isRespondent1, String template, String email) {
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .respondent1Represented(isRespondentLiP ? YesOrNo.NO : YesOrNo.YES)
             .caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(
                 isRespondentBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString())))

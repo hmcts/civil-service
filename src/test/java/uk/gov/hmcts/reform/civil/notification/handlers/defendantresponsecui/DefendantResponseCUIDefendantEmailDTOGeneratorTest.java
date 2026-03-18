@@ -39,7 +39,7 @@ public class DefendantResponseCUIDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenNotBilingual() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getRespondentLipResponseSubmissionTemplate()).thenReturn(expectedTemplateId);
@@ -51,7 +51,7 @@ public class DefendantResponseCUIDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateWhenBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .caseDataLiP(
                 new CaseDataLiP()
                     .setRespondent1LiPResponse(
@@ -79,7 +79,7 @@ public class DefendantResponseCUIDefendantEmailDTOGeneratorTest {
     void shouldReturnCorrectCustomProperties() {
         Party party = new Party();
         String legacyCaseReference = "legacy case reference";
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .legacyCaseReference(legacyCaseReference)
             .applicant1(party)
             .respondent1(party)

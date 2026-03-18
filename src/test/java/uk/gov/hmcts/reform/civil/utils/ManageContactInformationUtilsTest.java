@@ -681,7 +681,7 @@ class ManageContactInformationUtilsTest {
             PartyFlagStructure partyDetails1 = createParty("claimant-1-org-individual-1");
             PartyFlagStructure partyDetails2 = createParty("claimant-1-org-individual-2");
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1OrgIndividuals(wrapElements(partyDetails1, partyDetails2))
                 .applicant2OrgIndividuals(wrapElements(createParty("claimant-2-org-individual")))
                 .build();
@@ -708,7 +708,7 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldReturnEmptyList_applicant1OrgIndividualsNull() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant2OrgIndividuals(wrapElements(createParty("claimant-2-org-individual")))
                 .build();
 
@@ -725,7 +725,7 @@ class ManageContactInformationUtilsTest {
             PartyFlagStructure partyDetails1 = createParty("claimant-2-org-individual-1");
             PartyFlagStructure partyDetails2 = createParty("claimant-2-org-individual-2");
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant2OrgIndividuals(wrapElements(partyDetails1, partyDetails2))
                 .applicant1OrgIndividuals(wrapElements(createParty("claimant-1-org-individual")))
                 .build();
@@ -752,7 +752,7 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldReturnEmptyList_applicant2OrgIndividualsNull() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1OrgIndividuals(wrapElements(createParty("claimant-1-org-individual")))
                 .build();
 
@@ -769,7 +769,7 @@ class ManageContactInformationUtilsTest {
             PartyFlagStructure partyDetails1 = createParty("defendant-1-org-individual-1");
             PartyFlagStructure partyDetails2 = createParty("defendant-1-org-individual-2");
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1OrgIndividuals(wrapElements(partyDetails1, partyDetails2))
                 .respondent2OrgIndividuals(wrapElements(createParty("defendant-1-org-individual")))
                 .build();
@@ -796,7 +796,7 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldReturnEmprtList_respondent1OrgIndividualsNull() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent2OrgIndividuals(wrapElements(createParty("defendant-2-org-individual")))
                 .build();
 
@@ -813,7 +813,7 @@ class ManageContactInformationUtilsTest {
             PartyFlagStructure partyDetails1 = createParty("defendant-2-org-individual-1");
             PartyFlagStructure partyDetails2 = createParty("defendant-2-org-individual-2");
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent2OrgIndividuals(wrapElements(partyDetails1, partyDetails2))
                 .respondent1OrgIndividuals(wrapElements(createParty("defendant-1-org-individual")))
                 .build();
@@ -840,7 +840,7 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldReturnEmprtList_respondent2OrgIndividualsNull() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1OrgIndividuals(wrapElements(createParty("defendant-1-org-individual")))
                 .build();
 
@@ -861,7 +861,7 @@ class ManageContactInformationUtilsTest {
             PartyFlagStructure partyDetails1 = createParty("claimant-1-lr-individual-1");
             PartyFlagStructure partyDetails2 = createParty("claimant-1-lr-individual-2");
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .applicant1LRIndividuals(wrapElements(partyDetails1, partyDetails2))
                 .respondent1LRIndividuals(wrapElements(createParty("defendant-1-lr-individual")))
                 .build();
@@ -888,7 +888,7 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldReturnEmptyList_applicant1LRIndividualsNull() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1LRIndividuals(wrapElements(createParty("defendant-1-org-individual")))
                 .build();
 
@@ -905,7 +905,7 @@ class ManageContactInformationUtilsTest {
             PartyFlagStructure partyDetails1 = createParty("defendant-1-lr-individual-1");
             PartyFlagStructure partyDetails2 = createParty("defendant-1-lr-individual-2");
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1LRIndividuals(wrapElements(partyDetails1, partyDetails2))
                 .respondent2LRIndividuals(wrapElements(createParty("defendant-2-lr-individual")))
                 .build();
@@ -932,7 +932,7 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldReturnEmptyList_respondent1LRIndividualsNull() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent2LRIndividuals(wrapElements(createParty("defendant-2-org-individual")))
                 .build();
 
@@ -949,7 +949,7 @@ class ManageContactInformationUtilsTest {
             PartyFlagStructure partyDetails1 = createParty("defendant-2-lr-individual-1");
             PartyFlagStructure partyDetails2 = createParty("defendant-2-lr-individual-2");
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent2LRIndividuals(wrapElements(partyDetails1, partyDetails2))
                 .respondent1LRIndividuals(wrapElements(createParty("defendant-1-lr-individual")))
                 .build();
@@ -976,7 +976,7 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldReturnEmptyList_respondent2LRIndividualsNull() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = new CaseData()
                 .respondent1LRIndividuals(wrapElements(createParty("defendant-1-org-individual")))
                 .build();
 

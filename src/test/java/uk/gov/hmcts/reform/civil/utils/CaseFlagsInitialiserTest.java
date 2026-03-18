@@ -66,7 +66,7 @@ class CaseFlagsInitialiserTest {
         var applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
         var applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
 
-        var expected = CaseData.builder()
+        var expected = new CaseData()
             .applicant1(
                 applicant1.setFlags(
                     new Flags()
@@ -108,7 +108,7 @@ class CaseFlagsInitialiserTest {
                         .setDetails(List.of())))
             .build();
 
-        var caseData = CaseData.builder()
+        var caseData = new CaseData()
             .applicant1(applicant1)
             .applicant1LitigationFriend(applicant1LitFriend)
             .applicant2(applicant2)
@@ -126,7 +126,7 @@ class CaseFlagsInitialiserTest {
         var respondent1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
         var respondent2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
 
-        var expected = CaseData.builder()
+        var expected = new CaseData()
             .respondent1LitigationFriend(
                 respondent1LitFriend.copy().setFlags(
                         new Flags()
@@ -144,7 +144,7 @@ class CaseFlagsInitialiserTest {
                     )
             .build();
 
-        var caseData = CaseData.builder()
+        var caseData = new CaseData()
             .respondent1LitigationFriend(respondent1LitFriend)
             .respondent2LitigationFriend(respondent2LitFriend).build();
 
@@ -155,7 +155,7 @@ class CaseFlagsInitialiserTest {
 
     @Test
     void shouldInitialiseCaseFlagsForManageContactInformationEvent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("id")))
             .updateDetailsForm(new UpdateDetailsForm()
                                    .setPartyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
@@ -180,7 +180,7 @@ class CaseFlagsInitialiserTest {
         Expert expert2 = new Expert().setFirstName("Second").setLastName("expert");
         Expert expert3 = new Expert().setFirstName("Third").setLastName("experto");
 
-        CaseData expected = CaseData.builder()
+        CaseData expected = new CaseData()
             .applicant1(
                 applicant1.setFlags(
                     new Flags()
@@ -294,7 +294,7 @@ class CaseFlagsInitialiserTest {
                         )))
             .build();
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(applicant1)
             .applicant1LitigationFriend(applicant1LitFriend)
             .applicant2(applicant2)
@@ -338,7 +338,7 @@ class CaseFlagsInitialiserTest {
         Expert expert2 = new Expert().setFirstName("Second").setLastName("expert");
         Expert expert3 = new Expert().setFirstName("Third").setLastName("experto");
 
-        CaseData expected = CaseData.builder()
+        CaseData expected = new CaseData()
             .applicant1(
                 applicant1.setFlags(
                     new Flags()
@@ -479,7 +479,7 @@ class CaseFlagsInitialiserTest {
                                                                     .setRoleOnCase(RESPONDENT_SOLICITOR_TWO_EXPERT)))))
             .build();
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(applicant1)
             .applicant1LitigationFriend(applicant1LitFriend)
             .applicant2(applicant2)
@@ -583,7 +583,7 @@ class CaseFlagsInitialiserTest {
         Expert expert2 = new Expert().setFirstName("Second").setLastName("expert");
         Expert expert3 = new Expert().setFirstName("Third").setLastName("experto");
 
-        CaseData expected = CaseData.builder()
+        CaseData expected = new CaseData()
             .applicant1(
                 applicant1.setFlags(
                     new Flags()
@@ -733,7 +733,7 @@ class CaseFlagsInitialiserTest {
                                                          ))))
             .build();
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseData()
             .applicant1(applicant1)
             .applicant1LitigationFriend(applicant1LitFriend)
             .applicant2(applicant2)
