@@ -38,17 +38,17 @@ class BundleRequestDocsOrganizerTest {
         UploadEvidenceWitness witness1 = new UploadEvidenceWitness()
             .setWitnessOptionName("WitnessA")
             .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 5));
-        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness1).build());
+        witnessEvidenceList.add(new Element<UploadEvidenceWitness>().setValue(witness1));
 
         UploadEvidenceWitness witness2 = new UploadEvidenceWitness()
             .setWitnessOptionName("WitnessA")
             .setWitnessOptionUploadDate(LocalDate.of(2023, 3, 10));
-        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness2).build());
+        witnessEvidenceList.add(new Element<UploadEvidenceWitness>().setValue(witness2));
 
         UploadEvidenceWitness witness3 = new UploadEvidenceWitness()
             .setWitnessOptionName("WitnessB")
             .setWitnessOptionUploadDate(LocalDate.of(2023, 4, 15));
-        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness3).build());
+        witnessEvidenceList.add(new Element<UploadEvidenceWitness>().setValue(witness3));
 
         Map<String, List<Element<UploadEvidenceWitness>>> result =
             bundleRequestDocsOrganizer.groupWitnessStatementsByName(witnessEvidenceList);
@@ -71,8 +71,8 @@ class BundleRequestDocsOrganizerTest {
             .setWitnessOptionUploadDate(LocalDate.of(2023, 3, 10));
 
         List<Element<UploadEvidenceWitness>> witnessEvidenceList = new ArrayList<>();
-        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness1).build());
-        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness2).build());
+        witnessEvidenceList.add(new Element<UploadEvidenceWitness>().setValue(witness1));
+        witnessEvidenceList.add(new Element<UploadEvidenceWitness>().setValue(witness2));
 
         bundleRequestDocsOrganizer.sortWitnessListByDate(witnessEvidenceList, false);
 
@@ -92,8 +92,8 @@ class BundleRequestDocsOrganizerTest {
             .setExpertOptionUploadDate(LocalDate.of(2023, 3, 10));
 
         List<Element<UploadEvidenceExpert>> expertEvidenceList = new ArrayList<>();
-        expertEvidenceList.add(Element.<UploadEvidenceExpert>builder().value(expert1).build());
-        expertEvidenceList.add(Element.<UploadEvidenceExpert>builder().value(expert2).build());
+        expertEvidenceList.add(new Element<UploadEvidenceExpert>().setValue(expert1));
+        expertEvidenceList.add(new Element<UploadEvidenceExpert>().setValue(expert2));
 
         bundleRequestDocsOrganizer.sortExpertListByDate(expertEvidenceList);
 
@@ -117,9 +117,9 @@ class BundleRequestDocsOrganizerTest {
             .setExpertOptionUploadDate(LocalDate.of(2023, 4, 15));
 
         List<Element<UploadEvidenceExpert>> expertEvidenceList = new ArrayList<>();
-        expertEvidenceList.add(Element.<UploadEvidenceExpert>builder().value(expert1).build());
-        expertEvidenceList.add(Element.<UploadEvidenceExpert>builder().value(expert2).build());
-        expertEvidenceList.add(Element.<UploadEvidenceExpert>builder().value(expert3).build());
+        expertEvidenceList.add(new Element<UploadEvidenceExpert>().setValue(expert1));
+        expertEvidenceList.add(new Element<UploadEvidenceExpert>().setValue(expert2));
+        expertEvidenceList.add(new Element<UploadEvidenceExpert>().setValue(expert3));
 
         Map<String, List<Element<UploadEvidenceExpert>>> result =
             bundleRequestDocsOrganizer.groupExpertStatementsByName(expertEvidenceList);
@@ -141,8 +141,8 @@ class BundleRequestDocsOrganizerTest {
             .setDocumentIssuedDate(LocalDate.of(2023, 3, 10));
 
         List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
-        documentList.add(Element.<UploadEvidenceDocumentType>builder().value(doc1).build());
-        documentList.add(Element.<UploadEvidenceDocumentType>builder().value(doc2).build());
+        documentList.add(new Element<UploadEvidenceDocumentType>().setValue(doc1));
+        documentList.add(new Element<UploadEvidenceDocumentType>().setValue(doc2));
 
         bundleRequestDocsOrganizer.sortEvidenceUploadByDate(documentList, false);
 

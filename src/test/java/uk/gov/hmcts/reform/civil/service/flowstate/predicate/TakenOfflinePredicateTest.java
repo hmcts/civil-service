@@ -189,9 +189,7 @@ class TakenOfflinePredicateTest {
     @Test
     void should_return_true_for_afterClaimNotified_when_claim_notified_and_options_not_both() {
         when(caseData.getClaimNotificationDate()).thenReturn(LocalDateTime.now());
-        DynamicList options = DynamicList.builder()
-            .value(DynamicListElement.builder().label("Solicitor 1").build())
-            .build();
+        DynamicList options = new DynamicList().setValue(new DynamicListElement().setLabel("Solicitor 1"));
         when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(options);
         assertTrue(TakenOfflinePredicate.afterClaimNotified.test(caseData));
     }
@@ -206,9 +204,7 @@ class TakenOfflinePredicateTest {
     @Test
     void should_return_false_for_afterClaimNotified_when_notify_options_both() {
         when(caseData.getClaimNotificationDate()).thenReturn(LocalDateTime.now());
-        DynamicList options = DynamicList.builder()
-            .value(DynamicListElement.builder().label("Both").build())
-            .build();
+        DynamicList options = new DynamicList().setValue(new DynamicListElement().setLabel("Both"));
         when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(options);
         assertFalse(TakenOfflinePredicate.afterClaimNotified.test(caseData));
     }
@@ -350,9 +346,7 @@ class TakenOfflinePredicateTest {
     @Test
     void should_return_true_for_afterNotifiedOptions_when_notified_and_options_not_both() {
         when(caseData.getClaimDetailsNotificationDate()).thenReturn(LocalDateTime.now());
-        DynamicList dynamicList = DynamicList.builder()
-            .value(DynamicListElement.builder().label("Solicitor 1").build())
-            .build();
+        DynamicList dynamicList = new DynamicList().setValue(new DynamicListElement().setLabel("Solicitor 1"));
         when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dynamicList);
         assertTrue(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
     }
@@ -374,9 +368,7 @@ class TakenOfflinePredicateTest {
     @Test
     void should_return_false_for_afterNotifiedOptions_when_notify_options_is_both() {
         when(caseData.getClaimDetailsNotificationDate()).thenReturn(LocalDateTime.now());
-        DynamicList dynamicList = DynamicList.builder()
-            .value(DynamicListElement.builder().label("Both").build())
-            .build();
+        DynamicList dynamicList = new DynamicList().setValue(new DynamicListElement().setLabel("Both"));
         when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dynamicList);
         assertFalse(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
     }

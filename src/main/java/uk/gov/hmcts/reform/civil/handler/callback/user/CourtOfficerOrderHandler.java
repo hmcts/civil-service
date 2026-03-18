@@ -125,20 +125,20 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
 
     private DynamicList populateCurrentHearingLocation(CaseData caseData, String authorisation) {
         LocationRefData locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
+        DynamicListElement currentLocation = new DynamicListElement()
+            .setCode("LOCATION_LIST")
+            .setLabel(locationRefData.getSiteName());
 
-        return DynamicList.builder().listItems(List.of(DynamicListElement.builder()
-                                                           .code("LOCATION_LIST")
-                                                           .label(locationRefData.getSiteName())
-                                                           .build(),
-                                                       DynamicListElement.builder()
-                                                           .code("OTHER_LOCATION")
-                                                           .label("Other location")
-                                                           .build()))
-            .value(DynamicListElement.builder()
-                       .code("LOCATION_LIST")
-                       .label(locationRefData.getSiteName())
-                       .build())
-            .build();
+        return new DynamicList()
+            .setListItems(List.of(
+                currentLocation,
+                new DynamicListElement()
+                    .setCode("OTHER_LOCATION")
+                    .setLabel("Other location")
+            ))
+            .setValue(new DynamicListElement()
+                .setCode("LOCATION_LIST")
+                .setLabel(locationRefData.getSiteName()));
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
