@@ -44,7 +44,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
     private final ObjectMapper objectMapper;
     protected final WorkingDayIndicator workingDayIndicator;
-        private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT,
+    private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderClaimant";
