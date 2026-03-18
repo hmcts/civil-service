@@ -36,12 +36,8 @@ class CaseQueriesCollectionTest {
             "John Doe",
             "applicant-solicitor",
             List.of(
-                Element.<CaseMessage>builder()
-                    .id(UUID.randomUUID())
-                    .value(queryMessage).build(),
-                Element.<CaseMessage>builder()
-                    .id(UUID.randomUUID())
-                    .value(oldQueryMessage).build()
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(queryMessage),
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(oldQueryMessage)
             )
         );
 
@@ -116,12 +112,8 @@ class CaseQueriesCollectionTest {
             "John Doe",
             "applicant-solicitor",
             List.of(
-                Element.<CaseMessage>builder()
-                    .id(UUID.randomUUID())
-                    .value(queryMessage).build(),
-                Element.<CaseMessage>builder()
-                    .id(UUID.randomUUID())
-                    .value(responseMessage).build()
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(queryMessage),
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(responseMessage)
             )
         );
 
@@ -149,15 +141,9 @@ class CaseQueriesCollectionTest {
             "John Doe",
             "applicant-solicitor",
             List.of(
-                Element.<CaseMessage>builder()
-                    .id(UUID.randomUUID())
-                    .value(queryMessage).build(),
-                Element.<CaseMessage>builder()
-                    .id(UUID.randomUUID())
-                    .value(responseMessage).build(),
-                Element.<CaseMessage>builder()
-                    .id(UUID.randomUUID())
-                    .value(followUpMessage).build()
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(queryMessage),
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(responseMessage),
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(followUpMessage)
             )
         );
 
@@ -183,9 +169,9 @@ class CaseQueriesCollectionTest {
         otherRootMessage.setCreatedOn(now.minusDays(1));
 
         CaseQueriesCollection caseQueries = buildCaseQueries(null, null, List.of(
-            Element.<CaseMessage>builder().id(UUID.randomUUID()).value(rootMessage).build(),
-            Element.<CaseMessage>builder().id(UUID.randomUUID()).value(childMessage).build(),
-            Element.<CaseMessage>builder().id(UUID.randomUUID()).value(otherRootMessage).build()
+            new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(rootMessage),
+            new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(childMessage),
+            new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(otherRootMessage)
         ));
 
         List<Element<CaseMessage>> thread = caseQueries.messageThread(rootMessage);
@@ -215,9 +201,9 @@ class CaseQueriesCollectionTest {
         otherRootMessage.setCreatedOn(now.minusDays(1));
 
         CaseQueriesCollection caseQueries = buildCaseQueries(null, null, List.of(
-            Element.<CaseMessage>builder().id(UUID.randomUUID()).value(rootMessage).build(),
-            Element.<CaseMessage>builder().id(UUID.randomUUID()).value(childMessage).build(),
-            Element.<CaseMessage>builder().id(UUID.randomUUID()).value(otherRootMessage).build()
+            new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(rootMessage),
+            new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(childMessage),
+            new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(otherRootMessage)
         ));
 
         List<Element<CaseMessage>> thread = caseQueries.messageThread(childMessage);

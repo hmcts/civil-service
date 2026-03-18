@@ -84,9 +84,9 @@ public class DocUploadDashboardNotificationServiceTest {
                 .generalAppConsentOrder(YES)
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id(STRING_CONSTANT).forename(
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId(STRING_CONSTANT).setForename(
                         "GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
 
                 .build();
 
@@ -132,10 +132,10 @@ public class DocUploadDashboardNotificationServiceTest {
                 .defendant1PartyName("Mr. Sole Trader")
                 .generalAppConsentOrder(YES)
                 .isGaRespondentOneLip(NO)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id(STRING_CONSTANT).forename(
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId(STRING_CONSTANT).setForename(
                         "GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
 
                 .build();
 
@@ -173,10 +173,10 @@ public class DocUploadDashboardNotificationServiceTest {
                                                                               .setDocumentBinaryUrl(
                                                                                   "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
@@ -195,8 +195,8 @@ public class DocUploadDashboardNotificationServiceTest {
                 .generalAppConsentOrder(YES)
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("123456789").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("123456789").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .generalAppRespondentSolicitors(gaRespSolicitors)
 
                 .build();
@@ -228,10 +228,10 @@ public class DocUploadDashboardNotificationServiceTest {
                                                                               .setDocumentBinaryUrl(
                                                                                   "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
@@ -250,8 +250,8 @@ public class DocUploadDashboardNotificationServiceTest {
                 .generalAppConsentOrder(YES)
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("123456789").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("123456789").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .generalAppRespondentSolicitors(gaRespSolicitors)
 
                 .build();
@@ -283,10 +283,10 @@ public class DocUploadDashboardNotificationServiceTest {
                                                                               .setDocumentBinaryUrl(
                                                                                   "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
@@ -305,8 +305,8 @@ public class DocUploadDashboardNotificationServiceTest {
                 .generalAppConsentOrder(YES)
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("123456789").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("123456789").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .generalAppRespondentSolicitors(gaRespSolicitors)
 
                 .build();
@@ -331,10 +331,10 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             List<GeneralApplicationTypes> generalAppType = new ArrayList<>();
             generalAppType.add(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -352,9 +352,9 @@ public class DocUploadDashboardNotificationServiceTest {
                 .generalAppConsentOrder(YES)
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
-                .generalAppType(GAApplicationType.builder().types(generalAppType).build())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("123456789").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppType(new GAApplicationType().setTypes(generalAppType))
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("123456789").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .generalAppRespondentSolicitors(gaRespSolicitors)
 
                 .build();
@@ -379,10 +379,10 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             List<GeneralApplicationTypes> generalAppType = new ArrayList<>();
             generalAppType.add(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -400,9 +400,9 @@ public class DocUploadDashboardNotificationServiceTest {
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
                 .parentCaseReference("1678356746785475")
-                .generalAppType(GAApplicationType.builder().types(generalAppType).build())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("123456789").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppType(new GAApplicationType().setTypes(generalAppType))
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("123456789").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .generalAppRespondentSolicitors(gaRespSolicitors)
 
                 .build();
@@ -434,10 +434,10 @@ public class DocUploadDashboardNotificationServiceTest {
                                                                               .setDocumentBinaryUrl(
                                                                                   "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
@@ -456,8 +456,8 @@ public class DocUploadDashboardNotificationServiceTest {
                 .generalAppConsentOrder(YES)
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("123456789").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("123456789").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .generalAppRespondentSolicitors(gaRespSolicitors)
 
                 .build();
@@ -488,10 +488,10 @@ public class DocUploadDashboardNotificationServiceTest {
                                                                               .setDocumentBinaryUrl(
                                                                                   "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -508,8 +508,8 @@ public class DocUploadDashboardNotificationServiceTest {
                 .defendant1PartyName("Mr. Sole Trader")
                 .isGaApplicantLip(NO)
                 .isGaRespondentOneLip(NO)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("123456789").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("123456789").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .generalAppRespondentSolicitors(gaRespSolicitors)
 
                 .build();
@@ -535,10 +535,10 @@ public class DocUploadDashboardNotificationServiceTest {
                                                                               .setDocumentBinaryUrl(
                                                                                   "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -555,8 +555,8 @@ public class DocUploadDashboardNotificationServiceTest {
                 .defendant1PartyName("Mr. Sole Trader")
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("123456789").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("123456789").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .generalAppRespondentSolicitors(gaRespSolicitors)
 
                 .build();
@@ -582,10 +582,10 @@ public class DocUploadDashboardNotificationServiceTest {
                                                                               .setDocumentBinaryUrl(
                                                                                   "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -601,8 +601,8 @@ public class DocUploadDashboardNotificationServiceTest {
                 .defendant1PartyName("Mr. Sole Trader")
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("123456789").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("123456789").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .generalAppRespondentSolicitors(gaRespSolicitors)
 
                 .build();
@@ -628,10 +628,10 @@ public class DocUploadDashboardNotificationServiceTest {
                                                                               .setDocumentBinaryUrl(
                                                                                   "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
@@ -646,8 +646,8 @@ public class DocUploadDashboardNotificationServiceTest {
                 .defendant1PartyName("Mr. Sole Trader")
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("123456789").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("123456789").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .generalAppRespondentSolicitors(gaRespSolicitors)
 
                 .build();
@@ -685,9 +685,9 @@ public class DocUploadDashboardNotificationServiceTest {
                 .generalAppConsentOrder(YES)
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id(STRING_CONSTANT).forename(
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId(STRING_CONSTANT).setForename(
                         "GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
 
                 .build();
 

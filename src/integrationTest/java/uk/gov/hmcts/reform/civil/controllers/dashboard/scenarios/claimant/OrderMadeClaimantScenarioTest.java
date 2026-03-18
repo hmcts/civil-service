@@ -41,8 +41,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
     @Autowired
     private OrderMadeClaimantNotificationHandler handler;
 
-    DynamicListElement selectedCourt = DynamicListElement.builder()
-        .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+    DynamicListElement selectedCourt = new DynamicListElement().setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
 
     @Test
     void should_create_order_made_claimant_scenario() throws Exception {

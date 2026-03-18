@@ -678,7 +678,7 @@ public class SdoGeneratorServiceTest {
         trial.setPhysicalBundleOptions(PhysicalTrialBundleOptions.NONE);
         trial.setSdoR2TrialFirstOpenDateAfter(trialFirstOpen);
         trial.setSdoR2TrialWindow(trialWindow);
-        trial.setHearingCourtLocationList(options.toBuilder().value(selectedCourt).build());
+        trial.setHearingCourtLocationList(options.setValue(selectedCourt));
         trial.setPhysicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE);
         updatedData.sdoR2Trial(trial);
 
