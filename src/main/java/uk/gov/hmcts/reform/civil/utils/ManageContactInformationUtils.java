@@ -502,24 +502,24 @@ public class ManageContactInformationUtils {
                 form.setLastName(partyElement.getValue().getLastName());
                 form.setEmailAddress(partyElement.getValue().getEmail());
                 form.setPhoneNumber(partyElement.getValue().getPhone());
-                return Element.<UpdatePartyDetailsForm>builder()
-                    .id(partyElement.getId())
-                    .value(form)
-                    .build();
+                return new Element<UpdatePartyDetailsForm>().setId(partyElement.getId()).setValue(form);
             })
             .toList();
     }
 
     public static List<Element<PartyFlagStructure>> mapFormDataToIndividualsData(List<Element<PartyFlagStructure>> existing,
                                                                            List<Element<UpdatePartyDetailsForm>> updatedData) {
-        return updatedData.stream().map(updatedParty -> Element.<PartyFlagStructure>builder()
-                        .id(updatedParty.getId())
-                        .value(updateIndividualWithFormData(ofNullable(existing).orElse(new ArrayList<>()).stream()
-                                .filter(existingParty -> existingParty.getId().equals(updatedParty.getId()))
-                                .map(Element::getValue)
-                                .findFirst().orElse(new PartyFlagStructure()), updatedParty.getValue()))
-                        .build())
-                .toList();
+        return updatedData.stream().map(updatedParty -> {
+            PartyFlagStructure matchingExistingParty = ofNullable(existing).orElse(new ArrayList<>()).stream()
+                .filter(existingParty -> existingParty.getId().equals(updatedParty.getId()))
+                .map(Element::getValue)
+                .findFirst()
+                .orElse(new PartyFlagStructure());
+
+            return new Element<PartyFlagStructure>()
+                .setId(updatedParty.getId())
+                .setValue(updateIndividualWithFormData(matchingExistingParty, updatedParty.getValue()));
+        }).toList();
     }
 
     private static PartyFlagStructure updateIndividualWithFormData(PartyFlagStructure individual, UpdatePartyDetailsForm form) {
