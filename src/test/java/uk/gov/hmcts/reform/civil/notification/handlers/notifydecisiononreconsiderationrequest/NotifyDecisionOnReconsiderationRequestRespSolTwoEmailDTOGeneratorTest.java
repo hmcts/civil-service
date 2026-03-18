@@ -70,23 +70,52 @@ class NotifyDecisionOnReconsiderationRequestRespSolTwoEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldNotifyWhenSecondDefendantExistsEvenWithSameSolicitor() {
+    void shouldNotifyWhenSecondDefendantHasSeparateRepresentation() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .respondent2(new PartyBuilder().individual("Alex").build())
+            .respondent2SameLegalRepresentative(YesOrNo.NO)
             .addRespondent2(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.YES)
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotNotifyWhenSecondDefendantIsLiP() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .respondent2(new PartyBuilder().individual("Alex").build())
+            .respondent2SameLegalRepresentative(YesOrNo.NO)
+            .addRespondent2(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.NO)
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldNotNotifyWhenSecondDefendantSharesRepresentation() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .respondent2(new PartyBuilder().individual("Alex").build())
             .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .addRespondent2(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.YES)
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldFallbackToRespondentSolicitorOneEmailWhenSolicitorTwoMissing() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .respondent2(new PartyBuilder().individual("Alex").build())
+            .respondent2SameLegalRepresentative(YesOrNo.NO)
+            .addRespondent2(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.YES)
             .respondentSolicitor1EmailAddress("solicitor@example.com")
             .respondentSolicitor2EmailAddress(null)
             .build();
 
-        assertThat(generator.getShouldNotify(caseData)).isTrue();
         assertThat(generator.getEmailAddress(caseData)).isEqualTo("solicitor@example.com");
-    }
-
-    @Test
-    void shouldNotNotifyWhenSecondDefendantMissing() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-
-        assertThat(generator.getShouldNotify(caseData)).isFalse();
     }
 }
