@@ -97,11 +97,10 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
         .respondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode(PIN))
         .submittedDate(LocalDateTime.now())
         .defaultJudgmentDocuments(List.of(
-            Element.<CaseDocument>builder()
-                .value(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT_DEFENDANT1)
+            new Element<CaseDocument>().setValue(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT_DEFENDANT1)
                 .setDocumentName("DefendantDJ.pdf")
                 .setDocumentLink(new Document().setDocumentFileName("DefendantDJ.pdf").setDocumentBinaryUrl("Binary/url").setDocumentUrl("url"))
-                .setCreatedDatetime(LocalDateTime.now())).build()))
+                .setCreatedDatetime(LocalDateTime.now()))))
         .build();
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF = "default-judgment-non-divergent-spec-pin_in_letter";

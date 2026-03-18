@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -382,7 +383,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent2ResponseDeadline(null);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            handler.handle(params);
+            Assertions.assertDoesNotThrow(() -> handler.handle(params));
         }
 
         @Test
@@ -394,7 +395,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent2ResponseDeadline(null);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            handler.handle(params);
+            Assertions.assertDoesNotThrow(() -> handler.handle(params));
         }
 
         @Test
@@ -407,7 +408,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent2ResponseDeadline(LocalDateTime.now());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            handler.handle(params);
+            Assertions.assertDoesNotThrow(() -> handler.handle(params));
         }
 
         @Test
@@ -422,7 +423,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-            assertThat(response.getData().get("respondent2DocumentGeneration")).isEqualTo("userRespondent2");
+            assertThat(response.getData()).containsEntry("respondent2DocumentGeneration", "userRespondent2");
         }
 
         @Test
