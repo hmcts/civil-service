@@ -1,0 +1,14 @@
+{
+  "name": "Role Assignments - Query",
+  "request": {
+    "method": "POST",
+    "urlPath": "/am/role-assignments/query"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "roleAssignmentServiceResponse.json"
+  }
+}
