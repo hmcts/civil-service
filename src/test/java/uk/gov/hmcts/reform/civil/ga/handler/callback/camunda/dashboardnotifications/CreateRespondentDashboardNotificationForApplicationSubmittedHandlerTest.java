@@ -64,8 +64,8 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.NO).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.NO))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -92,8 +92,8 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.YES))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -121,7 +121,7 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppConsentOrder(YesOrNo.YES)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.NO).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.NO))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -149,7 +149,7 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppConsentOrder(YesOrNo.YES)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.YES))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
