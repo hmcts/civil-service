@@ -125,6 +125,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         if (isSDOEvent(callbackParams)
             && isEligibleForReconsideration(caseData)
             && Objects.isNull(caseData.getIsReferToJudgeClaim())) {
+            deleteNotificationAndInactiveTasks(caseData);
             return SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario();
         }
         if (isCarmApplicableCase(caseData)
@@ -140,7 +141,6 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
         }
         if (isSDODrawnPreCPRelease(caseData)) {
-            deleteNotificationAndInactiveTasks(caseData);
             return SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
         if (isFinalOrderIssued(callbackParams)) {

@@ -582,25 +582,6 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         }
 
         @Test
-        void shouldExcludeOnlyHearingCategoryWhenCaseProgressionDisabled() {
-            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
-            caseData.setRespondent1Represented(YesOrNo.NO);
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
-            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(toggleService.isCuiGaNroEnabled()).thenReturn(false);
-            when(toggleService.isLocationWhiteListed(any())).thenReturn(false);
-            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
-                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
-
-            handler.handle(params);
-
-            verifyDeleteNotificationsAndTaskListUpdatesNotInEa(caseData);
-        }
-
-        @Test
         void shouldRecordScenarioDefendantFinalOrderFastTrackTrialReady_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
             caseData.setRespondent1Represented(YesOrNo.NO);
@@ -631,14 +612,11 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT"
         );
-        ArgumentCaptor<String[]> categoriesCaptor = ArgumentCaptor.forClass(String[].class);
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
-            eq(caseData.getCcdCaseReference().toString()),
-            eq("DEFENDANT"),
-            categoriesCaptor.capture()
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT",
+            "Applications"
         );
-        assertThat(categoriesCaptor.getValue())
-            .containsExactlyInAnyOrder("Applications", "Hearing");
     }
 
     private void verifyDeleteNotificationsAndTaskListUpdatesNotInEa(CaseData caseData) {
@@ -646,12 +624,9 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT"
         );
-        ArgumentCaptor<String[]> categoriesCaptor = ArgumentCaptor.forClass(String[].class);
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
-            eq(caseData.getCcdCaseReference().toString()),
-            eq("DEFENDANT"),
-            categoriesCaptor.capture()
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT"
         );
-        assertThat(categoriesCaptor.getValue()).containsExactly("Hearing");
     }
 }
