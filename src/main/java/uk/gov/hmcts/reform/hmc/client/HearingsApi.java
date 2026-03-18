@@ -30,14 +30,16 @@ public interface HearingsApi {
     String HEARINGS_ENDPOINT = "/hearings";
     String ROLE_ASSIGNMENT_URL = "Role-Assignment-Url";
     String DATA_STORE_URL = "Data-Store-Url";
+    String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
 
     @GetMapping(HEARING_ENDPOINT + "/{id}")
     HearingGetResponse getHearingRequest(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
-        @PathVariable String id,
         @RequestHeader(value = DATA_STORE_URL, required = false) String dataStoreUrl,
         @RequestHeader(value = ROLE_ASSIGNMENT_URL, required = false) String roleAssignmentUrl,
+        @RequestHeader(value = HMCTS_DEPLOYMENT_ID, required = false) String hmctsDeploymentId,
+        @PathVariable String id,
         @RequestParam(name = "isValid", required = false) Boolean isValid
     );
 
@@ -47,6 +49,7 @@ public interface HearingsApi {
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
         @RequestHeader(value = DATA_STORE_URL, required = false) String dataStoreUrl,
         @RequestHeader(value = ROLE_ASSIGNMENT_URL, required = false) String roleAssignmentUrl,
+        @RequestHeader(value = HMCTS_DEPLOYMENT_ID, required = false) String hmctsDeploymentId,
         @PathVariable("id") String id
     );
 
@@ -56,6 +59,7 @@ public interface HearingsApi {
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
         @RequestHeader(value = DATA_STORE_URL, required = false) String dataStoreUrl,
         @RequestHeader(value = ROLE_ASSIGNMENT_URL, required = false) String roleAssignmentUrl,
+        @RequestHeader(value = HMCTS_DEPLOYMENT_ID, required = false) String hmctsDeploymentId,
         @RequestBody PartiesNotified partiesNotified,
         @PathVariable("id") String hearingId,
         @RequestParam("version") int requestVersion,
@@ -69,6 +73,7 @@ public interface HearingsApi {
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
         @RequestHeader(value = DATA_STORE_URL, required = false) String dataStoreUrl,
         @RequestHeader(value = ROLE_ASSIGNMENT_URL, required = false) String roleAssignmentUrl,
+        @RequestHeader(value = HMCTS_DEPLOYMENT_ID, required = false) String hmctsDeploymentId,
         @PathVariable String hmctsServiceCode,
         @RequestParam("hearing_start_date_from") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             LocalDateTime hearingStartDateFrom,
@@ -82,6 +87,7 @@ public interface HearingsApi {
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
         @RequestHeader(value = DATA_STORE_URL, required = false) String dataStoreUrl,
         @RequestHeader(value = ROLE_ASSIGNMENT_URL, required = false) String roleAssignmentUrl,
+        @RequestHeader(value = HMCTS_DEPLOYMENT_ID, required = false) String hmctsDeploymentId,
         @PathVariable Long caseId,
         @RequestParam("status") String status
     );

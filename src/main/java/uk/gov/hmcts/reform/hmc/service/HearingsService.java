@@ -27,6 +27,8 @@ public class HearingsService {
     private String roleAssignmentUrl;
     @Value("${core_case_data.api.url:#{null}}")
     private String dataStoreUrl;
+    @Value("${hmc.deployment-id:#{null}}")
+    private String hmctsDeploymentId;
 
     public HearingGetResponse getHearingResponse(String authToken, String hearingId) throws HmcException {
         log.debug("Sending Get Hearings with Hearing ID {}", hearingId);
@@ -34,9 +36,10 @@ public class HearingsService {
             return hearingNoticeApi.getHearingRequest(
                 authToken,
                 authTokenGenerator.generate(),
-                hearingId,
                 dataStoreUrl,
                 roleAssignmentUrl,
+                hmctsDeploymentId,
+                hearingId,
                 null);
         } catch (FeignException ex)  {
             log.error("Failed to retrieve hearing with Id: {} from HMC", hearingId);
@@ -52,6 +55,7 @@ public class HearingsService {
                 authTokenGenerator.generate(),
                 dataStoreUrl,
                 roleAssignmentUrl,
+                hmctsDeploymentId,
                 hearingId);
         } catch (FeignException e) {
             log.error("Failed to retrieve patries notified with Id: {} from HMC", hearingId);
@@ -68,6 +72,7 @@ public class HearingsService {
                 authTokenGenerator.generate(),
                 dataStoreUrl,
                 roleAssignmentUrl,
+                hmctsDeploymentId,
                 payload,
                 hearingId,
                 requestVersion,
@@ -89,6 +94,7 @@ public class HearingsService {
                 authTokenGenerator.generate(),
                 dataStoreUrl,
                 roleAssignmentUrl,
+                hmctsDeploymentId,
                 hmctsServiceCode,
                 hearingStartDateFrom,
                 hearingStartDateTo);
@@ -106,6 +112,7 @@ public class HearingsService {
                 authTokenGenerator.generate(),
                 dataStoreUrl,
                 roleAssignmentUrl,
+                hmctsDeploymentId,
                 caseId,
                 status);
         } catch (FeignException e) {

@@ -41,7 +41,8 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(properties = {
     "hmc.api.url=http://localhost:8991",
     "core_case_data.api.url=" + BaseContractTest.DATA_STORE_URL,
-    "role-assignment-service.api.url=" + BaseContractTest.ROLE_ASSIGNMENT_URL
+    "role-assignment-service.api.url=" + BaseContractTest.ROLE_ASSIGNMENT_URL,
+    "hmc.deployment-id=test-deployment-id"
 })
 public class HearingsApiConsumerTest extends BaseContractTest {
 
@@ -49,6 +50,8 @@ public class HearingsApiConsumerTest extends BaseContractTest {
     private static final String CASE_REFERENCE = "1671000000000018";
     private static final String SERVICE_CODE = "AAA7";
     private static final long CASE_ID = 1671000000000018L;
+    private static final String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
+    private static final String HMCTS_DEPLOYMENT_ID_VALUE = "test-deployment-id";
     private static final LocalDateTime HEARING_RECEIVED = LocalDateTime.of(2024, 10, 3, 11, 15);
     private static final LocalDateTime HEARING_START = LocalDateTime.of(2024, 10, 20, 9, 30);
     private static final LocalDateTime HEARING_END = HEARING_START.plusHours(2);
@@ -75,7 +78,8 @@ public class HearingsApiConsumerTest extends BaseContractTest {
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN,
                 SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN,
                 DATA_STORE_URL_HEADER, DATA_STORE_URL,
-                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL)
+                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL,
+                HMCTS_DEPLOYMENT_ID, HMCTS_DEPLOYMENT_ID_VALUE)
             .willRespondWith()
             .status(HttpStatus.SC_OK)
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -93,7 +97,8 @@ public class HearingsApiConsumerTest extends BaseContractTest {
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN,
                 SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN,
                 DATA_STORE_URL_HEADER, DATA_STORE_URL,
-                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL)
+                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL,
+                HMCTS_DEPLOYMENT_ID, HMCTS_DEPLOYMENT_ID_VALUE)
             .willRespondWith()
             .status(HttpStatus.SC_OK)
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -113,7 +118,8 @@ public class HearingsApiConsumerTest extends BaseContractTest {
                 AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN,
                 SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN,
                 DATA_STORE_URL_HEADER, DATA_STORE_URL,
-                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL)
+                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL,
+                HMCTS_DEPLOYMENT_ID, HMCTS_DEPLOYMENT_ID_VALUE)
             .matchQuery("version", "1", "1")
             .matchQuery("received", receivedQueryValue, receivedQueryValue)
             .body(createJsonObject(getPartiesNotifiedPayload()))
@@ -133,7 +139,8 @@ public class HearingsApiConsumerTest extends BaseContractTest {
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN,
                 SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN,
                 DATA_STORE_URL_HEADER, DATA_STORE_URL,
-                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL)
+                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL,
+                HMCTS_DEPLOYMENT_ID, HMCTS_DEPLOYMENT_ID_VALUE)
             .matchQuery("hearing_start_date_from", fromParam, fromParam)
             .willRespondWith()
             .status(HttpStatus.SC_OK)
@@ -152,7 +159,8 @@ public class HearingsApiConsumerTest extends BaseContractTest {
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN,
                 SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN,
                 DATA_STORE_URL_HEADER, DATA_STORE_URL,
-                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL)
+                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL,
+                HMCTS_DEPLOYMENT_ID, HMCTS_DEPLOYMENT_ID_VALUE)
             .matchQuery("status", "LISTED", "LISTED")
             .willRespondWith()
             .status(HttpStatus.SC_OK)
