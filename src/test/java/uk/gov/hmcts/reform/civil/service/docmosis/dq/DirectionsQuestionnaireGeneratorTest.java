@@ -2817,17 +2817,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
                 .build();
 
-            String statementOfTruth = """
-                    The claimant believes that the facts in this claim are true.\
-                    
-                    
-                    
-                    I am duly authorised by the claimant to sign this statement.
-                    
-                    The claimant understands that the proceedings for contempt of court \
-                    may be brought against anyone who makes, or causes to be made, \
-                    a false statement in a document verified by a statement of truth \
-                    without an honest belief in its truth.""";
+            String statementOfTruth = expectedStatementOfTruth("claimant", "in this claim");
 
             DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
             assertNotEquals(SPEC_CLAIM, caseData.getCaseAccessCategory());
@@ -2849,21 +2839,22 @@ class DirectionsQuestionnaireGeneratorTest {
                 .businessProcess(new BusinessProcess().setCamundaEvent("DEFENDANT_RESPONSE"))
                 .build();
 
-            String statementOfTruth = """
-                    The defendant believes that the facts stated in the response are true.\
-                    
-                    
-                    
-                    I am duly authorised by the defendant to sign this statement.
-                    
-                    The defendant understands that the proceedings for contempt of court \
-                    may be brought against anyone who makes, or causes to be made, \
-                    a false statement in a document verified by a statement of truth \
-                    without an honest belief in its truth.""";
+            String statementOfTruth = expectedStatementOfTruth("defendant", "stated in the response");
 
             DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
             assertNotEquals(SPEC_CLAIM, caseData.getCaseAccessCategory());
             assertEquals(statementOfTruth, templateData.getStatementOfTruthText());
+        }
+
+        private String expectedStatementOfTruth(String party, String factsText) {
+            return """
+                The %s believes that the facts %s are true.%n%n%n\
+                I am duly authorised by the %s to sign this statement.%n%n\
+                The %s understands that the proceedings for contempt of court \
+                may be brought against anyone who makes, or causes to be made, \
+                a false statement in a document verified by a statement of truth \
+                without an honest belief in its truth."""
+                .formatted(party, factsText, party, party);
         }
     }
 }

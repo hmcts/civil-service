@@ -242,7 +242,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .build();
             CaseDetails parentCaseDetails = CaseDetails.builder().build();
             GeneralApplicationCaseData parentCivilCaseData = new GeneralApplicationCaseData().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
@@ -250,6 +249,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             when(coreCaseDataService.getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())))
                 .thenReturn(parentCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(parentCaseDetails)).thenReturn(parentCivilCaseData);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
@@ -371,10 +371,10 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             handler.handle(params);
 
             verify(dismissalOrderGenerator, times(1))
