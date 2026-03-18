@@ -64,11 +64,10 @@ class GaHearingFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    List<DynamicListElement> listItems = singletonList(DynamicListElement.builder()
-                                                           .code("code").label("label").build());
+    List<DynamicListElement> listItems = singletonList(new DynamicListElement().setCode("code").setLabel("label"));
 
-    DynamicListElement selectedLocation = DynamicListElement
-        .builder().label("sitename - location name - D12 8997").build();
+    DynamicListElement selectedLocation =
+        new DynamicListElement().setLabel("sitename - location name - D12 8997");
 
     private static final String TEMPLATE_NAME = "Application_Hearing_Notice_%s.pdf";
     private static final String FILE_NAME_APPLICATION = String.format(
@@ -162,9 +161,7 @@ class GaHearingFormGeneratorTest {
                                        .setHearingDuration(GAHearingDuration.OTHER)
                                        .setChannel(GAJudicialHearingType.IN_PERSON)
                                        .setHearingLocation(
-                                           DynamicList.builder()
-                                               .value(selectedLocation).listItems(listItems)
-                                               .build()))
+                                           new DynamicList().setValue(selectedLocation).setListItems(listItems)))
             .build();
 
         var templateData = generator.getTemplateData(null, caseData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
@@ -200,7 +197,7 @@ class GaHearingFormGeneratorTest {
         )).thenReturn(caseDetails);
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YES)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("8"))
             .build();
 
         Exception exception =
@@ -383,9 +380,7 @@ class GaHearingFormGeneratorTest {
                                            .setHearingDuration(GAHearingDuration.OTHER)
                                            .setChannel(GAJudicialHearingType.IN_PERSON)
                                            .setHearingLocation(
-                                               DynamicList.builder()
-                                                   .value(selectedLocation).listItems(listItems)
-                                                   .build()))
+                                               new DynamicList().setValue(selectedLocation).setListItems(listItems)))
                 .build();
 
             var templateData = generator.getTemplateData(

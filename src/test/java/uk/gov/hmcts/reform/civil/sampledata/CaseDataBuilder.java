@@ -1952,29 +1952,17 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder defendantSolicitorNotifyClaimOptions(String defaultValue) {
-        this.defendantSolicitorNotifyClaimOptions = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                .label(defaultValue)
-                .build())
-            .build();
+        this.defendantSolicitorNotifyClaimOptions = new DynamicList().setValue(new DynamicListElement().setLabel(defaultValue));
         return this;
     }
 
     public CaseDataBuilder defendantSolicitorNotifyClaimDetailsOptions(String defaultValue) {
-        this.defendantSolicitorNotifyClaimDetailsOptions = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                .label(defaultValue)
-                .build())
-            .build();
+        this.defendantSolicitorNotifyClaimDetailsOptions = new DynamicList().setValue(new DynamicListElement().setLabel(defaultValue));
         return this;
     }
 
     public CaseDataBuilder selectLitigationFriend(String defaultValue) {
-        this.selectLitigationFriend = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                .label(defaultValue)
-                .build())
-            .build();
+        this.selectLitigationFriend = new DynamicList().setValue(new DynamicListElement().setLabel(defaultValue));
         return this;
     }
 
@@ -2512,7 +2500,7 @@ public class CaseDataBuilder {
         courtLocation = new CourtLocation()
             .setApplicantPreferredCourt("214320")
             .setApplicantPreferredCourtLocationList(
-                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
+                new DynamicList().setValue(new DynamicListElement().setLabel("sitename")))
             .setCaseLocation(new CaseLocationCivil()
                 .setRegion("10")
                 .setBaseLocation("214320")
@@ -2523,9 +2511,7 @@ public class CaseDataBuilder {
         claimType = ClaimType.PERSONAL_INJURY;
         claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
-        applicantSolicitor1PbaAccounts = DynamicList.builder()
-            .value(DynamicListElement.builder().label("PBA0077597").build())
-            .build();
+        applicantSolicitor1PbaAccounts = new DynamicList().setValue(new DynamicListElement().setLabel("PBA0077597"));
         claimFee = new Fee()
             .setVersion("1")
             .setCode("CODE")
@@ -2560,7 +2546,7 @@ public class CaseDataBuilder {
         courtLocation = new CourtLocation()
             .setApplicantPreferredCourt("214320")
             .setApplicantPreferredCourtLocationList(
-                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
+                new DynamicList().setValue(new DynamicListElement().setLabel("sitename")))
             .setCaseLocation(new CaseLocationCivil()
                 .setRegion("10")
                 .setBaseLocation("214320")
@@ -2571,9 +2557,7 @@ public class CaseDataBuilder {
         claimType = ClaimType.PERSONAL_INJURY;
         claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
-        applicantSolicitor1PbaAccounts = DynamicList.builder()
-            .value(DynamicListElement.builder().label("PBA0077597").build())
-            .build();
+        applicantSolicitor1PbaAccounts = new DynamicList().setValue(new DynamicListElement().setLabel("PBA0077597"));
         claimFee = new Fee()
             .setVersion("1")
             .setCode("CODE")
@@ -2821,16 +2805,12 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssued1v2AndBothDefendantsDefaultJudgment() {
-        defendantDetails = DynamicList.builder()
-            .value(DynamicListElement.builder().label("Both Defendants").build())
-            .build();
+        defendantDetails = new DynamicList().setValue(new DynamicListElement().setLabel("Both Defendants"));
         return this;
     }
 
     public CaseDataBuilder atStateClaimIssued1v2AndOneDefendantDefaultJudgment() {
-        defendantDetails = DynamicList.builder()
-            .value(DynamicListElement.builder().label("Mr. Sole Trader").build())
-            .build();
+        defendantDetails = new DynamicList().setValue(new DynamicListElement().setLabel("Mr. Sole Trader"));
         return this;
     }
 
@@ -3052,8 +3032,9 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialLocationInPerson() {
-        trialHearingMethodInPersonDJ = DynamicList.builder().value(
-            DynamicListElement.builder().label("Court 1").build()).build();
+        trialHearingMethodInPersonDJ = new DynamicList()
+                                           .setValue(
+                                               new DynamicListElement().setLabel("Court 1"));
         return this;
     }
 
@@ -3319,12 +3300,8 @@ public class CaseDataBuilder {
         ChangeOrganisationRequest request = new ChangeOrganisationRequest();
         request.setRequestTimestamp(LocalDateTime.now());
         request.setCreatedBy(email);
-        request.setCaseRoleId(DynamicList.builder()
-            .value(DynamicListElement.builder()
-                .code(caseRole)
-                .label(caseRole)
-                .build())
-            .build());
+        request.setCaseRoleId(new DynamicList()
+                                  .setValue(new DynamicListElement().setCode(caseRole).setLabel(caseRole)));
         request.setOrganisationToAdd(new Organisation().setOrganisationID(newOrgID));
         request.setOrganisationToRemove(new Organisation().setOrganisationID(oldOrgId));
         request.setApprovalStatus(ChangeOrganisationApprovalStatus.APPROVED);
@@ -4119,10 +4096,7 @@ public class CaseDataBuilder {
         applicantQuery.setIsHearingRelated(YES);
         applicantQuery.setCreatedOn(queryCreationDatetime);
         List<Element<CaseMessage>> caseMessages = new ArrayList<>();
-        caseMessages.add(Element.<CaseMessage>builder()
-                                .id(UUID.randomUUID())
-                                .value(applicantQuery)
-                                .build());
+        caseMessages.add(new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(applicantQuery));
         CaseQueriesCollection caseQueries = new CaseQueriesCollection();
         caseQueries.setPartyName("Claimant");
         caseQueries.setRoleOnCase("applicant-citizen");
@@ -4141,9 +4115,7 @@ public class CaseDataBuilder {
         this.queries.setCaseMessages(
             Stream.concat(
                 this.queries.getCaseMessages().stream(),
-                List.of(Element.<CaseMessage>builder()
-                            .id(UUID.randomUUID())
-                            .value(applicantResponse).build()).stream()
+                List.of(new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(applicantResponse)).stream()
             ).toList());
         return this;
     }
@@ -4158,9 +4130,7 @@ public class CaseDataBuilder {
         this.queries.setCaseMessages(
                 Stream.concat(
                     this.queries.getCaseMessages().stream(),
-                    List.of(Element.<CaseMessage>builder()
-                                .id(UUID.randomUUID())
-                                .value(applicantFollowUp).build()).stream()
+                    List.of(new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(applicantFollowUp)).stream()
                 ).toList());
         return this;
     }
@@ -4171,10 +4141,7 @@ public class CaseDataBuilder {
         respondentQuery.setIsHearingRelated(YES);
         respondentQuery.setCreatedOn(queryCreationDatetime);
         List<Element<CaseMessage>> caseMessages = new ArrayList<>();
-        caseMessages.add(Element.<CaseMessage>builder()
-                             .id(UUID.randomUUID())
-                             .value(respondentQuery)
-                             .build());
+        caseMessages.add(new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(respondentQuery));
         CaseQueriesCollection caseQueries = new CaseQueriesCollection();
         caseQueries.setPartyName("Defendant");
         caseQueries.setRoleOnCase("respondent-citizen");
@@ -4193,9 +4160,7 @@ public class CaseDataBuilder {
         this.queries.setCaseMessages(
             Stream.concat(
                 this.queries.getCaseMessages().stream(),
-                List.of(Element.<CaseMessage>builder()
-                            .id(UUID.randomUUID())
-                            .value(respondentResponse).build()).stream()
+                List.of(new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(respondentResponse)).stream()
             ).toList());
         return this;
     }
@@ -4210,9 +4175,7 @@ public class CaseDataBuilder {
         this.queries.setCaseMessages(
                 Stream.concat(
                     this.queries.getCaseMessages().stream(),
-                    List.of(Element.<CaseMessage>builder()
-                                .id(UUID.randomUUID())
-                                .value(respondentFollowUp).build()).stream()
+                    List.of(new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(respondentFollowUp)).stream()
                 ).toList());
         return this;
     }
@@ -5470,19 +5433,15 @@ public class CaseDataBuilder {
     public CaseDataBuilder getGeneralApplicationWithStrikeOut(final String litigiousPartyID) {
         List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
         List<Element<GeneralApplication>> generalApplicationValues = wrapElements(
-            GeneralApplication.builder()
-                .applicantPartyName("partyName")
-                .litigiousPartyID(litigiousPartyID)
-                .generalAppDateDeadline(DEADLINE)
-                .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
-                .generalAppType(GAApplicationType.builder()
-                    .types(types)
-                    .build())
-
-                .caseLink(CaseLink.builder().caseReference("12345678").build())
-                .businessProcess(new BusinessProcess()
-                    .setCamundaEvent("NotifyRoboticsOnCaseHandedOffline"))
-                .build());
+            new GeneralApplication()
+                .setApplicantPartyName("partyName")
+                .setLitigiousPartyID(litigiousPartyID)
+                .setGeneralAppDateDeadline(DEADLINE)
+                .setGeneralAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
+                .setGeneralAppType(new GAApplicationType().setTypes(types))
+                .setCaseLink(new CaseLink("12345678"))
+                .setBusinessProcess(new BusinessProcess()
+                    .setCamundaEvent("NotifyRoboticsOnCaseHandedOffline")));
 
         this.generalApplications = generalApplicationValues;
         return this;
@@ -5490,12 +5449,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder getGeneralStrikeOutApplicationsDetailsWithCaseState(final String caseState) {
         List<Element<GeneralApplicationsDetails>> generalApplicationsDetails = wrapElements(
-            GeneralApplicationsDetails.builder()
-                .generalApplicationType(STRIKE_OUT.getDisplayedValue())
-                .caseState(caseState)
-                .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
-                .caseLink(CaseLink.builder().caseReference("12345678").build())
-                .build()
+            new GeneralApplicationsDetails()
+                .setGeneralApplicationType(STRIKE_OUT.getDisplayedValue())
+                .setCaseState(caseState)
+                .setGeneralAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
+                .setCaseLink(new CaseLink("12345678"))
         );
 
         this.generalApplicationsDetails = generalApplicationsDetails;
@@ -6086,8 +6044,7 @@ public class CaseDataBuilder {
 
     public CaseData buildClaimIssuedPaymentCaseDataWithPba(String pbaAccountNumber) {
         return this.buildClaimIssuedPaymentCaseData().toBuilder()
-            .applicantSolicitor1PbaAccounts(DynamicList.builder()
-                .value(DynamicListElement.dynamicElement(pbaAccountNumber)).build())
+            .applicantSolicitor1PbaAccounts(new DynamicList().setValue(DynamicListElement.dynamicElement(pbaAccountNumber)))
             .paymentReference("RC-1234-1234-1234-1234")
             .build();
     }
@@ -6339,11 +6296,7 @@ public class CaseDataBuilder {
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
             .partialPayment(YesOrNo.YES)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
-            .defendantDetailsSpec(DynamicList.builder()
-                .value(DynamicListElement.builder()
-                    .label("Test User")
-                    .build())
-                .build())
+            .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("Test User")))
             .build();
     }
 
@@ -6361,11 +6314,7 @@ public class CaseDataBuilder {
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
             .partialPayment(YesOrNo.YES)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
-            .defendantDetailsSpec(DynamicList.builder()
-                .value(DynamicListElement.builder()
-                    .label("John Smith")
-                    .build())
-                .build())
+            .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("John Smith")))
             .build();
     }
 
@@ -6383,11 +6332,7 @@ public class CaseDataBuilder {
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
             .partialPayment(YesOrNo.YES)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
-            .defendantDetailsSpec(DynamicList.builder()
-                .value(DynamicListElement.builder()
-                    .label("Test User")
-                    .build())
-                .build())
+            .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("Test User")))
             .joJudgmentPaidInFull(paidInFull)
             .activeJudgment(new JudgmentDetails().setIssueDate(LocalDate.now()))
             .build();
@@ -7460,11 +7405,7 @@ public class CaseDataBuilder {
             documentsReferred = null;
         }
         UploadMediationDocumentsForm form = new UploadMediationDocumentsForm();
-        form.setUploadMediationDocumentsPartyChosen(DynamicList.builder()
-            .value(DynamicListElement.builder()
-                .code(partyChosen)
-                .build())
-            .build());
+        form.setUploadMediationDocumentsPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosen)));
         form.setMediationDocumentsType(documentTypes);
         form.setDocumentsReferredForm(documentsReferred);
         form.setNonAttendanceStatementForm(mediationNonAttendanceStatement);

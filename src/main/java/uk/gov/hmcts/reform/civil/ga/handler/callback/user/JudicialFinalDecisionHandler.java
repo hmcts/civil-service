@@ -280,21 +280,10 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
     }
 
     private DynamicList populateHearingLocation(GeneralApplicationCaseData caseData) {
-        return DynamicList.builder().listItems(List.of(
-                DynamicListElement.builder()
-                    .code("LOCATION_LIST")
-                    .label(caseData.getLocationName())
-                    .build(),
-                DynamicListElement.builder()
-                    .code("OTHER_LOCATION")
-                    .label("Other location")
-                    .build()
-            ))
-            .value(DynamicListElement.builder()
-                       .code("LOCATION_LIST")
-                       .label(caseData.getLocationName())
-                       .build())
-            .build();
+        return new DynamicList().setListItems(List.of(
+                new DynamicListElement().setCode("LOCATION_LIST").setLabel(caseData.getLocationName()),
+                new DynamicListElement().setCode("OTHER_LOCATION").setLabel("Other location")
+            )).setValue(new DynamicListElement().setCode("LOCATION_LIST").setLabel(caseData.getLocationName()));
     }
 
     private CallbackResponse setFinalDecisionBusinessProcess(CallbackParams callbackParams) {

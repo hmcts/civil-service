@@ -185,7 +185,7 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .applicationIsUncloakedOnce(YesOrNo.NO)
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -209,7 +209,7 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .applicationIsUncloakedOnce(YesOrNo.NO)
                 .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
 
@@ -233,7 +233,7 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations())
                 .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS))
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -260,7 +260,7 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations())
                 .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS))
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
 
@@ -346,7 +346,7 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
                 .gaHearingNoticeApplication(new GAHearingNoticeApplication())
                 .gaHearingNoticeDetail(new GAHearingNoticeDetail())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -377,7 +377,7 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
                 .gaHearingNoticeApplication(new GAHearingNoticeApplication())
                 .gaHearingNoticeDetail(new GAHearingNoticeDetail())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -405,7 +405,7 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
                 .judicialDecision(new GAJudicialDecision().setDecision(decisionOption))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder().setMakeAnOrder(orderOption)).build();
@@ -436,7 +436,7 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
                 .judicialDecision(new GAJudicialDecision().setDecision(decisionOption))
                 .ccdState(CaseState.ADDITIONAL_RESPONSE_TIME_EXPIRED)
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
@@ -466,7 +466,7 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
                 .judicialDecision(new GAJudicialDecision().setDecision(
                     MAKE_AN_ORDER
                 ))
