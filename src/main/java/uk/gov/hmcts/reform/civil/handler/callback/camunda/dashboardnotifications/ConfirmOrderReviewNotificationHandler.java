@@ -82,7 +82,7 @@ public abstract class ConfirmOrderReviewNotificationHandler extends DashboardCal
                     authToken,
                     scenario,
                     caseId,
-                    ScenarioRequestParams.builder().params(paramsMap).build()
+                    new ScenarioRequestParams(paramsMap)
                 );
             }
         }

@@ -107,7 +107,7 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
             "BEARER_TOKEN",
             SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -146,7 +146,7 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
             "BEARER_TOKEN",
             SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

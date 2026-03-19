@@ -46,18 +46,9 @@ class NotificationTemplateCatalogTest {
 
     @Test
     void shouldReloadTemplatesAndProtectInternalState() {
-        NotificationTemplateDefinition first = NotificationTemplateDefinition.builder()
-            .name("Template.One")
-            .titleEn("First")
-            .build();
-        NotificationTemplateDefinition second = NotificationTemplateDefinition.builder()
-            .name("Template.Two")
-            .titleEn("Second")
-            .build();
-        NotificationTemplateDefinition replacement = NotificationTemplateDefinition.builder()
-            .name("Template.One")
-            .titleEn("Replacement")
-            .build();
+        NotificationTemplateDefinition first = template("Template.One", "First");
+        NotificationTemplateDefinition second = template("Template.Two", "Second");
+        NotificationTemplateDefinition replacement = template("Template.One", "Replacement");
 
         NotificationTemplateJsonLoader loader = mock(NotificationTemplateJsonLoader.class);
         when(loader.loadTemplates()).thenReturn(List.of(first));
@@ -74,5 +65,12 @@ class NotificationTemplateCatalogTest {
             .contains(replacement);
         assertThatThrownBy(() -> reloadedCatalog.findAll().add(first))
             .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    private NotificationTemplateDefinition template(String name, String titleEn) {
+        NotificationTemplateDefinition template = new NotificationTemplateDefinition();
+        template.setName(name);
+        template.setTitleEn(titleEn);
+        return template;
     }
 }

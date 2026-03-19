@@ -63,8 +63,8 @@ public class ApplicationSubmittedDashboardNotificationHandler extends CallbackHa
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> scenarios = getScenarios(caseData);
-        ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
-            caseData)).build();
+        ScenarioRequestParams scenarioParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(
+            caseData));
         scenarios.forEach(scenario -> dashboardApiClient.recordScenario(
             caseData.getCcdCaseReference().toString(),
             scenario,
