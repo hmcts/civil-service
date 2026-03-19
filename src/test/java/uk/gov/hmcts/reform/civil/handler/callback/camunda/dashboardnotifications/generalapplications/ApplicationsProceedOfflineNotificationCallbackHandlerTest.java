@@ -230,7 +230,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                new ScenarioRequestParams(new HashMap<>())
             );
         }
 
@@ -258,7 +258,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                new ScenarioRequestParams(new HashMap<>())
             );
         }
 
@@ -293,7 +293,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                new ScenarioRequestParams(new HashMap<>())
             );
         }
 
@@ -321,7 +321,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                new ScenarioRequestParams(new HashMap<>())
             );
         }
 
@@ -349,7 +349,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                new ScenarioRequestParams(new HashMap<>())
             );
         }
 
@@ -384,7 +384,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                new ScenarioRequestParams(new HashMap<>())
             );
         }
     }

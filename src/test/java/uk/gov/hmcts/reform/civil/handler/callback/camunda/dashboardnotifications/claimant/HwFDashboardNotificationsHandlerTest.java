@@ -104,7 +104,7 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 dashboardScenario.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -139,7 +139,7 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 dashboardScenario.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

@@ -101,13 +101,13 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
             "BEARER_TOKEN",
                 SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService, times(1)).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }
@@ -146,13 +146,13 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService, times(1)).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }

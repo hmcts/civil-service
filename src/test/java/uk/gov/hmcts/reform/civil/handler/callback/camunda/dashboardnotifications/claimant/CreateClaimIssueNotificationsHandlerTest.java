@@ -67,7 +67,7 @@ class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimIssue.Response.Await",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -92,7 +92,7 @@ class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimIssue.HWF.PhonePayment",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -118,13 +118,13 @@ class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

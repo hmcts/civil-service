@@ -74,7 +74,7 @@ class CreateSdoDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.CP.OrderMade.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -168,7 +168,7 @@ class CreateSdoDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.MediationUnsuccessfulWithoutUploadDocuments.TrackChange.CARM.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -205,14 +205,14 @@ class CreateSdoDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             "Scenario.AAA6.CP.OrderMade.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -250,14 +250,14 @@ class CreateSdoDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             "Scenario.AAA6.CP.OrderMade.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -296,7 +296,7 @@ class CreateSdoDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -330,14 +330,14 @@ class CreateSdoDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             "Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -363,7 +363,7 @@ class CreateSdoDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -388,7 +388,7 @@ class CreateSdoDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.CP.OrderMade.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -411,7 +411,7 @@ class CreateSdoDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.CP.SDOMadebyLA.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -434,14 +434,14 @@ class CreateSdoDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.CP.SDOMadebyLA.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             "Scenario.AAA6.CP.OrderMade.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -464,14 +464,14 @@ class CreateSdoDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.CP.SDOMadebyLA.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             "Scenario.AAA6.CP.OrderMade.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 }
