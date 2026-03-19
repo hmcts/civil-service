@@ -140,11 +140,9 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
 
         caseDataBuilder
             .hearingDetailsResp(
-                GAHearingDetails
-                    .builder()
-                    .hearingPreferredLocation(getLocationsFromList(locationRefDataService
-                                                                       .getCourtLocations(authToken)))
-                    .build());
+                new GAHearingDetails()
+                    .setHearingPreferredLocation(getLocationsFromList(locationRefDataService
+                                                                       .getCourtLocations(authToken))));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(applicationExistsValidation(callbackParams))
@@ -369,14 +367,14 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
             Optional<DynamicListElement> first = dynamicLocationList.getListItems().stream()
                 .filter(l -> l.getLabel().equals(applicationLocationLabel)).findFirst();
             first.ifPresent(dynamicLocationList::setValue);
-            gaHearingDetailsResp = caseData.getHearingDetailsResp().toBuilder()
-                .respondentResponsePartyName(getRespondentResponsePartyName(caseData, userInfo))
-                .hearingPreferredLocation(dynamicLocationList).build();
+            gaHearingDetailsResp = caseData.getHearingDetailsResp().copy()
+                .setRespondentResponsePartyName(getRespondentResponsePartyName(caseData, userInfo))
+                .setHearingPreferredLocation(dynamicLocationList);
 
         } else {
-            gaHearingDetailsResp = caseData.getHearingDetailsResp().toBuilder()
-                .respondentResponsePartyName(getRespondentResponsePartyName(caseData, userInfo))
-                .hearingPreferredLocation(DynamicList.builder().build()).build();
+            gaHearingDetailsResp = caseData.getHearingDetailsResp().copy()
+                .setRespondentResponsePartyName(getRespondentResponsePartyName(caseData, userInfo))
+                .setHearingPreferredLocation(new DynamicList());
         }
         return gaHearingDetailsResp;
     }

@@ -198,8 +198,9 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
 
         GeneralApplicationCaseData updatedCaseData =  GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().copy()
             .gaDraftDocument(singletonList(
-            Element.<CaseDocument>builder().id(UUID.fromString(uid1))
-                .value(pdfDocument).build())).build();
+                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)
+            ))
+            .build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
@@ -230,8 +231,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
 
         GeneralApplicationCaseData updatedCaseData =  GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().copy()
             .gaDraftDocument(singletonList(
-                Element.<CaseDocument>builder().id(UUID.fromString(uid1))
-                    .value(pdfDocument).build())).build();
+                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument))).build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(updatedCaseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
@@ -262,47 +262,39 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
 
         when(gaForLipService.isGaForLip(any())).thenReturn(true); // GA for LIP condition
         var draftDocumentsList = List.of(
-            Element.<CaseDocument>builder()
-                .id(UUID.fromString(uid1))
-                .value(new CaseDocument()
+            new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(new CaseDocument()
                            .setDocumentName("Draft_application_2024-12-02 14:48:26.pdf")
                            .setCreatedDatetime(LocalDateTime.parse("2024-12-02T14:48:26"))
                            .setDocumentLink(new Document()
                                              .setDocumentUrl("fake-url-draft-1")
                                              .setDocumentFileName("Draft_application_2024-12-02 14:48:26.pdf")
-                                             .setDocumentBinaryUrl("binary-url-draft-1"))).build(),
+                                             .setDocumentBinaryUrl("binary-url-draft-1"))),
 
-            Element.<CaseDocument>builder()
-                .id(UUID.fromString(uid2))
-                .value(new CaseDocument()
+            new Element<CaseDocument>().setId(UUID.fromString(uid2)).setValue(new CaseDocument()
                            .setDocumentName("Translated_draft_application_2024-12-02 14:54:15.pdf")
                            .setCreatedDatetime(LocalDateTime.parse("2024-12-02T14:54:15"))
                            .setDocumentLink(new Document()
                                              .setDocumentUrl("fake-url-translated-1")
                                              .setDocumentFileName(
                                                  "Translated_draft_application_2024-12-02 14:54:15.pdf")
-                                             .setDocumentBinaryUrl("binary-url-translated-1"))).build(),
+                                             .setDocumentBinaryUrl("binary-url-translated-1"))),
 
-            Element.<CaseDocument>builder()
-                .id(UUID.fromString(uid3))
-                .value(new CaseDocument()
+            new Element<CaseDocument>().setId(UUID.fromString(uid3)).setValue(new CaseDocument()
                            .setDocumentName("Draft_application_2024-12-02 15:27:01.pdf")
                            .setCreatedDatetime(LocalDateTime.parse("2024-12-02T15:27:01"))
                            .setDocumentLink(new Document()
                                              .setDocumentUrl("fake-url-draft-2")
                                              .setDocumentFileName("Draft_application_2024-12-02 15:27:01.pdf")
-                                             .setDocumentBinaryUrl("binary-url-draft-2"))).build(),
+                                             .setDocumentBinaryUrl("binary-url-draft-2"))),
 
-            Element.<CaseDocument>builder()
-                .id(UUID.fromString(uid4))
-                .value(new CaseDocument()
+            new Element<CaseDocument>().setId(UUID.fromString(uid4)).setValue(new CaseDocument()
                            .setDocumentName("Translated_draft_application_2024-12-02 15:45:15.pdf")
                            .setCreatedDatetime(LocalDateTime.parse("2024-12-02T15:45:15"))
                            .setDocumentLink(new Document()
                                              .setDocumentUrl("fake-url-translated-2")
                                              .setDocumentFileName(
                                                  "Translated_draft_application_2024-12-02 15:45:15.pdf")
-                                             .setDocumentBinaryUrl("binary-url-translated-2"))).build()
+                                             .setDocumentBinaryUrl("binary-url-translated-2")))
         );
         GeneralApplicationCaseData gaLipCaseData = new GeneralApplicationCaseData()
             .applicantBilingualLanguagePreference(YesOrNo.YES)

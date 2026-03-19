@@ -20,19 +20,22 @@ public class DashboardNotificationsTestUtils {
     }
 
     public static List<TaskList> getTaskListList() {
-
-        List<TaskList> taskListList = new ArrayList<>();
-        taskListList.add(TaskList.builder().id(TASK_ITEM_IDENTIFIER)
-                             .taskNameCy("HearingCY")
-                             .taskNameEn("HearingEN").taskOrder(1).categoryCy("CategoryCy")
-                             .categoryEn("CategoryEn")
-                             .role("Defendant")
-                             .currentStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
-                             .currentStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
-                             .nextStatusEn(TaskStatus.IN_PROGRESS.getName())
-                             .nextStatusCy(TaskStatus.IN_PROGRESS.getWelshName())
-                             .hintTextCy("HintCy").hintTextEn("HintEn").reference("123").build());
-        return taskListList;
+        TaskList taskList = new TaskList();
+        taskList.setId(TASK_ITEM_IDENTIFIER);
+        taskList.setTaskNameCy("HearingCY");
+        taskList.setTaskNameEn("HearingEN");
+        taskList.setTaskOrder(1);
+        taskList.setCategoryCy("CategoryCy");
+        taskList.setCategoryEn("CategoryEn");
+        taskList.setRole("Defendant");
+        taskList.setCurrentStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName());
+        taskList.setCurrentStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName());
+        taskList.setNextStatusEn(TaskStatus.IN_PROGRESS.getName());
+        taskList.setNextStatusCy(TaskStatus.IN_PROGRESS.getWelshName());
+        taskList.setHintTextCy("HintCy");
+        taskList.setHintTextEn("HintEn");
+        taskList.setReference("123");
+        return List.of(taskList);
     }
 
     public static List<TaskListEntity> getTaskListEntityList() {
@@ -43,21 +46,30 @@ public class DashboardNotificationsTestUtils {
     }
 
     public static TaskListEntity getTaskListEntity(UUID taskItemIdentifier) {
+        TaskItemTemplateEntity taskItemTemplate = new TaskItemTemplateEntity();
+        taskItemTemplate.setId(Long.valueOf(123));
+        taskItemTemplate.setTaskNameCy("TaskNameCy");
+        taskItemTemplate.setTaskNameEn("TaskNameEn");
+        taskItemTemplate.setScenarioName("Scenario.hearing");
+        taskItemTemplate.setTemplateName("Hearing.view");
+        taskItemTemplate.setTaskOrder(1);
+        taskItemTemplate.setHintTextCy("HintCY");
+        taskItemTemplate.setHintTextEn("HintEn");
+        taskItemTemplate.setRole("Defendant");
+        taskItemTemplate.setCategoryCy("CategoryCy");
+        taskItemTemplate.setCategoryEn("CategoryEn");
 
-        return TaskListEntity.builder()
-            .id(taskItemIdentifier).taskNameCy("HearingCY").taskNameEn("HearingEN")
-            .currentStatus(1)
-            .nextStatus(6).hintTextCy("HintCy")
-            .hintTextEn("HintEn").reference("123")
-            .taskItemTemplate(TaskItemTemplateEntity.builder()
-                                  .id(Long.valueOf(123)).taskNameCy("TaskNameCy")
-                                  .taskNameEn("TaskNameEn")
-                                  .scenarioName("Scenario.hearing")
-                                  .templateName("Hearing.view")
-                                  .taskOrder(1).hintTextCy("HintCY")
-                                  .hintTextEn("HintEn").role("Defendant")
-                                  .categoryCy("CategoryCy").categoryEn("CategoryEn")
-                                  .build()).build();
+        TaskListEntity taskListEntity = new TaskListEntity();
+        taskListEntity.setId(taskItemIdentifier);
+        taskListEntity.setTaskNameCy("HearingCY");
+        taskListEntity.setTaskNameEn("HearingEN");
+        taskListEntity.setCurrentStatus(1);
+        taskListEntity.setNextStatus(6);
+        taskListEntity.setHintTextCy("HintCy");
+        taskListEntity.setHintTextEn("HintEn");
+        taskListEntity.setReference("123");
+        taskListEntity.setTaskItemTemplate(taskItemTemplate);
+        return taskListEntity;
     }
 
     public static List<DashboardNotificationsEntity> getNotificationEntityList() {
@@ -65,18 +77,21 @@ public class DashboardNotificationsTestUtils {
     }
 
     public static DashboardNotificationsEntity getNotification(UUID notificationId) {
-        return DashboardNotificationsEntity.builder().id(notificationId)
-            .reference("ccd-case-reference")
-            .descriptionEn("desc").descriptionCy("descCy")
-            .name("template.name")
-            .citizenRole("CLAIMANT")
-            .build();
+        DashboardNotificationsEntity notification = new DashboardNotificationsEntity();
+        notification.setId(notificationId);
+        notification.setReference("ccd-case-reference");
+        notification.setDescriptionEn("desc");
+        notification.setDescriptionCy("descCy");
+        notification.setName("template.name");
+        notification.setCitizenRole("CLAIMANT");
+        return notification;
     }
 
     public static List<Notification> getNotificationList() {
-        List<Notification> notificationList = new ArrayList<>();
-        notificationList.add(Notification.builder().id(TASK_ITEM_IDENTIFIER).descriptionEn("desc").descriptionCy(
-            "descCy").build());
-        return notificationList;
+        Notification notification = new Notification();
+        notification.setId(TASK_ITEM_IDENTIFIER);
+        notification.setDescriptionEn("desc");
+        notification.setDescriptionCy("descCy");
+        return List.of(notification);
     }
 }

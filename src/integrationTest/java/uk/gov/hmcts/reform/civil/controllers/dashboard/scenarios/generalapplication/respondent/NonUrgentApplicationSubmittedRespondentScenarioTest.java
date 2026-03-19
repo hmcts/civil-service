@@ -25,8 +25,7 @@ public class NonUrgentApplicationSubmittedRespondentScenarioTest extends BaseInt
 
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>()).build(),
+               new ScenarioRequestParams(new HashMap<>()),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_NON_URGENT_APPLICATION_SUBMITTED_RESPONDENT, caseId
         )
             .andExpect(status().isOk());

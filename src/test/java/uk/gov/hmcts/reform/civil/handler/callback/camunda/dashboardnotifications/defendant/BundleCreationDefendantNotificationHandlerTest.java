@@ -64,7 +64,7 @@ class BundleCreationDefendantNotificationHandlerTest extends BaseCallbackHandler
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -86,7 +86,7 @@ class BundleCreationDefendantNotificationHandlerTest extends BaseCallbackHandler
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -112,7 +112,7 @@ class BundleCreationDefendantNotificationHandlerTest extends BaseCallbackHandler
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }
