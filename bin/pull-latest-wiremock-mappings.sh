@@ -13,5 +13,5 @@ cd ..
 #Copy mappings, response files, and load script
 cp -r ./civil-wiremock-mappings/mappings .
 cp -r ./civil-wiremock-mappings/__files .
-cp -r ./civil-wiremock-mappings/bin/load-wiremock-mappings.sh ./bin/
+cp -r ./civil-wiremock-mappings/bin/. ./bin/
 rm -rf ./civil-wiremock-mappings
