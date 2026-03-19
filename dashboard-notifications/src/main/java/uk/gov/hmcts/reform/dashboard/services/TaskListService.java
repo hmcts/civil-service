@@ -63,7 +63,8 @@ public class TaskListService {
 
         TaskListEntity beingUpdated = taskList;
         if (latestEntity.isPresent()) {
-            beingUpdated = taskList.toBuilder().id(latestEntity.get().getId()).build();
+            beingUpdated = copyTaskList(taskList);
+            beingUpdated.setId(latestEntity.get().getId());
             entities.stream()
                 .filter(e -> !e.equals(latestEntity.get()))
                 .forEach(duplicateEntity -> taskListRepository.deleteById(duplicateEntity.getId()));
@@ -78,7 +79,8 @@ public class TaskListService {
         Optional<TaskListEntity> existingEntity = taskListRepository.findById(taskItemIdentifier);
 
         return existingEntity.map(taskListEntity -> {
-            TaskListEntity updated = taskListEntity.toBuilder().currentStatus(taskListEntity.getNextStatus()).build();
+            TaskListEntity updated = copyTaskList(taskListEntity);
+            updated.setCurrentStatus(taskListEntity.getNextStatus());
             return taskListRepository.save(updated);
         }).orElseThrow(() -> new IllegalArgumentException("Invalid task item identifier " + taskItemIdentifier));
     }
@@ -122,14 +124,13 @@ public class TaskListService {
             );
         }
         tasks.forEach(t -> {
-            TaskListEntity task = t.toBuilder()
-                .currentStatus(TaskStatus.INACTIVE.getPlaceValue())
-                .nextStatus(TaskStatus.INACTIVE.getPlaceValue())
-                .hintTextCy("")
-                .hintTextEn("")
-                .taskNameEn(StringUtility.removeAnchor(t.getTaskNameEn()))
-                .taskNameCy(StringUtility.removeAnchor(t.getTaskNameCy()))
-                .build();
+            TaskListEntity task = copyTaskList(t);
+            task.setCurrentStatus(TaskStatus.INACTIVE.getPlaceValue());
+            task.setNextStatus(TaskStatus.INACTIVE.getPlaceValue());
+            task.setHintTextCy("");
+            task.setHintTextEn("");
+            task.setTaskNameEn(StringUtility.removeAnchor(t.getTaskNameEn()));
+            task.setTaskNameCy(StringUtility.removeAnchor(t.getTaskNameCy()));
             log.info("{} task made inactive for claim = {}", task.getTaskNameEn(), caseIdentifier);
             taskListRepository.save(task);
         });
@@ -177,15 +178,32 @@ public class TaskListService {
         );
         tasks.stream().filter(task -> task.getCurrentStatus() == TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()).toList()
             .forEach(t -> {
-                TaskListEntity task = t.toBuilder()
-                    .currentStatus(TaskStatus.AVAILABLE.getPlaceValue())
-                    .nextStatus(TaskStatus.AVAILABLE.getPlaceValue())
-                    .hintTextCy("")
-                    .hintTextEn("")
-                    .taskNameEn(StringUtility.activateLink(t.getTaskNameEn()))
-                    .taskNameCy(StringUtility.activateLink(t.getTaskNameCy()))
-                    .build();
+                TaskListEntity task = copyTaskList(t);
+                task.setCurrentStatus(TaskStatus.AVAILABLE.getPlaceValue());
+                task.setNextStatus(TaskStatus.AVAILABLE.getPlaceValue());
+                task.setHintTextCy("");
+                task.setHintTextEn("");
+                task.setTaskNameEn(StringUtility.activateLink(t.getTaskNameEn()));
+                task.setTaskNameCy(StringUtility.activateLink(t.getTaskNameCy()));
                 taskListRepository.save(task);
             });
+    }
+
+    private TaskListEntity copyTaskList(TaskListEntity task) {
+        return new TaskListEntity(
+            task.getId(),
+            task.getTaskItemTemplate(),
+            task.getReference(),
+            task.getCurrentStatus(),
+            task.getNextStatus(),
+            task.getTaskNameEn(),
+            task.getHintTextEn(),
+            task.getTaskNameCy(),
+            task.getHintTextCy(),
+            task.getCreatedAt(),
+            task.getUpdatedAt(),
+            task.getUpdatedBy(),
+            task.getMessageParams()
+        );
     }
 }

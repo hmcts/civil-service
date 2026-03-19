@@ -82,7 +82,7 @@ class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTes
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -104,7 +104,7 @@ class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTes
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_DECISION_OUTCOME.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -127,7 +127,7 @@ class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTes
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

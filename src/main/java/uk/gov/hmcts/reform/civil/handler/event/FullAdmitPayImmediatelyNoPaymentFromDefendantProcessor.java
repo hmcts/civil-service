@@ -32,8 +32,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantProcessor {
             userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword()),
             DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT,
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder()
-                .params(mapper.mapCaseDataToParams(caseData)).build()
+            new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
         );
     }
 }

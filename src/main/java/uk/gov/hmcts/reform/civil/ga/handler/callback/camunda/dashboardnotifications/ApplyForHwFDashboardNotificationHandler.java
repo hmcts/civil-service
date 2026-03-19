@@ -48,7 +48,7 @@ public class ApplyForHwFDashboardNotificationHandler extends CallbackHandler imp
         dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                           DashboardScenarios.SCENARIO_AAA6_GENERAL_APPS_HWF_REQUESTED_APPLICANT.getScenario(),
                                           authToken,
-                                          ScenarioRequestParams.builder().params(paramsMap).build()
+                                          new ScenarioRequestParams(paramsMap)
 
         );
         return AboutToStartOrSubmitCallbackResponse.builder()

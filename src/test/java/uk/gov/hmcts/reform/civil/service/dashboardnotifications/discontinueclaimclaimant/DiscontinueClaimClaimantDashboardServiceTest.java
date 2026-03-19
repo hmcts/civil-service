@@ -52,7 +52,7 @@ class DiscontinueClaimClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_DISCONTINUE_NOTICE_OF_DISCONTINUE_ISSUED_DEFENDANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
