@@ -145,7 +145,7 @@ class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHand
             "BEARER_TOKEN",
             SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -172,7 +172,7 @@ class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHand
             "BEARER_TOKEN",
             SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 

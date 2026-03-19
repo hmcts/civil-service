@@ -86,7 +86,7 @@ public class DefaultJudgementIssuedClaimantNotificationHandlerTest extends BaseC
             "BEARER_TOKEN",
             SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }

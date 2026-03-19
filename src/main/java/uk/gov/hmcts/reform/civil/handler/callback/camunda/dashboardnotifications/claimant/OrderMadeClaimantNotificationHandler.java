@@ -103,7 +103,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
                 authToken,
                 SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(paramsMap).build()
+                new ScenarioRequestParams(paramsMap)
             );
         }
 
@@ -112,7 +112,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
                 authToken,
                 scenario,
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(paramsMap).build()
+                new ScenarioRequestParams(paramsMap)
             );
         }
 

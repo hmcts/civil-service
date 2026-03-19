@@ -96,7 +96,7 @@ class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest extends Bas
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -127,7 +127,7 @@ class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest extends Bas
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -157,7 +157,7 @@ class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest extends Bas
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
     }
