@@ -60,7 +60,7 @@ class TrialArrangementsNotifyOtherPartyClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -76,7 +76,7 @@ class TrialArrangementsNotifyOtherPartyClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT.getScenario(),
             "5678",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -92,7 +92,7 @@ class TrialArrangementsNotifyOtherPartyClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_LR_CLAIMANT.getScenario(),
             "9012",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verifyNoInteractions(dashboardNotificationService);
         verifyNoInteractions(taskListService);
@@ -110,7 +110,7 @@ class TrialArrangementsNotifyOtherPartyClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_LR_CLAIMANT.getScenario(),
             "3456",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verifyNoInteractions(dashboardNotificationService);
         verifyNoInteractions(taskListService);
