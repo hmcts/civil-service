@@ -33,7 +33,7 @@ class AssignUserWithACaseRoleTest {
         assignCaseReference.setOrganisationId("org1");
         assignCaseReference.setCaseRole("CREATOR");
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
         assignUserWithACaseRole.migrateCaseData(caseData, assignCaseReference);
 
         verify(coreCaseUserService).assignCase(
@@ -56,7 +56,7 @@ class AssignUserWithACaseRoleTest {
 
     @Test
     void shouldThrowExceptionWhenCaseReferenceIsNull() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         CaseRoleCaseReference ref = new CaseRoleCaseReference();
         ref.setCaseReference(null);
