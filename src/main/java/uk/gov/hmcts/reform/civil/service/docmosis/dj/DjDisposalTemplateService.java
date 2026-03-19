@@ -70,7 +70,7 @@ public class DjDisposalTemplateService {
             .setDisposalHearingCostsAddSection(
                 directionsToggleService.isToggleEnabled(caseData.getDisposalHearingCostsDJToggle()))
             .setApplicant(partyFieldService.hasApplicantPartyName(caseData)
-                           ? PartyUtils.getPartyNameWithLitigiousFriend(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend(), true) : null)
+                           ? PartyUtils.getApplicant1NameWithLitigiousFriend(caseData, true) : null)
 
             .setRespondent(partyFieldService.resolveRespondent(caseData))
             .setCaseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));

@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDynamicListValueLabel;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getHearingTimeEstimateLabel;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getRespondent1NameWithLitigiousFriend;
 
 @Service
 @RequiredArgsConstructor
@@ -82,7 +82,7 @@ public class DjTrialTemplateService {
                 hearingMethodFieldService.isInPerson(caseData.getTrialHearingMethodDJ()))
             .setTrialHearingLocation(trialHearingLocation)
             .setApplicant(partyFieldService.hasApplicantPartyName(caseData)
-                           ? getPartyNameWithLitigiousFriend(caseData.getRespondent1(), caseData.getRespondent1LitigationFriend(), true) : null)
+                           ? getRespondent1NameWithLitigiousFriend(caseData, true) : null)
             .setRespondent(partyFieldService.resolveRespondent(caseData))
             .setTrialHearingTimeDJ(caseData.getTrialHearingTimeDJ())
             .setDisposalHearingDateToToggle(trialTemplateFieldService.hasDateToToggle(caseData))
