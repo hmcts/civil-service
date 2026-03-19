@@ -40,7 +40,7 @@ public class CoreCaseUserService {
     public void assignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
         String caaAccessToken = getCaaAccessToken();
 
-        if (!userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole)) {
+        if (!userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole, userId)) {
             assignUserToCaseForRole(caseId, userId, organisationId, caseRole, caaAccessToken);
         } else {
             log.info("Case already have the user with {} role", caseRole.getFormattedName());
@@ -49,7 +49,7 @@ public class CoreCaseUserService {
 
     public void unassignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
         String caaAccessToken = getCaaAccessToken();
-        if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole)) {
+        if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole, userId)) {
             CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation = new CaseAssignedUserRoleWithOrganisation()
                 .setCaseDataId(caseId)
                 .setUserId(userId)
@@ -63,7 +63,7 @@ public class CoreCaseUserService {
 
         String caaAccessToken = getCaaAccessToken();
 
-        if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, CaseRole.CREATOR)) {
+        if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, CaseRole.CREATOR, userId)) {
             removeCreatorAccess(caseId, userId, organisationId, caaAccessToken);
         } else {
             log.info("User doesn't have {} role", CaseRole.CREATOR.getFormattedName());
@@ -127,7 +127,7 @@ public class CoreCaseUserService {
         );
     }
 
-    private boolean userWithCaseRoleExistsOnCase(String caseId, String accessToken, CaseRole caseRole) {
+    private boolean userWithCaseRoleExistsOnCase(String caseId, String accessToken, CaseRole caseRole, String userId) {
         CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
             accessToken,
             authTokenGenerator.generate(),
@@ -135,6 +135,9 @@ public class CoreCaseUserService {
         );
 
         return userRoles.getCaseAssignedUserRoles().stream()
-            .anyMatch(c -> c.getCaseRole().equals(caseRole.getFormattedName()));
+            .anyMatch(c ->
+                          caseRole.getFormattedName().equals(c.getCaseRole())
+                              && userId.equals(c.getUserId())
+        );
     }
 }
