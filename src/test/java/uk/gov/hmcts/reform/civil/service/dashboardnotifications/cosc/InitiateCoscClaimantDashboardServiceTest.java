@@ -65,7 +65,7 @@ class InitiateCoscClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_CLAIMANT.getScenario(),
             parentCaseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 

@@ -100,7 +100,7 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -134,7 +134,7 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -168,7 +168,7 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -202,7 +202,7 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -236,7 +236,7 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -270,7 +270,7 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

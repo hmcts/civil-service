@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.dashboard.data;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
@@ -13,7 +12,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Notification {
@@ -39,20 +37,21 @@ public class Notification {
     private LocalDateTime deadline;
 
     public static Notification from(DashboardNotificationsEntity dashboardNotificationsEntity) {
-
-        NotificationBuilder notification = Notification.builder()
-            .id(dashboardNotificationsEntity.getId())
-            .titleEn(dashboardNotificationsEntity.getTitleEn())
-            .titleCy(dashboardNotificationsEntity.getTitleCy())
-            .descriptionEn(dashboardNotificationsEntity.getDescriptionEn())
-            .descriptionCy(dashboardNotificationsEntity.getDescriptionCy())
-            .timeToLive(dashboardNotificationsEntity.getTimeToLive())
-            .params(dashboardNotificationsEntity.getParams())
-            .createdAt(dashboardNotificationsEntity.getCreatedAt())
-            .deadline(dashboardNotificationsEntity.getDeadline());
+        Notification notification = new Notification(
+            dashboardNotificationsEntity.getId(),
+            dashboardNotificationsEntity.getTitleEn(),
+            dashboardNotificationsEntity.getTitleCy(),
+            dashboardNotificationsEntity.getDescriptionEn(),
+            dashboardNotificationsEntity.getDescriptionCy(),
+            dashboardNotificationsEntity.getTimeToLive(),
+            null,
+            dashboardNotificationsEntity.getParams(),
+            dashboardNotificationsEntity.getCreatedAt(),
+            dashboardNotificationsEntity.getDeadline()
+        );
 
         Optional.ofNullable(dashboardNotificationsEntity.getNotificationAction())
-            .ifPresent(action -> notification.notificationAction(NotificationAction.from(action)));
-        return notification.build();
+            .ifPresent(action -> notification.setNotificationAction(NotificationAction.from(action)));
+        return notification;
     }
 }

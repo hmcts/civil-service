@@ -109,7 +109,7 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             scenario,
             AUTH_TOKEN,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
