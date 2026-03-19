@@ -122,21 +122,25 @@ class AsyncCaseMigrationServiceTest {
 
     @Test
     void shouldUpdateCaseStateWhenUpdatedStatePresent() {
+        // Arrange
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
-        CaseData caseData = mock(CaseData.class);
-        StartEventResponse startEventResponse = mock(StartEventResponse.class);
-        uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetails = mock(uk.gov.hmcts.reform.ccd.client.model.CaseDetails.class);
+        CaseData caseData = new CaseData().ccdCaseReference(12345L).build();
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .eventId("event-id")
+            .token("event-token")
+            .caseDetails(CaseDetails.builder().id(12345L).state("OLD_STATE").build())
+            .build();
 
         when(coreCaseDataService.startUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.eq(CaseEvent.UPDATE_CASE_DATA))).thenReturn(startEventResponse);
-        when(startEventResponse.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
 
         CaseReference caseReference = new CaseReference("12345");
         when(migrationTask.migrateCaseData(caseData, caseReference)).thenReturn(caseData);
         when(migrationTask.getUpdatedState(ArgumentMatchers.any())).thenReturn(Optional.of("NEW_STATE"));
         when(migrationTask.getEventSummary()).thenReturn("summary");
         when(migrationTask.getEventDescription()).thenReturn("description");
+        ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
 
         // Act
         List<CaseReference> caseReferences = List.of(caseReference);
@@ -144,6 +148,9 @@ class AsyncCaseMigrationServiceTest {
 
         // Assert
         verify(coreCaseDataService).startUpdate(ArgumentMatchers.eq("12345"), ArgumentMatchers.any(CaseEvent.class));
+        verify(coreCaseDataService).submitUpdate(ArgumentMatchers.eq("12345"), contentCaptor.capture());
+        Map<?, ?> submittedData = (Map<?, ?>) contentCaptor.getValue().getData();
+        assertEquals("NEW_STATE", submittedData.get("nextState"));
     }
 
     @Test

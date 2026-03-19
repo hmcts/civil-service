@@ -5,17 +5,22 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -111,6 +116,87 @@ class JudgmentOnlineMapperTest {
             1).getValue().getLastUpdateTimeStamp()), true);
         assertEquals(caseData.getHistoricJudgment().get(1).getValue().getLastUpdateTimeStamp().isAfter(caseData.getHistoricJudgment().get(
             2).getValue().getLastUpdateTimeStamp()), true);
+    }
+
+    @Test
+    void updateJudgmentTabDataWithActiveJudgmentPayInInstalmentsCancelledState() {
+        LocalDateTime fixedNow = LocalDateTime.of(2024, 1, 2, 10, 15);
+        RecordJudgmentOnlineMapper judgmentOnlineMapper = new RecordJudgmentOnlineMapper(() -> fixedNow, addressMapper);
+
+        CaseData caseData = new CaseData().build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setDefendant1Name("Defendant One")
+            .setDefendant2Name("Defendant Two")
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IN_INSTALMENTS))
+            .setInstalmentDetails(new JudgmentInstalmentDetails()
+                                      .setAmount("100")
+                                      .setStartDate(LocalDate.of(2024, 2, 1))
+                                      .setPaymentFrequency(PaymentFrequency.MONTHLY))
+            .setState(JudgmentState.CANCELLED)
+            .setIssueDate(LocalDate.of(2024, 1, 1))
+            .setFullyPaymentMadeDate(LocalDate.of(2024, 3, 1))
+            .setOrderedAmount("14000")
+            .setCosts("1000")
+            .setClaimFeeAmount("0")
+            .setAmountAlreadyPaid("0")
+            .setTotalAmount("15000");
+
+        judgmentOnlineMapper.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData, BigDecimal.TEN);
+
+        assertEquals(caseData.getJoIsLiveJudgmentExists(), YES);
+        assertEquals(caseData.getJoIsDisplayInJudgmentTab(), YES);
+        assertEquals(caseData.getJoDefendantName1(), "Defendant One");
+        assertEquals(caseData.getJoDefendantName2(), "Defendant Two");
+        assertEquals(caseData.getJoPaymentPlanSelected(), PaymentPlanSelection.PAY_IN_INSTALMENTS);
+        assertEquals(caseData.getJoState(), JudgmentState.CANCELLED);
+        assertEquals(caseData.getJoRepaymentAmount(), "100");
+        assertEquals(caseData.getJoRepaymentStartDate(), LocalDate.of(2024, 2, 1));
+        assertEquals(caseData.getJoRepaymentFrequency(), PaymentFrequency.MONTHLY);
+        assertEquals(caseData.getJoIssueDate(), LocalDate.of(2024, 1, 1));
+        assertEquals(caseData.getJoFullyPaymentMadeDate(), LocalDate.of(2024, 3, 1));
+        assertEquals(
+            caseData.getJoRepaymentSummaryObject(),
+            JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, BigDecimal.TEN)
+        );
+        assertEquals(caseData.getJoJudgementByAdmissionIssueDate(), fixedNow);
+    }
+
+    @Test
+    void updateJudgmentTabDataWithActiveJudgmentPayImmediatelyIssuedState() {
+        LocalDateTime fixedNow = LocalDateTime.of(2024, 4, 5, 9, 30);
+        RecordJudgmentOnlineMapper judgmentOnlineMapper = new RecordJudgmentOnlineMapper(() -> fixedNow, addressMapper);
+
+        CaseData caseData = new CaseData()
+            .joRepaymentAmount("existing-amount")
+            .joRepaymentStartDate(LocalDate.of(2024, 1, 1))
+            .joRepaymentFrequency(PaymentFrequency.WEEKLY)
+            .build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setDefendant1Name("Defendant One")
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IMMEDIATELY))
+            .setState(JudgmentState.ISSUED)
+            .setIssueDate(LocalDate.of(2024, 1, 10))
+            .setFullyPaymentMadeDate(LocalDate.of(2024, 1, 11))
+            .setOrderedAmount("14000")
+            .setCosts("0")
+            .setClaimFeeAmount("0")
+            .setAmountAlreadyPaid("0")
+            .setTotalAmount("14000");
+
+        judgmentOnlineMapper.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData, BigDecimal.ZERO);
+
+        assertEquals(caseData.getJoPaymentPlanSelected(), PaymentPlanSelection.PAY_IMMEDIATELY);
+        assertEquals(caseData.getJoState(), JudgmentState.ISSUED);
+        assertNull(caseData.getJoRepaymentAmount());
+        assertNull(caseData.getJoRepaymentStartDate());
+        assertNull(caseData.getJoRepaymentFrequency());
+        assertNull(caseData.getJoIssueDate());
+        assertNull(caseData.getJoFullyPaymentMadeDate());
+        assertEquals(
+            caseData.getJoRepaymentSummaryObject(),
+            JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, BigDecimal.ZERO)
+        );
+        assertEquals(caseData.getJoJudgementByAdmissionIssueDate(), fixedNow);
     }
 
 }
