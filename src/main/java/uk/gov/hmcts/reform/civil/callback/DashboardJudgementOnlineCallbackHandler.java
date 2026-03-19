@@ -45,8 +45,8 @@ public abstract class DashboardJudgementOnlineCallbackHandler extends CallbackHa
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String scenario = getScenario(caseData);
-        ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
-            caseData)).build();
+        ScenarioRequestParams scenarioParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(
+            caseData));
 
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
             dashboardScenariosService.recordScenarios(

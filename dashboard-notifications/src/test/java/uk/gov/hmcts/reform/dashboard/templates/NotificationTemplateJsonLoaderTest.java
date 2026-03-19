@@ -62,17 +62,9 @@ class NotificationTemplateJsonLoaderTest {
 
         when(mockedResolver.getResources("pattern")).thenReturn(new Resource[]{resourceA, resourceInvalid, resourceB});
 
-        NotificationTemplateDefinition definitionOne = NotificationTemplateDefinition.builder()
-            .name("Template")
-            .titleEn("First")
-            .build();
-        NotificationTemplateDefinition definitionDuplicate = NotificationTemplateDefinition.builder()
-            .name("Template")
-            .titleEn("Second")
-            .build();
-        NotificationTemplateDefinition definitionWithoutName = NotificationTemplateDefinition.builder()
-            .name(null)
-            .build();
+        NotificationTemplateDefinition definitionOne = template("Template", "First");
+        NotificationTemplateDefinition definitionDuplicate = template("Template", "Second");
+        NotificationTemplateDefinition definitionWithoutName = template(null, null);
 
         when(mockedMapper.readValue(any(InputStream.class), eq(NotificationTemplateDefinition.class)))
             .thenReturn(definitionOne, definitionWithoutName, definitionDuplicate);
@@ -154,5 +146,12 @@ class NotificationTemplateJsonLoaderTest {
         assertThatThrownBy(loader::loadTemplates)
             .isInstanceOf(NotificationTemplatesLoadingException.class)
             .hasMessageContaining("Unable to read notification template definitions");
+    }
+
+    private NotificationTemplateDefinition template(String name, String titleEn) {
+        NotificationTemplateDefinition template = new NotificationTemplateDefinition();
+        template.setName(name);
+        template.setTitleEn(titleEn);
+        return template;
     }
 }

@@ -261,7 +261,7 @@ class StayLiftedDefendantNotificationHandlerTest extends BaseCallbackHandlerTest
                 "BEARER_TOKEN",
                 scenario,
                 CCD_REFERENCE,
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 

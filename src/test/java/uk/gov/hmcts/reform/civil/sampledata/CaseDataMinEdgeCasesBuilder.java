@@ -64,7 +64,7 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         courtLocation = new CourtLocation()
             .setApplicantPreferredCourt("127")
             .setApplicantPreferredCourtLocationList(
-                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
+                new DynamicList().setValue(new DynamicListElement().setLabel("sitename")))
             .setCaseLocation(new CaseLocationCivil()
                               .setRegion("4")
                               .setBaseLocation("000000")
