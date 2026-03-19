@@ -93,6 +93,22 @@ public class PartyUtils {
         };
     }
 
+    public static String getApplicant1NameWithLitigiousFriend(CaseData caseData) {
+        return getPartyNameWithLitigiousFriend(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend(), false);
+    }
+
+    public static String getApplicant2NameWithLitigiousFriend(CaseData caseData) {
+        return getPartyNameWithLitigiousFriend(caseData.getApplicant2(), caseData.getApplicant2LitigationFriend(), false);
+    }
+
+    public static String getRespondent1NameWithLitigiousFriend(CaseData caseData) {
+        return getPartyNameWithLitigiousFriend(caseData.getRespondent1(), caseData.getRespondent1LitigationFriend(), false);
+    }
+
+    public static String getRespondent2NameWithLitigiousFriend(CaseData caseData) {
+        return getPartyNameWithLitigiousFriend(caseData.getRespondent2(), caseData.getRespondent2LitigationFriend(), false);
+    }
+
     public static String getPartyNameWithLitigiousFriend(Party party, LitigationFriend litigationFriend) {
         return getPartyNameWithLitigiousFriend(party, litigationFriend, false);
     }

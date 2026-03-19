@@ -22,7 +22,10 @@ import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle.ADD;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getApplicant1NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getApplicant2NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getRespondent1NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getRespondent2NameWithLitigiousFriend;
 
 @Slf4j
 @Service
@@ -49,10 +52,10 @@ public class SdoFastTrackTemplateService {
             .setJudgeName(judgeName)
             .setCaseNumber(caseData.getLegacyCaseReference())
             .setApplicant1(caseData.getApplicant1())
-            .setApplicant1PartyName(getPartyNameWithLitigiousFriend(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend()))
-            .setApplicant2PartyName(getPartyNameWithLitigiousFriend(caseData.getApplicant2(), caseData.getApplicant2LitigationFriend()))
-            .setRespondent1PartyName(getPartyNameWithLitigiousFriend(caseData.getRespondent1(), caseData.getRespondent1LitigationFriend()))
-            .setRespondent2PartyName(getPartyNameWithLitigiousFriend(caseData.getRespondent2(), caseData.getRespondent2LitigationFriend()))
+            .setApplicant1PartyName(getApplicant1NameWithLitigiousFriend(caseData))
+            .setApplicant2PartyName(getApplicant2NameWithLitigiousFriend(caseData))
+            .setRespondent1PartyName(getRespondent1NameWithLitigiousFriend(caseData))
+            .setRespondent2PartyName(getRespondent2NameWithLitigiousFriend(caseData))
             .setHasApplicant2(caseClassificationService.hasApplicant2(caseData))
             .setApplicant2(caseData.getApplicant2())
             .setRespondent1(caseData.getRespondent1())
