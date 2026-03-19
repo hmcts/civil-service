@@ -53,7 +53,7 @@ class MakeDecisionRespondentDashboardServiceTest {
     @Test
     void shouldRecordJudgeUncloakScenarioWhenWithoutNoticeAndUncloaked() {
         GeneralApplicationCaseData caseData = baseCase()
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
             .applicationIsUncloakedOnce(YesOrNo.YES)
             .makeAppVisibleToRespondents(
                 new GAMakeApplicationAvailableCheck()
@@ -67,7 +67,7 @@ class MakeDecisionRespondentDashboardServiceTest {
     @Test
     void shouldFallBackToDecisionScenarioWhenWithoutNoticeAndUncloakedButNotVisibleToRespondent() {
         GeneralApplicationCaseData caseData = baseCase()
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
             .applicationIsUncloakedOnce(YesOrNo.YES)
             .judicialDecisionRequestMoreInfo(
                 new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)
@@ -166,7 +166,7 @@ class MakeDecisionRespondentDashboardServiceTest {
             .ccdCaseReference(456L)
             .isGaRespondentOneLip(YesOrNo.YES)
             .isMultiParty(YesOrNo.NO)
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
             .build();
     }
 

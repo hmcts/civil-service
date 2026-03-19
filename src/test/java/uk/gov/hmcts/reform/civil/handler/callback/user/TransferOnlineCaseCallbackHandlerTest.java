@@ -405,9 +405,8 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(locationRefData);
 
             DynamicList transferCourtList = new DynamicList();
-            DynamicListElement transferCourtElement = DynamicListElement.builder()
-                .label("Site 1 - Adr 1 - AAA 111")
-                .build();
+            DynamicListElement transferCourtElement = new DynamicListElement()
+                .setLabel("Site 1 - Adr 1 - AAA 111");
             transferCourtList.setValue(transferCourtElement);
 
             // Using respondent1Represented(NO)
@@ -443,9 +442,8 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(locationRefData);
 
             DynamicList transferCourtList = new DynamicList();
-            DynamicListElement transferCourtElement = DynamicListElement.builder()
-                .label("Site 1 - Adr 1 - AAA 111")
-                .build();
+            DynamicListElement transferCourtElement = new DynamicListElement()
+                .setLabel("Site 1 - Adr 1 - AAA 111");
             transferCourtList.setValue(transferCourtElement);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .applicant1Represented(NO)

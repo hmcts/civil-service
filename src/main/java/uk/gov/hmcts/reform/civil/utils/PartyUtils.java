@@ -379,8 +379,7 @@ public class PartyUtils {
 
     public static List<Element<PartyFlagStructure>> appendWithNewPartyIds(List<Element<PartyFlagStructure>> partyFlagStructures) {
         return partyFlagStructures != null ? partyFlagStructures.stream().map(
-            party -> Element.<PartyFlagStructure>builder()
-                .id(party.getId()).value(appendWithNewPartyId(party.getValue())).build()
+            party -> new Element<PartyFlagStructure>().setId(party.getId()).setValue(appendWithNewPartyId(party.getValue()))
         ).toList() : null;
     }
 

@@ -17,6 +17,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -201,11 +204,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                     .build().toBuilder()
-                    .defendantDetails(uk.gov.hmcts.reform.civil.model.common.DynamicList.builder()
-                                              .value(uk.gov.hmcts.reform.civil.model.common.DynamicListElement.builder()
-                                                             .label("Someone Else")
-                                                             .build())
-                                              .build())
+                    .defendantDetails(dynamicListWithLabel("Someone Else"))
                     .build();
             CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
@@ -307,11 +306,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
                     .build().toBuilder()
                     .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
                     .respondent1Represented(NO)
-                    .defendantDetails(uk.gov.hmcts.reform.civil.model.common.DynamicList.builder()
-                                              .value(uk.gov.hmcts.reform.civil.model.common.DynamicListElement.builder()
-                                                             .label("Mr. Sole Trader")
-                                                             .build())
-                                              .build())
+                    .defendantDetails(dynamicListWithLabel("Mr. Sole Trader"))
                     .build();
 
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -340,11 +335,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
                     .build().toBuilder()
                     .respondent2SameLegalRepresentative(YES)
                     .respondent1EmailAddress("respondentsolicitor@example.com")
-                    .defendantDetails(uk.gov.hmcts.reform.civil.model.common.DynamicList.builder()
-                                              .value(uk.gov.hmcts.reform.civil.model.common.DynamicListElement.builder()
-                                                             .label("Mr. John Rambo")
-                                                             .build())
-                                              .build())
+                    .defendantDetails(dynamicListWithLabel("Mr. John Rambo"))
                     .build();
 
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -376,17 +367,13 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
                     .build().toBuilder()
                     .addRespondent2(YES)
                     .respondent2Represented(NO)
-                    .respondent2(new uk.gov.hmcts.reform.civil.model.Party()
-                                         .setType(uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL)
+                    .respondent2(new Party()
+                                         .setType(Party.Type.INDIVIDUAL)
                                          .setIndividualFirstName("John")
                                          .setIndividualLastName("Rambo")
                                          .setPartyName("Mr. John Rambo")
                                          .setPartyEmail("rambo@email.com"))
-                    .defendantDetails(uk.gov.hmcts.reform.civil.model.common.DynamicList.builder()
-                                              .value(uk.gov.hmcts.reform.civil.model.common.DynamicListElement.builder()
-                                                             .label("Both Defendants")
-                                                             .build())
-                                              .build())
+                    .defendantDetails(dynamicListWithLabel("Both Defendants"))
                     .respondent2OrganisationPolicy(null)
                     .build();
 
@@ -416,11 +403,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .build().toBuilder()
-                    .defendantDetails(uk.gov.hmcts.reform.civil.model.common.DynamicList.builder()
-                                              .value(uk.gov.hmcts.reform.civil.model.common.DynamicListElement.builder()
-                                                             .label("Mr. Sole Trader")
-                                                             .build())
-                                              .build())
+                    .defendantDetails(dynamicListWithLabel("Mr. Sole Trader"))
                     .build();
 
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -450,11 +433,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
                     .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                     .build().toBuilder()
                     .respondent2OrganisationPolicy(null)
-                    .defendantDetails(uk.gov.hmcts.reform.civil.model.common.DynamicList.builder()
-                                              .value(uk.gov.hmcts.reform.civil.model.common.DynamicListElement.builder()
-                                                             .label("Mr. John Rambo")
-                                                             .build())
-                                              .build())
+                    .defendantDetails(dynamicListWithLabel("Mr. John Rambo"))
                     .build();
 
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -539,6 +518,10 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
                     any(),
                     any()
             );
+        }
+
+        private DynamicList dynamicListWithLabel(String label) {
+            return new DynamicList().setValue(new DynamicListElement().setLabel(label));
         }
 
         private Map<String, String> getNotificationDataMap() {

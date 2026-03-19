@@ -54,7 +54,7 @@ public class DocmosisServiceTest {
         when(generalAppLocationRefDataService.getCourtLocations(any())).thenReturn(locationRefData);
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build()).build();
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("2")).build();
         LocationRefData locationRefData = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
         assertThat(locationRefData.getVenueName())
             .isEqualTo("London");
@@ -66,7 +66,7 @@ public class DocmosisServiceTest {
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("420219").build()).build();
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("420219")).build();
         LocationRefData cnbcLocationRefData = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
         assertThat(cnbcLocationRefData.getVenueName())
             .isEqualTo("CNBC");
@@ -78,7 +78,7 @@ public class DocmosisServiceTest {
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("420219").build()).build();
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("420219")).build();
         LocationRefData cnbcLocationRefData = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
         assertThat(cnbcLocationRefData.getVenueName())
             .isEqualTo("CNBC");
@@ -89,7 +89,7 @@ public class DocmosisServiceTest {
         when(generalAppLocationRefDataService.getCourtLocations(any())).thenReturn(locationRefData);
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build()).build();
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("8")).build();
 
         Exception exception =
             assertThrows(
