@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Data;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @Data
 public class ScenarioRequestParams {
