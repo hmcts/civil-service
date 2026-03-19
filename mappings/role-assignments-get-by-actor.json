@@ -1,0 +1,14 @@
+{
+  "name": "Role Assignments - Get by Actor ID",
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/am/role-assignments/actors/.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "roleAssignmentServiceResponse.json"
+  }
+}

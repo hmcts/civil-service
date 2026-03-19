@@ -57,7 +57,7 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
     private CallbackResponse createDashboardNotification(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         ScenarioRequestParams
-            notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+            notificationParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (caseData.isApplicantLiP()) {
             dashboardScenariosService.recordScenarios(

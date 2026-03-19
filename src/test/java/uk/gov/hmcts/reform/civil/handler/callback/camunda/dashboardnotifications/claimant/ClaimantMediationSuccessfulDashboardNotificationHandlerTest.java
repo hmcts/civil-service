@@ -93,7 +93,7 @@ class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends BaseCa
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_MEDIATION_SUCCESSFUL.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -116,7 +116,7 @@ class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends BaseCa
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_SUCCESSFUL_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }
