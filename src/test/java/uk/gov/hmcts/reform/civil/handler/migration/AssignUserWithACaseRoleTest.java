@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.civil.bulkupdate.csv.AssignCaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseRoleCaseReference;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -27,7 +27,7 @@ class AssignUserWithACaseRoleTest {
 
     @Test
     void shouldAssignCaseRoleSuccessfully() {
-        AssignCaseReference assignCaseReference = new AssignCaseReference();
+        CaseRoleCaseReference assignCaseReference = new CaseRoleCaseReference();
         assignCaseReference.setCaseReference("12345");
         assignCaseReference.setUserId("user1");
         assignCaseReference.setOrganisationId("org1");
@@ -46,7 +46,7 @@ class AssignUserWithACaseRoleTest {
 
     @Test
     void shouldThrowExceptionWhenCaseDataIsNull() {
-        AssignCaseReference ref = new AssignCaseReference();
+        CaseRoleCaseReference ref = new CaseRoleCaseReference();
         ref.setCaseReference("123");
 
         assertThrows(IllegalArgumentException.class, () ->
@@ -58,7 +58,7 @@ class AssignUserWithACaseRoleTest {
     void shouldThrowExceptionWhenCaseReferenceIsNull() {
         CaseData caseData = CaseData.builder().build();
 
-        AssignCaseReference ref = new AssignCaseReference();
+        CaseRoleCaseReference ref = new CaseRoleCaseReference();
         ref.setCaseReference(null);
 
         assertThrows(IllegalArgumentException.class, () ->

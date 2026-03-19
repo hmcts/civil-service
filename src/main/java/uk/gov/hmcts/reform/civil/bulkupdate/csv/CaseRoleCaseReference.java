@@ -15,9 +15,8 @@ import java.util.Map;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonPropertyOrder({"caseReference"})
-@SuppressWarnings("java:S1700")
 @NoArgsConstructor
-public class AssignCaseReference extends CaseReference implements ExcelMappable {
+public class CaseRoleCaseReference extends CaseReference implements ExcelMappable {
 
     @JsonProperty
     private String userId;
@@ -29,20 +28,20 @@ public class AssignCaseReference extends CaseReference implements ExcelMappable 
     @Override
     public void fromExcelRow(Map<String, Object> rowValues) throws Exception {
         if (rowValues.containsKey("caseReference")) {
-            Object value = rowValues.get("caseReference");
-            setCaseReference(value != null ? value.toString() : null);
+            setCaseReference(asString(rowValues.get("caseReference")));
         }
         if (rowValues.containsKey("userId")) {
-            Object value = rowValues.get("userId");
-            setUserId(value != null ? value.toString() : null);
+            setUserId(asString(rowValues.get("userId")));
         }
         if (rowValues.containsKey("organisationId")) {
-            Object value = rowValues.get("organisationId");
-            setOrganisationId(value != null ? value.toString() : null);
+            setOrganisationId(asString(rowValues.get("organisationId")));
         }
         if (rowValues.containsKey("caseRole")) {
-            Object value = rowValues.get("caseRole");
-            setCaseRole(value != null ? value.toString() : null);
+            setCaseRole(asString(rowValues.get("caseRole")));
         }
+    }
+
+    private String asString(Object value) {
+        return value != null ? value.toString() : null;
     }
 }

@@ -8,7 +8,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class AssignCaseReferenceTest {
+class CaseRoleCaseReferenceTest {
 
     @Test
     void shouldHandleNullValues() throws Exception {
@@ -18,7 +18,7 @@ class AssignCaseReferenceTest {
         rowValues.put("organisationId", null);
         rowValues.put("caseRole", null);
 
-        AssignCaseReference assignCaseReference = new AssignCaseReference();
+        CaseRoleCaseReference assignCaseReference = new CaseRoleCaseReference();
         assignCaseReference.fromExcelRow(rowValues);
 
         assertNull(assignCaseReference.getCaseReference());
@@ -35,7 +35,7 @@ class AssignCaseReferenceTest {
         rowValues.put("organisationId", "org1");
         rowValues.put("caseRole", "CREATOR");
 
-        AssignCaseReference assignCaseReference = new AssignCaseReference();
+        CaseRoleCaseReference assignCaseReference = new CaseRoleCaseReference();
         assignCaseReference.fromExcelRow(rowValues);
 
         assertEquals("12345", assignCaseReference.getCaseReference());
@@ -49,7 +49,7 @@ class AssignCaseReferenceTest {
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("caseReference", "99999");
 
-        AssignCaseReference assignCaseReference = new AssignCaseReference();
+        CaseRoleCaseReference assignCaseReference = new CaseRoleCaseReference();
         assignCaseReference.fromExcelRow(rowValues);
 
         assertEquals("99999", assignCaseReference.getCaseReference());
