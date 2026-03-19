@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -95,9 +96,33 @@ public class JudgmentOnlineUtils {
         return result;
     }
 
-    public static Party getPartyDetails(uk.gov.hmcts.reform.civil.model.Party party) {
+    public static Party getApplicant1Details(CaseData caseData) {
+        LitigationFriend litigationFriend = caseData.getApplicant1LitigationFriend();
+        uk.gov.hmcts.reform.civil.model.Party party = caseData.getApplicant1();
+        return getPartyDetails(litigationFriend, party);
+    }
+
+    public static Party getRespondent1Details(CaseData caseData) {
+        LitigationFriend litigationFriend = caseData.getRespondent1LitigationFriend();
+        uk.gov.hmcts.reform.civil.model.Party party = caseData.getRespondent1();
+        return getPartyDetails(litigationFriend, party);
+    }
+
+    public static Party getRespondent2Details(CaseData caseData) {
+        LitigationFriend litigationFriend = caseData.getRespondent2LitigationFriend();
+        uk.gov.hmcts.reform.civil.model.Party party = caseData.getRespondent2();
+        return getPartyDetails(litigationFriend, party);
+    }
+
+    public static Party getPartyDetails(LitigationFriend litigationFriend, uk.gov.hmcts.reform.civil.model.Party party) {
         return new Party()
-            .setName(party.getPartyName())
+            .setName(getPartyNameWithLitigiousFriend(party, litigationFriend))
+            .setPrimaryAddress(party.getPrimaryAddress());
+    }
+
+    public static Party getPartyDetails(CaseData caseData, uk.gov.hmcts.reform.civil.model.Party party) {
+        return new Party()
+            .setName(getPartyNameWithLitigiousFriend(party, caseData.getRespondent1LitigationFriend()))
             .setPrimaryAddress(party.getPrimaryAddress());
     }
 

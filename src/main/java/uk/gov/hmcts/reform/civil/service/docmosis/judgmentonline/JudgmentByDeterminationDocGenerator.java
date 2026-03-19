@@ -29,11 +29,13 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_DETERMINATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_DETERMINATION_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant1Details;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicants;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrgDetails;
-import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getPartyDetails;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1Details;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1SolicitorRef;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2Details;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 
 @Slf4j
@@ -190,7 +192,7 @@ public class JudgmentByDeterminationDocGenerator {
 
     private Party getClaimantLipOrLRDetailsForPaymentAddress(CaseData caseData) {
         if (caseData.isApplicantLiP()) {
-            return getPartyDetails(caseData.getApplicant1());
+            return getApplicant1Details(caseData);
         } else if (caseData.getApplicant1OrganisationPolicy() != null) {
             return getOrgDetails(caseData.getApplicant1OrganisationPolicy(), organisationService);
         } else {
@@ -200,11 +202,11 @@ public class JudgmentByDeterminationDocGenerator {
 
     private Party getRespondentLROrLipDetails(CaseData caseData, String partyType) {
         if (partyType.equals(RESPONDENT1) && caseData.isRespondent1LiP()) {
-            return getPartyDetails(caseData.getRespondent1());
+            return getRespondent1Details(caseData);
         } else if (partyType.equals(RESPONDENT1) && caseData.getRespondent1OrganisationPolicy() != null) {
             return getOrgDetails(caseData.getRespondent1OrganisationPolicy(), organisationService);
         } else if (!partyType.equals(RESPONDENT1) && caseData.isRespondent2LiP()) {
-            return getPartyDetails(caseData.getRespondent2());
+            return getRespondent2Details(caseData);
         } else if (!partyType.equals(RESPONDENT1) && caseData.getRespondent2OrganisationPolicy() != null) {
             return getOrgDetails(caseData.getRespondent2OrganisationPolicy(), organisationService);
         } else {

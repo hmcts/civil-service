@@ -16,9 +16,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant1Details;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicants;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1Details;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1SolicitorRef;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2Details;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 
 @Component
@@ -79,7 +82,7 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
     private Party getRespondentLROrLipDetails(CaseData caseData, String partyType) {
         if (partyType.equals(RESPONDENT_1)) {
             if (caseData.isRespondent1LiP()) {
-                return getPartyDetails(caseData.getRespondent1());
+                return getRespondent1Details(caseData);
             } else {
                 if (caseData.getRespondent1OrganisationPolicy() != null) {
                     return getApplicantOrgDetails(caseData.getRespondent1OrganisationPolicy());
@@ -89,7 +92,7 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
             }
         } else {
             if (caseData.isRespondent2LiP()) {
-                return getPartyDetails(caseData.getRespondent2());
+                return getRespondent2Details(caseData);
             } else {
                 if (caseData.getRespondent2OrganisationPolicy() != null) {
                     return getApplicantOrgDetails(caseData.getRespondent2OrganisationPolicy());
@@ -102,7 +105,7 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
 
     private Party getClaimantLipOrLRDetailsForPaymentAddress(CaseData caseData) {
         if (caseData.isApplicantLiP()) {
-            return getPartyDetails(caseData.getApplicant1());
+            return getApplicant1Details(caseData);
         } else {
             if (caseData.getApplicant1OrganisationPolicy() != null) {
                 return getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy());
