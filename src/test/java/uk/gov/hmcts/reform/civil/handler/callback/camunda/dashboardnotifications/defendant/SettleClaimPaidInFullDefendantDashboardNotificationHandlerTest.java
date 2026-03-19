@@ -87,7 +87,7 @@ class SettleClaimPaidInFullDefendantDashboardNotificationHandlerTest extends Bas
             "BEARER_TOKEN",
             SCENARIO_AAA6_SETTLE_CLAIM_PAID_IN_FULL_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

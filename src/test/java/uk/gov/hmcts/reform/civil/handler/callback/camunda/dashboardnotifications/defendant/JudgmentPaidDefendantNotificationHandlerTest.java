@@ -113,7 +113,7 @@ public class JudgmentPaidDefendantNotificationHandlerTest extends BaseCallbackHa
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }
