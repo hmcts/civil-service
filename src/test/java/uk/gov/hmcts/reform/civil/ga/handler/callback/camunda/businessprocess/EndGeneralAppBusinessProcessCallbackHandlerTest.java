@@ -1,18 +1,18 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.businessprocess;
 
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -26,39 +26,39 @@ import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GaFinalOrderSelection;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
-import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
-import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.AssistedOrderFurtherHearingDetails;
+import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
+import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
-import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
-import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.AssistedOrderFurtherHearingDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
-import uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -72,12 +72,12 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS_GASPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_WITH_GA_STATE;
@@ -101,7 +101,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
-public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
+class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     private EndGeneralAppBusinessProcessCallbackHandler handler;
 
@@ -149,8 +149,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
     @Nested
     class AboutToSubmitCallbackGaForLip {
 
-        private ArgumentCaptor<String> parentCaseId = ArgumentCaptor.forClass(String.class);
-        private ArgumentCaptor<CaseDataContent> caseDataContent = ArgumentCaptor.forClass(CaseDataContent.class);
+        private final ArgumentCaptor<String> parentCaseId = ArgumentCaptor.forClass(String.class);
+        private final ArgumentCaptor<CaseDataContent> caseDataContent = ArgumentCaptor.forClass(CaseDataContent.class);
 
         @BeforeEach
         void setUp() {
@@ -203,6 +203,9 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
         @Test
         void shouldAddGaToJudgeCollectionPaymentThroughServiceRequestAndHwfIsNull() {
+            PaymentDetails paymentDetails = new PaymentDetails();
+            paymentDetails.setStatus(PaymentStatus.SUCCESS);
+            paymentDetails.setReference("RC-1233-DUMMY");
             GeneralApplicationCaseData updatedCaseDate = new GeneralApplicationCaseData()
                 .isGaApplicantLip(NO)
                 .isGaRespondentTwoLip(NO)
@@ -214,7 +217,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
-                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("PAY")))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("PAY"))
+                                          .setPaymentDetails(paymentDetails))
                 .build();
 
             GeneralApplicationsDetails claimantCollection = new GeneralApplicationsDetails()
@@ -247,6 +251,9 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
         @Test
         void shouldAddGaToJudgeCollectionPaymentThroughServiceRequest() {
+            PaymentDetails paymentDetails = new PaymentDetails();
+            paymentDetails.setStatus(PaymentStatus.SUCCESS);
+            paymentDetails.setReference("RC-1233-DUMMY");
             GeneralApplicationCaseData updatedCaseDate = new GeneralApplicationCaseData()
                 .isGaApplicantLip(NO)
                 .isGaRespondentTwoLip(NO)
@@ -259,7 +266,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
-                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("PAY")))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("PAY"))
+                                          .setPaymentDetails(paymentDetails))
                 .build();
 
             GeneralApplicationsDetails claimantCollection = new GeneralApplicationsDetails()
