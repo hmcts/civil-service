@@ -97,32 +97,20 @@ public class JudgmentOnlineUtils {
     }
 
     public static Party getApplicant1Details(CaseData caseData) {
-        LitigationFriend litigationFriend = caseData.getApplicant1LitigationFriend();
-        uk.gov.hmcts.reform.civil.model.Party party = caseData.getApplicant1();
-        return getPartyDetails(litigationFriend, party);
+        return getPartyDetails(caseData.getApplicant1LitigationFriend(), caseData.getApplicant1());
     }
 
     public static Party getRespondent1Details(CaseData caseData) {
-        LitigationFriend litigationFriend = caseData.getRespondent1LitigationFriend();
-        uk.gov.hmcts.reform.civil.model.Party party = caseData.getRespondent1();
-        return getPartyDetails(litigationFriend, party);
+        return getPartyDetails(caseData.getRespondent1LitigationFriend(), caseData.getRespondent1());
     }
 
     public static Party getRespondent2Details(CaseData caseData) {
-        LitigationFriend litigationFriend = caseData.getRespondent2LitigationFriend();
-        uk.gov.hmcts.reform.civil.model.Party party = caseData.getRespondent2();
-        return getPartyDetails(litigationFriend, party);
+        return getPartyDetails(caseData.getRespondent2LitigationFriend(), caseData.getRespondent2());
     }
 
     public static Party getPartyDetails(LitigationFriend litigationFriend, uk.gov.hmcts.reform.civil.model.Party party) {
         return new Party()
             .setName(getPartyNameWithLitigiousFriend(party, litigationFriend))
-            .setPrimaryAddress(party.getPrimaryAddress());
-    }
-
-    public static Party getPartyDetails(CaseData caseData, uk.gov.hmcts.reform.civil.model.Party party) {
-        return new Party()
-            .setName(getPartyNameWithLitigiousFriend(party, caseData.getRespondent1LitigationFriend()))
             .setPrimaryAddress(party.getPrimaryAddress());
     }
 
