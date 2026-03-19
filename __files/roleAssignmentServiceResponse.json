@@ -1,0 +1,40 @@
+{
+  "roleAssignmentResponse": [
+    {
+      "actorId": "actor-id-123",
+      "actorIdType": "IDAM",
+      "roleType": "CASE",
+      "roleName": "judge",
+      "roleLabel": "Judge",
+      "classification": "PUBLIC",
+      "grantType": "STANDARD",
+      "roleCategory": "JUDICIAL",
+      "readOnly": false,
+      "beginTime": "2024-01-01T00:00:00Z",
+      "endTime": null,
+      "created": "2024-01-01T00:00:00Z",
+      "attributes": {
+        "caseId": "1234567890123456",
+        "jurisdiction": "CIVIL"
+      }
+    },
+    {
+      "actorId": "actor-id-456",
+      "actorIdType": "IDAM",
+      "roleType": "ORGANISATION",
+      "roleName": "caseworker-civil",
+      "roleLabel": "Civil Caseworker",
+      "classification": "PUBLIC",
+      "grantType": "STANDARD",
+      "roleCategory": "LEGAL_OPERATIONS",
+      "readOnly": false,
+      "beginTime": "2024-01-01T00:00:00Z",
+      "endTime": null,
+      "created": "2024-01-01T00:00:00Z",
+      "attributes": {
+        "jurisdiction": "CIVIL",
+        "primaryLocation": "366559"
+      }
+    }
+  ]
+}
