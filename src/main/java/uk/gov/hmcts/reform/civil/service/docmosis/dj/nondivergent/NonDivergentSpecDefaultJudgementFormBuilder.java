@@ -23,6 +23,8 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1SolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2Details;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getRespondent1NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getRespondent2NameWithLitigiousFriend;
 
 @Component
 public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgmentFormBuilderBase {
@@ -52,8 +54,8 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
             .setTotalCost(debtAmount.add(cost).setScale(2).toString())
             .setApplicantReference(getApplicantSolicitorRef(caseData))
             .setRespondentReference(getRespondent1SolicitorRef(caseData))
-            .setRespondent1Name(caseData.getRespondent1().getPartyName())
-            .setRespondent2Name(Objects.isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
+            .setRespondent1Name(getRespondent1NameWithLitigiousFriend(caseData))
+            .setRespondent2Name(Objects.isNull(caseData.getRespondent2()) ? null : getRespondent2NameWithLitigiousFriend(caseData))
             .setRespondent1Ref(getRespondent1SolicitorRef(caseData))
             .setRespondent2Ref(getRespondent2SolicitorRef(caseData))
             .setClaimantLR(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
