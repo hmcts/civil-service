@@ -440,7 +440,7 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
             var responseCaseData = getCaseData(response);
 
             assertThat(responseCaseData.getIsRespondentResponded()).isEqualTo(YES);
-            assertThat(responseCaseData.getIsApplicantResponded()).isEqualTo(null);
+            assertThat(responseCaseData.getIsApplicantResponded()).isNull();
             assertThat(responseCaseData.getGaAddlDocRespondentSol()).hasSize(1);
             assertThat(responseCaseData.getGeneralAppWrittenRepText()).isNull();
             verify(respondToWrittenRepresentationGenerator).generate(any(), anyString(), eq(DocUploadUtils.RESPONDENT_ONE));

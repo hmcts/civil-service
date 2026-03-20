@@ -525,7 +525,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         return caseData.getGeneralAppType().getTypes().stream().anyMatch(validGATypes::contains);
     }
 
-    private Boolean checkIfAppAndRespHaveSameSupportReq(GeneralApplicationCaseData caseData) {
+    private boolean checkIfAppAndRespHaveSameSupportReq(GeneralApplicationCaseData caseData) {
 
         if (caseData.getRespondentsResponses().stream().iterator().next().getValue()
             .getGaHearingDetails().getSupportRequirement() != null) {

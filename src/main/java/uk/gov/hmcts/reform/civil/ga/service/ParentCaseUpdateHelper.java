@@ -158,7 +158,7 @@ public class ParentCaseUpdateHelper {
         for (String role : roles) {
             try {
                 updateCaseDocumentByType(updateMap, type, role, civilCaseData, generalAppCaseData);
-            } catch (Exception e) {
+            } catch (ReflectiveOperationException e) {
                 log.error(e.getMessage());
             }
         }
@@ -850,7 +850,7 @@ public class ParentCaseUpdateHelper {
         for (String type : DOCUMENT_TYPES) {
             try {
                 updateCaseDocumentByType(updateMap, type, role, civilCaseData, generalAppCaseData);
-            } catch (Exception e) {
+            } catch (ReflectiveOperationException e) {
                 log.error(e.getMessage());
             }
         }
@@ -869,7 +869,7 @@ public class ParentCaseUpdateHelper {
      *
      */
     protected void updateCaseDocumentByType(Map<String, Object> updateMap, String type, String role,
-                                    GeneralApplicationCaseData civilCaseData, GeneralApplicationCaseData generalAppCaseData) throws Exception {
+                                    GeneralApplicationCaseData civilCaseData, GeneralApplicationCaseData generalAppCaseData) throws ReflectiveOperationException {
         if (Objects.isNull(role)) {
             return;
         }
@@ -892,7 +892,8 @@ public class ParentCaseUpdateHelper {
     }
 
     @SuppressWarnings("unchecked")
-    private List<Element<?>> getDocumentCollection(GeneralApplicationCaseData caseData, String collectionName) throws Exception {
+    private List<Element<?>> getDocumentCollection(GeneralApplicationCaseData caseData, String collectionName)
+        throws ReflectiveOperationException {
         Method getter = ReflectionUtils.findMethod(
             GeneralApplicationCaseData.class,
             "get" + StringUtils.capitalize(collectionName)

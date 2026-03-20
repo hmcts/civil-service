@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -129,9 +129,9 @@ public class UploadTranslatedDocumentServiceTest {
         assertThat(result.getGaAddlDoc()).isNotNull();
         assertThat(result.getGaAddlDocClaimant()).isNotNull();
         assertThat(result.getGaAddlDocStaff()).isNotNull();
-        assertThat(result.getGaAddlDoc().size()).isEqualTo(1);
-        assertThat(result.getGaAddlDocClaimant().size()).isEqualTo(1);
-        assertThat(result.getGaAddlDocStaff().size()).isEqualTo(1);
+        assertThat(result.getGaAddlDoc()).hasSize(1);
+        assertThat(result.getGaAddlDocClaimant()).hasSize(1);
+        assertThat(result.getGaAddlDocStaff()).hasSize(1);
         verify(assignCategoryId, times(1)).assignCategoryIdToCollection(anyList(), any(), eq(AssignCategoryId.APPLICATIONS));
     }
 

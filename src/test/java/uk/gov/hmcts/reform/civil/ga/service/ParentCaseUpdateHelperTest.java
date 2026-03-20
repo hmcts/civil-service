@@ -173,7 +173,7 @@ class ParentCaseUpdateHelperTest {
                 updateMap, "gaDraft", "Claimant",
                 civilCase, gaCase
             );
-            assertThat(((List<?>) updateMap.get("gaDraftDocClaimant")).size()).isEqualTo(1);
+            assertThat((List<?>) updateMap.get("gaDraftDocClaimant")).hasSize(1);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -194,7 +194,7 @@ class ParentCaseUpdateHelperTest {
                 updateMap, "gaDraft", "Claimant",
                 civilCase, gaCase
             );
-            assertThat(((List<?>) updateMap.get("gaDraftDocClaimant")).size()).isEqualTo(1);
+            assertThat((List<?>) updateMap.get("gaDraftDocClaimant")).hasSize(1);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -406,8 +406,8 @@ class ParentCaseUpdateHelperTest {
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("claimantGaAppDetails")).isNotNull();
         assertThat(mapCaptor.getValue().get("gaDetailsMasterCollection")).isNotNull();
-        assertThat(mapCaptor.getValue().get("respondentSolGaAppDetails")).isEqualTo(List.of());
-        assertThat(mapCaptor.getValue().get("respondentSolTwoGaAppDetails")).isEqualTo(List.of());
+        assertThat(mapCaptor.getValue()).containsEntry("respondentSolGaAppDetails", List.of());
+        assertThat(mapCaptor.getValue()).containsEntry("respondentSolTwoGaAppDetails", List.of());
     }
 
     @Test
@@ -486,7 +486,7 @@ class ParentCaseUpdateHelperTest {
         parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
-        assertThat(mapCaptor.getValue().get("respondentSolTwoGaAppDetails")).isEqualTo(List.of());
+        assertThat(mapCaptor.getValue()).containsEntry("respondentSolTwoGaAppDetails", List.of());
         assertThat(mapCaptor.getValue().get("gaDetailsMasterCollection")).isNotNull();
         assertThat(mapCaptor.getValue().get("respondentSolGaAppDetails")).isNotNull();
         assertThat(mapCaptor.getValue().get("claimantGaAppDetails")).isNotNull();
@@ -503,7 +503,7 @@ class ParentCaseUpdateHelperTest {
         parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
-        assertThat(mapCaptor.getValue().get("respondentSolTwoGaAppDetails")).isEqualTo(List.of());
+        assertThat(mapCaptor.getValue()).containsEntry("respondentSolTwoGaAppDetails", List.of());
         assertThat(mapCaptor.getValue().get("gaDetailsMasterCollection")).isNotNull();
         assertThat(mapCaptor.getValue().get("respondentSolGaAppDetails")).isNotNull();
         assertThat(mapCaptor.getValue().get("claimantGaAppDetails")).isNotNull();

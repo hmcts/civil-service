@@ -39,6 +39,9 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.W
 @Service
 public class UploadTranslatedDocumentService {
 
+    private static final String WRITTEN_REPRESENTATION = "Written representation";
+    private static final String ADDITIONAL_INFORMATION = "Additional information";
+
     private final AssignCategoryId assignCategoryId;
     private final GaForLipService gaForLipService;
     private final DocUploadDashboardNotificationService docUploadDashboardNotificationService;
@@ -241,8 +244,8 @@ public class UploadTranslatedDocumentService {
 
     private String getOriginalDocumentName(TranslatedDocumentType documentType) {
         return switch (documentType) {
-            case WRITTEN_REPRESENTATIONS_APPLICANT, WRITTEN_REPRESENTATIONS_RESPONDENT -> "Written representation";
-            case REQUEST_MORE_INFORMATION_APPLICANT, REQUEST_MORE_INFORMATION_RESPONDENT -> "Additional information";
+            case WRITTEN_REPRESENTATIONS_APPLICANT, WRITTEN_REPRESENTATIONS_RESPONDENT -> WRITTEN_REPRESENTATION;
+            case REQUEST_MORE_INFORMATION_APPLICANT, REQUEST_MORE_INFORMATION_RESPONDENT -> ADDITIONAL_INFORMATION;
             default -> "";
         };
     }
@@ -263,8 +266,7 @@ public class UploadTranslatedDocumentService {
                     context.bulkPrintOriginalDocuments()
                 );
                 break;
-            case GENERAL_ORDER:
-            case APPROVE_OR_EDIT_ORDER:
+            case GENERAL_ORDER, APPROVE_OR_EDIT_ORDER:
                 moveGeneralOrder(
                     context.caseDataBuilder(),
                     context.preTranslationGaDocuments(),
@@ -589,13 +591,13 @@ public class UploadTranslatedDocumentService {
 
         return switch (translatedDocumentType) {
             case WRITTEN_REPRESENTATIONS_APPLICANT ->
-                new UploadNotificationTarget("Written representation", DocUploadUtils.APPLICANT, "RESPONDENT");
+                new UploadNotificationTarget(WRITTEN_REPRESENTATION, DocUploadUtils.APPLICANT, "RESPONDENT");
             case WRITTEN_REPRESENTATIONS_RESPONDENT ->
-                new UploadNotificationTarget("Written representation", DocUploadUtils.RESPONDENT_ONE, "APPLICANT");
+                new UploadNotificationTarget(WRITTEN_REPRESENTATION, DocUploadUtils.RESPONDENT_ONE, "APPLICANT");
             case REQUEST_MORE_INFORMATION_APPLICANT ->
-                new UploadNotificationTarget("Additional information", DocUploadUtils.APPLICANT, null);
+                new UploadNotificationTarget(ADDITIONAL_INFORMATION, DocUploadUtils.APPLICANT, null);
             case REQUEST_MORE_INFORMATION_RESPONDENT ->
-                new UploadNotificationTarget("Additional information", DocUploadUtils.RESPONDENT_ONE, null);
+                new UploadNotificationTarget(ADDITIONAL_INFORMATION, DocUploadUtils.RESPONDENT_ONE, null);
             default -> null;
         };
     }
