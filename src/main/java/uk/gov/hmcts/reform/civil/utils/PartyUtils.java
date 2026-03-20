@@ -63,6 +63,10 @@ public class PartyUtils {
         return getPartyNameBasedOnType(party, false);
     }
 
+    public static String getPartyNameBasedOnType(Party party, boolean omitTitle, boolean upperCase) {
+        return ofNullable(getPartyNameBasedOnType(party, omitTitle)).map(name -> upperCase? name.toUpperCase() : name).orElse(null);
+    }
+
     private static String getTitle(String title) {
         return StringUtils.isBlank(title) ? "" : title + " ";
     }
@@ -130,7 +134,7 @@ public class PartyUtils {
     }
 
     public static String getPartyNameWithLitigiousFriend(Party party, LitigationFriend litigationFriend, boolean upperCase) {
-        String partyName = ofNullable(party).map(Party::getPartyName).map(name -> upperCase ? name.toUpperCase() : name).orElse(null);
+        String partyName = getPartyNameBasedOnType(party, false, upperCase);
         if (partyName != null) {
             return ofNullable(litigationFriend)
                 .map(lf ->  partyName + " (by his litigation friend " + lf.getFirstName() + " " + lf.getLastName() + ")")
