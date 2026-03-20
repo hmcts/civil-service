@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ALREADY_PAID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_FULL_DISPUTE_MEDIATION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_NO_MEDIATION_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_DEFENDANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MULTI_INT_FAST_DEFENDANT;
 
@@ -118,7 +119,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -148,7 +149,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -164,7 +165,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
             caseData.setLegacyCaseReference("reference");
             caseData.setCcdCaseReference(Long.valueOf(caseId));
-            caseData.setRespondent1(PartyBuilder.builder().company().build());
+            caseData.setRespondent1(new PartyBuilder().company().build());
             caseData.setRespondent1Represented(YesOrNo.NO);
             caseData.setRespondent1RepaymentPlan(new RepaymentPlanLRspec()
                 .setFirstRepaymentDate(firstRepaymentDate)
@@ -182,7 +183,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -198,7 +199,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
             caseData.setLegacyCaseReference("reference");
             caseData.setCcdCaseReference(Long.valueOf(caseId));
-            caseData.setRespondent1(PartyBuilder.builder().company().build());
+            caseData.setRespondent1(new PartyBuilder().company().build());
             caseData.setRespondent1Represented(YesOrNo.NO);
             caseData.setRespondent1RepaymentPlan(new RepaymentPlanLRspec()
                 .setFirstRepaymentDate(firstRepaymentDate)
@@ -216,7 +217,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -244,7 +245,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ALREADY_PAID.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -272,7 +273,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ALREADY_PAID.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -303,7 +304,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -334,7 +335,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -364,7 +365,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -394,7 +395,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_NO_MEDIATION_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -424,7 +425,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_FULL_DISPUTE_MEDIATION.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -456,7 +457,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MULTI_INT_FAST_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -488,8 +489,96 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_DEFENDANT_CARM.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
+
+        @Test
+        void configureDashboardNotificationsForDefendantResponseForPartAdmitBySetDateOrg() {
+            //given
+            HashMap<String, Object> params = new HashMap<>();
+
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+            LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setCcdCaseReference(1234L);
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setRespondent1(new PartyBuilder().company().build());
+            caseData.setRespondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(admitPaymentDeadline));
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+            caseData.setRespondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000));
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+            //when
+            handler.handle(callbackParams);
+            //then
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                new ScenarioRequestParams(params)
+            );
+        }
+
+        @Test
+        void configureDashboardNotificationsForDefendantResponseForFullAdmitBySetDateOrg() {
+            //given
+            HashMap<String, Object> params = new HashMap<>();
+
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+            LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setCcdCaseReference(1234L);
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setRespondent1(new PartyBuilder().company().build());
+            caseData.setRespondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(admitPaymentDeadline));
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+            caseData.setTotalClaimAmount(new BigDecimal(1000));
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+            //when
+            handler.handle(callbackParams);
+            //then
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                new ScenarioRequestParams(params)
+            );
+        }
+
+        @Test
+        void configureDashboardNotificationsForDefendantResponse_NoScenarioMatches_ReturnsNull() {
+            //given
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setCcdCaseReference(1234L);
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            // Set fields to ensure no if conditions in getScenario match
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(null);
+            caseData.setRespondent1RepaymentPlan(null);
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+
+            //when
+            handler.handle(callbackParams);
+
+            //then
+            verify(dashboardScenariosService, org.mockito.Mockito.never()).recordScenarios(any(), any(), any(), any());
+        }
+
     }
 }

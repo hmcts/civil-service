@@ -73,16 +73,15 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordDefendantScenarioActionNeeded_whenInvoked_claimantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                  .value(GADetailsRespondentSol.builder()
-                                                             .parentClaimantIsApplicant(YesOrNo.YES)
-                                                             .caseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()).build()).build()))
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
+                                                      .setParentClaimantIsApplicant(YesOrNo.YES)
+                                                      .setCaseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -101,23 +100,22 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordDefendantScenarioInProgress_whenInvoked_claimantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                       .value(GADetailsRespondentSol.builder()
-                                                                  .parentClaimantIsApplicant(YesOrNo.YES)
-                                                                  .caseState(HEARING_SCHEDULED.getDisplayedValue()).build()).build()))
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
+                                                           .setParentClaimantIsApplicant(YesOrNo.YES)
+                                                           .setCaseState(HEARING_SCHEDULED.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -136,23 +134,22 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordDefendantScenarioAvailable_whenInvoked_claimantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                       .value(GADetailsRespondentSol.builder()
-                                                                  .parentClaimantIsApplicant(YesOrNo.YES)
-                                                                  .caseState(APPLICATION_DISMISSED.getDisplayedValue()).build()).build()))
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
+                                                           .setParentClaimantIsApplicant(YesOrNo.YES)
+                                                           .setCaseState(APPLICATION_DISMISSED.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -171,23 +168,22 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordDefendantScenarioActionNeeded_whenInvoked_defendantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.NO)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                       .value(GADetailsRespondentSol.builder()
-                                                                  .parentClaimantIsApplicant(YesOrNo.NO)
-                                                                  .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()).build()).build()))
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
+                                                           .setParentClaimantIsApplicant(YesOrNo.NO)
+                                                           .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -206,23 +202,22 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordDefendantScenarioInProgress_whenInvoked_defendantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.NO)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                       .value(GADetailsRespondentSol.builder()
-                                                                  .parentClaimantIsApplicant(YesOrNo.NO)
-                                                                  .caseState(HEARING_SCHEDULED.getDisplayedValue()).build()).build()))
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
+                                                           .setParentClaimantIsApplicant(YesOrNo.NO)
+                                                           .setCaseState(HEARING_SCHEDULED.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -241,23 +236,22 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordDefendantScenarioAvailable_whenInvoked_defendantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.NO)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                       .value(GADetailsRespondentSol.builder()
-                                                                  .parentClaimantIsApplicant(YesOrNo.NO)
-                                                                  .caseState(APPLICATION_DISMISSED.getDisplayedValue()).build()).build()))
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
+                                                           .setParentClaimantIsApplicant(YesOrNo.NO)
+                                                           .setCaseState(APPLICATION_DISMISSED.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -276,23 +270,22 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldNotRecordDefendantScenario_whenDefendantNotLiP() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                  .value(GADetailsRespondentSol.builder()
-                                                             .parentClaimantIsApplicant(YesOrNo.YES)
-                                                             .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()).build()).build()))
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
+                                                      .setParentClaimantIsApplicant(YesOrNo.YES)
+                                                      .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);

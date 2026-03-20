@@ -432,12 +432,14 @@ public class SdoGeneratorServiceTest {
 
     private CaseData fastTrackCasePopulatedBySpecialistService(CaseData baseCase) {
         SdoDeadlineService deadlineService = Mockito.mock(SdoDeadlineService.class);
+        FeatureToggleService mockFeatureToggleService = Mockito.mock(FeatureToggleService.class);
         when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))
             .thenAnswer(invocation -> LocalDate.of(2025, 1, 1)
                 .plusWeeks(invocation.getArgument(0, Integer.class)));
+        when(mockFeatureToggleService.isOtherRemedyEnabled()).thenReturn(true);
 
         SdoFastTrackSpecialistDirectionsService specialistService =
-            new SdoFastTrackSpecialistDirectionsService(deadlineService, true);
+            new SdoFastTrackSpecialistDirectionsService(deadlineService, mockFeatureToggleService);
 
         CaseData caseData = baseCase.toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
@@ -676,7 +678,7 @@ public class SdoGeneratorServiceTest {
         trial.setPhysicalBundleOptions(PhysicalTrialBundleOptions.NONE);
         trial.setSdoR2TrialFirstOpenDateAfter(trialFirstOpen);
         trial.setSdoR2TrialWindow(trialWindow);
-        trial.setHearingCourtLocationList(options.toBuilder().value(selectedCourt).build());
+        trial.setHearingCourtLocationList(options.setValue(selectedCourt));
         trial.setPhysicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE);
         updatedData.sdoR2Trial(trial);
 

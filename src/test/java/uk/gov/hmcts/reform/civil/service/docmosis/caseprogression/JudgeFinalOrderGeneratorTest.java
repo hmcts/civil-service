@@ -271,14 +271,12 @@ class JudgeFinalOrderGeneratorTest {
             .ccdState(CaseState.CASE_PROGRESSION)
             .orderWithoutNotice(new FreeFormOrderValues().setWithoutNoticeSelectionTextArea("test without notice")
                                 .setWithoutNoticeSelectionDate(LocalDate.now()))
-            .respondent2(PartyBuilder.builder().individual().build().toBuilder()
-                             .partyID("app-2-party-id")
-                             .partyName("Applicant2")
-                             .build())
-            .applicant2(PartyBuilder.builder().soleTrader().build().toBuilder()
-                            .partyID("res-2-party-id")
-                            .partyName("Respondent2")
-                            .build())
+            .respondent2(new PartyBuilder().individual().build()
+                             .setPartyID("app-2-party-id")
+                             .setPartyName("Applicant2"))
+            .applicant2(new PartyBuilder().soleTrader().build()
+                            .setPartyID("res-2-party-id")
+                            .setPartyName("Respondent2"))
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -303,16 +301,13 @@ class JudgeFinalOrderGeneratorTest {
             .ccdState(CaseState.CASE_PROGRESSION)
             .orderWithoutNotice(new FreeFormOrderValues().setWithoutNoticeSelectionTextArea("test without notice")
                                 .setWithoutNoticeSelectionDate(LocalDate.now()))
-            .respondent2(PartyBuilder.builder().individual().build().toBuilder()
-                             .partyID("app-2-party-id")
-                             .partyName("Applicant2")
-                             .build())
-            .applicant2(PartyBuilder.builder().soleTrader().build().toBuilder()
-                            .partyID("res-2-party-id")
-                            .partyName("Respondent2")
-                            .build())
-            .hearingLocation(DynamicList.builder()
-                                 .value(DynamicListElement.dynamicElement("hearing-location")).build())
+            .respondent2(new PartyBuilder().individual().build()
+                             .setPartyID("app-2-party-id")
+                             .setPartyName("Applicant2"))
+            .applicant2(new PartyBuilder().soleTrader().build()
+                            .setPartyID("res-2-party-id")
+                            .setPartyName("Respondent2"))
+            .hearingLocation(new DynamicList().setValue(DynamicListElement.dynamicElement("hearing-location")))
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
@@ -446,11 +441,8 @@ class JudgeFinalOrderGeneratorTest {
         when(appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
             new JudgeFinalOrderForm().setInitiativeDate(appealDate));
 
-        DynamicListElement dynamicListElement = DynamicListElement.builder().label("test_label").build();
-        DynamicList dynamicList = DynamicList.builder()
-            .listItems(Collections.singletonList(dynamicListElement))
-            .value(dynamicListElement)
-            .build();
+        DynamicListElement dynamicListElement = new DynamicListElement().setLabel("test_label");
+        DynamicList dynamicList = new DynamicList().setListItems(Collections.singletonList(dynamicListElement)).setValue(dynamicListElement);
         List<FinalOrdersJudgePapers> finalOrdersJudgePapersList =
             new ArrayList<>(Arrays.asList(FinalOrdersJudgePapers.CONSIDERED));
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -463,10 +455,10 @@ class JudgeFinalOrderGeneratorTest {
             .finalOrderJudgePapers(
                 finalOrdersJudgePapersList)
             // judge heard from section
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)
-            .applicant2(PartyBuilder.builder().individual().build())
+            .applicant2(new PartyBuilder().individual().build())
             .addApplicant2(YES)
             .finalOrderRepresentation(new FinalOrderRepresentation()
                                           .setTypeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
@@ -505,8 +497,7 @@ class JudgeFinalOrderGeneratorTest {
             .orderMadeOnDetailsOrderWithoutNotice(new OrderMadeOnDetailsOrderWithoutNotice()
                                                       .setWithOutNoticeText("without notice test")
                                                       .setWithOutNoticeDate(LocalDate.now()))
-            .hearingLocation(DynamicList.builder()
-                                 .value(DynamicListElement.dynamicElement("hearing-location")).build())
+            .hearingLocation(new DynamicList().setValue(DynamicListElement.dynamicElement("hearing-location")))
             .build();
         //When: Assisted order document generation called
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);

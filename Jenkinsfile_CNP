@@ -66,16 +66,6 @@ def getFunctionalTestsGroups() {
   return functionalTestGroups.join(",")
 }
 
-def getFunctionalTestsType() {
-  def githubApi = new GithubAPI(this)
-  def labels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "general_apps_ft")
-  if (labels) {
-    return "GENERAL_APPS_FT"
-  } else {
-    return "CIVIL_FT"
-  }
-}
-
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
    secretType : 'Secret',
@@ -144,19 +134,15 @@ def getCivilCcdDefinitionBranch() {
   return "master"
 }
 
-def getGenAppsCcdDefinitionBranch() {
-  def githubApi = new GithubAPI(this)
-  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "gaDefinitionBranch:")) {
-    return label.minus("gaDefinitionBranch:").trim()
-  }
-  return "master"
-}
-
 withPipeline(type, product, component) {
   env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
   env.PACT_BROKER_PORT = "443"
   env.PACT_BROKER_SCHEME = "https"
   env.ENABLE_SECURE_URL = true
+  env.SONAR_SKIP_COMPILE = "true"
+  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
+  // Only run checkstyle on PR pipeline
+  env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
 
   onPR {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
@@ -187,7 +173,6 @@ withPipeline(type, product, component) {
     env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.FT_TYPE = getFunctionalTestsType()
 
     retry(3) {
       sh """
@@ -198,19 +183,16 @@ withPipeline(type, product, component) {
         ./bin/pull-latest-camunda-files.sh ${camundaBranch}
         ./bin/pull-latest-dmn-files.sh ${dmnBranch}
         ./bin/pull-latest-civil-ccd-files.sh ${getCivilCcdDefinitionBranch()}
-        ./bin/pull-latest-gen-apps-ccd-files.sh ${getGenAppsCcdDefinitionBranch()}
         ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
         ./bin/import-gen-apps-ccd-definition.sh "-e *-nonprod.json"
       """
     }
 
-    if (env.FT_TYPE == "GENERAL_APPS_FT") {
-      yarnBuilder.yarn('yarn-update')
-    }
-
     yarnBuilder.yarn('install-dependencies')
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.IDAM_TEST_SUPPORT_API_URL = "https://idam-testing-support-api.aat.platform.hmcts.net"
     env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    env.PAYMENT_API_URL = "http://payment-api-aat.service.core-compute-aat.internal"
     env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.AAC_API_URL = "https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
@@ -235,6 +217,7 @@ withPipeline(type, product, component) {
       copyPrevFailedAndNotExecutedTestFilesJson()
     }
     copyPreviousAllureHistory()
+    env.UNASSIGN_CASES = true
   }
 
   afterAlways('functionalTest:preview') {
@@ -251,15 +234,12 @@ withPipeline(type, product, component) {
   }
 
   before('smoketest:aat') {
-    env.FT_TYPE = "CIVIL_FT"
-
     sh """
       eval \$(./bin/variables/load-staging-environment-variables.sh)
       ./bin/add-roles.sh
       ./bin/pull-latest-camunda-files.sh ${camundaBranch}
       ./bin/pull-latest-dmn-files.sh ${dmnBranch}
       ./bin/pull-latest-civil-ccd-files.sh ${getCivilCcdDefinitionBranch()}
-      ./bin/pull-latest-gen-apps-ccd-files.sh ${getGenAppsCcdDefinitionBranch()}
       ./bin/import-ccd-definition.sh "-e *-nonprod.json,*COS-nonprod.json,AuthorisationCaseType-shuttered.json"
       ./bin/import-gen-apps-ccd-definition.sh "-e *-nonprod.json"
       ./bin/import-bpmn-diagram.sh .
@@ -268,6 +248,8 @@ withPipeline(type, product, component) {
     env.CIVIL_SERVICE_URL = "https://civil-service-staging.aat.platform.hmcts.net"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.IDAM_TEST_SUPPORT_API_URL = "https://idam-testing-support-api.aat.platform.hmcts.net"
+    env.PAYMENT_API_URL = "http://payment-api-aat.service.core-compute-aat.internal"
     env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
@@ -282,6 +264,7 @@ withPipeline(type, product, component) {
   before('functionalTest:aat') {
     copyPrevFailedAndNotExecutedTestFilesJson()
     copyPreviousAllureHistory()
+    env.UNASSIGN_CASES = true
   }
 
   afterAlways('functionalTest:aat') {

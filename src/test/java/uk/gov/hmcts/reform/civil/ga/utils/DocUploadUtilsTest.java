@@ -88,26 +88,26 @@ public class DocUploadUtilsTest {
     @Test
     public void should_getUserRole() {
         List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-        gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                         .id("222")
-                                         .email(DUMMY_EMAIL)
-                                         .organisationIdentifier("2").build()));
-        gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                         .id("id1")
-                                         .email(DUMMY_EMAIL)
-                                         .organisationIdentifier("2").build()));
-        gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                         .id("id3")
-                                         .email(DUMMY_EMAIL)
-                                         .organisationIdentifier("2").build()));
-        gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                         .id(STRING_CONSTANT)
-                                         .email(DUMMY_EMAIL)
-                                         .organisationIdentifier("3").build()));
-        gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                         .id("id33")
-                                         .email(DUMMY_EMAIL)
-                                         .organisationIdentifier("3").build()));
+        gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                         .setId("222")
+                                         .setEmail(DUMMY_EMAIL)
+                                         .setOrganisationIdentifier("2")));
+        gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                         .setId("id1")
+                                         .setEmail(DUMMY_EMAIL)
+                                         .setOrganisationIdentifier("2")));
+        gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                         .setId("id3")
+                                         .setEmail(DUMMY_EMAIL)
+                                         .setOrganisationIdentifier("2")));
+        gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                         .setId(STRING_CONSTANT)
+                                         .setEmail(DUMMY_EMAIL)
+                                         .setOrganisationIdentifier("3")));
+        gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                         .setId("id33")
+                                         .setEmail(DUMMY_EMAIL)
+                                         .setOrganisationIdentifier("3")));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .atStateClaimDraft()
             .ccdCaseReference(1678356749555475L)
@@ -117,8 +117,8 @@ public class DocUploadUtilsTest {
             .generalAppRespondentSolicitors(gaRespSolicitors)
             .parentClaimantIsApplicant(NO)
             .isMultiParty(YES)
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("2").forename("GAApplnSolicitor")
-                                          .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("2").setForename("GAApplnSolicitor")
+                                          .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
             .claimant1PartyName("Mr. John Rambo")
             .defendant1PartyName("Mr. Sole Trader")
             .build();
@@ -146,14 +146,14 @@ public class DocUploadUtilsTest {
                              .setCreatedDatetime(LocalDateTime.now())));
         UUID sameId = from.get(1).getId();
         List<Element<CaseDocument>> to = new ArrayList<>();
-        to.add(Element.<CaseDocument>builder()
-                   .id(sameId).value(new CaseDocument().setCreatedBy("civil")
+        to.add(new Element<CaseDocument>()
+                   .setId(sameId).setValue(new CaseDocument().setCreatedBy("civil")
                                          .setDocumentLink(new Document()
                                                            .setDocumentFileName("witness_document.pdf")
                                                            .setDocumentUrl("http://dm-store:8080")
                                                            .setDocumentBinaryUrl("http://dm-store:8080/documents"))
                                          .setDocumentName("witness_document.docx")
-                                         .setCreatedDatetime(LocalDateTime.now())).build());
+                                         .setCreatedDatetime(LocalDateTime.now())));
         assertThat(DocUploadUtils.addDocuments(from, to).size()).isEqualTo(2);
     }
 
@@ -197,7 +197,7 @@ public class DocUploadUtilsTest {
     @Test
     public void shouldNotVisible_whenWithoutNotice() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-            .buildFeeValidationCaseData(null, false, false);
+            .buildFeeValidationCaseData(null, false, false).build();
         assertThat(DocUploadUtils.isDocumentVisible(caseData)).isEqualTo(YesOrNo.NO);
     }
 
@@ -217,7 +217,7 @@ public class DocUploadUtilsTest {
 
     @Test
     public void shouldVisible_whenWithNotice() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().build();
         assertThat(DocUploadUtils.isDocumentVisible(caseData)).isEqualTo(YesOrNo.YES);
     }
 

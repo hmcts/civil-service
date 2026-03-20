@@ -2364,10 +2364,7 @@ class EventHistoryMapperTest {
         final String partyID = "002";
         DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
         DynamicList preferredCourt =
-                DynamicList.builder()
-                        .listItems(locationValues.getListItems())
-                        .value(locationValues.getListItems().getFirst())
-                        .build();
+                new DynamicList().setListItems(locationValues.getListItems()).setValue(locationValues.getListItems().getFirst());
 
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithRespondentPartAdmissionWithOptionalEvents() {
@@ -3994,7 +3991,7 @@ class EventHistoryMapperTest {
                             .respondent2DQ()
                             .respondent1DQ()
                             .respondent1(
-                                    PartyBuilder.builder()
+                                    new PartyBuilder()
                                             .individual()
                                             .individualDateOfBirth(LocalDate.now().plusDays(1))
                                             .build())
@@ -4085,7 +4082,7 @@ class EventHistoryMapperTest {
                             .respondent2DQ()
                             .respondent1DQ()
                             .respondent1(
-                                    PartyBuilder.builder()
+                                    new PartyBuilder()
                                             .individual()
                                             .individualDateOfBirth(LocalDate.now().plusDays(1))
                                             .build())
@@ -10247,13 +10244,13 @@ class EventHistoryMapperTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetails(
-                    DynamicList.builder().value(DynamicListElement.builder().label("Both").build()).build());
+                    new DynamicList().setValue(new DynamicListElement().setLabel("Both")));
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory)
                     .extracting("interlocutoryJudgment")
@@ -10268,15 +10265,13 @@ class EventHistoryMapperTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetails(
-                    DynamicList.builder()
-                            .value(DynamicListElement.builder().label("Test User").build())
-                            .build());
+                    new DynamicList().setValue(new DynamicListElement().setLabel("Test User")));
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory)
                     .extracting("miscellaneous")
@@ -10297,7 +10292,7 @@ class EventHistoryMapperTest {
             caseData.setTotalClaimAmount(new BigDecimal(1000));
             caseData.setRepaymentSuggestion("100");
             caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setPaymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN);
             caseData.setRepaymentSummaryObject(
@@ -10322,7 +10317,7 @@ class EventHistoryMapperTest {
             caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetailsSpec(
-                    DynamicList.builder().value(DynamicListElement.builder().label("Both").build()).build());
+                    new DynamicList().setValue(new DynamicListElement().setLabel("Both")));
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory)
                     .extracting("defaultJudgment")
@@ -10337,7 +10332,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
             caseData.setTotalClaimAmount(new BigDecimal(1000));
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setPaymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN);
             caseData.setRepaymentSummaryObject(
@@ -10364,9 +10359,7 @@ class EventHistoryMapperTest {
             caseData.setRepaymentSuggestion("100");
             caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
             caseData.setDefendantDetailsSpec(
-                    DynamicList.builder()
-                            .value(DynamicListElement.builder().label("Test User").build())
-                            .build());
+                    new DynamicList().setValue(new DynamicListElement().setLabel("Test User")));
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory)
                     .extracting("miscellaneous")
@@ -10385,7 +10378,7 @@ class EventHistoryMapperTest {
             caseData.setTotalClaimAmount(new BigDecimal(1000));
             caseData.setRepaymentSuggestion("100");
             caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setPaymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN);
             caseData.setRepaymentSummaryObject(
@@ -10411,7 +10404,7 @@ class EventHistoryMapperTest {
             caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetailsSpec(
-                    DynamicList.builder().value(DynamicListElement.builder().label("Both").build()).build());
+                    new DynamicList().setValue(new DynamicListElement().setLabel("Both")));
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory)
                     .extracting("defaultJudgment")
@@ -10443,7 +10436,7 @@ class EventHistoryMapperTest {
             caseData.setTotalClaimAmount(new BigDecimal(1000));
             caseData.setRepaymentSuggestion("100");
             caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setPaymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
@@ -10469,7 +10462,7 @@ class EventHistoryMapperTest {
             caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetailsSpec(
-                    DynamicList.builder().value(DynamicListElement.builder().label("Both").build()).build());
+                    new DynamicList().setValue(new DynamicListElement().setLabel("Both")));
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory)
                     .extracting("defaultJudgment")
@@ -10501,7 +10494,7 @@ class EventHistoryMapperTest {
             caseData.setTotalClaimAmount(new BigDecimal(1000));
             caseData.setRepaymentSuggestion("100");
             caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setPaymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
@@ -10527,7 +10520,7 @@ class EventHistoryMapperTest {
             caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetailsSpec(
-                    DynamicList.builder().value(DynamicListElement.builder().label("Both").build()).build());
+                    new DynamicList().setValue(new DynamicListElement().setLabel("Both")));
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory)
                     .extracting("defaultJudgment")
@@ -10743,10 +10736,7 @@ class EventHistoryMapperTest {
         public void shouldGenerateRPA_PartAdmitRejectPayment() {
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             DynamicList preferredCourt =
-                    DynamicList.builder()
-                            .listItems(locationValues.getListItems())
-                            .value(locationValues.getListItems().getFirst())
-                            .build();
+                    new DynamicList().setListItems(locationValues.getListItems()).setValue(locationValues.getListItems().getFirst());
 
             CaseData caseData =
                     CaseDataBuilder.builder()
@@ -10844,10 +10834,7 @@ class EventHistoryMapperTest {
         public void shouldGenerateRPA_ForPartAdmit_WhenClaimIsInMediation() {
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             DynamicList preferredCourt =
-                    DynamicList.builder()
-                            .listItems(locationValues.getListItems())
-                            .value(locationValues.getListItems().getFirst())
-                            .build();
+                    new DynamicList().setListItems(locationValues.getListItems()).setValue(locationValues.getListItems().getFirst());
 
             CaseData caseData =
                     CaseDataBuilder.builder()
@@ -10912,10 +10899,7 @@ class EventHistoryMapperTest {
             BigDecimal claimValue = BigDecimal.valueOf(1000);
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             DynamicList preferredCourt =
-                    DynamicList.builder()
-                            .listItems(locationValues.getListItems())
-                            .value(locationValues.getListItems().getFirst())
-                            .build();
+                    new DynamicList().setListItems(locationValues.getListItems()).setValue(locationValues.getListItems().getFirst());
 
             CaseData caseData =
                     CaseDataBuilder.builder()
@@ -10998,17 +10982,14 @@ class EventHistoryMapperTest {
             BigDecimal claimValue = BigDecimal.valueOf(1500);
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             DynamicList preferredCourt =
-                    DynamicList.builder()
-                            .listItems(locationValues.getListItems())
-                            .value(locationValues.getListItems().getFirst())
-                            .build();
+                    new DynamicList().setListItems(locationValues.getListItems()).setValue(locationValues.getListItems().getFirst());
 
             CaseData caseData =
                     CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .specClaim1v1LrVsLip()
                             .atStateSpec1v1ClaimSubmitted()
-                            .respondent1(PartyBuilder.builder().company().build())
+                            .respondent1(new PartyBuilder().company().build())
                             .atStateRespondent1v1FullAdmissionSpec()
                             .build();
             caseData.setResponseClaimMediationSpecRequired(YES);

@@ -1525,12 +1525,11 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private CaseData getReadyTestCaseData(CaseData caseData, boolean multipleGenAppTypes) {
-        GAInformOtherParty withOrWithoutNotice = GAInformOtherParty.builder()
-            .isWithNotice(YES)
-            .reasonsForWithoutNotice(STRING_CONSTANT)
-            .build();
-        GARespondentOrderAgreement withOrWithoutConsent = GARespondentOrderAgreement.builder()
-            .hasAgreed(NO).build();
+        GAInformOtherParty withOrWithoutNotice = new GAInformOtherParty()
+            .setIsWithNotice(YES)
+            .setReasonsForWithoutNotice(STRING_CONSTANT);
+        GARespondentOrderAgreement withOrWithoutConsent = new GARespondentOrderAgreement()
+            .setHasAgreed(NO);
 
         return getReadyTestCaseData(caseData, multipleGenAppTypes, withOrWithoutConsent, withOrWithoutNotice);
     }
@@ -1539,33 +1538,32 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                           boolean multipleGenAppTypes,
                                           GARespondentOrderAgreement hasAgreed,
                                           GAInformOtherParty withOrWithoutNotice) {
-        GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
+        GeneralApplication application = new GeneralApplication();
         if (multipleGenAppTypes) {
-            builder.generalAppType(GAApplicationType.builder()
-                                       .types(Arrays.asList(EXTEND_TIME, SUMMARY_JUDGEMENT))
-                                       .build());
+            application.setGeneralAppType(
+                new GAApplicationType().setTypes(Arrays.asList(EXTEND_TIME, SUMMARY_JUDGEMENT))
+            );
         } else {
-            builder.generalAppType(GAApplicationType.builder()
-                                       .types(singletonList(EXTEND_TIME))
-                                       .build());
+            application.setGeneralAppType(
+                new GAApplicationType().setTypes(singletonList(EXTEND_TIME))
+            );
         }
-        GeneralApplication application = builder
-
-            .generalAppInformOtherParty(withOrWithoutNotice)
-            .generalAppRespondentAgreement(hasAgreed)
-            .generalAppPBADetails(
-                GAPbaDetails.builder()
-                    .fee(FEE275)
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                                              .generalAppUrgency(YES)
-                                              .reasonsForUrgency(STRING_CONSTANT)
-                                              .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                                              .build())
-            .isMultiParty(NO)
-            .businessProcess(new BusinessProcess()
+        application
+            .setGeneralAppInformOtherParty(withOrWithoutNotice)
+            .setGeneralAppRespondentAgreement(hasAgreed)
+            .setGeneralAppPBADetails(
+                new GAPbaDetails()
+                    .setFee(FEE275)
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
+            .setGeneralAppUrgencyRequirement(new GAUrgencyRequirement()
+                                              .setGeneralAppUrgency(YES)
+                                              .setReasonsForUrgency(STRING_CONSTANT)
+                                              .setUrgentAppConsiderationDate(APP_DATE_EPOCH)
+                                              )
+            .setIsMultiParty(NO)
+            .setBusinessProcess(new BusinessProcess()
                                  .setStatus(BusinessProcessStatus.READY))
-            .build();
+            ;
         return getEmptyTestCase(caseData)
             .toBuilder()
             .generalApplications(wrapElements(application))

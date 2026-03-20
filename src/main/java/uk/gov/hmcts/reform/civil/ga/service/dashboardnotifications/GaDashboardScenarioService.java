@@ -32,9 +32,7 @@ public abstract class GaDashboardScenarioService {
         String caseReference = resolveCaseReference(caseData);
         log.info("Evaluating dashboard scenarios for case {}", caseReference);
 
-        ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder()
-            .params(mapper.mapCaseDataToParams(caseData))
-            .build();
+        ScenarioRequestParams scenarioParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
 
         String scenario = getScenario(caseData);
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
@@ -76,24 +74,29 @@ public abstract class GaDashboardScenarioService {
         return "unknown";
     }
 
+    @SuppressWarnings("java:S1172")
     protected abstract String getScenario(GeneralApplicationCaseData caseData);
 
     protected String getExtraScenario() {
         return null;
     }
 
+    @SuppressWarnings("unused")
     protected Map<String, Boolean> getScenarios(GeneralApplicationCaseData caseData) {
         return new HashMap<>();
     }
 
+    @SuppressWarnings("java:S1172")
     protected boolean shouldRecordScenario(GeneralApplicationCaseData caseData) {
         return true;
     }
 
+    @SuppressWarnings({"java:S1172", "unused"})
     protected boolean shouldRecordExtraScenario(GeneralApplicationCaseData caseData) {
         return false;
     }
 
+    @SuppressWarnings("unused")
     protected void beforeRecordScenario(GeneralApplicationCaseData caseData, String authToken) {
         // hook for subclasses
     }

@@ -114,7 +114,7 @@ class FullDefenceRespondentSolicitorOneCCSpecNotifierTest {
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
             .respondent2DQ(new Respondent2DQ())
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
+            .respondent2(new Party().setType(Party.Type.COMPANY).setCompanyName("my company"))
             .build();
         CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")

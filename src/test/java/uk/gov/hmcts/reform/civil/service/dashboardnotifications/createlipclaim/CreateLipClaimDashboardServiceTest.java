@@ -53,7 +53,7 @@ class CreateLipClaimDashboardServiceTest {
 
         service.notifyCreateLipClaim(caseData, AUTH_TOKEN);
 
-        ScenarioRequestParams params = ScenarioRequestParams.builder().params(new HashMap<>()).build();
+        ScenarioRequestParams params = new ScenarioRequestParams(new HashMap<>());
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIM_ISSUE_CLAIM_FEE_REQUIRED.getScenario(),
@@ -81,7 +81,7 @@ class CreateLipClaimDashboardServiceTest {
 
         service.notifyCreateLipClaim(caseData, AUTH_TOKEN);
 
-        ScenarioRequestParams params = ScenarioRequestParams.builder().params(new HashMap<>()).build();
+        ScenarioRequestParams params = new ScenarioRequestParams(new HashMap<>());
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIM_ISSUE_HWF_REQUESTED.getScenario(),
@@ -109,7 +109,7 @@ class CreateLipClaimDashboardServiceTest {
 
         service.notifyCreateLipClaim(caseData, AUTH_TOKEN);
 
-        ScenarioRequestParams params = ScenarioRequestParams.builder().params(new HashMap<>()).build();
+        ScenarioRequestParams params = new ScenarioRequestParams(new HashMap<>());
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIM_ISSUE_CLAIM_FEE_REQUIRED.getScenario(),

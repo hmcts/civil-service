@@ -237,17 +237,13 @@ public class EditJudgmentsOnlineMapperTest {
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)
             .applicant1Represented(YES)
-            .defendantDetailsSpec(DynamicList.builder()
-                .value(DynamicListElement.builder()
-                    .label("John Doe")
-                    .build())
-                .build())
+            .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("John Doe")))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
                 .setWhenWillThisAmountBePaid(LocalDate.now().plusDays(5)))
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .ccjPaymentDetails(ccjPaymentDetails)
-            .respondent1(PartyBuilder.builder().organisation().build())
+            .respondent1(new PartyBuilder().organisation().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionMapper.addUpdateActiveJudgment(caseData);
 

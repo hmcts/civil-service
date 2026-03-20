@@ -47,9 +47,7 @@ abstract class ApplicationsProceedOfflineDashboardService {
             partyLabel()
         );
 
-        ScenarioRequestParams params = ScenarioRequestParams.builder()
-            .params(mapper.mapCaseDataToParams(caseData))
-            .build();
+        ScenarioRequestParams params = new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
 
         dashboardScenariosService.recordScenarios(
             authToken,
