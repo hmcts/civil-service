@@ -70,6 +70,8 @@ public enum CamundaProcessIdentifier {
     NotifyDecisionOnReconsiderationRequestNotifier,
     SettleClaimPaidInFullNotificationNotifier,
     ClaimantResponsePartAdmitPayImmediatelyNotifier,
+    InformAgreedExtensionDateNotifier,
+    InformAgreedExtensionDateSpecNotifier,
     NotifyDefendantClaimantSettleTheClaimNotify,
     TranslatedDocumentUploadedNotifyParties,
     STANDARD_DIRECTION_ORDER_DJ_NOTIFY_PARTIES,
