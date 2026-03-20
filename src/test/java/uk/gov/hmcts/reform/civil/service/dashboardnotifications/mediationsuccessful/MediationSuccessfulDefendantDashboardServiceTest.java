@@ -55,7 +55,7 @@ class MediationSuccessfulDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -72,7 +72,7 @@ class MediationSuccessfulDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_SUCCESSFUL_DEFENDANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 

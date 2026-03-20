@@ -1,22 +1,22 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.bulkupdate.csv.UnAssignCaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseRoleCaseReference;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
 @Component
-public class UnAssignUserWithACaseRole extends MigrationTask<UnAssignCaseReference> {
+public class UnAssignUserWithACaseRole extends MigrationTask<CaseRoleCaseReference> {
 
     public final CoreCaseUserService coreCaseUserService;
 
     public UnAssignUserWithACaseRole(CoreCaseUserService coreCaseUserService1) {
-        super(UnAssignCaseReference.class);
+        super(CaseRoleCaseReference.class);
         this.coreCaseUserService = coreCaseUserService1;
     }
 
-    protected CaseData migrateCaseData(CaseData caseData, UnAssignCaseReference unassignCaseReference) {
+    protected CaseData migrateCaseData(CaseData caseData, CaseRoleCaseReference unassignCaseReference) {
         if (caseData == null || unassignCaseReference.getCaseReference() == null) {
             throw new IllegalArgumentException("CaseData and CaseReference must not be null");
         }

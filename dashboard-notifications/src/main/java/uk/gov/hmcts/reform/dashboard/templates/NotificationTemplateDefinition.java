@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -28,17 +26,17 @@ public class NotificationTemplateDefinition {
     private boolean markedForDeletion;
 
     public NotificationTemplateDefinition sanitise() {
-        return NotificationTemplateDefinition.builder()
-            .name(trim(name))
-            .role(trim(role))
-            .titleEn(trim(titleEn))
-            .titleCy(trim(titleCy))
-            .descriptionEn(trim(descriptionEn))
-            .descriptionCy(trim(descriptionCy))
-            .timeToLive(trim(timeToLive))
-            .deadlineParam(trim(deadlineParam))
-            .markedForDeletion(markedForDeletion)
-            .build();
+        return new NotificationTemplateDefinition(
+            trim(name),
+            trim(role),
+            trim(titleEn),
+            trim(titleCy),
+            trim(descriptionEn),
+            trim(descriptionCy),
+            trim(timeToLive),
+            trim(deadlineParam),
+            markedForDeletion
+        );
     }
 
     private String trim(String value) {
