@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -151,24 +152,20 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
      * @param caseDetails caseDetails
      */
     private void updateOrgPoliciesForLiP(CaseDetails caseDetails) {
-        ChangeOrganisationRequest changeOrganisationRequestField = objectMapper.convertValue(
-            caseDetails.getData().get(CHANGE_ORGANISATION_REQUEST), ChangeOrganisationRequest.class);
-
-        Organisation organisationToRemove = changeOrganisationRequestField.getOrganisationToRemove();
-        DynamicList caseRoleId = changeOrganisationRequestField.getCaseRoleId();
-        String caseRole = caseRoleId.getValue().getCode();
-
-        if (organisationToRemove != null) {
+        ChangeOrganisationRequest changeOrganisationRequestField =
+            objectMapper.convertValue(caseDetails.getData().get(CHANGE_ORGANISATION_REQUEST), ChangeOrganisationRequest.class);
+        if (changeOrganisationRequestField.getOrganisationToRemove() != null) {
             return;
         }
 
         ChangeOrganisationRequest updatedRequest = new ChangeOrganisationRequest();
-        String orgIdCopyIfExists = getOrgIdCopyIfExists(caseDetails, caseRole);
         updatedRequest.setOrganisationToAdd(changeOrganisationRequestField.getOrganisationToAdd());
         updatedRequest.setApprovalStatus(changeOrganisationRequestField.getApprovalStatus());
-        updatedRequest.setCaseRoleId(caseRoleId);
         updatedRequest.setRequestTimestamp(changeOrganisationRequestField.getRequestTimestamp());
+        DynamicList caseRoleId = changeOrganisationRequestField.getCaseRoleId();
+        updatedRequest.setCaseRoleId(caseRoleId);
         // Preserve OrganisationToRemove node for persistence even when the value is logically null.
+        String orgIdCopyIfExists = getOrgIdCopyIfExists(caseDetails, caseRoleId.getValue().getCode());
         updatedRequest.setOrganisationToRemove(new Organisation().setOrganisationID(orgIdCopyIfExists));
         caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST, updatedRequest);
     }
@@ -240,7 +237,11 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             return request.getOrganisationToRemove().getOrganisationID();
         }
 
-        String caseRole = request.getCaseRoleId().getValue().getCode();
+        String caseRole = Optional.ofNullable(request.getCaseRoleId())
+            .map(DynamicList::getValue)
+            .map(DynamicListElement::getCode)
+            .orElse(null);
+
         if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
             return caseData.getRespondent1OrganisationIDCopy();
         } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
