@@ -226,6 +226,45 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
         }
 
         @Test
+        void shouldKeepUploadedWrittenRepresentationInAddlDocsWhenWelshEnabledAndBilingualButNoTextResponse() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+
+            List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
+
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
+
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
+
+            generalAppWrittenRepUpload.add(element(document1));
+            generalAppWrittenRepUpload.add(element(document2));
+
+            GeneralApplicationCaseData caseData = getCase(generalAppWrittenRepUpload, null, null)
+                .copy()
+                .applicantBilingualLanguagePreference(YES)
+                .build();
+
+            Map<String, Object> dataMap = objectMapper.convertValue(
+                caseData, new TypeReference<>() {
+                }
+            );
+            CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var responseCaseData = getCaseData(response);
+
+            assertThat(responseCaseData.getGeneralAppWrittenRepUpload()).isNull();
+            assertThat(responseCaseData.getPreTranslationGaDocumentType()).isNull();
+            assertThat(responseCaseData.getPreTranslationGaDocuments()).isEmpty();
+            assertThat(responseCaseData.getGaAddlDoc()).hasSize(2);
+            assertThat(responseCaseData.getGaAddlDocStaff()).hasSize(2);
+            assertThat(responseCaseData.getGaAddlDocClaimant()).hasSize(2);
+        }
+
+        @Test
         void shouldConvertToDocAndReturnNullWrittenRepText() {
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             when(respondToWrittenRepresentationGenerator.generate(any(), anyString(), anyString()))
@@ -381,6 +420,81 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
                 anyString()
             );
         }
+
+        @Test
+        void shouldGenerateRespondentWrittenRepAndSetRespondedFlagWhenRespondentSubmits() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(respondToWrittenRepresentationGenerator.generate(any(), anyString(), anyString()))
+                .thenReturn(new CaseDocument().setDocumentLink(new Document()));
+
+            GeneralApplicationCaseData caseData = getRespondentCase();
+
+            Map<String, Object> dataMap = objectMapper.convertValue(
+                caseData, new TypeReference<>() {
+                }
+            );
+            CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var responseCaseData = getCaseData(response);
+
+            assertThat(responseCaseData.getIsRespondentResponded()).isEqualTo(YES);
+            assertThat(responseCaseData.getIsApplicantResponded()).isEqualTo(null);
+            assertThat(responseCaseData.getGaAddlDocRespondentSol()).hasSize(1);
+            assertThat(responseCaseData.getGeneralAppWrittenRepText()).isNull();
+            verify(respondToWrittenRepresentationGenerator).generate(any(), anyString(), eq(DocUploadUtils.RESPONDENT_ONE));
+            verify(docUploadDashboardNotificationService).createDashboardNotification(
+                any(GeneralApplicationCaseData.class),
+                eq(DocUploadUtils.RESPONDENT_ONE),
+                anyString(),
+                anyBoolean()
+            );
+            verify(docUploadDashboardNotificationService).createResponseDashboardNotification(
+                any(),
+                eq("RESPONDENT"),
+                anyString()
+            );
+            verify(docUploadDashboardNotificationService).createResponseDashboardNotification(
+                any(),
+                eq("APPLICANT"),
+                anyString()
+            );
+        }
+
+        @Test
+        void shouldOnlyCreateRespondentResponseNotificationWhenRespondentTranslationRequired() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(respondToWrittenRepresentationGenerator.generate(any(), anyString(), anyString()))
+                .thenReturn(new CaseDocument().setDocumentLink(new Document()));
+
+            GeneralApplicationCaseData caseData = getRespondentCase().copy()
+                .isGaRespondentOneLip(YES)
+                .respondentBilingualLanguagePreference(YES)
+                .build();
+
+            Map<String, Object> dataMap = objectMapper.convertValue(
+                caseData, new TypeReference<>() {
+                }
+            );
+            CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+
+            verify(docUploadDashboardNotificationService, never()).createDashboardNotification(
+                any(GeneralApplicationCaseData.class), anyString(), anyString(), anyBoolean());
+            verify(docUploadDashboardNotificationService, never()).createResponseDashboardNotification(
+                any(),
+                eq("APPLICANT"),
+                anyString()
+            );
+            verify(docUploadDashboardNotificationService).createResponseDashboardNotification(
+                any(),
+                eq("RESPONDENT"),
+                anyString()
+            );
+        }
     }
 
     private GeneralApplicationCaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
@@ -412,5 +526,30 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
             .build();
     }
 
-}
+    private GeneralApplicationCaseData getRespondentCase() {
+        List<GeneralApplicationTypes> types = List.of(GeneralApplicationTypes.SUMMARY_JUDGEMENT);
+        return new GeneralApplicationCaseData().parentClaimantIsApplicant(YES)
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                                          .setEmail("abc@gmail.com").setId("applicant-id"))
+            .generalAppRespondentSolicitors(List.of(
+                element(new GASolicitorDetailsGAspec()
+                            .setId(APP_UID)
+                            .setEmail("respondent@gmail.com")
+                            .setOrganisationIdentifier("org1"))
+            ))
+            .generalAppWrittenRepText("writtenRep text")
+            .generalAppRespondent1Representative(
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+            )
+            .generalAppType(new GAApplicationType().setTypes(types))
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.READY)
+                                 .setActivityId(ACTIVITY_ID))
+            .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
+            .build();
+    }
 
+}

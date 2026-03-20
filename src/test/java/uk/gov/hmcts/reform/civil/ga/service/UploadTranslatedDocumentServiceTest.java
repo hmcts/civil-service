@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.ga.enums.dq.GaFinalOrderSelection;
 import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType;
@@ -37,9 +36,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 public class UploadTranslatedDocumentServiceTest {
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @Mock
     private AssignCategoryId assignCategoryId;
@@ -109,6 +105,37 @@ public class UploadTranslatedDocumentServiceTest {
     }
 
     @Test
+    void shouldAddUploadedApplicantDocumentToAdditionalDocuments() {
+        // Given
+        List<Element<TranslatedDocument>> translatedDocuments = new ArrayList<>();
+        TranslatedDocument translatedDocument = TranslatedDocument.builder()
+            .documentType(TranslatedDocumentType.UPLOADED_DOCUMENTS_APPLICANT)
+            .file(new Document()
+                      .setDocumentFileName("test.pdf")
+                      .setDocumentUrl("http://test")
+                      .setDocumentBinaryUrl("http://test/12345")
+                      .setUploadTimestamp("01-01-2025"))
+            .build();
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
+
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .translatedDocuments(translatedDocuments)
+            .build();
+
+        // When
+        GeneralApplicationCaseData result = uploadTranslatedDocumentService.processTranslatedDocument(caseData, translator).build();
+
+        // Then
+        assertThat(result.getGaAddlDoc()).isNotNull();
+        assertThat(result.getGaAddlDocClaimant()).isNotNull();
+        assertThat(result.getGaAddlDocStaff()).isNotNull();
+        assertThat(result.getGaAddlDoc().size()).isEqualTo(1);
+        assertThat(result.getGaAddlDocClaimant().size()).isEqualTo(1);
+        assertThat(result.getGaAddlDocStaff().size()).isEqualTo(1);
+        verify(assignCategoryId, times(1)).assignCategoryIdToCollection(anyList(), any(), eq(AssignCategoryId.APPLICATIONS));
+    }
+
+    @Test
     void updateGaDraftDocumentsWithTheOriginalDocuments() {
         // Given
         List<Element<TranslatedDocument>> translatedDocuments = new ArrayList<>();
@@ -140,6 +167,32 @@ public class UploadTranslatedDocumentServiceTest {
         // Then
         assertThat(caseData.getGaDraftDocument()).isNotNull();
         assertThat(caseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
+    }
+
+    @Test
+    void shouldNotUpdateDeadlineForApplicationSummaryWhenOriginalDraftIsMissing() {
+        // Given
+        List<Element<TranslatedDocument>> translatedDocuments = new ArrayList<>();
+        TranslatedDocument translatedDocument = TranslatedDocument.builder()
+            .documentType(TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT)
+            .file(mock(Document.class))
+            .build();
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
+
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .translatedDocuments(translatedDocuments)
+            .preTranslationGaDocuments(null)
+            .preTranslationGaDocumentType(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC)
+            .build();
+
+        // When
+        GeneralApplicationCaseData builder = caseData.copy();
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
+
+        // Then
+        caseData = builder.build();
+        assertThat(caseData.getGeneralAppNotificationDeadlineDate()).isNull();
+        verify(deadlinesCalculator, never()).calculateApplicantResponseDeadline(any(LocalDateTime.class), any(Integer.class));
     }
 
     @Test
@@ -975,7 +1028,7 @@ public class UploadTranslatedDocumentServiceTest {
         assertThat(result.getWrittenRepConcurrentDocument()).isNotNull();
         assertThat(result.getDismissalOrderDocument()).isNotNull();
         assertThat(result.getGaDraftDocument()).isNotNull();
-        assertThat(result.getGeneralOrderDocument().get(0).getValue().getCreatedBy()).isEqualTo(translator);
+        assertThat(result.getGeneralOrderDocument().getFirst().getValue().getCreatedBy()).isEqualTo(translator);
         verify(assignCategoryId, times(9)).assignCategoryIdToCollection(anyList(), any(), any());
     }
 
@@ -1053,5 +1106,79 @@ public class UploadTranslatedDocumentServiceTest {
 
         verify(docUploadDashboardNotificationService).createDashboardNotification(eq(caseData), eq("Respondent One"), eq("auth"), eq(false));
         verify(docUploadDashboardNotificationService, never()).createResponseDashboardNotification(eq(caseData), eq("APPLICANT"), eq("auth"));
+    }
+
+    @Test
+    void shouldNotSendUserUploadNotificationForUnsupportedTranslatedDocumentType() {
+        List<Element<TranslatedDocument>> translatedDocuments = new ArrayList<>();
+        TranslatedDocument translatedDocument = TranslatedDocument.builder()
+            .documentType(TranslatedDocumentType.GENERAL_ORDER)
+            .file(mock(Document.class))
+            .build();
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .translatedDocuments(translatedDocuments).build();
+
+        uploadTranslatedDocumentService.sendUserUploadNotification(caseData, new GeneralApplicationCaseData().build(), "auth");
+
+        verifyNoInteractions(docUploadDashboardNotificationService);
+    }
+
+    @Test
+    void shouldNotSendUserUploadNotificationWhenCaseIsNotGaForLip() {
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        List<Element<TranslatedDocument>> translatedDocuments = new ArrayList<>();
+        TranslatedDocument translatedDocument = TranslatedDocument.builder()
+            .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_APPLICANT)
+            .file(mock(Document.class))
+            .build();
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .translatedDocuments(translatedDocuments).build();
+
+        uploadTranslatedDocumentService.sendUserUploadNotification(caseData, new GeneralApplicationCaseData().build(), "auth");
+
+        verifyNoInteractions(docUploadDashboardNotificationService);
+    }
+
+    @Test
+    void shouldReturnGaLipEventWhenNoTranslatedDocumentsPresent() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .translatedDocuments(null)
+            .build();
+
+        var caseEvent = uploadTranslatedDocumentService.getBusinessProcessEvent(caseData);
+
+        assertThat(caseEvent).isEqualTo(uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_GA_LIP);
+    }
+
+    @Test
+    void shouldNotSendUserUploadNotificationWhenDocumentIsStillAwaitingTranslation() {
+        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        List<Element<TranslatedDocument>> translatedDocuments = new ArrayList<>();
+        TranslatedDocument translatedDocument = TranslatedDocument.builder()
+            .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_APPLICANT)
+            .file(mock(Document.class))
+            .build();
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
+
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        preTranslationDocuments.add(
+            element(new CaseDocument()
+                        .setDocumentName("Written representation")
+                        .setCreatedBy("Applicant"))
+        );
+
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .translatedDocuments(translatedDocuments)
+            .build();
+        GeneralApplicationCaseData updatedCaseData = new GeneralApplicationCaseData()
+            .preTranslationGaDocuments(preTranslationDocuments)
+            .build();
+
+        uploadTranslatedDocumentService.sendUserUploadNotification(caseData, updatedCaseData, "auth");
+
+        verify(docUploadDashboardNotificationService, never()).createDashboardNotification(any(), any(), any(), any(Boolean.class));
+        verify(docUploadDashboardNotificationService, never()).createResponseDashboardNotification(any(), any(), any());
     }
 }
