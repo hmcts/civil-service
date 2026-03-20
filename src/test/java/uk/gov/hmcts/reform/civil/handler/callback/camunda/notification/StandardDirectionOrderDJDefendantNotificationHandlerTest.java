@@ -30,13 +30,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -266,13 +264,12 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         }
 
         @Test
-        public void shouldThrowErrorWhenMissingEmail() {
+        void shouldSkipNotification_whenRespondent1SolicitorEmailMissing() {
             Organisation organisation = new Organisation();
             organisation.setName("Test Org Name");
             when(organisationService.findOrganisationById(anyString()))
                     .thenReturn(Optional.of(organisation));
 
-            doThrow(new RuntimeException()).when(notificationService).sendMail(isNull(), any(), any(), any());
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
@@ -289,12 +286,29 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
 
             handler.handle(params);
 
-            verify(notificationService).sendMail(
-                    any(),
-                    any(),
-                    any(),
-                    any()
-            );
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
+        void shouldSkipNotification_whenRespondent1LipEmailMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued1v1UnrepresentedDefendant()
+                    .build().toBuilder()
+                    .defendantUserDetails(null)
+                    .respondent1Represented(NO)
+                    .defendantDetails(dynamicListWithLabel("Mr. Sole Trader"))
+                    .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
+                            .caseDetails(CaseDetails.builder().id(123L).build())
+                            .build())
+                    .build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
         }
 
         @Test
@@ -409,6 +423,29 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         }
 
         @Test
+        void shouldSkipNotification_whenRespondent2EmailMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                    .build().toBuilder()
+                    .respondent2Represented(YES)
+                    .respondentSolicitor2EmailAddress(null)
+                    .defendantDetails(dynamicListWithLabel("Mr. John Rambo"))
+                    .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                            .caseDetails(CaseDetails.builder().id(123L).build())
+                            .build())
+                    .build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
         void shouldReturnRespondent1Name_whenOrganisationNotFound() {
             when(organisationService.findOrganisationById(anyString()))
                     .thenReturn(Optional.empty());
@@ -505,7 +542,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
                             .build())
                     .build();
 
-            assertThrows(NullPointerException.class, () -> handler.handle(params));
+            handler.handle(params);
             verifyNoInteractions(notificationService);
         }
 

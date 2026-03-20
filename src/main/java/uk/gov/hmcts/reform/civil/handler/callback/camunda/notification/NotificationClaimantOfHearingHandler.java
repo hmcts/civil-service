@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -32,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARING;
@@ -101,16 +104,39 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
         boolean isHmcEvent = isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING_HMC);
 
         if (isHmcEvent && !isApplicantLip) {
-            sendEmailHMC(caseData, caseData.getApplicantSolicitor1UserDetails().getEmail());
+            Optional.ofNullable(caseData.getApplicantSolicitor1UserDetails())
+                .map(IdamUserDetails::getEmail)
+                .ifPresentOrElse(
+                    recipient -> sendEmailHMC(caseData, recipient),
+                    () -> logMissingRecipient(callbackParams)
+                );
         } else {
-            sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip, isHmcEvent), isApplicantLip, isHmcEvent);
+            Optional.ofNullable(getRecipient(caseData, isApplicantLip))
+                .ifPresentOrElse(
+                    recipient -> sendEmail(
+                        caseData,
+                        recipient,
+                        getReferenceTemplate(caseData, isApplicantLip, isHmcEvent),
+                        isApplicantLip,
+                        isHmcEvent),
+                    () -> logMissingRecipient(callbackParams)
+                );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
+    private void logMissingRecipient(CallbackParams callbackParams) {
+        log.warn("Skipping claimant hearing notification due to missing recipient email for case {}",
+                 callbackParams.getRequest().getCaseDetails().getId());
+    }
+
     private void sendEmail(CaseData caseData, String recipient, String reference, boolean isApplicantLip, boolean isHmcEvent) {
-        notificationService.sendMail(recipient, getEmailTemplate(caseData, isApplicantLip), addPropertiesHearing(caseData, isHmcEvent, isApplicantLip), reference);
+        notificationService.sendMail(
+            recipient,
+            getEmailTemplate(caseData, isApplicantLip),
+            addPropertiesHearing(caseData, isHmcEvent, isApplicantLip),
+            reference);
     }
 
     private void sendEmailHMC(CaseData caseData, String recipient) {
@@ -135,7 +161,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference(),
             CLAIM_LEGAL_ORG_NAME_SPEC, isApplicantLip
-                ? caseData.getApplicant1().getPartyName()
+                ? Optional.ofNullable(caseData.getApplicant1()).map(Party::getPartyName).orElse("")
                 : getApplicantLegalOrganizationName(caseData, organisationService)
         ));
 
@@ -145,7 +171,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
                 ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : "";
 
             if (!isPaymentSuccessful(caseData)) {
-                map.put(HEARING_FEE, caseData.getHearingFee() != null
+                map.put(HEARING_FEE, caseData.getHearingFee() != null && caseData.getHearingFee().formData() != null
                     ? String.valueOf(caseData.getHearingFee().formData()) : "£0.00");
                 map.put(HEARING_DUE_DATE, caseData.getHearingDueDate() != null
                     ? NotificationUtils.getFormattedHearingDate(caseData.getHearingDueDate()) : "");
@@ -197,8 +223,8 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     private String getRecipient(CaseData caseData, boolean isApplicantLip) {
         return isApplicantLip
-            ? caseData.getApplicant1().getPartyEmail()
-            : caseData.getApplicantSolicitor1UserDetails().getEmail();
+            ? Optional.ofNullable(caseData.getApplicant1()).map(Party::getPartyEmail).orElse(null)
+            : Optional.ofNullable(caseData.getApplicantSolicitor1UserDetails()).map(IdamUserDetails::getEmail).orElse(null);
     }
 
     private String getReferenceTemplate(CaseData caseData, boolean isApplicantLip, boolean isHmcEvent) {

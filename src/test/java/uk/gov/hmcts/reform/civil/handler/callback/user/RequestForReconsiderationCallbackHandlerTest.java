@@ -77,8 +77,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
 
     private static final String ERROR_MESSAGE_DEADLINE_EXPIRED
         = "You can no longer request a reconsideration because the deadline has expired";
-
-    private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND = "You can only request a reconsideration for claims of £1,000 or less.";
+    private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_TEN_THOUSAND = "You can only request a reconsideration for claims of £10,000 or less.";
     private static final String ERROR_MESSAGE_EVENT_NOT_ALLOWED = "You can only request a reconsideration where a Legal Advisor has drawn the SDO.";
 
     @Test
@@ -161,7 +160,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: The error should be displayed
-            assertThat(response.getErrors().contains(ERROR_MESSAGE_DEADLINE_EXPIRED));
+            assertThat(response.getErrors()).contains(ERROR_MESSAGE_DEADLINE_EXPIRED);
         }
 
         @Test
@@ -179,7 +178,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: The error should be displayed
-            assertThat(response.getErrors().contains(ERROR_MESSAGE_DEADLINE_EXPIRED));
+            assertThat(response.getErrors()).contains(ERROR_MESSAGE_DEADLINE_EXPIRED);
         }
 
         @ParameterizedTest
@@ -234,7 +233,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
-        void shouldNotAllowEventForCaseWithClaimAmountGreaterThan1000() {
+        void shouldNotAllowEventForCaseWithClaimAmountGreaterThan10000() {
             //Given : Casedata with claim amount greater than 1000
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .totalClaimAmount(new BigDecimal(12000))
@@ -244,8 +243,8 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             //When: handler is called with ABOUT_TO_START event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            //Then: No errors should be displayed
-            assertThat(response.getErrors().contains(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND));
+            //Then: ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_TEN_THOUSAND should be displayed
+            assertThat(response.getErrors()).contains(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_TEN_THOUSAND);
         }
 
         @Test
@@ -261,7 +260,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: No errors should be displayed
-            assertThat(response.getErrors().contains(ERROR_MESSAGE_EVENT_NOT_ALLOWED));
+            assertThat(response.getErrors()).contains(ERROR_MESSAGE_EVENT_NOT_ALLOWED);
         }
     }
 
