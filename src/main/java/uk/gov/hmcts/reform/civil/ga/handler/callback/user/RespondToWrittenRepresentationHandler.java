@@ -120,15 +120,16 @@ public class RespondToWrittenRepresentationHandler extends CallbackHandler imple
                                                                   List<Element<Document>> responseDocuments,
                                                                   String authToken,
                                                                   String role) {
+        boolean hasGeneratedWrittenRepresentation = hasGeneratedWrittenRepresentation(caseData);
         boolean translationRequired = false;
         PreTranslationGaDocumentType documentType = null;
 
-        if (hasGeneratedWrittenRepresentation(caseData)) {
+        if (hasGeneratedWrittenRepresentation) {
             translationRequired = isTranslationRequired(caseData);
             documentType = translationRequired ? WRITTEN_REPS_RESPONSE_DOC : null;
         }
 
-        if (hasGeneratedWrittenRepresentation(caseData)) {
+        if (hasGeneratedWrittenRepresentation) {
             CaseDocument caseDocument = respondToWrittenRepresentation.generate(caseData, authToken, role);
             responseDocuments.add(ElementUtils.element(caseDocument.getDocumentLink()));
         }

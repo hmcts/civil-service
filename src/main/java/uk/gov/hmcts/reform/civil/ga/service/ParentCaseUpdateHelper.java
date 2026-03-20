@@ -95,8 +95,6 @@ public class ParentCaseUpdateHelper {
             APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION
     );
 
-    private final String[] roles = {CLAIMANT_ROLE, RESPONDENT_SOL_ROLE, RESPONDENT_SOL_TWO_ROLE};
-
     public void updateParentWithGAState(GeneralApplicationCaseData generalAppCaseData, String newState) {
 
         String applicationId = generalAppCaseData.getCcdCaseReference().toString();
@@ -472,12 +470,17 @@ public class ParentCaseUpdateHelper {
                                                            parentCollections.respondentDetails(),
                                                            parentCollections.respondentTwoDetails(),
                                                            parentCollections.judgeDetails());
+        String[] documentVisibilityRoles = defaultVisibilityRoles();
         if (parentCollections.respondentTwoDetails().isEmpty()) {
-            roles[2] = null;
+            documentVisibilityRoles[2] = null;
         }
-        updateCaseDocument(updateMap, caseData, generalAppCaseData, roles);
+        updateCaseDocument(updateMap, caseData, generalAppCaseData, documentVisibilityRoles);
         submitParentCaseUpdate(parentCaseId, startEventResponse, updateMap);
         log.info("Submitted update for Parent Case ID: {}", parentCaseId);
+    }
+
+    private String[] defaultVisibilityRoles() {
+        return new String[] {CLAIMANT_ROLE, RESPONDENT_SOL_ROLE, RESPONDENT_SOL_TWO_ROLE};
     }
 
     private ParentCollections updateParentCollectionsForState(GeneralApplicationCaseData caseData,

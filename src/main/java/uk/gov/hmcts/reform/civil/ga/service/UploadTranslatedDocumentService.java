@@ -199,7 +199,7 @@ public class UploadTranslatedDocumentService {
                 context.caseDataBuilder(),
                 context.preTranslationGaDocuments(),
                 context.applicantPreTranslation(),
-                getOriginalDocumentName(documentType)
+                getApplicantOriginalDocumentName(documentType)
             );
             return;
         }
@@ -208,7 +208,7 @@ public class UploadTranslatedDocumentService {
                 context.caseDataBuilder(),
                 context.preTranslationGaDocuments(),
                 context.respondentPreTranslation(),
-                getOriginalDocumentName(documentType)
+                getRespondentOriginalDocumentName(documentType)
             );
         }
     }
@@ -242,12 +242,16 @@ public class UploadTranslatedDocumentService {
             || documentType == REQUEST_MORE_INFORMATION_RESPONDENT;
     }
 
-    private String getOriginalDocumentName(TranslatedDocumentType documentType) {
-        return switch (documentType) {
-            case WRITTEN_REPRESENTATIONS_APPLICANT, WRITTEN_REPRESENTATIONS_RESPONDENT -> WRITTEN_REPRESENTATION;
-            case REQUEST_MORE_INFORMATION_APPLICANT, REQUEST_MORE_INFORMATION_RESPONDENT -> ADDITIONAL_INFORMATION;
-            default -> "";
-        };
+    private String getApplicantOriginalDocumentName(TranslatedDocumentType documentType) {
+        return documentType == WRITTEN_REPRESENTATIONS_APPLICANT
+            ? WRITTEN_REPRESENTATION
+            : ADDITIONAL_INFORMATION;
+    }
+
+    private String getRespondentOriginalDocumentName(TranslatedDocumentType documentType) {
+        return documentType == WRITTEN_REPRESENTATIONS_RESPONDENT
+            ? WRITTEN_REPRESENTATION
+            : ADDITIONAL_INFORMATION;
     }
 
     private void moveOrderDocument(OriginalDocumentUpdateContext context, TranslatedDocumentType documentType) {

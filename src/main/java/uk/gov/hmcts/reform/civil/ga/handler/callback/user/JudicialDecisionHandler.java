@@ -1248,8 +1248,8 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         return format(
             JUDICIAL_PREF_TYPE_TEXT_3,
             caseData.getGeneralAppHearingDetails().getHearingPreferencesPreferredType().getDisplayedValue(),
-            getRespondentHearingPreferenceFromResponse(response1(caseData)),
-            getRespondentHearingPreferenceFromResponse(response2(caseData))
+            getRespondentHearingPreferenceFromResponse(getRespondentResponseValue(response1(caseData))),
+            getRespondentHearingPreferenceFromResponse(getRespondentResponseValue(response2(caseData)))
         );
     }
 
@@ -1259,8 +1259,8 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
             || caseData.getGeneralAppHearingDetails().getHearingPreferencesPreferredType() != null;
     }
 
-    private String getRespondentHearingPreferenceFromResponse(Optional<Element<GARespondentResponse>> response) {
-        return response.map(Element::getValue)
+    private String getRespondentHearingPreferenceFromResponse(GARespondentResponse response) {
+        return Optional.ofNullable(response)
             .map(GARespondentResponse::getGaHearingDetails)
             .map(GAHearingDetails::getHearingPreferencesPreferredType)
             .map(GAHearingType::getDisplayedValue)
@@ -1412,10 +1412,18 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
             return appendApplicantVulnerabilityTextForTwoRespondents(caseData, applicantText);
         }
         if (hasRespondent1VulnerabilityResponded) {
-            return appendApplicantVulnerabilityText(applicantText, response1(caseData), JUDICIAL_RESPONDENT1_VULNERABILITY_TEXT);
+            return appendApplicantVulnerabilityText(
+                applicantText,
+                getRespondentResponseValue(response1(caseData)),
+                JUDICIAL_RESPONDENT1_VULNERABILITY_TEXT
+            );
         }
         if (hasRespondent2VulnerabilityResponded) {
-            return appendApplicantVulnerabilityText(applicantText, response2(caseData), JUDICIAL_RESPONDENT2_VULNERABILITY_TEXT);
+            return appendApplicantVulnerabilityText(
+                applicantText,
+                getRespondentResponseValue(response2(caseData)),
+                JUDICIAL_RESPONDENT2_VULNERABILITY_TEXT
+            );
         }
         return null;
     }
@@ -1428,10 +1436,16 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
             return buildRespondentOnlyVulnerabilityText(caseData);
         }
         if (hasRespondent2VulnerabilityResponded) {
-            return getRespondentVulnerabilityText(response2(caseData), JUDICIAL_RESPONDENT2_VULNERABILITY_TEXT);
+            return getRespondentVulnerabilityText(
+                getRespondentResponseValue(response2(caseData)),
+                JUDICIAL_RESPONDENT2_VULNERABILITY_TEXT
+            );
         }
         if (hasRespondent1VulnerabilityResponded) {
-            return getRespondentVulnerabilityText(response1(caseData), JUDICIAL_RESPONDENT1_VULNERABILITY_TEXT);
+            return getRespondentVulnerabilityText(
+                getRespondentResponseValue(response1(caseData)),
+                JUDICIAL_RESPONDENT1_VULNERABILITY_TEXT
+            );
         }
         return null;
     }
@@ -1448,7 +1462,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
     }
 
     private String appendApplicantVulnerabilityText(String applicantText,
-                                                    Optional<Element<GARespondentResponse>> response,
+                                                    GARespondentResponse response,
                                                     String respondentPrefix) {
         String respondentText = getRespondentVulnerabilityText(response, respondentPrefix);
         return respondentText == null ? null : applicantText.concat(respondentText);
@@ -1456,24 +1470,36 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
 
     private String appendApplicantVulnerabilityTextForTwoRespondents(GeneralApplicationCaseData caseData,
                                                                      String applicantText) {
-        String respondentOneText = getRespondentVulnerabilityText(response1(caseData), JUDICIAL_RESPONDENT1_VULNERABILITY_TEXT);
-        String respondentTwoText = getRespondentVulnerabilityText(response2(caseData), JUDICIAL_RESPONDENT2_VULNERABILITY_TEXT);
+        String respondentOneText = getRespondentVulnerabilityText(
+            getRespondentResponseValue(response1(caseData)),
+            JUDICIAL_RESPONDENT1_VULNERABILITY_TEXT
+        );
+        String respondentTwoText = getRespondentVulnerabilityText(
+            getRespondentResponseValue(response2(caseData)),
+            JUDICIAL_RESPONDENT2_VULNERABILITY_TEXT
+        );
         return respondentOneText != null && respondentTwoText != null
             ? applicantText.concat(respondentOneText).concat(respondentTwoText)
             : null;
     }
 
     private String buildRespondentOnlyVulnerabilityText(GeneralApplicationCaseData caseData) {
-        String respondentOneText = getRespondentVulnerabilityText(response1(caseData), JUDICIAL_RESPONDENT1_VULNERABILITY_TEXT);
-        String respondentTwoText = getRespondentVulnerabilityText(response2(caseData), JUDICIAL_RESPONDENT2_VULNERABILITY_TEXT);
+        String respondentOneText = getRespondentVulnerabilityText(
+            getRespondentResponseValue(response1(caseData)),
+            JUDICIAL_RESPONDENT1_VULNERABILITY_TEXT
+        );
+        String respondentTwoText = getRespondentVulnerabilityText(
+            getRespondentResponseValue(response2(caseData)),
+            JUDICIAL_RESPONDENT2_VULNERABILITY_TEXT
+        );
         return respondentOneText != null && respondentTwoText != null
             ? respondentOneText.concat(respondentTwoText)
             : null;
     }
 
-    private String getRespondentVulnerabilityText(Optional<Element<GARespondentResponse>> response,
+    private String getRespondentVulnerabilityText(GARespondentResponse response,
                                                   String respondentPrefix) {
-        return response.map(Element::getValue)
+        return Optional.ofNullable(response)
             .map(GARespondentResponse::getGaHearingDetails)
             .map(GAHearingDetails::getVulnerabilityQuestion)
             .map(respondentPrefix::concat)
@@ -1569,11 +1595,8 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
     }
 
     private String createJudicialSupportReqText3(GeneralApplicationCaseData caseData, String appSupportReq) {
-        Optional<Element<GARespondentResponse>> response1 = response1(caseData);
-        Optional<Element<GARespondentResponse>> response2 = response2(caseData);
-
-        String respondentOne = retrieveSupportRequirementsFromResponse(response1);
-        String respondentTwo = retrieveSupportRequirementsFromResponse(response2);
+        String respondentOne = retrieveSupportRequirementsFromResponse(getRespondentResponseValue(response1(caseData)));
+        String respondentTwo = retrieveSupportRequirementsFromResponse(getRespondentResponseValue(response2(caseData)));
         return format(
             JUDICIAL_SUPPORT_REQ_TEXT_3,
             appSupportReq.isEmpty() ? NO_SUPPORT : appSupportReq,
@@ -1590,14 +1613,14 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         return format(respondentSupportReq.isEmpty() ? NO_SUPPORT : resSupportReq);
     }
 
-    private String retrieveSupportRequirementsFromResponse(Optional<Element<GARespondentResponse>> response) {
-        if (response.isPresent()
-            && response.get().getValue().getGaHearingDetails().getSupportRequirement() != null) {
-            return response.get().getValue().getGaHearingDetails()
-                .getSupportRequirement().stream().map(GAHearingSupportRequirements::getDisplayedValue)
-                .collect(Collectors.joining(", "));
-        }
-        return StringUtils.EMPTY;
+    private String retrieveSupportRequirementsFromResponse(GARespondentResponse response) {
+        return Optional.ofNullable(response)
+            .map(GARespondentResponse::getGaHearingDetails)
+            .map(GAHearingDetails::getSupportRequirement)
+            .map(supportRequirements -> supportRequirements.stream()
+                .map(GAHearingSupportRequirements::getDisplayedValue)
+                .collect(Collectors.joining(", ")))
+            .orElse(StringUtils.EMPTY);
     }
 
     private String generateRespondentCourtLocationText(GeneralApplicationCaseData caseData) {
@@ -1682,6 +1705,10 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
             .filter(res -> res.getValue() != null && res.getValue().getGaRespondentDetails()
                 .equals(respondent2Id)).findAny();
         return responseElementOptional2;
+    }
+
+    private GARespondentResponse getRespondentResponseValue(Optional<Element<GARespondentResponse>> response) {
+        return response.map(Element::getValue).orElse(null);
     }
 
     private String generateRespondentCourtDirectionText(GeneralApplicationCaseData caseData) {
