@@ -53,7 +53,7 @@ class CourtOfficerOrderClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario(),
             "1594901956117591",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -70,7 +70,7 @@ class CourtOfficerOrderClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_HEARING_FEE_CLAIMANT.getScenario(),
             "12345",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -84,7 +84,7 @@ class CourtOfficerOrderClaimantDashboardServiceTest {
 
         service.notifyCourtOfficerOrder(caseData, AUTH_TOKEN);
 
-        ScenarioRequestParams params = ScenarioRequestParams.builder().params(new HashMap<>()).build();
+        ScenarioRequestParams params = new ScenarioRequestParams(new HashMap<>());
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario(),

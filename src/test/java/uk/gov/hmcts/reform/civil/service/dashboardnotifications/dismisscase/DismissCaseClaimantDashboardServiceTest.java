@@ -62,7 +62,7 @@ class DismissCaseClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_DISMISS_CASE_CLAIMANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -81,7 +81,7 @@ class DismissCaseClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 }

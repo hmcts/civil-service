@@ -58,7 +58,7 @@ class StayCaseClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 }

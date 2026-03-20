@@ -92,7 +92,7 @@ class ApplicationSubmittedApplicantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
             AUTH_TOKEN,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verifyNoMoreInteractions(dashboardApiClient);
     }
@@ -116,13 +116,13 @@ class ApplicationSubmittedApplicantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             primaryScenario,
             AUTH_TOKEN,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardApiClient).recordScenario(
             caseData.getCcdCaseReference().toString(),
             extraScenario,
             AUTH_TOKEN,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verifyNoMoreInteractions(dashboardApiClient);
     }

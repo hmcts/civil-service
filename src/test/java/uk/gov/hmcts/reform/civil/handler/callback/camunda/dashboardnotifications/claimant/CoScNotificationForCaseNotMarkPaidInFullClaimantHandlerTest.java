@@ -68,7 +68,7 @@ class CoScNotificationForCaseNotMarkPaidInFullClaimantHandlerTest extends BaseCa
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }
