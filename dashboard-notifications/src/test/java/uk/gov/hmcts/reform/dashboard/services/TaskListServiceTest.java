@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -92,6 +93,49 @@ class TaskListServiceTest {
         //then
         verify(taskListRepository).findById(taskItemIdentifier);
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldUpdateTaskStatusesAndAuditFields_whenTaskExists() {
+        UUID taskItemIdentifier = UUID.randomUUID();
+        TaskListEntity existingTask = getTaskListEntity(taskItemIdentifier);
+        existingTask.setCreatedAt(OffsetDateTime.now().minusDays(2));
+        existingTask.setUpdatedAt(OffsetDateTime.now().minusDays(1));
+        existingTask.setUpdatedBy("before-update");
+
+        TaskListEntity updateRequest = new TaskListEntity();
+        updateRequest.setId(taskItemIdentifier);
+        updateRequest.setCurrentStatus(TaskStatus.DONE.getPlaceValue());
+        updateRequest.setNextStatus(TaskStatus.AVAILABLE.getPlaceValue());
+        updateRequest.setUpdatedBy("tester");
+
+        when(taskListRepository.findById(taskItemIdentifier)).thenReturn(Optional.of(existingTask));
+
+        taskListService.updateTask(updateRequest);
+
+        verify(taskListRepository).findById(taskItemIdentifier);
+        verify(taskListRepository).save(ArgumentMatchers.argThat(task -> {
+            Assertions.assertEquals(TaskStatus.DONE.getPlaceValue(), task.getCurrentStatus());
+            Assertions.assertEquals(TaskStatus.AVAILABLE.getPlaceValue(), task.getNextStatus());
+            Assertions.assertEquals("tester", task.getUpdatedBy());
+            Assertions.assertNotNull(task.getUpdatedAt());
+            Assertions.assertTrue(task.getUpdatedAt().isAfter(existingTask.getCreatedAt()));
+            return true;
+        }));
+    }
+
+    @Test
+    void shouldNotSave_whenTaskToUpdateDoesNotExist() {
+        UUID taskItemIdentifier = UUID.randomUUID();
+        TaskListEntity updateRequest = new TaskListEntity();
+        updateRequest.setId(taskItemIdentifier);
+
+        when(taskListRepository.findById(taskItemIdentifier)).thenReturn(Optional.empty());
+
+        taskListService.updateTask(updateRequest);
+
+        verify(taskListRepository).findById(taskItemIdentifier);
+        verify(taskListRepository, never()).save(any());
     }
 
     @Test

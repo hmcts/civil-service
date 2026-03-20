@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 import uk.gov.hmcts.reform.dashboard.utilities.StringUtility;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -45,6 +46,27 @@ public class TaskListService {
             .sorted(Comparator.comparingInt(t -> t.getTaskItemTemplate().getTaskOrder()))
             .map(TaskList::from)
             .toList();
+    }
+
+    @Transactional
+    public void updateTask(TaskListEntity taskList) {
+
+        Optional<TaskListEntity> entities = taskListRepository
+            .findById(taskList.getId());
+
+        Optional<TaskListEntity> latestEntity = entities.stream()
+            .max(Comparator.comparing(TaskListEntity::getCreatedAt));
+
+        TaskListEntity beingUpdated;
+        if (latestEntity.isPresent()) {
+            beingUpdated = latestEntity.get();
+            beingUpdated.setCurrentStatus(taskList.getCurrentStatus());
+            beingUpdated.setNextStatus(taskList.getNextStatus());
+            beingUpdated.setUpdatedAt(OffsetDateTime.now());
+            beingUpdated.setUpdatedBy(taskList.getUpdatedBy());
+            taskListRepository.save(beingUpdated);
+        }
+
     }
 
     @Transactional
@@ -129,6 +151,7 @@ public class TaskListService {
             task.setNextStatus(TaskStatus.INACTIVE.getPlaceValue());
             task.setHintTextCy("");
             task.setHintTextEn("");
+            task.setUpdatedAt(OffsetDateTime.now());
             task.setTaskNameEn(StringUtility.removeAnchor(t.getTaskNameEn()));
             task.setTaskNameCy(StringUtility.removeAnchor(t.getTaskNameCy()));
             log.info("{} task made inactive for claim = {}", task.getTaskNameEn(), caseIdentifier);
