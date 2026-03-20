@@ -20,7 +20,7 @@ public class UpdateDashboardTaskStatus extends MigrationTask<UpdateDashboardTask
 
     @Override
     protected String getEventSummary() {
-        return "Assign a case role to a case";
+        return "Update dashboard task status";
     }
 
     protected CaseData migrateCaseData(CaseData caseData, UpdateDashboardTaskCaseReference caseRef) {
@@ -39,11 +39,11 @@ public class UpdateDashboardTaskStatus extends MigrationTask<UpdateDashboardTask
 
     @Override
     protected String getEventDescription() {
-        return "This task is used to assign a case role to a case";
+        return "This task is used to update a dashboard task status";
     }
 
     @Override
     protected String getTaskName() {
-        return "AssignUserWithACaseRole";
+        return "UpdateDashboardTaskStatus";
     }
 }
