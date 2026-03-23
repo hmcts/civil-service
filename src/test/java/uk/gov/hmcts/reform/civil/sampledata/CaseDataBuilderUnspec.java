@@ -195,14 +195,12 @@ public class CaseDataBuilderUnspec {
             ;
         courtLocation = new CourtLocation()
             .setApplicantPreferredCourtLocationList(
-                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build());
+                new DynamicList().setValue(new DynamicListElement().setLabel("sitename")));
         claimValue = new ClaimValue()
             .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
         claimType = ClaimType.PERSONAL_INJURY;
         personalInjuryType = ROAD_ACCIDENT;
-        applicantSolicitor1PbaAccounts = DynamicList.builder()
-            .value(DynamicListElement.builder().label("PBA0077597").build())
-            .build();
+        applicantSolicitor1PbaAccounts = new DynamicList().setValue(new DynamicListElement().setLabel("PBA0077597"));
         claimFee = new Fee()
             .setVersion("1")
             .setCode("CODE")

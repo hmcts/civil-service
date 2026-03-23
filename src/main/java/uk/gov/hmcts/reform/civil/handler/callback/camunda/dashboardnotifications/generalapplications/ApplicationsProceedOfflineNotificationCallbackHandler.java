@@ -84,7 +84,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
         if (notificationType == null) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
-        ScenarioRequestParams notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+        ScenarioRequestParams notificationParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
         dashboardScenariosService.recordScenarios(
             authToken,
             notificationType.equals(CLAIMANT)

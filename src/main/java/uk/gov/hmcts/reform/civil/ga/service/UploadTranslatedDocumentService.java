@@ -94,7 +94,7 @@ public class UploadTranslatedDocumentService {
             );
 
             categorizedDocuments.computeIfAbsent(documentType, k -> new ArrayList<>())
-                .add(Element.<CaseDocument>builder().value(caseDocument).build());
+                .add(new Element<CaseDocument>().setValue(caseDocument));
         }
 
         return categorizedDocuments;

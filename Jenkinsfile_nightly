@@ -165,6 +165,7 @@ withNightlyPipeline(type, product, component) {
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
   env.AAC_API_URL = aacApiUrl
+  env.UNASSIGN_CASES = true
   overrideVaultEnvironments([
   'aat': params.ENVIRONMENT
   ])
