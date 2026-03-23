@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -20,8 +21,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.time.LocalDate;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -110,6 +113,29 @@ class EndBusinessProcessTaskHandlerTest {
 
         handler.execute(mockExternalTask, externalTaskService);
 
+        verify(coreCaseDataService).startUpdate(CASE_ID, END_BUSINESS_PROCESS);
+        verify(coreCaseDataService).submitUpdate(CASE_ID, getCaseDataContent(caseDetails, startEventResponse));
+        verify(externalTaskService).complete(mockExternalTask, null);
+    }
+
+    @Test
+    void shouldTriggerEndBusinessProcessCCDEventAndUpdateBusinessProcessStatusToFinished_whenCalledV1() {
+        CaseData caseData = new CaseDataBuilder()
+            .atStateClaimDraft()
+            .coscSchedulerDeadline(LocalDate.now().plusDays(30))
+            .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
+            .build();
+
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        when(coreCaseDataService.startUpdate(CASE_ID, END_BUSINESS_PROCESS)).thenReturn(startEventResponse);
+        when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        assertEquals(BusinessProcessStatus.READY, caseData.getBusinessProcess().getStatus());
         verify(coreCaseDataService).startUpdate(CASE_ID, END_BUSINESS_PROCESS);
         verify(coreCaseDataService).submitUpdate(CASE_ID, getCaseDataContent(caseDetails, startEventResponse));
         verify(externalTaskService).complete(mockExternalTask, null);

@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -712,6 +713,18 @@ public class CaseDataBuilder {
     private LocalDate nextDeadline;
 
     private CaseQueriesCollection queries;
+    private LocalDate coscSchedulerDeadline;
+    private CoscApplicationStatus coSCApplicationStatus;
+
+    public CaseDataBuilder coscSchedulerDeadline(LocalDate coscSchedulerDeadline) {
+        this.coscSchedulerDeadline = coscSchedulerDeadline;
+        return this;
+    }
+
+    public CaseDataBuilder coSCApplicationStatus(CoscApplicationStatus coSCApplicationStatus) {
+        this.coSCApplicationStatus = coSCApplicationStatus;
+        return this;
+    }
 
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
