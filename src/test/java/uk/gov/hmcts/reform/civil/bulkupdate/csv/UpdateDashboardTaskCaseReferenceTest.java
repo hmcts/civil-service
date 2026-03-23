@@ -14,7 +14,9 @@ class UpdateDashboardTaskCaseReferenceTest {
     void shouldPopulateFieldsFromExcelRow() throws Exception {
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("caseReference", 12345L);
-        rowValues.put("taskItemTemplateId", "3fa85f64-5717-4562-b3fc-2c963f66afa6");
+        rowValues.put("taskListId", "3fa85f64-5717-4562-b3fc-2c963f66afa6");
+        rowValues.put("taskNameEn", "English task name");
+        rowValues.put("taskNameCy", "Welsh task name");
         rowValues.put("currentStatus", 1);
         rowValues.put("nextStatus", 2);
         rowValues.put("updatedBy", "migration-user");
@@ -23,7 +25,9 @@ class UpdateDashboardTaskCaseReferenceTest {
         caseReference.fromExcelRow(rowValues);
 
         assertEquals("12345", caseReference.getCaseReference());
-        assertEquals("3fa85f64-5717-4562-b3fc-2c963f66afa6", caseReference.getTaskItemTemplateId());
+        assertEquals("3fa85f64-5717-4562-b3fc-2c963f66afa6", caseReference.getTaskListId());
+        assertEquals("English task name", caseReference.getTaskNameEn());
+        assertEquals("Welsh task name", caseReference.getTaskNameCy());
         assertEquals("1", caseReference.getCurrentStatus());
         assertEquals("2", caseReference.getNextStatus());
         assertEquals("migration-user", caseReference.getUpdatedBy());
@@ -33,13 +37,15 @@ class UpdateDashboardTaskCaseReferenceTest {
     void shouldHandleMissingAndNullValues() throws Exception {
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("caseReference", "12345");
-        rowValues.put("taskItemTemplateId", null);
+        rowValues.put("taskListId", null);
 
         UpdateDashboardTaskCaseReference caseReference = new UpdateDashboardTaskCaseReference();
         caseReference.fromExcelRow(rowValues);
 
         assertEquals("12345", caseReference.getCaseReference());
-        assertNull(caseReference.getTaskItemTemplateId());
+        assertNull(caseReference.getTaskListId());
+        assertNull(caseReference.getTaskNameEn());
+        assertNull(caseReference.getTaskNameCy());
         assertNull(caseReference.getCurrentStatus());
         assertNull(caseReference.getNextStatus());
         assertNull(caseReference.getUpdatedBy());

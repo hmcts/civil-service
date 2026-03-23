@@ -64,8 +64,10 @@ public class TaskListService {
         if (existingEntity.isPresent()) {
             TaskListEntity beingUpdated = existingEntity.get();
             log.info(
-                "Saving dashboard task id={} newCurrentStatus={} newNextStatus={} newUpdatedAt={} newUpdatedBy={}",
+                "Saving dashboard task id={} taskNameEn={} taskNameCy={} newCurrentStatus={} newNextStatus={} newUpdatedAt={} newUpdatedBy={}",
                 beingUpdated.getId(),
+                beingUpdated.getTaskNameEn(),
+                beingUpdated.getTaskNameCy(),
                 taskList.getCurrentStatus(),
                 taskList.getNextStatus(),
                 updatedAt,
@@ -78,6 +80,12 @@ public class TaskListService {
             final Integer previousNextStatus = beingUpdated.getNextStatus();
             beingUpdated.setCurrentStatus(taskList.getCurrentStatus());
             beingUpdated.setNextStatus(taskList.getNextStatus());
+            if (taskList.getTaskNameCy() != null) {
+                beingUpdated.setTaskNameCy(taskList.getTaskNameCy());
+            }
+            if (taskList.getTaskNameEn() != null) {
+                beingUpdated.setTaskNameEn(taskList.getTaskNameEn());
+            }
             beingUpdated.setUpdatedAt(updatedAt);
             if (taskList.getUpdatedBy() != null) {
                 beingUpdated.setUpdatedBy(taskList.getUpdatedBy());
@@ -89,8 +97,10 @@ public class TaskListService {
                 entityManager.flush();
             } catch (RuntimeException exception) {
                 log.error(
-                    "Dashboard task persistence failed id={} reference={} templateId={} currentStatus={} nextStatus={} updatedAt={} updatedBy={}",
+                    "Dashboard task persistence failed id={} taskNameEn={} taskNameCy={} reference={} templateId={} currentStatus={} nextStatus={} updatedAt={} updatedBy={}",
                     beingUpdated.getId(),
+                    beingUpdated.getTaskNameEn(),
+                    beingUpdated.getTaskNameCy(),
                     beingUpdated.getReference(),
                     beingUpdated.getTaskItemTemplate() != null ? beingUpdated.getTaskItemTemplate().getId() : null,
                     beingUpdated.getCurrentStatus(),

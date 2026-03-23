@@ -19,13 +19,17 @@ import java.util.Map;
 public class UpdateDashboardTaskCaseReference extends CaseReference implements ExcelMappable {
 
     @JsonProperty
-    private String taskItemTemplateId;
+    private String taskListId;
     @JsonProperty
     private String currentStatus;
     @JsonProperty
     private String nextStatus;
     @JsonProperty
     private String updatedBy;
+    @JsonProperty
+    private String taskNameEn;
+    @JsonProperty
+    private String taskNameCy;
 
     private String asString(Object value) {
         return value != null ? value.toString() : null;
@@ -36,8 +40,14 @@ public class UpdateDashboardTaskCaseReference extends CaseReference implements E
         if (rowValues.containsKey("caseReference")) {
             setCaseReference(asString(rowValues.get("caseReference")));
         }
-        if (rowValues.containsKey("taskItemTemplateId")) {
-            setTaskItemTemplateId(asString(rowValues.get("taskItemTemplateId")));
+        if (rowValues.containsKey("taskListId")) {
+            setTaskListId(asString(rowValues.get("taskListId")));
+        }
+        if (rowValues.containsKey("taskNameEn")) {
+            setTaskNameEn(asString(rowValues.get("taskNameEn")));
+        }
+        if (rowValues.containsKey("taskNameCy")) {
+            setTaskNameCy(asString(rowValues.get("taskNameCy")));
         }
         if (rowValues.containsKey("currentStatus")) {
             setCurrentStatus(asString(rowValues.get("currentStatus")));

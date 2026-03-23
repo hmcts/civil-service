@@ -112,6 +112,8 @@ class TaskListServiceTest {
         updateRequest.setCurrentStatus(TaskStatus.DONE.getPlaceValue());
         updateRequest.setNextStatus(TaskStatus.AVAILABLE.getPlaceValue());
         updateRequest.setUpdatedBy("tester");
+        updateRequest.setTaskNameEn("Updated English task name");
+        updateRequest.setTaskNameCy("Updated Welsh task name");
 
         when(taskListRepository.findById(taskItemIdentifier)).thenReturn(Optional.of(existingTask));
 
@@ -122,6 +124,8 @@ class TaskListServiceTest {
             Assertions.assertEquals(TaskStatus.DONE.getPlaceValue(), task.getCurrentStatus());
             Assertions.assertEquals(TaskStatus.AVAILABLE.getPlaceValue(), task.getNextStatus());
             Assertions.assertEquals("tester", task.getUpdatedBy());
+            Assertions.assertEquals("Updated English task name", task.getTaskNameEn());
+            Assertions.assertEquals("Updated Welsh task name", task.getTaskNameCy());
             Assertions.assertNotNull(task.getUpdatedAt());
             Assertions.assertTrue(task.getUpdatedAt().isAfter(existingTask.getCreatedAt()));
             return true;
@@ -159,6 +163,31 @@ class TaskListServiceTest {
 
         verify(taskListRepository).save(ArgumentMatchers.argThat(task -> {
             Assertions.assertEquals("existing-user", task.getUpdatedBy());
+            Assertions.assertEquals(TaskStatus.DONE.getPlaceValue(), task.getCurrentStatus());
+            Assertions.assertEquals(TaskStatus.AVAILABLE.getPlaceValue(), task.getNextStatus());
+            return true;
+        }));
+    }
+
+    @Test
+    void shouldPreserveTaskNames_whenUpdateRequestDoesNotProvideThem() {
+        UUID taskItemIdentifier = UUID.randomUUID();
+        TaskListEntity existingTask = getTaskListEntity(taskItemIdentifier);
+        existingTask.setTaskNameEn("Existing English task name");
+        existingTask.setTaskNameCy("Existing Welsh task name");
+
+        TaskListEntity updateRequest = new TaskListEntity();
+        updateRequest.setId(taskItemIdentifier);
+        updateRequest.setCurrentStatus(TaskStatus.DONE.getPlaceValue());
+        updateRequest.setNextStatus(TaskStatus.AVAILABLE.getPlaceValue());
+
+        when(taskListRepository.findById(taskItemIdentifier)).thenReturn(Optional.of(existingTask));
+
+        taskListService.updateTask(updateRequest);
+
+        verify(taskListRepository).save(ArgumentMatchers.argThat(task -> {
+            Assertions.assertEquals("Existing English task name", task.getTaskNameEn());
+            Assertions.assertEquals("Existing Welsh task name", task.getTaskNameCy());
             Assertions.assertEquals(TaskStatus.DONE.getPlaceValue(), task.getCurrentStatus());
             Assertions.assertEquals(TaskStatus.AVAILABLE.getPlaceValue(), task.getNextStatus());
             return true;

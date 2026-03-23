@@ -32,15 +32,19 @@ public class UpdateDashboardTaskStatus extends MigrationTask<UpdateDashboardTask
             throw new IllegalArgumentException("CaseData and CaseReference must not be null");
         }
         TaskListEntity taskItemEntity = new TaskListEntity();
-        taskItemEntity.setId(UUID.fromString(caseRef.getTaskItemTemplateId()));
+        taskItemEntity.setId(UUID.fromString(caseRef.getTaskListId()));
+        taskItemEntity.setTaskNameEn(caseRef.getTaskNameEn());
+        taskItemEntity.setTaskNameCy(caseRef.getTaskNameCy());
         taskItemEntity.setCurrentStatus(Integer.parseInt(caseRef.getCurrentStatus()));
         taskItemEntity.setNextStatus(Integer.parseInt(caseRef.getNextStatus()));
         taskItemEntity.setUpdatedBy(caseRef.getUpdatedBy() != null ? caseRef.getUpdatedBy() : DEFAULT_UPDATED_BY);
 
         log.info(
-            "Updating dashboard task id={} for caseReference={} currentStatus={} nextStatus={} updatedBy={}",
+            "Updating dashboard task id={} for caseReference={} taskNameEn={} taskNameCy={} currentStatus={} nextStatus={} updatedBy={}",
             taskItemEntity.getId(),
             caseRef.getCaseReference(),
+            taskItemEntity.getTaskNameEn(),
+            taskItemEntity.getTaskNameCy(),
             taskItemEntity.getCurrentStatus(),
             taskItemEntity.getNextStatus(),
             taskItemEntity.getUpdatedBy()

@@ -35,7 +35,9 @@ class UpdateDashboardTaskStatusTest {
         String taskId = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
         UpdateDashboardTaskCaseReference reference = new UpdateDashboardTaskCaseReference();
         reference.setCaseReference("12345");
-        reference.setTaskItemTemplateId(taskId);
+        reference.setTaskListId(taskId);
+        reference.setTaskNameEn("English task name");
+        reference.setTaskNameCy("Welsh task name");
         reference.setCurrentStatus("1");
         reference.setNextStatus("2");
         reference.setUpdatedBy("migration-user");
@@ -47,6 +49,8 @@ class UpdateDashboardTaskStatusTest {
         assertSame(caseData, result);
         verify(taskListService).updateTask(argThat((TaskListEntity task) ->
             UUID.fromString(taskId).equals(task.getId())
+                && "English task name".equals(task.getTaskNameEn())
+                && "Welsh task name".equals(task.getTaskNameCy())
                 && task.getCurrentStatus() == 1
                 && task.getNextStatus() == 2
                 && "migration-user".equals(task.getUpdatedBy())
@@ -58,7 +62,7 @@ class UpdateDashboardTaskStatusTest {
         String taskId = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
         UpdateDashboardTaskCaseReference reference = new UpdateDashboardTaskCaseReference();
         reference.setCaseReference("12345");
-        reference.setTaskItemTemplateId(taskId);
+        reference.setTaskListId(taskId);
         reference.setCurrentStatus("1");
         reference.setNextStatus("2");
 
