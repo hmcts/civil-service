@@ -87,7 +87,7 @@ class EvidenceUploadedClaimantNotificationHandlerTest extends BaseCallbackHandle
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -114,7 +114,7 @@ class EvidenceUploadedClaimantNotificationHandlerTest extends BaseCallbackHandle
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

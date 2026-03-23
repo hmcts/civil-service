@@ -80,7 +80,7 @@ class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandlerT
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -104,7 +104,7 @@ class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandlerT
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -130,7 +130,7 @@ class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandlerT
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_LR_RECIPIENT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -156,7 +156,7 @@ class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandlerT
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_CLAIMANT_RECIPIENT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }

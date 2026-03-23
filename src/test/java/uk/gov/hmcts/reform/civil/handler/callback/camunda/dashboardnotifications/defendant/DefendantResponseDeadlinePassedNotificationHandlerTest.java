@@ -82,7 +82,7 @@ class DefendantResponseDeadlinePassedNotificationHandlerTest extends BaseCallbac
                 "BEARER_TOKEN",
                 "Scenario.AAA6.DefResponse.ResponseTimeElapsed.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }
