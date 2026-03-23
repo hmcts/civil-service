@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
-import java.time.LocalDate;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -102,6 +101,7 @@ class EndBusinessProcessTaskHandlerTest {
     void shouldTriggerEndBusinessProcessCCDEventAndUpdateBusinessProcessStatusToFinished_whenCalled() {
         CaseData caseData = new CaseDataBuilder()
             .atStateClaimDraft()
+            .coSCApplicationStatus(CoscApplicationStatus.PROCESSED)
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
 
@@ -122,7 +122,6 @@ class EndBusinessProcessTaskHandlerTest {
     void shouldTriggerEndBusinessProcessCCDEventAndUpdateBusinessProcessStatusToFinished_whenCalledV1() {
         CaseData caseData = new CaseDataBuilder()
             .atStateClaimDraft()
-            .coscSchedulerDeadline(LocalDate.now().plusDays(30))
             .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();

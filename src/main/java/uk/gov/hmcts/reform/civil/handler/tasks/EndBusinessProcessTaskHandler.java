@@ -48,7 +48,7 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         } else {
             coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
         }
-        if (CoscApplicationStatus.ACTIVE.equals(data.getCoSCApplicationStatus()) && nonNull(data.getCoscSchedulerDeadline())) {
+        if (CoscApplicationStatus.ACTIVE.equals(data.getCoSCApplicationStatus())) {
             log.info("Invoking process cosc application flow for case {}", caseId);
             data.setBusinessProcess(BusinessProcess.ready(PROCESS_COSC_APPLICATION));
         }

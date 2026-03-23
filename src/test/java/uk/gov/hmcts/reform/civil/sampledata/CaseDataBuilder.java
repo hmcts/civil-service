@@ -713,13 +713,7 @@ public class CaseDataBuilder {
     private LocalDate nextDeadline;
 
     private CaseQueriesCollection queries;
-    private LocalDate coscSchedulerDeadline;
     private CoscApplicationStatus coSCApplicationStatus;
-
-    public CaseDataBuilder coscSchedulerDeadline(LocalDate coscSchedulerDeadline) {
-        this.coscSchedulerDeadline = coscSchedulerDeadline;
-        return this;
-    }
 
     public CaseDataBuilder coSCApplicationStatus(CoscApplicationStatus coSCApplicationStatus) {
         this.coSCApplicationStatus = coSCApplicationStatus;
