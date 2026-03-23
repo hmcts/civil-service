@@ -91,7 +91,12 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         var stateFlow = stateFlowEngine.getStateFlow(data);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
+        variables.putValue("isJudgmentMarkedPaidInFull", checkMarkPaidInFull(data));
         return variables;
+    }
+
+    private boolean checkMarkPaidInFull(CaseData data) {
+        return (Objects.nonNull(data.getActiveJudgment()) && data.getActiveJudgment().getFullyPaymentMadeDate() != null);
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse,

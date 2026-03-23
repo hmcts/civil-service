@@ -106,6 +106,7 @@ class CaseEventTaskHandlerTest {
     ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
     @InjectMocks
     private CaseEventTaskHandler caseEventTaskHandler;
+    private static final String IS_JUDGMENT_MARKED_PAID_IN_FULL = "isJudgmentMarkedPaidInFull";
 
     @Nested
     class NotifyRespondent {
@@ -134,6 +135,7 @@ class CaseEventTaskHandlerTest {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
             variables.putValue(FLOW_FLAGS, Map.of());
+            variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, false);
 
             CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
@@ -253,7 +255,10 @@ class CaseEventTaskHandlerTest {
                 FLOW_FLAGS,
                 flags
             );
-
+            variables.putValue(
+                IS_JUDGMENT_MARKED_PAID_IN_FULL,
+                false
+            );
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
             when(mockTask.getTopicName()).thenReturn("test");
             when(mockTask.getActivityId()).thenReturn("activityId");
@@ -276,7 +281,7 @@ class CaseEventTaskHandlerTest {
 
             verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
-            verify(externalTaskService).complete(mockTask, Map.of(
+            verify(externalTaskService).complete(mockTask, Map.of(IS_JUDGMENT_MARKED_PAID_IN_FULL, false,
                 FLOW_FLAGS, flags,
                 FLOW_STATE, state.fullName()
             ));
@@ -312,6 +317,10 @@ class CaseEventTaskHandlerTest {
                 FLOW_FLAGS,
                 getFlowFlags(TAKEN_OFFLINE_BY_STAFF)
             );
+            variables.putValue(
+                IS_JUDGMENT_MARKED_PAID_IN_FULL,
+                false
+            );
 
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(TAKEN_OFFLINE_BY_STAFF.fullName());
             when(mockTask.getTopicName()).thenReturn("test");
@@ -337,7 +346,7 @@ class CaseEventTaskHandlerTest {
 
             verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
-            verify(externalTaskService).complete(mockTask, Map.of(
+            verify(externalTaskService).complete(mockTask, Map.of(IS_JUDGMENT_MARKED_PAID_IN_FULL, false,
                 FLOW_FLAGS, getFlowFlags(TAKEN_OFFLINE_BY_STAFF),
                 FLOW_STATE, TAKEN_OFFLINE_BY_STAFF.fullName()
             ));
