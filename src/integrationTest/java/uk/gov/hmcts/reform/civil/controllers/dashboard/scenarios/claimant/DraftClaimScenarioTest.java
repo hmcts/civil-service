@@ -23,9 +23,7 @@ public class DraftClaimScenarioTest extends BaseIntegrationTest {
 
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>())
-                   .build(),
+               new ScenarioRequestParams(new HashMap<>()),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA6_CLAIM_ISSUE_CLAIM_SUBMIT_REQUIRED.getScenario(), caseId
         )
             .andExpect(status().isOk());
