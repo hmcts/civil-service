@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,18 +9,24 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 public class OrderDetailsGroupTest {
@@ -108,6 +115,76 @@ public class OrderDetailsGroupTest {
                 null
             )
         );
+    }
+
+    @Nested
+    class PopulateAssistedOrderDetailsPenalNotice {
+
+        @Test
+        void shouldSetShowPenalNoticeAndContentWhenToggleIsShowAndContentProvided() {
+            String penalNoticeContent = "WARNING - Custom penal notice for Defendant attached to paragraph 5.";
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW))
+                .assistedOrderPenalNoticeContent(penalNoticeContent)
+                .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(
+                    new DatesFinalOrders().setSingleDate(LocalDate.of(2023, 9, 15))))
+                .finalOrderRecitalsRecorded(new FinalOrderRecitalsRecorded().setText("Recorded"))
+                .build();
+
+            JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+            JudgeFinalOrderForm result = orderDetailsPopulator.populateAssistedOrderDetails(form, caseData);
+
+            assertTrue(result.getShowPenalNotice());
+            assertEquals(penalNoticeContent, result.getPenalNoticeText());
+        }
+
+        @Test
+        void shouldSetShowPenalNoticeFalseAndContentNullWhenToggleIsNull() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .assistedOrderPenalNoticeToggle(null)
+                .assistedOrderPenalNoticeContent("Some content")
+                .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(
+                    new DatesFinalOrders().setSingleDate(LocalDate.of(2023, 9, 15))))
+                .build();
+
+            JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+            JudgeFinalOrderForm result = orderDetailsPopulator.populateAssistedOrderDetails(form, caseData);
+
+            assertFalse(result.getShowPenalNotice());
+            assertNull(result.getPenalNoticeText());
+        }
+
+        @Test
+        void shouldSetShowPenalNoticeFalseAndContentNullWhenToggleIsEmpty() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .assistedOrderPenalNoticeToggle(List.of())
+                .assistedOrderPenalNoticeContent("Some content")
+                .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(
+                    new DatesFinalOrders().setSingleDate(LocalDate.of(2023, 9, 15))))
+                .build();
+
+            JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+            JudgeFinalOrderForm result = orderDetailsPopulator.populateAssistedOrderDetails(form, caseData);
+
+            assertFalse(result.getShowPenalNotice());
+            assertNull(result.getPenalNoticeText());
+        }
+
+        @Test
+        void shouldSetPenalNoticeTextNullWhenToggleIsShowButContentIsNull() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW))
+                .assistedOrderPenalNoticeContent(null)
+                .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(
+                    new DatesFinalOrders().setSingleDate(LocalDate.of(2023, 9, 15))))
+                .build();
+
+            JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+            JudgeFinalOrderForm result = orderDetailsPopulator.populateAssistedOrderDetails(form, caseData);
+
+            assertTrue(result.getShowPenalNotice());
+            assertNull(result.getPenalNoticeText());
+        }
     }
 
 }
