@@ -139,7 +139,7 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
         if (ClaimTypeUnspec.PERSONAL_INJURY.equals(caseData.getClaimTypeUnSpec())) {
             return "PERSONAL INJURY";
         } else if (ClaimTypeUnspec.HOUSING_DISREPAIR.equals(caseData.getClaimTypeUnSpec()) || ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY.equals(caseData.getClaimTypeUnSpec())) {
-            return "Multi/Other";
+            return "CLAIM - MULT/OTHER";
         }
         return "CLAIM - UNSPEC ONLY";
     }
