@@ -108,6 +108,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionO
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.FUTURE_DATE_TO_ERROR;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.FUTURE_SINGLE_DATE_ERROR;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.HEADER;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.PENAL_NOTICE_CONTENT_REQUIRED;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -390,6 +391,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW)).finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing())
                 .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS).assistedOrderCostsReserved(new AssistedOrderCostDetails())
                 .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()).assistedOrderCostsBespoke(new AssistedOrderCostDetails())
+                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW)).assistedOrderPenalNoticeContent("Custom penal notice")
                 .finalOrderAppealToggle(List.of(FinalOrderToggle.SHOW)).finalOrderAppealComplex(new FinalOrderAppeal())
                 .orderMadeOnDetailsList(OrderMadeOnTypes.WITHOUT_NOTICE)
                 .finalOrderGiveReasonsComplex(new AssistedOrderReasons().setReasonsText("text"))
@@ -665,6 +667,40 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .extracting("typeRepresentationDefendantTwoDynamic")
                 .isEqualTo("Mr. John Rambo");
 
+        }
+
+        @Test
+        void shouldPreserveEditedPenalNoticeContent_whenPopulateFormValuesCalledAgain() {
+            // AC4: Edited content persists on navigation - when user navigates back, populate-form-values
+            // may run again but should not overwrite user's edited penal notice content
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(locationRefDataWithCourtNameRegion());
+            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+            when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
+            when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))
+                .thenReturn(LocalDate.now())
+                .thenReturn(LocalDate.now().plusDays(7))
+                .thenReturn(LocalDate.now().plusDays(7))
+                .thenReturn(LocalDate.now().plusDays(7))
+                .thenReturn(LocalDate.now().plusDays(14))
+                .thenReturn(LocalDate.now().plusDays(14))
+                .thenReturn(LocalDate.now().plusDays(21))
+                .thenReturn(LocalDate.now().plusDays(21))
+                .thenReturn(LocalDate.now().plusDays(21))
+                .thenReturn(LocalDate.now().plusDays(21));
+
+            String customPenalNotice = "Custom edited penal notice with defendant name and paragraph X";
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CASE_PROGRESSION)
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .assistedOrderPenalNoticeContent(customPenalNotice)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("assistedOrderPenalNoticeContent")
+                .isEqualTo(customPenalNotice);
         }
 
     }
@@ -1656,6 +1692,57 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
             // Then
             assertThat(response.getErrors().get(0)).isEqualTo(FURTHER_HEARING_OTHER_ALT_LOCATION);
+        }
+
+        @Test
+        void shouldReturnErrorWhenPenalNoticeSelectedButContentBlank() {
+            // Given - penal notice toggle is SHOW but content is null/blank
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders()
+                    .setSingleDate(LocalDate.now().minusDays(2))))
+                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW))
+                .assistedOrderPenalNoticeContent(null)
+                .build();
+
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
+
+            assertThat(response.getErrors()).contains(PENAL_NOTICE_CONTENT_REQUIRED);
+        }
+
+        @Test
+        void shouldReturnErrorWhenPenalNoticeSelectedButContentEmptyString() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders()
+                    .setSingleDate(LocalDate.now().minusDays(2))))
+                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW))
+                .assistedOrderPenalNoticeContent("   ")
+                .build();
+
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
+
+            assertThat(response.getErrors()).contains(PENAL_NOTICE_CONTENT_REQUIRED);
+        }
+
+        @Test
+        void shouldNotReturnErrorWhenPenalNoticeSelectedAndContentProvided() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders()
+                    .setSingleDate(LocalDate.now().minusDays(2))))
+                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW))
+                .assistedOrderPenalNoticeContent("Custom penal notice text")
+                .build();
+
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
+
+            assertThat(response.getErrors())
+                .filteredOn(PENAL_NOTICE_CONTENT_REQUIRED::equals)
+                .isEmpty();
         }
     }
 
