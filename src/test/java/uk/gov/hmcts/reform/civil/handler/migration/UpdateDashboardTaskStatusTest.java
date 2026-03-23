@@ -38,6 +38,7 @@ class UpdateDashboardTaskStatusTest {
         reference.setTaskItemTemplateId(taskId);
         reference.setCurrentStatus("1");
         reference.setNextStatus("2");
+        reference.setUpdatedBy("migration-user");
 
         CaseData caseData = CaseData.builder().build();
 
@@ -48,6 +49,24 @@ class UpdateDashboardTaskStatusTest {
             UUID.fromString(taskId).equals(task.getId())
                 && task.getCurrentStatus() == 1
                 && task.getNextStatus() == 2
+                && "migration-user".equals(task.getUpdatedBy())
+        ));
+    }
+
+    @Test
+    void shouldDefaultUpdatedByWhenNotProvided() {
+        String taskId = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
+        UpdateDashboardTaskCaseReference reference = new UpdateDashboardTaskCaseReference();
+        reference.setCaseReference("12345");
+        reference.setTaskItemTemplateId(taskId);
+        reference.setCurrentStatus("1");
+        reference.setNextStatus("2");
+
+        updateDashboardTaskStatus.migrateCaseData(CaseData.builder().build(), reference);
+
+        verify(taskListService).updateTask(argThat((TaskListEntity task) ->
+            UUID.fromString(taskId).equals(task.getId())
+                && "UpdateDashboardTaskStatus".equals(task.getUpdatedBy())
         ));
     }
 

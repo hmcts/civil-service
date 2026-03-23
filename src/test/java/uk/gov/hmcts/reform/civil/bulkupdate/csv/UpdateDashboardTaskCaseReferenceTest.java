@@ -17,6 +17,7 @@ class UpdateDashboardTaskCaseReferenceTest {
         rowValues.put("taskItemTemplateId", "3fa85f64-5717-4562-b3fc-2c963f66afa6");
         rowValues.put("currentStatus", 1);
         rowValues.put("nextStatus", 2);
+        rowValues.put("updatedBy", "migration-user");
 
         UpdateDashboardTaskCaseReference caseReference = new UpdateDashboardTaskCaseReference();
         caseReference.fromExcelRow(rowValues);
@@ -25,6 +26,7 @@ class UpdateDashboardTaskCaseReferenceTest {
         assertEquals("3fa85f64-5717-4562-b3fc-2c963f66afa6", caseReference.getTaskItemTemplateId());
         assertEquals("1", caseReference.getCurrentStatus());
         assertEquals("2", caseReference.getNextStatus());
+        assertEquals("migration-user", caseReference.getUpdatedBy());
     }
 
     @Test
@@ -40,5 +42,6 @@ class UpdateDashboardTaskCaseReferenceTest {
         assertNull(caseReference.getTaskItemTemplateId());
         assertNull(caseReference.getCurrentStatus());
         assertNull(caseReference.getNextStatus());
+        assertNull(caseReference.getUpdatedBy());
     }
 }

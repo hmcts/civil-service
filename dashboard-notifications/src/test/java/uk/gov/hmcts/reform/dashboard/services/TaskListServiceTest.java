@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 
+import jakarta.persistence.EntityManager;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,9 @@ class TaskListServiceTest {
 
     @Mock
     private TaskItemTemplateRepository taskItemTemplateRepository;
+
+    @Mock
+    private EntityManager entityManager;
 
     @InjectMocks
     private TaskListService taskListService;
@@ -136,6 +140,29 @@ class TaskListServiceTest {
 
         verify(taskListRepository).findById(taskItemIdentifier);
         verify(taskListRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldPreserveUpdatedBy_whenUpdateRequestDoesNotProvideIt() {
+        UUID taskItemIdentifier = UUID.randomUUID();
+        TaskListEntity existingTask = getTaskListEntity(taskItemIdentifier);
+        existingTask.setUpdatedBy("existing-user");
+
+        TaskListEntity updateRequest = new TaskListEntity();
+        updateRequest.setId(taskItemIdentifier);
+        updateRequest.setCurrentStatus(TaskStatus.DONE.getPlaceValue());
+        updateRequest.setNextStatus(TaskStatus.AVAILABLE.getPlaceValue());
+
+        when(taskListRepository.findById(taskItemIdentifier)).thenReturn(Optional.of(existingTask));
+
+        taskListService.updateTask(updateRequest);
+
+        verify(taskListRepository).save(ArgumentMatchers.argThat(task -> {
+            Assertions.assertEquals("existing-user", task.getUpdatedBy());
+            Assertions.assertEquals(TaskStatus.DONE.getPlaceValue(), task.getCurrentStatus());
+            Assertions.assertEquals(TaskStatus.AVAILABLE.getPlaceValue(), task.getNextStatus());
+            return true;
+        }));
     }
 
     @Test
@@ -286,12 +313,12 @@ class TaskListServiceTest {
                 TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
                 TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
             ),
-            List.of(Long.valueOf(123))
+            List.of(123L)
         ))
             .thenReturn(tasks);
 
         TaskItemTemplateEntity category = new TaskItemTemplateEntity();
-        category.setId(Long.valueOf(123));
+        category.setId(123L);
         category.setTaskNameCy("TaskNameCy");
         category.setTaskNameEn("TaskNameEn");
         category.setScenarioName("Scenario.hearing");
@@ -324,7 +351,7 @@ class TaskListServiceTest {
                 TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
                 TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
             ),
-            List.of(Long.valueOf(123))
+            List.of(123L)
         );
 
         verify(taskListRepository, atLeast(5)).save(ArgumentMatchers.argThat(

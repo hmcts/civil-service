@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.UpdateDashboardTaskCaseReference;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -9,7 +10,10 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import java.util.UUID;
 
 @Component
+@Slf4j
 public class UpdateDashboardTaskStatus extends MigrationTask<UpdateDashboardTaskCaseReference> {
+
+    private static final String DEFAULT_UPDATED_BY = "UpdateDashboardTaskStatus";
 
     public final TaskListService taskListService;
 
@@ -31,6 +35,16 @@ public class UpdateDashboardTaskStatus extends MigrationTask<UpdateDashboardTask
         taskItemEntity.setId(UUID.fromString(caseRef.getTaskItemTemplateId()));
         taskItemEntity.setCurrentStatus(Integer.parseInt(caseRef.getCurrentStatus()));
         taskItemEntity.setNextStatus(Integer.parseInt(caseRef.getNextStatus()));
+        taskItemEntity.setUpdatedBy(caseRef.getUpdatedBy() != null ? caseRef.getUpdatedBy() : DEFAULT_UPDATED_BY);
+
+        log.info(
+            "Updating dashboard task id={} for caseReference={} currentStatus={} nextStatus={} updatedBy={}",
+            taskItemEntity.getId(),
+            caseRef.getCaseReference(),
+            taskItemEntity.getCurrentStatus(),
+            taskItemEntity.getNextStatus(),
+            taskItemEntity.getUpdatedBy()
+        );
 
         taskListService.updateTask(taskItemEntity);
 

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 import uk.gov.hmcts.reform.dashboard.utilities.StringUtility;
 
+import jakarta.persistence.EntityManager;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,13 +27,17 @@ public class TaskListService {
 
     private final TaskListRepository taskListRepository;
     private final TaskItemTemplateRepository taskItemTemplateRepository;
+    private final EntityManager entityManager;
     private static final String DOCUMENT_TEMPLATE_NAME = "Hearing.Document.View";
     private static final List<String> ROLES = List.of("CLAIMANT", "DEFENDANT");
 
     @Autowired
-    public TaskListService(TaskListRepository taskListRepository, TaskItemTemplateRepository taskItemTemplateRepository) {
+    public TaskListService(TaskListRepository taskListRepository,
+                           TaskItemTemplateRepository taskItemTemplateRepository,
+                           EntityManager entityManager) {
         this.taskListRepository = taskListRepository;
         this.taskItemTemplateRepository = taskItemTemplateRepository;
+        this.entityManager = entityManager;
     }
 
     public List<TaskList> getTaskList(String ccdCaseIdentifier, String roleType) {
@@ -50,23 +55,67 @@ public class TaskListService {
 
     @Transactional
     public void updateTask(TaskListEntity taskList) {
+        entityManager.joinTransaction();
+        OffsetDateTime updatedAt = OffsetDateTime.now();
 
-        Optional<TaskListEntity> entities = taskListRepository
-            .findById(taskList.getId());
+        Optional<TaskListEntity> existingEntity = taskListRepository.findById(taskList.getId());
+        log.info("Dashboard task lookup completed id={} found={}", taskList.getId(), existingEntity.isPresent());
 
-        Optional<TaskListEntity> latestEntity = entities.stream()
-            .max(Comparator.comparing(TaskListEntity::getCreatedAt));
+        if (existingEntity.isPresent()) {
+            TaskListEntity beingUpdated = existingEntity.get();
+            log.info(
+                "Saving dashboard task id={} newCurrentStatus={} newNextStatus={} newUpdatedAt={} newUpdatedBy={}",
+                beingUpdated.getId(),
+                taskList.getCurrentStatus(),
+                taskList.getNextStatus(),
+                updatedAt,
+                taskList.getUpdatedBy() != null ? taskList.getUpdatedBy() : beingUpdated.getUpdatedBy()
+            );
 
-        TaskListEntity beingUpdated;
-        if (latestEntity.isPresent()) {
-            beingUpdated = latestEntity.get();
+            final String previousUpdatedBy = beingUpdated.getUpdatedBy();
+            final OffsetDateTime previousUpdatedAt = beingUpdated.getUpdatedAt();
+            final Integer previousCurrentStatus = beingUpdated.getCurrentStatus();
+            final Integer previousNextStatus = beingUpdated.getNextStatus();
             beingUpdated.setCurrentStatus(taskList.getCurrentStatus());
             beingUpdated.setNextStatus(taskList.getNextStatus());
-            beingUpdated.setUpdatedAt(OffsetDateTime.now());
-            beingUpdated.setUpdatedBy(taskList.getUpdatedBy());
-            taskListRepository.save(beingUpdated);
-        }
+            beingUpdated.setUpdatedAt(updatedAt);
+            if (taskList.getUpdatedBy() != null) {
+                beingUpdated.setUpdatedBy(taskList.getUpdatedBy());
+            }
 
+            try {
+                taskListRepository.save(beingUpdated);
+                log.info("Dashboard task save invoked successfully id={}", beingUpdated.getId());
+                entityManager.flush();
+            } catch (RuntimeException exception) {
+                log.error(
+                    "Dashboard task persistence failed id={} reference={} templateId={} currentStatus={} nextStatus={} updatedAt={} updatedBy={}",
+                    beingUpdated.getId(),
+                    beingUpdated.getReference(),
+                    beingUpdated.getTaskItemTemplate() != null ? beingUpdated.getTaskItemTemplate().getId() : null,
+                    beingUpdated.getCurrentStatus(),
+                    beingUpdated.getNextStatus(),
+                    beingUpdated.getUpdatedAt(),
+                    beingUpdated.getUpdatedBy(),
+                    exception
+                );
+                throw exception;
+            }
+            log.info(
+                "Updated dashboard task id={} currentStatus {}->{} nextStatus {}->{} updatedAt {}->{} updatedBy {}->{}",
+                beingUpdated.getId(),
+                previousCurrentStatus,
+                beingUpdated.getCurrentStatus(),
+                previousNextStatus,
+                beingUpdated.getNextStatus(),
+                previousUpdatedAt,
+                beingUpdated.getUpdatedAt(),
+                previousUpdatedBy,
+                beingUpdated.getUpdatedBy()
+            );
+        } else {
+            log.warn("Dashboard task not found for update id={}", taskList.getId());
+        }
     }
 
     @Transactional

@@ -24,6 +24,8 @@ public class UpdateDashboardTaskCaseReference extends CaseReference implements E
     private String currentStatus;
     @JsonProperty
     private String nextStatus;
+    @JsonProperty
+    private String updatedBy;
 
     private String asString(Object value) {
         return value != null ? value.toString() : null;
@@ -42,6 +44,9 @@ public class UpdateDashboardTaskCaseReference extends CaseReference implements E
         }
         if (rowValues.containsKey("nextStatus")) {
             setNextStatus(asString(rowValues.get("nextStatus")));
+        }
+        if (rowValues.containsKey("updatedBy")) {
+            setUpdatedBy(asString(rowValues.get("updatedBy")));
         }
     }
 }
