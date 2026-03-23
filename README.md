@@ -343,7 +343,7 @@ For that you should have such file as this:
 Add the following label to your GitHub PR.
 
 ```
-civilDefinitionBranch:????
+civilDefinitionBranch:???
 
 where ???? is the branch name you want to point to. e.g civilDefinitionBranch:DTSCCI-1699
 ```
