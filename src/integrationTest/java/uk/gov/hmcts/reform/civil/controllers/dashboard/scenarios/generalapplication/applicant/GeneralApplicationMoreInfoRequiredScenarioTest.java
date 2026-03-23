@@ -26,8 +26,7 @@ public class GeneralApplicationMoreInfoRequiredScenarioTest extends BaseIntegrat
 
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>()).build(),
+               new ScenarioRequestParams(new HashMap<>()),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_GA_MORE_INFO_REQ, caseId
         )
             .andExpect(status().isOk());
