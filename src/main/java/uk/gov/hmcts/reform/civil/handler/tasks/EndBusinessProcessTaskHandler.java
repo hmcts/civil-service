@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCESS_COSC_APPLICATION;
 
 @Slf4j
 @Component
@@ -46,10 +44,6 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
             throw new NotRetryableException(NOT_RETRYABLE_MESSAGE);
         } else {
             coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
-        }
-        if (CoscApplicationStatus.ACTIVE.equals(data.getCoSCApplicationStatus())) {
-            log.info("Invoking process cosc application flow for case {}", caseId);
-            data.setBusinessProcess(BusinessProcess.ready(PROCESS_COSC_APPLICATION));
         }
         return new ExternalTaskData();
     }
