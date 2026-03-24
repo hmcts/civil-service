@@ -12,10 +12,15 @@ public class Query {
     private final QueryBuilder queryBuilder;
     private final List<String> dataToReturn;
     private final int startIndex;
+    private final boolean sortByReferenceAsc;
     private boolean initialSearch;
     private String searchAfterValue;
 
     public Query(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex) {
+        this(queryBuilder, dataToReturn, startIndex, false);
+    }
+
+    public Query(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex, boolean sortByReferenceAsc) {
         Objects.requireNonNull(queryBuilder, "QueryBuilder cannot be null in search");
         if (startIndex < 0) {
             throw new IllegalArgumentException("Start index cannot be less than 0");
@@ -23,6 +28,7 @@ public class Query {
         this.queryBuilder = queryBuilder;
         this.dataToReturn = dataToReturn;
         this.startIndex = startIndex;
+        this.sortByReferenceAsc = sortByReferenceAsc;
     }
 
     public Query(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex,
@@ -30,6 +36,7 @@ public class Query {
         this.queryBuilder = queryBuilder;
         this.dataToReturn = dataToReturn;
         this.startIndex = startIndex;
+        this.sortByReferenceAsc = false;
         this.initialSearch = initialSearch;
         this.searchAfterValue = searchAfterValue;
     }
@@ -39,8 +46,16 @@ public class Query {
         return "{"
             + "\"query\": " + queryBuilder.toString() + ", "
             + "\"_source\": " + toJSONString(dataToReturn) + ", "
+            + getSortClause()
             + "\"from\": " + startIndex
             + "}";
+    }
+
+    private String getSortClause() {
+        if (!sortByReferenceAsc) {
+            return "";
+        }
+        return "\"sort\": [{\"reference.keyword\": \"asc\"}], ";
     }
 
     public String toMediationQueryString() {
