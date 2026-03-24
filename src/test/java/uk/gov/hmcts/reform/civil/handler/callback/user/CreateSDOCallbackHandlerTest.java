@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -218,7 +217,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
 
-@TestPropertySource(properties = "other_remedy.enabled=false")
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
     JacksonAutoConfiguration.class,
@@ -462,11 +460,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
                 .reasonForTransfer("Court Closed")
-                .transferCourtLocationList(DynamicList.builder()
-                                               .value(DynamicListElement.builder()
-                                                          .code("97c6385d-dc61-4a46-b58f-2992e5ecb4f4")
-                                                          .label("Central London County Court - Thomas More Building, Royal Courts of Justice, Strand, London - WC2A 2LL")
-                                                          .build()).build())
+                .transferCourtLocationList(new DynamicList().setValue(
+                    new DynamicListElement()
+                        .setCode("97c6385d-dc61-4a46-b58f-2992e5ecb4f4")
+                        .setLabel("Central London County Court - Thomas More Building, Royal Courts of Justice, Strand, London - WC2A 2LL")
+                ))
                 .caseManagementLocation(civil)
                 .caseAccessCategory(UNSPEC_CLAIM)
                 .build();
