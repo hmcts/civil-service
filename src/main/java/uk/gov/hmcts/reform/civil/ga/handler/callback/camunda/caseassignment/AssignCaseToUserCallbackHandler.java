@@ -107,15 +107,6 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
             applicantSolicitor,
             APPLICANTSOLICITORONE.getFormattedName()
         ));
-
-        if (!gaForLipService.isGaForLip(caseData)) {
-            var applicantOrgId = applicantSolicitor.getOrganisationIdentifier();
-            var applicantAddlSolList = caseData.getGeneralAppRespondentSolicitors().stream()
-                .filter(sol ->
-                            sol.getValue().getOrganisationIdentifier().equalsIgnoreCase(applicantOrgId))
-                .toList();
-            caseData.generalAppApplicantAddlSolicitors(applicantAddlSolList);
-        }
     }
 
     private void assignRespondentOrgPolicy(GeneralApplicationCaseData caseData) {
@@ -249,11 +240,11 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
 
     private OrganisationPolicy buildOrganisationPolicy(GASolicitorDetailsGAspec solicitor, String role) {
         return new OrganisationPolicy().setOrganisation(
-            new Organisation().setOrganisationID(
-                solicitor.getOrganisationIdentifier())
+                new Organisation().setOrganisationID(
+                    solicitor.getOrganisationIdentifier())
             )
             .setOrgPolicyCaseAssignedRole(role
-        );
+            );
     }
 
 }
