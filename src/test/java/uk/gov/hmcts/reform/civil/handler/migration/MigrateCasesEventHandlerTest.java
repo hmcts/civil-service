@@ -263,7 +263,11 @@ class MigrateCasesEventHandlerTest {
 
         @Override
         public void fromExcelRow(Map<String, Object> rowValues) throws Exception {
-
+            // Mimic the real excel mapping.
+            if (rowValues != null && rowValues.containsKey("caseReference")) {
+                Object value = rowValues.get("caseReference");
+                setCaseReference(value != null ? value.toString() : null);
+            }
         }
     }
 
