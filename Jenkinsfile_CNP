@@ -187,6 +187,8 @@ withPipeline(type, product, component) {
       env.PREVIEW_GENAPP_LRD_URL = "http://rd-location-ref-api-aat.service.core-compute-aat.internal"
       env.PREVIEW_SENDGRID_HOST = ""
       env.PREVIEW_SENDGRID_TEST = "false"
+    } else {
+      echo "disableWiremock label not detected - using wiremock URLs for API endpoints"
     }
 
     before('build') {
