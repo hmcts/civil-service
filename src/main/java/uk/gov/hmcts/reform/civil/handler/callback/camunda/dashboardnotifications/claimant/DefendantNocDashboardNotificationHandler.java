@@ -65,9 +65,7 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
     private CallbackResponse configureScenarioForDefendantNoc(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        ScenarioRequestParams params = ScenarioRequestParams.builder()
-                .params(mapper.mapCaseDataToParams(caseData))
-                .build();
+        ScenarioRequestParams params = new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
         if (!featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
             dashboardNotificationService.deleteByReferenceAndCitizenRole(
                     caseData.getCcdCaseReference().toString(), CLAIMANT_ROLE);
