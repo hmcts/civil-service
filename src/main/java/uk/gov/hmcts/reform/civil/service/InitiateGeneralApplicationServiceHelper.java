@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -94,7 +93,7 @@ public class InitiateGeneralApplicationServiceHelper {
             .stream()
             .filter(caseAssigned -> Objects.equals(
                 caseAssigned.getUserId(),
-                userDetails != null ? userDetails.getId() : null
+                userDetails.getId()
             ))
             .toList();
 
@@ -118,28 +117,36 @@ public class InitiateGeneralApplicationServiceHelper {
             .map(CaseAssignmentUserRole::getCaseRole)
             .toList();
 
-        List<CaseAssignmentUserRole> respondentSolicitors = Optional.ofNullable(caseAssignments)
-            .orElse(Collections.emptyList())
-            .stream()
-            .filter(caseAssignedRoleEntry -> !Objects.equals(
-                caseAssignedRoleEntry.getUserId(),
-                userDetails.getId()
-            ))
-            .filter(caseAssignedRoleEntry ->
-                        gaApplicantRolesOnMainCase.stream()
-                            .noneMatch(applicantRole ->
-                                           StringUtils.equalsIgnoreCase(applicantRole, caseAssignedRoleEntry.getCaseRole())
-                            )
-            )
-            .toList();
+        List<CaseAssignmentUserRole> gaApplicantAddlnSolicitors = new ArrayList<>();
+        List<CaseAssignmentUserRole> respondentSolicitors = new ArrayList<>();
+
+        assert caseAssignments != null;
+        for (CaseAssignmentUserRole entry : caseAssignments) {
+
+            // Skip current user
+            if (Objects.equals(entry.getUserId(), userDetails.getId())) {
+                continue;
+            }
+
+            String role = entry.getCaseRole();
+
+            if (role != null && gaApplicantRolesOnMainCase.contains(role)) {
+                gaApplicantAddlnSolicitors.add(entry);
+            } else {
+                respondentSolicitors.add(entry);
+            }
+        }
+
+        applicationBuilder.setGeneralAppApplicantAddlSolicitors(collectGaSolicitors(gaApplicantAddlnSolicitors,
+                              applicationBuilder, caseData, applicant1OrgCaseRole, respondent1OrgCaseRole));
 
         GAParties applicantPartyData;
         /*
          * Set GA respondent solicitors' details
          * */
         if (!CollectionUtils.isEmpty(respondentSolicitors)) {
-            applicationBuilder.setGeneralAppRespondentSolicitors(collectGaRespondentSolicitors(respondentSolicitors,
-                applicationBuilder, caseData, applicant1OrgCaseRole, respondent1OrgCaseRole));
+            applicationBuilder.setGeneralAppRespondentSolicitors(collectGaSolicitors(respondentSolicitors,
+                    applicationBuilder, caseData, applicant1OrgCaseRole, respondent1OrgCaseRole));
         }
 
         applicantPartyData = getApplicantPartyData(userRoles, userDetails, caseData);
@@ -271,85 +278,84 @@ public class InitiateGeneralApplicationServiceHelper {
         }
     }
 
-    private List<Element<GASolicitorDetailsGAspec>> collectGaRespondentSolicitors(List<CaseAssignmentUserRole> respondentSolicitors,
+    private List<Element<GASolicitorDetailsGAspec>> collectGaSolicitors(List<CaseAssignmentUserRole> solicitors,
                                                                                   GeneralApplication applicationBuilder,
                                                                                   CaseData caseData,
                                                                                   String applicant1OrgCaseRole,
                                                                                   String respondent1OrgCaseRole) {
-        List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
+        List<Element<GASolicitorDetailsGAspec>> addedSols = new ArrayList<>();
 
-        respondentSolicitors.forEach(respSol -> {
-            GASolicitorDetailsGAspec specBuilder = new GASolicitorDetailsGAspec();
+        solicitors.forEach(sol -> {
+            GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = new GASolicitorDetailsGAspec();
 
-            if (respSol.getCaseRole() != null) {
-                log.info(respSol.getCaseRole(), "**", respSol.getUserId());
+            if (sol.getCaseRole() != null) {
+                log.info(sol.getCaseRole(), "**", sol.getUserId());
                 /*GA for Lips is only 1v1, check user id with ClaimantUserDetails/DefendantUserDetails*/
-                if (respSol.getCaseRole().equals(CaseRole.CLAIMANT.getFormattedName())
-                        || respSol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
+                if (sol.getCaseRole().equals(CaseRole.CLAIMANT.getFormattedName())
+                        || sol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
                     applicationBuilder.setIsGaRespondentOneLip(YES);
-                    specBuilder.setId(respSol.getUserId());
+                    gaSolicitorDetailsGAspec.setId(sol.getUserId());
                     if (Objects.nonNull(caseData.getDefendantUserDetails())
-                            && respSol.getUserId().equals(caseData.getDefendantUserDetails().getId())) {
-                        specBuilder.setEmail(caseData.getDefendantUserDetails().getEmail());
-                        specBuilder.setForename(caseData.getRespondent1().getIndividualFirstName());
+                            && sol.getUserId().equals(caseData.getDefendantUserDetails().getId())) {
+                        gaSolicitorDetailsGAspec.setEmail(caseData.getDefendantUserDetails().getEmail());
+                        gaSolicitorDetailsGAspec.setForename(caseData.getRespondent1().getIndividualFirstName());
                         if (Objects.nonNull(caseData.getRespondent1().getIndividualLastName())) {
-                            specBuilder.setSurname(Optional.of(caseData.getRespondent1().getIndividualLastName()));
+                            gaSolicitorDetailsGAspec.setSurname(Optional.of(caseData.getRespondent1().getIndividualLastName()));
                         } else {
-                            specBuilder.setSurname(Optional.empty());
+                            gaSolicitorDetailsGAspec.setSurname(Optional.empty());
                         }
                     } else if (Objects.nonNull(caseData.getClaimantUserDetails())
-                            && respSol.getUserId().equals(caseData.getClaimantUserDetails().getId())) {
-                        specBuilder.setEmail(caseData.getClaimantUserDetails().getEmail());
-                        specBuilder.setForename(caseData.getApplicant1().getIndividualFirstName());
+                            && sol.getUserId().equals(caseData.getClaimantUserDetails().getId())) {
+                        gaSolicitorDetailsGAspec.setEmail(caseData.getClaimantUserDetails().getEmail());
+                        gaSolicitorDetailsGAspec.setForename(caseData.getApplicant1().getIndividualFirstName());
                         if (Objects.nonNull(caseData.getApplicant1().getIndividualLastName())) {
-                            specBuilder.setSurname(Optional.of(caseData.getApplicant1().getIndividualLastName()));
+                            gaSolicitorDetailsGAspec.setSurname(Optional.of(caseData.getApplicant1().getIndividualLastName()));
                         } else {
-                            specBuilder.setSurname(Optional.empty());
+                            gaSolicitorDetailsGAspec.setSurname(Optional.empty());
                         }
                     }
                     /*Populate the GA respondent solicitor details in accordance with civil case Applicant Solicitor 1
                 details if case role of collected user matches with case role of Applicant 1*/
-                } else if (respSol.getCaseRole().equals(applicant1OrgCaseRole)) {
+                } else if (sol.getCaseRole().equals(applicant1OrgCaseRole)) {
                     if (caseData.getApplicantSolicitor1UserDetails() != null) {
-                        specBuilder.setId(respSol.getUserId());
-                        specBuilder.setEmail(caseData.getApplicantSolicitor1UserDetails().getEmail());
-                        specBuilder.setOrganisationIdentifier(caseData.getApplicant1OrganisationPolicy()
+                        gaSolicitorDetailsGAspec.setId(sol.getUserId());
+                        gaSolicitorDetailsGAspec.setEmail(caseData.getApplicantSolicitor1UserDetails().getEmail());
+                        gaSolicitorDetailsGAspec.setOrganisationIdentifier(caseData.getApplicant1OrganisationPolicy()
                                 .getOrganisation().getOrganisationID());
                     }
                 /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                 Solicitor 1 details if caserole of collected user matches with caserole Respondent Solicitor 1*/
-                } else if (respSol.getCaseRole().equals(respondent1OrgCaseRole)) {
-                    specBuilder.setId(respSol.getUserId());
-                    specBuilder.setEmail(caseData.getRespondentSolicitor1EmailAddress());
-                    specBuilder.setOrganisationIdentifier(getRespondent1SolicitorOrgId(caseData));
+                } else if (sol.getCaseRole().equals(respondent1OrgCaseRole)) {
+                    gaSolicitorDetailsGAspec.setId(sol.getUserId());
+                    gaSolicitorDetailsGAspec.setEmail(caseData.getRespondentSolicitor1EmailAddress());
+                    gaSolicitorDetailsGAspec.setOrganisationIdentifier(getRespondent1SolicitorOrgId(caseData));
 
                 /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                 Solicitor 2 details if it's 1 V 2 Different Solicitor scenario*/
                 } else {
                     if (Objects.nonNull(caseData.getAddRespondent2())
                             && caseData.getAddRespondent2().equals(YES)) {
-                        specBuilder.setId(respSol.getUserId());
-                        specBuilder.setEmail(caseData.getRespondentSolicitor2EmailAddress());
-                        specBuilder.setOrganisationIdentifier(getRespondent2SolicitorOrgId(caseData));
+                        gaSolicitorDetailsGAspec.setId(sol.getUserId());
+                        gaSolicitorDetailsGAspec.setEmail(caseData.getRespondentSolicitor2EmailAddress());
+                        gaSolicitorDetailsGAspec.setOrganisationIdentifier(getRespondent2SolicitorOrgId(caseData));
                     }
                 }
                 /*Set the GA Respondent solicitor details to Empty if above checks are failed*/
             } else {
                 String errorMsg = String.format(
                         "Invalid User (userId [%s]): Without Case Role ",
-                        respSol.getUserId()
+                        sol.getUserId()
                 );
                 log.error(errorMsg);
                 throw new IllegalArgumentException(errorMsg);
             }
 
-            GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = specBuilder;
             if (Objects.nonNull(gaSolicitorDetailsGAspec.getId())) {
-                respondentSols.add(element(gaSolicitorDetailsGAspec));
+                addedSols.add(element(gaSolicitorDetailsGAspec));
             }
 
         });
-        return respondentSols;
+        return addedSols;
     }
 
     private GAParties getApplicantPartyData(CaseAssignmentUserRolesResource userRoles, UserDetails userDetails,
