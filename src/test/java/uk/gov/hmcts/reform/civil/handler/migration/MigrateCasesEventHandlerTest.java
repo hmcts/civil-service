@@ -88,7 +88,7 @@ class MigrateCasesEventHandlerTest {
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertNotNull(result);
-        verify(asyncCaseMigrationService, times(1)).migrateCasesAsync(migrationTask, mockReferences, null);
+        verify(asyncCaseMigrationService, times(1)).migrateCasesAsync(migrationTask, mockReferences, null, false);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -113,7 +113,7 @@ class MigrateCasesEventHandlerTest {
 
         assertNotNull(result);
         verify(asyncCaseMigrationService, times(1))
-            .migrateCasesAsync(eq(migrationTask), anyList(), isNull());
+            .migrateCasesAsync(eq(migrationTask), anyList(), isNull(), eq(false));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -138,7 +138,7 @@ class MigrateCasesEventHandlerTest {
 
         assertNotNull(result);
         verify(asyncCaseMigrationService, times(1))
-            .migrateCasesAsync(eq(migrationTask), anyList(), isNull());
+            .migrateCasesAsync(eq(migrationTask), anyList(), isNull(), eq(false));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -163,7 +163,7 @@ class MigrateCasesEventHandlerTest {
 
         assertNotNull(result);
         verify(asyncCaseMigrationService, times(1))
-            .migrateCasesAsync(eq(migrationTask), anyList(), isNull());
+            .migrateCasesAsync(eq(migrationTask), anyList(), isNull(), eq(false));
     }
 
     @Test
@@ -205,7 +205,7 @@ class MigrateCasesEventHandlerTest {
 
         assertNotNull(result);
         verify(asyncCaseMigrationService, times(1))
-            .migrateCasesAsync(eq(migrationTask), anyList(), eq("IN_PROGRESS"));
+            .migrateCasesAsync(eq(migrationTask), anyList(), eq("IN_PROGRESS"), eq(false));
     }
 
     @Test
@@ -253,7 +253,7 @@ class MigrateCasesEventHandlerTest {
 
         handler.handleTask(externalTask);
 
-        verify(asyncCaseMigrationService).migrateCasesAsync(migrationTask, mockReferences, null);
+        verify(asyncCaseMigrationService).migrateCasesAsync(migrationTask, mockReferences, null, false);
     }
 
     private static class ExcelMappableCaseReference extends CaseReference implements ExcelMappable {
@@ -290,7 +290,7 @@ class MigrateCasesEventHandlerTest {
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertNotNull(result);
-        verify(asyncCaseMigrationService, times(0)).migrateCasesAsync(any(), anyList(), any());
+        verify(asyncCaseMigrationService, times(0)).migrateCasesAsync(any(), anyList(), any(), eq(false));
     }
 
     @Test
@@ -319,7 +319,7 @@ class MigrateCasesEventHandlerTest {
         // Assert
         assertNotNull(result);
         verify(caseReferenceCsvLoader, times(1)).loadFromExcelBytes(ExcelMappableCaseReference.class, excelBytes);
-        verify(asyncCaseMigrationService, times(1)).migrateCasesAsync(migrationTask, mockReferences, null);
+        verify(asyncCaseMigrationService, times(1)).migrateCasesAsync(migrationTask, mockReferences, null, false);
     }
 
     @Test
@@ -348,7 +348,7 @@ class MigrateCasesEventHandlerTest {
 
         ArgumentCaptor<List<NotificationCaseReference>> captor = ArgumentCaptor.forClass(List.class);
         verify(asyncCaseMigrationService, times(1))
-            .migrateCasesAsync(eq(migrationTask), captor.capture(), eq("PENDING"));
+            .migrateCasesAsync(eq(migrationTask), captor.capture(), eq("PENDING"), eq(false));
 
         List<NotificationCaseReference> capturedReferences = captor.getValue();
         assertEquals(2, capturedReferences.size());
