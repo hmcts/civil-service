@@ -79,7 +79,7 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
 
         log.info("Linking defendant to claim for case reference: {}", caseData.getCcdCaseReference());
 
-        return getDefendantUserId(defendantEmail)
+        return getUserIdByUserEmail(defendantEmail)
             .map(defendantUserId -> linkDefendantToClaim(caseData, defendantUserId, defendantEmail))
             .orElseGet(() -> {
                 log.error("No user found with the provided email address for case reference: {}", caseData.getCcdCaseReference());
@@ -89,12 +89,12 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
             });
     }
 
-    private Optional<String> getDefendantUserId(String defendantEmailAddress) {
-        return idamClient.searchUsers(getCaaAccessToken(), String.format("email:\"%s\"", defendantEmailAddress))
+    private Optional<String> getUserIdByUserEmail(String email) {
+        return idamClient.searchUsers(getSystemUserAccessToken(), String.format("email:\"%s\"", email))
             .stream().findFirst().map(UserDetails::getId);
     }
 
-    private String getCaaAccessToken() {
+    private String getSystemUserAccessToken() {
         return userService.getAccessToken(
             systemUpdateUserConfiguration.getUserName(),
             systemUpdateUserConfiguration.getPassword()
