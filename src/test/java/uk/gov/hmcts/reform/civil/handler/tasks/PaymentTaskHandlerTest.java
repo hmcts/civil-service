@@ -7,7 +7,6 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,11 +65,6 @@ class PaymentTaskHandlerTest {
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
     @InjectMocks
     private PaymentTaskHandler paymentTaskHandler;
-
-    @BeforeEach
-    void init() {
-
-    }
 
     @Nested
     class SuccessHandler {
