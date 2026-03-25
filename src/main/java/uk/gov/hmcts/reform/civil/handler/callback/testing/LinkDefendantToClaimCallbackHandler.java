@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.client.CustomIdamApi;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -38,7 +39,7 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(LINK_DEFENDANT_TO_CLAIM);
 
     private final ValidateEmailService validateEmailService;
-    private final IdamClient idamClient;
+    private final CustomIdamApi customIdamApi;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
     private final SystemUpdateUserConfiguration systemUpdateUserConfiguration;
@@ -82,7 +83,10 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
         return getUserIdByUserEmail(defendantEmail)
             .map(defendantUserId -> linkDefendantToClaim(caseData, defendantUserId, defendantEmail))
             .orElseGet(() -> {
-                log.error("No user found with the provided email address for case reference: {}", caseData.getCcdCaseReference());
+                log.error(
+                    "No user found with the provided email address for case reference: {}",
+                    caseData.getCcdCaseReference()
+                );
                 return AboutToStartOrSubmitCallbackResponse.builder()
                     .errors(List.of("No user found with the provided email address"))
                     .build();
@@ -90,8 +94,8 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
     }
 
     private Optional<String> getUserIdByUserEmail(String email) {
-        return idamClient.searchUsers(getSystemUserAccessToken(), String.format("email:\"%s\"", email))
-            .stream().findFirst().map(UserDetails::getId);
+        return Optional.ofNullable(customIdamApi.getUserByEmail(getSystemUserAccessToken(), email))
+            .map(UserDetails::getId);
     }
 
     private String getSystemUserAccessToken() {

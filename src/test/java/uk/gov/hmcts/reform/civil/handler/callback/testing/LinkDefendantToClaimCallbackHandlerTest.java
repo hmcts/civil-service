@@ -13,6 +13,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.client.CustomIdamApi;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -25,7 +26,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -49,7 +49,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private ValidateEmailService validateEmailService;
 
     @Mock
-    private IdamClient idamClient;
+    private CustomIdamApi customIdamApi;
 
     @Mock
     private CoreCaseUserService coreCaseUserService;
@@ -191,7 +191,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             String userId = "1234567890";
             UserDetails userDetails = UserDetails.builder().id(userId).build();
 
-            when(idamClient.searchUsers(BEARER_TOKEN, SEARCH_QUERY)).thenReturn(List.of(userDetails));
+            when(customIdamApi.getUserByEmail(BEARER_TOKEN, DEFENDANT_EMAIL)).thenReturn(userDetails);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -203,7 +203,10 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseData.get("defendantUserDetails"))
                 .isNotNull()
                 .satisfies(obj -> {
-                    Map<String, Object> details = objectMapper.convertValue(obj, new TypeReference<>() {});
+                    Map<String, Object> details = objectMapper.convertValue(
+                        obj, new TypeReference<>() {
+                        }
+                    );
                     assertThat(details.get("id")).isEqualTo(userId);
                     assertThat(details.get("email")).isEqualTo(DEFENDANT_EMAIL);
                 });
@@ -212,7 +215,10 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseData.get("respondent1"))
                 .isNotNull()
                 .satisfies(obj -> {
-                    Map<String, Object> respondent1 = objectMapper.convertValue(obj, new TypeReference<>() {});
+                    Map<String, Object> respondent1 = objectMapper.convertValue(
+                        obj, new TypeReference<>() {
+                        }
+                    );
                     assertThat(respondent1.get("partyEmail")).isEqualTo(DEFENDANT_EMAIL);
                 });
 
@@ -220,7 +226,10 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseData.get("respondent1PinToPostLRspec"))
                 .isNotNull()
                 .satisfies(obj -> {
-                    Map<String, Object> pin = objectMapper.convertValue(obj, new TypeReference<>() {});
+                    Map<String, Object> pin = objectMapper.convertValue(
+                        obj, new TypeReference<>() {
+                        }
+                    );
                     assertThat(pin.get("expiryDate")).isEqualTo("2026-01-01");
                     assertThat(pin.get("citizenCaseRole")).isEqualTo(CITIZEN_CASE_ROLE);
                     assertThat(pin.get("respondentCaseRole")).isEqualTo(CITIZEN_CASE_ROLE);
@@ -244,7 +253,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData).build();
 
-            when(idamClient.searchUsers(BEARER_TOKEN, SEARCH_QUERY)).thenReturn(List.of());
+            when(customIdamApi.getUserByEmail(BEARER_TOKEN, DEFENDANT_EMAIL)).thenReturn(null);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
