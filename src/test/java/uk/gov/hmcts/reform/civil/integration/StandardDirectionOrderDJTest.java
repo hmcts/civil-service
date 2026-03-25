@@ -560,7 +560,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("input1")
                 .isEqualTo(PERSONAL_INJURY_PERMISSION_DJ);
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("date1")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isNull();
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("input2")
                 .isEqualTo(PERSONAL_INJURY_QUESTIONS);
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("date2")

@@ -155,7 +155,7 @@ class DjTrialTemplateServiceTest {
                 .plusWeeks(invocation.getArgument(0, Integer.class)));
 
         DjBuildingDisputeDirectionsService buildingService = new DjBuildingDisputeDirectionsService(deadlineService);
-        DjClinicalDirectionsService clinicalService = new DjClinicalDirectionsService(deadlineService);
+        DjClinicalDirectionsService clinicalService = new DjClinicalDirectionsService();
 
         return baseCase.toBuilder()
             .trialBuildingDispute(buildingService.buildTrialBuildingDispute())

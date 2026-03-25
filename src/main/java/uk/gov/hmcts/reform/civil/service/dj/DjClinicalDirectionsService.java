@@ -20,8 +20,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 @RequiredArgsConstructor
 public class DjClinicalDirectionsService {
 
-    private final DjDeadlineService deadlineService;
-
     public TrialClinicalNegligence buildTrialClinicalNegligence() {
         return new TrialClinicalNegligence()
             .setInput1(CLINICAL_DOCUMENTS_HEADING)
@@ -33,7 +31,6 @@ public class DjClinicalDirectionsService {
     public TrialPersonalInjury buildTrialPersonalInjury() {
         return new TrialPersonalInjury()
             .setInput1(PERSONAL_INJURY_PERMISSION_DJ)
-            .setDate1(deadlineService.nextWorkingDayInWeeks(4))
             .setInput2(PERSONAL_INJURY_QUESTIONS)
             .setDate2(LocalDate.now().plusWeeks(7))
             .setInput3(PERSONAL_INJURY_ANSWERS)
