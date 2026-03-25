@@ -58,7 +58,7 @@ class FinalOrderDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
     }
@@ -81,7 +81,7 @@ class FinalOrderDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
     }

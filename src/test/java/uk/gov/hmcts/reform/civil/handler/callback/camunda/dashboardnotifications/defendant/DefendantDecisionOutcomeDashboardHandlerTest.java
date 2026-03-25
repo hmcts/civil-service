@@ -83,7 +83,7 @@ class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -107,7 +107,7 @@ class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_DECISION_OUTCOME.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -134,7 +134,7 @@ class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

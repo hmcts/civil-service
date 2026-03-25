@@ -194,14 +194,25 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         boolean isOtherPartyLiP;
 
         if (isApplicant) {
-            partyName = APPLICANT_PREFIX + caseData.getApplicant1().getPartyName()
-                + (isApplicant2Present(caseData) ? AND + caseData.getApplicant2().getPartyName() : "");
+            partyName = APPLICANT_PREFIX
+                + Optional.ofNullable(caseData.getApplicant1())
+                .map(Party::getPartyName)
+                .orElse("")
+                + Optional.ofNullable(caseData.getApplicant2())
+                .filter(p -> isApplicant2Present(caseData))
+                .map(p -> AND + p.getPartyName())
+                .orElse("");
             reason = caseData.getReasonForReconsiderationApplicant();
             isOtherPartyLiP = caseData.isRespondent1LiP();
         } else {
-            partyName = DEFENDANT_PREFIX + caseData.getRespondent1().getPartyName()
-                + (isRespondent2Present(caseData) && isRespondent2SameLegalRep(caseData)
-                ? AND + caseData.getRespondent2().getPartyName() : "");
+            partyName = DEFENDANT_PREFIX
+                + Optional.ofNullable(caseData.getRespondent1())
+                .map(Party::getPartyName)
+                .orElse("")
+                + Optional.ofNullable(caseData.getRespondent2())
+                .filter(p -> isRespondent2Present(caseData) && isRespondent2SameLegalRep(caseData))
+                .map(p -> AND + p.getPartyName())
+                .orElse("");
             reason = caseData.getReasonForReconsiderationRespondent1();
             isOtherPartyLiP = caseData.isApplicantLiP();
         }
@@ -263,13 +274,19 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
     }
 
     private void handleRespondentSolicitorTwo(CaseData caseData) {
-        String partyName = DEFENDANT_PREFIX + (isRespondent2Present(caseData) ? caseData.getRespondent2().getPartyName() : "");
+        ReasonForReconsideration reason = Optional.ofNullable(caseData.getReasonForReconsiderationRespondent2())
+            .orElse(new ReasonForReconsideration());
 
-        ReasonForReconsideration reason = caseData.getReasonForReconsiderationRespondent2();
+        String partyName = DEFENDANT_PREFIX + Optional.ofNullable(caseData.getRespondent2())
+            .filter(p -> isRespondent2Present(caseData))
+            .map(Party::getPartyName)
+            .orElse("");
         reason.setRequestor(partyName);
+
         if (StringUtils.isBlank(reason.getReasonForReconsiderationTxt())) {
             reason.setReasonForReconsiderationTxt(REASON_NOT_PROVIDED);
         }
+
         caseData.setReasonForReconsiderationRespondent2(reason);
     }
 

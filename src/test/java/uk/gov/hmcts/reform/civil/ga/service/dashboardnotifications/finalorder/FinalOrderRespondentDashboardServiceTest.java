@@ -53,7 +53,7 @@ class FinalOrderRespondentDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_RESPONDENT.getScenario(),
             AUTH_TOKEN,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -78,7 +78,7 @@ class FinalOrderRespondentDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_RESPONDENT.getScenario(),
             AUTH_TOKEN,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
