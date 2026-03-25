@@ -123,10 +123,8 @@ class GenerateSpecDJFormRequestedAppSolEmailDTOGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
-            .build()
-            .toBuilder()
-            .defendantDetailsSpec(new DynamicList(firstDefendant, List.of(firstDefendant)))
             .build();
+        caseData.setDefendantDetailsSpec(new DynamicList(firstDefendant, List.of(firstDefendant)));
 
         assertThat(generator.getShouldNotify(caseData)).isTrue();
     }
@@ -137,10 +135,8 @@ class GenerateSpecDJFormRequestedAppSolEmailDTOGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
-            .build()
-            .toBuilder()
-            .defendantDetailsSpec(new DynamicList(bothDefendants, List.of(bothDefendants)))
             .build();
+        caseData.setDefendantDetailsSpec(new DynamicList(bothDefendants, List.of(bothDefendants)));
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();
     }

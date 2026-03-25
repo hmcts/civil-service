@@ -183,10 +183,8 @@ class GenerateSpecDJFormRequestedRespSolOneEmailDTOGeneratorTest {
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .addRespondent2(YesOrNo.YES)
             .build();
-
-        return baseCaseData.toBuilder()
-            .defendantDetailsSpec(new DynamicList(value, List.of(value)))
-            .build();
+        baseCaseData.setDefendantDetailsSpec(new DynamicList(value, List.of(value)));
+        return baseCaseData;
     }
 
     private CaseData multiPartyCaseDataSameSolicitor() {
@@ -208,10 +206,8 @@ class GenerateSpecDJFormRequestedRespSolOneEmailDTOGeneratorTest {
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .addRespondent2(YesOrNo.YES)
             .build();
-
-        return baseCaseData.toBuilder()
-            .defendantDetailsSpec(new DynamicList(value, List.of(value)))
-            .build();
+        baseCaseData.setDefendantDetailsSpec(new DynamicList(value, List.of(value)));
+        return baseCaseData;
     }
 
     @Test
@@ -221,10 +217,8 @@ class GenerateSpecDJFormRequestedRespSolOneEmailDTOGeneratorTest {
             .respondent1Represented(YesOrNo.YES)
             .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
-            .build()
-            .toBuilder()
-            .defendantDetailsSpec(new DynamicList(bothDefendants, List.of(bothDefendants)))
             .build();
+        caseData.setDefendantDetailsSpec(new DynamicList(bothDefendants, List.of(bothDefendants)));
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();
     }

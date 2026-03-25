@@ -183,8 +183,7 @@ class GenerateSpecDJFormRequestedRespSolTwoEmailDTOGeneratorTest {
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .addRespondent2(YesOrNo.YES)
             .build();
-        return baseCaseData.toBuilder()
-            .defendantDetailsSpec(new DynamicList(value, List.of(value)))
-            .build();
+        baseCaseData.setDefendantDetailsSpec(new DynamicList(value, List.of(value)));
+        return baseCaseData;
     }
 }

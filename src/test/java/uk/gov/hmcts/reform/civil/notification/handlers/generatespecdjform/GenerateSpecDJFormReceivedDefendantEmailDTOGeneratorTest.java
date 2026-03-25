@@ -93,7 +93,7 @@ class GenerateSpecDJFormReceivedDefendantEmailDTOGeneratorTest {
     @Test
     void shouldNotifyForLrvLipScenarioWhenEmailPresent() {
         Party respondent = new PartyBuilder().individual().partyEmail("defendant@example.com").build();
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1Represented(YesOrNo.YES)
             .respondent1Represented(YesOrNo.NO)
             .respondent1(respondent)
@@ -105,7 +105,7 @@ class GenerateSpecDJFormReceivedDefendantEmailDTOGeneratorTest {
     @Test
     void shouldNotifyForLipVLipWhenFeatureEnabled() {
         Party respondent = new PartyBuilder().individual().partyEmail("defendant@example.com").build();
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .respondent1(respondent)
@@ -118,7 +118,7 @@ class GenerateSpecDJFormReceivedDefendantEmailDTOGeneratorTest {
     @Test
     void shouldNotNotifyWhenLipVLipFeatureDisabled() {
         Party respondent = new PartyBuilder().individual().partyEmail("defendant@example.com").build();
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .respondent1(respondent)
@@ -131,7 +131,7 @@ class GenerateSpecDJFormReceivedDefendantEmailDTOGeneratorTest {
     @Test
     void shouldNotNotifyWhenNoPartyEmail() {
         Party respondent = new PartyBuilder().individual().partyEmail(null).build();
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1Represented(YesOrNo.YES)
             .respondent1Represented(YesOrNo.NO)
             .respondent1(respondent)

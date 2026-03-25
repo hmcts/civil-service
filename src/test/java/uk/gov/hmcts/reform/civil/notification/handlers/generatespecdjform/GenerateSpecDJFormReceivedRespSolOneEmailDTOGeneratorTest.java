@@ -119,10 +119,8 @@ class GenerateSpecDJFormReceivedRespSolOneEmailDTOGeneratorTest {
             .respondent1Represented(YesOrNo.YES)
             .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
-            .build()
-            .toBuilder()
-            .defendantDetailsSpec(new DynamicList(bothDefendants, List.of(bothDefendants)))
             .build();
+        caseData.setDefendantDetailsSpec(new DynamicList(bothDefendants, List.of(bothDefendants)));
 
         assertThat(generator.getShouldNotify(caseData)).isTrue();
     }
@@ -134,10 +132,8 @@ class GenerateSpecDJFormReceivedRespSolOneEmailDTOGeneratorTest {
             .respondent1Represented(YesOrNo.YES)
             .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
-            .build()
-            .toBuilder()
-            .defendantDetailsSpec(new DynamicList(secondDefendant, List.of(secondDefendant)))
             .build();
+        caseData.setDefendantDetailsSpec(new DynamicList(secondDefendant, List.of(secondDefendant)));
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();
     }
