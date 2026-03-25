@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.CustomIdamApi;
-import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -41,7 +41,7 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
     private final CustomIdamApi customIdamApi;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
-    private final SystemUpdateUserConfiguration systemUpdateUserConfiguration;
+    private final CrossAccessUserConfiguration crossAccessUserConfiguration;
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
 
@@ -93,14 +93,14 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
     }
 
     private Optional<String> getUserIdByUserEmail(String email) {
-        return Optional.ofNullable(customIdamApi.getUserByEmail(getSystemUserAccessToken(), email))
+        return Optional.ofNullable(customIdamApi.getUserByEmail(getCaaAccessToken(), email))
             .map(UserDetails::getId);
     }
 
-    private String getSystemUserAccessToken() {
+    private String getCaaAccessToken() {
         return userService.getAccessToken(
-            systemUpdateUserConfiguration.getUserName(),
-            systemUpdateUserConfiguration.getPassword()
+            crossAccessUserConfiguration.getUserName(),
+            crossAccessUserConfiguration.getPassword()
         );
     }
 
