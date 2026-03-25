@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDateTime;
@@ -22,7 +23,7 @@ class InformAgreedExtensionDateNotificationDataHelperTest {
     @Test
     void shouldUseRespondentOneDeadlineWhenSingleDefendant() {
         LocalDateTime respondent1Deadline = LocalDateTime.of(2025, 4, 1, 12, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1ResponseDeadline(respondent1Deadline)
             .build();
 
@@ -49,7 +50,7 @@ class InformAgreedExtensionDateNotificationDataHelperTest {
     void shouldUseRespondentTwoDeadlineWhenLater() {
         LocalDateTime respondent1Deadline = LocalDateTime.of(2025, 2, 1, 12, 0);
         LocalDateTime respondent2Deadline = LocalDateTime.of(2025, 5, 1, 12, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1ResponseDeadline(respondent1Deadline)
             .respondent2ResponseDeadline(respondent2Deadline)
             .build();
