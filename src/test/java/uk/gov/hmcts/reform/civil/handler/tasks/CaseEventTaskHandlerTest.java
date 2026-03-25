@@ -35,6 +35,8 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
+import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -49,6 +51,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -135,7 +138,7 @@ class CaseEventTaskHandlerTest {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
             variables.putValue(FLOW_FLAGS, Map.of());
-            variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, false);
+            variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, checkMarkPaidInFull(caseData));
 
             CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
@@ -152,6 +155,80 @@ class CaseEventTaskHandlerTest {
             verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_EVENT);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
+        }
+
+        @Test
+        void shouldTriggerCCDEvent_whenHandlerIsExecutedV1() {
+            CaseData caseData1 = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.READY)
+                                     .setProcessInstanceId("processInstanceId"))
+                .build();
+            CaseData.CaseDataBuilder<?, ?> caseData2 = caseData1.toBuilder();
+            caseData2.activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()));
+            caseData2.certOfSC(new CertOfSC().setDefendantFinalPaymentDate(LocalDate.now()));
+            CaseData caseData  = caseData2.build();
+
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
+            variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, checkMarkPaidInFull(caseData));
+
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+            when(stateFlowEngine.getStateFlow(any(CaseData.class)))
+                .thenReturn(new StateFlowDTO().setState(State.from("MAIN.DRAFT")).setFlags(Map.of()));
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_EVENT);
+            verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(mockTask, variables);
+        }
+
+        @Test
+        void shouldTriggerCCDEvent_whenHandlerIsExecutedV3() {
+            CaseData caseData1 = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.READY)
+                                     .setProcessInstanceId("processInstanceId"))
+                .build();
+            CaseData.CaseDataBuilder<?, ?> caseData2 = caseData1.toBuilder();
+            caseData2.activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()));
+            CaseData caseData  = caseData2.build();
+
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
+            variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, checkMarkPaidInFull(caseData));
+
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+            when(stateFlowEngine.getStateFlow(any(CaseData.class)))
+                .thenReturn(new StateFlowDTO().setState(State.from("MAIN.DRAFT")).setFlags(Map.of()));
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_EVENT);
+            verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(mockTask, variables);
+        }
+
+        private boolean checkMarkPaidInFull(CaseData data) {
+            return (Objects.nonNull(data.getActiveJudgment())
+                && data.getActiveJudgment().getFullyPaymentMadeDate() != null
+                && Objects.nonNull(data.getCertOfSC())
+                && data.getCertOfSC().getDefendantFinalPaymentDate() != null);
         }
     }
 
