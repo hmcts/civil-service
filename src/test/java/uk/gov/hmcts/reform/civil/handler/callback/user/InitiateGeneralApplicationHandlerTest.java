@@ -633,7 +633,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
             assertThat(response.getErrors().size()).isEqualTo(1);
-            assertThat(response.getErrors().get(0).equals("It is not possible to select an additional application type when applying to vary payment terms of judgment"));
+            assertThat(response.getErrors().get(0)).isEqualTo("It is not possible to select an additional application type when applying to vary payment terms of judgment");
         }
 
         @Test
@@ -651,8 +651,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
             assertThat(response.getErrors().size()).isEqualTo(1);
-            assertThat(response.getErrors().get(0).equals("It is not possible to select an additional application type " +
-                    "when applying to Settle by consent"));
+            assertThat(response.getErrors().get(0)).isEqualTo("It is not possible to select an additional application type " +
+                    "when applying to Settle by consent");
         }
     }
 
