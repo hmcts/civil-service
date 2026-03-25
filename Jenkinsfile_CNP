@@ -176,8 +176,6 @@ withPipeline(type, product, component) {
     if (disableWiremock) {
       echo "disableWiremock label detected - pointing API URLs to AAT instances"
       env.PREVIEW_ACA_SERVICE_API_BASEURL = "http://${previewServiceName}-aac-manage-case-assignment"
-      env.PREVIEW_HMC_API_URL = "http://hmc-cft-hearing-service-aat.service.core-compute-aat.internal"
-      env.PREVIEW_RD_PROFESSIONAL_API_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
       env.PREVIEW_RD_COMMONDATA_API_URL = "http://rd-commondata-api-aat.service.core-compute-aat.internal"
       env.PREVIEW_SEND_LETTER_URL = "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
       env.PREVIEW_FEES_API_URL = "http://fees-register-api-aat.service.core-compute-aat.internal"
