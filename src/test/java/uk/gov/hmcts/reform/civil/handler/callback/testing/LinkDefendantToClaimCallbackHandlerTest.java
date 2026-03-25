@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -58,7 +59,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private UserService userService;
 
     @Mock
-    private CrossAccessUserConfiguration crossAccessUserConfiguration;
+    private SystemUpdateUserConfiguration systemUpdateUserConfiguration;
 
     @Mock
     private FeatureToggleService featureToggleService;
@@ -170,8 +171,8 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setUp() {
-            when(crossAccessUserConfiguration.getUserName()).thenReturn(USER);
-            when(crossAccessUserConfiguration.getPassword()).thenReturn(PASSWORD);
+            when(systemUpdateUserConfiguration.getUserName()).thenReturn(USER);
+            when(systemUpdateUserConfiguration.getPassword()).thenReturn(PASSWORD);
             when(userService.getAccessToken(USER, PASSWORD)).thenReturn(BEARER_TOKEN);
             when(featureToggleService.isLinkDefendantTestingEnabled()).thenReturn(true);
         }
