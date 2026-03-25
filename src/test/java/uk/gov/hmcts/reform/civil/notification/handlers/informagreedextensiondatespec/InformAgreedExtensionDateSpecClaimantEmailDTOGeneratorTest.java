@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDateTime;
@@ -41,7 +42,7 @@ class InformAgreedExtensionDateSpecClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnWelshTemplateWhenClaimantBilingual() {
-        CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference(BOTH.toString()).build();
+        CaseData caseData = CaseDataBuilder.builder().claimantBilingualLanguagePreference(BOTH.toString()).build();
         when(notificationsProperties.getClaimantLipDeadlineExtensionWelsh()).thenReturn("welsh-template");
 
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo("welsh-template");
@@ -49,7 +50,7 @@ class InformAgreedExtensionDateSpecClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnEnglishTemplateWhenClaimantNotBilingual() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(notificationsProperties.getClaimantLipDeadlineExtension()).thenReturn("english-template");
 
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo("english-template");
@@ -65,7 +66,7 @@ class InformAgreedExtensionDateSpecClaimantEmailDTOGeneratorTest {
         Party claimant = new Party().setCompanyName("Claimant").setType(Party.Type.COMPANY);
         Party defendant = new Party().setCompanyName("Defendant").setType(Party.Type.COMPANY);
         LocalDateTime responseDeadline = LocalDateTime.of(2025, 6, 5, 0, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .applicant1(claimant)
             .respondent1(defendant)
             .respondent1ResponseDeadline(responseDeadline)

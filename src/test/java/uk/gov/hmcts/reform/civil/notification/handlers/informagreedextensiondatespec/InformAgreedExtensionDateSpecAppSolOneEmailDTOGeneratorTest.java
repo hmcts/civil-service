@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
@@ -39,7 +40,7 @@ class InformAgreedExtensionDateSpecAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         String templateId = "spec-template";
         when(notificationsProperties.getClaimantSolicitorAgreedExtensionDateForSpec()).thenReturn(templateId);
 
@@ -54,7 +55,7 @@ class InformAgreedExtensionDateSpecAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         LocalDate extensionDate = LocalDate.of(2025, 3, 15);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondentSolicitor1AgreedDeadlineExtension(extensionDate)
             .build();
 
