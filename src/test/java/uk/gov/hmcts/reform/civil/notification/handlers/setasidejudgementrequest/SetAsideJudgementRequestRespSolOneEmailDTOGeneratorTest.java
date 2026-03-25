@@ -8,6 +8,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
@@ -36,16 +37,15 @@ class SetAsideJudgementRequestRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(notificationsProperties.getNotifySetAsideJudgmentTemplate()).thenReturn("template");
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo("template");
     }
 
     @Test
     void shouldAddAdditionalProperties() {
-        CaseData caseData = CaseData.builder()
-            .joSetAsideJudgmentErrorText("reason")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setJoSetAsideJudgmentErrorText("reason");
         Map<String, String> properties = new HashMap<>();
 
         try (MockedStatic<NotificationUtils> utils = Mockito.mockStatic(NotificationUtils.class)) {
