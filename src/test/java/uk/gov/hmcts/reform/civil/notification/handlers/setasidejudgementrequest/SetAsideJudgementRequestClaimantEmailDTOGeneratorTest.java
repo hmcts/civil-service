@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +23,7 @@ class SetAsideJudgementRequestClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnLipTemplate() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn("lip-template");
 
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo("lip-template");
