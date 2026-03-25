@@ -61,7 +61,7 @@ class NotifyDecisionOnReconsiderationRequestClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyWhenApplicantIsLiP() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1Represented(YesOrNo.NO)
             .build();
 
@@ -70,7 +70,7 @@ class NotifyDecisionOnReconsiderationRequestClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotifyWhenApplicantRepresented() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1Represented(YesOrNo.YES)
             .build();
 

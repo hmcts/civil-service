@@ -56,7 +56,7 @@ class NotifyDecisionOnReconsiderationRequestRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .respondent2(new PartyBuilder().individual("Alex").build())
             .addRespondent2(YesOrNo.YES)
             .build();
@@ -71,7 +71,7 @@ class NotifyDecisionOnReconsiderationRequestRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyWhenSecondDefendantHasSeparateRepresentation() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .respondent2(new PartyBuilder().individual("Alex").build())
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .addRespondent2(YesOrNo.YES)
@@ -83,7 +83,7 @@ class NotifyDecisionOnReconsiderationRequestRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotifyWhenSecondDefendantIsLiP() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .respondent2(new PartyBuilder().individual("Alex").build())
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .addRespondent2(YesOrNo.YES)
@@ -95,7 +95,7 @@ class NotifyDecisionOnReconsiderationRequestRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotifyWhenSecondDefendantSharesRepresentation() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .respondent2(new PartyBuilder().individual("Alex").build())
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .addRespondent2(YesOrNo.YES)
@@ -107,7 +107,7 @@ class NotifyDecisionOnReconsiderationRequestRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldFallbackToRespondentSolicitorOneEmailWhenSolicitorTwoMissing() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .respondent2(new PartyBuilder().individual("Alex").build())
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .addRespondent2(YesOrNo.YES)
