@@ -29,7 +29,7 @@ class GenerateSpecDJFormNotificationHelperTest {
 
         assertThat(helper.shouldNotifyApplicantSolicitorReceived(caseData)).isTrue();
 
-        CaseData lipCase = caseData.toBuilder()
+        CaseData lipCase = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1Represented(YesOrNo.NO)
             .build();
 
@@ -38,10 +38,8 @@ class GenerateSpecDJFormNotificationHelperTest {
 
     @Test
     void shouldNotifyApplicantSolicitorReceivedForBothDefendants() {
-        CaseData caseData = multiPartyCaseData()
-            .toBuilder()
-            .defendantDetailsSpec(new DynamicList(bothDefendants(), List.of(bothDefendants())))
-            .build();
+        CaseData caseData = multiPartyCaseData();
+        caseData.setDefendantDetailsSpec(new DynamicList(bothDefendants(), List.of(bothDefendants())));
 
         assertThat(helper.shouldNotifyApplicantSolicitorReceived(caseData)).isTrue();
     }
@@ -49,10 +47,8 @@ class GenerateSpecDJFormNotificationHelperTest {
     @Test
     void shouldNotifyApplicantSolicitorRequestedOnlyWhenSingleDefendantSelection() {
         CaseData singleSelection = caseDataWithSelection(true, YesOrNo.NO);
-        CaseData bothSelected = multiPartyCaseData()
-            .toBuilder()
-            .defendantDetailsSpec(new DynamicList(bothDefendants(), List.of(bothDefendants())))
-            .build();
+        CaseData bothSelected = multiPartyCaseData();
+        bothSelected.setDefendantDetailsSpec(new DynamicList(bothDefendants(), List.of(bothDefendants())));
 
         assertThat(helper.shouldNotifyApplicantSolicitorRequested(singleSelection)).isTrue();
         assertThat(helper.shouldNotifyApplicantSolicitorRequested(bothSelected)).isFalse();
@@ -63,10 +59,8 @@ class GenerateSpecDJFormNotificationHelperTest {
     @Test
     void shouldNotifyRespondentSolicitorOneReceivedWhenNoSecondDefendantOrBothSelected() {
         CaseData singleDefendant = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-        CaseData bothSelected = multiPartyCaseData()
-            .toBuilder()
-            .defendantDetailsSpec(new DynamicList(bothDefendants(), List.of(bothDefendants())))
-            .build();
+        CaseData bothSelected = multiPartyCaseData();
+        bothSelected.setDefendantDetailsSpec(new DynamicList(bothDefendants(), List.of(bothDefendants())));
         CaseData singleSelection = caseDataWithSelection(false, YesOrNo.NO);
 
         assertThat(helper.shouldNotifyRespondentSolicitorOneReceived(singleDefendant)).isTrue();
@@ -78,11 +72,9 @@ class GenerateSpecDJFormNotificationHelperTest {
     void shouldNotifyRespondentSolicitorOneRequestedMatchingLegacyLogic() {
         CaseData firstSelected = caseDataWithSelection(true, YesOrNo.NO);
         CaseData secondSelectedSameSolicitor = caseDataWithSelection(false, YesOrNo.YES);
-        CaseData secondSelectedDifferentSolicitor = caseDataWithSelection(false, YesOrNo.NO);
-        CaseData bothSelected = multiPartyCaseData()
-            .toBuilder()
-            .defendantDetailsSpec(new DynamicList(bothDefendants(), List.of(bothDefendants())))
-            .build();
+        final CaseData secondSelectedDifferentSolicitor = caseDataWithSelection(false, YesOrNo.NO);
+        CaseData bothSelected = multiPartyCaseData();
+        bothSelected.setDefendantDetailsSpec(new DynamicList(bothDefendants(), List.of(bothDefendants())));
 
         assertThat(helper.shouldNotifyRespondentSolicitorOneRequested(firstSelected)).isTrue();
         assertThat(helper.shouldNotifyRespondentSolicitorOneRequested(secondSelectedSameSolicitor)).isTrue();
@@ -109,10 +101,9 @@ class GenerateSpecDJFormNotificationHelperTest {
         String label = isFirstDefendant ? base.getRespondent1().getPartyName() : base.getRespondent2().getPartyName();
         String code = isFirstDefendant ? "first" : "second";
         DynamicListElement selection = DynamicListElement.dynamicElementFromCode(code, label);
-        return base.toBuilder()
-            .respondent2SameLegalRepresentative(sameSolicitor)
-            .defendantDetailsSpec(new DynamicList(selection, List.of(selection)))
-            .build();
+        base.setRespondent2SameLegalRepresentative(sameSolicitor);
+        base.setDefendantDetailsSpec(new DynamicList(selection, List.of(selection)));
+        return base;
     }
 
     private DynamicListElement bothDefendants() {

@@ -101,7 +101,7 @@ class GenerateSpecDJFormRecievedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyWhenLipVsLipAndToggleEnabled() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .build();
@@ -112,7 +112,7 @@ class GenerateSpecDJFormRecievedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotifyWhenToggleDisabled() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .build();
@@ -123,7 +123,7 @@ class GenerateSpecDJFormRecievedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotifyWhenNotLipVsLip() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1Represented(YesOrNo.YES)
             .respondent1Represented(YesOrNo.NO)
             .build();
