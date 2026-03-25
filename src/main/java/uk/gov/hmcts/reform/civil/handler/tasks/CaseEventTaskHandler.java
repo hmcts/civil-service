@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import java.util.Map;
-import java.util.Objects;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -17,15 +14,18 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
+
+import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -96,7 +96,10 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     }
 
     private boolean checkMarkPaidInFull(CaseData data) {
-        return (Objects.nonNull(data.getActiveJudgment()) && data.getActiveJudgment().getFullyPaymentMadeDate() != null);
+        return (Objects.nonNull(data.getActiveJudgment())
+            && data.getActiveJudgment().getFullyPaymentMadeDate() != null
+            && Objects.nonNull(data.getCertOfSC())
+            && data.getCertOfSC().getDefendantFinalPaymentDate() != null);
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse,
