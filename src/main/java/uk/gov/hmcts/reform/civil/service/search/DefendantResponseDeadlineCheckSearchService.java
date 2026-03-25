@@ -53,7 +53,8 @@ public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchSe
                                 .must(haveNoOngoingBusinessProcess())
                     ),
                 List.of("reference"),
-                startIndex
+                startIndex,
+                true
             );
         }
         return new Query(
@@ -66,7 +67,8 @@ public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchSe
                             .must(haveNoOngoingBusinessProcess())
                 ),
             List.of("reference"),
-            startIndex
+            startIndex,
+            true
         );
     }
 

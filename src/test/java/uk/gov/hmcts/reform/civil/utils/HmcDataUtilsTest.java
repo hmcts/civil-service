@@ -239,10 +239,6 @@ class HmcDataUtilsTest {
         );
     }
 
-    @Test
-    void getTitle() {
-    }
-
     @Nested
     class GetHearingStartDay {
 
