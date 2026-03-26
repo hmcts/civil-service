@@ -8,7 +8,7 @@ VALUES ('Scenario.AAA6.MarkPaidInFull.Confirmation.Claimant',
                               "Notice.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Claimant",
                               "Notice.AAA6.JudgmentsOnline.IssuedCCJ.Claimant"
                             }',
-        '{}');
+        '{"Notice.AAA6.JudgmentsOnline.PaidInFull.Claimant": []}');
 
 /**
  * Add scenario to delete defendant notification
