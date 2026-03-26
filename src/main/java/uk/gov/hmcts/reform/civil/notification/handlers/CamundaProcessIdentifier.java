@@ -62,5 +62,6 @@ public enum CamundaProcessIdentifier {
     OtherPartyQueryRaisedNotifier,
     NotifyLipGenericTemplateNotifier,
     NotifyLipResetPinNotifier,
-    GenerateSpecDJFormNotifier;
+    GenerateSpecDJFormNotifier,
+    NotifyDecisionOnReconsiderationRequestNotifier;
 }
