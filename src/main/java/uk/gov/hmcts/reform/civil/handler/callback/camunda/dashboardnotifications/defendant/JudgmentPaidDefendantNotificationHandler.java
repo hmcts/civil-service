@@ -14,6 +14,8 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_NOTIFICATIONS_JUDGMENT_PAID_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MARK_PAID_IN_FULL_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
 
 @Service
 public class JudgmentPaidDefendantNotificationHandler extends DashboardCallbackHandler {
@@ -39,6 +41,9 @@ public class JudgmentPaidDefendantNotificationHandler extends DashboardCallbackH
 
     @Override
     public String getScenario(CaseData caseData) {
+        if (checkMarkPaidInFull(caseData)) {
+            return SCENARIO_AAA6_MARK_PAID_IN_FULL_DEFENDANT.getScenario();
+        }
         return SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_DEFENDANT.getScenario();
     }
 

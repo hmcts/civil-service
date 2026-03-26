@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
 
 @RequiredArgsConstructor
 @Component
@@ -93,13 +94,6 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
         variables.putValue("isJudgmentMarkedPaidInFull", checkMarkPaidInFull(data));
         return variables;
-    }
-
-    private boolean checkMarkPaidInFull(CaseData data) {
-        return (Objects.nonNull(data.getActiveJudgment())
-            && data.getActiveJudgment().getFullyPaymentMadeDate() != null
-            && Objects.nonNull(data.getCertOfSC())
-            && data.getCertOfSC().getDefendantFinalPaymentDate() != null);
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse,
