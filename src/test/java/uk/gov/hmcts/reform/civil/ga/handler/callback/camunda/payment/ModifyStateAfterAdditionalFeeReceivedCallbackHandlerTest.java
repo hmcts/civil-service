@@ -119,8 +119,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .isMultiParty(YesOrNo.NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                          .email("test@gmail.com").organisationIdentifier("org1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                          .setEmail("test@gmail.com").setOrganisationIdentifier("org1"))
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(NO)
@@ -148,8 +148,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .isMultiParty(YesOrNo.NO)
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                          .email("test@gmail.com").organisationIdentifier("org1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                          .setEmail("test@gmail.com").setOrganisationIdentifier("org1"))
             .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
                 GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
             .isGaRespondentOneLip(NO)
@@ -222,18 +222,16 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
         caseData = caseData.copy()
             .parentCaseReference("1234")
-            .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                              .value(GeneralApplicationsDetails.builder()
-                                                         .parentClaimantIsApplicant(YES)
-                                                         .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue())
-                                                         .build())
-                                              .build()))
-            .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                   .value(GADetailsRespondentSol.builder()
-                                                              .parentClaimantIsApplicant(YES)
-                                                              .caseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue())
-                                                              .build())
-                                                   .build()))
+            .claimantGaAppDetails(List.of(new Element<GeneralApplicationsDetails>()
+                                              .setValue(new GeneralApplicationsDetails()
+                                                            .setParentClaimantIsApplicant(YES)
+                                                            .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()))
+                                              ))
+            .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>()
+                                                   .setValue(new GADetailsRespondentSol()
+                                                                 .setParentClaimantIsApplicant(YES)
+                                                                 .setCaseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()))
+                                                   ))
             .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
             .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -253,13 +251,13 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardApiClient).recordScenario(
             caseData.getParentCaseReference(),
             SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -268,18 +266,16 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
         caseData = caseData.copy()
             .parentCaseReference("1234")
-            .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                              .value(GeneralApplicationsDetails.builder()
-                                                         .parentClaimantIsApplicant(YES)
-                                                         .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue())
-                                                         .build())
-                                              .build()))
-            .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                   .value(GADetailsRespondentSol.builder()
-                                                              .parentClaimantIsApplicant(YES)
-                                                              .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue())
-                                                              .build())
-                                                   .build()))
+            .claimantGaAppDetails(List.of(new Element<GeneralApplicationsDetails>()
+                                              .setValue(new GeneralApplicationsDetails()
+                                                            .setParentClaimantIsApplicant(YES)
+                                                            .setCaseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()))
+                                              ))
+            .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>()
+                                                   .setValue(new GADetailsRespondentSol()
+                                                                 .setParentClaimantIsApplicant(YES)
+                                                                 .setCaseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()))
+                                                   ))
             .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
             .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -299,13 +295,13 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getParentCaseReference(),
             SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardApiClient).recordScenario(
             caseData.getParentCaseReference(),
             SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -314,18 +310,16 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
         caseData = caseData.copy()
             .parentCaseReference("1234")
-            .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                              .value(GeneralApplicationsDetails.builder()
-                                                         .parentClaimantIsApplicant(YES)
-                                                         .caseState(APPLICATION_CLOSED.getDisplayedValue())
-                                                         .build())
-                                              .build()))
-            .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                   .value(GADetailsRespondentSol.builder()
-                                                              .parentClaimantIsApplicant(YES)
-                                                              .caseState(APPLICATION_CLOSED.getDisplayedValue())
-                                                              .build())
-                                                   .build()))
+            .claimantGaAppDetails(List.of(new Element<GeneralApplicationsDetails>()
+                                              .setValue(new GeneralApplicationsDetails()
+                                                            .setParentClaimantIsApplicant(YES)
+                                                            .setCaseState(APPLICATION_CLOSED.getDisplayedValue()))
+                                              ))
+            .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>()
+                                                   .setValue(new GADetailsRespondentSol()
+                                                                 .setParentClaimantIsApplicant(YES)
+                                                                 .setCaseState(APPLICATION_CLOSED.getDisplayedValue()))
+                                                   ))
             .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
             .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -345,13 +339,13 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getParentCaseReference(),
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardApiClient).recordScenario(
             caseData.getParentCaseReference(),
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -360,18 +354,16 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
         caseData = caseData.copy()
             .parentCaseReference("1234")
-            .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                              .value(GeneralApplicationsDetails.builder()
-                                                         .parentClaimantIsApplicant(NO)
-                                                         .caseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue())
-                                                         .build())
-                                              .build()))
-            .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                   .value(GADetailsRespondentSol.builder()
-                                                              .parentClaimantIsApplicant(NO)
-                                                              .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue())
-                                                              .build())
-                                                   .build()))
+            .claimantGaAppDetails(List.of(new Element<GeneralApplicationsDetails>()
+                                              .setValue(new GeneralApplicationsDetails()
+                                                            .setParentClaimantIsApplicant(NO)
+                                                            .setCaseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()))
+                                              ))
+            .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>()
+                                                   .setValue(new GADetailsRespondentSol()
+                                                                 .setParentClaimantIsApplicant(NO)
+                                                                 .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()))
+                                                   ))
             .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
             .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -387,13 +379,13 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getParentCaseReference(),
             SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardApiClient).recordScenario(
             caseData.getParentCaseReference(),
             SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -402,18 +394,16 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
         caseData = caseData.copy()
             .parentCaseReference("1234")
-            .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                              .value(GeneralApplicationsDetails.builder()
-                                                         .parentClaimantIsApplicant(NO)
-                                                         .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue())
-                                                         .build())
-                                              .build()))
-            .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                   .value(GADetailsRespondentSol.builder()
-                                                              .parentClaimantIsApplicant(NO)
-                                                              .caseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue())
-                                                              .build())
-                                                   .build()))
+            .claimantGaAppDetails(List.of(new Element<GeneralApplicationsDetails>()
+                                              .setValue(new GeneralApplicationsDetails()
+                                                            .setParentClaimantIsApplicant(NO)
+                                                            .setCaseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()))
+                                              ))
+            .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>()
+                                                   .setValue(new GADetailsRespondentSol()
+                                                                 .setParentClaimantIsApplicant(NO)
+                                                                 .setCaseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()))
+                                                   ))
             .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
             .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -429,13 +419,13 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getParentCaseReference(),
             SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardApiClient).recordScenario(
             caseData.getParentCaseReference(),
             SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -470,8 +460,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .isMultiParty(YesOrNo.NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                          .email("test@gmail.com").organisationIdentifier("org1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                          .setEmail("test@gmail.com").setOrganisationIdentifier("org1"))
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .isGaRespondentOneLip(YES)
             .parentClaimantIsApplicant(YES)
@@ -493,7 +483,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getParentCaseReference(),
             SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -503,8 +493,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                          .email("test@gmail.com").organisationIdentifier("org1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                          .setEmail("test@gmail.com").setOrganisationIdentifier("org1"))
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(YES)
@@ -531,13 +521,13 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPS_HWF_FEE_PAID_APPLICANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardApiClient).recordScenario(
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -547,8 +537,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                          .email("test@gmail.com").organisationIdentifier("org1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                          .setEmail("test@gmail.com").setOrganisationIdentifier("org1"))
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(YES)
@@ -573,13 +563,13 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPS_HWF_FEE_PAID_APPLICANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardApiClient).recordScenario(
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -589,8 +579,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                          .email("test@gmail.com").organisationIdentifier("org1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                          .setEmail("test@gmail.com").setOrganisationIdentifier("org1"))
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(YES)
@@ -615,7 +605,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -625,8 +615,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                          .email("test@gmail.com").organisationIdentifier("org1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                          .setEmail("test@gmail.com").setOrganisationIdentifier("org1"))
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(YES)
@@ -653,7 +643,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPS_HWF_FULL_REMISSION_APPLICANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -663,8 +653,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .isMultiParty(YesOrNo.NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                          .email("test@gmail.com").organisationIdentifier("org1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                          .setEmail("test@gmail.com").setOrganisationIdentifier("org1"))
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .ccdCaseReference(CCD_CASE_REFERENCE)
             .isGaApplicantLip(NO)
@@ -692,7 +682,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
                                                      GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
             .ccdCaseReference(CCD_CASE_REFERENCE).build().copy()
             .parentCaseReference(PARENT_CASE_REFERENCE)
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build()).build();
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO)).build();
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -708,7 +698,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_NONURGENT_UNCLOAKED_RESPONDENT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -724,7 +714,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
                                                      GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
             .ccdCaseReference(CCD_CASE_REFERENCE).build().copy()
             .parentCaseReference(PARENT_CASE_REFERENCE)
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build()).build();
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES)).build();
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -740,7 +730,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_URGENT_UNCLOAKED_RESPONDENT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -784,8 +774,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .isMultiParty(YesOrNo.NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                .email("test@gmail.com").organisationIdentifier("org1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                .setEmail("test@gmail.com").setOrganisationIdentifier("org1"))
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .ccdCaseReference(CCD_CASE_REFERENCE)
             .build();
@@ -817,16 +807,14 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData parentCaseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
         parentCaseData = parentCaseData.copy()
             .claimantGaAppDetails(List.of(
-                Element.<GeneralApplicationsDetails>builder().value(
-                    GeneralApplicationsDetails.builder()
-                        .parentClaimantIsApplicant(YES)
-                        .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()) // Action needed
-                        .build()).build(),
-                Element.<GeneralApplicationsDetails>builder().value(
-                    GeneralApplicationsDetails.builder()
-                        .parentClaimantIsApplicant(YES)
-                        .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()) // In progress
-                        .build()).build()
+                new Element<GeneralApplicationsDetails>().setValue(
+                    new GeneralApplicationsDetails()
+                        .setParentClaimantIsApplicant(YES)
+                        .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue())), // Action needed
+                new Element<GeneralApplicationsDetails>().setValue(
+                    new GeneralApplicationsDetails()
+                        .setParentClaimantIsApplicant(YES)
+                        .setCaseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue())) // In progress
             ))
             .respondentSolGaAppDetails(null)
             .build();
@@ -846,18 +834,18 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             caseData.getParentCaseReference(),
             SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
     public List<Element<GASolicitorDetailsGAspec>> getRespondentSolicitors() {
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email("test@gmail.com").organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
-        GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-            .email("test@gmail.com").organisationIdentifier("org3").build();
+        GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail("test@gmail.com").setOrganisationIdentifier("org3");
 
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));

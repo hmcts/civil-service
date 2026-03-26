@@ -281,8 +281,8 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDate(LocalDateTime.now())
             .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
             .ccdState(CaseState.HEARING_READINESS)
-            .hearingDocuments(List.of(Element.<CaseDocument>builder().value(new CaseDocument()
-                                                                                .setDocumentName("testDoc")).build()))
+            .hearingDocuments(List.of(new Element<CaseDocument>().setValue(new CaseDocument()
+                                                                                .setDocumentName("testDoc"))))
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService, Collections.singletonList(CaseEventDetail.builder()
@@ -298,8 +298,8 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDate(LocalDateTime.now())
             .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
             .ccdState(CaseState.HEARING_READINESS)
-            .hearingDocuments(List.of(Element.<CaseDocument>builder().value(new CaseDocument()
-                                                                                .setDocumentName("testDoc")).build()))
+            .hearingDocuments(List.of(new Element<CaseDocument>().setValue(new CaseDocument()
+                                                                                .setDocumentName("testDoc"))))
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService, Collections.singletonList(CaseEventDetail.builder()
@@ -315,8 +315,8 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDate(LocalDateTime.now())
             .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
             .ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
-            .hearingDocuments(List.of(Element.<CaseDocument>builder().value(new CaseDocument()
-                                                                                .setDocumentName("testDoc")).build()))
+            .hearingDocuments(List.of(new Element<CaseDocument>().setValue(new CaseDocument()
+                                                                                .setDocumentName("testDoc"))))
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService, Collections.singletonList(CaseEventDetail.builder()
@@ -332,8 +332,8 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDate(LocalDateTime.now())
             .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
             .ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
-            .hearingDocuments(List.of(Element.<CaseDocument>builder().value(new CaseDocument()
-                                                                                .setDocumentName("testDoc")).build()))
+            .hearingDocuments(List.of(new Element<CaseDocument>().setValue(new CaseDocument()
+                                                                                .setDocumentName("testDoc"))))
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService, Collections.singletonList(CaseEventDetail.builder()
@@ -459,8 +459,7 @@ class CcdClaimStatusDashboardFactoryTest {
                 .setCreatedDatetime(LocalDateTime.now())
                 .setDocumentType(SDO_ORDER)
         );
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        DynamicListElement selectedCourt = new DynamicListElement().setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
             .systemGeneratedCaseDocuments(List.of(document))
@@ -797,12 +796,14 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_defaultJudgementStatusIssuedByClaimant_thenReturnDefaultJudgementStatus() {
         CaseData claim =
-            CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1)).activeJudgment(
-                new JudgmentDetails().setType(JudgmentType.DEFAULT_JUDGMENT).setIssueDate(LocalDate.now())
-                    .setState(JudgmentState.ISSUED)).defaultJudgmentDocuments(List.of(
-                Element.<CaseDocument>builder()
-                    .value(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
-                               .setCreatedDatetime(LocalDateTime.now())).build())).build();
+            CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
+                .activeJudgment(new JudgmentDetails().setType(JudgmentType.DEFAULT_JUDGMENT).setIssueDate(LocalDate.now())
+                                    .setState(JudgmentState.ISSUED))
+                .defaultJudgmentDocuments(List.of(
+                    new Element<CaseDocument>().setValue(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
+                                       .setCreatedDatetime(LocalDateTime.now()))
+                ))
+                .build();
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(
                 new CcdDashboardDefendantClaimMatcher(
@@ -817,9 +818,8 @@ class CcdClaimStatusDashboardFactoryTest {
         CaseData claim =
             CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
                 .defaultJudgmentDocuments(List.of(
-                    Element.<CaseDocument>builder()
-                        .value(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
-                                   .setCreatedDatetime(LocalDateTime.now())).build()))
+                    new Element<CaseDocument>().setValue(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
+                                   .setCreatedDatetime(LocalDateTime.now()))))
                 .build();
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
@@ -843,9 +843,8 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_sdoIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        CaseData claim = CaseData.builder().preTranslationDocuments(List.of(Element.<CaseDocument>builder()
-                                                                                .value(new CaseDocument()
-                                                                                           .setDocumentType(SDO_ORDER)).build()))
+        CaseData claim = CaseData.builder().preTranslationDocuments(List.of(new Element<CaseDocument>().setValue(new CaseDocument()
+                                                                                           .setDocumentType(SDO_ORDER))))
             .ccdState(CaseState.CASE_PROGRESSION)
             .build();
 
@@ -858,10 +857,9 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_decisionMadeIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        CaseData claim = CaseData.builder().preTranslationDocuments(List.of(Element.<CaseDocument>builder()
-                                                                                .value(new CaseDocument()
+        CaseData claim = CaseData.builder().preTranslationDocuments(List.of(new Element<CaseDocument>().setValue(new CaseDocument()
                                                                                            .setDocumentType(
-                                                                                               DECISION_MADE_ON_APPLICATIONS)).build()))
+                                                                                               DECISION_MADE_ON_APPLICATIONS))))
             .ccdState(CaseState.CASE_PROGRESSION)
             .build();
 

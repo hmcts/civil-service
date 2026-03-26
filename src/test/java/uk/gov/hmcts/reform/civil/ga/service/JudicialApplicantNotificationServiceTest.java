@@ -392,8 +392,7 @@ class JudicialApplicantNotificationServiceTest {
             GeneralApplicationCaseData caseData
                 = caseDataForJudicialRequestForInformationOfApplication(NO, NO, NO,
                                                                         SEND_APP_TO_OTHER_PARTY)
-                .copy().generalAppType(GAApplicationType.builder()
-                                                .types(applicationTypeSummeryJudgement()).build()).build();
+                .copy().generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement())).build();
 
             when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
@@ -416,8 +415,7 @@ class JudicialApplicantNotificationServiceTest {
             GeneralApplicationCaseData caseData
                 = caseDataForJudicialRequestForInformationOfApplication(NO, NO, YES,
                                                                         SEND_APP_TO_OTHER_PARTY)
-                .copy().generalAppType(GAApplicationType.builder()
-                                                .types(applicationTypeSummeryJudgement()).build()).build();
+                .copy().generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement())).build();
 
             when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
@@ -441,8 +439,7 @@ class JudicialApplicantNotificationServiceTest {
                                                                         REQUEST_MORE_INFORMATION)
                 .copy()
                 .generalAppConsentOrder(NO)
-                .ccdState(CaseState.APPLICATION_ADD_PAYMENT).generalAppType(GAApplicationType.builder()
-                                                .types(applicationTypeVaryOrder()).build()).build();
+                .ccdState(CaseState.APPLICATION_ADD_PAYMENT).generalAppType(new GAApplicationType().setTypes(applicationTypeVaryOrder())).build();
 
             when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
@@ -468,8 +465,7 @@ class JudicialApplicantNotificationServiceTest {
                                                                         REQUEST_MORE_INFORMATION)
                 .copy()
                 .generalAppConsentOrder(NO)
-                .ccdState(CaseState.APPLICATION_ADD_PAYMENT).generalAppType(GAApplicationType.builder()
-                                                                                .types(applicationTypeVaryOrder()).build()).build();
+                .ccdState(CaseState.APPLICATION_ADD_PAYMENT).generalAppType(new GAApplicationType().setTypes(applicationTypeVaryOrder())).build();
 
             when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
@@ -539,8 +535,8 @@ class JudicialApplicantNotificationServiceTest {
         void notificationShouldSendRespondentForFreeFormOrder_ifNotWithNoticeOrConsent() {
             GeneralApplicationCaseData caseData = caseDataFreeFormOrder();
             caseData = caseData.copy()
-                .generalAppInformOtherParty(GAInformOtherParty.builder().build())
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build()).build();
+                .generalAppInformOtherParty(new GAInformOtherParty())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO)).build();
             when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
@@ -558,8 +554,8 @@ class JudicialApplicantNotificationServiceTest {
         void notificationShouldSendRespondentForFreeFormOrder_ifMadeWithNotice() {
             GeneralApplicationCaseData caseData = caseDataFreeFormOrder();
             caseData = caseData.copy()
-                .generalAppInformOtherParty(GAInformOtherParty.builder().build())
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                .generalAppInformOtherParty(new GAInformOtherParty())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
                 .applicationIsUncloakedOnce(YES)
                 .build();
             when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
@@ -587,13 +583,11 @@ class JudicialApplicantNotificationServiceTest {
                 .defendant1PartyName("DEF")
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                .setMakeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION))
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeSummeryJudgement()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                 .isMultiParty(NO)
                 .build();
         }
@@ -609,14 +603,12 @@ class JudicialApplicantNotificationServiceTest {
                 .applicantPartyName("App")
                 .claimant1PartyName("CL")
                 .defendant1PartyName("DEF")
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeSummeryJudgement()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                 .isMultiParty(NO)
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION)
@@ -640,11 +632,9 @@ class JudicialApplicantNotificationServiceTest {
                                                      .setJudgeRequestMoreInfoText("Test")
                                                      .setJudgeRequestMoreInfoByDate(LocalDate.now())
                                                      .setDeadlineForMoreInfoSubmission(deadline))
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                                   .hasAgreed(isRespondentOrderAgreement).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(isRespondentOrderAgreement))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(NO)
                 .applicantPartyName("App")
@@ -653,8 +643,7 @@ class JudicialApplicantNotificationServiceTest {
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeToStayTheClaim()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeToStayTheClaim()))
                 .generalAppPBADetails(new GeneralApplicationPbaDetails())
                 .build();
 
@@ -671,18 +660,16 @@ class JudicialApplicantNotificationServiceTest {
                                                .setMakeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT))
                 .judicialDecision(new GAJudicialDecision()
                                       .setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .isGaRespondentOneLip(NO)
                 .isGaApplicantLip(YES)
 
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(orderAgreement).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeSummeryJudgement()).build())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(orderAgreement))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                 .isMultiParty(NO)
                 .applicantPartyName("App")
                 .claimant1PartyName("CL")
@@ -699,8 +686,8 @@ class JudicialApplicantNotificationServiceTest {
             YesOrNo isRespondentLip) {
             return new GeneralApplicationCaseData()
                 .ccdCaseReference(CASE_REFERENCE)
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(orderAgreement).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(orderAgreement))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
                 .applicationIsCloaked(isCloaked)
                 .isGaApplicantLip(isApplicantLip)
                 .applicantPartyName("App")
@@ -711,13 +698,11 @@ class JudicialApplicantNotificationServiceTest {
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING))
                 .generalAppRespondentSolicitors(isGaLip.equals(YES) ? lipRespondent() : respondentSolicitors())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeSummeryJudgement()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                 .generalAppPBADetails(new GeneralApplicationPbaDetails())
                 .isMultiParty(NO)
                 .build();
@@ -727,8 +712,8 @@ class JudicialApplicantNotificationServiceTest {
                                                    YesOrNo isLipApplicant, YesOrNo isLipRespondent) {
             return new GeneralApplicationCaseData()
                 .ccdCaseReference(CASE_REFERENCE)
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(orderAgreement).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(orderAgreement))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
                 .applicationIsCloaked(isCloaked)
                 .isGaApplicantLip(isLipApplicant)
                 .isGaRespondentOneLip(isLipRespondent)
@@ -740,13 +725,11 @@ class JudicialApplicantNotificationServiceTest {
                                       .setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                .setMakeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION))
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeSummeryJudgement()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                 .generalAppPBADetails(new GeneralApplicationPbaDetails())
                 .isMultiParty(NO)
                 .build();
@@ -805,16 +788,14 @@ class JudicialApplicantNotificationServiceTest {
                     .generalAppRespondentSolicitors(respondentSolicitors())
                     .judicialDecision(new GAJudicialDecision()
                                           .setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                                  .email(DUMMY_EMAIL).build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                     .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                                   .setCaseReference(CASE_REFERENCE.toString()))
                     .judicialDecisionMakeAnOrderForWrittenRepresentations(
                         new GAJudicialWrittenRepresentations().setWrittenOption(
                             GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS))
-                    .generalAppType(GAApplicationType.builder()
-                                        .types(applicationTypeSummeryJudgement()).build())
+                    .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                     .judicialConcurrentDateText(DUMMY_DATE)
                     .isMultiParty(NO)
                     .build();
@@ -833,25 +814,25 @@ class JudicialApplicantNotificationServiceTest {
                 .judicialDecision(new GAJudicialDecision()
                                       .setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
                 .generalAppRespondentSolicitors(respondentSolicitors())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
                 .judicialDecisionMakeAnOrderForWrittenRepresentations(
                     new GAJudicialWrittenRepresentations().setWrittenOption(
                         GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeSummeryJudgement()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                 .isMultiParty(NO)
                 .build();
         }
 
         private List<Element<GASolicitorDetailsGAspec>> respondentSolicitors() {
-            return Collections.singletonList(element(GASolicitorDetailsGAspec.builder().id(ID)
-                                                         .forename("respondent")
-                                                         .surname(Optional.of("solicitor"))
-                                                         .email(DUMMY_EMAIL).organisationIdentifier(ORG_ID).build()));
+            return Collections.singletonList(element(new GASolicitorDetailsGAspec()
+                                                         .setId(ID)
+                                                         .setForename("respondent")
+                                                         .setSurname(Optional.of("solicitor"))
+                                                         .setEmail(DUMMY_EMAIL)
+                                                         .setOrganisationIdentifier(ORG_ID)));
         }
     }
 
@@ -1635,16 +1616,14 @@ class JudicialApplicantNotificationServiceTest {
                     .judicialDecision(new GAJudicialDecision()
                                           .setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
                     .generalAppRespondentSolicitors(respondentSolicitors())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                                  .email(DUMMY_EMAIL).build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                     .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                                   .setCaseReference(CASE_REFERENCE.toString()))
                     .judicialDecisionMakeAnOrderForWrittenRepresentations(
                         new GAJudicialWrittenRepresentations().setWrittenOption(
                             GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS))
-                    .generalAppType(GAApplicationType.builder()
-                                        .types(applicationTypeSummeryJudgement()).build())
+                    .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                     .judicialConcurrentDateText(DUMMY_DATE)
                     .isMultiParty(NO)
                     .build();
@@ -1657,16 +1636,14 @@ class JudicialApplicantNotificationServiceTest {
                 .judicialDecision(new GAJudicialDecision()
                                       .setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
                 .generalAppRespondentSolicitors(respondentSolicitors())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
                 .judicialDecisionMakeAnOrderForWrittenRepresentations(
                     new GAJudicialWrittenRepresentations().setWrittenOption(
                         GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeToGetReliefFromSanctions()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeToGetReliefFromSanctions()))
                 .isMultiParty(NO)
                 .build();
         }
@@ -1674,8 +1651,7 @@ class JudicialApplicantNotificationServiceTest {
         private GeneralApplicationCaseData caseDataForConcurrentWrittenRepRespondentNotPresent() {
             return new GeneralApplicationCaseData()
                 .ccdCaseReference(CASE_REFERENCE)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .generalAppRespondentSolicitors(respondentSolicitors())
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
@@ -1683,8 +1659,7 @@ class JudicialApplicantNotificationServiceTest {
                 .judicialDecisionMakeAnOrderForWrittenRepresentations(
                     new GAJudicialWrittenRepresentations().setWrittenOption(
                         GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeSummeryJudgement()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                 .judicialConcurrentDateText(DUMMY_DATE)
                 .isMultiParty(NO)
                 .build();
@@ -1694,8 +1669,8 @@ class JudicialApplicantNotificationServiceTest {
                                                    YesOrNo isLipApplicant, YesOrNo isLipRespondent, YesOrNo isLipApp) {
             return new GeneralApplicationCaseData()
                 .ccdCaseReference(CASE_REFERENCE)
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(orderAgreement).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(orderAgreement))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
                 .applicationIsCloaked(isCloaked)
                 .isGaApplicantLip(isLipApplicant)
                 .isGaRespondentOneLip(isLipRespondent)
@@ -1707,13 +1682,11 @@ class JudicialApplicantNotificationServiceTest {
                                       .setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                .setMakeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION))
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeToStrikeOut()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeToStrikeOut()))
                 .generalAppPBADetails(new GeneralApplicationPbaDetails())
                 .isMultiParty(NO)
                 .build();
@@ -1726,13 +1699,11 @@ class JudicialApplicantNotificationServiceTest {
                                       .setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                .setMakeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION))
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeToExtendTheClaim()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeToExtendTheClaim()))
                 .isMultiParty(NO)
                 .build();
         }
@@ -1746,13 +1717,11 @@ class JudicialApplicantNotificationServiceTest {
                                                .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING))
                 .judicialDecision(new GAJudicialDecision()
                                       .setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeSummeryJudgement()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                 .build();
         }
 
@@ -1770,18 +1739,16 @@ class JudicialApplicantNotificationServiceTest {
                                                .setMakeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT))
                 .judicialDecision(new GAJudicialDecision()
                                       .setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .isGaRespondentOneLip(isRespondentLip)
                 .isGaApplicantLip(isApplicantLip)
 
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(orderAgreement).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeToStayTheClaim()).build())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(orderAgreement))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeToStayTheClaim()))
                 .isMultiParty(NO)
                 .applicantPartyName("App")
                 .claimant1PartyName("CL")
@@ -1793,20 +1760,18 @@ class JudicialApplicantNotificationServiceTest {
             return new GeneralApplicationCaseData()
                 .ccdCaseReference(CASE_REFERENCE)
                 .applicationIsCloaked(NO)
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                .setMakeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION))
                 .judicialDecision(new GAJudicialDecision()
                                       .setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
                 .isMultiParty(NO)
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeToStrikeOut()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeToStrikeOut()))
                 .build();
         }
 
@@ -1818,13 +1783,11 @@ class JudicialApplicantNotificationServiceTest {
                 .isMultiParty(NO)
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                .setMakeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION))
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeToAmendStatmentOfClaim()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeToAmendStatmentOfClaim()))
                 .build();
         }
 
@@ -1832,18 +1795,16 @@ class JudicialApplicantNotificationServiceTest {
             return new GeneralApplicationCaseData()
                 .ccdCaseReference(CASE_REFERENCE)
                 .isMultiParty(NO)
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(orderAgreement).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(orderAgreement))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                .setMakeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT))
                 .generalAppRespondentSolicitors(respondentSolicitors())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeToAmendStatmentOfClaim()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeToAmendStatmentOfClaim()))
                 .generalAppPBADetails(new GeneralApplicationPbaDetails())
                 .build();
         }
@@ -1851,18 +1812,16 @@ class JudicialApplicantNotificationServiceTest {
         private GeneralApplicationCaseData caseDataForJudicialDirectionOrderOfApplication(YesOrNo orderAgreement, YesOrNo isWithNotice) {
             return new GeneralApplicationCaseData()
                 .ccdCaseReference(CASE_REFERENCE)
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(orderAgreement).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(orderAgreement))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING))
                 .generalAppRespondentSolicitors(respondentSolicitors())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeToAmendStatmentOfClaim()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeToAmendStatmentOfClaim()))
                 .generalAppPBADetails(new GeneralApplicationPbaDetails())
                 .isMultiParty(NO)
                 .build();
@@ -1877,8 +1836,8 @@ class JudicialApplicantNotificationServiceTest {
             YesOrNo isRespondentLip) {
             return new GeneralApplicationCaseData()
                 .ccdCaseReference(CASE_REFERENCE)
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(orderAgreement).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(orderAgreement))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
                 .applicationIsCloaked(isCloaked)
                 .isGaApplicantLip(isApplicantLip)
                 .applicantPartyName("App")
@@ -1888,13 +1847,11 @@ class JudicialApplicantNotificationServiceTest {
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING))
                 .generalAppRespondentSolicitors(isGaLip.equals(YES) ? lipRespondent() : respondentSolicitors())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeToAmendStatmentOfClaim()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeToAmendStatmentOfClaim()))
                 .generalAppPBADetails(new GeneralApplicationPbaDetails())
                 .isMultiParty(NO)
                 .build();
@@ -1909,20 +1866,17 @@ class JudicialApplicantNotificationServiceTest {
                     .isMultiParty(NO)
                     .generalAppRespondentSolicitors(respondentSolicitors())
                     .generalAppSuperClaimType(superClaimType)
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                                       .hasAgreed(orderAgreement).build())
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
+                    .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(orderAgreement))
+                    .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
                     .applicationIsCloaked(isCloaked)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                                  .email(DUMMY_EMAIL).build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                     .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                                   .setCaseReference(CASE_REFERENCE.toString()))
                     .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                    .setMakeAnOrder(
                                                        GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT))
-                    .generalAppType(GAApplicationType.builder()
-                                        .types(applicationTypeToStrikeOut()).build())
+                    .generalAppType(new GAApplicationType().setTypes(applicationTypeToStrikeOut()))
                     .judicialConcurrentDateText(DUMMY_DATE)
                     .generalAppPBADetails(new GeneralApplicationPbaDetails())
                     .build();
@@ -1935,16 +1889,14 @@ class JudicialApplicantNotificationServiceTest {
                     .judicialDecision(new GAJudicialDecision()
                                           .setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
                     .generalAppRespondentSolicitors(respondentSolicitors())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                                  .email(DUMMY_EMAIL).build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                     .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                                   .setCaseReference(CASE_REFERENCE.toString()))
                     .judicialDecisionMakeAnOrderForWrittenRepresentations(
                         new GAJudicialWrittenRepresentations().setWrittenOption(
                             GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS))
-                    .generalAppType(GAApplicationType.builder()
-                                        .types(applicationTypeSummeryJudgement()).build())
+                    .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                     .judicialConcurrentDateText(DUMMY_DATE)
                     .isMultiParty(NO)
                     .generalAppPBADetails(new GeneralApplicationPbaDetails())
@@ -1957,19 +1909,16 @@ class JudicialApplicantNotificationServiceTest {
                 new GeneralApplicationCaseData()
                     .ccdCaseReference(CASE_REFERENCE)
                     .generalAppRespondentSolicitors(respondentSolicitors())
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                                       .hasAgreed(orderAgreement).build())
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                                  .email(DUMMY_EMAIL).build())
+                    .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(orderAgreement))
+                    .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                     .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                                   .setCaseReference(CASE_REFERENCE.toString()))
                     .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                    .setMakeAnOrder(
                                                        GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT))
-                    .generalAppType(GAApplicationType.builder()
-                                        .types(applicationTypeSummeryJudgement()).build())
+                    .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                     .judicialConcurrentDateText(DUMMY_DATE)
                     .generalAppPBADetails(new GeneralApplicationPbaDetails())
                     .isMultiParty(NO)
@@ -1981,15 +1930,13 @@ class JudicialApplicantNotificationServiceTest {
                 new GeneralApplicationCaseData()
                     .ccdCaseReference(CASE_REFERENCE)
                     .generalAppRespondentSolicitors(respondentSolicitors())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                                  .email(DUMMY_EMAIL).build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                     .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                                   .setCaseReference(CASE_REFERENCE.toString()))
                     .judicialDecision(new GAJudicialDecision()
                                           .setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
-                    .generalAppType(GAApplicationType.builder()
-                                        .types(applicationTypeSummeryJudgement()).build())
+                    .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                     .judicialConcurrentDateText(DUMMY_DATE)
                     .isMultiParty(NO)
                     .build();
@@ -2001,13 +1948,11 @@ class JudicialApplicantNotificationServiceTest {
             return
                 new GeneralApplicationCaseData()
                     .ccdCaseReference(CASE_REFERENCE)
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                                       .hasAgreed(orderAgreement).build())
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
+                    .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(orderAgreement))
+                    .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
                     .applicationIsCloaked(isCloaked)
                     .generalAppRespondentSolicitors(respondentSolicitors())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                                  .email(DUMMY_EMAIL).build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                     .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                                   .setCaseReference(CASE_REFERENCE.toString()))
@@ -2016,8 +1961,7 @@ class JudicialApplicantNotificationServiceTest {
                     .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder().setMakeAnOrder(
                         GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION
                     ))
-                    .generalAppType(GAApplicationType.builder()
-                                        .types(applicationTypeSummeryJudgement()).build())
+                    .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                     .judicialConcurrentDateText(DUMMY_DATE)
                     .generalAppPBADetails(new GeneralApplicationPbaDetails())
                     .isMultiParty(NO)
@@ -2030,8 +1974,7 @@ class JudicialApplicantNotificationServiceTest {
                     .ccdCaseReference(CASE_REFERENCE)
                     .generalAppRespondentSolicitors(respondentSolicitors())
                     .generalAppSuperClaimType(superClaimType)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                                  .email(DUMMY_EMAIL).build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                     .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                                   .setCaseReference(CASE_REFERENCE.toString()))
@@ -2040,8 +1983,7 @@ class JudicialApplicantNotificationServiceTest {
                     ))
                     .judicialDecision(new GAJudicialDecision()
                                           .setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
-                    .generalAppType(GAApplicationType.builder()
-                                        .types(applicationTypeToStrikeOut()).build())
+                    .generalAppType(new GAApplicationType().setTypes(applicationTypeToStrikeOut()))
                     .applicationIsCloaked(YES)
                     .judicialConcurrentDateText(DUMMY_DATE)
                     .isMultiParty(NO)
@@ -2053,8 +1995,7 @@ class JudicialApplicantNotificationServiceTest {
                 new GeneralApplicationCaseData()
                     .ccdCaseReference(CASE_REFERENCE)
                     .generalAppRespondentSolicitors(respondentSolicitors())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                                  .email(DUMMY_EMAIL).build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                     .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                                   .setCaseReference(CASE_REFERENCE.toString()))
@@ -2063,8 +2004,7 @@ class JudicialApplicantNotificationServiceTest {
                     ))
                     .judicialDecision(new GAJudicialDecision()
                                           .setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
-                    .generalAppType(GAApplicationType.builder()
-                                        .types(applicationTypeSummeryJudgement()).build())
+                    .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                     .applicationIsCloaked(YES)
                     .judicialConcurrentDateText(DUMMY_DATE)
                     .isMultiParty(NO)
@@ -2076,8 +2016,7 @@ class JudicialApplicantNotificationServiceTest {
                 new GeneralApplicationCaseData()
                     .ccdCaseReference(CASE_REFERENCE)
                     .generalAppRespondentSolicitors(respondentSolicitors())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                                  .email(DUMMY_EMAIL).build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                     .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                                   .setCaseReference(CASE_REFERENCE.toString()))
@@ -2086,8 +2025,7 @@ class JudicialApplicantNotificationServiceTest {
                     ))
                     .judicialDecision(new GAJudicialDecision()
                                           .setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
-                    .generalAppType(GAApplicationType.builder()
-                                        .types(applicationTypeSummeryJudgement()).build())
+                    .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                     .applicationIsCloaked(YES)
                     .isMultiParty(NO)
                     .judicialConcurrentDateText(DUMMY_DATE)
@@ -2105,14 +2043,12 @@ class JudicialApplicantNotificationServiceTest {
                 .applicantPartyName("App")
                 .claimant1PartyName("CL")
                 .defendant1PartyName("DEF")
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .email(DUMMY_EMAIL).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL))
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(CASE_REFERENCE.toString()))
-                .generalAppType(GAApplicationType.builder()
-                                    .types(applicationTypeSummeryJudgement()).build())
+                .generalAppType(new GAApplicationType().setTypes(applicationTypeSummeryJudgement()))
                 .isMultiParty(NO)
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION)
@@ -2496,19 +2432,20 @@ class JudicialApplicantNotificationServiceTest {
 
     private GeneralApplicationCaseData getCaseData(YesOrNo isUrgent, YesOrNo informOtherParty, String recipient) {
         return new GeneralApplicationCaseData()
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(isUrgent).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(informOtherParty).build())
-            .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec.builder()
-                                                             .email(recipient).build()))
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(isUrgent))
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(informOtherParty))
+            .generalAppRespondentSolicitors(wrapElements(new GASolicitorDetailsGAspec().setEmail(recipient)))
             .build();
     }
 
     private GeneralApplicationCaseData caseDataForJudicialRequestForInformationOfApplication(
         YesOrNo isRespondentOrderAgreement, YesOrNo isWithNotice, YesOrNo isCloaked,
         YesOrNo isLipApp, YesOrNo isLipRespondent, GAJudgeRequestMoreInfoOption gaJudgeRequestMoreInfoOption) {
-        GASolicitorDetailsGAspec lr = GASolicitorDetailsGAspec.builder().email(DUMMY_EMAIL).build();
-        GASolicitorDetailsGAspec lip = GASolicitorDetailsGAspec.builder().email(DUMMY_EMAIL)
-                .forename("LipF").surname(Optional.of("LipS")).build();
+        GASolicitorDetailsGAspec lr = new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL);
+        GASolicitorDetailsGAspec lip = new GASolicitorDetailsGAspec()
+                                           .setEmail(DUMMY_EMAIL)
+                                           .setForename("LipF")
+                                           .setSurname(Optional.of("LipS"));
         return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_REFERENCE)
             .generalAppRespondentSolicitors(isLipRespondent.equals(YES) ? lipRespondent() : respondentSolicitors())
@@ -2521,9 +2458,8 @@ class JudicialApplicantNotificationServiceTest {
                                                  .setJudgeRequestMoreInfoText("Test")
                                                  .setJudgeRequestMoreInfoByDate(LocalDate.now())
                                                  .setDeadlineForMoreInfoSubmission(deadline))
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(isRespondentOrderAgreement).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(isRespondentOrderAgreement))
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isWithNotice))
             .generalAppApplnSolicitor(isLipApp.equals(YES) ? lip : lr)
             .isGaApplicantLip(isLipApp)
             .isGaRespondentOneLip(isLipRespondent)
@@ -2533,8 +2469,7 @@ class JudicialApplicantNotificationServiceTest {
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                           .setCaseReference(CASE_REFERENCE.toString()))
-            .generalAppType(GAApplicationType.builder()
-                                .types(applicationTypeToStayTheClaim()).build())
+            .generalAppType(new GAApplicationType().setTypes(applicationTypeToStayTheClaim()))
             .generalAppPBADetails(new GeneralApplicationPbaDetails())
             .build();
 
@@ -2581,20 +2516,25 @@ class JudicialApplicantNotificationServiceTest {
     }
 
     private List<Element<GASolicitorDetailsGAspec>> respondentSolicitors() {
-        return Arrays.asList(element(GASolicitorDetailsGAspec.builder().id(ID)
-                                         .forename("respondent")
-                                         .surname(Optional.of("solicitor"))
-                                         .email(DUMMY_EMAIL).organisationIdentifier(ORG_ID).build()),
-                             element(GASolicitorDetailsGAspec.builder().id(ID)
-                                         .email(DUMMY_EMAIL).organisationIdentifier(ORG_ID).build())
+        return Arrays.asList(element(new GASolicitorDetailsGAspec()
+                                         .setId(ID)
+                                         .setForename("respondent")
+                                         .setSurname(Optional.of("solicitor"))
+                                         .setEmail(DUMMY_EMAIL)
+                                         .setOrganisationIdentifier(ORG_ID)),
+                             element(new GASolicitorDetailsGAspec()
+                                         .setId(ID)
+                                         .setEmail(DUMMY_EMAIL)
+                                         .setOrganisationIdentifier(ORG_ID))
         );
     }
 
     private List<Element<GASolicitorDetailsGAspec>> lipRespondent() {
-        return Collections.singletonList(element(GASolicitorDetailsGAspec.builder().id(ID)
-                                                     .forename("respondent")
-                                                     .surname(Optional.of("lip"))
-                                                     .email(DUMMY_EMAIL).build()));
+        return Collections.singletonList(element(new GASolicitorDetailsGAspec()
+                                                     .setId(ID)
+                                                     .setForename("respondent")
+                                                     .setSurname(Optional.of("lip"))
+                                                     .setEmail(DUMMY_EMAIL)));
     }
 
     private PaymentDetails buildAdditionalPaymentSuccessData() {

@@ -508,7 +508,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_isNotifyOptionsBoth_when_label_both() {
-            DynamicListElement element = DynamicListElement.builder().label("Both").build();
+            DynamicListElement element = new DynamicListElement().setLabel("Both");
             DynamicList list = new DynamicList(element, List.of(element));
             when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(list);
             assertTrue(CaseDataPredicate.Claim.isNotifyOptionsBoth.test(caseData));
@@ -516,7 +516,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_isNotifyOptionsBoth_when_label_not_both() {
-            DynamicListElement element = DynamicListElement.builder().label("Other").build();
+            DynamicListElement element = new DynamicListElement().setLabel("Other");
             DynamicList list = new DynamicList(element, List.of(element));
             when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(list);
             assertFalse(CaseDataPredicate.Claim.isNotifyOptionsBoth.test(caseData));
@@ -602,7 +602,7 @@ class CaseDataPredicateTest {
         @Test
         void should_return_true_for_hasNotifyOptionsBoth_when_label_both() {
             DynamicListElement value = DynamicListElement.dynamicElement("Both");
-            DynamicList dl = DynamicList.builder().value(value).listItems(List.of(value)).build();
+            DynamicList dl = new DynamicList().setValue(value).setListItems(List.of(value));
             when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dl);
             assertTrue(CaseDataPredicate.ClaimDetails.isNotifyOptionsBoth.test(caseData));
         }
@@ -610,7 +610,7 @@ class CaseDataPredicateTest {
         @Test
         void should_return_false_for_hasNotifyOptionsBoth_when_label_not_both() {
             DynamicListElement value = DynamicListElement.dynamicElement("Other");
-            DynamicList dl = DynamicList.builder().value(value).listItems(List.of(value)).build();
+            DynamicList dl = new DynamicList().setValue(value).setListItems(List.of(value));
             when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dl);
             assertFalse(CaseDataPredicate.ClaimDetails.isNotifyOptionsBoth.test(caseData));
         }
