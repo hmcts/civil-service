@@ -64,5 +64,6 @@ public enum CamundaProcessIdentifier {
     NotifyLipResetPinNotifier,
     GenerateSpecDJFormNotifier,
     NotifyDecisionOnReconsiderationRequestNotifier,
-    SettleClaimPaidInFullNotificationNotifier;
+    SettleClaimPaidInFullNotificationNotifier,
+    ClaimantResponsePartAdmitPayImmediatelyNotifier;
 }
