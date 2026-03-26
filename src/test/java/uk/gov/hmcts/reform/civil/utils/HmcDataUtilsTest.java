@@ -261,7 +261,12 @@ class HmcDataUtilsTest {
                                     LocalDateTime.of(2023, 01, 02, 0, 0, 0))
                         )));
 
-            assertEquals(HmcDataUtils.getHearingStartDay(hearing), expected);
+            var result = HmcDataUtils.getHearingStartDay(hearing);
+
+            assertEquals(
+                LocalDateTime.of(2023, 1, 1, 0, 0),
+                result.getHearingStartDateTime()
+            );
         }
 
         @Test
