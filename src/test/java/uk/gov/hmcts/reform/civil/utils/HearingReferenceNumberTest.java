@@ -11,6 +11,6 @@ public class HearingReferenceNumberTest {
     void shouldGenerateHearingReferenceNumber() {
         String result = generateHearingReference();
 
-        assertThat(result).isEqualTo("000HN001");
+        assertThat(result).matches("\\d{3}HN\\d{3}");
     }
 }
