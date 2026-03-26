@@ -61,6 +61,7 @@ java:
     SENDGRID_HOST: ${SERVICE_NAME}-wiremock
     RTL_API_URL: http://${SERVICE_NAME}-wiremock
     SENDGRID_TEST: true
+    CIVIL_CLIENT_SCOPE: 'openid profile roles search-user'
   keyVaults:
     civil:
       resourceGroup: civil

@@ -177,6 +177,7 @@ idam:
   client:
     id: civil-service
     secret: ${CIVIL_CLIENT_SECRET:AAAAAAA}
+    scope: ${CIVIL_CLIENT_SCOPE:openid profile roles}
 
 auth:
   idam:
@@ -738,6 +739,7 @@ idam:
     id: civil-service
     redirect_uri: https://localhost:3000/oauth2/callback
     secret: ${CIVIL_CLIENT_SECRET:OOOOOOOOOOOOOOOO}
+    scope: ${CIVIL_CLIENT_SCOPE:openid profile roles}
 
 document_management:
   url: ${DOCUMENT_MANAGEMENT_URL:http://localhost:3453}
@@ -905,6 +907,7 @@ idam:
     id: civil-service
     redirect_uri: https://localhost:3000/oauth2/callback
     secret: ${CIVIL_CLIENT_SECRET:OOOOOOOOOOOOOOOO}
+    scope: ${CIVIL_CLIENT_SCOPE:openid profile roles}
 
 caseFlags:
   logging:

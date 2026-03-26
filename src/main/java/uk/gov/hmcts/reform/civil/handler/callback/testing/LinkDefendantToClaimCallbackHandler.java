@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.CustomIdamApi;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -19,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.Collections;
@@ -38,7 +38,7 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(LINK_DEFENDANT_TO_CLAIM);
 
     private final ValidateEmailService validateEmailService;
-    private final CustomIdamApi customIdamApi;
+    private final IdamClient idamClient;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
     private final SystemUpdateUserConfiguration systemUpdateUserConfiguration;
@@ -93,8 +93,8 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
     }
 
     private Optional<String> getUserIdByUserEmail(String email) {
-        return Optional.ofNullable(customIdamApi.getUserByEmail(getSystemUserAccessToken(), email))
-            .map(UserDetails::getId);
+        return idamClient.searchUsers(getSystemUserAccessToken(), String.format("email:\"%s\"", email))
+            .stream().findFirst().map(UserDetails::getId);
     }
 
     private String getSystemUserAccessToken() {
