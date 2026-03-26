@@ -119,7 +119,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -149,7 +149,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -183,7 +183,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -217,7 +217,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -245,7 +245,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ALREADY_PAID.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -273,7 +273,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ALREADY_PAID.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -304,7 +304,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -335,7 +335,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -365,7 +365,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -395,7 +395,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_NO_MEDIATION_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -425,7 +425,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_FULL_DISPUTE_MEDIATION.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -457,7 +457,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MULTI_INT_FAST_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -489,7 +489,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_DEFENDANT_CARM.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -521,7 +521,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -553,7 +553,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 

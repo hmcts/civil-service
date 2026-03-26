@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.data;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
@@ -11,7 +10,6 @@ import java.util.Map;
 import java.util.UUID;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskList {
@@ -53,26 +51,26 @@ public class TaskList {
     private int taskOrder;
 
     public static TaskList from(TaskListEntity taskListEntity) {
-        return TaskList.builder()
-            .id(taskListEntity.getId())
-            .reference(taskListEntity.getReference())
-            .currentStatusEn(TaskStatus.getTaskStatusByPlaceValue(taskListEntity.getCurrentStatus()).getName())
-            .currentStatusCy(TaskStatus.getTaskStatusByPlaceValue(taskListEntity.getCurrentStatus()).getWelshName())
-            .nextStatusEn(TaskStatus.getTaskStatusByPlaceValue(taskListEntity.getNextStatus()).getName())
-            .nextStatusCy(TaskStatus.getTaskStatusByPlaceValue(taskListEntity.getNextStatus()).getWelshName())
-            .taskNameEn(taskListEntity.getTaskNameEn())
-            .hintTextEn(taskListEntity.getHintTextEn())
-            .taskNameCy(taskListEntity.getTaskNameCy())
-            .hintTextCy(taskListEntity.getHintTextCy())
-            .createdAt(taskListEntity.getCreatedAt())
-            .updatedBy(taskListEntity.getUpdatedBy())
-            .updatedAt(taskListEntity.getUpdatedAt())
-            .messageParams(taskListEntity.getMessageParams())
-            .categoryEn(taskListEntity.getTaskItemTemplate().getCategoryEn())
-            .categoryCy(taskListEntity.getTaskItemTemplate().getCategoryCy())
-            .role(taskListEntity.getTaskItemTemplate().getRole())
-            .taskOrder(taskListEntity.getTaskItemTemplate().getTaskOrder())
-            .build();
+        return new TaskList(
+            taskListEntity.getId(),
+            taskListEntity.getReference(),
+            TaskStatus.getTaskStatusByPlaceValue(taskListEntity.getCurrentStatus()).getName(),
+            TaskStatus.getTaskStatusByPlaceValue(taskListEntity.getCurrentStatus()).getWelshName(),
+            TaskStatus.getTaskStatusByPlaceValue(taskListEntity.getNextStatus()).getName(),
+            TaskStatus.getTaskStatusByPlaceValue(taskListEntity.getNextStatus()).getWelshName(),
+            taskListEntity.getTaskNameEn(),
+            taskListEntity.getHintTextEn(),
+            taskListEntity.getTaskNameCy(),
+            taskListEntity.getHintTextCy(),
+            taskListEntity.getCreatedAt(),
+            taskListEntity.getUpdatedAt(),
+            taskListEntity.getUpdatedBy(),
+            taskListEntity.getMessageParams(),
+            taskListEntity.getTaskItemTemplate().getCategoryEn(),
+            taskListEntity.getTaskItemTemplate().getCategoryCy(),
+            taskListEntity.getTaskItemTemplate().getRole(),
+            taskListEntity.getTaskItemTemplate().getTaskOrder()
+        );
     }
 
 }

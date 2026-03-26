@@ -52,7 +52,7 @@ class GaDashboardScenarioServiceTest {
 
         service.trigger(caseData, AUTH_TOKEN);
 
-        ScenarioRequestParams expectedParams = ScenarioRequestParams.builder().params(params).build();
+        ScenarioRequestParams expectedParams = new ScenarioRequestParams(params);
         String caseReference = caseData.getCcdCaseReference().toString();
 
         verify(dashboardApiClient).recordScenario(caseReference, "Scenario.Primary", AUTH_TOKEN, expectedParams);

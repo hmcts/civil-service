@@ -53,7 +53,7 @@ class FinalOrderRespondentDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_RESPONDENT.getScenario(),
             AUTH_TOKEN,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -65,7 +65,7 @@ class FinalOrderRespondentDashboardServiceTest {
                 .isMultiParty(YesOrNo.NO)
                 .atStateClaimDraft()
                 .withNoticeCaseData()
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
                 .generalAppConsentOrder(YesOrNo.YES)
                 .build();
 
@@ -78,7 +78,7 @@ class FinalOrderRespondentDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_RESPONDENT.getScenario(),
             AUTH_TOKEN,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

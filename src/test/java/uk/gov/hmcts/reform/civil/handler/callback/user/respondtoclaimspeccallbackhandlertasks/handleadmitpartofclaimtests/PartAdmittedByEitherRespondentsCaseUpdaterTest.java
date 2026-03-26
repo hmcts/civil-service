@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.handleadmitpartofclaimtests;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,10 +17,6 @@ class PartAdmittedByEitherRespondentsCaseUpdaterTest {
 
     @InjectMocks
     private PartAdmittedByEitherRespondentsCaseUpdater updater;
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void shouldSetPartAdmittedByEitherRespondentsToYesForRespondent2() {

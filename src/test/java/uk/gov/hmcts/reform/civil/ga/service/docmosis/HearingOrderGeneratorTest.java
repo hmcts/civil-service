@@ -95,7 +95,7 @@ class HearingOrderGeneratorTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .hearingOrderApplication(YesOrNo.NO, YesOrNo.NO)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("8"))
             .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
@@ -244,7 +244,7 @@ class HearingOrderGeneratorTest {
                 .judicialListForHearing(new GAJudgesHearingListGAspec()
                                             .setHearingPreferencesPreferredType(GAJudicialHearingType.PAPER_HEARING)
                                             .setJudicialTimeEstimate(GAHearingDuration.MINUTES_15))
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
                 .build();
 
             GeneralApplicationCaseData caseDataBuilder = caseData.copy();
@@ -294,7 +294,7 @@ class HearingOrderGeneratorTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .hearingOrderApplication(YesOrNo.NO, YesOrNo.YES).build().copy()
                 .isMultiParty(NO)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("2"))
                 .build();
 
             GeneralApplicationCaseData caseDataBuilder = caseData.copy();

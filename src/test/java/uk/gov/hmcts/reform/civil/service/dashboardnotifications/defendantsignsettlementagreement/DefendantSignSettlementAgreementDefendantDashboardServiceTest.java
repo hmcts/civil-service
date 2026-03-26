@@ -59,7 +59,7 @@ class DefendantSignSettlementAgreementDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_ACCEPTED_DEFENDANT.getScenario(),
             "4567",
-            ScenarioRequestParams.builder().params((HashMap<String, Object>) params).build()
+            new ScenarioRequestParams((HashMap<String, Object>) params)
         );
     }
 
@@ -74,7 +74,7 @@ class DefendantSignSettlementAgreementDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_DEFENDANT.getScenario(),
             "4567",
-            ScenarioRequestParams.builder().params((HashMap<String, Object>) params).build()
+            new ScenarioRequestParams((HashMap<String, Object>) params)
         );
     }
 

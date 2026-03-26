@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -8,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.sdo.FastTrackVariable;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
@@ -21,30 +23,24 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle.ADD;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class SdoFastTrackTemplateService {
 
     private final DocumentHearingLocationHelper locationHelper;
     private final SdoCaseClassificationService caseClassificationService;
     private final SdoFastTrackDirectionsService fastTrackDirectionsService;
     private final SdoFastTrackTemplateFieldService fastTrackTemplateFieldService;
-    private final boolean otherRemedyEnabled;
-
-    public SdoFastTrackTemplateService(DocumentHearingLocationHelper locationHelper,
-                                       SdoCaseClassificationService caseClassificationService,
-                                       SdoFastTrackDirectionsService fastTrackDirectionsService,
-                                       SdoFastTrackTemplateFieldService fastTrackTemplateFieldService,
-                                       @Value("${other_remedy.enabled:false}") boolean otherRemedyEnabled) {
-        this.locationHelper = locationHelper;
-        this.caseClassificationService = caseClassificationService;
-        this.fastTrackDirectionsService = fastTrackDirectionsService;
-        this.fastTrackTemplateFieldService = fastTrackTemplateFieldService;
-        this.otherRemedyEnabled = otherRemedyEnabled;
-    }
+    private final FeatureToggleService featureToggleService;
 
     public SdoDocumentFormFast buildTemplate(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         boolean showBundleInfo = hasVariable(caseData, FastTrackVariable.TRIAL_BUNDLE_TOGGLE);
         boolean hasPpi = hasDirection(caseData, FastTrack.fastClaimPPI);
+        boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
+
+        log.info("Building Fast Track SDO template for case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
 
         SdoDocumentFormFast template = new SdoDocumentFormFast()
             .setWrittenByJudge(isJudge)

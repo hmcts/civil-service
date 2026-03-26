@@ -238,7 +238,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
         class LegalRepView {
             UpdateDetailsForm form = new UpdateDetailsForm()
                 .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                .setPartyChosen(DynamicList.builder().listItems(List.of(DynamicListElement.builder().label("something").build())).build());
+                .setPartyChosen(new DynamicList().setListItems(List.of(new DynamicListElement().setLabel("something"))));
 
             @Nested
             class OneVOne {
@@ -818,12 +818,10 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateRespondentOneDates_whenDefendantChoiceIsSelected() {
                     UpdateDetailsForm form = new UpdateDetailsForm()
                         .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .setPartyChosen(DynamicList.builder()
-                                         .value(DynamicListElement.builder().label("Defendant").build())
-                                         .listItems(List.of(
-                                             DynamicListElement.builder().label("Claimant").build(),
-                                             DynamicListElement.builder().label("Defendant").build()
-                                         )).build());
+                        .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setLabel("Defendant")).setListItems(List.of(
+                                             new DynamicListElement().setLabel("Claimant"),
+                                             new DynamicListElement().setLabel("Defendant")
+                                         )));
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -843,12 +841,10 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateApplicantOneDates_whenClaimantChoiceIsSelected() {
                     UpdateDetailsForm form = new UpdateDetailsForm()
                         .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .setPartyChosen(DynamicList.builder()
-                                         .value(DynamicListElement.builder().label("Claimant").build())
-                                         .listItems(List.of(
-                                             DynamicListElement.builder().label("Claimant").build(),
-                                             DynamicListElement.builder().label("Defendant").build()
-                                         )).build());
+                        .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setLabel("Claimant")).setListItems(List.of(
+                                             new DynamicListElement().setLabel("Claimant"),
+                                             new DynamicListElement().setLabel("Defendant")
+                                         )));
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -871,12 +867,10 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateRespondentOneAndTwoDates_whenDefendantsChoiceIsSelected() {
                     UpdateDetailsForm form = new UpdateDetailsForm()
                         .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .setPartyChosen(DynamicList.builder()
-                                         .value(DynamicListElement.builder().label("Defendants").build())
-                                         .listItems(List.of(
-                                             DynamicListElement.builder().label("Claimant").build(),
-                                             DynamicListElement.builder().label("Defendants").build()
-                                         )).build());
+                        .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setLabel("Defendants")).setListItems(List.of(
+                                             new DynamicListElement().setLabel("Claimant"),
+                                             new DynamicListElement().setLabel("Defendants")
+                                         )));
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -898,12 +892,10 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateApplicantOneDates_whenClaimantChoiceIsSelected() {
                     UpdateDetailsForm form = new UpdateDetailsForm()
                         .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .setPartyChosen(DynamicList.builder()
-                                         .value(DynamicListElement.builder().label("Claimant").build())
-                                         .listItems(List.of(
-                                             DynamicListElement.builder().label("Claimant").build(),
-                                             DynamicListElement.builder().label("Defendants").build()
-                                         )).build());
+                        .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setLabel("Claimant")).setListItems(List.of(
+                                             new DynamicListElement().setLabel("Claimant"),
+                                             new DynamicListElement().setLabel("Defendants")
+                                         )));
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -928,13 +920,11 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateRespondentOneDates_whenDefendant1ChoiceIsSelected() {
                     UpdateDetailsForm form = new UpdateDetailsForm()
                         .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .setPartyChosen(DynamicList.builder()
-                                         .value(DynamicListElement.builder().label("Defendant 1").build())
-                                         .listItems(List.of(
-                                             DynamicListElement.builder().label("Claimant").build(),
-                                             DynamicListElement.builder().label("Defendant 1").build(),
-                                             DynamicListElement.builder().label("Defendant 2").build()
-                                         )).build());
+                        .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setLabel("Defendant 1")).setListItems(List.of(
+                                             new DynamicListElement().setLabel("Claimant"),
+                                             new DynamicListElement().setLabel("Defendant 1"),
+                                             new DynamicListElement().setLabel("Defendant 2")
+                                         )));
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -957,13 +947,11 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateRespondentTwoDates_whenDefendant2ChoiceIsSelected() {
                     UpdateDetailsForm form = new UpdateDetailsForm()
                         .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .setPartyChosen(DynamicList.builder()
-                                         .value(DynamicListElement.builder().label("Defendant 2").build())
-                                         .listItems(List.of(
-                                             DynamicListElement.builder().label("Claimant").build(),
-                                             DynamicListElement.builder().label("Defendant 1").build(),
-                                             DynamicListElement.builder().label("Defendant 2").build()
-                                         )).build());
+                        .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setLabel("Defendant 2")).setListItems(List.of(
+                                             new DynamicListElement().setLabel("Claimant"),
+                                             new DynamicListElement().setLabel("Defendant 1"),
+                                             new DynamicListElement().setLabel("Defendant 2")
+                                         )));
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -986,13 +974,11 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateApplicantOneDates_whenClaimantChoiceIsSelected() {
                     UpdateDetailsForm form = new UpdateDetailsForm()
                         .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .setPartyChosen(DynamicList.builder()
-                                         .value(DynamicListElement.builder().label("Claimant").build())
-                                         .listItems(List.of(
-                                             DynamicListElement.builder().label("Claimant").build(),
-                                             DynamicListElement.builder().label("Defendant 1").build(),
-                                             DynamicListElement.builder().label("Defendant 2").build()
-                                         )).build());
+                        .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setLabel("Claimant")).setListItems(List.of(
+                                             new DynamicListElement().setLabel("Claimant"),
+                                             new DynamicListElement().setLabel("Defendant 1"),
+                                             new DynamicListElement().setLabel("Defendant 2")
+                                         )));
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -1018,12 +1004,10 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateRespondentOneDates_whenDefendantChoiceIsSelected() {
                     UpdateDetailsForm form = new UpdateDetailsForm()
                         .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .setPartyChosen(DynamicList.builder()
-                                         .value(DynamicListElement.builder().label("Defendant").build())
-                                         .listItems(List.of(
-                                             DynamicListElement.builder().label("Claimants").build(),
-                                             DynamicListElement.builder().label("Defendant").build()
-                                         )).build());
+                        .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setLabel("Defendant")).setListItems(List.of(
+                                             new DynamicListElement().setLabel("Claimants"),
+                                             new DynamicListElement().setLabel("Defendant")
+                                         )));
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -1045,12 +1029,10 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateApplicantOneDates_whenClaimantsChoiceIsSelected() {
                     UpdateDetailsForm form = new UpdateDetailsForm()
                         .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .setPartyChosen(DynamicList.builder()
-                                         .value(DynamicListElement.builder().label("Claimants").build())
-                                         .listItems(List.of(
-                                             DynamicListElement.builder().label("Claimants").build(),
-                                             DynamicListElement.builder().label("Defendant").build()
-                                         )).build());
+                        .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setLabel("Claimants")).setListItems(List.of(
+                                             new DynamicListElement().setLabel("Claimants"),
+                                             new DynamicListElement().setLabel("Defendant")
+                                         )));
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()

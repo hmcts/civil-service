@@ -91,7 +91,7 @@ class CourtOfficerOrderGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .courtOfficerOrdered("apples and bananas")
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.dynamicElement("A hearing location")).build())
+            .hearingLocation(new DynamicList().setValue(DynamicListElement.dynamicElement("A hearing location")))
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = generator.generate(caseData, "BEARER_TOKEN");

@@ -52,13 +52,16 @@ class DashboardControllerTest {
 
     @BeforeEach
     void init() {
-        taskListEntity = TaskListEntity.builder().id(TASK_ID).build();
-        notificationEntity = DashboardNotificationsEntity.builder().id(NOTIFICATION_ID).build();
+        taskListEntity = new TaskListEntity();
+        taskListEntity.setId(TASK_ID);
+        notificationEntity = new DashboardNotificationsEntity();
+        notificationEntity.setId(NOTIFICATION_ID);
     }
 
     @Test
     void shouldReturnTaskListForCaseAndRole() {
-        TaskList taskList = TaskList.builder().reference(CASE_ID).build();
+        TaskList taskList = new TaskList();
+        taskList.setReference(CASE_ID);
         when(taskListService.getTaskList(CASE_ID, ROLE)).thenReturn(List.of(taskList));
 
         ResponseEntity<List<TaskList>> response = controller.getTaskListByCaseIdentifierAndRole(CASE_ID, ROLE, AUTH);
@@ -93,7 +96,8 @@ class DashboardControllerTest {
 
     @Test
     void shouldReturnNotificationsForCaseAndRole() {
-        Notification notification = Notification.builder().id(NOTIFICATION_ID).build();
+        Notification notification = new Notification();
+        notification.setId(NOTIFICATION_ID);
         when(notificationService.getNotifications(CASE_ID, ROLE)).thenReturn(List.of(notification));
 
         ResponseEntity<List<Notification>> response =
@@ -106,7 +110,8 @@ class DashboardControllerTest {
 
     @Test
     void shouldReturnNotificationsForMultipleCases() {
-        Notification notification = Notification.builder().id(NOTIFICATION_ID).build();
+        Notification notification = new Notification();
+        notification.setId(NOTIFICATION_ID);
         Map<String, List<Notification>> notifications = Map.of(CASE_ID, List.of(notification));
         when(notificationService.getAllCasesNotifications(List.of(CASE_ID), ROLE)).thenReturn(notifications);
 
