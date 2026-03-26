@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.hmc.service;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -22,6 +23,10 @@ public class HearingsService {
 
     private final HearingsApi hearingNoticeApi;
     private final AuthTokenGenerator authTokenGenerator;
+    @Value("${role-assignment-service.api.url:#{null}}")
+    private String roleAssignmentUrl;
+    @Value("${core_case_data.api.url:#{null}}")
+    private String dataStoreUrl;
 
     public HearingGetResponse getHearingResponse(String authToken, String hearingId) throws HmcException {
         log.debug("Sending Get Hearings with Hearing ID {}", hearingId);
@@ -29,6 +34,8 @@ public class HearingsService {
             return hearingNoticeApi.getHearingRequest(
                 authToken,
                 authTokenGenerator.generate(),
+                dataStoreUrl,
+                roleAssignmentUrl,
                 hearingId,
                 null);
         } catch (FeignException ex)  {
@@ -43,6 +50,8 @@ public class HearingsService {
             return hearingNoticeApi.getPartiesNotifiedRequest(
                 authToken,
                 authTokenGenerator.generate(),
+                dataStoreUrl,
+                roleAssignmentUrl,
                 hearingId);
         } catch (FeignException e) {
             log.error("Failed to retrieve patries notified with Id: {} from HMC", hearingId);
@@ -57,6 +66,8 @@ public class HearingsService {
             return hearingNoticeApi.updatePartiesNotifiedRequest(
                 authToken,
                 authTokenGenerator.generate(),
+                dataStoreUrl,
+                roleAssignmentUrl,
                 payload,
                 hearingId,
                 requestVersion,
@@ -76,6 +87,8 @@ public class HearingsService {
             return hearingNoticeApi.getUnNotifiedHearingRequest(
                 authToken,
                 authTokenGenerator.generate(),
+                dataStoreUrl,
+                roleAssignmentUrl,
                 hmctsServiceCode,
                 hearingStartDateFrom,
                 hearingStartDateTo);
@@ -91,6 +104,8 @@ public class HearingsService {
             return hearingNoticeApi.getHearings(
                 authToken,
                 authTokenGenerator.generate(),
+                dataStoreUrl,
+                roleAssignmentUrl,
                 caseId,
                 status);
         } catch (FeignException e) {

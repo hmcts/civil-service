@@ -245,44 +245,33 @@ public class CaseDataBuilderSpec {
 
     public CaseDataBuilderSpec atStateClaimDraft() {
         caseAccessCategory = CaseCategory.SPEC_CLAIM;
-        solicitorReferences = SolicitorReferences.builder()
-            .applicantSolicitor1Reference("12345")
-            .respondentSolicitor1Reference("6789")
-            .build();
-        claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
-            .build();
-        applicantSolicitor1PbaAccounts = DynamicList.builder()
-            .value(DynamicListElement.builder().label("PBA0077597").build())
-            .build();
-        claimFee = Fee.builder()
-            .version("1")
-            .code("CODE")
-            .calculatedAmountInPence(BigDecimal.valueOf(100))
-            .build();
-        applicant1 = PartyBuilder.builder().individual().build();
-        respondent1 = PartyBuilder.builder().soleTrader().build();
+        solicitorReferences = new SolicitorReferences()
+            .setApplicantSolicitor1Reference("12345")
+            .setRespondentSolicitor1Reference("6789")
+            ;
+        claimValue = new ClaimValue()
+            .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
+        applicantSolicitor1PbaAccounts = new DynamicList().setValue(new DynamicListElement().setLabel("PBA0077597"));
+        claimFee = new Fee()
+            .setVersion("1")
+            .setCode("CODE")
+            .setCalculatedAmountInPence(BigDecimal.valueOf(100))
+            ;
+        applicant1 = new PartyBuilder().individual().build();
+        respondent1 = new PartyBuilder().soleTrader().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
-        applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY A").build())
-            .build();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        applicant1OrganisationPolicy = organisationPolicy("QWERTY A", null);
+        respondent1OrganisationPolicy = organisationPolicy("QWERTY R", "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy("QWERTY R2", "[RESPONDENTSOLICITORTWO]");
         respondent1OrganisationIDCopy = respondent1OrganisationPolicy.getOrganisation().getOrganisationID();
         respondent2OrganisationIDCopy = respondent2OrganisationPolicy.getOrganisation().getOrganisationID();
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
-        applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
-        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
-        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        applicantSolicitor1UserDetails = new IdamUserDetails().setEmail("applicantsolicitor@example.com");
+        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults();
+        applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
         return this;
     }
 
@@ -292,14 +281,14 @@ public class CaseDataBuilderSpec {
         ccdState = PENDING_CASE_ISSUED;
         ccdCaseReference = CASE_ID;
         submittedDate = SUBMITTED_DATE_TIME;
-        claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
+        claimIssuedPaymentDetails = new PaymentDetails().setCustomerReference("12345");
         return this;
     }
 
     public CaseDataBuilderSpec atStateClaimSubmittedTwoRespondentSameSolicitorSpec() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent2SameLegalRepresentative = YES;
         return this;
     }
@@ -307,7 +296,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2Represented = YES;
@@ -319,7 +308,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateClaimSubmitted2v1() {
         atStateSpec1v1ClaimSubmitted();
         addApplicant2 = YES;
-        applicant2 = PartyBuilder.builder().individual().build();
+        applicant2 = new PartyBuilder().individual().build();
         return this;
     }
 
@@ -332,7 +321,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec2v1DefendantUnrepresentedClaimSubmitted() {
         atStateSpec1v1ClaimSubmitted();
         addApplicant2 = YES;
-        applicant2 = PartyBuilder.builder().individual().build();
+        applicant2 = new PartyBuilder().individual().build();
         respondent1Represented = NO;
         return this;
     }
@@ -340,7 +329,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v2OneDefendantUnrepresentedClaimSubmitted() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2Represented = NO;
@@ -351,7 +340,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v2BothDefendantUnrepresentedClaimSubmitted() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = NO;
         respondent2Represented = NO;
         respondent1OrgRegistered = null;
@@ -369,7 +358,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec2v1DefendantUnregisteredClaimSubmitted() {
         atStateSpec1v1ClaimSubmitted();
         addApplicant2 = YES;
-        applicant2 = PartyBuilder.builder().individual().build();
+        applicant2 = new PartyBuilder().individual().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         return this;
@@ -378,7 +367,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v2Solicitor1UnregisteredSolicitor2RegisteredAndRepresented() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2Represented = YES;
@@ -390,7 +379,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = NO;
         respondent1OrgRegistered = null;
         respondent2Represented = YES;
@@ -401,7 +390,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantRepresentedAndUnregistered() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent2SameLegalRepresentative = NO;
         respondent1Represented = YES;
         respondent2Represented = YES;
@@ -413,7 +402,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantRepresentedAndUnregistered() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent2SameLegalRepresentative = YES;
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
@@ -428,18 +417,18 @@ public class CaseDataBuilderSpec {
         }
 
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-                                                            .customerReference("12345")
-                                                            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+                                                            .setCustomerReference("12345")
+                                                            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v1PaymentSuccessful() {
         atStateSpec1v1ClaimSubmitted();
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-                                                            .customerReference("12345")
-                                                            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+                                                            .setCustomerReference("12345")
+                                                            ;
         return this;
     }
 
@@ -455,78 +444,78 @@ public class CaseDataBuilderSpec {
 
     public CaseDataBuilderSpec atStateSpec1v1PaymentFailed() {
         atStateSpec1v1ClaimSubmitted();
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
-                                                            .customerReference("12345")
-                                                            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED)
+                                                            .setCustomerReference("12345")
+                                                            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantRepresentedPaymentSuccessful() {
         atStateClaimSubmittedTwoRespondentSameSolicitorSpec();
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantUnrepresentedPaymentSuccessful() {
         atStateSpec1v2BothDefendantUnrepresentedClaimSubmitted();
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantRepresentedPaymentFailed() {
         atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec();
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorOneDefendantUnrepresentedPaymentSuccessful() {
         atStateSpec1v2BothDefendantUnrepresentedClaimSubmitted();
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantUnregisteredPaymentSuccessful() {
         atStateSpec1v2SameSolicitorBothDefendantRepresentedAndUnregistered();
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantUnregisteredPaymentSuccessful() {
         atStateSpec1v2DifferentSolicitorBothDefendantRepresentedAndUnregistered();
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2OneDefendantUnregisteredOtherUnrepresentedPaymentSuccessful() {
         atStateSpec1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted();
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec2v1PaymentFailure() {
         atStateClaimSubmitted2v1();
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
@@ -582,11 +571,11 @@ public class CaseDataBuilderSpec {
         atStateSpec1v1UnrepresentedPendingClaimIssued();
         respondent1Represented = NO;
         claimNotificationDeadline = LocalDate.now().atStartOfDay().plusDays(14);
-        respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
-                                           .expiryDate(LocalDate.now())
-                                           .citizenCaseRole("citizen")
-                                           .respondentCaseRole("respondent")
-                                           .accessCode("123").build();
+        respondent1PinToPostLRspec = new DefendantPinToPostLRspec()
+            .setExpiryDate(LocalDate.now())
+            .setCitizenCaseRole("citizen")
+            .setRespondentCaseRole("respondent")
+            .setAccessCode("123");
 
         return this;
     }
@@ -662,6 +651,14 @@ public class CaseDataBuilderSpec {
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
             .build();
+    }
+
+    private OrganisationPolicy organisationPolicy(String organisationId, String role) {
+        OrganisationPolicy policy = new OrganisationPolicy();
+        if (organisationId != null) {
+            policy.setOrganisation(new Organisation().setOrganisationID(organisationId));
+        }
+        return policy.setOrgPolicyCaseAssignedRole(role);
     }
 
 }

@@ -38,24 +38,22 @@ class ConversionToBundleRequestDocsTest {
     void shouldConvertOtherWitnessEvidenceToBundleRequestDocs() {
         String displayName = "displayName";
         String documentType = "documentType";
-        Party party = Party.builder()
-            .partyName("PartyName")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        Party party = new Party()
+            .setPartyName("PartyName")
+            .setType(Party.Type.INDIVIDUAL);
 
-        Document witnessDocument = Document.builder()
-            .documentUrl("http://example.com/document.pdf")
-            .documentBinaryUrl("http://example.com/documentBinary.pdf")
-            .documentFileName("document.pdf")
-            .categoryID("SomeCategoryID")
-            .build();
+        Document witnessDocument = new Document()
+            .setDocumentUrl("http://example.com/document.pdf")
+            .setDocumentBinaryUrl("http://example.com/documentBinary.pdf")
+            .setDocumentFileName("document.pdf")
+            .setCategoryID("SomeCategoryID");
 
         UploadEvidenceWitness uploadEvidenceWitness = new UploadEvidenceWitness()
             .setWitnessOptionName("WitnessOptionName1")
             .setWitnessOptionDocument(witnessDocument)
             .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 5));
         List<Element<UploadEvidenceWitness>> listOfUploadEvidenceWitness =
-            List.of(Element.<UploadEvidenceWitness>builder().value(uploadEvidenceWitness).build());
+            List.of(new Element<UploadEvidenceWitness>().setValue(uploadEvidenceWitness));
 
         Map<String, List<Element<UploadEvidenceWitness>>> witnessStatementsMap = new HashMap<>();
         witnessStatementsMap.put("Witness1", listOfUploadEvidenceWitness);
@@ -74,12 +72,11 @@ class ConversionToBundleRequestDocsTest {
         boolean isWitnessSelf = true;
         PartyType partyType = PartyType.CLAIMANT1;
 
-        Document witnessDocument = Document.builder()
-            .documentUrl("http://example.com/document.pdf")
-            .documentBinaryUrl("http://example.com/documentBinary.pdf")
-            .documentFileName("document.pdf")
-            .categoryID("SomeCategoryID")
-            .build();
+        Document witnessDocument = new Document()
+            .setDocumentUrl("http://example.com/document.pdf")
+            .setDocumentBinaryUrl("http://example.com/documentBinary.pdf")
+            .setDocumentFileName("document.pdf")
+            .setCategoryID("SomeCategoryID");
 
         UploadEvidenceWitness uploadEvidenceWitness = new UploadEvidenceWitness()
             .setWitnessOptionName("WitnessOptionName1")
@@ -87,7 +84,7 @@ class ConversionToBundleRequestDocsTest {
             .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 5));
 
         List<Element<UploadEvidenceWitness>> listOfUploadEvidenceWitness =
-            List.of(Element.<UploadEvidenceWitness>builder().value(uploadEvidenceWitness).build());
+            List.of(new Element<UploadEvidenceWitness>().setValue(uploadEvidenceWitness));
 
         List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertWitnessEvidenceToBundleRequestDocs(
             listOfUploadEvidenceWitness, fileNamePrefix, documentType, partyType, isWitnessSelf);
@@ -102,12 +99,11 @@ class ConversionToBundleRequestDocsTest {
         String documentType = EvidenceUploadType.SKELETON_ARGUMENT.name();
         PartyType partyType = PartyType.CLAIMANT1;
 
-        Document document = Document.builder()
-            .documentUrl("http://example.com/document.pdf")
-            .documentBinaryUrl("http://example.com/documentBinary.pdf")
-            .documentFileName("document.pdf")
-            .categoryID("SomeCategoryID")
-            .build();
+        Document document = new Document()
+            .setDocumentUrl("http://example.com/document.pdf")
+            .setDocumentBinaryUrl("http://example.com/documentBinary.pdf")
+            .setDocumentFileName("document.pdf")
+            .setCategoryID("SomeCategoryID");
 
         UploadEvidenceDocumentType uploadEvidenceDocumentType1 = new UploadEvidenceDocumentType()
             .setDocumentIssuedDate(LocalDate.of(2023, 4, 24))
@@ -121,8 +117,8 @@ class ConversionToBundleRequestDocsTest {
 
         List<Element<UploadEvidenceDocumentType>> listOfUploadDocumentType =
             List.of(
-                Element.<UploadEvidenceDocumentType>builder().value(uploadEvidenceDocumentType1).build(),
-                Element.<UploadEvidenceDocumentType>builder().value(uploadEvidenceDocumentType2).build()
+                new Element<UploadEvidenceDocumentType>().setValue(uploadEvidenceDocumentType1),
+                new Element<UploadEvidenceDocumentType>().setValue(uploadEvidenceDocumentType2)
             );
 
         List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(

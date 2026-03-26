@@ -88,20 +88,17 @@ class GenerateHearingNoticeHMCDefendantEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("000DC001")
             .hearingDate(hearingDate)
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId(processInstanceId)
-                                 .build())
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .individualFirstName("John")
-                             .individualLastName("Doe")
-                             .partyName("John Doe")
-                             .build())
+            .businessProcess(new BusinessProcess()
+                                 .setProcessInstanceId(processInstanceId))
+            .respondent1(new Party()
+                             .setType(Party.Type.INDIVIDUAL)
+                             .setIndividualFirstName("John")
+                             .setIndividualLastName("Doe")
+                             .setPartyName("John Doe"))
             .build();
 
-        HearingNoticeVariables hearingNoticeVariables = HearingNoticeVariables.builder()
-            .hearingStartDateTime(hearingStartDateTime)
-            .build();
+        HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables()
+            .setHearingStartDateTime(hearingStartDateTime);
 
         when(camundaService.getProcessVariables(processInstanceId)).thenReturn(hearingNoticeVariables);
 

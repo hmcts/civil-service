@@ -125,67 +125,61 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
     }
 
     private Party getParty(String applicant) {
-        return Party.builder()
-            .partyID("partyID")
-            .type(Party.Type.COMPANY)
-            .individualTitle("Mr")
-            .individualFirstName(applicant)
-            .individualLastName("Silvassauro")
-            .individualDateOfBirth(LocalDate.of(2019, 1, 1))
-            .companyName("company")
-            .organisationName("org")
-            .soleTraderTitle("soleTr")
-            .soleTraderFirstName("soleTrFN")
-            .soleTraderLastName("soleTrLN")
-                .soleTraderDateOfBirth(LocalDate.of(2019, 1, 1))
-            .primaryAddress(getTestAddress("rua1"))
-            .partyName(applicant)
-            .bulkClaimPartyName("bulk")
-            .partyTypeDisplayValue("typeDispl")
-            .partyEmail("is@is.is")
-            .partyPhone("07070006066")
-            .legalRepHeading("legalRep")
-            .unavailableDates(getUnavailableTestDates())
-            .flags(new Flags())
-            .build();
+        return new Party()
+            .setPartyID("partyID")
+            .setType(Party.Type.COMPANY)
+            .setIndividualTitle("Mr")
+            .setIndividualFirstName(applicant)
+            .setIndividualLastName("Silvassauro")
+            .setIndividualDateOfBirth(LocalDate.of(2019, 1, 1))
+            .setCompanyName("company")
+            .setOrganisationName("org")
+            .setSoleTraderTitle("soleTr")
+            .setSoleTraderFirstName("soleTrFN")
+            .setSoleTraderLastName("soleTrLN")
+                .setSoleTraderDateOfBirth(LocalDate.of(2019, 1, 1))
+            .setPrimaryAddress(getTestAddress("rua1"))
+            .setPartyName(applicant)
+            .setBulkClaimPartyName("bulk")
+            .setPartyTypeDisplayValue("typeDispl")
+            .setPartyEmail("is@is.is")
+            .setPartyPhone("07070006066")
+            .setLegalRepHeading("legalRep")
+            .setUnavailableDates(getUnavailableTestDates())
+            .setFlags(new Flags());
     }
 
     private List<Element<UnavailableDate>> getUnavailableTestDates() {
-        return List.of(Element.<UnavailableDate>builder().id(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba"))
-                           .value(UnavailableDate.builder()
-                                      .who("who")
-                                      .date(LocalDate.of(2020, 1, 1))
-                                      .fromDate(LocalDate.of(2020, 1, 1))
-                                      .toDate(LocalDate.of(2020, 1, 1))
-                                      .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                      .eventAdded("eventAdd")
-                                      .dateAdded(LocalDate.of(2020, 1, 1))
-                                      .build()).build());
+        return List.of(new Element<UnavailableDate>().setId(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba")).setValue(new UnavailableDate()
+                                      .setWho("who")
+                                      .setDate(LocalDate.of(2020, 1, 1))
+                                      .setFromDate(LocalDate.of(2020, 1, 1))
+                                      .setToDate(LocalDate.of(2020, 1, 1))
+                                      .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                                      .setEventAdded("eventAdd")
+                                      .setDateAdded(LocalDate.of(2020, 1, 1))));
     }
 
     private Address getTestAddress(String rua) {
-        return Address.builder()
-            .addressLine1(rua)
-            .addressLine2(rua)
-            .addressLine3(rua)
-            .postTown("town")
-            .country("UK")
-            .county("Shire")
-            .postCode("KT1 3ER")
-            .build();
+        Address address = new Address();
+        address.setAddressLine1(rua);
+        address.setAddressLine2(rua);
+        address.setAddressLine3(rua);
+        address.setPostTown("town");
+        address.setCountry("UK");
+        address.setCounty("Shire");
+        address.setPostCode("KT1 3ER");
+        return address;
     }
 
     private Element<BundlingRequestDocument> getTestElement() {
-        return Element.<BundlingRequestDocument>builder()
-            .id(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba"))
-            .value(new BundlingRequestDocument()
+        return new Element<BundlingRequestDocument>().setId(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba")).setValue(new BundlingRequestDocument()
                        .setDocumentFileName("docFileName")
                        .setDocumentLink(new DocumentLink()
                                          .setDocumentBinaryUrl("binaryUrl")
                                          .setDocumentFilename("docFileName")
                                          .setDocumentUrl("docURL"))
-                       .setDocumentType("testDocType"))
-            .build();
+                       .setDocumentType("testDocType"));
     }
 
     static DslPart buildBundleCreateResponseDsl() {

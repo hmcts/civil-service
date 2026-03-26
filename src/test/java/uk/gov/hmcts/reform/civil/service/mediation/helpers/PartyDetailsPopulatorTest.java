@@ -28,8 +28,7 @@ public class PartyDetailsPopulatorTest {
         party.setIndividualLastName("Doe");
         party.setFlags(flags);
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
-        MediationLitigant litigant = partyDetailsPopulator.populator(builder, party).build();
+        MediationLitigant litigant = partyDetailsPopulator.populator(new MediationLitigant(), party);
 
         assertThat(litigant.getPartyID()).isEqualTo("P1");
         assertThat(litigant.getPartyRole()).isEqualTo("Defendant");
@@ -40,15 +39,13 @@ public class PartyDetailsPopulatorTest {
 
     @Test
     void shouldHandleNullFlags_whenFlagsAreNotProvided() {
-        Party party = Party.builder()
-            .partyID("P2")
-            .type(Type.COMPANY)
-            .individualFirstName("John")
-            .individualLastName("Doe")
-            .build();
+        Party party = new Party()
+            .setPartyID("P2")
+            .setType(Type.COMPANY)
+            .setIndividualFirstName("John")
+            .setIndividualLastName("Doe");
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
-        MediationLitigant litigant = partyDetailsPopulator.populator(builder, party).build();
+        MediationLitigant litigant = partyDetailsPopulator.populator(new MediationLitigant(), party);
 
         assertThat(litigant.getPartyID()).isEqualTo("P2");
         assertThat(litigant.getPartyRole()).isNull();

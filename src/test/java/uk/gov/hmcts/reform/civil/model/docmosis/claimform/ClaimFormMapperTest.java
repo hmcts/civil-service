@@ -62,39 +62,35 @@ class ClaimFormMapperTest {
     void should_displayIndividualName_whenPartiesIndividual() {
         //Given
         List<Evidence> evidenceList = List.of(
-            Evidence.builder().id("0").value(EvidenceDetails.builder()
-                                                 .evidenceType("EXPERT_WITNESS")
-                                                 .expertWitnessEvidence("This is an expert")
-                                                 .build())
-                .build(),
-            Evidence.builder().id("0").value(EvidenceDetails.builder()
-                                                 .evidenceType("LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE")
-                                                 .lettersEmailsAndOtherCorrespondenceEvidence("This is Letter")
-                                                 .build())
-                .build()
+            new Evidence()
+                .setId("0")
+                .setValue(new EvidenceDetails()
+                              .setEvidenceType("EXPERT_WITNESS")
+                              .setExpertWitnessEvidence("This is an expert")),
+            new Evidence()
+                .setId("0")
+                .setValue(new EvidenceDetails()
+                              .setEvidenceType("LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE")
+                              .setLettersEmailsAndOtherCorrespondenceEvidence("This is Letter"))
         );
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .individualLastName(INDIVIDUAL_LAST_NAME)
-                            .individualFirstName(INDIVIDUAL_FIRST_NAME)
-                            .individualTitle(INDIVIDUAL_TITLE)
-                            .partyEmail(EMAIL)
-                            .type(Party.Type.INDIVIDUAL)
-                            .build())
+            .applicant1(new Party()
+                            .setIndividualLastName(INDIVIDUAL_LAST_NAME)
+                            .setIndividualFirstName(INDIVIDUAL_FIRST_NAME)
+                            .setIndividualTitle(INDIVIDUAL_TITLE)
+                            .setPartyEmail(EMAIL)
+                            .setType(Party.Type.INDIVIDUAL))
             .timelineOfEvents(List.of(
-                TimelineOfEvents.builder().id("1").value(
-                        TimelineOfEventDetails.builder()
-                            .timelineDate(LocalDate.now())
-                            .timelineDescription("desc")
-                            .build())
-                    .build()))
-            .respondent1(Party.builder()
-                             .individualLastName(INDIVIDUAL_LAST_NAME)
-                             .individualFirstName(INDIVIDUAL_FIRST_NAME)
-                             .individualTitle(INDIVIDUAL_TITLE)
-                             .partyEmail(EMAIL)
-                             .type(Party.Type.INDIVIDUAL)
-                             .build())
+                new TimelineOfEvents(
+                    new TimelineOfEventDetails(LocalDate.now(), "desc"),
+                    "1"
+                )))
+            .respondent1(new Party()
+                             .setIndividualLastName(INDIVIDUAL_LAST_NAME)
+                             .setIndividualFirstName(INDIVIDUAL_FIRST_NAME)
+                             .setIndividualTitle(INDIVIDUAL_TITLE)
+                             .setPartyEmail(EMAIL)
+                             .setType(Party.Type.INDIVIDUAL))
             .speclistYourEvidenceList(evidenceList)
             .build();
         //When
@@ -115,22 +111,20 @@ class ClaimFormMapperTest {
     void shouldDisplay_soleTraderInformation_whenPartiesAreSoleTrader() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .soleTraderLastName(INDIVIDUAL_LAST_NAME)
-                            .soleTraderFirstName(INDIVIDUAL_FIRST_NAME)
-                            .soleTraderTitle(INDIVIDUAL_TITLE)
-                            .soleTraderTradingAs(SOLE_TRADER)
-                            .partyEmail(EMAIL)
-                            .type(Party.Type.SOLE_TRADER)
-                            .build())
-            .respondent1(Party.builder()
-                             .soleTraderLastName(INDIVIDUAL_LAST_NAME)
-                             .soleTraderFirstName(INDIVIDUAL_FIRST_NAME)
-                             .soleTraderTitle(INDIVIDUAL_TITLE)
-                             .soleTraderTradingAs(SOLE_TRADER)
-                             .partyEmail(EMAIL)
-                             .type(Party.Type.SOLE_TRADER)
-                             .build())
+            .applicant1(new Party()
+                            .setSoleTraderLastName(INDIVIDUAL_LAST_NAME)
+                            .setSoleTraderFirstName(INDIVIDUAL_FIRST_NAME)
+                            .setSoleTraderTitle(INDIVIDUAL_TITLE)
+                            .setSoleTraderTradingAs(SOLE_TRADER)
+                            .setPartyEmail(EMAIL)
+                            .setType(Party.Type.SOLE_TRADER))
+            .respondent1(new Party()
+                             .setSoleTraderLastName(INDIVIDUAL_LAST_NAME)
+                             .setSoleTraderFirstName(INDIVIDUAL_FIRST_NAME)
+                             .setSoleTraderTitle(INDIVIDUAL_TITLE)
+                             .setSoleTraderTradingAs(SOLE_TRADER)
+                             .setPartyEmail(EMAIL)
+                             .setType(Party.Type.SOLE_TRADER))
             .build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
@@ -145,20 +139,18 @@ class ClaimFormMapperTest {
     void shouldDisplayCompany_whenPartiesAreCompany() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .companyName(COMPANY)
-                            .partyEmail(EMAIL)
-                            .type(Party.Type.COMPANY)
-                            .build())
+            .applicant1(new Party()
+                            .setCompanyName(COMPANY)
+                            .setPartyEmail(EMAIL)
+                            .setType(Party.Type.COMPANY))
             .claimantUserDetails(
-                IdamUserDetails.builder().email(EMAIL).build()
+                new IdamUserDetails().setEmail(EMAIL)
             )
-            .respondent1(Party.builder()
-                             .companyName(COMPANY)
-                             .partyEmail(EMAIL)
-                             .type(Party.Type.COMPANY)
-                             .build())
-            .uiStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build())
+            .respondent1(new Party()
+                             .setCompanyName(COMPANY)
+                             .setPartyEmail(EMAIL)
+                             .setType(Party.Type.COMPANY))
+            .uiStatementOfTruth(new StatementOfTruth().setName("Test").setRole("Test"))
             .build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
@@ -174,19 +166,17 @@ class ClaimFormMapperTest {
     void shouldDisplayOrganisationName_whenPartiesAreOrganisation() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .organisationName(ORGANISATION)
-                            .partyEmail(EMAIL)
-                            .type(Party.Type.ORGANISATION)
-                            .build())
+            .applicant1(new Party()
+                            .setOrganisationName(ORGANISATION)
+                            .setPartyEmail(EMAIL)
+                            .setType(Party.Type.ORGANISATION))
             .claimantUserDetails(
-                IdamUserDetails.builder().email(EMAIL).build()
+                new IdamUserDetails().setEmail(EMAIL)
             )
-            .respondent1(Party.builder()
-                             .organisationName(ORGANISATION)
-                             .partyEmail(EMAIL)
-                             .type(Party.Type.ORGANISATION)
-                             .build())
+            .respondent1(new Party()
+                             .setOrganisationName(ORGANISATION)
+                             .setPartyEmail(EMAIL)
+                             .setType(Party.Type.ORGANISATION))
             .build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
@@ -383,7 +373,7 @@ class ClaimFormMapperTest {
         //Given
         CaseData caseData = CASE_DATA.toBuilder()
             .claimantUserDetails(
-                IdamUserDetails.builder().email(EMAIL).build()
+                new IdamUserDetails().setEmail(EMAIL)
             ).totalClaimAmount(null).build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
@@ -404,7 +394,7 @@ class ClaimFormMapperTest {
         //Given
         CaseData caseData = getCaseData().toBuilder()
             .submittedDate(SUBMITTED_DATE)
-            .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(CLAIM_FEE))
             .build();
         given(interestCalculator.calculateInterest(caseData)).willReturn(INTEREST);
         //When
@@ -484,15 +474,14 @@ class ClaimFormMapperTest {
     void shouldMapFlightDelayDetails() {
         //Given
         CaseData caseData = getCaseData().toBuilder()
-                .respondent1(Party.builder()
-                        .companyName(COMPANY)
-                        .partyEmail(EMAIL)
-                        .type(Party.Type.COMPANY)
-                        .build())
-                .flightDelayDetails(FlightDelayDetails.builder()
-                        .flightNumber("BA123")
-                        .nameOfAirline("BATestAirLine")
-                        .scheduledDate(LocalDate.now()).build()).build();
+                .respondent1(new Party()
+                        .setCompanyName(COMPANY)
+                        .setPartyEmail(EMAIL)
+                        .setType(Party.Type.COMPANY))
+                .flightDelayDetails(new FlightDelayDetails()
+                        .setFlightNumber("BA123")
+                        .setNameOfAirline("BATestAirLine")
+                        .setScheduledDate(LocalDate.now())).build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
@@ -512,16 +501,14 @@ class ClaimFormMapperTest {
         return CaseData.builder()
             .legacyCaseReference("000MC038")
             .ccdCaseReference(1234567890123456L)
-            .applicant1(Party.builder()
-                            .companyName(ORGANISATION)
-                            .partyEmail(EMAIL)
-                            .type(Party.Type.ORGANISATION)
-                            .build())
-            .respondent1(Party.builder()
-                             .companyName(ORGANISATION)
-                             .partyEmail(EMAIL)
-                             .type(Party.Type.ORGANISATION)
-                             .build())
+            .applicant1(new Party()
+                            .setCompanyName(ORGANISATION)
+                            .setPartyEmail(EMAIL)
+                            .setType(Party.Type.ORGANISATION))
+            .respondent1(new Party()
+                             .setCompanyName(ORGANISATION)
+                             .setPartyEmail(EMAIL)
+                             .setType(Party.Type.ORGANISATION))
             .totalClaimAmount(TOTAL_CLAIM_AMOUNT)
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1AdditionalLipPartyDetails(new AdditionalLipPartyDetails())

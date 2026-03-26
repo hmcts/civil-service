@@ -46,10 +46,9 @@ class PartyValidatorTest {
 
         @Test
         public void should_return_Special_character_error_name() {
-            Address primaryAddress = Address.builder()
-                .addressLine1("Proper address")
-                .county(" ¨Proper address")
-                .build();
+            Address primaryAddress = new Address();
+            primaryAddress.setAddressLine1("Proper address");
+            primaryAddress.setCounty(" ¨Proper address");
 
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
@@ -62,14 +61,13 @@ class PartyValidatorTest {
     class ValidateAddress {
         @Test
         void should_return_max_length_error() {
-            Address primaryAddress = Address.builder()
-                .addressLine1("Line 1 test again for more than 35 characters")
-                .addressLine2("Line 1 test again for more than 35 characters")
-                .addressLine3("Line 1 test again for more than 35 characters")
-                .county("Line 1 test again for more than 35 characters")
-                .postCode("Line 1 test again for more than 35 characters")
-                .postTown("Line 1 test again for more than 35 characters")
-                .build();
+            Address primaryAddress = new Address();
+            primaryAddress.setAddressLine1("Line 1 test again for more than 35 characters");
+            primaryAddress.setAddressLine2("Line 1 test again for more than 35 characters");
+            primaryAddress.setAddressLine3("Line 1 test again for more than 35 characters");
+            primaryAddress.setCounty("Line 1 test again for more than 35 characters");
+            primaryAddress.setPostCode("Line 1 test again for more than 35 characters");
+            primaryAddress.setPostTown("Line 1 test again for more than 35 characters");
 
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
@@ -81,14 +79,13 @@ class PartyValidatorTest {
 
         @Test
         void should_not_return_max_length_error() {
-            Address primaryAddress = Address.builder()
-                .addressLine1("Proper address")
-                .addressLine2("Proper address")
-                .addressLine3("Proper address")
-                .county("Proper address")
-                .postCode("Proper")
-                .postTown("Proper address")
-                .build();
+            Address primaryAddress = new Address();
+            primaryAddress.setAddressLine1("Proper address");
+            primaryAddress.setAddressLine2("Proper address");
+            primaryAddress.setAddressLine3("Proper address");
+            primaryAddress.setCounty("Proper address");
+            primaryAddress.setPostCode("Proper");
+            primaryAddress.setPostTown("Proper address");
 
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
@@ -98,9 +95,8 @@ class PartyValidatorTest {
 
         @Test
         void should_return_Special_character_error_address_line1() {
-            Address primaryAddress = Address.builder()
-                .addressLine1("ˆProper address")
-                .build();
+            Address primaryAddress = new Address();
+            primaryAddress.setAddressLine1("ˆProper address");
 
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
@@ -110,10 +106,9 @@ class PartyValidatorTest {
 
         @Test
         void should_return_Special_character_error_address_line2() {
-            Address primaryAddress = Address.builder()
-                .addressLine1("Proper address")
-                .addressLine2("`Proper address")
-                .build();
+            Address primaryAddress = new Address();
+            primaryAddress.setAddressLine1("Proper address");
+            primaryAddress.setAddressLine2("`Proper address");
 
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
@@ -123,10 +118,9 @@ class PartyValidatorTest {
 
         @Test
         void should_return_Special_character_error_address_line3() {
-            Address primaryAddress = Address.builder()
-                .addressLine1("Proper address")
-                .addressLine3("´Proper address")
-                .build();
+            Address primaryAddress = new Address();
+            primaryAddress.setAddressLine1("Proper address");
+            primaryAddress.setAddressLine3("´Proper address");
 
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
@@ -136,10 +130,9 @@ class PartyValidatorTest {
 
         @Test
         void should_return_Special_character_error_address_posttown() {
-            Address primaryAddress = Address.builder()
-                .addressLine1("Proper address")
-                .postTown(" ¨Proper address")
-                .build();
+            Address primaryAddress = new Address();
+            primaryAddress.setAddressLine1("Proper address");
+            primaryAddress.setPostTown(" ¨Proper address");
 
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
@@ -149,10 +142,9 @@ class PartyValidatorTest {
 
         @Test
         void should_return_Special_character_error_address_postcode() {
-            Address primaryAddress = Address.builder()
-                .addressLine1("Proper address")
-                .postCode(" ¨Proper address")
-                .build();
+            Address primaryAddress = new Address();
+            primaryAddress.setAddressLine1("Proper address");
+            primaryAddress.setPostCode(" ¨Proper address");
 
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
@@ -161,10 +153,9 @@ class PartyValidatorTest {
 
         @Test
         void should_return_Special_character_error_address_county() {
-            Address primaryAddress = Address.builder()
-                .addressLine1("Proper address")
-                .county(" ¨Proper address")
-                .build();
+            Address primaryAddress = new Address();
+            primaryAddress.setAddressLine1("Proper address");
+            primaryAddress.setCounty(" ¨Proper address");
 
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);

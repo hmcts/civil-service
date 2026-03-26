@@ -72,7 +72,7 @@ public class GaMoreInformationHwfCallbackHandler extends CallbackHandler impleme
 
     private CallbackResponse submitMoreInformationHwf(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
+        GeneralApplicationCaseData updatedData = caseData.copy()
                 .businessProcess(BusinessProcess.readyGa(NOTIFY_APPLICANT_LIP_HWF));
 
         HwFFeeTypeUtil.updateEventInHwfDetails(caseData, updatedData, MORE_INFORMATION_HWF_GA);

@@ -57,15 +57,16 @@ public class UpdatedRefNumberHWFCallbackHandler extends CallbackHandler implemen
     }
 
     private GeneralApplicationCaseData updateHwFReference(GeneralApplicationCaseData caseData) {
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
+        GeneralApplicationCaseData updatedData = caseData.copy()
                 .businessProcess(BusinessProcess.readyGa(NOTIFY_APPLICANT_LIP_HWF));
         if (caseData.isHWFTypeApplication()) {
             String newRefNumber = getHwFNewReferenceNumber(caseData.getGaHwfDetails());
             ofNullable(caseData.getGeneralAppHelpWithFees())
                 .ifPresent(hwf -> updatedData.generalAppHelpWithFees(hwf.copy().setHelpWithFeesReferenceNumber(newRefNumber)));
             if (caseData.getGaHwfDetails() != null) {
-                updatedData.gaHwfDetails(caseData.getGaHwfDetails().toBuilder()
-                        .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA).hwfReferenceNumber(null).build());
+                updatedData.gaHwfDetails(caseData.getGaHwfDetails().copy()
+                        .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
+                        .setHwfReferenceNumber(null));
             }
             return updatedData.build();
         }
@@ -74,8 +75,9 @@ public class UpdatedRefNumberHWFCallbackHandler extends CallbackHandler implemen
             ofNullable(caseData.getGeneralAppHelpWithFees())
                 .ifPresent(hwf -> updatedData.generalAppHelpWithFees(hwf.copy().setHelpWithFeesReferenceNumber(newRefNumber)));
             if (caseData.getAdditionalHwfDetails() != null) {
-                updatedData.additionalHwfDetails(caseData.getAdditionalHwfDetails().toBuilder()
-                        .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA).hwfReferenceNumber(null).build());
+                updatedData.additionalHwfDetails(caseData.getAdditionalHwfDetails().copy()
+                        .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
+                        .setHwfReferenceNumber(null));
             }
             return updatedData.build();
         }

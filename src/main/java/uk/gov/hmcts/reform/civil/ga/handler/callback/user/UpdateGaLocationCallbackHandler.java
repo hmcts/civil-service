@@ -56,7 +56,7 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler implements 
         if (locationDetails != null && !locationDetails.isEmpty()) {
             return locationDetails.get(0);
         } else {
-            return LocationRefData.builder().build();
+            return new LocationRefData();
         }
     }
 
@@ -70,21 +70,19 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler implements 
                             .getCase(Long.parseLong(parentCaseReference)));
         LocationRefData locationDetails = getWorkAllocationLocationDetails(civilCaseData.getCaseManagementLocation().getBaseLocation(),
                                                                            authToken);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder
             .businessProcess(
-                BusinessProcess.builder()
-                    .camundaEvent(callbackParams.getRequest().getEventId())
-                    .status(BusinessProcessStatus.FINISHED)
-                    .build())
+                new BusinessProcess()
+                    .setCamundaEvent(callbackParams.getRequest().getEventId())
+                    .setStatus(BusinessProcessStatus.FINISHED))
             .isCcmccLocation(YesOrNo.NO)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(civilCaseData.getCaseManagementLocation()
-                                                                              .getBaseLocation())
-                                        .region(civilCaseData.getCaseManagementLocation().getRegion())
-                                        .siteName(locationDetails.getSiteName())
-                                        .address(locationDetails.getCourtAddress())
-                                        .postcode(locationDetails.getPostcode())
-                                        .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(civilCaseData.getCaseManagementLocation().getBaseLocation())
+                                        .setRegion(civilCaseData.getCaseManagementLocation().getRegion())
+                                        .setSiteName(locationDetails.getSiteName())
+                                        .setAddress(locationDetails.getCourtAddress())
+                                        .setPostcode(locationDetails.getPostcode()))
             .locationName(civilCaseData.getLocationName());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

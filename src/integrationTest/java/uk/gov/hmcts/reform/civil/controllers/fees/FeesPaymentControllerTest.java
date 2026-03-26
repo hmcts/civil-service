@@ -63,11 +63,10 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(CASE_REFERENCE)
                 .data(Map.of(
                         "hearingFeePBADetails",
-                        SRPbaDetails.builder().serviceReqReference("2023-1701090705688")
-                                .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
-                                .build(),
+                        new SRPbaDetails().setServiceReqReference("2023-1701090705688")
+                                .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200"))),
                         "hearingFee",
-                        Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
+                        new Fee().setCalculatedAmountInPence(new BigDecimal("23200"))
                 )).build();
 
         when(coreCaseDataService.getCase(CASE_REFERENCE)).thenReturn(expectedCaseDetails);
@@ -129,11 +128,9 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             CaseDetails expectedCaseDetails = CaseDetails.builder().id(GA_CASE_REFERENCE)
                 .data(Map.of(
                     "generalAppPBADetails",
-                    GAPbaDetails.builder().serviceReqReference("2023-1701090705688")
-                        .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
-                        .build(),
+                    new GAPbaDetails().setServiceReqReference("2023-1701090705688").setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200"))),
                     "generalAppFee",
-                    Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build(),
+                    new Fee().setCalculatedAmountInPence(new BigDecimal("23200")),
                     "parentCaseReference",
                     CASE_REFERENCE
                 )).build();
@@ -183,16 +180,15 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         }
 
         private CardPaymentStatusResponse gaExpectedResponse(String status) {
-            final CardPaymentStatusResponse.CardPaymentStatusResponseBuilder payment
-                = CardPaymentStatusResponse.builder()
-                .paymentReference("RC-1701-0909-0602-0418")
-                .status(status)
-                .paymentAmount(new BigDecimal(200));
+            final CardPaymentStatusResponse payment = new CardPaymentStatusResponse()
+                .setPaymentReference("RC-1701-0909-0602-0418")
+                .setStatus(status)
+                .setPaymentAmount(new BigDecimal(200));
 
             if (status.equals("Failed")) {
-                payment.errorCode("P0030").errorDescription("Payment was cancelled by the user");
+                payment.setErrorCode("P0030").setErrorDescription("Payment was cancelled by the user");
             }
-            return payment.build();
+            return payment;
         }
     }
 

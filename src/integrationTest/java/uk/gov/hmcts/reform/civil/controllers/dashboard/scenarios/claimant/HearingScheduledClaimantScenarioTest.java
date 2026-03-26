@@ -50,12 +50,12 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
     void should_create_hearing_scheduled_scenario() throws Exception {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
+        locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "8123456781";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
             .legacyCaseReference("reference")
@@ -66,9 +66,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                               .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT")
-                                               .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                               .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT"));
 
         // When
         handler.handle(callbackParams);
@@ -133,34 +132,32 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
     void should_create_hearing_scheduled_scenario_HMC() throws Exception {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
+        locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(10)));
         when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingId("HER1234")
-                            .hearingType("AAA7-TRI")
-                            .build());
+            .thenReturn(new HearingNoticeVariables()
+                            .setHearingId("HER1234")
+                            .setHearingType("AAA7-TRI"));
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "8123456781";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
             .hearingDate(LocalDate.of(2024, 4, 1))
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(""))
+            .hearingFeePaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
             .applicant1Represented(YesOrNo.NO)
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC")
-                                                                .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC"));
 
         // When
         handler.handle(callbackParams);
@@ -225,19 +222,19 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
     void should_create_hearing_fee_required_scenario() throws Exception {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
+        locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "503206541654";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDate(LocalDate.of(2024, 4, 1))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(20000)).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(20000)))
             .ccdState(HEARING_READINESS)
             .listingOrRelisting(LISTING)
             .applicant1Represented(YesOrNo.NO)
@@ -245,9 +242,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         // When
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT")
-                                                                .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT"));
 
         // When
         handler.handle(callbackParams);
@@ -300,26 +296,25 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
     void should_create_hearing_fee_scenario_HMC() throws Exception {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
+        locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(20000)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(20000)));
         when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingId("HER1234")
-                            .hearingType("AAA7-TRI")
-                            .build());
+            .thenReturn(new HearingNoticeVariables()
+                            .setHearingId("HER1234")
+                            .setHearingType("AAA7-TRI"));
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "8123456781";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
             .hearingDate(LocalDate.of(2024, 4, 1))
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(""))
             .totalClaimAmount(new BigDecimal(10))
             .responseClaimTrack("SMALL_CLAIM")
             .allocatedTrack(null)
@@ -327,9 +322,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC")
-                                                                .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC"));
 
         // When
         handler.handle(callbackParams);

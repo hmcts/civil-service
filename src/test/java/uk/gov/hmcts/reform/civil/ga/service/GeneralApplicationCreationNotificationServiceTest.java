@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.mockito.stubbing.OngoingStubbing;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
@@ -56,32 +57,30 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.RAISE_QUERY_LR;
 
-@SpringBootTest(classes = {
-    GeneralApplicationCreationNotificationService.class,
-    GaForLipService.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class GeneralApplicationCreationNotificationServiceTest {
 
-    @Autowired
+    @InjectMocks
     private GeneralApplicationCreationNotificationService gaNotificationService;
-    @MockBean
+    @Mock
     private SolicitorEmailValidation solicitorEmailValidation;
-    @MockBean
+    @Mock
     private NotificationService notificationService;
 
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @Mock
     private NotificationsSignatureConfiguration configuration;
+    @Spy
+    private GaForLipService gaForLipService;
     @Captor
     ArgumentCaptor<Map<String, String>> argumentCaptor;
 
@@ -95,40 +94,21 @@ public class GeneralApplicationCreationNotificationServiceTest {
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getGeneralApplicationRespondentEmailTemplate())
-                .thenReturn("general-application-respondent-template-id");
-            when(notificationsProperties.getUrgentGeneralAppRespondentEmailTemplate())
-                .thenReturn("general-application-respondent-template-id");
-            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
-                .thenReturn("general-application-respondent-template-lip-id");
-            //when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
-            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh())
-                .thenReturn("general-application-respondent-welsh-template-lip-id");
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getWelshContact()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
-            when(configuration.getSpecContact()).thenReturn("Email: contactocmc@justice.gov.uk");
-            when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
-            when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
-            when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
-        }
-
         @Test
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFee() {
-            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+            GeneralApplicationCaseData caseData = getCaseData(true).copy()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("FREE")))
                 .build();
 
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
-            when(solicitorEmailValidation
-                     .validateSolicitorEmail(any(), any()))
-                .thenReturn(caseData);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
+            getGeneralApplicationCaseDataOngoingStubbing(caseData);
+            when(notificationsProperties.getUrgentGeneralAppRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 any(), any(), any(), any()
             );
@@ -136,13 +116,13 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
         @Test
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFeeV2() {
-            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+            GeneralApplicationCaseData caseData = getCaseData(true).copy()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("FREE")))
                 .generalAppRespondentSolicitors(List.of())
                 .build();
 
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
@@ -152,13 +132,13 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
         @Test
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFeeV2Null() {
-            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+            GeneralApplicationCaseData caseData = getCaseData(true).copy()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("FREE")))
                 .generalAppRespondentSolicitors(null)
                 .build();
 
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
@@ -171,25 +151,30 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                .email(DUMMY_EMAIL).organisationIdentifier("2").forename("LipF").surname(Optional.of("LipS")).build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("2").setForename("LipF").setSurname(Optional.of("LipS"));
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
 
-            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+            GeneralApplicationCaseData caseData = getCaseData(true).copy()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("FREE")))
                 .generalAppRespondentSolicitors(respondentSols)
                 .build();
 
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
+            when(notificationsProperties.getUrgentGeneralAppRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService).sendMail(
                 any(), any(), any(), any()
             );
@@ -200,25 +185,30 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                .email(DUMMY_EMAIL).organisationIdentifier("2").forename("LipF").surname(Optional.of("LipS")).build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("2").setForename("LipF").setSurname(Optional.of("LipS"));
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
 
-            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+            GeneralApplicationCaseData caseData = getCaseData(true).copy()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("FREE")))
                 .generalAppRespondentSolicitors(respondentSols)
                 .build();
 
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
+            when(notificationsProperties.getGeneralApplicationRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService).sendMail(
                 any(), any(), any(), any()
             );
@@ -226,18 +216,23 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
         @Test
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFeePaid() {
-            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAID").build())
-                                          .paymentDetails(PaymentDetails.builder().status(
-                                              PaymentStatus.SUCCESS).build()).build())
+            GeneralApplicationCaseData caseData = getCaseData(true).copy()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee().setCode("PAID"))
+                                          .setPaymentDetails(new PaymentDetails().setStatus(
+                                              PaymentStatus.SUCCESS)))
                 .build();
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
+            when(notificationsProperties.getUrgentGeneralAppRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 any(), any(), any(), any()
             );
@@ -245,9 +240,9 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
         @Test
         void notificationShouldNotSendIfGa_NonUrgent_WithNoticeAndFreeFee() {
-            GeneralApplicationCaseData caseData = getCaseData(false).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+            GeneralApplicationCaseData caseData = getCaseData(false).copy()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("FREE")))
                 .build();
 
             when(solicitorEmailValidation
@@ -259,12 +254,12 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
         @Test
         void notificationShouldNotSendIfGa_NonUrgent_WithNoticeAndFeePaid() {
-            GeneralApplicationCaseData caseData = getCaseData(false).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAID").build())
-                                          .paymentDetails(PaymentDetails.builder().status(
-                                              PaymentStatus.SUCCESS).build()).build())
+            GeneralApplicationCaseData caseData = getCaseData(false).copy()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee().setCode("PAID"))
+                                          .setPaymentDetails(new PaymentDetails().setStatus(
+                                              PaymentStatus.SUCCESS)))
                 .build();
 
             when(solicitorEmailValidation
@@ -276,22 +271,27 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
         @Test
         void notificationShouldSendIfGa_Lip_WithNoticeAndFeePaid_defendantLipIsGaRespondent() {
-            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
+            GeneralApplicationCaseData caseData = getCaseData(true).copy()
                 .isGaRespondentOneLip(YES)
                 .parentClaimantIsApplicant(YES)
                 .ccdCaseReference(CASE_REFERENCE)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAID").build())
-                                          .paymentDetails(PaymentDetails.builder().status(
-                                              PaymentStatus.SUCCESS).build()).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee().setCode("PAID"))
+                                          .setPaymentDetails(new PaymentDetails().setStatus(
+                                              PaymentStatus.SUCCESS)))
                 .build();
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
+            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-lip-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 any(), eq("general-application-respondent-template-lip-id"), argumentCaptor.capture(), any()
             );
@@ -301,22 +301,27 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
         @Test
         void notificationShouldSendIfGa_Lip_WithNoticeAndFeePaid_claimantLipIsGaRespondent() {
-            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
+            GeneralApplicationCaseData caseData = getCaseData(true).copy()
                 .isGaRespondentOneLip(YES)
                 .parentClaimantIsApplicant(NO)
                 .ccdCaseReference(CASE_REFERENCE)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAID").build())
-                                          .paymentDetails(PaymentDetails.builder().status(
-                                              PaymentStatus.SUCCESS).build()).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee().setCode("PAID"))
+                                          .setPaymentDetails(new PaymentDetails().setStatus(
+                                              PaymentStatus.SUCCESS)))
                 .build();
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
+            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-lip-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 any(), eq("general-application-respondent-template-lip-id"), argumentCaptor.capture(), any()
             );
@@ -326,21 +331,24 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
         @Test
         void notificationSendShouldContainSolicitorEmailReferenceIfAdded() {
-            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
+            GeneralApplicationCaseData caseData = getCaseData(true).copy()
                 .emailPartyReference("Claimant Reference: ABC limited - Defendant Reference: Defendant Ltd")
                 .isGaRespondentOneLip(YES)
                 .ccdCaseReference(CASE_REFERENCE)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAID").build())
-                                          .paymentDetails(PaymentDetails.builder().status(
-                                              PaymentStatus.SUCCESS).build()).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee().setCode("PAID"))
+                                          .setPaymentDetails(new PaymentDetails().setStatus(
+                                              PaymentStatus.SUCCESS)))
                 .build();
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
+            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-lip-id");
+            mockNotificationsSignatureConfiguration();
 
             gaNotificationService.sendNotification(caseData);
             verify(notificationService, times(2)).sendMail(
@@ -352,24 +360,29 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
         @Test
         void notificationRespondentInWelshShouldSendIfGa_Lip_WithNoticeAndFeePaid() {
-            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
+            GeneralApplicationCaseData caseData = getCaseData(true).copy()
                 .isGaRespondentOneLip(YES)
                 .respondentBilingualLanguagePreference(YES)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAID").build())
-                                          .paymentDetails(PaymentDetails.builder().status(
-                                              PaymentStatus.SUCCESS).build()).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee().setCode("PAID"))
+                                          .setPaymentDetails(new PaymentDetails().setStatus(
+                                              PaymentStatus.SUCCESS)))
                 .build();
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
-            GeneralApplicationCaseData claimRespondentResponseLan = GeneralApplicationCaseData.builder().respondentBilingualLanguagePreference(YES)
+            GeneralApplicationCaseData claimRespondentResponseLan = new GeneralApplicationCaseData().respondentBilingualLanguagePreference(YES)
                 .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(
                     Language.BOTH.toString())).build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(claimRespondentResponseLan);
+            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh())
+                .thenReturn("general-application-respondent-welsh-template-lip-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 any(), eq("general-application-respondent-welsh-template-lip-id"), argumentCaptor.capture(), any()
             );
@@ -381,12 +394,17 @@ public class GeneralApplicationCreationNotificationServiceTest {
         void notificationShouldSendWhenInvoked() {
             GeneralApplicationCaseData caseData = getCaseData(true);
 
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
 
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
+            when(notificationsProperties.getGeneralApplicationRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 DUMMY_EMAIL,
                 "general-application-respondent-template-id",
@@ -399,13 +417,17 @@ public class GeneralApplicationCreationNotificationServiceTest {
         void notificationShouldSendWhenInvokedTwice() {
             GeneralApplicationCaseData caseData = getCaseData(true);
 
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
 
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
+            when(notificationsProperties.getGeneralApplicationRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-id");
+            mockNotificationsSignatureConfiguration();
 
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 any(),
                 any(),
@@ -459,11 +481,11 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                .email(DUMMY_EMAIL).organisationIdentifier("2").forename("LipF").surname(Optional.of("LipS")).build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("2").setForename("LipF").setSurname(Optional.of("LipS"));
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-                .email(DUMMY_EMAIL).organisationIdentifier("3").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+                .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("3");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
@@ -475,31 +497,25 @@ public class GeneralApplicationCreationNotificationServiceTest {
                     .claimant1PartyName("CL")
                     .defendant1PartyName("DEF")
                     .ccdCaseReference(CASE_REFERENCE)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                                  .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                                  .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                     .generalAppRespondentSolicitors(respondentSols)
-                    .businessProcess(BusinessProcess.builder().status(STARTED)
-                                         .processInstanceId(PROCESS_INSTANCE_ID).build())
-                    .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-                    .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                    .businessProcess(new BusinessProcess().setStatus(STARTED)
+                                         .setProcessInstanceId(PROCESS_INSTANCE_ID))
+                    .gaInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
+                    .gaUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
                     .parentClaimantIsApplicant(YES)
-                    .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                    .gaRespondentOrderAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
                     .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
                     .respondentSolicitor2EmailAddress(DUMMY_EMAIL)
-                    .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                      .organisation(Organisation.builder().organisationID("1").build())
-                                                      .build())
-                    .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                       .organisation(Organisation.builder().organisationID("2").build())
-                                                       .build())
-                    .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                       .organisation(Organisation.builder().organisationID("3").build())
-                                                       .build())
-                    .generalAppParentCaseLink(
-                        GeneralAppParentCaseLink
-                            .builder()
-                            .caseReference(CASE_REFERENCE.toString())
-                            .build())
+                    .applicant1OrganisationPolicy(new OrganisationPolicy()
+                                                      .setOrganisation(new Organisation().setOrganisationID("1")))
+                    .respondent1OrganisationPolicy(new OrganisationPolicy()
+                                                       .setOrganisation(new Organisation().setOrganisationID("2")))
+                    .respondent2OrganisationPolicy(new OrganisationPolicy()
+                                                       .setOrganisation(new Organisation().setOrganisationID("3")))
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                                  .setCaseReference(CASE_REFERENCE.toString()))
                     .generalAppDeadlineNotificationDate(DUMMY_DATE)
                     .build();
             } else {
@@ -508,31 +524,43 @@ public class GeneralApplicationCreationNotificationServiceTest {
                     .applicantPartyName("App")
                     .claimant1PartyName("CL")
                     .defendant1PartyName("DEF")
-                    .businessProcess(BusinessProcess.builder().status(STARTED)
-                                         .processInstanceId(PROCESS_INSTANCE_ID).build())
-                    .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
-                    .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                    .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                    .businessProcess(new BusinessProcess().setStatus(STARTED)
+                                         .setProcessInstanceId(PROCESS_INSTANCE_ID))
+                    .gaInformOtherParty(new GAInformOtherParty().setIsWithNotice(NO))
+                    .gaUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                    .gaRespondentOrderAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
                     .ccdCaseReference(CASE_REFERENCE)
                     .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
                     .respondentSolicitor2EmailAddress(DUMMY_EMAIL)
-                    .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                      .organisation(Organisation.builder().organisationID("1").build())
-                                                      .build())
-                    .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                       .organisation(Organisation.builder().organisationID("2").build())
-                                                       .build())
-                    .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                       .organisation(Organisation.builder().organisationID("3").build())
-                                                       .build())
-                    .generalAppParentCaseLink(
-                        GeneralAppParentCaseLink
-                            .builder()
-                            .caseReference(CASE_REFERENCE.toString())
-                            .build())
+                    .applicant1OrganisationPolicy(new OrganisationPolicy()
+                                                      .setOrganisation(new Organisation().setOrganisationID("1")))
+                    .respondent1OrganisationPolicy(new OrganisationPolicy()
+                                                       .setOrganisation(new Organisation().setOrganisationID("2")))
+                    .respondent2OrganisationPolicy(new OrganisationPolicy()
+                                                       .setOrganisation(new Organisation().setOrganisationID("3")))
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                                  .setCaseReference(CASE_REFERENCE.toString()))
                     .generalAppDeadlineNotificationDate(DUMMY_DATE)
                     .build();
             }
         }
+    }
+
+    private void mockNotificationsSignatureConfiguration() {
+        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                             + "\n For all other matters, call 0300 123 7050");
+        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+        when(configuration.getWelshContact()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
+        when(configuration.getSpecContact()).thenReturn("Email: contactocmc@justice.gov.uk");
+        when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
+        when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
+        when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+    }
+
+    private OngoingStubbing<GeneralApplicationCaseData> getGeneralApplicationCaseDataOngoingStubbing(GeneralApplicationCaseData caseData) {
+        return when(solicitorEmailValidation
+                        .validateSolicitorEmail(any(), any()))
+            .thenReturn(caseData);
     }
 }

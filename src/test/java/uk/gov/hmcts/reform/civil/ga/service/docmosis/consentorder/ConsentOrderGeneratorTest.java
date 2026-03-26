@@ -61,10 +61,7 @@ class ConsentOrderGeneratorTest {
     @Test
     void shouldThrowExceptionWhenNoLocationMatch() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().consentOrderApplication()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .siteName("County Court")
-                                        .baseLocation("8")
-                                        .region("4").build()).build();
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("County Court").setBaseLocation("8").setRegion("4")).build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(CONSENT_ORDER_FORM)))
             .thenReturn(new DocmosisDocument(CONSENT_ORDER_FORM.getDocumentTitle(), bytes));
@@ -87,7 +84,7 @@ class ConsentOrderGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(CONSENT_ORDER_FORM)))
             .thenReturn(new DocmosisDocument(CONSENT_ORDER_FORM.getDocumentTitle(), bytes));
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
         consentOrderGenerator.generate(caseData, BEARER_TOKEN);
 
         verify(documentManagementService).uploadDocument(
@@ -102,11 +99,11 @@ class ConsentOrderGeneratorTest {
 
     @Test
     void whenCaseWorkerMakeDecision_ShouldGetConsentOrderData() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().consentOrderApplication().build().toBuilder().isMultiParty(
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().consentOrderApplication().build().copy().isMultiParty(
                 YES)
             .build();
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
         var templateData = consentOrderGenerator.getTemplateData(caseData, "auth");
         assertThatFieldsAreCorrect_GeneralOrder(templateData, caseData);
     }
@@ -133,14 +130,14 @@ class ConsentOrderGeneratorTest {
 
     @Test
     void whenCaseWorkerMakeDecision_ShouldGetConsentOrderData_1v1() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().consentOrderApplication().build().toBuilder()
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().consentOrderApplication().build().copy()
             .defendant2PartyName(null)
             .claimant2PartyName(null)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
             .isMultiParty(NO)
             .build();
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Manchester").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Manchester"));
         var templateData = consentOrderGenerator.getTemplateData(caseData, "auth");
         assertThatFieldsAreCorrect_GeneralOrder_1v1(templateData, caseData);
     }

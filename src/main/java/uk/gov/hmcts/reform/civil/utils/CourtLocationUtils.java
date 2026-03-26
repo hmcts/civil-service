@@ -9,9 +9,22 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static java.util.Objects.isNull;
 
 @Component
 public class CourtLocationUtils {
+
+    public LocationRefData fillPreferredLocationData(final List<LocationRefData> locations,
+                                                            DynamicList hearingLocation) {
+        if (locations.isEmpty() || isNull(hearingLocation) || isNull(hearingLocation.getValue())) {
+            return null;
+        }
+        String locationLabel = hearingLocation.getValue().getLabel();
+        return locations.stream()
+            .filter(locationRefData -> checkLocation(locationRefData, locationLabel))
+            .findFirst()
+            .orElse(null);
+    }
 
     public DynamicList getLocationsFromList(final List<LocationRefData> locations) {
         return fromList(locations.stream()

@@ -96,12 +96,12 @@ class JudgeOrderDownloadGeneratorTest {
         .documentType(JUDGE_FINAL_ORDER)
         .build();
 
-    private static LocationRefData locationRefData = LocationRefData.builder().siteName("SiteName")
-        .courtAddress("1").postcode("1")
-        .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-        .externalShortName("ExternalShortName")
-        .courtTypeId("10").courtLocationCode("121")
-        .epimmsId("000000").build();
+    private static LocationRefData locationRefData = new LocationRefData().setSiteName("SiteName")
+        .setCourtAddress("1").setPostcode("1")
+        .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
+        .setExternalShortName("ExternalShortName")
+        .setCourtTypeId("10").setCourtLocationCode("121")
+        .setEpimmsId("000000");
 
     @InjectMocks
     JudgeOrderDownloadGenerator judgeOrderDownloadGenerator;
@@ -130,9 +130,7 @@ class JudgeOrderDownloadGeneratorTest {
     void getDownloadTemplate(String templateToUse) {
         if (templateToUse.equals(BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING)) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.dynamicElement(templateToUse))
-                                                       .build())
+                .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement.dynamicElement(templateToUse)))
                 .orderAfterHearingDate(new OrderAfterHearingDate()
                                            .setDateType(OrderAfterHearingDateType.BESPOKE_RANGE)
                                            .setBespokeDates("12-01-2025, 14-12-2024 to 19-12-2024"))
@@ -140,9 +138,7 @@ class JudgeOrderDownloadGeneratorTest {
             judgeOrderDownloadGenerator.getDownloadTemplate(caseData, "auth");
         } else {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.dynamicElement(templateToUse))
-                                                       .build())
+                .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement.dynamicElement(templateToUse)))
                 .build();
             judgeOrderDownloadGenerator.getDownloadTemplate(caseData, "auth");
         }
@@ -279,10 +275,8 @@ class JudgeOrderDownloadGeneratorTest {
                                                            .setAssignComplexityBand(YES)
                                                            .setBand(ComplexityBand.BAND_2)
                                                            .setReasons("important reasons"))
-            .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                   .value(DynamicListElement
-                                                              .dynamicElement("Blank template to be used before a hearing/box work"))
-                                                   .build())
+            .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement
+                                                              .dynamicElement("Blank template to be used before a hearing/box work")))
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
@@ -303,10 +297,8 @@ class JudgeOrderDownloadGeneratorTest {
             .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
             .finalOrderAllocateToTrack(YES)
             .finalOrderTrackAllocation(SMALL_CLAIM)
-            .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                   .value(DynamicListElement
-                                                              .dynamicElement("Blank template to be used before a hearing/box work"))
-                                                   .build())
+            .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement
+                                                              .dynamicElement("Blank template to be used before a hearing/box work")))
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
@@ -327,10 +319,8 @@ class JudgeOrderDownloadGeneratorTest {
             .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
             .finalOrderAllocateToTrack(YES)
             .finalOrderTrackAllocation(SMALL_CLAIM)
-            .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                   .value(DynamicListElement
-                                                              .dynamicElement("Blank template to be used after a hearing"))
-                                                   .build())
+            .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement
+                                                              .dynamicElement("Blank template to be used after a hearing")))
             .orderAfterHearingDate(new OrderAfterHearingDate()
                                        .setDateType(OrderAfterHearingDateType.BESPOKE_RANGE)
                                        .setBespokeDates("12-01-2025, 14-12-2024 to 19-12-2024"))
@@ -358,10 +348,8 @@ class JudgeOrderDownloadGeneratorTest {
                                                            .setAssignComplexityBand(YES)
                                                            .setBand(ComplexityBand.BAND_2)
                                                            .setReasons("important reasons"))
-            .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                   .value(DynamicListElement
-                                                              .dynamicElement("Fix a date for CMC"))
-                                                   .build())
+            .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement
+                                                              .dynamicElement("Fix a date for CMC")))
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
@@ -382,10 +370,8 @@ class JudgeOrderDownloadGeneratorTest {
             .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
             .finalOrderAllocateToTrack(YES)
             .finalOrderTrackAllocation(MULTI_CLAIM)
-            .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                   .value(DynamicListElement
-                                                              .dynamicElement("Fix a date for CCMC"))
-                                                   .build())
+            .finalOrderDownloadTemplateOptions(new DynamicList().setValue(DynamicListElement
+                                                              .dynamicElement("Fix a date for CCMC")))
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);

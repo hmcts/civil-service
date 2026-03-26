@@ -94,7 +94,7 @@ class DefaultJudgmentFormGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .build();
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
@@ -119,7 +119,7 @@ class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .hwfFeeType(FeeType.CLAIMISSUED)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .claimIssuedHwfDetails(new HelpWithFeesDetails().setOutstandingFeeInPounds(BigDecimal.valueOf(1)))
             .atStateNotificationAcknowledged()
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
@@ -148,7 +148,7 @@ class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .hwfFeeType(FeeType.CLAIMISSUED)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .claimIssuedHwfDetails(new HelpWithFeesDetails().setOutstandingFeeInPounds(BigDecimal.ZERO))
             .atStateNotificationAcknowledged()
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
@@ -178,7 +178,7 @@ class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .totalClaimAmount(new BigDecimal(2000))
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .caseDataLiP(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.NO)))
@@ -206,10 +206,10 @@ class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .totalClaimAmount(new BigDecimal(2000))
-            .fixedCosts(FixedCosts.builder()
-                .claimFixedCosts(YesOrNo.YES)
-                .fixedCostAmount("10000")
-                .build())
+            .fixedCosts(new FixedCosts()
+                .setClaimFixedCosts(YesOrNo.YES)
+                .setFixedCostAmount("10000")
+                )
             .claimFixedCostsOnEntryDJ(YesOrNo.NO)
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .caseDataLiP(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.NO)))
@@ -236,10 +236,10 @@ class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .totalClaimAmount(new BigDecimal(2000))
-            .fixedCosts(FixedCosts.builder()
-                .claimFixedCosts(YesOrNo.YES)
-                .fixedCostAmount("10000")
-                .build())
+            .fixedCosts(new FixedCosts()
+                .setClaimFixedCosts(YesOrNo.YES)
+                .setFixedCostAmount("10000")
+                )
             .claimFixedCostsOnEntryDJ(YesOrNo.YES)
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .caseDataLiP(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.NO)))
@@ -267,7 +267,7 @@ class DefaultJudgmentFormGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors()
             .totalClaimAmount(new BigDecimal(2000))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .build();
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
@@ -290,7 +290,7 @@ class DefaultJudgmentFormGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors()
             .totalClaimAmount(new BigDecimal(2000))
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .build();
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 

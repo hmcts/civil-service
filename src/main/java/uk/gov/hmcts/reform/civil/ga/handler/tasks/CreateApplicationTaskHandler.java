@@ -92,10 +92,9 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                                                               coreCaseDataService.caseDataContentFromStartEventResponse(
                                                                   startEventResponse,
                                                                   caseData.toMap(mapper)));
-        return ExternalTaskData.builder()
-            .parentCaseData(parentCaseData)
-            .updateGeneralApplicationCaseData(generalAppCaseData)
-            .build();
+        return new ExternalTaskData()
+            .setParentCaseData(parentCaseData)
+            .setUpdateGeneralApplicationCaseData(generalAppCaseData);
     }
 
     private GeneralApplicationCaseData withoutNoticeNoConsent(GeneralApplication generalApplication,
@@ -171,7 +170,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
             }
         }
 
-        return caseData.toBuilder()
+        return caseData.copy()
             .claimantGaAppDetails(applications)
             .respondentSolGaAppDetails(respondentSpecficGADetails)
             .respondentSolTwoGaAppDetails(respondentTwoSpecficGADetails)
@@ -183,17 +182,14 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         List<GeneralApplicationTypes> types = generalApplication.getGeneralAppType().getTypes();
         String collect = types.stream().map(GeneralApplicationTypes::getDisplayedValue)
             .collect(Collectors.joining(", "));
-        GeneralApplicationsDetails gaDetails = GeneralApplicationsDetails.builder()
-            .generalApplicationType(collect)
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(CaseLink.builder().caseReference(String.valueOf(
-                generalAppCaseData.getCcdCaseReference())).build())
-            .caseState(PENDING_APPLICATION_ISSUED.getDisplayedValue())
-            .build();
+        GeneralApplicationsDetails gaDetails = new GeneralApplicationsDetails()
+            .setGeneralApplicationType(collect)
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(new CaseLink(String.valueOf(generalAppCaseData.getCcdCaseReference())))
+            .setCaseState(PENDING_APPLICATION_ISSUED.getDisplayedValue());
 
-        return gaDetails.toBuilder()
-            .parentClaimantIsApplicant(generalApplication.getParentClaimantIsApplicant())
-            .build();
+        gaDetails.setParentClaimantIsApplicant(generalApplication.getParentClaimantIsApplicant());
+        return gaDetails;
     }
 
     private GADetailsRespondentSol buildRespApplication(GeneralApplication generalApplication,
@@ -202,17 +198,14 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         String collect = types.stream().map(GeneralApplicationTypes::getDisplayedValue)
             .collect(Collectors.joining(", "));
 
-        GADetailsRespondentSol gaRespondentDetails = GADetailsRespondentSol.builder()
-            .generalApplicationType(collect)
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(CaseLink.builder().caseReference(String.valueOf(
-                generalAppCaseData.getCcdCaseReference())).build())
-            .caseState(PENDING_APPLICATION_ISSUED.getDisplayedValue())
-            .build();
+        GADetailsRespondentSol gaRespondentDetails = new GADetailsRespondentSol()
+            .setGeneralApplicationType(collect)
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(new CaseLink(String.valueOf(generalAppCaseData.getCcdCaseReference())))
+            .setCaseState(PENDING_APPLICATION_ISSUED.getDisplayedValue());
 
-        return gaRespondentDetails.toBuilder()
-            .parentClaimantIsApplicant(generalApplication.getParentClaimantIsApplicant())
-            .build();
+        gaRespondentDetails.setParentClaimantIsApplicant(generalApplication.getParentClaimantIsApplicant());
+        return gaRespondentDetails;
     }
 
     private List<Element<GeneralApplicationsDetails>> addApplication(GeneralApplicationsDetails application,
@@ -243,8 +236,8 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         generalApplication.setGeneralAppN245FormUpload(null);
         generalApplication.getBusinessProcess().setCamundaEvent(variables.getCaseEvent().name());
         if (generalAppCaseData != null && generalAppCaseData.getCcdCaseReference() != null) {
-            generalApplication.setCaseLink(CaseLink.builder().caseReference(String.valueOf(
-                generalAppCaseData.getCcdCaseReference())).build());
+            generalApplication.setCaseLink(new CaseLink(String.valueOf(
+                generalAppCaseData.getCcdCaseReference())));
         }
     }
 

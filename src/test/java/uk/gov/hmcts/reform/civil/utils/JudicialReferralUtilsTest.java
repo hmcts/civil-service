@@ -40,9 +40,8 @@ public class JudicialReferralUtilsTest {
     public void testShouldMoveToJudicialReferralForUnspecClaim() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .claimValue(ClaimValue.builder()
-                            .statementOfValueInPennies(BigDecimal.valueOf(10000_00))
-                            .build())
+            .claimValue(new ClaimValue()
+                            .setStatementOfValueInPennies(BigDecimal.valueOf(10000_00)))
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .build();
 
@@ -54,9 +53,8 @@ public class JudicialReferralUtilsTest {
     public void testShouldMoveToJudicialReferralForUnspecMultiClaimMintiEnabled() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .claimValue(ClaimValue.builder()
-                            .statementOfValueInPennies(BigDecimal.valueOf(100000000))
-                            .build())
+            .claimValue(new ClaimValue()
+                            .setStatementOfValueInPennies(BigDecimal.valueOf(100000000)))
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .build();
 
@@ -68,9 +66,8 @@ public class JudicialReferralUtilsTest {
     public void testShouldNotMoveToJudicialReferralForUnspecMultiClaimMintiNotEnabled() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .claimValue(ClaimValue.builder()
-                            .statementOfValueInPennies(BigDecimal.valueOf(100000000))
-                            .build())
+            .claimValue(new ClaimValue()
+                            .setStatementOfValueInPennies(BigDecimal.valueOf(100000000)))
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .build();
 

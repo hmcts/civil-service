@@ -82,9 +82,9 @@ public class DefaultJudgmentUtilsTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .addRespondent2(YesOrNo.NO)
             .claimFixedCostsOnEntryDJ(YesOrNo.YES)
-            .fixedCosts(FixedCosts.builder()
-                            .fixedCostAmount("10000")
-                            .build()).build();
+            .fixedCosts(new FixedCosts()
+                            .setFixedCostAmount("10000")
+                            ).build();
         BigDecimal result = calculateFixedCostsOnEntry(caseData, new BigDecimal(5001));
         assertThat(result).isEqualTo(MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
             Integer.parseInt("13000"))));
@@ -95,9 +95,9 @@ public class DefaultJudgmentUtilsTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .addRespondent2(YesOrNo.NO)
             .claimFixedCostsOnEntryDJ(YesOrNo.YES)
-            .fixedCosts(FixedCosts.builder()
-                            .fixedCostAmount("10000")
-                            .build()).build();
+            .fixedCosts(new FixedCosts()
+                            .setFixedCostAmount("10000")
+                            ).build();
         BigDecimal result = calculateFixedCostsOnEntry(caseData, new BigDecimal(5000));
         assertThat(result).isEqualTo(MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
             Integer.parseInt("12200"))));
@@ -108,9 +108,9 @@ public class DefaultJudgmentUtilsTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .addRespondent2(YesOrNo.NO)
             .claimFixedCostsOnEntryDJ(YesOrNo.YES)
-            .fixedCosts(FixedCosts.builder()
-                            .fixedCostAmount("10000")
-                            .build()).build();
+            .fixedCosts(new FixedCosts()
+                            .setFixedCostAmount("10000")
+                            ).build();
         BigDecimal result = calculateFixedCostsOnEntry(caseData, new BigDecimal(25));
         assertThat(result).isEqualTo(MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
             Integer.parseInt("10000"))));

@@ -5,10 +5,11 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,39 +35,34 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_SCHEDULER_CHECK_UNLESS_ORDER_DEADLINE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.ORDER_MADE;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_FROM_SANCTIONS;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.UNLESS_ORDER;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    CheckUnlessOrderDeadlineEndTaskHandler.class})
+@ExtendWith(MockitoExtension.class)
 public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
 
-    @MockBean
+    @Mock
     private ExternalTask externalTask;
 
-    @MockBean
+    @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private CaseStateSearchService searchService;
 
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @Autowired
+    @InjectMocks
     private CheckUnlessOrderDeadlineEndTaskHandler gaUnlessOrderMadeTaskHandler;
 
-    @Autowired
-    private ObjectMapper mapper;
+    @Spy
+    private ObjectMapper mapper = ObjectMapperFactory.instance();
 
     private CaseDetails caseDetailsWithTodayDeadlineNotProcessed;
     private CaseDetails caseDetailsWithTodayDeadlineProcessed;
-    private CaseDetails caseDetailsWithTodayDeadlineReliefFromSanctionOrder;
     private CaseDetails caseDetailsWithDeadlineCrossedNotProcessed;
     private CaseDetails caseDetailsWithDeadlineCrossedProcessed;
     private CaseDetails caseDetailsWithTodayDeadLineWithOrderProcessedNull;
@@ -75,7 +72,6 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
     private GeneralApplicationCaseData caseDataWithDeadlineCrossedNotProcessed;
     private GeneralApplicationCaseData caseDataWithTodayDeadlineNotProcessed;
     private GeneralApplicationCaseData caseDataWithTodayDeadlineProcessed;
-    private GeneralApplicationCaseData caseDataWithTodayDeadlineReliefFromSanctionOrder;
     private GeneralApplicationCaseData caseDataWithDeadlineCrossedProcessed;
     private GeneralApplicationCaseData caseDataWithTodayDeadLineWithOrderProcessedNull;
     private GeneralApplicationCaseData caseDataWithNoDeadline;
@@ -96,11 +92,6 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
                                                                YesOrNo.YES);
         caseDataWithTodayDeadlineProcessed = getCaseData(1L, UNLESS_ORDER, deadLineToday,
                                                          YesOrNo.YES);
-
-        caseDetailsWithTodayDeadlineReliefFromSanctionOrder = getCaseDetails(2L, RELIEF_FROM_SANCTIONS,
-                                                                             deadLineToday, YesOrNo.NO);
-        caseDataWithTodayDeadlineReliefFromSanctionOrder = getCaseData(2L, RELIEF_FROM_SANCTIONS,
-                                                                       deadLineToday, YesOrNo.NO);
 
         caseDetailsWithDeadlineCrossedNotProcessed = getCaseDetails(3L, UNLESS_ORDER,
                                                                     deadlineCrossed, YesOrNo.NO);
@@ -250,27 +241,25 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
         return GeneralApplicationCaseDataBuilder.builder()
             .ccdCaseReference(ccdId)
             .ccdState(ORDER_MADE)
-            .generalAppType(GAApplicationType.builder().types(List.of(generalApplicationType)).build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .makeAnOrder(APPROVE_OR_EDIT)
-                                           .judgeRecitalText("Sample Text")
-                                           .judgeApproveEditOptionDateForUnlessOrder(deadline)
-                                           .reasonForDecisionText("Sample Test")
-                                           .isOrderProcessedByUnlessScheduler(isProcessed)
-                                           .build()).build();
+            .generalAppType(new GAApplicationType().setTypes(List.of(generalApplicationType)))
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setMakeAnOrder(APPROVE_OR_EDIT)
+                                           .setJudgeRecitalText("Sample Text")
+                                           .setJudgeApproveEditOptionDateForUnlessOrder(deadline)
+                                           .setReasonForDecisionText("Sample Test")
+                                           .setIsOrderProcessedByUnlessScheduler(isProcessed)).build();
     }
 
     private CaseDetails getCaseDetails(Long ccdId, GeneralApplicationTypes generalApplicationType,
                                        LocalDate deadline, YesOrNo isProcessed) {
         return CaseDetails.builder().id(ccdId).data(
-                Map.of("judicialDecisionMakeOrder", GAJudicialMakeAnOrder.builder()
-                           .makeAnOrder(APPROVE_OR_EDIT)
-                           .judgeRecitalText("Sample Text")
-                           .judgeApproveEditOptionDateForUnlessOrder(deadline)
-                           .reasonForDecisionText("Sample Test")
-                           .isOrderProcessedByUnlessScheduler(isProcessed)
-                           .build(),
-                       "generalAppType", GAApplicationType.builder().types(List.of(generalApplicationType)).build()))
+                Map.of("judicialDecisionMakeOrder", new GAJudicialMakeAnOrder()
+                           .setMakeAnOrder(APPROVE_OR_EDIT)
+                           .setJudgeRecitalText("Sample Text")
+                           .setJudgeApproveEditOptionDateForUnlessOrder(deadline)
+                           .setReasonForDecisionText("Sample Test")
+                           .setIsOrderProcessedByUnlessScheduler(isProcessed),
+                       "generalAppType", new GAApplicationType().setTypes(List.of(generalApplicationType))))
             .state(ORDER_MADE.toString()).build();
     }
 }

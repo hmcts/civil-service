@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.sdo.FastTrackVariable;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
@@ -24,11 +25,13 @@ class SdoFastTrackTemplateServiceTest {
     private final SdoFastTrackDirectionsService fastTrackDirectionsService = Mockito.mock(SdoFastTrackDirectionsService.class);
     private final SdoCaseClassificationService classificationService = new SdoCaseClassificationService();
     private final SdoFastTrackTemplateFieldService templateFieldService = Mockito.mock(SdoFastTrackTemplateFieldService.class);
+    private final FeatureToggleService featureToggleService = Mockito.mock(FeatureToggleService.class);
     private final SdoFastTrackTemplateService service = new SdoFastTrackTemplateService(
         locationHelper,
         classificationService,
         fastTrackDirectionsService,
-        templateFieldService
+        templateFieldService,
+        featureToggleService
     );
 
     @Test

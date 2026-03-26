@@ -50,7 +50,7 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     @BeforeEach
     void bareMinimumToMakeAPositiveRequest() {
         when(authorisationService.isServiceAuthorized(any())).thenReturn(true);
-        CaseData caseData = CaseData.builder().businessProcess(BusinessProcess.builder().processInstanceId("instance").camundaEvent("camunda event").build()).build();
+        CaseData caseData = CaseData.builder().businessProcess(new BusinessProcess().setProcessInstanceId("instance").setCamundaEvent("camunda event")).build();
         CaseDetails caseDetails = CaseDetails.builder().build();
         caseDetails.setData(caseData.toMap(objectMapper));
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
@@ -116,16 +116,15 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     }
 
     private ServiceRequestUpdateDto buildServiceDto() {
-        return ServiceRequestUpdateDto.builder()
-            .ccdCaseNumber(CCD_CASE_NUMBER)
-            .serviceRequestStatus(PAID)
-            .payment(PaymentDto.builder()
-                         .amount(new BigDecimal(167))
-                         .paymentReference(REFERENCE)
-                         .caseReference(REFERENCE)
-                         .accountNumber(ACCOUNT_NUMBER)
-                         .build())
-            .build();
+        return new ServiceRequestUpdateDto()
+            .setCcdCaseNumber(CCD_CASE_NUMBER)
+            .setServiceRequestStatus(PAID)
+            .setPayment(PaymentDto.builder()
+                .amount(new BigDecimal(167))
+                .paymentReference(REFERENCE)
+                .caseReference(REFERENCE)
+                .accountNumber(ACCOUNT_NUMBER)
+                .build());
     }
 
     @SneakyThrows

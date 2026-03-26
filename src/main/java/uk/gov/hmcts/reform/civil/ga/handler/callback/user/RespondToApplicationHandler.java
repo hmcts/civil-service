@@ -126,7 +126,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
 
     private AboutToStartOrSubmitCallbackResponse applicationValidation(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)
@@ -140,11 +140,9 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
 
         caseDataBuilder
             .hearingDetailsResp(
-                GAHearingDetails
-                    .builder()
-                    .hearingPreferredLocation(getLocationsFromList(locationRefDataService
-                                                                       .getCourtLocations(authToken)))
-                    .build());
+                new GAHearingDetails()
+                    .setHearingPreferredLocation(getLocationsFromList(locationRefDataService
+                                                                       .getCourtLocations(authToken))));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(applicationExistsValidation(callbackParams))
@@ -318,7 +316,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
 
         GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         UserInfo userInfo = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String userId = userInfo.getUid();
@@ -327,7 +325,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
 
         caseDataBuilder.respondentsResponses(respondentsResponses);
         caseDataBuilder.hearingDetailsResp(null); // Empty HearingDetails Respondent details as its added in the field RespondetsResponses collection
-        caseDataBuilder.generalAppRespondent1Representative(GARespondentRepresentative.builder().build());
+        caseDataBuilder.generalAppRespondent1Representative(new GARespondentRepresentative());
         caseDataBuilder.gaRespondentConsent(null);
         caseDataBuilder.generalAppRespondReason(null);
         caseDataBuilder.generalAppRespondConsentReason(null);
@@ -344,7 +342,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
             .build();
     }
 
-    private void addResponseDoc(GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder, GeneralApplicationCaseData caseData, String role) {
+    private void addResponseDoc(GeneralApplicationCaseData caseDataBuilder, GeneralApplicationCaseData caseData, String role) {
         List<Element<Document>> documents = caseData.getGeneralAppRespondDocument();
         if (Objects.isNull(documents)) {
             documents = caseData.getGeneralAppRespondConsentDocument();
@@ -369,14 +367,14 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
             Optional<DynamicListElement> first = dynamicLocationList.getListItems().stream()
                 .filter(l -> l.getLabel().equals(applicationLocationLabel)).findFirst();
             first.ifPresent(dynamicLocationList::setValue);
-            gaHearingDetailsResp = caseData.getHearingDetailsResp().toBuilder()
-                .respondentResponsePartyName(getRespondentResponsePartyName(caseData, userInfo))
-                .hearingPreferredLocation(dynamicLocationList).build();
+            gaHearingDetailsResp = caseData.getHearingDetailsResp().copy()
+                .setRespondentResponsePartyName(getRespondentResponsePartyName(caseData, userInfo))
+                .setHearingPreferredLocation(dynamicLocationList);
 
         } else {
-            gaHearingDetailsResp = caseData.getHearingDetailsResp().toBuilder()
-                .respondentResponsePartyName(getRespondentResponsePartyName(caseData, userInfo))
-                .hearingPreferredLocation(DynamicList.builder().build()).build();
+            gaHearingDetailsResp = caseData.getHearingDetailsResp().copy()
+                .setRespondentResponsePartyName(getRespondentResponsePartyName(caseData, userInfo))
+                .setHearingPreferredLocation(new DynamicList());
         }
         return gaHearingDetailsResp;
     }
@@ -449,7 +447,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
             generalOther = YES;
         }
 
-        GARespondentResponse.GARespondentResponseBuilder gaRespondentResponseBuilder = GARespondentResponse.builder();
+        GARespondentResponse gaRespondentResponse = new GARespondentResponse();
         String reason = caseData.getGeneralAppRespondReason();
         if (Objects.isNull(reason)) {
             reason = caseData.getGeneralAppRespondConsentReason();
@@ -457,16 +455,16 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
                 reason = getDebtorReason(caseData.getGaRespondentDebtorOffer());
             }
         }
-        gaRespondentResponseBuilder
-            .generalAppRespondent1Representative(caseData.getGeneralAppRespondent1Representative() == null
+        gaRespondentResponse
+            .setGeneralAppRespondent1Representative(caseData.getGeneralAppRespondent1Representative() == null
                                                      ? generalOther
                                                      : caseData.getGeneralAppRespondent1Representative()
                 .getGeneralAppRespondent1Representative())
-            .gaHearingDetails(populateHearingDetailsResp(caseData, userInfo))
-            .gaRespondentResponseReason(reason)
-            .gaRespondentDetails(userInfo.getUid()).build();
+            .setGaHearingDetails(populateHearingDetailsResp(caseData, userInfo))
+            .setGaRespondentResponseReason(reason)
+            .setGaRespondentDetails(userInfo.getUid());
 
-        return gaRespondentResponseBuilder.build();
+        return gaRespondentResponse;
     }
 
     private String getDebtorReason(GARespondentDebtorOfferGAspec gaRespondentDebtorOffer) {

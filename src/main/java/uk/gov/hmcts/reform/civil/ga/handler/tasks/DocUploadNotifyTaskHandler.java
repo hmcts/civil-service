@@ -32,7 +32,7 @@ public class DocUploadNotifyTaskHandler extends BaseExternalTaskHandler {
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
         cases.forEach(this::fireEventForStateChange);
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private void fireEventForStateChange(GeneralApplicationCaseData caseData) {

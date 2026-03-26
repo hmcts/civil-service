@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
@@ -74,7 +74,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     private FeatureToggleService toggleService;
 
     @MockBean
-    private SpecReferenceNumberRepository specReferenceNumberRepository;
+    private CasemanReferenceNumberRepository casemanReferenceNumberRepository;
 
     @MockBean
     private CaseFlagsInitialiser caseFlagInitialiser;
@@ -124,7 +124,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         private CallbackParams params;
         private CaseData caseData;
         private static final String DEFENDANT_EMAIL_ADDRESS = "defendantmail@hmcts.net";
-        private static final String DEFENDANT_PARTY_NAME = "ABC ABC";
+        private static final String DEFENDANT_PARTY_NAME = "Dave Indent";
         private static final String CLAIMANT_PARTY_NAME = "Clay Mint";
 
         private final LocalDateTime submittedDate = LocalDateTime.now();
@@ -134,7 +134,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData = CaseDataBuilder.builder().atStateClaimDraft().applicant1OrganisationPolicy(null).build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             given(time.now()).willReturn(submittedDate);
-            given(specReferenceNumberRepository.getSpecReferenceNumber()).willReturn(REFERENCE_NUMBER);
+            given(casemanReferenceNumberRepository.next("spec")).willReturn(REFERENCE_NUMBER);
             given(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).willReturn(submittedDate);
         }
 
@@ -195,8 +195,8 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getPartyName().equals(DEFENDANT_PARTY_NAME));
-            assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getType().equals(Party.Type.INDIVIDUAL));
+            assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getPartyName()).isEqualTo(DEFENDANT_PARTY_NAME);
+            assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getType()).isEqualTo(Party.Type.INDIVIDUAL);
             assertThat(updatedData.getAllPartyNames()).isEqualTo("Clay Mint V Dave Indent");
         }
 
@@ -218,7 +218,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetCaseManagementLocation() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().courtName("Court Name").regionId("2").epimmsId("420219").siteName("Civil National Business Centre").build());
+            locations.add(new LocationRefData().setCourtName("Court Name").setRegionId("2").setEpimmsId("420219").setSiteName("Civil National Business Centre"));
             when(locationReferenceDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(locations);
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())

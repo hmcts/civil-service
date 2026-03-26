@@ -64,9 +64,9 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventProcessorTest {
         CaseData updated = caseData.toBuilder()
             .ccdCaseReference(CASE_ID)
             .totalClaimAmount(BigDecimal.valueOf(124.67))
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
-                .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                .setWhenWillThisAmountBePaid(whenWillThisAmountBePaid)
+            )
             .build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(updated).build();
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
@@ -85,7 +85,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventProcessorTest {
             AUTH_TOKEN,
             DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT,
             CASE_ID.toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 }

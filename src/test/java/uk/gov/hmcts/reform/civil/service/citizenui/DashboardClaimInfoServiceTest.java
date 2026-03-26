@@ -125,38 +125,30 @@ public class DashboardClaimInfoServiceTest {
         given(coreCaseDataService.getCCDClaimsForLipDefendant(any(), eq(0))).willReturn(searchResult);
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
-                            .applicant1(Party.builder()
-                                            .individualFirstName("Harry")
-                                            .individualLastName("Porter")
-                                            .type(Party.Type.INDIVIDUAL)
-                                            .build())
-                            .respondent1(Party.builder()
-                                             .individualFirstName("James")
-                                             .individualLastName("Bond")
-                                             .type(Party.Type.INDIVIDUAL)
-                                             .build())
-                            .claimValue(ClaimValue
-                                            .builder()
-                                            .statementOfValueInPennies(new BigDecimal("100000"))
-                                            .build())
+                            .applicant1(new Party()
+                                            .setIndividualFirstName("Harry")
+                                            .setIndividualLastName("Porter")
+                                            .setType(Party.Type.INDIVIDUAL))
+                            .respondent1(new Party()
+                                             .setIndividualFirstName("James")
+                                             .setIndividualLastName("Bond")
+                                             .setType(Party.Type.INDIVIDUAL))
+                            .claimValue(new ClaimValue()
+                                            .setStatementOfValueInPennies(new BigDecimal("100000")))
                             .build());
 
         given(caseDetailsConverter.toCaseData(CASE_DETAILS_2))
             .willReturn(CaseData.builder()
-                            .applicant1(Party.builder()
-                                            .individualFirstName("Tom")
-                                            .individualLastName("Cruise")
-                                            .type(Party.Type.INDIVIDUAL)
-                                            .build())
-                            .respondent1(Party.builder()
-                                             .individualFirstName("Jackie")
-                                             .individualLastName("Chan")
-                                             .type(Party.Type.INDIVIDUAL)
-                                             .build())
-                            .claimValue(ClaimValue
-                                            .builder()
-                                            .statementOfValueInPennies(new BigDecimal("100000"))
-                                            .build())
+                            .applicant1(new Party()
+                                            .setIndividualFirstName("Tom")
+                                            .setIndividualLastName("Cruise")
+                                            .setType(Party.Type.INDIVIDUAL))
+                            .respondent1(new Party()
+                                             .setIndividualFirstName("Jackie")
+                                             .setIndividualLastName("Chan")
+                                             .setType(Party.Type.INDIVIDUAL))
+                            .claimValue(new ClaimValue()
+                                            .setStatementOfValueInPennies(new BigDecimal("100000")))
                             .build());
     }
 
@@ -206,22 +198,18 @@ public class DashboardClaimInfoServiceTest {
     @Test
     void shouldIncludeResponseDeadlineIfItExists() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS)).willReturn(CaseData.builder()
-                                                                            .applicant1(Party.builder()
-                                                                                            .individualFirstName("Harry")
-                                                                                            .individualLastName("Porter")
-                                                                                            .type(Party.Type.INDIVIDUAL)
-                                                                                            .build())
-                                                                            .respondent1(Party.builder()
-                                                                                             .individualFirstName(
+                                                                            .applicant1(new Party()
+                                                                                            .setIndividualFirstName("Harry")
+                                                                                            .setIndividualLastName("Porter")
+                                                                                            .setType(Party.Type.INDIVIDUAL))
+                                                                            .respondent1(new Party()
+                                                                                             .setIndividualFirstName(
                                                                                                  "James")
-                                                                                             .individualLastName("Bond")
-                                                                                             .type(Party.Type.INDIVIDUAL)
-                                                                                             .build())
-                                                                            .claimValue(ClaimValue
-                                                                                            .builder()
-                                                                                            .statementOfValueInPennies(
-                                                                                                new BigDecimal("100000"))
-                                                                                            .build())
+                                                                                             .setIndividualLastName("Bond")
+                                                                                             .setType(Party.Type.INDIVIDUAL))
+                                                                            .claimValue(new ClaimValue()
+                                                                                            .setStatementOfValueInPennies(
+                                                                                                new BigDecimal("100000")))
                                                                             .respondent1ResponseDeadline(DATE_IN_2025)
                                                                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
@@ -237,26 +225,21 @@ public class DashboardClaimInfoServiceTest {
     void shouldIncludePaymentDateWhenItExists() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
-                            .applicant1(Party.builder()
-                                            .individualFirstName("Harry")
-                                            .individualLastName("Porter")
-                                            .type(Party.Type.INDIVIDUAL)
-                                            .build())
-                            .respondent1(Party.builder()
-                                             .individualFirstName(
+                            .applicant1(new Party()
+                                            .setIndividualFirstName("Harry")
+                                            .setIndividualLastName("Porter")
+                                            .setType(Party.Type.INDIVIDUAL))
+                            .respondent1(new Party()
+                                             .setIndividualFirstName(
                                                  "James")
-                                             .individualLastName("Bond")
-                                             .type(Party.Type.INDIVIDUAL)
-                                             .build())
-                            .claimValue(ClaimValue
-                                            .builder()
-                                            .statementOfValueInPennies(
-                                                new BigDecimal("100000"))
-                                            .build())
+                                             .setIndividualLastName("Bond")
+                                             .setType(Party.Type.INDIVIDUAL))
+                            .claimValue(new ClaimValue()
+                                            .setStatementOfValueInPennies(
+                                                new BigDecimal("100000")))
                             .respondToClaimAdmitPartLRspec(
-                                RespondToClaimAdmitPartLRspec
-                                    .builder()
-                                    .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
+                                new RespondToClaimAdmitPartLRspec()
+                                    .setWhenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
@@ -271,17 +254,15 @@ public class DashboardClaimInfoServiceTest {
     void shouldIncludeCcjCreationDateDateWhenItExists() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
-                            .applicant1(Party.builder()
-                                            .individualFirstName("Harry")
-                                            .individualLastName("Porter")
-                                            .type(Party.Type.INDIVIDUAL)
-                                            .build())
-                            .respondent1(Party.builder()
-                                             .individualFirstName(
+                            .applicant1(new Party()
+                                            .setIndividualFirstName("Harry")
+                                            .setIndividualLastName("Porter")
+                                            .setType(Party.Type.INDIVIDUAL))
+                            .respondent1(new Party()
+                                             .setIndividualFirstName(
                                                  "James")
-                                             .individualLastName("Bond")
-                                             .type(Party.Type.INDIVIDUAL)
-                                             .build())
+                                             .setIndividualLastName("Bond")
+                                             .setType(Party.Type.INDIVIDUAL))
                             .activeJudgment(new JudgmentDetails().setType(JudgmentType.DEFAULT_JUDGMENT)
                                             .setCreatedTimestamp(DATE_IN_2025))
                             .build());
@@ -298,24 +279,21 @@ public class DashboardClaimInfoServiceTest {
     void shouldIncludeCcjCreationDateDateForCcjJourneyWhenActiveJudgmentNotExist() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
-                            .applicant1(Party.builder()
-                                            .individualFirstName("Harry")
-                                            .individualLastName("Porter")
-                                            .type(Party.Type.INDIVIDUAL)
-                                            .build())
-                            .respondent1(Party.builder()
-                                             .individualFirstName(
+                            .applicant1(new Party()
+                                            .setIndividualFirstName("Harry")
+                                            .setIndividualLastName("Porter")
+                                            .setType(Party.Type.INDIVIDUAL))
+                            .respondent1(new Party()
+                                             .setIndividualFirstName(
                                                  "James")
-                                             .individualLastName("Bond")
-                                             .type(Party.Type.INDIVIDUAL)
-                                             .build())
+                                             .setIndividualLastName("Bond")
+                                             .setType(Party.Type.INDIVIDUAL))
                             .applicant1ResponseDate(DATE_IN_2025)
                             .caseDataLiP(new CaseDataLiP()
                                              .setApplicant1LiPResponse(new ClaimantLiPResponse()
                                                                         .setApplicant1ChoosesHowToProceed(REQUEST_A_CCJ)))
-                            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                                                   .ccjPaymentPaidSomeOption(YesOrNo.NO)
-                                                   .build())
+                            .ccjPaymentDetails(new CCJPaymentDetails()
+                                                   .setCcjPaymentPaidSomeOption(YesOrNo.NO))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
@@ -330,27 +308,22 @@ public class DashboardClaimInfoServiceTest {
     void shouldGetThePartPaymentImmediateValue() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
-                            .applicant1(Party.builder()
-                                            .individualFirstName("Harry")
-                                            .individualLastName("Porter")
-                                            .type(Party.Type.INDIVIDUAL)
-                                            .build())
-                            .respondent1(Party.builder()
-                                             .individualFirstName(
+                            .applicant1(new Party()
+                                            .setIndividualFirstName("Harry")
+                                            .setIndividualLastName("Porter")
+                                            .setType(Party.Type.INDIVIDUAL))
+                            .respondent1(new Party()
+                                             .setIndividualFirstName(
                                                  "James")
-                                             .individualLastName("Bond")
-                                             .type(Party.Type.INDIVIDUAL)
-                                             .build())
-                            .claimValue(ClaimValue
-                                            .builder()
-                                            .statementOfValueInPennies(
-                                                new BigDecimal("100000"))
-                                            .build())
+                                             .setIndividualLastName("Bond")
+                                             .setType(Party.Type.INDIVIDUAL))
+                            .claimValue(new ClaimValue()
+                                            .setStatementOfValueInPennies(
+                                                new BigDecimal("100000")))
                             .respondToAdmittedClaimOwingAmountPounds(PART_ADMIT_PAY_IMMEDIATELY_AMOUNT)
                             .respondToClaimAdmitPartLRspec(
-                                RespondToClaimAdmitPartLRspec
-                                    .builder()
-                                    .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
+                                new RespondToClaimAdmitPartLRspec()
+                                    .setWhenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
@@ -485,9 +458,8 @@ public class DashboardClaimInfoServiceTest {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
                             .defaultJudgmentDocuments(List.of(
-                                Element.<CaseDocument>builder()
-                                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
-                                               .createdDatetime(LocalDateTime.now()).build()).build()))
+                                new Element<CaseDocument>().setValue(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
+                                               .setCreatedDatetime(LocalDateTime.now()))))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",

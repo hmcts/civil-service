@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
@@ -13,7 +12,6 @@ import uk.gov.hmcts.reform.civil.utils.ObjectUtils;
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.joinNonNull;
 
 @Data
-@Builder(toBuilder = true)
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -84,14 +82,14 @@ public class Address {
 
     @JsonIgnore
     public static Address fromContactInformation(ContactInformation contactInformation) {
-        return Address.builder()
-            .addressLine1(contactInformation.getAddressLine1())
-            .addressLine2(contactInformation.getAddressLine2())
-            .addressLine3(contactInformation.getAddressLine3())
-            .postTown(contactInformation.getTownCity())
-            .county(contactInformation.getCounty())
-            .country(contactInformation.getCountry())
-            .postCode(contactInformation.getPostCode())
-            .build();
+        return new Address(
+            contactInformation.getAddressLine1(),
+            contactInformation.getAddressLine2(),
+            contactInformation.getAddressLine3(),
+            contactInformation.getTownCity(),
+            contactInformation.getCounty(),
+            contactInformation.getCountry(),
+            contactInformation.getPostCode()
+        );
     }
 }

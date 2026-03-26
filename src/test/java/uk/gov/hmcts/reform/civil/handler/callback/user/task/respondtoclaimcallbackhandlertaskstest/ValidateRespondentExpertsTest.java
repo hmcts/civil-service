@@ -62,10 +62,9 @@ class ValidateRespondentExpertsTest {
             .respondent1DQ(respondent1DQ)
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateRespondentExperts.execute(callbackParams);
@@ -89,10 +88,9 @@ class ValidateRespondentExpertsTest {
             .respondent1DQ(respondent1DQ)
             .build();
         caseData.setCcdCaseReference(1234L);
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -120,10 +118,9 @@ class ValidateRespondentExpertsTest {
             .build();
         caseData.setCcdCaseReference(1234L);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -152,10 +149,9 @@ class ValidateRespondentExpertsTest {
             .respondentResponseIsSame(NO)
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -181,10 +177,9 @@ class ValidateRespondentExpertsTest {
             .build();
         caseData.setCcdCaseReference(1234L);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());

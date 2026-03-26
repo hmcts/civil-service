@@ -47,7 +47,7 @@ public class CreateDashboardNotificationUploadTranslatedDocumentApplicantHandler
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build()))
+        assertThat(handler.camundaActivityId(new CallbackParams()))
             .isEqualTo("default");
     }
 
@@ -56,8 +56,8 @@ public class CreateDashboardNotificationUploadTranslatedDocumentApplicantHandler
 
         @Test
         void shouldRecordTranslatedDocUploadedScenario_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
+            caseData = caseData.copy().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -71,7 +71,7 @@ public class CreateDashboardNotificationUploadTranslatedDocumentApplicantHandler
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

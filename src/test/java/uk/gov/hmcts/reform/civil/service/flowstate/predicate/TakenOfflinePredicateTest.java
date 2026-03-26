@@ -189,9 +189,7 @@ class TakenOfflinePredicateTest {
     @Test
     void should_return_true_for_afterClaimNotified_when_claim_notified_and_options_not_both() {
         when(caseData.getClaimNotificationDate()).thenReturn(LocalDateTime.now());
-        DynamicList options = DynamicList.builder()
-            .value(DynamicListElement.builder().label("Solicitor 1").build())
-            .build();
+        DynamicList options = new DynamicList().setValue(new DynamicListElement().setLabel("Solicitor 1"));
         when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(options);
         assertTrue(TakenOfflinePredicate.afterClaimNotified.test(caseData));
     }
@@ -206,9 +204,7 @@ class TakenOfflinePredicateTest {
     @Test
     void should_return_false_for_afterClaimNotified_when_notify_options_both() {
         when(caseData.getClaimNotificationDate()).thenReturn(LocalDateTime.now());
-        DynamicList options = DynamicList.builder()
-            .value(DynamicListElement.builder().label("Both").build())
-            .build();
+        DynamicList options = new DynamicList().setValue(new DynamicListElement().setLabel("Both"));
         when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(options);
         assertFalse(TakenOfflinePredicate.afterClaimNotified.test(caseData));
     }
@@ -259,7 +255,7 @@ class TakenOfflinePredicateTest {
     void should_return_true_for_afterClaimNotifiedAckExtension_when_one_v_two_one_legal_rep_and_both_ack_and_extensions() {
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent2TimeExtensionDate()).thenReturn(LocalDateTime.now());
@@ -270,7 +266,7 @@ class TakenOfflinePredicateTest {
     void should_return_false_for_afterClaimNotifiedAckExtension_when_two_legal_rep_and_missing_r2_extension() {
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent2TimeExtensionDate()).thenReturn(null);
@@ -290,7 +286,7 @@ class TakenOfflinePredicateTest {
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1ResponseDate()).thenReturn(null);
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent2ResponseDate()).thenReturn(null);
@@ -310,7 +306,7 @@ class TakenOfflinePredicateTest {
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1ResponseDate()).thenReturn(null);
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent2ResponseDate()).thenReturn(null);
@@ -331,7 +327,7 @@ class TakenOfflinePredicateTest {
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1ResponseDate()).thenReturn(null);
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(null);
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent2ResponseDate()).thenReturn(null);
@@ -350,9 +346,7 @@ class TakenOfflinePredicateTest {
     @Test
     void should_return_true_for_afterNotifiedOptions_when_notified_and_options_not_both() {
         when(caseData.getClaimDetailsNotificationDate()).thenReturn(LocalDateTime.now());
-        DynamicList dynamicList = DynamicList.builder()
-            .value(DynamicListElement.builder().label("Solicitor 1").build())
-            .build();
+        DynamicList dynamicList = new DynamicList().setValue(new DynamicListElement().setLabel("Solicitor 1"));
         when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dynamicList);
         assertTrue(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
     }
@@ -374,9 +368,7 @@ class TakenOfflinePredicateTest {
     @Test
     void should_return_false_for_afterNotifiedOptions_when_notify_options_is_both() {
         when(caseData.getClaimDetailsNotificationDate()).thenReturn(LocalDateTime.now());
-        DynamicList dynamicList = DynamicList.builder()
-            .value(DynamicListElement.builder().label("Both").build())
-            .build();
+        DynamicList dynamicList = new DynamicList().setValue(new DynamicListElement().setLabel("Both"));
         when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dynamicList);
         assertFalse(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
     }
@@ -473,7 +465,7 @@ class TakenOfflinePredicateTest {
         when(caseData.getRespondent1ResponseDate()).thenReturn(null);
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(null);
         when(caseData.getClaimDismissedDate()).thenReturn(null);
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(null);
         when(caseData.getRespondent2ResponseDate()).thenReturn(null);
         when(caseData.getRespondent2TimeExtensionDate()).thenReturn(null);
@@ -487,7 +479,7 @@ class TakenOfflinePredicateTest {
         when(caseData.isLipCase()).thenReturn(true);
         when(caseData.getActiveJudgment()).thenReturn(mockedJudgmentDetails);
         when(caseData.getTakenOfflineDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getChangeOfRepresentation()).thenReturn(ChangeOfRepresentation.builder().build());
+        when(caseData.getChangeOfRepresentation()).thenReturn(new ChangeOfRepresentation());
         assertTrue(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA.test(caseData));
     }
 

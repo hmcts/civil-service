@@ -185,9 +185,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn(
                 RESPONDENT_MEDIATION_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
@@ -215,9 +215,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction()).thenReturn(
                 RESPONDENT_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -247,9 +247,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedInMediation()).thenReturn(
                 RESPONDENT_MEDIATION_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -282,9 +282,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedInMediation()).thenReturn(
                 RESPONDENT_MEDIATION_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -317,9 +317,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn(
                 RESPONDENT_LR_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -357,9 +357,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn(
                 RESPONDENT_LR_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
 
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
@@ -396,9 +396,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn(
                 RESPONDENT_LR_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
 
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
@@ -435,9 +435,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(
                 RESPONDENT_LR_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
 
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));

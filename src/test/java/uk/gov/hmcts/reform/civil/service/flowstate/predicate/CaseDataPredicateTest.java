@@ -362,13 +362,13 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_isMultiParty_when_applicant2_present() {
-            when(caseData.getApplicant2()).thenReturn(Party.builder().build());
+            when(caseData.getApplicant2()).thenReturn(new Party());
             assertTrue(CaseDataPredicate.Claim.isMultiParty.test(caseData));
         }
 
         @Test
         void should_return_true_for_isMultiParty_when_respondent2_present() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             assertTrue(CaseDataPredicate.Claim.isMultiParty.test(caseData));
         }
 
@@ -508,7 +508,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_isNotifyOptionsBoth_when_label_both() {
-            DynamicListElement element = DynamicListElement.builder().label("Both").build();
+            DynamicListElement element = new DynamicListElement().setLabel("Both");
             DynamicList list = new DynamicList(element, List.of(element));
             when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(list);
             assertTrue(CaseDataPredicate.Claim.isNotifyOptionsBoth.test(caseData));
@@ -516,7 +516,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_isNotifyOptionsBoth_when_label_not_both() {
-            DynamicListElement element = DynamicListElement.builder().label("Other").build();
+            DynamicListElement element = new DynamicListElement().setLabel("Other");
             DynamicList list = new DynamicList(element, List.of(element));
             when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(list);
             assertFalse(CaseDataPredicate.Claim.isNotifyOptionsBoth.test(caseData));
@@ -602,7 +602,7 @@ class CaseDataPredicateTest {
         @Test
         void should_return_true_for_hasNotifyOptionsBoth_when_label_both() {
             DynamicListElement value = DynamicListElement.dynamicElement("Both");
-            DynamicList dl = DynamicList.builder().value(value).listItems(List.of(value)).build();
+            DynamicList dl = new DynamicList().setValue(value).setListItems(List.of(value));
             when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dl);
             assertTrue(CaseDataPredicate.ClaimDetails.isNotifyOptionsBoth.test(caseData));
         }
@@ -610,7 +610,7 @@ class CaseDataPredicateTest {
         @Test
         void should_return_false_for_hasNotifyOptionsBoth_when_label_not_both() {
             DynamicListElement value = DynamicListElement.dynamicElement("Other");
-            DynamicList dl = DynamicList.builder().value(value).listItems(List.of(value)).build();
+            DynamicList dl = new DynamicList().setValue(value).setListItems(List.of(value));
             when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dl);
             assertFalse(CaseDataPredicate.ClaimDetails.isNotifyOptionsBoth.test(caseData));
         }
@@ -801,28 +801,28 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_isOneVTwoOneLegalRep_when_respondent2_present_and_same_legal_rep_yes() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
             assertTrue(CaseDataPredicate.MultiParty.isOneVTwoOneLegalRep.test(caseData));
         }
 
         @Test
         void should_return_false_for_isOneVTwoOneLegalRep_when_respondent2_present_and_same_legal_rep_no() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
             assertFalse(CaseDataPredicate.MultiParty.isOneVTwoOneLegalRep.test(caseData));
         }
 
         @Test
         void should_return_true_for_isOneVTwoTwoLegalRep_when_respondent2_present_and_same_legal_rep_no() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
             assertTrue(CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep.test(caseData));
         }
 
         @Test
         void should_return_false_for_isOneVTwoTwoLegalRep_when_respondent2_present_and_same_legal_rep_yes() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
             assertFalse(CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep.test(caseData));
         }
@@ -1040,7 +1040,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasRespondent2_when_present() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             assertTrue(CaseDataPredicate.Respondent.hasRespondent2.test(caseData));
         }
 
@@ -1477,9 +1477,9 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_claimIssuedPaymentSucceeded_when_status_success() {
-            PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.SUCCESS)
-                .build();
+            PaymentDetails pd = new PaymentDetails()
+                .setStatus(PaymentStatus.SUCCESS)
+                ;
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
             assertTrue(CaseDataPredicate.Payment.claimIssuedPaymentSucceeded.test(caseData));
         }
@@ -1492,9 +1492,9 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_claimIssuedPaymentSucceeded_when_payment_status_not_success() {
-            PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.FAILED)
-                .build();
+            PaymentDetails pd = new PaymentDetails()
+                .setStatus(PaymentStatus.FAILED)
+                ;
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
             assertFalse(CaseDataPredicate.Payment.claimIssuedPaymentSucceeded.test(caseData));
         }
@@ -1525,27 +1525,27 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_paymentDetailsFailed_when_status_failed() {
-            PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.FAILED)
-                .build();
+            PaymentDetails pd = new PaymentDetails()
+                .setStatus(PaymentStatus.FAILED)
+                ;
             when(caseData.getPaymentDetails()).thenReturn(pd);
             assertTrue(CaseDataPredicate.Payment.paymentDetailsFailed.test(caseData));
         }
 
         @Test
         void should_return_true_for_claimIssuedPaymentFailed_when_status_failed() {
-            PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.FAILED)
-                .build();
+            PaymentDetails pd = new PaymentDetails()
+                .setStatus(PaymentStatus.FAILED)
+                ;
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
             assertTrue(CaseDataPredicate.Payment.claimIssuedPaymentFailed.test(caseData));
         }
 
         @Test
         void should_return_false_for_paymentDetailsFailed_when_status_success() {
-            PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.SUCCESS)
-                .build();
+            PaymentDetails pd = new PaymentDetails()
+                .setStatus(PaymentStatus.SUCCESS)
+                ;
             when(caseData.getPaymentDetails()).thenReturn(pd);
             assertFalse(CaseDataPredicate.Payment.paymentDetailsFailed.test(caseData));
         }
@@ -1558,9 +1558,9 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_claimIssuedPaymentFailed_when_status_success() {
-            PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.SUCCESS)
-                .build();
+            PaymentDetails pd = new PaymentDetails()
+                .setStatus(PaymentStatus.SUCCESS)
+                ;
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
             assertFalse(CaseDataPredicate.Payment.claimIssuedPaymentFailed.test(caseData));
         }
@@ -1578,7 +1578,7 @@ class CaseDataPredicateTest {
         @Test
         void should_return_true_for_isNotRequiredApplicantMPSpec_when_hasAgreedFreeMediation_is_no() {
             when(caseData.getApplicantMPClaimMediationSpecRequired())
-                .thenReturn(SmallClaimMedicalLRspec.builder().hasAgreedFreeMediation(YesOrNo.NO).build());
+                .thenReturn(new SmallClaimMedicalLRspec(YesOrNo.NO));
             assertTrue(CaseDataPredicate.Mediation.isNotRequiredApplicantMPSpec.test(caseData));
         }
 
@@ -1588,14 +1588,14 @@ class CaseDataPredicateTest {
             assertFalse(CaseDataPredicate.Mediation.isNotRequiredApplicantMPSpec.test(caseData));
 
             when(caseData.getApplicantMPClaimMediationSpecRequired())
-                .thenReturn(SmallClaimMedicalLRspec.builder().hasAgreedFreeMediation(YesOrNo.YES).build());
+                .thenReturn(new SmallClaimMedicalLRspec(YesOrNo.YES));
             assertFalse(CaseDataPredicate.Mediation.isNotRequiredApplicantMPSpec.test(caseData));
         }
 
         @Test
         void should_return_true_for_isNotAgreedFreeMediationApplicant1Spec_when_hasAgreedFreeMediation_is_no() {
             when(caseData.getApplicant1ClaimMediationSpecRequired())
-                .thenReturn(SmallClaimMedicalLRspec.builder().hasAgreedFreeMediation(YesOrNo.NO).build());
+                .thenReturn(new SmallClaimMedicalLRspec(YesOrNo.NO));
             assertTrue(CaseDataPredicate.Mediation.isNotAgreedFreeMediationApplicant1Spec.test(caseData));
         }
 
@@ -1605,7 +1605,7 @@ class CaseDataPredicateTest {
             assertFalse(CaseDataPredicate.Mediation.isNotAgreedFreeMediationApplicant1Spec.test(caseData));
 
             when(caseData.getApplicant1ClaimMediationSpecRequired())
-                .thenReturn(SmallClaimMedicalLRspec.builder().hasAgreedFreeMediation(YesOrNo.YES).build());
+                .thenReturn(new SmallClaimMedicalLRspec(YesOrNo.YES));
             assertFalse(CaseDataPredicate.Mediation.isNotAgreedFreeMediationApplicant1Spec.test(caseData));
         }
 

@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -81,7 +81,7 @@ public class SubmitClaimTask {
     private final FeesService feesService;
     private final UserService userService;
     private final Time time;
-    private final SpecReferenceNumberRepository specReferenceNumberRepository;
+    private final CasemanReferenceNumberRepository casemanReferenceNumberRepository;
     private final OrganisationService organisationService;
     private final AirlineEpimsService airlineEpimsService;
     private final LocationReferenceDataService locationRefDataService;
@@ -269,7 +269,7 @@ public class SubmitClaimTask {
         caseData.setSubmittedDate(time.now());
 
         if (null != eventId) {
-            caseData.setLegacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
+            caseData.setLegacyCaseReference(casemanReferenceNumberRepository.next("spec"));
             caseData.setBusinessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
         }
 
@@ -279,16 +279,15 @@ public class SubmitClaimTask {
 
     private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData) {
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
-            OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
-
+            OrganisationPolicy respondent2OrganisationPolicy = new OrganisationPolicy();
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
             if (respondent1OrganisationPolicy != null) {
-                organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
-                    .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                    .build();
+                respondent2OrganisationPolicy
+                    .setOrganisation(respondent1OrganisationPolicy.getOrganisation())
+                    .setOrgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference());
             }
-            organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
-            caseData.setRespondent2OrganisationPolicy(organisationPolicy2Builder.build());
+            respondent2OrganisationPolicy.setOrgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
+            caseData.setRespondent2OrganisationPolicy(respondent2OrganisationPolicy);
         }
     }
 

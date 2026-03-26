@@ -35,7 +35,7 @@ class ClaimFeeUtilityTest {
         void shouldReturnCalculatedFee_whenHwfDetailsAreNull() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
+                .claimFee(new Fee().setCalculatedAmountInPence(CLAIM_FEE_IN_PENCE))
                 .claimIssuedHwfDetails(null)
                 .build();
 
@@ -50,7 +50,7 @@ class ClaimFeeUtilityTest {
         void shouldReturnCalculatedFee_whenHwfDetailsArePresentButRemissionAndOutstandingAreNull() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
+                .claimFee(new Fee().setCalculatedAmountInPence(CLAIM_FEE_IN_PENCE))
                 .claimIssuedHwfDetails(new HelpWithFeesDetails())
                 .build();
 
@@ -65,7 +65,7 @@ class ClaimFeeUtilityTest {
         void shouldReturnZero_whenFullRemissionIsGranted() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
+                .claimFee(new Fee().setCalculatedAmountInPence(CLAIM_FEE_IN_PENCE))
                 .claimIssuedHwfDetails(new HelpWithFeesDetails()
                                            .setRemissionAmount(CLAIM_FEE_IN_PENCE))
                 .build();
@@ -83,7 +83,7 @@ class ClaimFeeUtilityTest {
             BigDecimal outstandingFee = new BigDecimal("25.00");
             BigDecimal remissionAmount = new BigDecimal("7500"); // 75 pounds
             CaseData caseData = CaseDataBuilder.builder()
-                .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
+                .claimFee(new Fee().setCalculatedAmountInPence(CLAIM_FEE_IN_PENCE))
                 .claimIssuedHwfDetails(new HelpWithFeesDetails()
                                            .setRemissionAmount(remissionAmount)
                                            .setOutstandingFeeInPounds(outstandingFee))
@@ -101,7 +101,7 @@ class ClaimFeeUtilityTest {
             // Given
             BigDecimal remissionAmount = new BigDecimal("7500"); // 75 pounds
             CaseData caseData = CaseDataBuilder.builder()
-                .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
+                .claimFee(new Fee().setCalculatedAmountInPence(CLAIM_FEE_IN_PENCE))
                 .claimIssuedHwfDetails(new HelpWithFeesDetails()
                                            .setRemissionAmount(remissionAmount)
                                            .setOutstandingFeeInPounds(null))

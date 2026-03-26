@@ -39,8 +39,7 @@ public class SdoLegalAdviserDefendantScenarioTest extends DashboardBaseIntegrati
     void should_create_order_made_defendant_scenario() throws Exception {
 
         String caseId = "72014112268";
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        DynamicListElement selectedCourt = new DynamicListElement().setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
@@ -54,8 +53,7 @@ public class SdoLegalAdviserDefendantScenarioTest extends DashboardBaseIntegrati
             .respondent1Represented(YesOrNo.NO)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
-                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
-            .build();
+                new CaseDocument().setDocumentLink(new Document().setDocumentBinaryUrl("url"))))).build();
 
         handler.handle(callbackParamsTestSDO(caseData));
 

@@ -56,16 +56,12 @@ public class JudgmentsOnlineHelperTest {
     void checkIfNonDivergent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued().build().toBuilder()
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.YES)
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both Defendants")
-                                                 .build())
-                                      .build())
+            .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("Both Defendants")))
             .build();
         assertThat(isNonDivergentForDJ(caseData)).isTrue();
     }
@@ -74,16 +70,12 @@ public class JudgmentsOnlineHelperTest {
     void checkIfDivergent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued().build().toBuilder()
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.NO)
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("John Smith")
-                                                 .build())
-                                      .build())
+            .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("John Smith")))
             .build();
         assertThat(isNonDivergentForDJ(caseData)).isFalse();
     }
@@ -120,23 +112,26 @@ public class JudgmentsOnlineHelperTest {
 
     @Test
     void testAddress() {
-        JudgmentAddress address = JudgmentsOnlineHelper
+        Address inputAddress = new Address();
+        inputAddress.setAddressLine1("sdjhvjdshvsjhdvjhdjkvheddadasdadasdadddadadaddsvjdhkhdskedevdhv");
+        inputAddress.setAddressLine3("sdjhvjdshv sjhdvjhdjkvhdsv jdhkhdskvdhv");
+        inputAddress.setAddressLine2("fdkbmkbklmklf kfmkvbfkvfl fbmkflbmklfmkfvfdkvfv mdvkfldfmfv");
+        inputAddress.setPostCode("fhbfv");
+        inputAddress.setPostTown("dfjbgjkhgjhgkjhdjkbh;hb;kjdkdfkgjdfkgkfgkldjgdf");
+        inputAddress.setCounty("fdkgjblkfgjbklgj");
+        inputAddress.setCountry("dfjnbgjkfbjkjkg");
+
+        JudgmentAddress judgmentAddress = JudgmentsOnlineHelper
             .getJudgmentAddress(
-                Address.builder()
-                    .addressLine1("sdjhvjdshvsjhdvjhdjkvheddadasdadasdadddadadaddsvjdhkhdskedevdhv")
-                    .addressLine3("sdjhvjdshv sjhdvjhdjkvhdsv jdhkhdskvdhv")
-                    .addressLine2("fdkbmkbklmklf kfmkvbfkvfl fbmkflbmklfmkfvfdkvfv mdvkfldfmfv")
-                    .postCode("fhbfv")
-                    .postTown("dfjbgjkhgjhgkjhdjkbh;hb;kjdkdfkgjdfkgkfgkldjgdf")
-                    .county("fdkgjblkfgjbklgj").country("dfjnbgjkfbjkjkg").build(),
+                inputAddress,
                 new RoboticsAddressMapper(new AddressLinesMapper())
             );
-        assertThat(address).isNotNull();
-        assertThat(address.getDefendantAddressLine1().length()).isLessThanOrEqualTo(35);
-        assertThat(address.getDefendantAddressLine2().length()).isLessThanOrEqualTo(35);
-        assertThat(address.getDefendantAddressLine3().length()).isLessThanOrEqualTo(35);
-        assertThat(address.getDefendantAddressLine4().length()).isLessThanOrEqualTo(35);
-        assertThat(address.getDefendantAddressLine5().length()).isLessThanOrEqualTo(35);
+        assertThat(judgmentAddress).isNotNull();
+        assertThat(judgmentAddress.getDefendantAddressLine1().length()).isLessThanOrEqualTo(35);
+        assertThat(judgmentAddress.getDefendantAddressLine2().length()).isLessThanOrEqualTo(35);
+        assertThat(judgmentAddress.getDefendantAddressLine3().length()).isLessThanOrEqualTo(35);
+        assertThat(judgmentAddress.getDefendantAddressLine4().length()).isLessThanOrEqualTo(35);
+        assertThat(judgmentAddress.getDefendantAddressLine5().length()).isLessThanOrEqualTo(35);
     }
 
     @Test

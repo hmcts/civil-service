@@ -214,7 +214,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             documentAndNote.setDocument(testDocument);
 
             List<Element<DocumentAndNote>> documentList = new ArrayList<>();
-            documentList.add(Element.<DocumentAndNote>builder().value(documentAndNote).build());
+            documentList.add(new Element<DocumentAndNote>().setValue(documentAndNote));
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setDocumentAndNoteToAdd(documentList);
@@ -243,7 +243,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             documentAndNote.setDocument(testDocument);
 
             List<Element<DocumentWithName>> documentList = new ArrayList<>();
-            documentList.add(Element.<DocumentWithName>builder().value(documentAndNote).build());
+            documentList.add(new Element<DocumentWithName>().setValue(documentAndNote));
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setDocumentAndNameToAdd(documentList);
@@ -275,11 +275,10 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private CaseNote createCaseNote(LocalDateTime timeStamp) {
-        return CaseNote.builder()
-            .createdOn(timeStamp)
-            .createdBy("John Doe")
-            .note("test note")
-            .build();
+        return new CaseNote()
+            .setCreatedOn(timeStamp)
+            .setCreatedBy("John Doe")
+            .setNote("test note");
     }
 
 }

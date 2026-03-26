@@ -87,7 +87,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
         void setup() {
             when(notificationsProperties.getClaimantSolicitorAgreedExtensionDate()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
             when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
@@ -261,10 +261,10 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
             void shouldNotifyWithCorrectExtensionDate_when1v2DSRespondentSolicitor1ExtendsFirst() {
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
-                    .respondent1(PartyBuilder.builder().individual().build())
+                    .respondent1(new PartyBuilder().individual().build())
                     .addRespondent2(YES)
                     .respondent2SameLegalRepresentative(NO)
-                    .respondent2(PartyBuilder.builder().soleTrader().build())
+                    .respondent2(new PartyBuilder().soleTrader().build())
                     .respondent1TimeExtensionDate(LocalDateTime.now().minusDays(1))
                     .build();
 
@@ -309,7 +309,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
                     .addRespondent2(YES)
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(new PartyBuilder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .build();
 

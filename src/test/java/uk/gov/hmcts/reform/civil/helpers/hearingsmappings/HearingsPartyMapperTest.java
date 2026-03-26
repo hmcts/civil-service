@@ -65,17 +65,17 @@ public class HearingsPartyMapperTest {
     @BeforeEach
     void setUp() {
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_TWO_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_TWO_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_TWO_LR_ORG_NAME)
+                                        ));
     }
 
     private String getLocalDateInString(LocalDate date) {
@@ -310,16 +310,14 @@ public class HearingsPartyMapperTest {
             .addRespondent1OrgIndividual("Respondent One", "Hearing Attendee")
             .build()
             .toBuilder()
-            .applicant1(Party.builder()
-                            .partyID(APPLICANT_PARTY_ID)
-                            .companyName(APPLICANT_COMPANY_NAME)
-                            .type(COMPANY)
-                            .build())
-            .respondent1(Party.builder()
-                             .partyID(RESPONDENT_ONE_PARTY_ID)
-                             .organisationName(RESPONDENT_ONE_ORG_NAME)
-                             .type(ORGANISATION)
-                             .build())
+            .applicant1(new Party()
+                            .setPartyID(APPLICANT_PARTY_ID)
+                            .setCompanyName(APPLICANT_COMPANY_NAME)
+                            .setType(COMPANY))
+            .respondent1(new Party()
+                             .setPartyID(RESPONDENT_ONE_PARTY_ID)
+                             .setOrganisationName(RESPONDENT_ONE_ORG_NAME)
+                             .setType(ORGANISATION))
             .build();
 
         caseData = rollUpUnavailableDateRespondent(caseData);
@@ -517,11 +515,10 @@ public class HearingsPartyMapperTest {
             .addRespondent1LitigationFriend()
             .addApplicant2ExpertsAndWitnesses()
             .addRespondent1ExpertsAndWitnesses()
-            .applicant2(Party.builder()
-                            .partyID(APPLICANT_TWO_PARTY_ID)
-                            .companyName(APPLICANT_TWO_COMPANY_NAME)
-                            .type(COMPANY)
-                            .build())
+            .applicant2(new Party()
+                            .setPartyID(APPLICANT_TWO_PARTY_ID)
+                            .setCompanyName(APPLICANT_TWO_COMPANY_NAME)
+                            .setType(COMPANY))
             .addApplicant2OrgIndividual("Applicant Two", "Hearing Attendee")
             .build();
 
@@ -678,11 +675,10 @@ public class HearingsPartyMapperTest {
             .addRespondent1ExpertsAndWitnesses()
             .addRespondent2ExpertsAndWitnesses()
             .addRespondent2OrgIndividual("Respondent Two", "Hearing Attendee")
-            .respondent2(Party.builder()
-                             .partyID(RESPONDENT_TWO_PARTY_ID)
-                             .organisationName(RESPONDENT_TWO_ORG_NAME)
-                             .type(ORGANISATION)
-                             .build())
+            .respondent2(new Party()
+                             .setPartyID(RESPONDENT_TWO_PARTY_ID)
+                             .setOrganisationName(RESPONDENT_TWO_ORG_NAME)
+                             .setType(ORGANISATION))
             .build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
@@ -986,8 +982,7 @@ public class HearingsPartyMapperTest {
             .addApplicant1ExpertsAndWitnesses()
             .addRespondent1ExpertsAndWitnesses()
             .build().toBuilder()
-            .applicant1OrganisationPolicy(uk.gov.hmcts.reform.ccd.model.OrganisationPolicy.builder()
-                                              .orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build()).build();
+            .applicant1OrganisationPolicy(new uk.gov.hmcts.reform.ccd.model.OrganisationPolicy().setOrgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]")).build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
             "app-1-party-id",

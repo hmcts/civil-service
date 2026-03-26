@@ -61,18 +61,17 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(10);
+        assertThat(result).hasSize(9);
 
         assertTransition(result.get(0), "MAIN.FULL_DEFENCE", "MAIN.IN_MEDIATION");
-        assertTransition(result.get(1), "MAIN.FULL_DEFENCE", "MAIN.IN_MEDIATION");
+        assertTransition(result.get(1), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
         assertTransition(result.get(2), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
         assertTransition(result.get(3), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
         assertTransition(result.get(4), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
         assertTransition(result.get(5), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
-        assertTransition(result.get(6), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
-        assertTransition(result.get(7), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_NOT_PROCEED");
-        assertTransition(result.get(8), "MAIN.FULL_DEFENCE", "MAIN.TAKEN_OFFLINE_BY_STAFF");
-        assertTransition(result.get(9), "MAIN.FULL_DEFENCE", "MAIN.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA");
+        assertTransition(result.get(6), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_NOT_PROCEED");
+        assertTransition(result.get(7), "MAIN.FULL_DEFENCE", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(8), "MAIN.FULL_DEFENCE", "MAIN.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA");
     }
 
     @Test
@@ -355,9 +354,7 @@ public class FullDefenceTransitionBuilderTest {
         defClaim.forEach((whoAgrees, expected) -> {
             CaseData cd = caseData.toBuilder()
                 .responseClaimMediationSpecRequired(whoAgrees[0])
-                .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                          .hasAgreedFreeMediation(whoAgrees[1])
-                                                          .build())
+                .applicant1ClaimMediationSpecRequired(new SmallClaimMedicalLRspec(whoAgrees[1]))
                 .build();
             assertEquals(expected, MediationPredicate.allAgreedToLrMediationSpec.test(cd));
         });
@@ -368,7 +365,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2SameLegalRepresentative(YES)
             .build();
 
@@ -384,9 +381,7 @@ public class FullDefenceTransitionBuilderTest {
         defClaim.forEach((whoAgrees, expected) -> {
             CaseData cd = caseData.toBuilder()
                 .responseClaimMediationSpecRequired(whoAgrees[0])
-                .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                          .hasAgreedFreeMediation(whoAgrees[1])
-                                                          .build())
+                .applicant1ClaimMediationSpecRequired(new SmallClaimMedicalLRspec(whoAgrees[1]))
                 .build();
             assertEquals(expected, MediationPredicate.allAgreedToLrMediationSpec.test(cd));
         });
@@ -397,7 +392,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2SameLegalRepresentative(NO)
             .build();
 
@@ -418,9 +413,7 @@ public class FullDefenceTransitionBuilderTest {
             CaseData cd = caseData.toBuilder()
                 .responseClaimMediationSpecRequired(whoAgrees[0])
                 .responseClaimMediationSpec2Required(whoAgrees[1])
-                .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                          .hasAgreedFreeMediation(whoAgrees[2])
-                                                          .build())
+                .applicant1ClaimMediationSpecRequired(new SmallClaimMedicalLRspec(whoAgrees[2]))
                 .build();
             assertEquals(expected, MediationPredicate.allAgreedToLrMediationSpec.test(cd));
         });
@@ -449,12 +442,8 @@ public class FullDefenceTransitionBuilderTest {
         defClaim.forEach((whoAgrees, expected) -> {
             CaseData cd = caseData.toBuilder()
                 .responseClaimMediationSpecRequired(whoAgrees[0])
-                .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                          .hasAgreedFreeMediation(whoAgrees[1])
-                                                          .build())
-                .applicantMPClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                           .hasAgreedFreeMediation(whoAgrees[2])
-                                                           .build())
+                .applicant1ClaimMediationSpecRequired(new SmallClaimMedicalLRspec(whoAgrees[1]))
+                .applicantMPClaimMediationSpecRequired(new SmallClaimMedicalLRspec(whoAgrees[2]))
                 .build();
             assertEquals(expected, MediationPredicate.allAgreedToLrMediationSpec.test(cd));
         });
@@ -813,7 +802,7 @@ public class FullDefenceTransitionBuilderTest {
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.YES)
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .responseClaimMediationSpec2Required(YesOrNo.NO)
             .build();
@@ -827,9 +816,7 @@ public class FullDefenceTransitionBuilderTest {
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.YES)
-            .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                      .hasAgreedFreeMediation(YesOrNo.NO)
-                                                      .build())
+            .applicant1ClaimMediationSpecRequired(new SmallClaimMedicalLRspec(YesOrNo.NO))
             .build();
 
         assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));
@@ -841,9 +828,7 @@ public class FullDefenceTransitionBuilderTest {
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.YES)
-            .applicantMPClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                       .hasAgreedFreeMediation(YesOrNo.NO)
-                                                       .build())
+            .applicantMPClaimMediationSpecRequired(new SmallClaimMedicalLRspec(YesOrNo.NO))
             .build();
 
         assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));

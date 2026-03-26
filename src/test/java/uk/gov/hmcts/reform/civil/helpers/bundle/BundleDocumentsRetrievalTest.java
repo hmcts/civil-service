@@ -80,7 +80,7 @@ class BundleDocumentsRetrievalTest {
             .setExpertDocument(documentTest);
 
         List<Element<UploadEvidenceExpert>> listOfDocs = new ArrayList<>();
-        listOfDocs.add(Element.<UploadEvidenceExpert>builder().value(uploadEvidenceExpert).build());
+        listOfDocs.add(new Element<UploadEvidenceExpert>().setValue(uploadEvidenceExpert));
 
         List<BundlingRequestDocument> expectedConvertedDocs = List.of(
             new BundlingRequestDocument()
@@ -120,7 +120,7 @@ class BundleDocumentsRetrievalTest {
             .setExpertDocument(documentTest);
 
         List<Element<UploadEvidenceExpert>> listOfDocs = new ArrayList<>();
-        listOfDocs.add(Element.<UploadEvidenceExpert>builder().value(uploadEvidenceExpert).build());
+        listOfDocs.add(new Element<UploadEvidenceExpert>().setValue(uploadEvidenceExpert));
 
         Map<String, List<Element<UploadEvidenceExpert>>> expectedGroupedDocuments = new HashMap<>();
         expectedGroupedDocuments.put("Expert1", listOfDocs);
@@ -131,7 +131,7 @@ class BundleDocumentsRetrievalTest {
         );
 
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().individualFirstName("James").individualLastName("Gordon").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualFirstName("James").setIndividualLastName("Gordon").setType(Party.Type.INDIVIDUAL))
             .documentExpertReport(new ArrayList<>())
             .documentQuestionsRes2(listOfDocs)
             .build();
@@ -164,7 +164,7 @@ class BundleDocumentsRetrievalTest {
             .setExpertDocument(documentTest1);
 
         List<Element<UploadEvidenceExpert>> listOfDocs = new ArrayList<>();
-        listOfDocs.add(Element.<UploadEvidenceExpert>builder().value(uploadEvidenceExpert1).build());
+        listOfDocs.add(new Element<UploadEvidenceExpert>().setValue(uploadEvidenceExpert1));
 
         Map<String, List<Element<UploadEvidenceExpert>>> expectedGroupedDocuments = new HashMap<>();
         expectedGroupedDocuments.put("Expert1", listOfDocs);

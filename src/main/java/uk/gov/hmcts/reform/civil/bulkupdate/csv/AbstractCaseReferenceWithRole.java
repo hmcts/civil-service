@@ -5,14 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 import java.util.Map;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder
 public abstract class AbstractCaseReferenceWithRole<T> extends CaseReference implements ExcelMappable {
 
     protected T dataObject;

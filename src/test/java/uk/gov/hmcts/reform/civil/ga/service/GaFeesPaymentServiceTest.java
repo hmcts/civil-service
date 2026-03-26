@@ -85,10 +85,10 @@ class GaFeesPaymentServiceTest {
 
     @BeforeEach
     void before() {
-        caseData = GeneralApplicationCaseData.builder().ccdCaseReference(2801090368574910L)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().serviceReqReference("2023-1701090705688")
-                                       .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
-                                       .build())
+        caseData = new GeneralApplicationCaseData().ccdCaseReference(2801090368574910L)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setServiceReqReference("2023-1701090705688")
+                                       .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
+                                       )
             .parentCaseReference("1701090368574910")
             .build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
@@ -116,8 +116,11 @@ class GaFeesPaymentServiceTest {
     @Test
     @SneakyThrows
     void shouldCreateGovPayPaymentUrlForServiceRequestAdditionalPayment() {
-        caseData = caseData.toBuilder().generalAppPBADetails(caseData.getGeneralAppPBADetails().toBuilder()
-                                                                 .additionalPaymentServiceRef("2023-1701090705600").build()).build();
+        GeneralApplicationPbaDetails updatedPbaDetails = caseData.getGeneralAppPBADetails().copy()
+            .setAdditionalPaymentServiceRef("2023-1701090705600");
+        caseData = caseData.copy()
+            .generalAppPBADetails(updatedPbaDetails)
+            .build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
         CardPaymentServiceRequestResponse response = buildServiceRequestResponse();
 
@@ -138,10 +141,10 @@ class GaFeesPaymentServiceTest {
     @Test
     @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingPbaDetails() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().ccdCaseReference(1701090368574910L)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                        .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
-                        .build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdCaseReference(1701090368574910L)
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                        .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
+                        )
             .build();
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
@@ -159,10 +162,10 @@ class GaFeesPaymentServiceTest {
     @Test
     @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingServiceRequest() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().ccdCaseReference(1701090368574910L)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
-                                      .build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdCaseReference(1701090368574910L)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
+                                      )
             .build();
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
@@ -338,19 +341,18 @@ class GaFeesPaymentServiceTest {
     }
 
     private CardPaymentStatusResponse expectedResponse(String status) {
-        CardPaymentStatusResponse.CardPaymentStatusResponseBuilder payment
-            = CardPaymentStatusResponse.builder()
-            .paymentReference("RC-1701-0909-0602-0418")
-            .status(status)
-            .paymentAmount(new BigDecimal(200))
-            .status(status);
+        CardPaymentStatusResponse payment = new CardPaymentStatusResponse()
+            .setPaymentReference("RC-1701-0909-0602-0418")
+            .setStatus(status)
+            .setPaymentAmount(new BigDecimal(200))
+            .setStatus(status);
 
         if (status.equals("Failed")) {
-            payment.errorCode("P0030")
-                .errorDescription("Payment was cancelled by the user");
+            payment.setErrorCode("P0030")
+                .setErrorDescription("Payment was cancelled by the user");
         }
 
-        return payment.build();
+        return payment;
     }
 
     private CardPaymentServiceRequestResponse buildServiceRequestResponse() {

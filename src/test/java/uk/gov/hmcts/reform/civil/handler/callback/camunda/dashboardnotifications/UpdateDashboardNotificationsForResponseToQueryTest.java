@@ -87,7 +87,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
             .qmLatestQuery(createLatestQuery("queryId"))
             .queries(claimantQueries)
             .legacyCaseReference("reference")
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
@@ -101,13 +101,13 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
             "BEARER_TOKEN",
                 SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService, times(1)).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }
@@ -132,7 +132,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
             .queries(defendantQueries)
             .legacyCaseReference("reference")
             .respondent1Represented(YesOrNo.NO)
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
@@ -146,13 +146,13 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService, times(1)).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }

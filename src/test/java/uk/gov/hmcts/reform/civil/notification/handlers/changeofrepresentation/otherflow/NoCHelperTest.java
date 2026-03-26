@@ -62,39 +62,36 @@ class NoCHelperTest {
     void setUp() {
         baseCaseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
-            .applicant1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualFirstName("Applicant")
-                            .individualLastName("A")
-                            .partyName("Applicant A").build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("QWERTY A").build())
-                                              .build())
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .individualFirstName("Respondent")
-                             .individualLastName("A")
-                             .partyName("Respondent A").build())
-            .respondent2(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .individualFirstName("Respondent")
-                             .individualLastName("B")
-                             .partyName("Respondent B").build())
+            .applicant1(new Party()
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setIndividualFirstName("Applicant")
+                            .setIndividualLastName("A")
+                            .setPartyName("Applicant A"))
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("QWERTY A")))
+            .respondent1(new Party()
+                             .setType(Party.Type.INDIVIDUAL)
+                             .setIndividualFirstName("Respondent")
+                             .setIndividualLastName("A")
+                             .setPartyName("Respondent A"))
+            .respondent2(new Party()
+                             .setType(Party.Type.INDIVIDUAL)
+                             .setIndividualFirstName("Respondent")
+                             .setIndividualLastName("B")
+                             .setPartyName("Respondent B"))
             .legacyCaseReference("LEGACY-REF")
             .issueDate(LocalDate.of(2024, 5, 1))
-            .changeOfRepresentation(ChangeOfRepresentation.builder()
-                                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                                        .organisationToAddID("orgAdd")
-                                        .organisationToRemoveID("orgRemove")
-                                        .formerRepresentationEmailAddress("former@sol.com")
-                                        .build())
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                                        .setOrganisationToAddID("orgAdd")
+                                        .setOrganisationToRemoveID("orgRemove")
+                                        .setFormerRepresentationEmailAddress("former@sol.com"))
             .applicant1Represented(YesOrNo.YES)
             .hearingDate(LocalDate.of(2024, 6, 1))
             .hearingDueDate(LocalDate.of(2024, 5, 20))
             .hearingTimeHourMinute("10:30")
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).build())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("Court A").build()).build())
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)))
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("Court A")))
+            .hearingFeePaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
             .build();
     }
 
@@ -102,13 +99,13 @@ class NoCHelperTest {
     void getProperties_shouldReturnExpectedMap() {
 
         when(organisationService.findOrganisationById("QWERTY A"))
-            .thenReturn(Optional.of(Organisation.builder().name("App Legal Org").build()));
+            .thenReturn(Optional.of(new Organisation().setName("App Legal Org")));
 
         when(organisationService.findOrganisationById("orgAdd"))
-            .thenReturn(Optional.of(Organisation.builder().name("New Org").build()));
+            .thenReturn(Optional.of(new Organisation().setName("New Org")));
 
         when(organisationService.findOrganisationById("orgRemove"))
-            .thenReturn(Optional.of(Organisation.builder().name("Old Org").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Old Org")));
 
         Map<String, String> props = noCHelper.getProperties(baseCaseData, false);
 
@@ -137,7 +134,7 @@ class NoCHelperTest {
     @Test
     void getHearingFeeEmailProperties_shouldReturnExpectedMap() {
         when(organisationService.findOrganisationById("QWERTY A"))
-            .thenReturn(Optional.of(Organisation.builder().name("App Legal Org").build()));
+            .thenReturn(Optional.of(new Organisation().setName("App Legal Org")));
 
         Map<String, String> props = noCHelper.getHearingFeeEmailProperties(baseCaseData);
 

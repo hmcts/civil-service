@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -8,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.sdo.FastTrackVariable;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
@@ -21,6 +23,7 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle.ADD;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SdoFastTrackTemplateService {
@@ -29,9 +32,15 @@ public class SdoFastTrackTemplateService {
     private final SdoCaseClassificationService caseClassificationService;
     private final SdoFastTrackDirectionsService fastTrackDirectionsService;
     private final SdoFastTrackTemplateFieldService fastTrackTemplateFieldService;
+    private final FeatureToggleService featureToggleService;
 
     public SdoDocumentFormFast buildTemplate(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         boolean showBundleInfo = hasVariable(caseData, FastTrackVariable.TRIAL_BUNDLE_TOGGLE);
+        boolean hasPpi = hasDirection(caseData, FastTrack.fastClaimPPI);
+        boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
+
+        log.info("Building Fast Track SDO template for case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
 
         SdoDocumentFormFast template = new SdoDocumentFormFast()
             .setWrittenByJudge(isJudge)
@@ -56,6 +65,8 @@ public class SdoFastTrackTemplateService {
             .setHasHousingDisrepair(hasDirection(caseData, FastTrack.fastClaimHousingDisrepair))
             .setHasPersonalInjury(hasDirection(caseData, FastTrack.fastClaimPersonalInjury))
             .setHasRoadTrafficAccident(hasDirection(caseData, FastTrack.fastClaimRoadTrafficAccident))
+            .setHasPaymentProtectionInsurance(hasPpi)
+            .setFastTrackPPI(hasPpi ? caseData.getFastTrackPPI() : null)
             .setFastTrackJudgesRecital(caseData.getFastTrackJudgesRecital())
             .setFastTrackDisclosureOfDocuments(caseData.getFastTrackDisclosureOfDocuments())
             .setFastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
@@ -69,6 +80,7 @@ public class SdoFastTrackTemplateService {
             .setFastTrackBuildingDispute(caseData.getFastTrackBuildingDispute())
             .setFastTrackClinicalNegligence(caseData.getFastTrackClinicalNegligence())
             .setFastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
+            .setOtherRemedyEnabled(otherRemedyEnabled)
             .setFastTrackPersonalInjury(caseData.getFastTrackPersonalInjury())
             .setFastTrackRoadTrafficAccident(caseData.getFastTrackRoadTrafficAccident())
             .setHasNewDirections(hasVariable(caseData, FastTrackVariable.ADD_NEW_DIRECTIONS))
@@ -93,7 +105,9 @@ public class SdoFastTrackTemplateService {
             .setWelshLanguageDescription(Optional.ofNullable(caseData.getSdoR2FastTrackUseOfWelshLanguage())
                                           .map(SdoR2WelshLanguageUsage::getDescription).orElse(null))
             .setSdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
-            .setSdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
+            .setSdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire())
+            .setShowPenalNotice(hasVariable(caseData, FastTrackVariable.PENAL_NOTICE_TOGGLE))
+            .setPenalNoticeText(caseData.getFastTrackPenalNotice());
 
         template
             .setHearingLocation(locationHelper.getHearingLocation(

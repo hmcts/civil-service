@@ -180,12 +180,11 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidatePaymentMadeDate() {
 
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(LocalDate.now().minusDays(2));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().contains("Date must be in past"));
+            assertThat(response.getErrors()).contains("Date must be in past");
         }
 
         @Test
@@ -198,7 +197,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().contains("Paid in full date must be on or after the date of the judgment"));
+            assertThat(response.getErrors()).contains("Paid in full date must be on or after the date of the judgment");
         }
 
         @Test
@@ -211,7 +210,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().contains("Paid in full date must be on or after the date of the judgment"));
+            assertThat(response.getErrors()).contains("Paid in full date must be on or after the date of the judgment");
         }
     }
 
@@ -220,10 +219,9 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void whenSubmitted_thenIncludeHeader() {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
-                .type(CallbackType.SUBMITTED)
-                .build();
+                .type(CallbackType.SUBMITTED);
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) handler.handle(params);
             Assertions.assertTrue(response.getConfirmationHeader().contains("# Judgment marked as paid in full"));

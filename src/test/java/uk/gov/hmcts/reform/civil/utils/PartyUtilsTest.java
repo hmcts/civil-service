@@ -216,7 +216,7 @@ class PartyUtilsTest {
         @ParameterizedTest
         @EnumSource(value = Party.Type.class, names = {"SOLE_TRADER", "INDIVIDUAL"})
         void shouldReturnDateOfBirth_whenPartyTypeIsIndividualOrSoleTrader(Party.Type type) {
-            Party party = PartyBuilder.builder().ofType(type).build();
+            Party party = new PartyBuilder().ofType(type).build();
 
             assertThat(PartyUtils.getDateOfBirth(party)).contains(DATE_OF_BIRTH);
         }
@@ -224,7 +224,7 @@ class PartyUtilsTest {
         @ParameterizedTest
         @EnumSource(value = Party.Type.class, mode = EnumSource.Mode.EXCLUDE, names = {"SOLE_TRADER", "INDIVIDUAL"})
         void shouldReturnEmpty_whenPartyTypeIsNotIndividualOrSoleTrader(Party.Type type) {
-            Party party = PartyBuilder.builder().ofType(type).build();
+            Party party = new PartyBuilder().ofType(type).build();
 
             assertThat(PartyUtils.getDateOfBirth(party)).isEmpty();
         }
@@ -523,17 +523,16 @@ class PartyUtilsTest {
             LocalDateTime datetime = LocalDateTime.now();
             LocalDate date = LocalDate.now();
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1(PartyBuilder.builder().individual().build())
+                .respondent1(new PartyBuilder().individual().build())
                 .respondent1TimeExtensionDate(datetime)
                 .respondentSolicitor1AgreedDeadlineExtension(date)
                 .build();
 
-            PartyData expectedData = PartyData.builder()
-                .role(RESPONDENT_ONE)
-                .details(caseData.getRespondent1())
-                .timeExtensionDate(datetime)
-                .solicitorAgreedDeadlineExtension(date)
-                .build();
+            PartyData expectedData = new PartyData()
+                .setRole(RESPONDENT_ONE)
+                .setDetails(caseData.getRespondent1())
+                .setTimeExtensionDate(datetime)
+                .setSolicitorAgreedDeadlineExtension(date);
 
             PartyData actualData = PartyUtils.respondent1Data(caseData);
 
@@ -545,17 +544,16 @@ class PartyUtilsTest {
             LocalDateTime datetime = LocalDateTime.now();
             LocalDate date = LocalDate.now();
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .respondent2TimeExtensionDate(datetime)
                 .respondentSolicitor2AgreedDeadlineExtension(date)
                 .build();
 
-            PartyData expectedData = PartyData.builder()
-                .role(RESPONDENT_TWO)
-                .details(caseData.getRespondent2())
-                .timeExtensionDate(datetime)
-                .solicitorAgreedDeadlineExtension(date)
-                .build();
+            PartyData expectedData = new PartyData()
+                .setRole(RESPONDENT_TWO)
+                .setDetails(caseData.getRespondent2())
+                .setTimeExtensionDate(datetime)
+                .setSolicitorAgreedDeadlineExtension(date);
 
             PartyData actualData = PartyUtils.respondent2Data(caseData);
 
@@ -970,7 +968,7 @@ class PartyUtilsTest {
             Witness witness = new Witness();
             witness.setPartyID(partyId);
             witness.setFirstName(firstName);
-            Element<Witness> witnessElement = Element.<Witness>builder().id(elementId).value(witness).build();
+            Element<Witness> witnessElement = new Element<Witness>().setId(elementId).setValue(witness);
             Witnesses witnesses = new Witnesses();
             witnesses.setDetails(List.of(witnessElement));
             return witnesses;
@@ -984,7 +982,7 @@ class PartyUtilsTest {
             Expert expert = new Expert();
             expert.setPartyID(partyId);
             expert.setFirstName(firstName);
-            Element<Expert> expertElement = Element.<Expert>builder().id(elementId).value(expert).build();
+            Element<Expert> expertElement = new Element<Expert>().setId(elementId).setValue(expert);
             Experts experts = new Experts();
             experts.setDetails(List.of(expertElement));
             return experts;

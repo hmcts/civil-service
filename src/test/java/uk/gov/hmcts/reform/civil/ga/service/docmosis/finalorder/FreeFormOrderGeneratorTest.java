@@ -93,11 +93,11 @@ class FreeFormOrderGeneratorTest {
                  .uploadDocument(any(String.class), any(PDF.class)))
             .thenReturn(CASE_DOCUMENT);
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(
                 YES).build()
-            .toBuilder()
+            .copy()
             .freeFormRecitalText("RecitalText")
             .freeFormOrderedText("OrderedText")
             .orderOnCourtsList(OrderOnCourtsList.NOT_APPLICABLE)
@@ -125,9 +125,9 @@ class FreeFormOrderGeneratorTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(
                 YES).build()
-            .toBuilder()
+            .copy()
             .freeFormRecitalText("RecitalText")
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("8"))
             .freeFormOrderedText("OrderedText")
             .orderOnCourtsList(OrderOnCourtsList.NOT_APPLICABLE)
             .build();
@@ -135,7 +135,7 @@ class FreeFormOrderGeneratorTest {
             assertThrows(
                 IllegalArgumentException.class, ()
                     -> generator.generate(caseData, BEARER_TOKEN)
-            );
+        );
         String expectedMessage = "Court Name is not found in location data";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
@@ -147,7 +147,7 @@ class FreeFormOrderGeneratorTest {
         FreeFormOrderValues values = new FreeFormOrderValues()
             .setOnInitiativeSelectionTextArea("test")
             .setOnInitiativeSelectionDate(LocalDate.now());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().orderOnCourtsList(
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().orderOnCourtsList(
                 ORDER_ON_COURT_INITIATIVE)
             .orderOnCourtInitiative(values).build();
         String orderString = generator.getFreeFormOrderValue(caseData);
@@ -159,7 +159,7 @@ class FreeFormOrderGeneratorTest {
         FreeFormOrderValues values = new FreeFormOrderValues()
             .setWithoutNoticeSelectionTextArea("test")
             .setWithoutNoticeSelectionDate(LocalDate.now());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().orderOnCourtsList(
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().orderOnCourtsList(
                 ORDER_WITHOUT_NOTICE)
             .orderWithoutNotice(values).build();
         String orderString = generator.getFreeFormOrderValue(caseData);
@@ -188,19 +188,20 @@ class FreeFormOrderGeneratorTest {
     @Test
     void whenJudgeMakeDecision_ShouldGetFreeFormOrderData() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-            .finalOrderFreeForm().isMultiParty(YES).build().toBuilder()
+            .finalOrderFreeForm().isMultiParty(YES).build().copy()
             .build();
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder()
-                            .epimmsId("2")
-                            .externalShortName("London")
-                            .build());
+            .thenReturn(
+                new LocationRefData()
+                    .setEpimmsId("2")
+                    .setExternalShortName("London")
+            );
         FreeFormOrder templateDate = generator.getTemplateData(
             null,
             caseData,
             "auth",
             FlowFlag.ONE_RESPONDENT_REPRESENTATIVE
-        );
+            );
         assertThatFieldsAreCorrect_FreeFormOrder(templateDate, caseData);
     }
 
@@ -221,24 +222,25 @@ class FreeFormOrderGeneratorTest {
     @Test
     void whenJudgeMakeDecision_ShouldGetFreeFormOrderData_1V1() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-            .finalOrderFreeForm().build().toBuilder()
+            .finalOrderFreeForm().build().copy()
             .defendant2PartyName(null)
             .claimant2PartyName(null)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
             .isMultiParty(NO)
             .build();
 
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder()
-                            .epimmsId("2")
-                            .externalShortName("Manchester")
-                            .build());
+            .thenReturn(
+                new LocationRefData()
+                    .setEpimmsId("2")
+                    .setExternalShortName("Manchester")
+            );
         FreeFormOrder templateDate = generator.getTemplateData(
             null,
             caseData,
             "auth",
             FlowFlag.ONE_RESPONDENT_REPRESENTATIVE
-        );
+            );
         assertThatFieldsAreCorrect_FreeFormOrder_1V1(templateDate, caseData);
     }
 
@@ -261,19 +263,20 @@ class FreeFormOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetFreeFormOrderData_1V1() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-                .finalOrderFreeForm().build().toBuilder()
+                .finalOrderFreeForm().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(NO)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
                 .isMultiParty(NO)
                 .build();
 
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder()
-                                .epimmsId("2")
-                                .externalShortName("Manchester")
-                                .build());
+                .thenReturn(
+                    new LocationRefData()
+                        .setEpimmsId("2")
+                        .setExternalShortName("Manchester")
+                );
             FreeFormOrder templateDate = generator.getTemplateData(
                 GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(),
                 caseData,
@@ -293,11 +296,11 @@ class FreeFormOrderGeneratorTest {
             when(documentManagementService.uploadDocument(any(String.class), any(PDF.class)))
                 .thenReturn(CASE_DOCUMENT);
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(
                     YES).build()
-                .toBuilder()
+                .copy()
                 .freeFormRecitalText("RecitalText")
                 .freeFormOrderedText("OrderedText")
                 .orderOnCourtsList(OrderOnCourtsList.NOT_APPLICABLE)
@@ -337,4 +340,3 @@ class FreeFormOrderGeneratorTest {
         }
     }
 }
-

@@ -74,23 +74,21 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private UserService userService;
 
-    private static LocationRefData locationRefData =   LocationRefData.builder().siteName("A nice Site Name")
-        .courtAddress("1").postcode("1")
-        .courtName("Court Name example").region("Region").regionId("2").courtVenueId("666")
-        .courtTypeId("10").courtLocationCode("121")
-        .epimmsId("000000").build();
-    public static final CaseDocument courtOfficerOrder = CaseDocument.builder()
-        .createdBy("Test")
-        .documentName("Court Officer Order test name")
-        .documentSize(0L)
-        .documentType(COURT_OFFICER_ORDER)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name.pdf")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    private static LocationRefData locationRefData =   new LocationRefData().setSiteName("A nice Site Name")
+        .setCourtAddress("1").setPostcode("1")
+        .setCourtName("Court Name example").setRegion("Region").setRegionId("2").setCourtVenueId("666")
+        .setCourtTypeId("10").setCourtLocationCode("121")
+        .setEpimmsId("000000");
+    public static final CaseDocument courtOfficerOrder = new CaseDocument()
+        .setCreatedBy("Test")
+        .setDocumentName("Court Officer Order test name")
+        .setDocumentSize(0L)
+        .setDocumentType(COURT_OFFICER_ORDER)
+        .setCreatedDatetime(LocalDateTime.now())
+        .setDocumentLink(new Document()
+                          .setDocumentUrl("fake-url")
+                          .setDocumentFileName("file-name.pdf")
+                          .setDocumentBinaryUrl("binary-url"));
 
     @BeforeEach
     void setup() {
@@ -150,11 +148,10 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
                                                        .setListFromDate(null))
                 .build();
 
-            when(courtOfficerOrderGenerator.generate(any(), any())).thenReturn(CaseDocument.builder().documentLink(
-                Document.builder()
-                    .documentFileName(fileName)
-                    .categoryID("caseManagementOrders")
-                    .build()).createdDatetime(LocalDateTime.now()).build());
+            when(courtOfficerOrderGenerator.generate(any(), any())).thenReturn(new CaseDocument().setDocumentLink(
+                new Document()
+                    .setDocumentFileName(fileName)
+                    .setCategoryID("caseManagementOrders")).setCreatedDatetime(LocalDateTime.now()));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

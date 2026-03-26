@@ -90,7 +90,7 @@ class StartBusinessProcessTaskHandlerTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, names = {"READY", "DISPATCHED"})
     void shouldStartBusinessProcess_whenValidBusinessProcessStatus(BusinessProcessStatus status) {
-        BusinessProcess businessProcess = BusinessProcess.builder().status(status).build();
+        BusinessProcess businessProcess = new BusinessProcess().setStatus(status);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().businessProcess(businessProcess).build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
@@ -98,10 +98,9 @@ class StartBusinessProcessTaskHandlerTest {
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
         when(mockTask.getTopicName()).thenReturn("test");
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder()
-                                                                               .state(State.from("MAIN.DRAFT"))
-                                                                               .flags(Map.of())
-                                                                               .build());
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(new StateFlowDTO()
+            .setState(State.from("MAIN.DRAFT"))
+            .setFlags(Map.of()));
 
         handler.execute(mockTask, externalTaskService);
 
@@ -139,10 +138,9 @@ class StartBusinessProcessTaskHandlerTest {
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
         when(mockTask.getTopicName()).thenReturn("test");
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder()
-                                                                               .state(State.from("MAIN.DRAFT"))
-                                                                               .flags(Map.of())
-                                                                               .build());
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(new StateFlowDTO()
+            .setState(State.from("MAIN.DRAFT"))
+            .setFlags(Map.of()));
 
         handler.execute(mockTask, externalTaskService);
 
@@ -194,9 +192,8 @@ class StartBusinessProcessTaskHandlerTest {
     }
 
     private BusinessProcess getBusinessProcess(BusinessProcessStatus started, String processInstanceId) {
-        return BusinessProcess.builder()
-            .status(started)
-            .processInstanceId(processInstanceId)
-            .build();
+        return new BusinessProcess()
+            .setStatus(started)
+            .setProcessInstanceId(processInstanceId);
     }
 }

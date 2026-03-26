@@ -109,11 +109,8 @@ public class StitchBundleApiConsumerTest extends BaseContractTest {
     }
 
     private BundleRequest getBundleRequest() {
-        return BundleRequest.builder()
-            .caseDetails(CaseDetails.builder()
-                             .id(666L)
-                             .data(new HashMap<>())
-                             .build())
-            .build();
+        return new BundleRequest(new CaseDetails()
+                                     .setId(666L)
+                                     .setData(new HashMap<>()));
     }
 }

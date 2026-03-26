@@ -27,7 +27,8 @@ public enum SmallClaimsVariable {
     }),
     ADD_NEW_DIRECTIONS(caseData -> caseData.getSmallClaimsAddNewDirections() != null),
     MEDIATION_SECTION_TOGGLE(caseData -> caseData.getSmallClaimsMediationSectionStatement() != null),
-    WELSH_TOGGLE(caseData -> caseData.getSdoR2SmallClaimsUseOfWelshToggle() != null);
+    WELSH_TOGGLE(caseData -> caseData.getSdoR2SmallClaimsUseOfWelshToggle() != null),
+    PENAL_NOTICE_TOGGLE(caseData -> caseData.getSmallClaimsPenalNoticeToggle() != null);
 
     private final Predicate<CaseData> predicate;
 

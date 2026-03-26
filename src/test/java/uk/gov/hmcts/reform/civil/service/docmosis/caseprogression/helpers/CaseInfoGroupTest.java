@@ -21,14 +21,13 @@ public class CaseInfoGroupTest {
 
     @Test
     void shouldPopulateCaseInfo_WhenAllFieldsPresent() {
-        Party applicant1 = Party.builder().partyName("Claimant 1").type(Type.COMPANY).build();
-        Party applicant2 = Party.builder().partyName("Claimant 2").type(Type.COMPANY).build();
-        Party respondent1 = Party.builder().partyName("Defendant 1").type(Type.COMPANY).build();
-        Party respondent2 = Party.builder().partyName("Defendant 2").type(Type.COMPANY).build();
-        SolicitorReferences solicitorReferences = SolicitorReferences.builder()
-            .applicantSolicitor1Reference("ClaimantRef")
-            .respondentSolicitor1Reference("DefendantRef")
-            .build();
+        Party applicant1 = new Party().setPartyName("Claimant 1").setType(Type.COMPANY);
+        Party applicant2 = new Party().setPartyName("Claimant 2").setType(Type.COMPANY);
+        Party respondent1 = new Party().setPartyName("Defendant 1").setType(Type.COMPANY);
+        Party respondent2 = new Party().setPartyName("Defendant 2").setType(Type.COMPANY);
+        SolicitorReferences solicitorReferences = new SolicitorReferences()
+            .setApplicantSolicitor1Reference("ClaimantRef")
+            .setRespondentSolicitor1Reference("DefendantRef");
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
             .applicant1(applicant1)
@@ -52,8 +51,8 @@ public class CaseInfoGroupTest {
 
     @Test
     void shouldPopulateCaseInfo_WhenOnlySingleClaimantAndDefendantPresent() {
-        Party applicant1 = Party.builder().partyName("Claimant 1").type(Type.COMPANY).build();
-        Party respondent1 = Party.builder().partyName("Defendant 1").type(Type.COMPANY).build();
+        Party applicant1 = new Party().setPartyName("Claimant 1").setType(Type.COMPANY);
+        Party respondent1 = new Party().setPartyName("Defendant 1").setType(Type.COMPANY);
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
             .applicant1(applicant1)
@@ -77,8 +76,8 @@ public class CaseInfoGroupTest {
 
     @Test
     void shouldPopulateCaseInfo_WhenSolicitorReferencesAreAbsent() {
-        Party applicant1 = Party.builder().partyName("Claimant 1").type(Type.COMPANY).build();
-        Party respondent1 = Party.builder().partyName("Defendant 1").type(Type.COMPANY).build();
+        Party applicant1 = new Party().setPartyName("Claimant 1").setType(Type.COMPANY);
+        Party respondent1 = new Party().setPartyName("Defendant 1").setType(Type.COMPANY);
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
             .applicant1(applicant1)

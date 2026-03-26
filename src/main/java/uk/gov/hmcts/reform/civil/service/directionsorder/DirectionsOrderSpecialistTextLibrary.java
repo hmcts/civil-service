@@ -79,6 +79,25 @@ public final class DirectionsOrderSpecialistTextLibrary {
         "The defendant must upload to the Digital Portal the amended Scott Schedule with the "
             + "relevant columns in response completed by 4pm on";
 
+    public static final String HOUSING_DISREPAIR_CLAUSE_A =
+        "a)   The claimant has permission to rely on the written report of an expert surveyor as uploaded to the portal "
+            + "with the particulars of claim.";
+    public static final String HOUSING_DISREPAIR_CLAUSE_B =
+        "b)   The defendant has permission to rely on the written report of an expert surveyor "
+            + "and if that report has not already been served then it must be served by 4pm";
+    public static final String HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE =
+        "c)   Where the Defendant has served an expert report, the parties' expert "
+            + "shall liaise to seek to narrow the scope of any disagreement between them and shall, by 4pm";
+    public static final String HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE =
+        ", send to each party a joint statement setting out areas of agreement, "
+            + "areas of disagreement and brief reasons for any areas of disagreement.";
+    public static final String HOUSING_DISREPAIR_CLAUSE_D =
+        "d)   The claimant shall upload the joint statement by no later than 7 days of service "
+            + "of the same in accordance with paragraph c.";
+    public static final String HOUSING_DISREPAIR_CLAUSE_E =
+        "e)   Any party seeking permission to rely on oral expert evidence must make an application "
+            + "within 14 days of the uploading of the joint statement.";
+
     /* Fast track & DJ – disclosure, schedules, and bundle text */
     public static final String FAST_TRACK_DISCLOSURE_STANDARD_SDO =
         "Standard disclosure shall be provided by the parties by uploading to the Digital Portal their list of documents by 4pm on";

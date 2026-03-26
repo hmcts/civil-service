@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -39,6 +38,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -64,11 +64,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT;
 
-@SpringBootTest(classes = {
-    JudicialFinalDecisionHandler.class,
-    JacksonAutoConfiguration.class,
-    GaForLipService.class,
-})
+@ExtendWith(MockitoExtension.class)
 class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     private static final String ON_INITIATIVE_SELECTION_TEST = "As this order was made on the court's own initiative, "
@@ -81,42 +77,30 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     private static final LocalDate localDatePlus7days = LocalDate.now().plusDays(7);
     private static final LocalDate localDatePlus14days = LocalDate.now().plusDays(14);
     private static final LocalDate localDatePlus21days = LocalDate.now().plusDays(21);
-    @Autowired
-    private JudicialFinalDecisionHandler handler;
-    @MockBean
-    private FreeFormOrderGenerator freeFormOrderGenerator;
-    @MockBean
-    private AssistedOrderFormGenerator assistedOrderFormGenerator;
-    @Autowired
-    private ObjectMapper objMapper;
-    @MockBean
-    private GeneralAppLocationRefDataService locationRefDataService;
-    @MockBean
-    private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
-    private IdamClient idamClient;
-    @MockBean
-    private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
-    private CoreCaseDataService coreCaseDataService;
 
-    @BeforeEach
-    void setUp() {
-        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
-        when(deadlinesCalculator
-                 .getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(7)))
-            .thenReturn(localDatePlus7days);
-        when(idamClient
-                 .getUserInfo(any()))
-            .thenReturn(UserInfo.builder().givenName("John").familyName("Doe").build());
-        when(deadlinesCalculator
-                 .getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(14)))
-            .thenReturn(localDatePlus14days);
-        when(deadlinesCalculator
-                 .getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(21)))
-            .thenReturn(localDatePlus21days);
-    }
+    @Spy
+    private ObjectMapper objMapper = ObjectMapperFactory.instance();
+
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+
+    @InjectMocks
+    private JudicialFinalDecisionHandler handler;
+
+    @Mock
+    private FreeFormOrderGenerator freeFormOrderGenerator;
+    @Mock
+    private AssistedOrderFormGenerator assistedOrderFormGenerator;
+    @Mock
+    private GeneralAppLocationRefDataService locationRefDataService;
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
+    @Mock
+    private IdamClient idamClient;
+    @Mock
+    private CoreCaseDataService coreCaseDataService;
+    @Mock
+    private GaForLipService gaForLipService;
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -125,10 +109,12 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
     @Test
     void setCaseName() {
+        when(idamClient.getUserInfo(any()))
+            .thenReturn(UserInfo.builder().givenName("John").familyName("Doe").build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .atStateClaimDraft()
-            .build().toBuilder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .build().copy()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .claimant1PartyName("Mr. John Rambo")
             .defendant1PartyName("Mr. Sole Trader")
             .build();
@@ -143,14 +129,17 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldPopulateFreeFormOrderValues_onMidEventCallback() {
         // Given
+        when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(7)))
+            .thenReturn(localDatePlus7days);
+        when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(14)))
+            .thenReturn(localDatePlus14days);
+        when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(21)))
+            .thenReturn(localDatePlus21days);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft()
-            .build().toBuilder().isMultiParty(NO)
+            .build().copy().isMultiParty(NO)
             .generalAppDetailsOfOrder("order test")
             .locationName("County Court Money Centre")
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("Ccmcc")
-                                        .region("4")
-                                        .siteName("County Court Money Centre").build()).build();
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("Ccmcc").setRegion("4").setSiteName("County Court Money Centre")).build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-finalOrder-form-values");
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -170,20 +159,22 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     void shouldPopulate_AssistedOrderFormOrderValues_onMidEventCallback() {
 
         // Given
+        when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(7)))
+            .thenReturn(localDatePlus7days);
+        when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(14)))
+            .thenReturn(localDatePlus14days);
+        when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(21)))
+            .thenReturn(localDatePlus21days);
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                          .build());
-        locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                          .build());
+        locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+        locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft()
-            .build().toBuilder().locationName("County Court Money Centre")
+            .build().copy().locationName("County Court Money Centre")
             .claimant1PartyName("Mr. John Rambo")
             .defendant1PartyName("Mr. Sole Trader")
             .isMultiParty(NO)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("Ccmcc")
-                                        .region("4")
-                                        .siteName("County Court Money Centre").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("Ccmcc").setRegion("4").setSiteName("County Court Money Centre"))
             .generalAppDetailsOfOrder("order test").build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-finalOrder-form-values");
         // When
@@ -227,7 +218,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
                 "assistedOrderAppealSecondOption")
             .extracting("assistedOrderAppealDate").isEqualTo(localDatePlus21days.toString());
         assertThat(((Map) ((ArrayList) ((Map) ((Map) (response.getData().get("assistedOrderFurtherHearingDetails")))
-            .get("alternativeHearingLocation")).get("list_items")).get(0))
+            .get("alternativeHearingLocation")).get("list_items")).getFirst())
                        .get("label")).isEqualTo("Site Name 1 - Address1 - 18000");
         assertThat(((Map) ((ArrayList) ((Map) ((Map) (response.getData().get("assistedOrderFurtherHearingDetails")))
             .get("hearingLocationList")).get("list_items")).get(0))
@@ -244,21 +235,23 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     void shouldPopulate_AssistedOrderFormOrderValues1v2_onMidEventCallback() {
 
         // Given
+        when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(7)))
+            .thenReturn(localDatePlus7days);
+        when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(14)))
+            .thenReturn(localDatePlus14days);
+        when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(21)))
+            .thenReturn(localDatePlus21days);
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                          .build());
-        locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                          .build());
+        locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+        locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft()
-            .build().toBuilder().locationName("County Court Money Centre")
+            .build().copy().locationName("County Court Money Centre")
             .claimant1PartyName("Mr. John Rambo")
             .defendant1PartyName("Mr. Sole Trader")
             .defendant2PartyName("Mr. Sole Trader Defendant2")
             .isMultiParty(YES)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("Ccmcc")
-                                        .region("4")
-                                        .siteName("County Court Money Centre").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("Ccmcc").setRegion("4").setSiteName("County Court Money Centre"))
             .generalAppDetailsOfOrder("order test").build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-finalOrder-form-values");
         // When
@@ -305,7 +298,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
                 "assistedOrderAppealSecondOption")
             .extracting("assistedOrderAppealDate").isEqualTo(localDatePlus21days.toString());
         assertThat(((Map) ((ArrayList) ((Map) ((Map) (response.getData().get("assistedOrderFurtherHearingDetails")))
-            .get("alternativeHearingLocation")).get("list_items")).get(0))
+            .get("alternativeHearingLocation")).get("list_items")).getFirst())
                        .get("label")).isEqualTo("Site Name 1 - Address1 - 18000");
         assertThat(((Map) ((ArrayList) ((Map) ((Map) (response.getData().get("assistedOrderFurtherHearingDetails")))
             .get("hearingLocationList")).get("list_items")).get(0))
@@ -327,15 +320,15 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         // Given
         when(freeFormOrderGenerator.generate(any(), any())).thenReturn(
-            CaseDocument.builder().documentLink(Document.builder().build()).build());
+            new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder()
+            .copy()
             .finalOrderSelection(GaFinalOrderSelection.FREE_FORM_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
-            .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(
-                AssistedOrderDateHeard.builder().singleDate(LocalDate.now().plusDays(1)).build()).build())
+            .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
+                new AssistedOrderDateHeard().setSingleDate(LocalDate.now().plusDays(1))))
             .build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
         // When
@@ -350,15 +343,15 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         // Given
         when(freeFormOrderGenerator.generate(any(), any())).thenReturn(
-            CaseDocument.builder().documentLink(Document.builder().build()).build());
+            new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder()
+            .copy()
             .finalOrderSelection(GaFinalOrderSelection.FREE_FORM_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
-            .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(
-                AssistedOrderDateHeard.builder().singleDate(LocalDate.now()).build()).build())
+            .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
+                new AssistedOrderDateHeard().setSingleDate(LocalDate.now())))
             .build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
         // When
@@ -372,16 +365,16 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     void shouldNotShowError_When_OrderDateIsSingleSelection() {
 
         when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
+            .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder()
+            .copy()
             .finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
-            .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(
-                AssistedOrderDateHeard.builder().singleDate(LocalDate.now()).build()).build()).build();
+            .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
+                new AssistedOrderDateHeard().setSingleDate(LocalDate.now()))).build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -396,15 +389,13 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldShowError_When_OrderDateIsSingleSelectionAfterTodayDate() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
-            .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(
-                AssistedOrderDateHeard.builder().singleDate(LocalDate.now().plusDays(1)).build()).build()).build();
+            .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
+                new AssistedOrderDateHeard().setSingleDate(LocalDate.now().plusDays(1)))).build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -415,16 +406,14 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldNotShowError_When_OrderDateIsDateRange_FromIsAfter() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
-            .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().dateRangeSelection(
-                AssistedOrderDateHeard.builder().dateRangeFrom(LocalDate.now().plusDays(1))
-                    .dateRangeTo(LocalDate.now()).build()).build()).build();
+            .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
+                new AssistedOrderDateHeard().setDateRangeFrom(LocalDate.now().plusDays(1))
+                    .setDateRangeTo(LocalDate.now()))).build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -435,16 +424,14 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldNotShowError_When_OrderDateIsDateRange_ToIsAfter() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
-            .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().dateRangeSelection(
-                AssistedOrderDateHeard.builder().dateRangeFrom(LocalDate.now())
-                    .dateRangeTo(LocalDate.now().plusDays(2)).build()).build()).build();
+            .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
+                new AssistedOrderDateHeard().setDateRangeFrom(LocalDate.now())
+                    .setDateRangeTo(LocalDate.now().plusDays(2)))).build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -454,19 +441,17 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldShowError_When_DatesToAvoidIsBeforeTodayDate() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
-            .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                    .datesToAvoid(YES)
-                                                    .datesToAvoidDateDropdown(AssistedOrderDateHeard.builder()
-                                                                                  .datesToAvoidDates(LocalDate.now().minusDays(
+            .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                    .setDatesToAvoid(YES)
+                                                    .setDatesToAvoidDateDropdown(new AssistedOrderDateHeard()
+                                                                                  .setDatesToAvoidDates(LocalDate.now().minusDays(
                                                                                       2))
-                                                                                  .build()).build())
+                                                                                  ))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
@@ -478,19 +463,17 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldShowError_When_JudgeHeardFromClaimantListIsNull() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
-            .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                             .representationType(CLAIMANT_AND_DEFENDANT)
-                                             .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                  .defendantRepresentation(
-                                                                                      DefendantRepresentationType.COST_DRAFTSMAN_FOR_THE_DEFENDANT).build())
-                                             .build())
+            .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                             .setRepresentationType(CLAIMANT_AND_DEFENDANT)
+                                             .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                  .setDefendantRepresentation(
+                                                                                      DefendantRepresentationType.COST_DRAFTSMAN_FOR_THE_DEFENDANT))
+                                             )
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
@@ -503,19 +486,17 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldShowError_When_JudgeHeardFromDefendantListIsNull() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
-            .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                             .representationType(CLAIMANT_AND_DEFENDANT)
-                                             .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                  .claimantRepresentation(
-                                                                                      ClaimantRepresentationType.CLAIMANT_NOT_ATTENDING).build())
-                                             .build())
+            .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                             .setRepresentationType(CLAIMANT_AND_DEFENDANT)
+                                             .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                  .setClaimantRepresentation(
+                                                                                      ClaimantRepresentationType.CLAIMANT_NOT_ATTENDING))
+                                             )
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
@@ -528,22 +509,20 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldShowError_When_JudgeHeardFromDefendantTwoListIsNull() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .generalOrderApplication()
             .build()
-            .toBuilder().isMultiParty(YES).finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().isMultiParty(YES).finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
-            .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                             .representationType(CLAIMANT_AND_DEFENDANT)
-                                             .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                  .defendantRepresentation(
+            .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                             .setRepresentationType(CLAIMANT_AND_DEFENDANT)
+                                             .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                  .setDefendantRepresentation(
                                                                                       DefendantRepresentationType.COUNSEL_FOR_DEFENDANT)
-                                                                                  .claimantRepresentation(
-                                                                                      ClaimantRepresentationType.CLAIMANT_NOT_ATTENDING).build())
-                                             .build())
+                                                                                  .setClaimantRepresentation(
+                                                                                      ClaimantRepresentationType.CLAIMANT_NOT_ATTENDING))
+                                             )
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
@@ -557,18 +536,18 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     void shouldNotShowError_When_DatesToAvoidIsAfterTodayDate() {
 
         when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
+            .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
-            .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                    .datesToAvoid(YES)
-                                                    .datesToAvoidDateDropdown(AssistedOrderDateHeard.builder()
-                                                                                  .datesToAvoidDates(LocalDate.now().plusDays(
+            .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                    .setDatesToAvoid(YES)
+                                                    .setDatesToAvoidDateDropdown(new AssistedOrderDateHeard()
+                                                                                  .setDatesToAvoidDates(LocalDate.now().plusDays(
                                                                                       2))
-                                                                                  .build()).build())
+                                                                                  ))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
@@ -581,22 +560,22 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     void shouldNotShowError_When_assistedOrderCostsFirstDropdownDateAndThirdDropdownDateIsAfterTodayDate() {
 
         when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
+            .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
-            .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                    .datesToAvoid(YES)
-                                                    .datesToAvoidDateDropdown(AssistedOrderDateHeard.builder()
-                                                                                  .datesToAvoidDates(LocalDate.now().plusDays(
+            .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                    .setDatesToAvoid(YES)
+                                                    .setDatesToAvoidDateDropdown(new AssistedOrderDateHeard()
+                                                                                  .setDatesToAvoidDates(LocalDate.now().plusDays(
                                                                                       2))
-                                                                                  .build()).build())
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                  .assistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(2))
-                                                  .assistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(2))
-                                                  .makeAnOrderForCostsYesOrNo(NO).build()
+                                                                                  ))
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                  .setAssistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(2))
+                                                  .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(2))
+                                                  .setMakeAnOrderForCostsYesOrNo(NO)
 
             )
             .build();
@@ -610,23 +589,21 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldShowError_When_assistedOrderCostsFirstDropdownDateIsAfterTodayDateAndThirdDropdownDateIsPrevious() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
-            .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                    .datesToAvoid(YES)
-                                                    .datesToAvoidDateDropdown(AssistedOrderDateHeard.builder()
-                                                                                  .datesToAvoidDates(LocalDate.now().plusDays(
+            .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                    .setDatesToAvoid(YES)
+                                                    .setDatesToAvoidDateDropdown(new AssistedOrderDateHeard()
+                                                                                  .setDatesToAvoidDates(LocalDate.now().plusDays(
                                                                                       2))
-                                                                                  .build()).build())
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                  .assistedOrderAssessmentThirdDropdownDate(LocalDate.now().minusDays(2))
-                                                  .assistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(2))
-                                                  .makeAnOrderForCostsYesOrNo(NO).build()
+                                                                                  ))
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                  .setAssistedOrderAssessmentThirdDropdownDate(LocalDate.now().minusDays(2))
+                                                  .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(2))
+                                                  .setMakeAnOrderForCostsYesOrNo(NO)
 
             )
             .build();
@@ -641,23 +618,21 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldShowError_When_assistedOrderCostsFirstDropdownDateIsPreviousDateAndThirdDropdownDateIsPrevious() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
-            .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                    .datesToAvoid(YES)
-                                                    .datesToAvoidDateDropdown(AssistedOrderDateHeard.builder()
-                                                                                  .datesToAvoidDates(LocalDate.now().plusDays(
+            .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                    .setDatesToAvoid(YES)
+                                                    .setDatesToAvoidDateDropdown(new AssistedOrderDateHeard()
+                                                                                  .setDatesToAvoidDates(LocalDate.now().plusDays(
                                                                                       2))
-                                                                                  .build()).build())
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                  .assistedOrderAssessmentThirdDropdownDate(LocalDate.now().minusDays(2))
-                                                  .assistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(2))
-                                                  .makeAnOrderForCostsYesOrNo(NO).build()
+                                                                                  ))
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                  .setAssistedOrderAssessmentThirdDropdownDate(LocalDate.now().minusDays(2))
+                                                  .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(2))
+                                                  .setMakeAnOrderForCostsYesOrNo(NO)
 
             )
             .build();
@@ -672,23 +647,21 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldShowError_When_assistedOrderCostsFirstDropdownDateIsPreviousDateAndThirdDropdownDateIsAfterDate() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
-            .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                    .datesToAvoid(YES)
-                                                    .datesToAvoidDateDropdown(AssistedOrderDateHeard.builder()
-                                                                                  .datesToAvoidDates(LocalDate.now().plusDays(
+            .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                    .setDatesToAvoid(YES)
+                                                    .setDatesToAvoidDateDropdown(new AssistedOrderDateHeard()
+                                                                                  .setDatesToAvoidDates(LocalDate.now().plusDays(
                                                                                       2))
-                                                                                  .build()).build())
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                  .assistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(2))
-                                                  .assistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(2))
-                                                  .makeAnOrderForCostsYesOrNo(NO).build()
+                                                                                  ))
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                  .setAssistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(2))
+                                                  .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(2))
+                                                  .setMakeAnOrderForCostsYesOrNo(NO)
 
             )
             .build();
@@ -703,35 +676,33 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldShowError_When_assistedOrderAppealFirstDropdownDateIsPreviousDate() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
-            .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                    .datesToAvoid(YES)
-                                                    .datesToAvoidDateDropdown(AssistedOrderDateHeard.builder()
-                                                                                  .datesToAvoidDates(LocalDate.now().plusDays(
+            .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                    .setDatesToAvoid(YES)
+                                                    .setDatesToAvoidDateDropdown(new AssistedOrderDateHeard()
+                                                                                  .setDatesToAvoidDates(LocalDate.now().plusDays(
                                                                                       2))
-                                                                                  .build()).build())
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                  .assistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(2))
-                                                  .assistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(2))
-                                                  .makeAnOrderForCostsYesOrNo(NO).build())
-            .assistedOrderAppealDetails(AssistedOrderAppealDetails.builder().appealTypeChoicesForGranted(
-                    AppealTypeChoices.builder()
-                        .appealChoiceOptionA(
-                            AppealTypeChoiceList.builder()
-                                .appealGrantedRefusedDate(LocalDate.now().minusDays(2))
-                                .build()).build())
-                                            .appealTypeChoicesForRefused(AppealTypeChoices.builder()
-                                                                             .appealChoiceOptionA(
-                                                                                 AppealTypeChoiceList.builder()
-                                                                                     .appealGrantedRefusedDate(LocalDate.now().minusDays(
+                                                                                  ))
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                  .setAssistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(2))
+                                                  .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(2))
+                                                  .setMakeAnOrderForCostsYesOrNo(NO))
+            .assistedOrderAppealDetails(new AssistedOrderAppealDetails().setAppealTypeChoicesForGranted(
+                    new AppealTypeChoices()
+                        .setAppealChoiceOptionA(
+                            new AppealTypeChoiceList()
+                                .setAppealGrantedRefusedDate(LocalDate.now().minusDays(2))
+                                ))
+                                            .setAppealTypeChoicesForRefused(new AppealTypeChoices()
+                                                                             .setAppealChoiceOptionA(
+                                                                                 new AppealTypeChoiceList()
+                                                                                     .setAppealGrantedRefusedDate(LocalDate.now().minusDays(
                                                                                          2))
-                                                                                     .build()).build()).build()).build();
+                                                                                     ))).build();
 
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
@@ -742,31 +713,29 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldShowError_When_assistedOrderAppealSecondDropdownDateIsPreviousDate() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
-            .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                    .datesToAvoid(YES)
-                                                    .datesToAvoidDateDropdown(AssistedOrderDateHeard.builder()
-                                                                                  .datesToAvoidDates(LocalDate.now().plusDays(
+            .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                    .setDatesToAvoid(YES)
+                                                    .setDatesToAvoidDateDropdown(new AssistedOrderDateHeard()
+                                                                                  .setDatesToAvoidDates(LocalDate.now().plusDays(
                                                                                       2))
-                                                                                  .build()).build())
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                  .assistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(2))
-                                                  .assistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(2))
-                                                  .makeAnOrderForCostsYesOrNo(NO).build()
+                                                                                  ))
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                  .setAssistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(2))
+                                                  .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(2))
+                                                  .setMakeAnOrderForCostsYesOrNo(NO)
 
             )
-            .assistedOrderAppealDetails(AssistedOrderAppealDetails.builder().appealTypeChoicesForGranted(
-                AppealTypeChoices.builder()
-                    .appealChoiceOptionB(
-                        AppealTypeChoiceList.builder()
-                            .appealGrantedRefusedDate(LocalDate.now().minusDays(2))
-                            .build()).build()).build())
+            .assistedOrderAppealDetails(new AssistedOrderAppealDetails().setAppealTypeChoicesForGranted(
+                new AppealTypeChoices()
+                    .setAppealChoiceOptionB(
+                        new AppealTypeChoiceList()
+                            .setAppealGrantedRefusedDate(LocalDate.now().minusDays(2))
+                            )))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
@@ -779,30 +748,30 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     void shouldNotShowError_When_assistedOrderAppealSecondDropdownDateIsAfterDate() {
 
         when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
+            .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
-            .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                    .datesToAvoid(YES)
-                                                    .datesToAvoidDateDropdown(AssistedOrderDateHeard.builder()
-                                                                                  .datesToAvoidDates(LocalDate.now().plusDays(
+            .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                    .setDatesToAvoid(YES)
+                                                    .setDatesToAvoidDateDropdown(new AssistedOrderDateHeard()
+                                                                                  .setDatesToAvoidDates(LocalDate.now().plusDays(
                                                                                       2))
-                                                                                  .build()).build())
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                  .assistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(2))
-                                                  .assistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(2))
-                                                  .makeAnOrderForCostsYesOrNo(NO).build()
+                                                                                  ))
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                  .setAssistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(2))
+                                                  .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(2))
+                                                  .setMakeAnOrderForCostsYesOrNo(NO)
 
             )
-            .assistedOrderAppealDetails(AssistedOrderAppealDetails.builder().appealTypeChoicesForGranted(
-                AppealTypeChoices.builder()
-                    .appealChoiceOptionB(
-                        AppealTypeChoiceList.builder()
-                            .appealGrantedRefusedDate(LocalDate.now().plusDays(2))
-                            .build()).build()).build())
+            .assistedOrderAppealDetails(new AssistedOrderAppealDetails().setAppealTypeChoicesForGranted(
+                new AppealTypeChoices()
+                    .setAppealChoiceOptionB(
+                        new AppealTypeChoiceList()
+                            .setAppealGrantedRefusedDate(LocalDate.now().plusDays(2))
+                            )))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
@@ -815,27 +784,27 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     void shouldNotShowError_When_assistedOrderAppealChoicesAreEmpty() {
 
         when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
+            .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
-            .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                    .datesToAvoid(YES)
-                                                    .datesToAvoidDateDropdown(AssistedOrderDateHeard.builder()
-                                                                                  .datesToAvoidDates(LocalDate.now().plusDays(
+            .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                    .setDatesToAvoid(YES)
+                                                    .setDatesToAvoidDateDropdown(new AssistedOrderDateHeard()
+                                                                                  .setDatesToAvoidDates(LocalDate.now().plusDays(
                                                                                       2))
-                                                                                  .build()).build())
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                  .assistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(2))
-                                                  .assistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(2))
-                                                  .makeAnOrderForCostsYesOrNo(NO).build()
+                                                                                  ))
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                  .setAssistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(2))
+                                                  .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().plusDays(2))
+                                                  .setMakeAnOrderForCostsYesOrNo(NO)
 
             )
-            .assistedOrderAppealDetails(AssistedOrderAppealDetails.builder().appealTypeChoicesForGranted(
-                AppealTypeChoices.builder()
-                    .build()).build())
+            .assistedOrderAppealDetails(new AssistedOrderAppealDetails().setAppealTypeChoicesForGranted(
+                new AppealTypeChoices()
+                    ))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
@@ -847,16 +816,14 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldShowError_When_OrderDateIsDateRange_FromIsAfterDateTo() {
 
-        when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
-            .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().dateRangeSelection(
-                AssistedOrderDateHeard.builder().dateRangeFrom(LocalDate.now().minusDays(2))
-                    .dateRangeTo(LocalDate.now().minusDays(3)).build()).build()).build();
+            .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
+                new AssistedOrderDateHeard().setDateRangeFrom(LocalDate.now().minusDays(2))
+                    .setDateRangeTo(LocalDate.now().minusDays(3)))).build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -867,15 +834,15 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     void shouldNotShowError_When_OrderDateIsDateRange_FromIsAfterDateTo() {
 
         when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
+            .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
-            .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().dateRangeSelection(
-                AssistedOrderDateHeard.builder().dateRangeFrom(LocalDate.now().minusDays(2))
-                    .dateRangeTo(LocalDate.now()).build()).build()).build();
+            .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
+                new AssistedOrderDateHeard().setDateRangeFrom(LocalDate.now().minusDays(2))
+                    .setDateRangeTo(LocalDate.now()))).build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -887,15 +854,15 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         // Given
         when(freeFormOrderGenerator.generate(any(), any())).thenReturn(
-            CaseDocument.builder().documentLink(Document.builder().build()).build());
+            new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder()
+            .copy()
             .finalOrderSelection(GaFinalOrderSelection.FREE_FORM_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
-            .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(
-                AssistedOrderDateHeard.builder().singleDate(LocalDate.now()).build()).build())
+            .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
+                new AssistedOrderDateHeard().setSingleDate(LocalDate.now())))
             .build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
         // When
@@ -907,11 +874,10 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
     @Test
     void shouldGenerateFinalOrderPreviewDocumentWhenPopulateFinalOrderPreviewDocIsCalled() {
-        when(freeFormOrderGenerator.generate(any(), any())).thenReturn(CaseDocument
-                                                                           .builder().documentLink(Document.builder().build()).build());
+        when(freeFormOrderGenerator.generate(any(), any())).thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.FREE_FORM_ORDER).build();
+            .copy().finalOrderSelection(GaFinalOrderSelection.FREE_FORM_ORDER).build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -925,10 +891,10 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     @Test
     void shouldGenerateAssistedOrderPreviewDocumentWhenPopulateFinalOrderPreviewDocIsCalled() {
         when(assistedOrderFormGenerator.generate(any(), any()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
+            .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER).build();
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER).build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -945,7 +911,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         void oneVOne() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .build().toBuilder()
+                .build().copy()
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
                 .build();
@@ -957,7 +923,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         void oneVTwoSameSol() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YES)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -972,7 +938,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         void oneVTwo() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -989,7 +955,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldSetUpReadyBusinessProcess() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().gaFinalOrderDocPreview(Document.builder().build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().gaFinalOrderDocPreview(new Document()).build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1012,7 +978,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")

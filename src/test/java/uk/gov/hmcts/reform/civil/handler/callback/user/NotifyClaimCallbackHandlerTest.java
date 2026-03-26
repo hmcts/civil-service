@@ -654,7 +654,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
                 assertThat(responseData.getCosNotifyClaimDefendant1()
-                               .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
+                               .getCosSenderStatementOfTruthLabel()).contains("CERTIFIED");
                 assertThat(response.getData())
                     .containsEntry(
                         "claimDetailsNotificationDeadline",
@@ -687,7 +687,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
                 assertThat(responseData.getCosNotifyClaimDefendant2()
-                               .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
+                               .getCosSenderStatementOfTruthLabel()).contains("CERTIFIED");
 
                 assertThat(response.getData())
                     .containsEntry("claimDetailsNotificationDeadline", expectedDeadline.format(ISO_DATE_TIME));
@@ -937,6 +937,23 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             String formattedDeadline = formatLocalDateTime(DEADLINE, DATE_TIME_AT);
             String confirmationBody = String.format(CONFIRMATION_BODY, formattedDeadline)
+                + exitSurveyContentService.applicantSurvey();
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# Notification of claim sent%n## Claim number: 000DC001"))
+                    .confirmationBody(confirmationBody)
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_whenInvokedWithNullDeadline() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
+            caseData.setClaimDetailsNotificationDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String confirmationBody = String.format(CONFIRMATION_BODY, "N/A")
                 + exitSurveyContentService.applicantSurvey();
 
             assertThat(response).usingRecursiveComparison().isEqualTo(

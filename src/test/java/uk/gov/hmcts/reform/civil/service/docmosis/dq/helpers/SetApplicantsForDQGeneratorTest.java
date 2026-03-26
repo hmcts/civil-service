@@ -33,7 +33,7 @@ class SetApplicantsForDQGeneratorTest {
     void shouldSetApplicantforDQFormBuilder() {
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoApplicants()
-            .applicant1(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
             .build();
 
         DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
@@ -48,7 +48,7 @@ class SetApplicantsForDQGeneratorTest {
     @Test
     void shouldSetSingleApplicantForDQFormBuilder() {
         CaseData caseData = CaseDataBuilder.builder()
-            .applicant1(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
             .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
             .build();
 
@@ -63,17 +63,21 @@ class SetApplicantsForDQGeneratorTest {
 
     @Test
     void shouldSetApplicant2v1ForDQFormBuilder() {
-        Address addr1 = Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build();
-        Address addr2 = Address.builder().addressLine1("345 Main St").postTown("Test City").country("Test Country").build();
+        Address addr1 = new Address();
+        addr1.setAddressLine1("123 Main St");
+        addr1.setPostTown("City");
+        addr1.setCountry("Country");
+        Address addr2 = new Address();
+        addr2.setAddressLine1("345 Main St");
+        addr2.setPostTown("Test City");
+        addr2.setCountry("Test Country");
         CaseData caseData = CaseDataBuilder.builder()
-            .applicant1(Party.builder()
-                            .partyName("Party").type(Party.Type.INDIVIDUAL)
-                            .primaryAddress(addr1)
-                            .build())
-            .applicant2(Party.builder()
-                            .partyName("Party").type(Party.Type.INDIVIDUAL)
-                            .primaryAddress(addr2)
-                            .build())
+            .applicant1(new Party()
+                            .setPartyName("Party").setType(Party.Type.INDIVIDUAL)
+                            .setPrimaryAddress(addr1))
+            .applicant2(new Party()
+                            .setPartyName("Party").setType(Party.Type.INDIVIDUAL)
+                            .setPrimaryAddress(addr2))
             .addApplicant2(YES)
             .applicant1ProceedWithClaimMultiParty2v1(YES)
             .applicant2ProceedWithClaimMultiParty2v1(YES)

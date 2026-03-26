@@ -91,7 +91,7 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
         DynamicList dynamicList = new DynamicList();
         dynamicList.setValue(dynamicListElement);
         caseData.setDefendantDetailsSpec(dynamicList);
-        caseData.setRespondent1(PartyBuilder.builder().individual().build());
+        caseData.setRespondent1(new PartyBuilder().individual().build());
         JudgmentDetails judgmentDetails = new JudgmentDetails();
         judgmentDetails.setIssueDate(LocalDate.now());
         judgmentDetails.setState(JudgmentState.ISSUED);
@@ -107,7 +107,7 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
             "BEARER_TOKEN",
             SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -130,7 +130,7 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
         DynamicList dynamicList = new DynamicList();
         dynamicList.setValue(dynamicListElement);
         caseData.setDefendantDetailsSpec(dynamicList);
-        caseData.setRespondent1(PartyBuilder.builder().organisation().build());
+        caseData.setRespondent1(new PartyBuilder().organisation().build());
         JudgmentDetails judgmentDetails = new JudgmentDetails();
         judgmentDetails.setIssueDate(LocalDate.now());
         judgmentDetails.setState(JudgmentState.ISSUED);
@@ -146,7 +146,7 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
             "BEARER_TOKEN",
             SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -167,7 +167,7 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
         DynamicList dynamicList = new DynamicList();
         dynamicList.setValue(dynamicListElement);
         caseData.setDefendantDetailsSpec(dynamicList);
-        caseData.setRespondent1(PartyBuilder.builder().individual().build());
+        caseData.setRespondent1(new PartyBuilder().individual().build());
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)

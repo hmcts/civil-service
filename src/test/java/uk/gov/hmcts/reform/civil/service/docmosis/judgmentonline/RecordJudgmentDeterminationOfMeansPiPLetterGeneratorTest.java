@@ -79,30 +79,24 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     private static final CaseDocument caseDocument =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName(String.format(N1.getDocumentTitle(), "000DC001"))
-            .documentSize(0L)
-            .documentType(DocumentType.RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName(String.format(N1.getDocumentTitle(), "000DC001"))
+            .setDocumentSize(0L)
+            .setDocumentType(DocumentType.RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
 
     @BeforeEach
     void setup() {
         given(defendantPinToPostLRspecService.buildDefendantPinToPost())
-            .willReturn(DefendantPinToPostLRspec.builder()
-                            .accessCode(
-                                AccessCodeGenerator.generateAccessCode())
-                            .respondentCaseRole(
-                                CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                            .expiryDate(LocalDate.now().plusDays(
-                                180))
-                            .build());
+            .willReturn(new DefendantPinToPostLRspec()
+                            .setAccessCode(AccessCodeGenerator.generateAccessCode())
+                            .setRespondentCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                            .setExpiryDate(LocalDate.now().plusDays(180)));
         given(documentGeneratorService.generateDocmosisDocument(
             any(MappableObject.class),
             eq(RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER)
@@ -126,8 +120,8 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
+        Party applicant = new PartyBuilder().soleTrader().build();
+        Party defendant = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1Represented(YesOrNo.NO)
             .applicant1(applicant)
@@ -139,8 +133,8 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
             any(),
             any()
         )).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
-        when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(Fee.builder().calculatedAmountInPence(
-            BigDecimal.valueOf(1000)).build());
+        when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(new Fee().setCalculatedAmountInPence(
+            BigDecimal.valueOf(1000)));
 
         // when
         generator.generateAndPrintRecordJudgmentDeterminationOfMeansLetter(caseData, BEARER_TOKEN);
@@ -159,8 +153,8 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
     @Test
     void shouldGetTemplateFeesCorrectly() {
         //Given
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
+        Party applicant = new PartyBuilder().soleTrader().build();
+        Party defendant = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1Represented(YesOrNo.NO)
             .applicant1(applicant)
@@ -169,9 +163,9 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
             .buildJudgmentOnlineCaseDataWithDeterminationMeans();
 
         when(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER))
-            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1500)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(1500)));
         when(generalAppFeesService.getFeeForJOWithApplicationType(OTHER))
-            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1400)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(1400)));
         //When
         RecordJudgmentDeterminationOfMeansLiPDefendantLetter recordJudgmentDeterminationOfMeansLiPDefendantLetter
             = generator.getTemplateData(caseData);

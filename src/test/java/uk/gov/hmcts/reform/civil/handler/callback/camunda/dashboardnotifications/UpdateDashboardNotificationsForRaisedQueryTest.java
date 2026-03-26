@@ -80,8 +80,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123456")
-                                                                       .build());
+        when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("123456"));
         CaseMessage applicantMessage = new CaseMessage();
         applicantMessage.setId("123456");
         applicantMessage.setCreatedBy("applicant");
@@ -96,7 +95,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             .qmLatestQuery(createLatestQuery("123456"))
             .queries(applicantCitizenQuery)
             .legacyCaseReference("reference")
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
@@ -110,25 +109,25 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_DEFENDANT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -139,8 +138,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
-                                                                       .build());
+        when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("123457"));
         CaseMessage defendantMessage = new CaseMessage();
         defendantMessage.setId("123457");
         defendantMessage.setCreatedBy("defendant");
@@ -155,7 +153,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             .qmLatestQuery(createLatestQuery("123457"))
             .queries(defendantCitizenQuery)
             .legacyCaseReference("reference")
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
@@ -169,25 +167,25 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_DEFENDANT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -198,8 +196,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
-                                                                       .build());
+        when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("123457"));
         CaseMessage defendantMessage = new CaseMessage();
         defendantMessage.setId("123457");
         defendantMessage.setCreatedBy("defendant");
@@ -217,7 +214,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             .qmLatestQuery(createLatestQuery("123457"))
             .queries(defendantCitizenQuery)
             .legacyCaseReference("reference")
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
@@ -231,19 +228,19 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_DEFENDANT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }
@@ -255,8 +252,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
-                                                                       .build());
+        when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("123457"));
         CaseMessage claimantMessage = new CaseMessage();
         claimantMessage.setId("123457");
         claimantMessage.setCreatedBy("claimant");
@@ -274,7 +270,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             .qmLatestQuery(createLatestQuery("123457"))
             .queries(applicantCitizenQuery)
             .legacyCaseReference("reference")
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
@@ -288,19 +284,19 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_DEFENDANT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }
