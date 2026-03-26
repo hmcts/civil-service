@@ -22,10 +22,13 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
+import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.OAuth2Configuration;
+import uk.gov.hmcts.reform.idam.client.models.TokenRequest;
+import uk.gov.hmcts.reform.idam.client.models.TokenResponse;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -34,6 +37,7 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -52,10 +56,10 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private IdamClient idamClient;
 
     @Mock
-    private CoreCaseUserService coreCaseUserService;
+    private IdamApi idamApi;
 
     @Mock
-    private UserService userService;
+    private CoreCaseUserService coreCaseUserService;
 
     @Mock
     private SystemUpdateUserConfiguration systemUpdateUserConfiguration;
@@ -65,6 +69,9 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Spy
     private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+
+    @Spy
+    private OAuth2Configuration oauth2Configuration = new OAuth2Configuration("", "", "", "");
 
     @InjectMocks
     private LinkDefendantToClaimCallbackHandler handler;
@@ -154,7 +161,9 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitTests {
 
-        public static final String BEARER_TOKEN = "BEARER TOKEN";
+        public static final String TOKEN = "TOKEN";
+        public static final TokenResponse TOKEN_RESPONSE = new TokenResponse(TOKEN, "", "", "", "", "");
+        public static final String BEARER_TOKEN = "Bearer " + TOKEN;
         public static final String USER = "user";
         public static final String PASSWORD = "password";
         public static final String SEARCH_QUERY = String.format("email:\"%s\"", DEFENDANT_EMAIL);
@@ -172,7 +181,6 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setUp() {
             when(systemUpdateUserConfiguration.getUserName()).thenReturn(USER);
             when(systemUpdateUserConfiguration.getPassword()).thenReturn(PASSWORD);
-            when(userService.getAccessToken(USER, PASSWORD)).thenReturn(BEARER_TOKEN);
             when(featureToggleService.isLinkDefendantTestingEnabled()).thenReturn(true);
         }
 
@@ -191,6 +199,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             String userId = "1234567890";
             UserDetails userDetails = UserDetails.builder().id(userId).build();
 
+            when(idamApi.generateOpenIdToken(any(TokenRequest.class))).thenReturn(TOKEN_RESPONSE);
             when(idamClient.searchUsers(BEARER_TOKEN, SEARCH_QUERY)).thenReturn(List.of(userDetails));
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -244,6 +253,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData).build();
 
+            when(idamApi.generateOpenIdToken(any(TokenRequest.class))).thenReturn(TOKEN_RESPONSE);
             when(idamClient.searchUsers(BEARER_TOKEN, SEARCH_QUERY)).thenReturn(List.of());
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
