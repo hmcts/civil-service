@@ -94,8 +94,8 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
             dashboardScenariosService.recordScenarios(
                     authToken,
                     SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(), caseId,
-                    ScenarioRequestParams.builder().params(
-                            mapper.mapCaseDataToParams(caseData)).build()
+                    new ScenarioRequestParams(
+                            mapper.mapCaseDataToParams(caseData))
             );
         }
 
@@ -119,7 +119,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
             log.info("HearingScheduledClaimantNotificationHandler: Recording hearing fee scenario for caseid: {}", caseId);
             dashboardScenariosService.recordScenarios(authToken,
                                               SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(), caseId,
-                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                                              new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
             );
         }
 
@@ -129,14 +129,14 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
                 log.info("HearingScheduledClaimantNotificationHandler: Recording trial arrangements scenario for caseid: {}", caseId);
                 dashboardScenariosService.recordScenarios(authToken,
                                                   SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(), caseId,
-                                                  ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                                                  new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
                 );
             }
 
             log.info("HearingScheduledClaimantNotificationHandler: Recording upload documents scenarios for caseid: {}", caseId);
             dashboardScenariosService.recordScenarios(authToken,
                                               SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(), caseId,
-                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                                              new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
             );
         }
 

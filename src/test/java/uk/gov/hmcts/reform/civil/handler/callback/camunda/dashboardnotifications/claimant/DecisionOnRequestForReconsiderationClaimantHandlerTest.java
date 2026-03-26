@@ -81,7 +81,7 @@ class DecisionOnRequestForReconsiderationClaimantHandlerTest {
             "BEARER_TOKEN",
             SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

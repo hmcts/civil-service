@@ -77,8 +77,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
 
     private static final String ERROR_MESSAGE_DEADLINE_EXPIRED
         = "You can no longer request a reconsideration because the deadline has expired";
-
-    private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND = "You can only request a reconsideration for claims of £1,000 or less.";
+    private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_TEN_THOUSAND = "You can only request a reconsideration for claims of £10,000 or less.";
     private static final String ERROR_MESSAGE_EVENT_NOT_ALLOWED = "You can only request a reconsideration where a Legal Advisor has drawn the SDO.";
 
     @Test
@@ -161,7 +160,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: The error should be displayed
-            assertThat(response.getErrors().contains(ERROR_MESSAGE_DEADLINE_EXPIRED));
+            assertThat(response.getErrors()).contains(ERROR_MESSAGE_DEADLINE_EXPIRED);
         }
 
         @Test
@@ -179,7 +178,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: The error should be displayed
-            assertThat(response.getErrors().contains(ERROR_MESSAGE_DEADLINE_EXPIRED));
+            assertThat(response.getErrors()).contains(ERROR_MESSAGE_DEADLINE_EXPIRED);
         }
 
         @ParameterizedTest
@@ -234,7 +233,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
-        void shouldNotAllowEventForCaseWithClaimAmountGreaterThan1000() {
+        void shouldNotAllowEventForCaseWithClaimAmountGreaterThan10000() {
             //Given : Casedata with claim amount greater than 1000
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .totalClaimAmount(new BigDecimal(12000))
@@ -244,8 +243,8 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             //When: handler is called with ABOUT_TO_START event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            //Then: No errors should be displayed
-            assertThat(response.getErrors().contains(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND));
+            //Then: ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_TEN_THOUSAND should be displayed
+            assertThat(response.getErrors()).contains(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_TEN_THOUSAND);
         }
 
         @Test
@@ -261,7 +260,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: No errors should be displayed
-            assertThat(response.getErrors().contains(ERROR_MESSAGE_EVENT_NOT_ALLOWED));
+            assertThat(response.getErrors()).contains(ERROR_MESSAGE_EVENT_NOT_ALLOWED);
         }
     }
 
@@ -291,6 +290,33 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
                 .extracting("reasonForReconsiderationTxt")
                 .isEqualTo("Reason");
+            assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
+                .extracting("requestor")
+                .isEqualTo("Applicant - FirstName LastName");
+        }
+
+        @Test
+        void shouldPopulateReasonAndRequestorDetailsOfApplicantBlank() {
+            //Given : Casedata
+            Party party = new Party();
+            party.setIndividualFirstName("FirstName");
+            party.setIndividualLastName("LastName");
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("test");
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .reasonForReconsiderationApplicant(new ReasonForReconsideration())
+                .applicant1(party).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: setAsideDate should be set correctly
+            assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
+                .extracting("reasonForReconsiderationTxt")
+                .isEqualTo("Not provided");
             assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
                 .extracting("requestor")
                 .isEqualTo("Applicant - FirstName LastName");
@@ -484,6 +510,40 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
+        void shouldPopulateReasonAndRequestorDetailsOfRespondentsWhen2V1DifferentDefSol() {
+            //Given : Casedata
+            Party party = new Party();
+            party.setIndividualFirstName("FirstName");
+            party.setIndividualLastName("LastName");
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("test");
+            ReasonForReconsideration reasonForReconsideration = new ReasonForReconsideration();
+            reasonForReconsideration.setReasonForReconsiderationTxt("Reason");
+            Party party1 = new Party();
+            party1.setIndividualFirstName("FirstName2");
+            party1.setIndividualLastName("LastName2");
+            party1.setType(Party.Type.INDIVIDUAL);
+            party1.setPartyName("test");
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .reasonForReconsiderationRespondent1(reasonForReconsideration)
+                .respondent1(party)
+                .addRespondent2(YesOrNo.YES)
+                .respondent2SameLegalRepresentative(YesOrNo.NO)
+                .respondent2(party1).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: requestor should not include respondent 2
+            assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
+                .extracting("requestor")
+                .isEqualTo("Defendant - FirstName LastName");
+        }
+
+        @Test
         void shouldPopulateReasonAndRequestorDetailsOfRespondentsWhen2V1SameDefSolBlank() {
             //Given : Casedata
             Party party = new Party();
@@ -627,6 +687,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .caseDataLip(new CaseDataLiP()
                                  .setRequestForReviewCommentsDefendant("Comments from defendant"))
                 .applicant1Represented(YesOrNo.NO)
+                .respondent1(new Party().setPartyName("Individual").setType(Party.Type.INDIVIDUAL))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -651,6 +712,35 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("requestForReconsiderationDocumentRes")
                 .extracting("documentName")
                 .isEqualTo(caseDocument.getDocumentName());
+        }
+
+        @Test
+        void shouldPopulateOrderRequestedForReviewDefendantWhenItIsDefendantLiPRequestBlank() {
+            //Given : Casedata
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .caseDataLip(new CaseDataLiP())
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1(new Party().setPartyName("Individual").setType(Party.Type.INDIVIDUAL))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
+            CaseDocument caseDocument = mock(CaseDocument.class);
+            when(caseDocument.getDocumentName()).thenReturn("Generated document for defendant");
+            when(documentService.generateLiPDocument(
+                caseData,
+                params.getParams().get(BEARER_TOKEN).toString(),
+                false
+            )).thenReturn(caseDocument);
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: setAsideDate should be set correctly
+            assertThat(response.getData()).extracting("orderRequestedForReviewDefendant")
+                .isEqualTo("Yes");
+            assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
+                .extracting("reasonForReconsiderationTxt")
+                .isEqualTo("Not provided");
         }
     }
 
