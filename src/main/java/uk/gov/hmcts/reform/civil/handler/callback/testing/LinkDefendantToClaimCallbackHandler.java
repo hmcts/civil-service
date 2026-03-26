@@ -16,11 +16,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
-import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.OAuth2Configuration;
-import uk.gov.hmcts.reform.idam.client.models.TokenRequest;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.Collections;
@@ -31,8 +29,6 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LINK_DEFENDANT_TO_CLAIM;
-import static uk.gov.hmcts.reform.idam.client.IdamClient.BEARER_AUTH_TYPE;
-import static uk.gov.hmcts.reform.idam.client.IdamClient.OPENID_GRANT_TYPE;
 
 @Slf4j
 @Service
@@ -43,12 +39,11 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
 
     private final ValidateEmailService validateEmailService;
     private final IdamClient idamClient;
-    private final IdamApi idamApi;
     private final CoreCaseUserService coreCaseUserService;
+    private final UserService userService;
     private final SystemUpdateUserConfiguration systemUpdateUserConfiguration;
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
-    private final OAuth2Configuration oauth2Configuration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -103,25 +98,10 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
     }
 
     private String getSystemUserAccessToken() {
-        return BEARER_AUTH_TYPE + " " + getAccessTokenResponse(
+        return userService.getAccessToken(
             systemUpdateUserConfiguration.getUserName(),
             systemUpdateUserConfiguration.getPassword()
         );
-    }
-
-    private String getAccessTokenResponse(String username, String password) {
-        return idamApi.generateOpenIdToken(
-            new TokenRequest(
-                oauth2Configuration.getClientId(),
-                oauth2Configuration.getClientSecret(),
-                OPENID_GRANT_TYPE,
-                oauth2Configuration.getRedirectUri(),
-                username,
-                password,
-                "search-user",
-                null,
-                null
-            )).accessToken;
     }
 
     private CallbackResponse linkDefendantToClaim(CaseData caseData, String defendantUserId, String defendantEmail) {
