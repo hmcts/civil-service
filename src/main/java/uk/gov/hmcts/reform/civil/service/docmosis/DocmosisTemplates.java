@@ -1,29 +1,36 @@
 package uk.gov.hmcts.reform.civil.service.docmosis;
 
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.DEFAULT_JUDGMENT_SPEC_FORM;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.DIRECTIONS_ORDER;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.DIRECTIONS_QUESTIONNAIRE_FORM;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.ORDERS;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.RESPONSE_SEALED_FORM;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.SEALED_CLAIM_FORM_SPEC;
+
 import jakarta.validation.constraints.NotNull;
 
 public enum DocmosisTemplates {
     N1("CV-UNS-CLM-ENG-01126.docx", "sealed_claim_form_%s.pdf"),
     N1_MULTIPARTY_SAME_SOL("CV-UNS-CLM-ENG-01125.docx", "sealed_claim_form_%s.pdf"),
-    N2("CV-SPC-CLM-ENG-01349.docx", "sealed_claim_form_spec%s.pdf"),
-    N2_2V1_LIP("CV-SPC-CLM-ENG-01355.docx", "sealed_claim_form_spec%s.pdf"),
-    N2_1V2_SAME_SOL("CV-SPC-CLM-ENG-01351.docx", "sealed_claim_form_spec%s.pdf"),
-    N2_1V2_DIFFERENT_SOL("CV-SPC-CLM-ENG-01350.docx", "sealed_claim_form_spec%s.pdf"),
-    N2_1V2_DIFFERENT_SOL_LIP("CV-SPC-CLM-ENG-01354.docx", "sealed_claim_form_spec%s.pdf"),
-    N2_2V1("CV-SPC-CLM-ENG-01352.docx", "sealed_claim_form_spec%s.pdf"),
+    N2("CV-SPC-CLM-ENG-01349.docx", SEALED_CLAIM_FORM_SPEC),
+    N2_2V1_LIP("CV-SPC-CLM-ENG-01355.docx", SEALED_CLAIM_FORM_SPEC),
+    N2_1V2_SAME_SOL("CV-SPC-CLM-ENG-01351.docx", SEALED_CLAIM_FORM_SPEC),
+    N2_1V2_DIFFERENT_SOL("CV-SPC-CLM-ENG-01350.docx", SEALED_CLAIM_FORM_SPEC),
+    N2_1V2_DIFFERENT_SOL_LIP("CV-SPC-CLM-ENG-01354.docx", SEALED_CLAIM_FORM_SPEC),
+    N2_2V1("CV-SPC-CLM-ENG-01352.docx", SEALED_CLAIM_FORM_SPEC),
     N10("CV-SPEC-ACK-ENG-00001-v01.docx", "acknowledgement_of_service_form_spec_%s.pdf"),
     N9_MULTIPARTY_SAME_SOL("CV-UNS-ACK-ENG-01142.docx", "acknowledgement_of_claim_form_%s.pdf"),
     N11("CV-UNS-ACK-ENG-01146.docx", "acknowledgement_of_claim_form_%s.pdf"),
-    N121_SPEC("CV-SPC-DEC-ENG-00910.docx", "default_judgment_spec_form_%s.pdf"),
-    N121_SPEC_NON_IMMEDIATE("CV-SPC-DEC-ENG-00913.docx", "default_judgment_spec_form_%s.pdf"),
-    N121_SPEC_DEFENDANT("CV-SPC-DEC-ENG-00911.docx", "default_judgment_spec_form_%s.pdf"),
-    N121_SPEC_CLAIMANT("CV-SPC-DEC-ENG-00912.docx", "default_judgment_spec_form_%s.pdf"),
-    N121_SPEC_CLAIMANT_WELSH("CV-SPC-DEC-WEL-00912.docx", "default_judgment_spec_form_%s.pdf"),
+    N121_SPEC("CV-SPC-DEC-ENG-00910.docx", DEFAULT_JUDGMENT_SPEC_FORM),
+    N121_SPEC_NON_IMMEDIATE("CV-SPC-DEC-ENG-00913.docx", DEFAULT_JUDGMENT_SPEC_FORM),
+    N121_SPEC_DEFENDANT("CV-SPC-DEC-ENG-00911.docx", DEFAULT_JUDGMENT_SPEC_FORM),
+    N121_SPEC_CLAIMANT("CV-SPC-DEC-ENG-00912.docx", DEFAULT_JUDGMENT_SPEC_FORM),
+    N121_SPEC_CLAIMANT_WELSH("CV-SPC-DEC-WEL-00912.docx", DEFAULT_JUDGMENT_SPEC_FORM),
     N121("CV-UNS-DEC-ENG-01280.docx", "default_judgment_form_%s.pdf"),
-    DEFENDANT_RESPONSE_SPEC_SEALED_1V2("CV-SPC-HRN-ENG-01360.docx", "%s_response_sealed_form.pdf"),
-    DEFENDANT_RESPONSE_SPEC_SEALED_1V2_LR_ADMISSION_BULK("CV-SPC-HRN-ENG-01363.docx", "%s_response_sealed_form.pdf"),
-    DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS("CV-SPC-HRN-ENG-01362.docx", "%s_response_sealed_form.pdf"),
-    DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS_LR_ADMISSION_BULK("CV-SPC-HRN-ENG-01364.docx", "%s_response_sealed_form.pdf"),
+    DEFENDANT_RESPONSE_SPEC_SEALED_1V2("CV-SPC-HRN-ENG-01360.docx", RESPONSE_SEALED_FORM),
+    DEFENDANT_RESPONSE_SPEC_SEALED_1V2_LR_ADMISSION_BULK("CV-SPC-HRN-ENG-01363.docx", RESPONSE_SEALED_FORM),
+    DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS("CV-SPC-HRN-ENG-01362.docx", RESPONSE_SEALED_FORM),
+    DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS_LR_ADMISSION_BULK("CV-SPC-HRN-ENG-01364.docx", RESPONSE_SEALED_FORM),
     LIP_CLAIM_FORM("CV-UNS-CLM-ENG-01096.docx", "litigant_in_person_claim_form_%s.pdf"),
     SDO_R2_DISPOSAL("CV-UNS-STD-ENG-01390.docx", "disposal_hearing_sdo_%s.pdf"),
     DJ_SDO_R2_DISPOSAL("CV-UNS-DEC-ENG-01331.docx", "Order_disposal_%s.pdf"),
@@ -41,19 +48,19 @@ public enum DocmosisTemplates {
     DEFAULT_JUDGMENT_COVER_LETTER("CV-SPC-STD-ENG-DJ-COVER-LETTER-00985.docx", "default_judgment_cover_letter.pdf"),
     SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER("CV-SPC-LET-ENG-LIP-SD0001.docx", "settle_claim_paid_in_full_letter.pdf"),
     SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_WELSH("CV-SPC-LET-WEL-LIP-SD0001.docx", "settle_claim_paid_in_full_letter.pdf"),
-    DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT("CV-SPC-HRN-ENG-01358.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01356.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT("CV-SPC-HRN-ENG-01359.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01343.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    DQ_RESPONSE_1V1_FAST_TRACK_INT("CV-UNS-HRN-ENG-01345.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01341.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    DQ_RESPONSE_1V2_DS_FAST_TRACK_INT("CV-UNS-HRN-ENG-01346.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01342.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    DQ_RESPONSE_1V2_SS_FAST_TRACK_INT("CV-UNS-HRN-ENG-01347.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01344.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    DQ_RESPONSE_2V1_FAST_TRACK_INT("CV-UNS-HRN-ENG-01348.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    DQ_LR_V_LIP_RESPONSE("CV-SPC-HRN-ENG-LIP-01282.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    DQ_LIP_RESPONSE("CV-SPC-HRN-ENG-LIP-01283.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT("CV-SPC-HRN-ENG-01358.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
+    CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01356.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
+    CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT("CV-SPC-HRN-ENG-01359.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
+    DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01343.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
+    DQ_RESPONSE_1V1_FAST_TRACK_INT("CV-UNS-HRN-ENG-01345.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
+    DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01341.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
+    DQ_RESPONSE_1V2_DS_FAST_TRACK_INT("CV-UNS-HRN-ENG-01346.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
+    DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01342.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
+    DQ_RESPONSE_1V2_SS_FAST_TRACK_INT("CV-UNS-HRN-ENG-01347.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
+    DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01344.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
+    DQ_RESPONSE_2V1_FAST_TRACK_INT("CV-UNS-HRN-ENG-01348.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
+    DQ_LR_V_LIP_RESPONSE("CV-SPC-HRN-ENG-LIP-01282.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
+    DQ_LIP_RESPONSE("CV-SPC-HRN-ENG-LIP-01283.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
     TRIAL_READY("CV-UNS-HRN-ENG-01247-10180.docx", "%s_%s_Trial_Arrangements.pdf"),
     HEARING_NOTICE_HMC("CV-UNS-HNO-ENG-01200.docx", "hearing_notice_%s.pdf"),
     HEARING_NOTICE_HMC_WELSH("CV-UNS-HNO-WEL-01200.docx", "hearing_notice_welsh_%s.pdf"),
@@ -66,17 +73,17 @@ public enum DocmosisTemplates {
     REQUEST_FOR_RECONSIDERATION("CV-SPC-CLM-ENG-REQUEST-RECONSIDERATION.docx", "%s_request_for_reconsideration.pdf"),
 
     // judge final Order
-    FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
-    ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf"),
+    FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", ORDERS),
+    ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", ORDERS),
 
     // Judge order download order
     BLANK_TEMPLATE_AFTER_HEARING_DOCX("CV-UNS-DEC-ENG-01286.docx", "%s_order.docx"),
-    BLANK_TEMPLATE_BEFORE_HEARING_DOCX("CV-UNS-DEC-ENG-01301.docx", "%s_Directions order.docx"),
-    FIX_DATE_CCMC_DOCX("CV-UNS-DEC-ENG-01287.docx", "%s_Directions order.docx"),
-    FIX_DATE_CMC_DOCX("CV-UNS-DEC-ENG-01302.docx", "%s_Directions order.docx"),
+    BLANK_TEMPLATE_BEFORE_HEARING_DOCX("CV-UNS-DEC-ENG-01301.docx", DIRECTIONS_ORDER),
+    FIX_DATE_CCMC_DOCX("CV-UNS-DEC-ENG-01287.docx", DIRECTIONS_ORDER),
+    FIX_DATE_CMC_DOCX("CV-UNS-DEC-ENG-01302.docx", DIRECTIONS_ORDER),
 
     //Court officer order
-    COURT_OFFICER_ORDER_PDF("CV-UNS-DEC-ENG-01299.docx", "Order_%s.pdf"),
+    COURT_OFFICER_ORDER_PDF("CV-UNS-DEC-ENG-01299.docx", ORDERS),
     SETTLEMENT_AGREEMENT_PDF("CV-SPC-CLM-ENG-00001-SETTLEMENT.docx", "%s-settlement-agreement.pdf"),
     CLAIMANT_LIP_MANUAL_DETERMINATION_PDF("CV-SPC-CLM-ENG-00001-LIP-MD.docx", "%s_request-org-repayment-amount.pdf"),
     JUDGMENT_BY_ADMISSION_OR_DETERMINATION("CV-SPC-CLM-ENG-00001-JBA-JBD.docx", "%s-ccj-request-%s.pdf"),
