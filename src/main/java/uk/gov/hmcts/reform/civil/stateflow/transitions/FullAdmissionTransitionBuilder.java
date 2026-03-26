@@ -80,12 +80,12 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
     }
 
     private Predicate<CaseData> takenOfflineSpecDefendantNocAfterJba() {
-        return isDefendantNoCOnlineForCase.and(PaymentPredicate.payImmediatelyPartAdmit)
+        return isDefendantNoCOnlineForCase.and(PaymentPredicate.payImmediately)
             .and(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA);
     }
 
     private static Predicate<CaseData> fullAdmitJudgementAdmission() {
-        return LipPredicate.ccjRequestJudgmentByAdmission.and(PaymentPredicate.payImmediatelyPartAdmit).and(LipPredicate.isLiPvLiPCase);
+        return LipPredicate.ccjRequestJudgmentByAdmission.and(PaymentPredicate.payImmediately).and(LipPredicate.isLiPvLiPCase);
     }
 
     public final Predicate<CaseData> isDefendantNoCOnlineForCase = featureToggleService::isDefendantNoCOnlineForCase;
