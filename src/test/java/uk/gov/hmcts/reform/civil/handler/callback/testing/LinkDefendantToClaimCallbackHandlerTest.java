@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.CustomIdamApi;
-import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -58,7 +58,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private UserService userService;
 
     @Mock
-    private CrossAccessUserConfiguration crossAccessUserConfiguration;
+    private SystemUpdateUserConfiguration systemUpdateUserConfiguration;
 
     @Mock
     private FeatureToggleService featureToggleService;
@@ -154,9 +154,9 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitTests {
 
-        public static final String CAA_USER = "caa_user";
-        public static final String CAA_PASSWORD = "caa_password";
-        public static final String CAA_TOKEN = "CAA_TOKEN";
+        public static final String BEARER_TOKEN = "BEARER TOKEN";
+        public static final String USER = "user";
+        public static final String PASSWORD = "password";
         public static final String CITIZEN_CASE_ROLE = "citizen";
 
         private static @NonNull DefendantPinToPostLRspec getDefendantPin() {
@@ -169,9 +169,9 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setUp() {
-            when(crossAccessUserConfiguration.getUserName()).thenReturn(CAA_USER);
-            when(crossAccessUserConfiguration.getPassword()).thenReturn(CAA_PASSWORD);
-            when(userService.getAccessToken(CAA_USER, CAA_PASSWORD)).thenReturn(CAA_TOKEN);
+            when(systemUpdateUserConfiguration.getUserName()).thenReturn(USER);
+            when(systemUpdateUserConfiguration.getPassword()).thenReturn(PASSWORD);
+            when(userService.getAccessToken(USER, PASSWORD)).thenReturn(BEARER_TOKEN);
             when(featureToggleService.isLinkDefendantTestingEnabled()).thenReturn(true);
         }
 
@@ -190,7 +190,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             String userId = "1234567890";
             UserDetails userDetails = UserDetails.builder().id(userId).build();
 
-            when(customIdamApi.getUserByEmail(CAA_TOKEN, DEFENDANT_EMAIL)).thenReturn(userDetails);
+            when(customIdamApi.getUserByEmail(BEARER_TOKEN, DEFENDANT_EMAIL)).thenReturn(userDetails);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -202,10 +202,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseData.get("defendantUserDetails"))
                 .isNotNull()
                 .satisfies(obj -> {
-                    Map<String, Object> details = objectMapper.convertValue(
-                        obj, new TypeReference<>() {
-                        }
-                    );
+                    Map<String, Object> details = objectMapper.convertValue(obj, new TypeReference<>() {});
                     assertThat(details.get("id")).isEqualTo(userId);
                     assertThat(details.get("email")).isEqualTo(DEFENDANT_EMAIL);
                 });
@@ -214,10 +211,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseData.get("respondent1"))
                 .isNotNull()
                 .satisfies(obj -> {
-                    Map<String, Object> respondent1 = objectMapper.convertValue(
-                        obj, new TypeReference<>() {
-                        }
-                    );
+                    Map<String, Object> respondent1 = objectMapper.convertValue(obj, new TypeReference<>() {});
                     assertThat(respondent1.get("partyEmail")).isEqualTo(DEFENDANT_EMAIL);
                 });
 
@@ -225,10 +219,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseData.get("respondent1PinToPostLRspec"))
                 .isNotNull()
                 .satisfies(obj -> {
-                    Map<String, Object> pin = objectMapper.convertValue(
-                        obj, new TypeReference<>() {
-                        }
-                    );
+                    Map<String, Object> pin = objectMapper.convertValue(obj, new TypeReference<>() {});
                     assertThat(pin.get("expiryDate")).isEqualTo("2026-01-01");
                     assertThat(pin.get("citizenCaseRole")).isEqualTo(CITIZEN_CASE_ROLE);
                     assertThat(pin.get("respondentCaseRole")).isEqualTo(CITIZEN_CASE_ROLE);
@@ -252,7 +243,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData).build();
 
-            when(customIdamApi.getUserByEmail(CAA_TOKEN, DEFENDANT_EMAIL)).thenReturn(null);
+            when(customIdamApi.getUserByEmail(BEARER_TOKEN, DEFENDANT_EMAIL)).thenReturn(null);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
