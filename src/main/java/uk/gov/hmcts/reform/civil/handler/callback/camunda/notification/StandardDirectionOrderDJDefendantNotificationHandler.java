@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -13,6 +15,10 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -83,48 +89,80 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
     }
 
     private void notifyDefendant1(CallbackParams callbackParams, CaseData caseData) {
-        if (isTargetDefendantNotSelected(caseData, caseData.getRespondent1().getPartyName())) {
+        if (isTargetDefendantNotSelected(caseData, Optional.ofNullable(caseData.getRespondent1()).map(Party::getPartyName).orElse(null))) {
             return;
         }
 
-        String recipientEmail = caseData.isRespondent1NotRepresented()
-            ? caseData.getDefendantUserDetails().getEmail()
-            : caseData.getRespondentSolicitor1EmailAddress();
+        try {
+            Optional<String> recipientEmail = getDefendant1RecipientEmail(caseData);
+            if (recipientEmail.isEmpty()) {
+                log.warn("Skipping defendant 1 notification due to missing recipient email for case {}",
+                         getCaseId(callbackParams));
+                return;
+            }
 
-        sendDefendantNotification(
-            callbackParams,
-            caseData,
-            recipientEmail,
-            addProperties(caseData),
-            "respondent 1"
-        );
+            sendDefendantNotification(
+                callbackParams,
+                caseData,
+                recipientEmail.get(),
+                addProperties(caseData),
+                "respondent 1"
+            );
+        } catch (Exception e) {
+            log.error("Failed to send email to respondent 1 for case {} due to error {}",
+                      getCaseId(callbackParams), e.getMessage());
+        }
     }
 
     private void notifyDefendant2(CallbackParams callbackParams, CaseData caseData) {
         if (!YesOrNo.YES.equals(caseData.getAddRespondent2())) {
             return;
         }
-        if (isTargetDefendantNotSelected(caseData, caseData.getRespondent2().getPartyName())) {
+        if (isTargetDefendantNotSelected(
+            caseData,
+            Optional.ofNullable(caseData.getRespondent2())
+                .map(Party::getPartyName)
+                .orElse(null))) {
             return;
         }
 
-        // In 1v2 with a single legal rep, respondent 1's LR receives the defendant 2 notification.
-        String recipientEmail = getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
-            ? caseData.getRespondent1EmailAddress()
-            : getDefendant2RecipientEmail(caseData);
+        try {
+            Optional<String> recipientEmail = getDefendant2RecipientEmail(caseData);
+            if (recipientEmail.isEmpty()) {
+                log.warn("Skipping defendant 2 notification due to missing recipient email for case {}",
+                         getCaseId(callbackParams));
+                return;
+            }
 
-        sendDefendantNotification(
-            callbackParams,
-            caseData,
-            recipientEmail,
-            addPropertiesDef2(caseData),
-            "respondent 2"
-        );
+            sendDefendantNotification(
+                callbackParams,
+                caseData,
+                recipientEmail.get(),
+                addPropertiesDef2(caseData),
+                "respondent 2"
+            );
+        } catch (Exception e) {
+            log.error("Failed to send email to respondent 2 for case {} due to error {}",
+                      getCaseId(callbackParams), e.getMessage());
+        }
     }
 
-    private static String getDefendant2RecipientEmail(CaseData caseData) {
+    private Optional<String> getDefendant1RecipientEmail(CaseData caseData) {
+        if (caseData.isRespondent1NotRepresented()) {
+            return Optional.ofNullable(caseData.getDefendantUserDetails())
+                .map(IdamUserDetails::getEmail);
+        }
+        return Optional.ofNullable(caseData.getRespondentSolicitor1EmailAddress());
+    }
+
+    private Optional<String> getDefendant2RecipientEmail(CaseData caseData) {
+        // In 1v2 with a single legal rep, respondent 1's LR receives the defendant 2 notification.
+        if (getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP) {
+            return Optional.ofNullable(caseData.getRespondent1EmailAddress());
+        }
         return YesOrNo.YES.equals(caseData.getRespondent2Represented())
-                ? caseData.getRespondentSolicitor2EmailAddress() : caseData.getRespondent2().getPartyEmail();
+            ? Optional.ofNullable(caseData.getRespondentSolicitor2EmailAddress())
+            : Optional.ofNullable(caseData.getRespondent2()).map(Party::getPartyEmail);
     }
 
     private void sendDefendantNotification(
@@ -168,7 +206,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
     public Map<String, String> addPropertiesDef2(final CaseData caseData) {
         String organisationId = getRespondent2OrganisationId(caseData);
         String legalOrgName = findOrganisationName(organisationId)
-            .orElse(caseData.getRespondent2().getPartyName());
+            .orElse(Optional.ofNullable(caseData.getRespondent2()).map(Party::getPartyName).orElse(""));
 
         return addCommonProperties(caseData, legalOrgName);
     }
@@ -198,14 +236,16 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
     }
 
     private String getRespondent1OrganisationId(CaseData caseData) {
-        if (nonNull(caseData.getRespondent1OrganisationPolicy().getOrganisation())) {
+        if (nonNull(caseData.getRespondent1OrganisationPolicy())
+            && nonNull(caseData.getRespondent1OrganisationPolicy().getOrganisation())) {
             return caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
         }
         return null;
     }
 
     private String getRespondent2OrganisationId(CaseData caseData) {
-        if (nonNull(caseData.getRespondent2OrganisationPolicy())) {
+        if (nonNull(caseData.getRespondent2OrganisationPolicy())
+            && nonNull(caseData.getRespondent2OrganisationPolicy().getOrganisation())) {
             return caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
         }
         // For some 1v2 states only respondent 1 org policy exists; use it as a fallback for org lookup.
@@ -213,10 +253,30 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
     }
 
     private boolean isBothDefendantsSelected(CaseData caseData) {
-        return !caseData.isRespondent1NotRepresented() && BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel());
+        if (caseData.isRespondent1NotRepresented()) {
+            return false;
+        }
+        return getDefendantDetailsLabel(caseData)
+            .map(BOTH_DEFENDANTS::equals)
+            .orElse(false);
     }
 
     private boolean isRequestedDefendant(final CaseData caseData, String defendantName) {
-        return caseData.getDefendantDetails() != null && defendantName.equals(caseData.getDefendantDetails().getValue().getLabel());
+        return defendantName != null && getDefendantDetailsLabel(caseData)
+            .map(defendantName::equals)
+            .orElse(false);
+    }
+
+    private Optional<String> getDefendantDetailsLabel(CaseData caseData) {
+        return Optional.ofNullable(caseData.getDefendantDetails())
+            .map(DynamicList::getValue)
+            .map(DynamicListElement::getLabel);
+    }
+
+    private Long getCaseId(CallbackParams callbackParams) {
+        return Optional.ofNullable(callbackParams.getRequest())
+            .map(CallbackRequest::getCaseDetails)
+            .map(CaseDetails::getId)
+            .orElse(null);
     }
 }

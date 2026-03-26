@@ -32,8 +32,7 @@ public class DashboardScenarioProcessor {
             userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword()),
             fromScenario(scenario),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder()
-                .params(mapper.mapCaseDataToParams(caseData)).build()
+            new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
         );
     }
 

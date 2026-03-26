@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -512,12 +513,14 @@ class CaseQueriesUtilTest {
         respondent2Queries.setCaseMessages(respondent2Messages);
         caseData.setQmRespondentSolicitor2Queries(respondent2Queries);
 
-        CaseQueriesUtil.logMigrationSuccess(caseData);
+        assertDoesNotThrow(() -> CaseQueriesUtil.logMigrationSuccess(caseData));
     }
 
     @Test
     void shouldNotError_whenNoOldQueriesExistWhileLoggingMigrationSuccess() {
-        CaseQueriesUtil.logMigrationSuccess(CaseDataBuilder.builder().build());
+        assertDoesNotThrow(() ->
+                               CaseQueriesUtil.logMigrationSuccess(CaseDataBuilder.builder().build())
+        );
     }
 
     private CaseDataLiP respondentResponseWithLanguagePreference(String languagePreference) {

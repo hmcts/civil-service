@@ -51,7 +51,7 @@ class DjNonDivergentDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT.getScenario(),
             "1594901956117591",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 }

@@ -69,8 +69,7 @@ public class UploadMediationService {
         for (String scenario : scenarios) {
             dashboardScenariosService.recordScenarios(
                 authorisation, scenario,
-                caseData.getCcdCaseReference().toString(), ScenarioRequestParams.builder()
-                    .params(mapper.mapCaseDataToParams(caseData)).build()
+                caseData.getCcdCaseReference().toString(), new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
             );
         }
     }

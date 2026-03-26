@@ -388,7 +388,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private boolean isMandatoryDocMissing(CertificateOfService certificateOfService) {
-        return Objects.isNull(certificateOfService.getCosEvidenceDocument());
+        return Objects.isNull(certificateOfService) || Objects.isNull(certificateOfService.getCosEvidenceDocument());
     }
 
     private boolean isBothDefendantLip(CaseData caseData) {
@@ -420,6 +420,10 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private void assignNotifyParticularOfClaimCategoryIds(CaseData caseData) {
+        if (caseData.getServedDocumentFiles() == null) {
+            log.warn("Skipping category assignment for null served document files");
+            return;
+        }
         assignCategoryId.assignCategoryIdToCollection(
             caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
             Element::getValue,
