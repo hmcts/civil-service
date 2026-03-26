@@ -54,7 +54,7 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: postgres
         run: ./gradlew integration
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: integration-tests-results
           path: build/reports/tests/integration
