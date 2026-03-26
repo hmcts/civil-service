@@ -66,7 +66,7 @@ public class UpdateDashboardNotificationsForRaisedQuery extends CallbackHandler 
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         ScenarioRequestParams
-            notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+            notificationParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
         boolean firstQueryRaisedOnClaim = isFirstQueryRaisedOnClaim(caseData);
         if (caseData.isLipCase()) {
             deleteDuplicateNotifications(caseData, authToken, notificationParams);

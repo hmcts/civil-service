@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -56,6 +58,8 @@ class ContactInformationUpdatedCallbackHandlerTest extends BaseCallbackHandlerTe
 
         AboutToStartOrSubmitCallbackResponse result = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+        assertNotNull(result);
+        assertNotNull(result.getData());
         verify(runTimeService).setVariable(processId, "submittedByCaseworker", submittedByCaseworker);
         assertNull(result.getData().get("contactDetailsUpdatedEvent"));
     }
@@ -63,7 +67,8 @@ class ContactInformationUpdatedCallbackHandlerTest extends BaseCallbackHandlerTe
     @Test
     void shouldReturnExpectedCamundaActivityId() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        handler.camundaActivityId(callbackParamsOf(caseData, CONTACT_INFORMATION_UPDATED, ABOUT_TO_SUBMIT));
+        String activityId = handler.camundaActivityId(callbackParamsOf(caseData, CONTACT_INFORMATION_UPDATED, ABOUT_TO_SUBMIT));
+        assertEquals("ContactInformationUpdated", activityId);
     }
 
 }

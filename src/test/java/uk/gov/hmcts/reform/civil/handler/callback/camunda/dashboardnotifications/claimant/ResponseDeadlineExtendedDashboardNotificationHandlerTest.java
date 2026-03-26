@@ -79,7 +79,7 @@ class ResponseDeadlineExtendedDashboardNotificationHandlerTest extends BaseCallb
             "BEARER_TOKEN",
             SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

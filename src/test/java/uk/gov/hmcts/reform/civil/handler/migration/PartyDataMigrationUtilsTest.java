@@ -44,14 +44,8 @@ class PartyDataMigrationUtilsTest {
 
     @Test
     void updateElements_shouldTransformElements() {
-        Element<String> element1 = Element.<String>builder()
-            .id(UUID.fromString("00000000-0000-0000-0000-000000000001"))
-            .value("A")
-            .build();
-        Element<String> element2 = Element.<String>builder()
-            .id(UUID.fromString("00000000-0000-0000-0000-000000000002"))
-            .value("B")
-            .build();
+        Element<String> element1 = new Element<String>().setId(UUID.fromString("00000000-0000-0000-0000-000000000001")).setValue("A");
+        Element<String> element2 = new Element<String>().setId(UUID.fromString("00000000-0000-0000-0000-000000000002")).setValue("B");
         List<Element<String>> elements = List.of(element1, element2);
 
         UnaryOperator<String> transformer = s -> s + "-updated";
@@ -73,10 +67,7 @@ class PartyDataMigrationUtilsTest {
 
     @Test
     void updateElements_shouldHandleTransformerReturningNull() {
-        Element<String> element = Element.<String>builder()
-            .id(UUID.randomUUID())
-            .value("X")
-            .build();
+        Element<String> element = new Element<String>().setId(UUID.randomUUID()).setValue("X");
         List<Element<String>> elements = List.of(element);
 
         List<Element<String>> result = PartyDataMigrationUtils.updateElements(elements, s -> null);

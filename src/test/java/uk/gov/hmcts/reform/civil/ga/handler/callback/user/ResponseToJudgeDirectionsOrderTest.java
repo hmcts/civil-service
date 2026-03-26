@@ -193,18 +193,15 @@ public class ResponseToJudgeDirectionsOrderTest extends GeneralApplicationBaseCa
         List<GeneralApplicationTypes> types = List.of(
             (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
         return new GeneralApplicationCaseData().parentClaimantIsApplicant(YES)
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                          .email("abc@gmail.com").id(APP_UID).build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                                          .setEmail("abc@gmail.com").setId(APP_UID))
             .generalAppDirOrderUpload(generalAppDirOrderUpload)
             .gaAddlDoc(gaAddlDoc)
             .generalAppRespondent1Representative(
                 new GARespondentRepresentative()
                     .setGeneralAppRespondent1Representative(YES)
                     )
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
+            .generalAppType(new GAApplicationType().setTypes(types))
             .businessProcess(new BusinessProcess()
                                  .setCamundaEvent(CAMUNDA_EVENT)
                                  .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)

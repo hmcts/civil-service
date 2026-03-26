@@ -34,8 +34,6 @@ public class DynamicListUtils {
         if (dynamicList == null) {
             return null;
         }
-        return DynamicList.builder()
-            .value(dynamicList.getValue())
-            .build();
+        return new DynamicList().setValue(dynamicList.getValue());
     }
 }

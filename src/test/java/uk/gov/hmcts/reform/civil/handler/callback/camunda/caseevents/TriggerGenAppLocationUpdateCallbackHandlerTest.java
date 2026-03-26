@@ -182,10 +182,9 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
         @Test
         void shouldSetTheEaFlagToTriggerTheWATask_TakeCaseOffline() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("54326781").build())
-                    .generalAppType(GAApplicationType.builder().types(singletonList(SUMMARY_JUDGEMENT)).build())
-                    .build());
+                new GeneralApplication()
+                    .setCaseLink(new CaseLink("54326781"))
+                    .setGeneralAppType(new GAApplicationType().setTypes(singletonList(SUMMARY_JUDGEMENT))));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
                 .caseDataLip(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.YES))
                 .respondent1Represented(YesOrNo.NO).build();
@@ -214,10 +213,9 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
         @Test
         void shouldNotSetTheEaFlagToTriggerTheWATask_TakeCaseOffline() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("54326781").build())
-                    .generalAppType(GAApplicationType.builder().types(singletonList(SUMMARY_JUDGEMENT)).build())
-                    .build());
+                new GeneralApplication()
+                    .setCaseLink(new CaseLink("54326781"))
+                    .setGeneralAppType(new GAApplicationType().setTypes(singletonList(SUMMARY_JUDGEMENT))));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
                 .caseDataLip(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.YES))
                 .respondent1Represented(YesOrNo.NO).build();
