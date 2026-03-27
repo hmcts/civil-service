@@ -346,9 +346,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
 
         private ChangeOrganisationRequest createRequest(String caseRole) {
             ChangeOrganisationRequest request = new ChangeOrganisationRequest();
-            request.setCaseRoleId(DynamicList.builder()
-                .value(DynamicListElement.builder().code(caseRole).build())
-                .build());
+            request.setCaseRoleId(new DynamicList().setValue(new DynamicListElement().setCode(caseRole)));
             return request;
         }
     }
@@ -360,9 +358,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
         void shouldUpdateOrgPoliciesForLipUsingOrgIdCopy_whenRespondent2OrganisationToRemoveIsNull() {
             ChangeOrganisationRequest request = new ChangeOrganisationRequest();
             request.setOrganisationToAdd(new Organisation().setOrganisationID("new-org-id"));
-            request.setCaseRoleId(DynamicList.builder()
-                .value(DynamicListElement.builder().code(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()).build())
-                .build());
+            request.setCaseRoleId(new DynamicList().setValue(new DynamicListElement().setCode(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())));
             request.setOrganisationToRemove(null);
 
             CaseDetails caseDetails = CaseDetails.builder().data(new HashMap<>()).build();
@@ -418,9 +414,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
         @Test
         void shouldUseFallbackOrgFromCaseData_whenOrganisationToRemoveIsNull() {
             ChangeOrganisationRequest request = new ChangeOrganisationRequest();
-            request.setCaseRoleId(DynamicList.builder()
-                .value(DynamicListElement.builder().code(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()).build())
-                .build());
+            request.setCaseRoleId(new DynamicList().setValue(new DynamicListElement().setCode(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())));
             request.setOrganisationToAdd(new Organisation().setOrganisationID("new-org-id"));
             request.setOrganisationToRemove(null);
 

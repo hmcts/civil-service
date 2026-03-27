@@ -85,7 +85,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventProcessorTest {
             AUTH_TOKEN,
             DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT,
             CASE_ID.toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 }

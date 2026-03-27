@@ -97,7 +97,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
                 authToken,
                 scenario,
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(paramsMap).build()
+                new ScenarioRequestParams(paramsMap)
             );
         }
 

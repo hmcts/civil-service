@@ -69,7 +69,7 @@ class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHandlerTes
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimIssue.HWF.Requested",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -92,14 +92,14 @@ class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHandlerTes
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimIssue.HWF.Requested",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
 
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimIssue.Claimant.FastTrack",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 

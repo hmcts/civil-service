@@ -26,8 +26,7 @@ public class GeneralApplicationApplicantRequestsHwfScenarioTest extends BaseInte
 
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>()).build(),
+               new ScenarioRequestParams(new HashMap<>()),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_GA_HWF_REQUESTED_APPLICANT, caseId
         )
             .andExpect(status().isOk());

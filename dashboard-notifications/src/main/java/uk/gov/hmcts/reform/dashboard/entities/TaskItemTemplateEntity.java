@@ -15,7 +15,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @lombok.Data
-@lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity

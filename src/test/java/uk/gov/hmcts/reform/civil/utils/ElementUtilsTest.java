@@ -17,8 +17,8 @@ class ElementUtilsTest {
 
     @Nested
     class WrapElements {
-        Element<String> element1 = Element.<String>builder().value("First").build();
-        Element<String> element2 = Element.<String>builder().value("Second").build();
+        Element<String> element1 = new Element<String>().setValue("First");
+        Element<String> element2 = new Element<String>().setValue("Second");
 
         @Test
         void shouldWrapAllObjectsWithElement() {
@@ -38,9 +38,9 @@ class ElementUtilsTest {
 
     @Nested
     class UnwrapElements {
-        Element<String> element1 = Element.<String>builder().id(randomUUID()).value("First").build();
-        Element<String> element2 = Element.<String>builder().id(randomUUID()).value("Second").build();
-        Element<String> elementWithoutValue = Element.<String>builder().id(randomUUID()).build();
+        Element<String> element1 = new Element<String>().setId(randomUUID()).setValue("First");
+        Element<String> element2 = new Element<String>().setId(randomUUID()).setValue("Second");
+        Element<String> elementWithoutValue = new Element<String>().setId(randomUUID());
 
         @Test
         void shouldUnwrapAllElements() {

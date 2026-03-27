@@ -117,7 +117,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
             "BEARER_TOKEN",
             SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -145,7 +145,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
             "BEARER_TOKEN",
             SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -172,7 +172,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -201,7 +201,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
         caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES);
         caseData.setDefendantDetailsSpec(defendantDetailsSpec);
-        caseData.setRespondent1(PartyBuilder.builder().individual().build());
+        caseData.setRespondent1(new PartyBuilder().individual().build());
         caseData.setActiveJudgment(activeJudgment);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -213,7 +213,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
             "BEARER_TOKEN",
             SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -242,7 +242,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
         caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES);
         caseData.setDefendantDetailsSpec(defendantDetailsSpec);
-        caseData.setRespondent1(PartyBuilder.builder().organisation().build());
+        caseData.setRespondent1(new PartyBuilder().organisation().build());
         caseData.setActiveJudgment(activeJudgment);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -254,7 +254,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
             "BEARER_TOKEN",
             SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }

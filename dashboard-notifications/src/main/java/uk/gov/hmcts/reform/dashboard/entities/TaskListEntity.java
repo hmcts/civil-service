@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.UUID;
 
 @lombok.Data
-@lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity

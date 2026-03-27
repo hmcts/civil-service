@@ -36,14 +36,14 @@ class GaValidateFeeCallbackHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void returnsCorrectTaskId() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE108, false, false);
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE108, false, false).build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo(TASK_ID);
         }
 
         @Test
         void returnsCorrectEvents() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE108, false, false);
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE108, false, false).build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             assertThat(handler.handledEvents()).contains(VALIDATE_FEE_GASPEC);
         }

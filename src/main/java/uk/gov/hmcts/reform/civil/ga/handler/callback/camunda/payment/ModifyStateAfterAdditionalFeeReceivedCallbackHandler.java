@@ -138,7 +138,7 @@ public class ModifyStateAfterAdditionalFeeReceivedCallbackHandler extends Callba
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         var caseData = callbackParams.getGeneralApplicationCaseData();
         if (gaForLipService.isGaForLip(caseData)) {
-            var scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+            var scenarioParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
             scenarios.forEach(scenario -> dashboardApiClient.recordScenario(
                 caseReference,
                 scenario,

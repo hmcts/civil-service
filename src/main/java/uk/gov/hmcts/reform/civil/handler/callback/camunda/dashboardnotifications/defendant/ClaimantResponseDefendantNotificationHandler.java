@@ -80,7 +80,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             );
         }
         if (caseData.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM) {
-            ScenarioRequestParams notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+            ScenarioRequestParams notificationParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
@@ -258,7 +258,8 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
 
     private boolean isClaimantRejectRepaymentPlan(CaseData caseData) {
         return ((caseData.isPayBySetDate() || caseData.isPayByInstallment())
-            && (caseData.isLRvLipOneVOne() || caseData.getRespondent1().isCompanyOROrganisation())
+            && (caseData.isLRvLipOneVOne()
+                    || (caseData.getRespondent1() != null && caseData.getRespondent1().isCompanyOROrganisation()))
             && caseData.hasApplicantRejectedRepaymentPlan());
     }
 

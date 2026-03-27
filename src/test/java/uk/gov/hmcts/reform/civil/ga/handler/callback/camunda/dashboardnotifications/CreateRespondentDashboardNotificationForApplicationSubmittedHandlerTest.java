@@ -59,13 +59,13 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
 
         @Test
         void shouldRecordApplicationSubmittedRespondentScenarioForWithNoticeNonUrgentApplicationWhenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.NO).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.NO))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -81,19 +81,19 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_NONURGENT_RESPONDENT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordApplicationSubmittedRespondentScenarioForWithNoticeUrgentApplicationWhenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.YES))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -109,19 +109,19 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_URGENT_RESPONDENT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordApplicationSubmittedRespondentScenarioForWithConsentNonUrgentApplicationWhenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppConsentOrder(YesOrNo.YES)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.NO).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.NO))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -137,19 +137,19 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_NONURGENT_RESPONDENT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordApplicationSubmittedRespondentScenarioForWithConsentUrgentApplicationWhenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppConsentOrder(YesOrNo.YES)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.YES))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -165,7 +165,7 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_URGENT_RESPONDENT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }
