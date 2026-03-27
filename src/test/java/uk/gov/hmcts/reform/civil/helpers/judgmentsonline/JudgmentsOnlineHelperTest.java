@@ -56,16 +56,12 @@ public class JudgmentsOnlineHelperTest {
     void checkIfNonDivergent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued().build().toBuilder()
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.YES)
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both Defendants")
-                                                 .build())
-                                      .build())
+            .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("Both Defendants")))
             .build();
         assertThat(isNonDivergentForDJ(caseData)).isTrue();
     }
@@ -74,16 +70,12 @@ public class JudgmentsOnlineHelperTest {
     void checkIfDivergent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued().build().toBuilder()
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.NO)
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("John Smith")
-                                                 .build())
-                                      .build())
+            .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("John Smith")))
             .build();
         assertThat(isNonDivergentForDJ(caseData)).isFalse();
     }

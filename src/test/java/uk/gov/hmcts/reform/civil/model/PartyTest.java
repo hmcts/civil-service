@@ -11,7 +11,7 @@ class PartyTest {
         String companyName = "The name";
         Party.Type partyType = Party.Type.COMPANY;
 
-        Party party = Party.builder().type(partyType).companyName(companyName).build();
+        Party party = new Party().setType(partyType).setCompanyName(companyName);
 
         assertThat(party.getPartyName()).isEqualTo(companyName);
         assertThat(party.getPartyTypeDisplayValue()).isEqualTo("Company");
@@ -19,68 +19,61 @@ class PartyTest {
 
     @Test
     void shouldGetIndividualPartyNameIncludingTitle_whenInstantiated() {
-        Party party = Party.builder().type(Party.Type.INDIVIDUAL)
-            .individualTitle("Mr")
-            .individualFirstName("James")
-            .individualLastName("Carver")
-            .build();
+        Party party = new Party().setType(Party.Type.INDIVIDUAL)
+            .setIndividualTitle("Mr")
+            .setIndividualFirstName("James")
+            .setIndividualLastName("Carver");
 
         assertThat(party.getPartyName()).isEqualTo("Mr James Carver");
     }
 
     @Test
     void shouldGetIndividualPartyNameExcludingTitle_whenInstantiated() {
-        Party party = Party.builder().type(Party.Type.INDIVIDUAL)
-            .individualTitle("Mr")
-            .individualFirstName("James")
-            .individualLastName("Carver")
-            .build();
+        Party party = new Party().setType(Party.Type.INDIVIDUAL)
+            .setIndividualTitle("Mr")
+            .setIndividualFirstName("James")
+            .setIndividualLastName("Carver");
 
         assertThat(party.getPartyName(true)).isEqualTo("James Carver");
     }
 
     @Test
     void shouldGetSoulTraderPartyNameIncludingTitle_whenInstantiated() {
-        Party party = Party.builder().type(Party.Type.SOLE_TRADER)
-            .soleTraderTitle("Mr")
-            .soleTraderFirstName("James")
-            .soleTraderLastName("Carver")
-            .build();
+        Party party = new Party().setType(Party.Type.SOLE_TRADER)
+            .setSoleTraderTitle("Mr")
+            .setSoleTraderFirstName("James")
+            .setSoleTraderLastName("Carver");
 
         assertThat(party.getPartyName()).isEqualTo("Mr James Carver");
     }
 
     @Test
     void shouldGetSoulTraderPartyNameExcludingTitle_whenInstantiated() {
-        Party party = Party.builder().type(Party.Type.SOLE_TRADER)
-            .soleTraderTitle("Mr")
-            .soleTraderFirstName("James")
-            .soleTraderLastName("Carver")
-            .build();
+        Party party = new Party().setType(Party.Type.SOLE_TRADER)
+            .setSoleTraderTitle("Mr")
+            .setSoleTraderFirstName("James")
+            .setSoleTraderLastName("Carver");
 
         assertThat(party.getPartyName(true)).isEqualTo("James Carver");
     }
 
     @Test
     void shouldReturnTrueWhenPartyIsCompany() {
-        Party party = Party.builder().type(Party.Type.COMPANY)
-            .build();
+        Party party = new Party().setType(Party.Type.COMPANY);
 
         assertThat(party.isCompanyOROrganisation()).isTrue();
     }
 
     @Test
     void shouldReturnTrueWhenPartyIsOrganisation() {
-        Party party = Party.builder().type(Party.Type.ORGANISATION)
-            .build();
+        Party party = new Party().setType(Party.Type.ORGANISATION);
 
         assertThat(party.isCompanyOROrganisation()).isTrue();
     }
 
     @Test
     void shouldReturnTrueWhenPartyIsNOTOrganisationOrCompany() {
-        Party party = Party.builder().type(Party.Type.INDIVIDUAL)
-            .build();
+        Party party = new Party().setType(Party.Type.INDIVIDUAL);
 
         assertThat(party.isCompanyOROrganisation()).isFalse();
     }
