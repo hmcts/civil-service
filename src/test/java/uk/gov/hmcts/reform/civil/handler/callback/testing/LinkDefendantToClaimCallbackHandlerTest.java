@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.testing;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LINK_DEFENDANT_TO_CLA
 @ExtendWith(MockitoExtension.class)
 class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    public static final String DEFENDANT_EMAIL = "valid@example.com";
+    private static final String DEFENDANT_EMAIL = "valid@example.com";
 
     @Mock
     private ValidateEmailService validateEmailService;
@@ -108,7 +107,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventTests {
 
-        public static final String PAGE_ID = "confirm-defendant-email";
+        private static final String PAGE_ID = "confirm-defendant-email";
 
         @BeforeEach
         void setUp() {
@@ -154,19 +153,11 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitTests {
 
-        public static final String BEARER_TOKEN = "BEARER TOKEN";
-        public static final String USER = "user";
-        public static final String PASSWORD = "password";
-        public static final String SEARCH_QUERY = String.format("email:\"%s\"", DEFENDANT_EMAIL);
-        public static final String CITIZEN_CASE_ROLE = "citizen";
-
-        private static @NonNull DefendantPinToPostLRspec getDefendantPin() {
-            DefendantPinToPostLRspec defendantPin = new DefendantPinToPostLRspec();
-            defendantPin.setExpiryDate(LocalDate.of(2026, 1, 1));
-            defendantPin.setCitizenCaseRole(CITIZEN_CASE_ROLE);
-            defendantPin.setRespondentCaseRole(CITIZEN_CASE_ROLE);
-            return defendantPin;
-        }
+        private static final String BEARER_TOKEN = "BEARER TOKEN";
+        private static final String USER = "user";
+        private static final String PASSWORD = "password";
+        private static final String SEARCH_QUERY = String.format("email:\"%s\"", DEFENDANT_EMAIL);
+        private static final String CITIZEN_CASE_ROLE = "citizen";
 
         @BeforeEach
         void setUp() {
@@ -250,6 +241,14 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).containsExactly("No user found with the provided email address");
+        }
+
+        private DefendantPinToPostLRspec getDefendantPin() {
+            DefendantPinToPostLRspec defendantPin = new DefendantPinToPostLRspec();
+            defendantPin.setExpiryDate(LocalDate.of(2026, 1, 1));
+            defendantPin.setCitizenCaseRole(CITIZEN_CASE_ROLE);
+            defendantPin.setRespondentCaseRole(CITIZEN_CASE_ROLE);
+            return defendantPin;
         }
     }
 }
