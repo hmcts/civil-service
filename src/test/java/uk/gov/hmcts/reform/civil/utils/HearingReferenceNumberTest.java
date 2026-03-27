@@ -14,4 +14,3 @@ public class HearingReferenceNumberTest {
         assertThat(result).matches("\\d{3}HN\\d{3}");
     }
 }
-gi
