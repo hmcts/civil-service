@@ -38,23 +38,23 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
     @Override
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(IN_MEDIATION, transitions)
-            .onlyWhen((MediationPredicate.agreedToMediation.and(MediationPredicate.allAgreedToLrMediationSpec.negate())
-                .and(ClaimantPredicate.fullDefenceNotProceed.negate()))
-                // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
-                // and move to in mediation if the applicant does not settle
-                .or(MediationPredicate.isCarmApplicableCaseLiP
-                    .and(
-                        LipPredicate.fullDefenceProceed.or(ClaimantPredicate.fullDefenceProceed)
-                    )
-                ), transitions)
-            .set((c, flags) ->
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c)), transitions)
-
-            .moveTo(IN_MEDIATION, transitions)
-            // for carm LR cases
-            .onlyWhen(MediationPredicate.isCarmApplicableCase.and(ClaimantPredicate.fullDefenceProceed), transitions)
-            .set((c, flags) ->
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c)), transitions)
+            .onlyWhen(
+                (MediationPredicate.agreedToMediation.and(MediationPredicate.allAgreedToLrMediationSpec.negate())
+                    .and(ClaimantPredicate.fullDefenceNotProceed.negate()))
+                    // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
+                    // and move to in mediation if the applicant does not settle
+                    .or(MediationPredicate.isCarmApplicableCaseLiP
+                            .and(LipPredicate.fullDefenceProceed.or(ClaimantPredicate.fullDefenceProceed)))
+                    // for carm LR cases
+                    .or(MediationPredicate.isCarmApplicableCase.and(ClaimantPredicate.fullDefenceProceed)), transitions
+            )
+            .set(
+                (c, flags) ->
+                    flags.put(
+                        FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(),
+                        LanguagePredicate.respondentIsBilingual.test(c)
+                    ), transitions
+            )
 
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen(ClaimantPredicate.fullDefenceProceed

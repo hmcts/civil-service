@@ -120,8 +120,6 @@ public class RaiseQueryDashboardService extends DashboardScenarioService {
     }
 
     private ScenarioRequestParams buildScenarioParams(CaseData caseData) {
-        return ScenarioRequestParams.builder()
-            .params(mapper.mapCaseDataToParams(caseData))
-            .build();
+        return new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
     }
 }

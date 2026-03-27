@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.model.genapplication;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,7 +23,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @Accessors(chain = true)
@@ -208,5 +206,65 @@ public class GeneralApplication implements MappableObject {
         this.gaWaTrackLabel = gaWaTrackLabel;
         this.emailPartyReference = emailPartyReference;
         this.mainCaseSubmittedDate = mainCaseSubmittedDate;
+    }
+
+    public GeneralApplication copy() {
+        return new GeneralApplication()
+            .setGeneralApplicationState(generalApplicationState)
+            .setGeneralAppType(generalAppType)
+            .setGeneralAppTypeLR(generalAppTypeLR)
+            .setGeneralAppRespondentAgreement(generalAppRespondentAgreement)
+            .setBusinessProcess(businessProcess)
+            .setGeneralAppPBADetails(generalAppPBADetails)
+            .setGeneralAppAskForCosts(generalAppAskForCosts)
+            .setGeneralAppDetailsOfOrder(generalAppDetailsOfOrder)
+            .setGeneralAppDetailsOfOrderColl(generalAppDetailsOfOrderColl)
+            .setGeneralAppReasonsOfOrder(generalAppReasonsOfOrder)
+            .setGeneralAppReasonsOfOrderColl(generalAppReasonsOfOrderColl)
+            .setGeneralAppInformOtherParty(generalAppInformOtherParty)
+            .setGeneralAppConsentOrder(generalAppConsentOrder)
+            .setGeneralAppUrgencyRequirement(generalAppUrgencyRequirement)
+            .setGeneralAppStatementOfTruth(generalAppStatementOfTruth)
+            .setGeneralAppHearingDetails(generalAppHearingDetails)
+            .setGeneralAppApplnSolicitor(generalAppApplnSolicitor)
+            .setGeneralAppRespondentSolicitors(generalAppRespondentSolicitors)
+            .setGeneralAppApplicantAddlSolicitors(generalAppApplicantAddlSolicitors)
+            .setGeneralAppEvidenceDocument(generalAppEvidenceDocument)
+            .setGeneralAppDateDeadline(generalAppDateDeadline)
+            .setIsMultiParty(isMultiParty)
+            .setIsDocumentVisibleGA(isDocumentVisibleGA)
+            .setParentClaimantIsApplicant(parentClaimantIsApplicant)
+            .setGaApplicantDisplayName(gaApplicantDisplayName)
+            .setCaseLink(caseLink)
+            .setGeneralAppSubmittedDateGAspec(generalAppSubmittedDateGAspec)
+            .setCivilServiceUserRoles(civilServiceUserRoles)
+            .setApplicantPartyName(applicantPartyName)
+            .setClaimant1PartyName(claimant1PartyName)
+            .setClaimant2PartyName(claimant2PartyName)
+            .setDefendant1PartyName(defendant1PartyName)
+            .setDefendant2PartyName(defendant2PartyName)
+            .setLitigiousPartyID(litigiousPartyID)
+            .setGeneralAppSuperClaimType(generalAppSuperClaimType)
+            .setCaseManagementLocation(caseManagementLocation)
+            .setIsCcmccLocation(isCcmccLocation)
+            .setCaseManagementCategory(caseManagementCategory)
+            .setCaseAccessCategory(caseAccessCategory)
+            .setLocationName(locationName)
+            .setApplicationClosedDate(applicationClosedDate)
+            .setApplicationTakenOfflineDate(applicationTakenOfflineDate)
+            .setGeneralAppVaryJudgementType(generalAppVaryJudgementType)
+            .setGeneralAppN245FormUpload(generalAppN245FormUpload)
+            .setGeneralAppHearingDate(generalAppHearingDate)
+            .setGeneralAppParentCaseLink(generalAppParentCaseLink)
+            .setRespondentsResponses(respondentsResponses)
+            .setIsGaApplicantLip(isGaApplicantLip)
+            .setIsGaRespondentOneLip(isGaRespondentOneLip)
+            .setIsGaRespondentTwoLip(isGaRespondentTwoLip)
+            .setGeneralAppHelpWithFees(generalAppHelpWithFees)
+            .setCertOfSC(certOfSC)
+            .setCaseNameGaInternal(caseNameGaInternal)
+            .setGaWaTrackLabel(gaWaTrackLabel)
+            .setEmailPartyReference(emailPartyReference)
+            .setMainCaseSubmittedDate(mainCaseSubmittedDate);
     }
 }

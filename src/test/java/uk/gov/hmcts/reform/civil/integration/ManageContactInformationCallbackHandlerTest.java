@@ -174,14 +174,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         void shouldNotReturnReturnErrors_WhenAboutToStartIsInvokedByAdminUserWhileCaseInAwaitingApplicantIntentionState() {
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
             CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder()
-                                .type(COMPANY)
-                                .companyName("Test Inc")
-                                .build())
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .applicant1(new Party()
+                                .setType(COMPANY)
+                                .setCompanyName("Test Inc"))
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .applicant1OrgIndividuals(wrapElements(List.of(new PartyFlagStructure()
                                                                    .setFirstName("Claimant")
                                                                    .setLastName("OrgIndividual")
@@ -251,10 +249,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1ExpertsAndWitnesses()
                 .applicant1Represented(YES)
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -294,10 +291,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1ExpertsAndWitnesses()
                 .applicant1Represented(NO)
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -337,10 +333,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1ExpertsAndWitnesses()
                 .applicant1Represented(YES)
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -376,10 +371,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1ExpertsAndWitnesses()
                 .addRespondent1ExpertsAndWitnesses()
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -414,10 +408,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .multiPartyClaimTwoApplicants()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1ExpertsAndWitnesses()
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -460,10 +453,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .multiPartyClaimTwoApplicants()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1ExpertsAndWitnesses()
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -502,10 +494,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1ExpertsAndWitnesses()
                 .addRespondent1ExpertsAndWitnesses()
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -541,10 +532,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1ExpertsAndWitnesses()
                 .applicant1Represented(YES)
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -590,10 +580,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .addApplicant1ExpertsAndWitnesses()
                 .addRespondent1ExpertsAndWitnesses()
                 .addRespondent1ExpertsAndWitnesses()
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -633,10 +622,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .addApplicant1ExpertsAndWitnesses()
                 .addRespondent1ExpertsAndWitnesses()
                 .addRespondent1ExpertsAndWitnesses()
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -677,10 +665,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .respondent2DQ()
                 .respondent2Represented(YES)
                 .addApplicant1ExpertsAndWitnesses()
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .applicant1Represented(YES)
                 .build()
                 .toBuilder()
@@ -734,10 +721,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .addApplicant1ExpertsAndWitnesses()
                 .addRespondent1ExpertsAndWitnesses()
                 .addRespondent2ExpertsAndWitnesses()
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -779,10 +765,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .addApplicant1ExpertsAndWitnesses()
                 .addRespondent1ExpertsAndWitnesses()
                 .addRespondent2ExpertsAndWitnesses()
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -824,10 +809,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .addApplicant1ExpertsAndWitnesses()
                 .addRespondent1ExpertsAndWitnesses()
                 .addRespondent2ExpertsAndWitnesses()
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                .respondent1(new Party()
+                                 .setType(COMPANY)
+                                 .setCompanyName("Test Inc"))
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -884,7 +868,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @BeforeEach
         void setup() {
-            party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").build();
+            party = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name");
             dqExpert = new Expert().setPartyID("id").setFirstName("dq").setLastName("dq");
             expectedExpert1 = dqExpert.copy().setFirstName("First").setLastName("Name")
                 .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now())
@@ -905,10 +889,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 ;
 
             CaseData caseDataBefore = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(INDIVIDUAL).build())
-                .applicant2(Party.builder().type(INDIVIDUAL).build())
-                .respondent1(Party.builder().type(INDIVIDUAL).build())
-                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .applicant1(new Party().setType(INDIVIDUAL))
+                .applicant2(new Party().setType(INDIVIDUAL))
+                .respondent1(new Party().setType(INDIVIDUAL))
+                .respondent2(new Party().setType(INDIVIDUAL))
                 .buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
         }
@@ -922,24 +906,19 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withPartyChanges() {
             Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
             CaseData caseDataBefore = CaseDataBuilder.builder()
-                .respondent1(Party.builder()
-                                 .individualFirstName("Dis")
-                                 .individualLastName("Guy")
-                                 .type(INDIVIDUAL).flags(respondent1Flags).build())
+                .respondent1(new Party()
+                                 .setIndividualFirstName("Dis")
+                                 .setIndividualLastName("Guy")
+                                 .setType(INDIVIDUAL).setFlags(respondent1Flags))
                 .buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(DEFENDANT_ONE_ID)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(DEFENDANT_ONE_ID)
-                                       .build())
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_ID)))
+                                       .setPartyChosenId(DEFENDANT_ONE_ID))
                 .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
@@ -964,10 +943,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withPartyChangesWithGaData() {
             Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1(Party.builder()
-                                 .individualFirstName("Dis")
-                                 .individualLastName("Guy")
-                                 .type(INDIVIDUAL).flags(respondent1Flags).build())
+                .respondent1(new Party()
+                                 .setIndividualFirstName("Dis")
+                                 .setIndividualLastName("Guy")
+                                 .setType(INDIVIDUAL).setFlags(respondent1Flags))
                 .buildClaimIssuedPaymentCaseData();
 
             CaseData caseDataBefore = GeneralApplicationDetailsBuilder.builder()
@@ -978,14 +957,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(DEFENDANT_ONE_ID)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(DEFENDANT_ONE_ID)
-                                       .build())
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_ID)))
+                                       .setPartyChosenId(DEFENDANT_ONE_ID))
                 .build();
 
             CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
@@ -1023,10 +997,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withClaimantLRIndividualChanges() {
             Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
-            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(Party.builder()
-                                                                                .individualFirstName("Dis")
-                                                                                .individualLastName("Guy")
-                                                                                .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
+            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
+                                                                                .setIndividualFirstName("Dis")
+                                                                                .setIndividualLastName("Guy")
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure().setFirstName("Claimant")
@@ -1040,21 +1014,15 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .updateLRIndividualsForm(wrapElements(UpdatePartyDetailsForm.builder()
-                                                                                 .firstName(expected.getFirstName())
-                                                                                 .lastName(expected.getLastName())
-                                                                                 .emailAddress(expected.getEmail())
-                                                                                 .phoneNumber(expected.getPhone())
-                                                                                 .build()
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setUpdateLRIndividualsForm(wrapElements(new UpdatePartyDetailsForm()
+                                                                                 .setFirstName(expected.getFirstName())
+                                                                                 .setLastName(expected.getLastName())
+                                                                                 .setEmailAddress(expected.getEmail())
+                                                                                 .setPhoneNumber(expected.getPhone())
                                        ))
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID)
-                                       .build())
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID)))
+                                       .setPartyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
                 .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
@@ -1072,10 +1040,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withDefendant1LRIndividualChanges() {
             Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
-            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(Party.builder()
-                                                                                .individualFirstName("Dis")
-                                                                                .individualLastName("Guy")
-                                                                                .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
+            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
+                                                                                .setIndividualFirstName("Dis")
+                                                                                .setIndividualLastName("Guy")
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure()
@@ -1089,21 +1057,15 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .updateLRIndividualsForm(wrapElements(UpdatePartyDetailsForm.builder()
-                                                                                 .firstName(expected.getFirstName())
-                                                                                 .lastName(expected.getLastName())
-                                                                                 .emailAddress(expected.getEmail())
-                                                                                 .phoneNumber(expected.getPhone())
-                                                                                 .build()
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setUpdateLRIndividualsForm(wrapElements(new UpdatePartyDetailsForm()
+                                                                                 .setFirstName(expected.getFirstName())
+                                                                                 .setLastName(expected.getLastName())
+                                                                                 .setEmailAddress(expected.getEmail())
+                                                                                 .setPhoneNumber(expected.getPhone())
                                        ))
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID)
-                                       .build())
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID)))
+                                       .setPartyChosenId(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
                 .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
@@ -1121,10 +1083,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withDefendant2LRIndividualChanges() {
             Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
-            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(Party.builder()
-                                                                                .individualFirstName("Dis")
-                                                                                .individualLastName("Guy")
-                                                                                .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
+            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
+                                                                                .setIndividualFirstName("Dis")
+                                                                                .setIndividualLastName("Guy")
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure()
@@ -1138,21 +1100,15 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .updateLRIndividualsForm(wrapElements(UpdatePartyDetailsForm.builder()
-                                                                                 .firstName(expected.getFirstName())
-                                                                                 .lastName(expected.getLastName())
-                                                                                 .emailAddress(expected.getEmail())
-                                                                                 .phoneNumber(expected.getPhone())
-                                                                                 .build()
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setUpdateLRIndividualsForm(wrapElements(new UpdatePartyDetailsForm()
+                                                                                 .setFirstName(expected.getFirstName())
+                                                                                 .setLastName(expected.getLastName())
+                                                                                 .setEmailAddress(expected.getEmail())
+                                                                                 .setPhoneNumber(expected.getPhone())
                                        ))
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID)
-                                       .build())
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID)))
+                                       .setPartyChosenId(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID))
                 .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
@@ -1170,10 +1126,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withClaimantOrgIndividualChanges() {
             Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
-            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(Party.builder()
-                                                                                .individualFirstName("Dis")
-                                                                                .individualLastName("Guy")
-                                                                                .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
+            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
+                                                                                .setIndividualFirstName("Dis")
+                                                                                .setIndividualLastName("Guy")
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure()
@@ -1187,21 +1143,15 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .updateOrgIndividualsForm(wrapElements(UpdatePartyDetailsForm.builder()
-                                                                                  .firstName(expected.getFirstName())
-                                                                                  .lastName(expected.getLastName())
-                                                                                  .emailAddress(expected.getEmail())
-                                                                                  .phoneNumber(expected.getPhone())
-                                                                                  .build()
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setUpdateOrgIndividualsForm(wrapElements(new UpdatePartyDetailsForm()
+                                                                                  .setFirstName(expected.getFirstName())
+                                                                                  .setLastName(expected.getLastName())
+                                                                                  .setEmailAddress(expected.getEmail())
+                                                                                  .setPhoneNumber(expected.getPhone())
                                        ))
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(CLAIMANT_ONE_ORG_INDIVIDUALS_ID)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(CLAIMANT_ONE_ORG_INDIVIDUALS_ID)
-                                       .build())
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(CLAIMANT_ONE_ORG_INDIVIDUALS_ID)))
+                                       .setPartyChosenId(CLAIMANT_ONE_ORG_INDIVIDUALS_ID))
                 .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
@@ -1219,10 +1169,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withClaimant2OrgIndividualChanges() {
             Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
-            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(Party.builder()
-                                                                                .individualFirstName("Dis")
-                                                                                .individualLastName("Guy")
-                                                                                .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
+            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
+                                                                                .setIndividualFirstName("Dis")
+                                                                                .setIndividualLastName("Guy")
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure()
@@ -1236,21 +1186,15 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .updateOrgIndividualsForm(wrapElements(UpdatePartyDetailsForm.builder()
-                                                                                  .firstName(expected.getFirstName())
-                                                                                  .lastName(expected.getLastName())
-                                                                                  .emailAddress(expected.getEmail())
-                                                                                  .phoneNumber(expected.getPhone())
-                                                                                  .build()
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setUpdateOrgIndividualsForm(wrapElements(new UpdatePartyDetailsForm()
+                                                                                  .setFirstName(expected.getFirstName())
+                                                                                  .setLastName(expected.getLastName())
+                                                                                  .setEmailAddress(expected.getEmail())
+                                                                                  .setPhoneNumber(expected.getPhone())
                                        ))
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(CLAIMANT_TWO_ORG_INDIVIDUALS_ID)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(CLAIMANT_TWO_ORG_INDIVIDUALS_ID)
-                                       .build())
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(CLAIMANT_TWO_ORG_INDIVIDUALS_ID)))
+                                       .setPartyChosenId(CLAIMANT_TWO_ORG_INDIVIDUALS_ID))
                 .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
@@ -1268,10 +1212,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withDefendant1OrgIndividualChanges() {
             Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
-            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(Party.builder()
-                                                                                .individualFirstName("Dis")
-                                                                                .individualLastName("Guy")
-                                                                                .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
+            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
+                                                                                .setIndividualFirstName("Dis")
+                                                                                .setIndividualLastName("Guy")
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure()
@@ -1285,21 +1229,15 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .updateOrgIndividualsForm(wrapElements(UpdatePartyDetailsForm.builder()
-                                                                                  .firstName(expected.getFirstName())
-                                                                                  .lastName(expected.getLastName())
-                                                                                  .emailAddress(expected.getEmail())
-                                                                                  .phoneNumber(expected.getPhone())
-                                                                                  .build()
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setUpdateOrgIndividualsForm(wrapElements(new UpdatePartyDetailsForm()
+                                                                                  .setFirstName(expected.getFirstName())
+                                                                                  .setLastName(expected.getLastName())
+                                                                                  .setEmailAddress(expected.getEmail())
+                                                                                  .setPhoneNumber(expected.getPhone())
                                        ))
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(DEFENDANT_ONE_ORG_INDIVIDUALS_ID)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(DEFENDANT_ONE_ORG_INDIVIDUALS_ID)
-                                       .build())
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_ORG_INDIVIDUALS_ID)))
+                                       .setPartyChosenId(DEFENDANT_ONE_ORG_INDIVIDUALS_ID))
                 .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
@@ -1317,10 +1255,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withDefendant2OrgIndividualChanges() {
             Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
-            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(Party.builder()
-                                                                                .individualFirstName("Dis")
-                                                                                .individualLastName("Guy")
-                                                                                .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
+            CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
+                                                                                .setIndividualFirstName("Dis")
+                                                                                .setIndividualLastName("Guy")
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure()
@@ -1334,21 +1272,15 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .updateOrgIndividualsForm(wrapElements(UpdatePartyDetailsForm.builder()
-                                                                                  .firstName(expected.getFirstName())
-                                                                                  .lastName(expected.getLastName())
-                                                                                  .emailAddress(expected.getEmail())
-                                                                                  .phoneNumber(expected.getPhone())
-                                                                                  .build()
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setUpdateOrgIndividualsForm(wrapElements(new UpdatePartyDetailsForm()
+                                                                                  .setFirstName(expected.getFirstName())
+                                                                                  .setLastName(expected.getLastName())
+                                                                                  .setEmailAddress(expected.getEmail())
+                                                                                  .setPhoneNumber(expected.getPhone())
                                        ))
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(DEFENDANT_TWO_ORG_INDIVIDUALS_ID)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(DEFENDANT_TWO_ORG_INDIVIDUALS_ID)
-                                       .build())
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_TWO_ORG_INDIVIDUALS_ID)))
+                                       .setPartyChosenId(DEFENDANT_TWO_ORG_INDIVIDUALS_ID))
                 .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
@@ -1367,23 +1299,18 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         void shouldReturnExpectedResponseCaseData_whenTriggeredByNonAdmin_withPartyChanges() {
             Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
             CaseData caseDataBefore = CaseDataBuilder.builder()
-                .respondent1(Party.builder()
-                                 .individualFirstName("Dis")
-                                 .individualLastName("Guy")
-                                 .type(INDIVIDUAL).flags(respondent1Flags).build())
+                .respondent1(new Party()
+                                 .setIndividualFirstName("Dis")
+                                 .setIndividualLastName("Guy")
+                                 .setType(INDIVIDUAL).setFlags(respondent1Flags))
                 .buildClaimIssuedPaymentCaseData();
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(DEFENDANT_ONE_ID)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(DEFENDANT_ONE_ID)
-                                       .build())
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_ID)))
+                                       .setPartyChosenId(DEFENDANT_ONE_ID))
                 .build();
 
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseDataBefore);
@@ -1408,29 +1335,24 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotSetEventDetailsOrChangeBusinessProcessCallbackResponse_withNoPartyChanges() {
             Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
-            Party respondent = Party.builder()
-                .individualFirstName("Dis")
-                .individualLastName("Guy")
-                .type(INDIVIDUAL).flags(respondent1Flags).build();
+            Party respondent = new Party()
+                .setIndividualFirstName("Dis")
+                .setIndividualLastName("Guy")
+                .setType(INDIVIDUAL).setFlags(respondent1Flags);
 
             CaseData caseDataBefore = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .respondent1(respondent).build()
                 .toBuilder()
-                .respondent1DetailsForClaimDetailsTab(respondent.toBuilder().flags(respondent1Flags).build())
+                .respondent1DetailsForClaimDetailsTab(respondent.setFlags(respondent1Flags))
                 .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
                 .caseNamePublic("John Rambo v Dis Guy")
                 .build();
 
             CaseData updated = caseDataBefore.toBuilder()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(DEFENDANT_ONE_ID)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(DEFENDANT_ONE_ID)
-                                       .build())
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_ID)))
+                                       .setPartyChosenId(DEFENDANT_ONE_ID))
                 .build();
 
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseDataBefore);
@@ -1451,15 +1373,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1LitigationFriend()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(CLAIMANT_ONE_ID)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(CLAIMANT_ONE_ID)
-                                       .updateExpertsDetailsForm(wrapElements(party))
-                                       .build())
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(CLAIMANT_ONE_ID)))
+                                       .setPartyChosenId(CLAIMANT_ONE_ID)
+                                       .setUpdateExpertsDetailsForm(wrapElements(party)))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1480,10 +1397,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             Flags applicant2Flags = new Flags().setPartyName("applicant2name").setRoleOnCase("applicant2");
 
             CaseData caseDataBefore = CaseData.builder()
-                .applicant1(Party.builder().flags(applicant1Flags).build())
-                .applicant2(Party.builder().flags(applicant2Flags).build())
-                .respondent1(Party.builder().flags(respondent1Flags).build())
-                .respondent2(Party.builder().flags(respondent2Flags).build())
+                .applicant1(new Party().setFlags(applicant1Flags))
+                .applicant2(new Party().setFlags(applicant2Flags))
+                .respondent1(new Party().setFlags(respondent1Flags))
+                .respondent2(new Party().setFlags(respondent2Flags))
                 .build();
 
             @BeforeEach
@@ -1496,36 +1413,27 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldCopyFlagsForApplicants(String partyChosenId) {
                 // Fix: Include all parties with their types to avoid NullPointerException
                 CaseData caseData = CaseData.builder()
-                    .applicant1(Party.builder()
-                                    .type(INDIVIDUAL)  // Using static import
-                                    .individualFirstName("John")
-                                    .individualLastName("Doe")
-                                    .flags(applicant1Flags)
-                                    .build())
-                    .applicant2(Party.builder()
-                                    .type(COMPANY)  // Using static import
-                                    .companyName("Test Company")
-                                    .flags(applicant2Flags)
-                                    .build())
-                    .respondent1(Party.builder()
-                                     .type(INDIVIDUAL)  // Using static import
-                                     .individualFirstName("Jane")
-                                     .individualLastName("Smith")
-                                     .flags(respondent1Flags)
-                                     .build())
-                    .respondent2(Party.builder()
-                                     .type(COMPANY)  // Using static import
-                                     .companyName("Defendant Corp")
-                                     .flags(respondent2Flags)
-                                     .build())
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(partyChosenId)
-                                           .build())
+                    .applicant1(new Party()
+                                    .setType(INDIVIDUAL)// Using static import
+                                    .setIndividualFirstName("John")
+                                    .setIndividualLastName("Doe")
+                                    .setFlags(applicant1Flags))
+                    .applicant2(new Party()
+                                    .setType(COMPANY)// Using static import
+                                    .setCompanyName("Test Company")
+                                    .setFlags(applicant2Flags))
+                    .respondent1(new Party()
+                                     .setType(INDIVIDUAL)// Using static import
+                                     .setIndividualFirstName("Jane")
+                                     .setIndividualLastName("Smith")
+                                     .setFlags(respondent1Flags))
+                    .respondent2(new Party()
+                                     .setType(COMPANY)// Using static import
+                                     .setCompanyName("Defendant Corp")
+                                     .setFlags(respondent2Flags))
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId)))
+                                           .setPartyChosenId(partyChosenId))
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1545,36 +1453,27 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldCopyFlagsForRespondents(String partyChosenId) {
                 // Fix: Include all parties with their types to avoid NullPointerException
                 CaseData caseData = CaseData.builder()
-                    .applicant1(Party.builder()
-                                    .type(INDIVIDUAL)  // Using static import
-                                    .individualFirstName("John")
-                                    .individualLastName("Doe")
-                                    .flags(applicant1Flags)
-                                    .build())
-                    .applicant2(Party.builder()
-                                    .type(COMPANY)  // Using static import
-                                    .companyName("Test Company")
-                                    .flags(applicant2Flags)
-                                    .build())
-                    .respondent1(Party.builder()
-                                     .type(INDIVIDUAL)  // Using static import
-                                     .individualFirstName("Jane")
-                                     .individualLastName("Smith")
-                                     .flags(respondent1Flags)
-                                     .build())
-                    .respondent2(Party.builder()
-                                     .type(COMPANY)  // Using static import
-                                     .companyName("Defendant Corp")
-                                     .flags(respondent2Flags)
-                                     .build())
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(partyChosenId)
-                                           .build())
+                    .applicant1(new Party()
+                                    .setType(INDIVIDUAL)// Using static import
+                                    .setIndividualFirstName("John")
+                                    .setIndividualLastName("Doe")
+                                    .setFlags(applicant1Flags))
+                    .applicant2(new Party()
+                                    .setType(COMPANY)// Using static import
+                                    .setCompanyName("Test Company")
+                                    .setFlags(applicant2Flags))
+                    .respondent1(new Party()
+                                     .setType(INDIVIDUAL)// Using static import
+                                     .setIndividualFirstName("Jane")
+                                     .setIndividualLastName("Smith")
+                                     .setFlags(respondent1Flags))
+                    .respondent2(new Party()
+                                     .setType(COMPANY)// Using static import
+                                     .setCompanyName("Defendant Corp")
+                                     .setFlags(respondent2Flags))
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId)))
+                                           .setPartyChosenId(partyChosenId))
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1593,15 +1492,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldUpdateApplicantOneExperts() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(CLAIMANT_ONE_EXPERTS_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(CLAIMANT_ONE_EXPERTS_ID)
-                                           .updateExpertsDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(CLAIMANT_ONE_EXPERTS_ID)))
+                                           .setPartyChosenId(CLAIMANT_ONE_EXPERTS_ID)
+                                           .setUpdateExpertsDetailsForm(wrapElements(party)))
                     .applicant1DQ(new Applicant1DQ()
                                       .setApplicant1DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
@@ -1620,15 +1514,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldUpdateDefendantOneExperts() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(DEFENDANT_ONE_EXPERTS_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(DEFENDANT_ONE_EXPERTS_ID)
-                                           .updateExpertsDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_EXPERTS_ID)))
+                                           .setPartyChosenId(DEFENDANT_ONE_EXPERTS_ID)
+                                           .setUpdateExpertsDetailsForm(wrapElements(party)))
                     .respondent1DQ(new Respondent1DQ()
                                        .setRespondent1DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
@@ -1647,15 +1536,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldUpdateDefendantOneExperts_WhenNoExpertsExisted() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(DEFENDANT_ONE_EXPERTS_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(DEFENDANT_ONE_EXPERTS_ID)
-                                           .updateExpertsDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_EXPERTS_ID)))
+                                           .setPartyChosenId(DEFENDANT_ONE_EXPERTS_ID)
+                                           .setUpdateExpertsDetailsForm(wrapElements(party)))
                     .respondent1DQ(new Respondent1DQ()
                                        .setRespondent1DQExperts(new Experts()))
                     .build();
@@ -1674,15 +1558,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldUpdateDefendantTwoExperts() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(DEFENDANT_TWO_EXPERTS_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(DEFENDANT_TWO_EXPERTS_ID)
-                                           .updateExpertsDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_TWO_EXPERTS_ID)))
+                                           .setPartyChosenId(DEFENDANT_TWO_EXPERTS_ID)
+                                           .setUpdateExpertsDetailsForm(wrapElements(party)))
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
@@ -1704,15 +1583,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .multiPartyClaimTwoApplicants()
                     .applicant1ProceedWithClaimMultiParty2v1(YES)
                     .applicant2ProceedWithClaimMultiParty2v1(YES)
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(CLAIMANT_ONE_EXPERTS_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(CLAIMANT_ONE_EXPERTS_ID)
-                                           .updateExpertsDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(CLAIMANT_ONE_EXPERTS_ID)))
+                                           .setPartyChosenId(CLAIMANT_ONE_EXPERTS_ID)
+                                           .setUpdateExpertsDetailsForm(wrapElements(party)))
                     .applicant1DQ(new Applicant1DQ()
                                       .setApplicant1DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .applicant2DQ(new Applicant2DQ()
@@ -1737,15 +1611,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .atStateApplicantRespondToDefenceAndProceed()
                     .multiPartyClaimOneDefendantSolicitor()
                     .respondentResponseIsSame(YES)
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(DEFENDANT_ONE_EXPERTS_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(DEFENDANT_ONE_EXPERTS_ID)
-                                           .updateExpertsDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_EXPERTS_ID)))
+                                           .setPartyChosenId(DEFENDANT_ONE_EXPERTS_ID)
+                                           .setUpdateExpertsDetailsForm(wrapElements(party)))
                     .respondent1DQ(new Respondent1DQ()
                                        .setRespondent1DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .respondent2DQ(new Respondent2DQ()
@@ -1768,15 +1637,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldUpdateDefendantTwoExperts_WhenNoExpertsExisted() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(DEFENDANT_TWO_EXPERTS_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(DEFENDANT_TWO_EXPERTS_ID)
-                                           .updateExpertsDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_TWO_EXPERTS_ID)))
+                                           .setPartyChosenId(DEFENDANT_TWO_EXPERTS_ID)
+                                           .setUpdateExpertsDetailsForm(wrapElements(party)))
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQExperts(new Experts()))
                     .build();
@@ -1798,15 +1662,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .multiPartyClaimTwoApplicants()
                     .applicant1ProceedWithClaimMultiParty2v1(YES)
                     .applicant2ProceedWithClaimMultiParty2v1(YES)
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(CLAIMANT_ONE_WITNESSES_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(CLAIMANT_ONE_WITNESSES_ID)
-                                           .updateWitnessesDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(CLAIMANT_ONE_WITNESSES_ID)))
+                                           .setPartyChosenId(CLAIMANT_ONE_WITNESSES_ID)
+                                           .setUpdateWitnessesDetailsForm(wrapElements(party)))
                     .applicant1DQ(new Applicant1DQ()
                                       .setApplicant1DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .applicant2DQ(new Applicant2DQ()
@@ -1827,15 +1686,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldUpdateDefendantOneWitnesses() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(DEFENDANT_ONE_WITNESSES_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
-                                           .updateWitnessesDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_WITNESSES_ID)))
+                                           .setPartyChosenId(DEFENDANT_ONE_WITNESSES_ID)
+                                           .setUpdateWitnessesDetailsForm(wrapElements(party)))
                     .respondent1DQ(new Respondent1DQ()
                                        .setRespondent1DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .respondent2DQ(new Respondent2DQ()
@@ -1856,15 +1710,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldUpdateDefendantTwoWitnesses() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(DEFENDANT_TWO_WITNESSES_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(DEFENDANT_TWO_WITNESSES_ID)
-                                           .updateWitnessesDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_TWO_WITNESSES_ID)))
+                                           .setPartyChosenId(DEFENDANT_TWO_WITNESSES_ID)
+                                           .setUpdateWitnessesDetailsForm(wrapElements(party)))
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .build();
@@ -1886,15 +1735,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .multiPartyClaimTwoApplicants()
                     .applicant1ProceedWithClaimMultiParty2v1(YES)
                     .applicant2ProceedWithClaimMultiParty2v1(YES)
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(CLAIMANT_ONE_WITNESSES_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(CLAIMANT_ONE_WITNESSES_ID)
-                                           .updateWitnessesDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(CLAIMANT_ONE_WITNESSES_ID)))
+                                           .setPartyChosenId(CLAIMANT_ONE_WITNESSES_ID)
+                                           .setUpdateWitnessesDetailsForm(wrapElements(party)))
                     .applicant1DQ(new Applicant1DQ()
                                       .setApplicant1DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .applicant2DQ(new Applicant2DQ()
@@ -1920,15 +1764,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .atStateApplicantRespondToDefenceAndProceed()
                     .multiPartyClaimOneDefendantSolicitor()
                     .respondentResponseIsSame(YES)
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(DEFENDANT_ONE_WITNESSES_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
-                                           .updateWitnessesDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_WITNESSES_ID)))
+                                           .setPartyChosenId(DEFENDANT_ONE_WITNESSES_ID)
+                                           .setUpdateWitnessesDetailsForm(wrapElements(party)))
                     .respondent1DQ(new Respondent1DQ()
                                        .setRespondent1DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .respondent2DQ(new Respondent2DQ()
@@ -1952,15 +1791,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldUpdateDefendantOneWitnesses_WhenNoWitnessesExisted() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(DEFENDANT_ONE_WITNESSES_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
-                                           .updateWitnessesDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_WITNESSES_ID)))
+                                           .setPartyChosenId(DEFENDANT_ONE_WITNESSES_ID)
+                                           .setUpdateWitnessesDetailsForm(wrapElements(party)))
                     .respondent1DQ(new Respondent1DQ()
                                        .setRespondent1DQWitnesses(new Witnesses()))
                     .build();
@@ -1979,15 +1813,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldUpdateDefendantTwoWitnesses_WhenNoWitnessesExisted() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(DEFENDANT_TWO_WITNESSES_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(DEFENDANT_TWO_WITNESSES_ID)
-                                           .updateWitnessesDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_TWO_WITNESSES_ID)))
+                                           .setPartyChosenId(DEFENDANT_TWO_WITNESSES_ID)
+                                           .setUpdateWitnessesDetailsForm(wrapElements(party)))
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQWitnesses(new Witnesses()))
                     .build();
@@ -2006,15 +1835,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void addingExpertWhenNoneExisted() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(CLAIMANT_ONE_EXPERTS_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(CLAIMANT_ONE_EXPERTS_ID)
-                                           .updateExpertsDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(CLAIMANT_ONE_EXPERTS_ID)))
+                                           .setPartyChosenId(CLAIMANT_ONE_EXPERTS_ID)
+                                           .setUpdateExpertsDetailsForm(wrapElements(party)))
                     .applicant1DQ(new Applicant1DQ()
                                       .setApplicant1DQExperts(new Experts()
                                                                .setExpertRequired(NO)))
@@ -2034,15 +1858,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void removingAllExperts() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(CLAIMANT_ONE_EXPERTS_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(CLAIMANT_ONE_EXPERTS_ID)
-                                           .updateExpertsDetailsForm(null)
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(CLAIMANT_ONE_EXPERTS_ID)))
+                                           .setPartyChosenId(CLAIMANT_ONE_EXPERTS_ID)
+                                           .setUpdateExpertsDetailsForm(null))
                     .applicant1DQ(new Applicant1DQ()
                                       .setApplicant1DQExperts(new Experts()
                                                                .setExpertRequired(YES)
@@ -2062,15 +1881,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void addingWitnessWhenNoneExisted() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(DEFENDANT_ONE_WITNESSES_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
-                                           .updateWitnessesDetailsForm(wrapElements(party))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_WITNESSES_ID)))
+                                           .setPartyChosenId(DEFENDANT_ONE_WITNESSES_ID)
+                                           .setUpdateWitnessesDetailsForm(wrapElements(party)))
                     .respondent1DQ(new Respondent1DQ()
                                        .setRespondent1DQWitnesses(new Witnesses()
                                                                    .setWitnessesToAppear(NO)))
@@ -2091,15 +1905,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void removingAllWitnesses() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(DEFENDANT_ONE_WITNESSES_ID)
-                                                                       .build())
-                                                            .build())
-                                           .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
-                                           .updateWitnessesDetailsForm(null)
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_WITNESSES_ID)))
+                                           .setPartyChosenId(DEFENDANT_ONE_WITNESSES_ID)
+                                           .setUpdateWitnessesDetailsForm(null))
                     .respondent1DQ(new Respondent1DQ()
                                        .setRespondent1DQWitnesses(new Witnesses()
                                                                    .setDetails(wrapElements(dqWitness))
@@ -2129,10 +1938,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     + "litigation friend's contact information is also up to date.";
 
                 CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .applicant2(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .applicant2(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
+                    .respondent2(new Party().setType(INDIVIDUAL))
                     .addApplicant1LitigationFriend()
                     .addApplicant2LitigationFriend()
                     .addRespondent1LitigationFriend()
@@ -2141,13 +1950,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = CaseDataBuilder.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .addApplicant1LitigationFriend()
                     .addApplicant2LitigationFriend()
                     .addRespondent1LitigationFriend()
@@ -2166,20 +1970,15 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 DEFENDANT_ONE_LITIGATION_FRIEND_ID})
             void shouldNotReturnWarning(String partyChosenId) {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
 
                 CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .applicant2(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .applicant2(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
+                    .respondent2(new Party().setType(INDIVIDUAL))
                     .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
@@ -2195,26 +1994,20 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 given(postcodeValidator.validate(any())).willReturn(List.of("Please enter Postcode"));
 
                 CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .applicant2(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .applicant2(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
+                    .respondent2(new Party().setType(INDIVIDUAL))
                     .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(CLAIMANT_ONE_ID)
-                                                                       .build())
-                                                            .build())
-                                           .build())
-                    .applicant1(Party.builder()
-                                    .type(INDIVIDUAL)
-                                    .primaryAddress(new Address())
-                                    .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(CLAIMANT_ONE_ID))))
+                    .applicant1(new Party()
+                                    .setType(INDIVIDUAL)
+                                    .setPrimaryAddress(new Address()))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
@@ -2230,9 +2023,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
             void shouldReturnLitigationFriendWarning_sameDefendantLegalRep_twoDefendantLitigationFriends(String partyChosenId) {
                 CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
+                    .respondent2(new Party().setType(INDIVIDUAL))
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
                     .addRespondent2LitigationFriend()
@@ -2242,13 +2035,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = caseDataBefore.toBuilder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
@@ -2263,9 +2051,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
             void shouldNotReturnLitigationFriendWarning_diffDefendantLegalRep_twoDefendantLitigationFriends(String partyChosenId) {
                 CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
+                    .respondent2(new Party().setType(INDIVIDUAL))
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
                     .addRespondent2LitigationFriend()
@@ -2276,13 +2064,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = caseDataBefore.toBuilder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
@@ -2295,9 +2078,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {CLAIMANT_ONE_LITIGATION_FRIEND_ID, CLAIMANT_TWO_LITIGATION_FRIEND_ID})
             void shouldReturnLitigationFriendWarning_twoClaimantLitigationFriend(String partyChosenId) {
                 CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .applicant2(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .applicant2(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
                     .addApplicant1LitigationFriend()
                     .addApplicant2LitigationFriend()
                     .addRespondent1LitigationFriend()
@@ -2305,13 +2088,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = caseDataBefore.toBuilder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
@@ -2326,9 +2104,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
             void shouldNotReturnLitigationFriendWarning_sameDefendantRep_oneDefendantLitigationFriend(String partyChosenId) {
                 CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
+                    .respondent2(new Party().setType(INDIVIDUAL))
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
                     .buildClaimIssuedPaymentCaseData().toBuilder()
@@ -2337,13 +2115,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = caseDataBefore.toBuilder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
@@ -2356,22 +2129,17 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
             void shouldNotReturnLitigationFriendWarning_diffDefendantRep_oneDefendantLitigationFriend(String partyChosenId) {
                 CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
+                    .respondent2(new Party().setType(INDIVIDUAL))
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
                     .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = caseDataBefore.toBuilder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
@@ -2384,9 +2152,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {CLAIMANT_ONE_LITIGATION_FRIEND_ID, CLAIMANT_TWO_LITIGATION_FRIEND_ID})
             void shouldNotReturnLitigationFriendWarning_oneClaimantLitigationFriend(String partyChosenId) {
                 CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .applicant2(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .applicant2(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
                     .buildClaimIssuedPaymentCaseData();
@@ -2394,13 +2162,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = caseDataBefore.toBuilder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
@@ -2432,19 +2195,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
-                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL)
-                                    .primaryAddress(invalidAddress)
-                                    .build())
-                    .applicant2(Party.builder().type(Party.Type.INDIVIDUAL)
-                                    .primaryAddress(invalidAddress)
-                                    .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
+                    .applicant1(new Party().setType(Party.Type.INDIVIDUAL)
+                                    .setPrimaryAddress(invalidAddress))
+                    .applicant2(new Party().setType(Party.Type.INDIVIDUAL)
+                                    .setPrimaryAddress(invalidAddress))
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2458,21 +2214,16 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})
             void shouldNotErrorForClaimantManageInformation(String partyChosenId) {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
 
                 CaseData caseDataBefore = CaseDataBuilder.builder()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .applicant2(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .applicant2(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
+                    .respondent2(new Party().setType(INDIVIDUAL))
                     .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
@@ -2486,21 +2237,16 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @Test
             void shouldNotErrorForNoPartyChosenSelectedManageInformation() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code("partyChosenId")
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode("partyChosenId"))))
                     .build();
 
                 CaseData caseDataBefore = CaseDataBuilder.builder()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .applicant2(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .applicant2(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
+                    .respondent2(new Party().setType(INDIVIDUAL))
                     .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
@@ -2515,13 +2261,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldNotErrorForDefaultPartyChosenSelectedManageInformation() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code("default")
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode("default"))))
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2544,19 +2285,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
-                    .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
-                                     .primaryAddress(invalidAddress)
-                                     .build())
-                    .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
-                                     .primaryAddress(invalidAddress)
-                                     .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
+                    .respondent1(new Party().setType(Party.Type.INDIVIDUAL)
+                                     .setPrimaryAddress(invalidAddress))
+                    .respondent2(new Party().setType(Party.Type.INDIVIDUAL)
+                                     .setPrimaryAddress(invalidAddress))
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2570,21 +2304,16 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
             void shouldNotErrorForDefendantManageInformation(String partyChosenId) {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
 
                 CaseData caseDataBefore = CaseDataBuilder.builder()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .applicant2(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .applicant2(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
+                    .respondent2(new Party().setType(INDIVIDUAL))
                     .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
@@ -2604,10 +2333,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @BeforeEach
             void setup() {
                 CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .applicant2(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .applicant1(new Party().setType(INDIVIDUAL))
+                    .applicant2(new Party().setType(INDIVIDUAL))
+                    .respondent1(new Party().setType(INDIVIDUAL))
+                    .respondent2(new Party().setType(INDIVIDUAL))
                     .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
             }
@@ -2615,13 +2344,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @Test
             void shouldPopulatePartyChosenId() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code("CODE")
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode("CODE"))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2639,13 +2363,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
 
                 CaseData caseData = CaseDataBuilder.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2663,13 +2382,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
 
                 CaseData caseData = CaseDataBuilder.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2686,8 +2400,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldPopulateExperts(String partyChosenId) {
                 when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
                 Expert expert = new Expert().setFirstName("First").setLastName("Name").setPartyID("id");
-                UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
-                    .partyId("id").build();
+                UpdatePartyDetailsForm party = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name")
+                    .setPartyId("id");
                 List<Element<UpdatePartyDetailsForm>> form = wrapElements(party);
 
                 CaseData caseData = CaseDataBuilder.builder()
@@ -2697,13 +2411,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                        .setRespondent1DQExperts(new Experts().setDetails(wrapElements(expert))))
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQExperts(new Experts().setDetails(wrapElements(expert))))
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2720,8 +2429,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldNotPopulateExpertsIfEmpty(String partyChosenId) {
                 when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
                 Expert expert = new Expert().setFirstName("First").setLastName("Name").setPartyID("id");
-                UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
-                    .partyId("id").build();
+                UpdatePartyDetailsForm party = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name")
+                    .setPartyId("id");
                 List<Element<UpdatePartyDetailsForm>> form = wrapElements(party);
 
                 CaseData caseData = CaseDataBuilder.builder()
@@ -2730,13 +2439,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                        .setRespondent1DQExperts(new Experts()))
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQExperts(new Experts()))
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2753,8 +2457,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {CLAIMANT_ONE_WITNESSES_ID, DEFENDANT_ONE_WITNESSES_ID, DEFENDANT_TWO_WITNESSES_ID})
             void shouldPopulateWitnesses(String partyChosenId) {
                 Witness witness = new Witness().setFirstName("First").setLastName("Name").setPartyID("id");
-                UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
-                    .partyId("id").build();
+                UpdatePartyDetailsForm party = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name")
+                    .setPartyId("id");
                 List<Element<UpdatePartyDetailsForm>> form = wrapElements(party);
 
                 CaseData caseData = CaseDataBuilder.builder()
@@ -2764,13 +2468,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                        .setRespondent1DQWitnesses(new Witnesses().setDetails(wrapElements(witness))))
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQWitnesses(new Witnesses().setDetails(wrapElements(witness))))
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2786,8 +2485,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {CLAIMANT_ONE_WITNESSES_ID, DEFENDANT_ONE_WITNESSES_ID, DEFENDANT_TWO_WITNESSES_ID})
             void shouldNotPopulateWitnessesIfEmpty(String partyChosenId) {
                 Witness witness = new Witness().setFirstName("First").setLastName("Name").setPartyID("id");
-                UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
-                    .partyId("id").build();
+                UpdatePartyDetailsForm party = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name")
+                    .setPartyId("id");
                 List<Element<UpdatePartyDetailsForm>> form = wrapElements(party);
 
                 CaseData caseData = CaseDataBuilder.builder()
@@ -2795,13 +2494,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                       .setApplicant1DQWitnesses(new Witnesses()))
                     .respondent1DQ(null)
                     .respondent2DQ(null)
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code(partyChosenId)
-                                                                       .build())
-                                                            .build())
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(partyChosenId))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2823,15 +2517,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldValidatePartyIdsandReturnError() {
                 when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
 
-                UpdatePartyDetailsForm expert = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").partyId(
-                    "id").build();
-                UpdatePartyDetailsForm expert2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").build();
+                UpdatePartyDetailsForm expert = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name").setPartyId(
+                    "id");
+                UpdatePartyDetailsForm expert2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("Name2");
 
                 // Create CaseData - try using toBuilder() if available
                 CaseData caseData = CaseData.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .updateExpertsDetailsForm(wrapElements(expert, expert2))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setUpdateExpertsDetailsForm(wrapElements(expert, expert2)))
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2848,15 +2541,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldValidatePartyIds_NotReturnError() {
                 when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
 
-                UpdatePartyDetailsForm expert = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").partyId(
-                    "id").build();
-                UpdatePartyDetailsForm expert2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").partyId(
-                    "id").build();
+                UpdatePartyDetailsForm expert = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name").setPartyId(
+                    "id");
+                UpdatePartyDetailsForm expert2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("Name2").setPartyId(
+                    "id");
 
                 CaseData caseData = CaseData.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .updateExpertsDetailsForm(wrapElements(expert, expert2))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setUpdateExpertsDetailsForm(wrapElements(expert, expert2)))
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2869,14 +2561,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldValidatePartyIds_NotReturnErrorAsAdmin() {
                 when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
 
-                UpdatePartyDetailsForm expert = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").partyId(
-                    "id").build();
-                UpdatePartyDetailsForm expert2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").build();
+                UpdatePartyDetailsForm expert = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name").setPartyId(
+                    "id");
+                UpdatePartyDetailsForm expert2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("Name2");
 
                 CaseData caseData = CaseData.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .updateExpertsDetailsForm(wrapElements(expert, expert2))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setUpdateExpertsDetailsForm(wrapElements(expert, expert2)))
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2894,14 +2585,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldValidatePartyIds_ReturnError() {
                 when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
 
-                UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").partyId(
-                    "id").build();
-                UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").build();
+                UpdatePartyDetailsForm party = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name").setPartyId(
+                    "id");
+                UpdatePartyDetailsForm party2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("Name2");
 
                 CaseData caseData = CaseData.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .updateWitnessesDetailsForm(wrapElements(party, party2))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setUpdateWitnessesDetailsForm(wrapElements(party, party2)))
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2918,15 +2608,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldValidatePartyIds_NotReturnError() {
                 when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
 
-                UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").partyId(
-                    "id").build();
-                UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").partyId(
-                    "id").build();
+                UpdatePartyDetailsForm party = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name").setPartyId(
+                    "id");
+                UpdatePartyDetailsForm party2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("Name2").setPartyId(
+                    "id");
 
                 CaseData caseData = CaseData.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .updateWitnessesDetailsForm(wrapElements(party, party2))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setUpdateWitnessesDetailsForm(wrapElements(party, party2)))
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2939,14 +2628,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             void shouldValidatePartyIds_NotReturnErrorAsAdmin() {
                 when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
 
-                UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").partyId(
-                    "id").build();
-                UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").build();
+                UpdatePartyDetailsForm party = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name").setPartyId(
+                    "id");
+                UpdatePartyDetailsForm party2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("Name2");
 
                 CaseData caseData = CaseData.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .updateWitnessesDetailsForm(wrapElements(party, party2))
-                                           .build())
+                    .updateDetailsForm(new UpdateDetailsForm()
+                                           .setUpdateWitnessesDetailsForm(wrapElements(party, party2)))
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);

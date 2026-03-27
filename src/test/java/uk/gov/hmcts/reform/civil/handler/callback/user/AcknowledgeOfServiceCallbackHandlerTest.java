@@ -91,7 +91,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void populateRespondentCopy1_checkIfDeadlineNotPassed() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .respondent2(PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build())
+                .respondent2(new PartyBuilder().soleTrader().build().setPartyID("res-1-party-id"))
                 .build();
 
             Flags respondent1Flags = new Flags();
@@ -146,7 +146,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent1ResponseDeadline(null);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
-            handler.handle(params);
+            Assertions.assertDoesNotThrow(() -> handler.handle(params));
         }
 
     }
@@ -253,7 +253,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .build();
-            caseData.setRespondent2(PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build());
+            caseData.setRespondent2(new PartyBuilder().soleTrader().build().setPartyID("res-1-party-id"));
             caseData.setRespondent1Copy(respondent1Copy);
             caseData.setRespondent2Copy(respondent2Copy);
 
@@ -340,7 +340,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent1ResponseDeadline(null);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
-            handler.handle(params);
+            Assertions.assertDoesNotThrow(() -> handler.handle(params));
         }
     }
 

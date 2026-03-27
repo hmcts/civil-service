@@ -266,7 +266,7 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(YES)
                 .build();
@@ -904,6 +904,11 @@ class DirectionsQuestionnaireGeneratorTest {
                 dq.setRespondToCourtLocation(null);
                 caseData.setRespondent1DQ(dq);
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThat(templateData).isNotNull();
+                assertThat(templateData.getRequestedCourt().getCaseLocation()).isNull();
+                assertThat(templateData.getRequestedCourt().getRequestHearingAtSpecificCourt()).isEqualTo(NO);
             }
 
             @Test
@@ -915,6 +920,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 dq.setRespondent1DQExperts(null);
                 caseData.setRespondent1DQ(dq);
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThat(templateData).isNotNull();
+                assertThat(templateData.getExperts().getExpertRequired()).isEqualTo(NO);
             }
 
             @Test
@@ -1641,7 +1650,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                     .respondent2DQWithFixedRecoverableCosts()
                     .respondent2ResponseDate(LocalDateTime.now())
-                    .respondent2(PartyBuilder.builder()
+                    .respondent2(new PartyBuilder()
                                      .individual()
                                      .legalRepHeading()
                                      .build())
@@ -1672,7 +1681,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent2DQWithFixedRecoverableCosts()
                     .respondent1ResponseDate(null)
                     .respondent2ResponseDate(LocalDateTime.now())
-                    .respondent2(PartyBuilder.builder()
+                    .respondent2(new PartyBuilder()
                                      .individual()
                                      .legalRepHeading()
                                      .build())
@@ -1718,7 +1727,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 respondent2LitigationFriend.setEmailAddress("respondent2LF@email.com");
                 caseData.setRespondent2LitigationFriend(respondent2LitigationFriend);
                 caseData.setRespondent1ResponseDate(LocalDateTime.now());
-                caseData.setRespondent2(PartyBuilder.builder()
+                caseData.setRespondent2(new PartyBuilder()
                         .individual()
                         .legalRepHeading()
                         .build());
@@ -1744,7 +1753,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                     .respondent2ResponseDate(LocalDateTime.now())
-                    .respondent2(PartyBuilder.builder()
+                    .respondent2(new PartyBuilder()
                         .individual()
                         .legalRepHeading()
                         .build())
@@ -1788,7 +1797,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                     .respondent2ResponseDate(createdDate)
-                    .respondent2(PartyBuilder.builder()
+                    .respondent2(new PartyBuilder()
                         .individual()
                         .legalRepHeading()
                         .build())
@@ -1832,7 +1841,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                     .respondent1ResponseDate(createdDate)
-                    .respondent2(PartyBuilder.builder()
+                    .respondent2(new PartyBuilder()
                         .individual()
                         .legalRepHeading()
                         .build())
@@ -1876,7 +1885,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                     .respondent1ResponseDate(createdDate)
-                    .respondent2(PartyBuilder.builder()
+                    .respondent2(new PartyBuilder()
                         .individual()
                         .legalRepHeading()
                         .build())
@@ -1920,7 +1929,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                     .respondent1ResponseDate(createdDate)
-                    .respondent2(PartyBuilder.builder()
+                    .respondent2(new PartyBuilder()
                         .individual()
                         .legalRepHeading()
                         .build())
@@ -1970,7 +1979,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                     .respondent2ResponseDate(createdDate)
-                    .respondent2(PartyBuilder.builder()
+                    .respondent2(new PartyBuilder()
                         .individual()
                         .legalRepHeading()
                         .build())
@@ -2014,7 +2023,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                     .respondent2ResponseDate(createdDate)
-                    .respondent2(PartyBuilder.builder()
+                    .respondent2(new PartyBuilder()
                         .individual()
                         .legalRepHeading()
                         .build())
@@ -2069,7 +2078,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                     .respondent2ResponseDate(createdDate)
-                    .respondent2(PartyBuilder.builder()
+                    .respondent2(new PartyBuilder()
                         .individual()
                         .legalRepHeading()
                         .build())
@@ -2100,7 +2109,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                    .respondent2(PartyBuilder.builder()
+                    .respondent2(new PartyBuilder()
                         .individual()
                         .legalRepHeading()
                         .build())
@@ -2134,7 +2143,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .legacyCaseReference("reference")
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                     .respondent1ResponseDate(createdDate)
-                    .respondent1(PartyBuilder.builder().individual().build())
+                    .respondent1(new PartyBuilder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
@@ -2173,7 +2182,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                     .respondent2ResponseDate(LocalDateTime.now())
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(new PartyBuilder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .build();
@@ -2213,7 +2222,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                     .respondent2ResponseDate(LocalDateTime.now())
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(new PartyBuilder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .build();
@@ -2245,7 +2254,7 @@ class DirectionsQuestionnaireGeneratorTest {
             void whenCaseStateIsFullDefence1v2ApplicantProceedsAgainstRes2Only_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
-                    .respondent2(PartyBuilder.builder().company().build())
+                    .respondent2(new PartyBuilder().company().build())
                     .build();
                 BusinessProcess businessProcess = new BusinessProcess();
                 businessProcess.setCamundaEvent("CLAIMANT_RESPONSE");
