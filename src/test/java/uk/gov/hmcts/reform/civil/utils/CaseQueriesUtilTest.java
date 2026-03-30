@@ -31,11 +31,11 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -313,11 +313,29 @@ class CaseQueriesUtilTest {
         caseData.setCcdCaseReference(1L);
         caseData.setQueries(queries);
 
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(Collections.emptyList());
-
         List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "4");
 
         assertThat(roles).containsExactly(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
+        verifyNoInteractions(coreCaseUserService);
+    }
+
+    @Test
+    void shouldPreferPersistedRoleEvenWhenUserStillHasMultipleRoles() {
+        CaseMessage respondentMsg = new CaseMessage();
+        respondentMsg.setId("5");
+        respondentMsg.setCreatedBy("user" + CaseQueriesUtil.ROLE_METADATA_DELIMITER
+            + CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
+        CaseQueriesCollection queries = new CaseQueriesCollection();
+        queries.setCaseMessages(wrapElements(respondentMsg));
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1L);
+        caseData.setQueries(queries);
+
+        List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "5");
+
+        assertThat(roles).containsExactly(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
+        verifyNoInteractions(coreCaseUserService);
     }
 
     @Test

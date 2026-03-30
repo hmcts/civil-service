@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -51,16 +52,16 @@ public class CaseQueriesUtil {
             .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId));
 
         CreatedByRoleMetadata metadata = extractRoleMetadata(caseMessage.getCreatedBy());
+        if (metadata.persistedRole != null) {
+            return List.of(metadata.persistedRole);
+        }
+
         List<String> roles = coreCaseUserService.getUserCaseRoles(
             caseData.getCcdCaseReference().toString(),
             metadata.userId
         );
 
-        if ((roles == null || roles.isEmpty()) && metadata.persistedRole != null) {
-            return List.of(metadata.persistedRole);
-        }
-
-        return roles;
+        return roles == null ? Collections.emptyList() : roles;
     }
 
     public static String buildCreatedByWithRoleMetadata(String userId, List<String> roles) {
