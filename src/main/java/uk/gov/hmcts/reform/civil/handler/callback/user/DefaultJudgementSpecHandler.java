@@ -80,6 +80,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     public static final String DJ_NOT_VALID_FOR_THIS_LIP_CLAIM = "The Claim is not eligible for Default Judgment.";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private static final int DEFAULT_JUDGEMENT_SPEC_DEADLINE_EXTENSION_MONTHS = 36;
+    private static final String CASES_CASE_DETAILS_CLAIM_DOCUMENTS = "/cases/case-details/%s#Claim documents";
+    private static final String BOTH = "Both";
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
@@ -126,7 +128,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         } else if (caseData.isLRvLipOneVOne()
             || (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
-            .getLabel().startsWith("Both"))) {
+            .getLabel().startsWith(BOTH))) {
             return format(JUDGMENT_REQUESTED_HEADER);
 
         } else {
@@ -137,24 +139,24 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private String getBody(CaseData caseData) {
         if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             return format(JUDGMENT_GRANTED, format(
-                "/cases/case-details/%s#Claim documents",
+                CASES_CASE_DETAILS_CLAIM_DOCUMENTS,
                 caseData.getCcdCaseReference()
             ));
         } else if (caseData.isLRvLipOneVOne()) {
             return format(JUDGMENT_REQUESTED_LIP_CASE);
         } else if (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
-            .getLabel().startsWith("Both")) {
+            .getLabel().startsWith(BOTH)) {
             return format(JUDGMENT_REQUESTED, caseData.getDefendantDetailsSpec().getValue().getLabel());
         } else {
             if (caseData.getRespondent2() != null) {
                 return format(JUDGMENT_GRANTED_OLD, format(
-                    "/cases/case-details/%s#Claim documents",
+                    CASES_CASE_DETAILS_CLAIM_DOCUMENTS,
                     caseData.getCcdCaseReference()
                 ));
             } else {
                 return format(JUDGMENT_GRANTED, format(
-                    "/cases/case-details/%s#Claim documents",
+                    CASES_CASE_DETAILS_CLAIM_DOCUMENTS,
                     caseData.getCcdCaseReference()
                 ));
             }
@@ -211,7 +213,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .getValue().getLabel() + " paid some of the amount owed?");
         var currentDefendantName = (caseData.getDefendantDetailsSpec()
             .getValue().getLabel());
-        if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
+        if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(BOTH)) {
             caseData.setBothDefendantsSpec(caseData.getDefendantDetailsSpec().getValue().getLabel());
             // populate the title of next screen if both defendants chosen
             currentDefendantString = ("Have the defendants paid some of the amount owed?");
@@ -229,7 +231,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
         if (caseData.getRespondent2() != null
             && caseData.getDefendantDetailsSpec().getValue()
-            .getLabel().startsWith("Both")) {
+            .getLabel().startsWith(BOTH)) {
             registrationList.add(element(regInfo));
             caseData.setRegistrationTypeRespondentOne(registrationList);
             caseData.setRegistrationTypeRespondentTwo(registrationList);
@@ -376,7 +378,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             repaymentBreakdown.append(
                 "The Judgment request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.");
         } else {
-            if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
+            if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(BOTH)) {
                 repaymentBreakdown.append("The judgment will order the defendants to pay £").append(
                     theOverallTotal);
             } else {

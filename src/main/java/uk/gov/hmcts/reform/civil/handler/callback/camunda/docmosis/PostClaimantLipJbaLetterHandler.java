@@ -69,7 +69,7 @@ public class PostClaimantLipJbaLetterHandler extends CallbackHandler {
             bulkPrintFileNames.add(claimantDJDoc.getValue().getDocumentLink().getDocumentFileName());
             bulkPrintFileNames.add(DEFAULT_JUDGMENT_COVER_LETTER.getDocumentTitle());
             byte[] claimantDjLetterBinary = coverLetterGeneratorService.generateDocumentWithCoverLetterBinary(
-                caseData.getApplicant1(), caseData, documents,
+                caseData.getApplicant1(), caseData.getApplicant1LitigationFriend(), caseData, documents,
                 "Claimant JBA letter.pdf",
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
             );
