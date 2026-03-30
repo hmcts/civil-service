@@ -21,6 +21,7 @@ import static java.math.RoundingMode.UP;
 @Slf4j
 public abstract class GaElasticSearchService {
 
+    private static final String FOUND_CASES_WITH_IDS = "Found {} case(s) with ids {}";
     protected final GaCoreCaseDataService coreCaseDataService;
 
     protected static final int START_INDEX = 0;
@@ -38,7 +39,7 @@ public abstract class GaElasticSearchService {
         }
 
         List<Long> ids = caseDetails.stream().map(CaseDetails::getId).sorted().toList();
-        log.info("Found {} case(s) with ids {}", ids.size(), ids);
+        log.info(FOUND_CASES_WITH_IDS, ids.size(), ids);
 
         return caseDetails;
     }
@@ -58,7 +59,7 @@ public abstract class GaElasticSearchService {
         }
 
         List<Long> ids = caseDetails.stream().map(CaseDetails::getId).sorted().toList();
-        log.info("Found {} case(s) with ids {}", ids.size(), ids);
+        log.info(FOUND_CASES_WITH_IDS, ids.size(), ids);
 
         return caseDetails;
     }
@@ -76,7 +77,7 @@ public abstract class GaElasticSearchService {
         }
 
         List<Long> ids = caseDetails.stream().map(CaseDetails::getId).sorted().toList();
-        log.info("Found {} case(s) with ids {}", ids.size(), ids);
+        log.info(FOUND_CASES_WITH_IDS, ids.size(), ids);
 
         return caseDetails;
     }
