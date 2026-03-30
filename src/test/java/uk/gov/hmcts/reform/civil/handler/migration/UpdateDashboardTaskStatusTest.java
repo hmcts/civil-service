@@ -42,7 +42,7 @@ class UpdateDashboardTaskStatusTest {
         reference.setNextStatus("2");
         reference.setUpdatedBy("migration-user");
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseData().build();
 
         CaseData result = updateDashboardTaskStatus.migrateCaseData(caseData, reference);
 
@@ -66,7 +66,7 @@ class UpdateDashboardTaskStatusTest {
         reference.setCurrentStatus("1");
         reference.setNextStatus("2");
 
-        updateDashboardTaskStatus.migrateCaseData(CaseData.builder().build(), reference);
+        updateDashboardTaskStatus.migrateCaseData(new CaseData().build(), reference);
 
         verify(taskListService).updateTask(argThat((TaskListEntity task) ->
             UUID.fromString(taskId).equals(task.getId())
@@ -95,7 +95,7 @@ class UpdateDashboardTaskStatusTest {
         reference.setCaseReference(null);
 
         assertThrows(IllegalArgumentException.class, () ->
-            updateDashboardTaskStatus.migrateCaseData(CaseData.builder().build(), reference)
+            updateDashboardTaskStatus.migrateCaseData(new CaseData().build(), reference)
         );
     }
 }

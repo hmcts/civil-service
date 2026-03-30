@@ -391,11 +391,12 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW)).finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing())
                 .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS).assistedOrderCostsReserved(new AssistedOrderCostDetails())
                 .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()).assistedOrderCostsBespoke(new AssistedOrderCostDetails())
-                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW)).assistedOrderPenalNoticeContent("Custom penal notice")
                 .finalOrderAppealToggle(List.of(FinalOrderToggle.SHOW)).finalOrderAppealComplex(new FinalOrderAppeal())
                 .orderMadeOnDetailsList(OrderMadeOnTypes.WITHOUT_NOTICE)
                 .finalOrderGiveReasonsComplex(new AssistedOrderReasons().setReasonsText("text"))
                 .build();
+            caseData.setAssistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW));
+            caseData.setAssistedOrderPenalNoticeContent("Custom penal notice");
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -690,11 +691,11 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .thenReturn(LocalDate.now().plusDays(21));
 
             String customPenalNotice = "Custom edited penal notice with defendant name and paragraph X";
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .ccdState(CASE_PROGRESSION)
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-                .assistedOrderPenalNoticeContent(customPenalNotice)
                 .build();
+            caseData.setAssistedOrderPenalNoticeContent(customPenalNotice);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1697,13 +1698,13 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldReturnErrorWhenPenalNoticeSelectedButContentBlank() {
             // Given - penal notice toggle is SHOW but content is null/blank
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders()
                     .setSingleDate(LocalDate.now().minusDays(2))))
-                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW))
-                .assistedOrderPenalNoticeContent(null)
                 .build();
+            caseData.setAssistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW));
+            caseData.setAssistedOrderPenalNoticeContent(null);
 
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
@@ -1713,13 +1714,13 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldReturnErrorWhenPenalNoticeSelectedButContentEmptyString() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders()
                     .setSingleDate(LocalDate.now().minusDays(2))))
-                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW))
-                .assistedOrderPenalNoticeContent("   ")
                 .build();
+            caseData.setAssistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW));
+            caseData.setAssistedOrderPenalNoticeContent("   ");
 
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
@@ -1729,13 +1730,13 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnErrorWhenPenalNoticeSelectedAndContentProvided() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders()
                     .setSingleDate(LocalDate.now().minusDays(2))))
-                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW))
-                .assistedOrderPenalNoticeContent("Custom penal notice text")
                 .build();
+            caseData.setAssistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW));
+            caseData.setAssistedOrderPenalNoticeContent("Custom penal notice text");
 
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));

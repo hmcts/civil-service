@@ -123,13 +123,13 @@ public class OrderDetailsGroupTest {
         @Test
         void shouldSetShowPenalNoticeAndContentWhenToggleIsShowAndContentProvided() {
             String penalNoticeContent = "WARNING - Custom penal notice for Defendant attached to paragraph 5.";
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW))
-                .assistedOrderPenalNoticeContent(penalNoticeContent)
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(
                     new DatesFinalOrders().setSingleDate(LocalDate.of(2023, 9, 15))))
                 .finalOrderRecitalsRecorded(new FinalOrderRecitalsRecorded().setText("Recorded"))
                 .build();
+            caseData.setAssistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW));
+            caseData.setAssistedOrderPenalNoticeContent(penalNoticeContent);
 
             JudgeFinalOrderForm form = new JudgeFinalOrderForm();
             JudgeFinalOrderForm result = orderDetailsPopulator.populateAssistedOrderDetails(form, caseData);
@@ -140,12 +140,12 @@ public class OrderDetailsGroupTest {
 
         @Test
         void shouldSetShowPenalNoticeFalseAndContentNullWhenToggleIsNull() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .assistedOrderPenalNoticeToggle(null)
-                .assistedOrderPenalNoticeContent("Some content")
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(
                     new DatesFinalOrders().setSingleDate(LocalDate.of(2023, 9, 15))))
                 .build();
+            caseData.setAssistedOrderPenalNoticeToggle(null);
+            caseData.setAssistedOrderPenalNoticeContent("Some content");
 
             JudgeFinalOrderForm form = new JudgeFinalOrderForm();
             JudgeFinalOrderForm result = orderDetailsPopulator.populateAssistedOrderDetails(form, caseData);
@@ -156,12 +156,12 @@ public class OrderDetailsGroupTest {
 
         @Test
         void shouldSetShowPenalNoticeFalseAndContentNullWhenToggleIsEmpty() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .assistedOrderPenalNoticeToggle(List.of())
-                .assistedOrderPenalNoticeContent("Some content")
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(
                     new DatesFinalOrders().setSingleDate(LocalDate.of(2023, 9, 15))))
                 .build();
+            caseData.setAssistedOrderPenalNoticeToggle(List.of());
+            caseData.setAssistedOrderPenalNoticeContent("Some content");
 
             JudgeFinalOrderForm form = new JudgeFinalOrderForm();
             JudgeFinalOrderForm result = orderDetailsPopulator.populateAssistedOrderDetails(form, caseData);
@@ -172,12 +172,12 @@ public class OrderDetailsGroupTest {
 
         @Test
         void shouldSetPenalNoticeTextNullWhenToggleIsShowButContentIsNull() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW))
-                .assistedOrderPenalNoticeContent(null)
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().copy()
                 .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(
                     new DatesFinalOrders().setSingleDate(LocalDate.of(2023, 9, 15))))
                 .build();
+            caseData.setAssistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW));
+            caseData.setAssistedOrderPenalNoticeContent(null);
 
             JudgeFinalOrderForm form = new JudgeFinalOrderForm();
             JudgeFinalOrderForm result = orderDetailsPopulator.populateAssistedOrderDetails(form, caseData);

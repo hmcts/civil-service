@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -26,14 +25,14 @@ public class DismissCaseDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenBilingual() {
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCaseDataLiP(
-            new CaseDataLiP()
-                .setRespondent1LiPResponse(
-                    new RespondentLiPResponse()
-                        .setRespondent1ResponseLanguage(BOTH.toString())
-                )
-        );
+        CaseData caseData = new CaseData()
+            .caseDataLiP(
+                new CaseDataLiP()
+                    .setRespondent1LiPResponse(
+                        new RespondentLiPResponse()
+                            .setRespondent1ResponseLanguage(BOTH.toString())
+                    )
+            ).build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(expectedTemplateId);
@@ -45,7 +44,7 @@ public class DismissCaseDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenNotBilingual() {
-        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseData caseData = new CaseData().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(expectedTemplateId);
