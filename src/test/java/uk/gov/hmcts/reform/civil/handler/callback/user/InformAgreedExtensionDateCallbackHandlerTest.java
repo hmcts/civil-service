@@ -180,7 +180,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
             caseData.setPreStayState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
-            LocalDateTime respondent1Deadline = LocalDateTime.of(2026, 3, 20, 16, 0);
+            LocalDateTime respondent1Deadline = LocalDateTime.now().plusDays(10);
             caseData.setRespondent1ResponseDeadline(respondent1Deadline);
             caseData.setRespondent1AcknowledgeNotificationDate(null);
             caseData.setAddRespondent2(NO);
