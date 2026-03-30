@@ -17,7 +17,8 @@ import static java.lang.String.format;
 @Component
 public class EventEmitterService {
 
-    public static final String TENANT_ID = "civil";
+    private static final String TENANT_ID = "civil";
+    private static final String CASE_ID = "caseId";
     private final ApplicationEventPublisher applicationEventPublisher;
     private final RuntimeService runtimeService;
 
@@ -38,13 +39,13 @@ public class EventEmitterService {
                 String queryId = latestQuery != null ? latestQuery.getId() : null;
                 runtimeService.createMessageCorrelation(camundaEvent)
                     .tenantId(TENANT_ID)
-                    .setVariable("caseId", caseId)
+                    .setVariable(CASE_ID, caseId)
                     .setVariable("queryId", queryId)
                     .correlateStartMessage();
             } else {
                 runtimeService.createMessageCorrelation(camundaEvent)
                     .tenantId(TENANT_ID)
-                    .setVariable("caseId", caseId)
+                    .setVariable(CASE_ID, caseId)
                     .correlateStartMessage();
             }
             log.info("Camunda event emitted successfully with tenant");
@@ -62,7 +63,7 @@ public class EventEmitterService {
                     applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
                 }
                 runtimeService.createMessageCorrelation(camundaEvent)
-                    .setVariable("caseId", caseId)
+                    .setVariable(CASE_ID, caseId)
                     .withoutTenantId()
                     .correlateStartMessage();
                 log.info("Camunda event emitted successfully without tenant");
