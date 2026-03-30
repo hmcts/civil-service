@@ -21,16 +21,20 @@ java:
     POLLING_EVENT_EMITTER_ENABLED: true
     CASE_DOCUMENT_AM_URL:  http://${SERVICE_NAME}-cdam
     STITCHING_API_ENABLED: true
-    ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
-    HMC_API_URL: http://${SERVICE_NAME}-wiremock
-    RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
-    RD_COMMONDATA_API_URL: http://${SERVICE_NAME}-wiremock
-    DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
-    SEND_LETTER_URL: http://${SERVICE_NAME}-wiremock
-    FEES_API_URL: http://${SERVICE_NAME}-wiremock
-    CLAIM_STORE_URL: http://${SERVICE_NAME}-wiremock
-    ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+    HMC_API_URL: ${PREVIEW_HMC_API_URL}
+    ACA_SERVICE_API_BASEURL: ${PREVIEW_ACA_SERVICE_API_BASEURL}
+    RD_PROFESSIONAL_API_URL: ${PREVIEW_RD_PROFESSIONAL_API_URL}
+    RD_COMMONDATA_API_URL: ${PREVIEW_RD_COMMONDATA_API_URL}
+    DOCMOSIS_TORNADO_URL: ${PREVIEW_DOCMOSIS_TORNADO_URL}
+    SEND_LETTER_URL: ${PREVIEW_SEND_LETTER_URL}
+    FEES_API_URL: ${PREVIEW_FEES_API_URL}
+    CLAIM_STORE_URL: ${PREVIEW_CLAIM_STORE_URL}
+    ROLE_ASSIGNMENT_URL: ${PREVIEW_ROLE_ASSIGNMENT_URL}
+    GENAPP_LRD_URL: ${PREVIEW_GENAPP_LRD_URL}
+    SENDGRID_HOST: ${PREVIEW_SENDGRID_HOST}
+    RTL_API_URL: ${PREVIEW_RTL_API_URL}
+    SENDGRID_TEST: ${PREVIEW_SENDGRID_TEST}
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
@@ -53,15 +57,10 @@ java:
     SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net/o/jwks
     AUTH_IDAM_CLIENT_BASEURL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    GENAPP_LRD_URL: http://${SERVICE_NAME}-wiremock
     PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SPRING_CLOUD_BOOTSTRAP_ENABLED: true
     MANAGEMENT_HEALTH_FEES_ENABLED: false
-    SENDGRID_HOST: ${SERVICE_NAME}-wiremock
-    RTL_API_URL: http://${SERVICE_NAME}-wiremock
-    SENDGRID_TEST: true
-    OTHER_REMEDY_ENABLED: true
   keyVaults:
     civil:
       resourceGroup: civil
@@ -115,7 +114,7 @@ java:
   postgresql:
     enabled: true
     image:
-      registry: hmctspublic.azurecr.io
+      registry: hmctsprod.azurecr.io
       repository: imported/bitnami/postgresql
       tag: '16.5.0'
     primary:
@@ -149,7 +148,7 @@ xui-webapp:
   nodejs:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
-    image: hmctspublic.azurecr.io/xui/webapp:latest
+    image: hmctsprod.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
     memoryRequests: 2Gi
     cpuRequests: 2000m
@@ -207,7 +206,7 @@ ccd:
 
   ccd-api-gateway-web:
     nodejs:
-      image: hmctspublic.azurecr.io/ccd/api-gateway-web:latest
+      image: hmctsprod.azurecr.io/ccd/api-gateway-web:latest
       imagePullPolicy: Always
       environment:
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
@@ -305,7 +304,7 @@ aac-manage-case-assignment:
     disableKeyVaults: true
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
-    image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
+    image: hmctsprod.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: manage-case-assignment-${SERVICE_NAME}.preview.platform.hmcts.net
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
@@ -331,7 +330,7 @@ aac-manage-case-assignment:
 em-ccdorc:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/em/ccdorc:latest
+    image: hmctsprod.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
     ingressHost: em-ccdorc-${SERVICE_FQDN}
     environment:
@@ -357,7 +356,7 @@ em-stitching:
   java:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-em-stitching
-    image: hmctspublic.azurecr.io/em/stitching:latest
+    image: hmctsprod.azurecr.io/em/stitching:latest
     ingressHost: em-stitching-${SERVICE_FQDN}
     environment:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
@@ -389,7 +388,7 @@ ccd-case-document-am-api:
   java:
     releaseNameOverride: ${SERVICE_NAME}-cdam
     imagePullPolicy: Always
-    image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
+    image: hmctsprod.azurecr.io/ccd/case-document-am-api:latest
     ingressHost: ccd-case-document-am-api-${SERVICE_FQDN}
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net

@@ -67,7 +67,7 @@ class HearingFeeUnpaidDefendantNotificationServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_HEARING_FEE_UNPAID_DEFENDANT.getScenario(),
             CCD_REF,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -87,7 +87,7 @@ class HearingFeeUnpaidDefendantNotificationServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_DEFENDANT.getScenario(),
             CCD_REF,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -109,7 +109,7 @@ class HearingFeeUnpaidDefendantNotificationServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_DEFENDANT.getScenario(),
             CCD_REF,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 

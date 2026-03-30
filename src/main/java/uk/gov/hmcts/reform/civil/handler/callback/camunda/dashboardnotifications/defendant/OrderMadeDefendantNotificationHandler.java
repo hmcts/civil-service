@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsucc
 @Service
 public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler {
 
+    private static final String DEFENDANT = "DEFENDANT";
     private final ObjectMapper objectMapper;
     protected final WorkingDayIndicator workingDayIndicator;
 
@@ -97,7 +98,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
                 authToken,
                 scenario,
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(paramsMap).build()
+                new ScenarioRequestParams(paramsMap)
             );
         }
 
@@ -177,7 +178,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
 
         dashboardNotificationService.deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
-            "DEFENDANT"
+            DEFENDANT
         );
         if (getFeatureToggleService().isLocationWhiteListed(caseData
                                                                                    .getCaseManagementLocation()
@@ -185,13 +186,13 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
             || getFeatureToggleService().isCuiGaNroEnabled()) {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
                 caseData.getCcdCaseReference().toString(),
-                "DEFENDANT",
+                DEFENDANT,
                 GA
             );
         } else {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
-                "DEFENDANT"
+                DEFENDANT
             );
         }
     }

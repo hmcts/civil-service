@@ -147,7 +147,7 @@ class StayLiftedDefendantDashboardServiceTest {
             AUTH_TOKEN,
             scenario,
             CCD_REFERENCE,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

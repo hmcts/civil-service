@@ -146,7 +146,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent1ResponseDeadline(null);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
-            handler.handle(params);
+            Assertions.assertDoesNotThrow(() -> handler.handle(params));
         }
 
     }
@@ -340,7 +340,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent1ResponseDeadline(null);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
-            handler.handle(params);
+            Assertions.assertDoesNotThrow(() -> handler.handle(params));
         }
     }
 

@@ -151,9 +151,7 @@ class BundleRequestMapperTest {
             .applicant1(party("applicant1"))
             .respondent1(party("respondent1"))
             .hearingDate(LocalDate.now())
-            .hearingLocation(DynamicList.builder()
-                                 .value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .build();
 
         BundleCreateRequest result = mapCaseData(caseData);
@@ -168,9 +166,7 @@ class BundleRequestMapperTest {
             .addApplicant2(YesOrNo.NO)
             .addRespondent2(YesOrNo.NO)
             .hearingDate(LocalDate.now())
-            .hearingLocation(DynamicList.builder()
-                                 .value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .applicant1(party("applicant1"))
             .respondent1(party("respondent1"))
             .build();

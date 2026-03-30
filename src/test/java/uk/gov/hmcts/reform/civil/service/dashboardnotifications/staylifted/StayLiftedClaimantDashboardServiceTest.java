@@ -156,7 +156,7 @@ class StayLiftedClaimantDashboardServiceTest {
             eq(AUTH_TOKEN),
             eq(scenario),
             any(),
-            eq(ScenarioRequestParams.builder().params(params).build())
+            eq(new ScenarioRequestParams(params))
         );
     }
 

@@ -191,11 +191,7 @@ class DJRespondentReceivedNotificationHandlerTest {
                 .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both")
-                                                 .build())
-                                      .build())
+                .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("Both")))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -222,11 +218,7 @@ class DJRespondentReceivedNotificationHandlerTest {
                 .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("steve")
-                                                     .build())
-                                          .build())
+                .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("steve")))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 

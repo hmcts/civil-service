@@ -115,8 +115,6 @@ public abstract class DashboardScenarioService {
     }
 
     protected ScenarioRequestParams scenarioRequestParamsFrom(CaseData caseData) {
-        return ScenarioRequestParams.builder()
-            .params(mapper.mapCaseDataToParams(caseData))
-            .build();
+        return new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
     }
 }

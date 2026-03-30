@@ -113,14 +113,12 @@ public class DashboardNotificationServiceTest {
         void should_sort_notifications_by_creation_time_descending() {
             UUID earlierId = UUID.randomUUID();
             UUID laterId = UUID.randomUUID();
-            DashboardNotificationsEntity earlier = DashboardNotificationsEntity.builder()
-                .id(earlierId)
-                .createdAt(OffsetDateTime.now().minusDays(1))
-                .build();
-            DashboardNotificationsEntity later = DashboardNotificationsEntity.builder()
-                .id(laterId)
-                .createdAt(OffsetDateTime.now())
-                .build();
+            DashboardNotificationsEntity earlier = new DashboardNotificationsEntity();
+            earlier.setId(earlierId);
+            earlier.setCreatedAt(OffsetDateTime.now().minusDays(1));
+            DashboardNotificationsEntity later = new DashboardNotificationsEntity();
+            later.setId(laterId);
+            later.setCreatedAt(OffsetDateTime.now());
 
             when(dashboardNotificationsRepository.findByReferenceAndCitizenRole("case", "role"))
                 .thenReturn(List.of(earlier, later));
@@ -177,12 +175,11 @@ public class DashboardNotificationServiceTest {
             dashboardNotificationsRepository
                 .findByReferenceAndCitizenRoleAndName(
                     any(), any(), any())).thenReturn(List.of(notification1, notification2));
-        DashboardNotificationsEntity notification = DashboardNotificationsEntity.builder()
-            .id(UUID.randomUUID())
-            .name("template.name")
-            .reference("reference")
-            .citizenRole("CLAIMANT")
-            .build();
+        DashboardNotificationsEntity notification = new DashboardNotificationsEntity();
+        notification.setId(UUID.randomUUID());
+        notification.setName("template.name");
+        notification.setReference("reference");
+        notification.setCitizenRole("CLAIMANT");
         dashboardNotificationService.saveOrUpdate(notification);
         verify(notificationActionRepository, times(2)).deleteByDashboardNotificationAndActionPerformed(any(DashboardNotificationsEntity.class), any());
         final ArgumentCaptor<DashboardNotificationsEntity> captor = ArgumentCaptor.forClass(DashboardNotificationsEntity.class);
@@ -193,11 +190,10 @@ public class DashboardNotificationServiceTest {
 
     @Test
     void saveOrUpdateShouldPersistWithoutTemplateLookupWhenNameMissing() {
-        DashboardNotificationsEntity notification = DashboardNotificationsEntity.builder()
-            .id(UUID.randomUUID())
-            .reference("reference")
-            .citizenRole("CLAIMANT")
-            .build();
+        DashboardNotificationsEntity notification = new DashboardNotificationsEntity();
+        notification.setId(UUID.randomUUID());
+        notification.setReference("reference");
+        notification.setCitizenRole("CLAIMANT");
 
         when(dashboardNotificationsRepository.save(notification)).thenReturn(notification);
 
@@ -210,7 +206,9 @@ public class DashboardNotificationServiceTest {
     }
 
     private DashboardNotificationsEntity createDashboardNotificationsEntity() {
-        return DashboardNotificationsEntity.builder().id(UUID.randomUUID()).build();
+        DashboardNotificationsEntity notification = new DashboardNotificationsEntity();
+        notification.setId(UUID.randomUUID());
+        return notification;
     }
 
     @Nested
@@ -243,11 +241,10 @@ public class DashboardNotificationServiceTest {
         @Test
         void shouldReuseExistingClickActionIdWhenRecordingSecondClick() {
             DashboardNotificationsEntity notification = getNotification(id);
-            NotificationActionEntity existingAction = NotificationActionEntity.builder()
-                .id(99L)
-                .actionPerformed("Click")
-                .reference(notification.getReference())
-                .build();
+            NotificationActionEntity existingAction = new NotificationActionEntity();
+            existingAction.setId(99L);
+            existingAction.setActionPerformed("Click");
+            existingAction.setReference(notification.getReference());
             notification.setNotificationAction(existingAction);
 
             when(dashboardNotificationsRepository.findById(id)).thenReturn(Optional.of(notification));
@@ -288,20 +285,18 @@ public class DashboardNotificationServiceTest {
 
     @Test
     void should_return_only_case_stayed_notifications_when_present() {
-        UUID normalId = UUID.randomUUID();
-        UUID stayedId = UUID.randomUUID();
+        final UUID normalId = UUID.randomUUID();
+        final UUID stayedId = UUID.randomUUID();
 
-        DashboardNotificationsEntity normal = DashboardNotificationsEntity.builder()
-            .id(normalId)
-            .name("Some.Other.Template")
-            .createdAt(OffsetDateTime.now().minusHours(1))
-            .build();
+        DashboardNotificationsEntity normal = new DashboardNotificationsEntity();
+        normal.setId(normalId);
+        normal.setName("Some.Other.Template");
+        normal.setCreatedAt(OffsetDateTime.now().minusHours(1));
 
-        DashboardNotificationsEntity stayed = DashboardNotificationsEntity.builder()
-            .id(stayedId)
-            .name("Notice.AAA6.CP.Case.Stayed.Claimant")
-            .createdAt(OffsetDateTime.now())
-            .build();
+        DashboardNotificationsEntity stayed = new DashboardNotificationsEntity();
+        stayed.setId(stayedId);
+        stayed.setName("Notice.AAA6.CP.Case.Stayed.Claimant");
+        stayed.setCreatedAt(OffsetDateTime.now());
 
         when(dashboardNotificationsRepository.findByReferenceAndCitizenRole("case", "role"))
             .thenReturn(List.of(normal, stayed));
@@ -316,20 +311,18 @@ public class DashboardNotificationServiceTest {
 
     @Test
     void should_return_all_notifications_when_no_case_stayed_templates_exist() {
-        UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
+        final UUID id1 = UUID.randomUUID();
+        final UUID id2 = UUID.randomUUID();
 
-        DashboardNotificationsEntity n1 = DashboardNotificationsEntity.builder()
-            .id(id1)
-            .name("Template.One")
-            .createdAt(OffsetDateTime.now())
-            .build();
+        DashboardNotificationsEntity n1 = new DashboardNotificationsEntity();
+        n1.setId(id1);
+        n1.setName("Template.One");
+        n1.setCreatedAt(OffsetDateTime.now());
 
-        DashboardNotificationsEntity n2 = DashboardNotificationsEntity.builder()
-            .id(id2)
-            .name("Template.Two")
-            .createdAt(OffsetDateTime.now().minusHours(1))
-            .build();
+        DashboardNotificationsEntity n2 = new DashboardNotificationsEntity();
+        n2.setId(id2);
+        n2.setName("Template.Two");
+        n2.setCreatedAt(OffsetDateTime.now().minusHours(1));
 
         when(dashboardNotificationsRepository.findByReferenceAndCitizenRole("case", "role"))
             .thenReturn(List.of(n1, n2));

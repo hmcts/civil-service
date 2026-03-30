@@ -127,7 +127,7 @@ class FreeFormOrderGeneratorTest {
                 YES).build()
             .copy()
             .freeFormRecitalText("RecitalText")
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("8"))
             .freeFormOrderedText("OrderedText")
             .orderOnCourtsList(OrderOnCourtsList.NOT_APPLICABLE)
             .build();
@@ -225,7 +225,7 @@ class FreeFormOrderGeneratorTest {
             .finalOrderFreeForm().build().copy()
             .defendant2PartyName(null)
             .claimant2PartyName(null)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
             .isMultiParty(NO)
             .build();
 
@@ -267,7 +267,7 @@ class FreeFormOrderGeneratorTest {
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(NO)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
                 .isMultiParty(NO)
                 .build();
 

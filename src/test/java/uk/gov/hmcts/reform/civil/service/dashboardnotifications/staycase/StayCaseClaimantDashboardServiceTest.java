@@ -61,7 +61,7 @@ class StayCaseClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -81,7 +81,7 @@ class StayCaseClaimantDashboardServiceTest {
             eq(AUTH_TOKEN),
             eq(SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT.getScenario()),
             eq("5678"),
-            eq(ScenarioRequestParams.builder().params(new HashMap<>()).build())
+            eq(new ScenarioRequestParams(new HashMap<>()))
         );
     }
 
@@ -101,7 +101,7 @@ class StayCaseClaimantDashboardServiceTest {
             eq(AUTH_TOKEN),
             eq(SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT.getScenario()),
             eq("5678"),
-            eq(ScenarioRequestParams.builder().params(new HashMap<>()).build())
+            eq(new ScenarioRequestParams(new HashMap<>()))
         );
     }
 }

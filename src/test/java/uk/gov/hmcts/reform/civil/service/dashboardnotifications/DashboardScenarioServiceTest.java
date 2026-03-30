@@ -121,9 +121,7 @@ class DashboardScenarioServiceTest {
         void should_delegate_to_dashboardScenariosService_with_correct_params() {
             // Arrange
             CaseData caseData = CaseData.builder().ccdCaseReference(456L).build();
-            ScenarioRequestParams expectedParams = ScenarioRequestParams.builder()
-                .params(new HashMap<>())
-                .build();
+            ScenarioRequestParams expectedParams = new ScenarioRequestParams(new HashMap<>());
 
             TestDashboardScenarioService spyService = spy(scenarioService);
             doReturn(expectedParams).when(spyService).scenarioRequestParamsFrom(caseData);
@@ -170,9 +168,7 @@ class DashboardScenarioServiceTest {
         private static ScenarioRequestParams getScenarioRequestParams() {
             HashMap<String, Object> parameters = new HashMap<>();
             parameters.put("param1", "value1");
-            return ScenarioRequestParams.builder()
-                .params(parameters)
-                .build();
+            return new ScenarioRequestParams(parameters);
         }
     }
 

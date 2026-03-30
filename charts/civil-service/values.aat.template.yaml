@@ -104,7 +104,7 @@ java:
   postgresql:
     enabled: true
     image:
-      registry: hmctspublic.azurecr.io
+      registry: hmctsprod.azurecr.io
       repository: imported/bitnami/postgresql
       tag: '16.5.0'
     primary:
@@ -136,7 +136,7 @@ xui-webapp:
   nodejs:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
-    image: hmctspublic.azurecr.io/xui/webapp:latest
+    image: hmctsprod.azurecr.io/xui/webapp:latest
     ingressHost: civil-service-xui-staging.aat.platform.hmcts.net
     memoryRequests: 2Gi
     cpuRequests: 2000m
@@ -191,7 +191,7 @@ ccd:
 
   ccd-api-gateway-web:
     nodejs:
-      image: hmctspublic.azurecr.io/ccd/api-gateway-web:latest
+      image: hmctsprod.azurecr.io/ccd/api-gateway-web:latest
       imagePullPolicy: Always
       environment:
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
@@ -291,7 +291,7 @@ aac-manage-case-assignment:
   java:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
-    image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
+    image: hmctsprod.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: civil-service-manage-case-assignment-staging.aat.platform.hmcts.net
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net

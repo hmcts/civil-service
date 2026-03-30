@@ -100,16 +100,24 @@ public class DashboardScenariosService {
             }
         }
 
-        DashboardNotificationsEntity updated = existingNotification.toBuilder()
-            .titleEn(substitutor.replace(template.getTitleEn()))
-            .titleCy(substitutor.replace(template.getTitleCy()))
-            .descriptionEn(substitutor.replace(template.getDescriptionEn()))
-            .descriptionCy(substitutor.replace(template.getDescriptionCy()))
-            .params(params)
-            .timeToLive(template.getTimeToLive())
-            .deadline(notificationDeadline)
-            .updatedOn(OffsetDateTime.now())
-            .build();
+        DashboardNotificationsEntity updated = new DashboardNotificationsEntity(
+            existingNotification.getId(),
+            existingNotification.getNotificationAction(),
+            existingNotification.getReference(),
+            existingNotification.getName(),
+            existingNotification.getCitizenRole(),
+            substitutor.replace(template.getTitleEn()),
+            substitutor.replace(template.getDescriptionEn()),
+            substitutor.replace(template.getTitleCy()),
+            substitutor.replace(template.getDescriptionCy()),
+            params,
+            existingNotification.getCreatedBy(),
+            existingNotification.getCreatedAt(),
+            existingNotification.getUpdatedBy(),
+            OffsetDateTime.now(),
+            notificationDeadline,
+            template.getTimeToLive()
+        );
 
         dashboardNotificationService.saveOrUpdate(updated);
 
@@ -159,21 +167,24 @@ public class DashboardScenariosService {
                     })
                     .orElse(null);
 
-                DashboardNotificationsEntity notification = DashboardNotificationsEntity.builder()
-                    .id(UUID.randomUUID())
-                    .reference(uniqueCaseIdentifier)
-                    .name(template.getName())
-                    .citizenRole(template.getRole())
-                    .titleCy(stringSubstitutor.replace(template.getTitleCy()))
-                    .titleEn(stringSubstitutor.replace(template.getTitleEn()))
-                    .descriptionCy(stringSubstitutor.replace(template.getDescriptionCy()))
-                    .descriptionEn(stringSubstitutor.replace(template.getDescriptionEn()))
-                    .createdAt(OffsetDateTime.now())
-                    .updatedOn(OffsetDateTime.now())
-                    .params(scenarioRequestParams.getParams())
-                    .timeToLive(template.getTimeToLive())
-                    .deadline(notificationDeadline)
-                    .build();
+                DashboardNotificationsEntity notification = new DashboardNotificationsEntity(
+                    UUID.randomUUID(),
+                    null,
+                    uniqueCaseIdentifier,
+                    template.getName(),
+                    template.getRole(),
+                    stringSubstitutor.replace(template.getTitleEn()),
+                    stringSubstitutor.replace(template.getDescriptionEn()),
+                    stringSubstitutor.replace(template.getTitleCy()),
+                    stringSubstitutor.replace(template.getDescriptionCy()),
+                    scenarioRequestParams.getParams(),
+                    null,
+                    OffsetDateTime.now(),
+                    null,
+                    OffsetDateTime.now(),
+                    notificationDeadline,
+                    template.getTimeToLive()
+                );
 
                 log.info(
                     "Task Notification details for scenario = {}, template = {}, caseId = {}",
@@ -201,21 +212,21 @@ public class DashboardScenariosService {
         // if not different, just same value)
         taskItemTemplate.forEach(template -> {
 
-            TaskListEntity taskItemEntity = TaskListEntity.builder()
-                .id(UUID.randomUUID())
-                .reference(uniqueCaseIdentifier)
-                .taskItemTemplate(template)
-                .currentStatus(template.getTaskStatusSequence()[0])
-                .nextStatus(template.getTaskStatusSequence()[1])
-                .taskNameEn(stringSubstitutor.replace(template.getTaskNameEn()))
-                .hintTextEn(stringSubstitutor.replace(template.getHintTextEn()))
-                .taskNameCy(stringSubstitutor.replace(template.getTaskNameCy()))
-                .hintTextCy(stringSubstitutor.replace(template.getHintTextCy()))
-                //TODO work on messageParams for specific template
-                .messageParams(scenarioRequestParams.getParams())
-                .createdAt(OffsetDateTime.now())
-                .updatedAt(OffsetDateTime.now())
-                .build();
+            TaskListEntity taskItemEntity = new TaskListEntity(
+                UUID.randomUUID(),
+                template,
+                uniqueCaseIdentifier,
+                template.getTaskStatusSequence()[0],
+                template.getTaskStatusSequence()[1],
+                stringSubstitutor.replace(template.getTaskNameEn()),
+                stringSubstitutor.replace(template.getHintTextEn()),
+                stringSubstitutor.replace(template.getTaskNameCy()),
+                stringSubstitutor.replace(template.getHintTextCy()),
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                null,
+                scenarioRequestParams.getParams()
+            );
 
             log.info(
                 "Task Item details for the role: {}, scenario = {}, caseReference = {}, id = {}, TaskItemEn = {}, HintTextEn = {}," +
