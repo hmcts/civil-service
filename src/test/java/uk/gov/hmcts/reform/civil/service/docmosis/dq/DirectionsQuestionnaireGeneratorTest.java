@@ -904,6 +904,11 @@ class DirectionsQuestionnaireGeneratorTest {
                 dq.setRespondToCourtLocation(null);
                 caseData.setRespondent1DQ(dq);
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThat(templateData).isNotNull();
+                assertThat(templateData.getRequestedCourt().getCaseLocation()).isNull();
+                assertThat(templateData.getRequestedCourt().getRequestHearingAtSpecificCourt()).isEqualTo(NO);
             }
 
             @Test
@@ -915,6 +920,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 dq.setRespondent1DQExperts(null);
                 caseData.setRespondent1DQ(dq);
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThat(templateData).isNotNull();
+                assertThat(templateData.getExperts().getExpertRequired()).isEqualTo(NO);
             }
 
             @Test

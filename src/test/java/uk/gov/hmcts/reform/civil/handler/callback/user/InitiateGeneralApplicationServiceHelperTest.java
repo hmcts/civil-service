@@ -217,7 +217,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getGeneralAppRespondentSolicitors()).isNotNull();
+        assertThat(result.getGeneralAppApplnSolicitor().getId()).isEqualTo(STRING_NUM_CONSTANT);
         assertThat(result.getGeneralAppRespondentSolicitors().size()).isEqualTo(2);
+        assertThat(result.getGeneralAppApplicantAddlSolicitors().size()).isEqualTo(4);
 
         ArrayList<String> userID = new ArrayList<>(Arrays.asList("3", "4"));
 

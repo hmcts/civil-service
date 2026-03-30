@@ -49,7 +49,8 @@ public class AsyncCaseMigrationService {
     public <T extends CaseReference> void migrateCasesAsync(
         MigrationTask<T> task,
         List<T> caseReferences,
-        String state
+        String state,
+        boolean isGA
     ) {
         int count = 0;
         int batchCount = 1;
@@ -64,9 +65,20 @@ public class AsyncCaseMigrationService {
                     batchCount++;
                 }
                 log.info("Migrating case with ID: {}", caseReference);
-                StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseReference.getCaseReference(), CaseEvent.UPDATE_CASE_DATA);
-                CaseDetails caseDetails = startEventResponse.getCaseDetails();
-                CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+                CaseData caseData;
+                StartEventResponse startEventResponse;
+                if (isGA) {
+                    startEventResponse = coreCaseDataService.startGeneralApplicationUpdate(caseReference.getCaseReference(), CaseEvent.UPDATE_CASE_DATA);
+                    CaseDetails caseDetails = startEventResponse.getCaseDetails();
+                    caseData = caseDetailsConverter.toGACaseData(caseDetails);
+                } else {
+                    startEventResponse = coreCaseDataService.startUpdate(
+                        caseReference.getCaseReference(),
+                        CaseEvent.UPDATE_CASE_DATA
+                    );
+                    CaseDetails caseDetails = startEventResponse.getCaseDetails();
+                    caseData = caseDetailsConverter.toCaseData(caseDetails);
+                }
                 caseData = task.migrateCaseData(caseData, caseReference);
                 Optional<String> updatedState = task.getUpdatedState(state);
                 if (updatedState.isPresent()) {
@@ -77,7 +89,12 @@ public class AsyncCaseMigrationService {
                     log.info("No state change for case {}", caseReference.getCaseReference());
                 }
                 CaseDataContent caseDataContent = buildCaseDataContent(startEventResponse, caseData, task);
-                coreCaseDataService.submitUpdate(caseReference.getCaseReference(), caseDataContent);
+                if (isGA) {
+                    coreCaseDataService.submitGeneralApplicationUpdate(caseReference.getCaseReference(), caseDataContent);
+                } else {
+                    coreCaseDataService.submitUpdate(caseReference.getCaseReference(), caseDataContent);
+                }
+
                 log.info("Migration completed for case ID: {}", caseReference.getCaseReference());
             } catch (RuntimeException e) {
                 log.error("Error migrating case with ID: {}. Error: {}", caseReference.getCaseReference(), e.getMessage(), e);

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -201,6 +202,10 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
     private OrderMadeOnTypes orderMadeOnDetailsList;
     private OrderMadeOnDetails orderMadeOnDetailsOrderCourt;
     private OrderMadeOnDetailsOrderWithoutNotice orderMadeOnDetailsOrderWithoutNotice;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<FinalOrderToggle> assistedOrderPenalNoticeToggle;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String assistedOrderPenalNoticeContent;
     private YesOrNo finalOrderGiveReasonsYesNo;
     private AssistedOrderReasons finalOrderGiveReasonsComplex;
     private YesOrNo finalOrderAllocateToTrack;
