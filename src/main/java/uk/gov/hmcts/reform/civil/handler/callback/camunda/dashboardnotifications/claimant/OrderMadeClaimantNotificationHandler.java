@@ -42,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsucc
 @Service
 public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
+    private static final String CLAIMANT = "CLAIMANT";
     private final ObjectMapper objectMapper;
     protected final WorkingDayIndicator workingDayIndicator;
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT,
@@ -193,7 +194,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
         dashboardNotificationService.deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
-            "CLAIMANT"
+            CLAIMANT
         );
         if (getFeatureToggleService().isLocationWhiteListed(caseData
                                                                                    .getCaseManagementLocation()
@@ -201,13 +202,13 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             || getFeatureToggleService().isCuiGaNroEnabled()) {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
                 caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
+                CLAIMANT,
                 GA
             );
         } else {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
-                "CLAIMANT"
+                CLAIMANT
             );
         }
     }

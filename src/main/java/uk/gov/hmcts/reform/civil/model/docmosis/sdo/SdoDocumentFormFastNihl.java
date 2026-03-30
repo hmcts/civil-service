@@ -116,4 +116,8 @@ public class SdoDocumentFormFastNihl implements MappableObject {
     private String sdoR2ImportantNotesTxt;
     private String physicalBundlePartyTxt;
     private String welshLanguageDescription;
+    private String applicant1PartyName;
+    private String applicant2PartyName;
+    private String respondent1PartyName;
+    private String respondent2PartyName;
 }

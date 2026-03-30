@@ -48,6 +48,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         implements ExpertsValidator, WitnessesValidator, DefendantAddressValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
+    private static final String CASES_CASE_DETAILS_CLAIM_DOCUMENTS = "/cases/case-details/%s#Claim documents";
 
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
@@ -195,7 +196,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                             + "After the other solicitor has responded and/or the time"
                             + " for responding has passed the claimant will be notified."
                             + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
-                    format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                    format(CASES_CASE_DETAILS_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
             );
         } else if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 && (caseData.isPayBySetDate())) {
@@ -210,7 +211,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                     + "%n%nWe will let you know when the claimant responds."
                     + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                format(CASES_CASE_DETAILS_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
             );
         } else {
             return format(
@@ -219,7 +220,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                             + "We will let you know when they respond."
                             + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
                     formatLocalDateTime(responseDeadline, DATE),
-                    format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                    format(CASES_CASE_DETAILS_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
             );
         }
     }
