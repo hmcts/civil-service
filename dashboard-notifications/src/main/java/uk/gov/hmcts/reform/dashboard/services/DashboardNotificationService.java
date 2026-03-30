@@ -122,11 +122,12 @@ public class DashboardNotificationService {
                 notification
             );
 
-            if (nonNull(notification.getNotificationAction())
-                && notification.getNotificationAction().getActionPerformed().equals(clickAction)) {
-                notificationAction.setId(notification.getNotificationAction().getId());
+            if (nonNull(notification.getNotificationActions())) {
+                notification.getNotificationActions().add(notificationAction);
+            } else {
+                notification.setNotificationActions(new java.util.ArrayList<>(java.util.List.of(notificationAction)));
             }
-            notification.setNotificationAction(notificationAction);
+
             dashboardNotificationsRepository.save(notification);
         });
     }
@@ -147,7 +148,7 @@ public class DashboardNotificationService {
     private DashboardNotificationsEntity copyNotification(DashboardNotificationsEntity notification) {
         return new DashboardNotificationsEntity(
             notification.getId(),
-            notification.getNotificationAction(),
+            notification.getNotificationActions(),
             notification.getReference(),
             notification.getName(),
             notification.getCitizenRole(),

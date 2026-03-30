@@ -10,7 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -48,7 +48,7 @@ public class NotificationActionEntity implements Serializable {
     private OffsetDateTime createdAt;
 
     @ToString.Exclude
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "dashboard_notifications_id", referencedColumnName = "id")
     @Schema(name = "dashboard_notifications_id")
     private DashboardNotificationsEntity dashboardNotification;

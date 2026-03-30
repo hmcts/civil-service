@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
@@ -25,6 +24,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -127,6 +127,39 @@ public class DashboardNotificationServiceTest {
 
             assertThat(notifications).extracting(Notification::getId).containsExactly(laterId, earlierId);
         }
+
+        @Test
+        void should_keep_getNotifications_working_when_entity_has_multiple_actions() {
+            DashboardNotificationsEntity notification = getNotification(UUID.randomUUID());
+
+            NotificationActionEntity olderAction = new NotificationActionEntity();
+            olderAction.setId(1L);
+            olderAction.setActionPerformed("Click");
+            olderAction.setReference(notification.getReference());
+            olderAction.setCreatedBy("Older user");
+            olderAction.setCreatedAt(OffsetDateTime.now().minusHours(2));
+            olderAction.setDashboardNotification(notification);
+
+            NotificationActionEntity latestAction = new NotificationActionEntity();
+            latestAction.setId(2L);
+            latestAction.setActionPerformed("Click");
+            latestAction.setReference(notification.getReference());
+            latestAction.setCreatedBy("Latest user");
+            latestAction.setCreatedAt(OffsetDateTime.now());
+            latestAction.setDashboardNotification(notification);
+
+            notification.setNotificationActions(List.of(olderAction, latestAction));
+
+            when(dashboardNotificationsRepository.findByReferenceAndCitizenRole("case", "Claimant"))
+                .thenReturn(List.of(notification));
+
+            List<Notification> actual = dashboardNotificationService.getNotifications("case", "Claimant");
+
+            assertThat(actual).hasSize(1);
+            assertThat(actual.get(0).getNotificationAction()).isNotNull();
+            assertThat(actual.get(0).getNotificationAction().getId()).isEqualTo(2L);
+            assertThat(actual.get(0).getNotificationAction().getCreatedBy()).isEqualTo("Latest user");
+        }
     }
 
     @Nested
@@ -146,7 +179,7 @@ public class DashboardNotificationServiceTest {
             String reference = "reference";
             String claimant = "CLAIMANT";
             dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, claimant);
-            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, claimant);
+            verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, claimant);
         }
 
         @Test
@@ -154,7 +187,7 @@ public class DashboardNotificationServiceTest {
             String reference = "reference";
             String defendant = "DEFENDANT";
             dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, defendant);
-            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, defendant);
+            verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, defendant);
         }
 
         @Test
@@ -162,7 +195,7 @@ public class DashboardNotificationServiceTest {
             String templateName = "template.name";
             String reference = "reference";
             dashboardNotificationService.deleteByNameAndReference(templateName, reference);
-            Mockito.verify(dashboardNotificationsRepository).deleteByNameAndReference(templateName, reference);
+            verify(dashboardNotificationsRepository).deleteByNameAndReference(templateName, reference);
         }
     }
 
@@ -222,7 +255,7 @@ public class DashboardNotificationServiceTest {
             when(dashboardNotificationsRepository.findById(id)).thenReturn(Optional.of(notification));
             when(dashboardNotificationsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-            UserDetails userDetails = Mockito.mock(UserDetails.class);
+            UserDetails userDetails = mock(UserDetails.class);
             when(userDetails.getFullName()).thenReturn("Claimant user");
             when(idamApi.retrieveUserDetails(authToken)).thenReturn(userDetails);
 
@@ -230,7 +263,12 @@ public class DashboardNotificationServiceTest {
 
             ArgumentCaptor<DashboardNotificationsEntity> captor = ArgumentCaptor.forClass(DashboardNotificationsEntity.class);
             verify(dashboardNotificationsRepository).save(captor.capture());
-            NotificationActionEntity action = captor.getValue().getNotificationAction();
+            DashboardNotificationsEntity saved = captor.getValue();
+
+            assertThat(saved.getNotificationActions()).isNotNull();
+            assertThat(saved.getNotificationActions()).hasSize(1);
+
+            NotificationActionEntity action = saved.getNotificationActions().get(0);
             assertThat(action).isNotNull();
             assertThat(action.getActionPerformed()).isEqualTo("Click");
             assertThat(action.getCreatedBy()).isEqualTo("Claimant user");
@@ -239,19 +277,22 @@ public class DashboardNotificationServiceTest {
         }
 
         @Test
-        void shouldReuseExistingClickActionIdWhenRecordingSecondClick() {
+        void shouldAppendNewClickActionWhenNotificationAlreadyHasActions() {
             DashboardNotificationsEntity notification = getNotification(id);
+
             NotificationActionEntity existingAction = new NotificationActionEntity();
             existingAction.setId(99L);
             existingAction.setActionPerformed("Click");
             existingAction.setReference(notification.getReference());
-            notification.setNotificationAction(existingAction);
+            existingAction.setDashboardNotification(notification);
+
+            notification.setNotificationActions(new ArrayList<>(List.of(existingAction)));
 
             when(dashboardNotificationsRepository.findById(id)).thenReturn(Optional.of(notification));
             when(dashboardNotificationsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
             String authToken = "Auth-token";
-            UserDetails userDetails = Mockito.mock(UserDetails.class);
+            UserDetails userDetails = mock(UserDetails.class);
             when(userDetails.getFullName()).thenReturn("Claimant user");
             when(idamApi.retrieveUserDetails(authToken)).thenReturn(userDetails);
 
@@ -259,11 +300,12 @@ public class DashboardNotificationServiceTest {
 
             ArgumentCaptor<DashboardNotificationsEntity> captor = ArgumentCaptor.forClass(DashboardNotificationsEntity.class);
             verify(dashboardNotificationsRepository).save(captor.capture());
-            NotificationActionEntity action = captor.getValue().getNotificationAction();
-            assertThat(action.getId()).isEqualTo(99L);
-            assertThat(action.getCreatedBy()).isEqualTo("Claimant user");
-            assertThat(action.getActionPerformed()).isEqualTo("Click");
+
+            DashboardNotificationsEntity saved = captor.getValue();
+            assertThat(saved.getNotificationActions()).hasSize(2);
+            assertThat(saved.getNotificationActions())
+                .extracting(NotificationActionEntity::getActionPerformed)
+                .containsExactly("Click", "Click");
         }
     }
-
 }

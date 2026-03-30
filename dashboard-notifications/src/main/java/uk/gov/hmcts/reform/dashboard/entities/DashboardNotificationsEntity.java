@@ -9,12 +9,13 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 @lombok.Data
@@ -31,9 +32,9 @@ public class DashboardNotificationsEntity implements Serializable {
     @Schema(name = "id")
     private UUID id;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "dashboardNotification")
+    @OneToMany(mappedBy = "dashboardNotification", cascade = CascadeType.ALL)
     @Schema(name = "notification_action_id")
-    private NotificationActionEntity notificationAction;
+    private List<NotificationActionEntity> notificationActions;
 
     @Schema(name = "reference")
     private String reference;

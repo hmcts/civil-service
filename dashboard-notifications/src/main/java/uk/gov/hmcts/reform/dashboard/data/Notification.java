@@ -1,13 +1,16 @@
 package uk.gov.hmcts.reform.dashboard.data;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,8 +53,15 @@ public class Notification {
             dashboardNotificationsEntity.getDeadline()
         );
 
-        Optional.ofNullable(dashboardNotificationsEntity.getNotificationAction())
+        Optional.ofNullable(dashboardNotificationsEntity.getNotificationActions())
+            .stream()
+            .flatMap(List::stream)
+            .max(Comparator.comparing(
+                NotificationActionEntity::getCreatedAt,
+                Comparator.nullsLast(Comparator.naturalOrder())
+            ))
             .ifPresent(action -> notification.setNotificationAction(NotificationAction.from(action)));
+
         return notification;
     }
 }
