@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.enums.sdo;
 
 public enum ClaimsTrack {
-    smallClaimsTrack,
-    fastTrack
+    SMALL_CLAIMS_TRACK,
+    FAST_TRACK
 }

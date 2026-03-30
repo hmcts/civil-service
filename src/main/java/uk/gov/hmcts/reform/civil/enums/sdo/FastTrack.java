@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.civil.enums.sdo;
 
 public enum FastTrack {
-    fastClaimBuildingDispute,
-    fastClaimClinicalNegligence,
-    fastClaimCreditHire,
-    fastClaimEmployersLiability,
-    fastClaimHousingDisrepair,
-    fastClaimPersonalInjury,
-    fastClaimRoadTrafficAccident,
-    fastClaimNoiseInducedHearingLoss,
-    fastClaimPPI
+    FAST_CLAIM_BUILDING_DISPUTE,
+    FAST_CLAIM_CLINICAL_NEGLIGENCE,
+    FAST_CLAIM_CREDIT_HIRE,
+    FAST_CLAIM_EMPLOYERS_LIABILITY,
+    FAST_CLAIM_HOUSING_DISREPAIR,
+    FAST_CLAIM_PERSONAL_INJURY,
+    FAST_CLAIM_ROAD_TRAFFIC_ACCIDENT,
+    FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS,
+    FAST_CLAIM_PPI
 }

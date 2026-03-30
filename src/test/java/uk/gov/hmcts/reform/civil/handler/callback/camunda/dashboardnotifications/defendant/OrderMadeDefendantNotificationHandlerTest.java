@@ -531,7 +531,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
             caseData.setRespondent1Represented(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
@@ -557,7 +557,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvokedForNro() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
             caseData.setRespondent1Represented(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
@@ -585,7 +585,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         void shouldRecordScenarioDefendantFinalOrderFastTrackTrialReady_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
             caseData.setRespondent1Represented(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
             caseData.setTrialReadyRespondent1(YesOrNo.YES);
 

@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.enums.sdo;
 
 public enum SmallTrack {
-    smallClaimCreditHire,
-    smallClaimRoadTrafficAccident,
-    smallClaimDisputeResolutionHearing,
-    smallClaimFlightDelay,
-    smallClaimHousingDisrepair,
-    smallClaimPPI
+    SMALL_CLAIM_CREDIT_HIRE,
+    SMALL_CLAIM_ROAD_TRAFFIC_ACCIDENT,
+    SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING,
+    SMALL_CLAIM_FLIGHT_DELAY,
+    SMALL_CLAIM_HOUSING_DISREPAIR,
+    SMALL_CLAIM_PPI
 }

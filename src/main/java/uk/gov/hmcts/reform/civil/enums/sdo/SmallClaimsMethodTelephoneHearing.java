@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum SmallClaimsMethodTelephoneHearing {
-    telephoneTheClaimant("the claimant"),
-    telephoneTheDefendant("the defendant"),
-    telephoneTheCourt("the court");
+    TELEPHONE_THE_CLAIMANT("the claimant"),
+    TELEPHONE_THE_DEFENDANT("the defendant"),
+    TELEPHONE_THE_COURT("the court");
 
     private final String label;
 

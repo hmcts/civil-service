@@ -35,7 +35,7 @@ public class SdoSmallClaimsTemplateService {
         String authorisation
     ) {
         boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
-        boolean hasPpi = hasAdditionalDirection(caseData, SmallTrack.smallClaimPPI);
+        boolean hasPpi = hasAdditionalDirection(caseData, SmallTrack.SMALL_CLAIM_PPI);
         SdoDocumentFormSmall template = new SdoDocumentFormSmall()
             .setWrittenByJudge(isJudge)
             .setCurrentDate(LocalDate.now())
@@ -51,10 +51,10 @@ public class SdoSmallClaimsTemplateService {
             .setDrawDirectionsOrder(caseData.getDrawDirectionsOrder())
             .setClaimsTrack(caseData.getClaimsTrack())
             .setSmallClaims(caseData.getSmallClaims())
-            .setHasCreditHire(hasAdditionalDirection(caseData, SmallTrack.smallClaimCreditHire))
-            .setHasHousingDisrepair(hasAdditionalDirection(caseData, SmallTrack.smallClaimHousingDisrepair))
+            .setHasCreditHire(hasAdditionalDirection(caseData, SmallTrack.SMALL_CLAIM_CREDIT_HIRE))
+            .setHasHousingDisrepair(hasAdditionalDirection(caseData, SmallTrack.SMALL_CLAIM_HOUSING_DISREPAIR))
             .setSmallClaimsHousingDisrepair(caseData.getSmallClaimsHousingDisrepair())
-            .setHasRoadTrafficAccident(hasAdditionalDirection(caseData, SmallTrack.smallClaimRoadTrafficAccident))
+            .setHasRoadTrafficAccident(hasAdditionalDirection(caseData, SmallTrack.SMALL_CLAIM_ROAD_TRAFFIC_ACCIDENT))
             .setHasPaymentProtectionInsurance(hasPpi)
             .setSmallClaimsPPI(hasPpi ? caseData.getSmallClaimsPPI() : null)
             .setSmallClaimsJudgesRecital(caseData.getSmallClaimsJudgesRecital())
