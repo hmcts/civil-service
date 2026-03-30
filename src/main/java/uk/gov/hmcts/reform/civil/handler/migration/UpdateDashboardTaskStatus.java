@@ -62,6 +62,6 @@ public class UpdateDashboardTaskStatus extends MigrationTask<UpdateDashboardTask
 
     @Override
     protected String getTaskName() {
-        return "UpdateDashboardTaskStatus";
+        return DEFAULT_UPDATED_BY;
     }
 }

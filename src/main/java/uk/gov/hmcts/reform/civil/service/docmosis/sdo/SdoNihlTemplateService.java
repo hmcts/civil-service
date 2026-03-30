@@ -14,6 +14,11 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoR2TrialTemplateFieldService;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getApplicant1NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getApplicant2NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getRespondent1NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getRespondent2NameWithLitigiousFriend;
+
 @Service
 @RequiredArgsConstructor
 public class SdoNihlTemplateService {
@@ -34,6 +39,10 @@ public class SdoNihlTemplateService {
             .setCurrentDate(LocalDate.now())
             .setJudgeName(judgeName)
             .setCaseNumber(caseData.getLegacyCaseReference())
+            .setApplicant1PartyName(getApplicant1NameWithLitigiousFriend(caseData))
+            .setApplicant2PartyName(getApplicant2NameWithLitigiousFriend(caseData))
+            .setRespondent1PartyName(getRespondent1NameWithLitigiousFriend(caseData))
+            .setRespondent2PartyName(getRespondent2NameWithLitigiousFriend(caseData))
             .setApplicant1(caseData.getApplicant1())
             .setHasApplicant2(caseClassificationService.hasApplicant2(caseData))
             .setApplicant2(caseData.getApplicant2())
