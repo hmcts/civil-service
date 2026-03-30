@@ -4,9 +4,9 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
+@Transactional
 public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
 
     public static final String CCD_CASE_ID = "130";
@@ -35,8 +36,8 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
-    @Sql("/scripts/dashboardNotifications/record_notification_click.sql")
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    @Sql(scripts = "/scripts/dashboardNotifications/record_notification_click.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "DELETE FROM dbs.dashboard_notifications WHERE id = '8c2712da-47ce-4050-bbee-650134a7b945'", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void shouldRecordNotificationClick() {
         doPut(BEARER_TOKEN, null, NOTIFICATION_CLICK_END_POINT, NOTIFICATION_ID.toString())
             .andExpect(status().isOk());
