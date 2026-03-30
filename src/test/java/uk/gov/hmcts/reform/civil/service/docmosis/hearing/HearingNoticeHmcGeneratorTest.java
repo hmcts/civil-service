@@ -113,7 +113,7 @@ class HearingNoticeHmcGeneratorTest {
                  .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_application_welsh, bytes, HEARING_FORM_WELSH)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION_WELSH, bytes, HEARING_FORM_WELSH)))
             .thenReturn(CASE_DOCUMENT);
 
         when(locationRefDataService
