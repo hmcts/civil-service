@@ -44,6 +44,48 @@ class NotificationTest {
     }
 
     @Test
+    void shouldReturnLatestNotificationAction_whenSomeActionsHaveNullCreatedAt() {
+        NotificationActionEntity nullAction = new NotificationActionEntity();
+        nullAction.setId(1L);
+        nullAction.setCreatedAt(null);
+
+        NotificationActionEntity latestAction = new NotificationActionEntity();
+        latestAction.setId(2L);
+        latestAction.setCreatedAt(OffsetDateTime.now());
+
+        DashboardNotificationsEntity entity = new DashboardNotificationsEntity();
+        entity.setId(UUID.randomUUID());
+        entity.setNotificationActions(new ArrayList<>(List.of(nullAction, latestAction)));
+
+        Notification notification = Notification.from(entity);
+
+        assertThat(notification.getNotificationAction()).isNotNull();
+        assertThat(notification.getNotificationAction().getId()).isEqualTo(2L);
+    }
+
+    @Test
+    void shouldReturnAction_whenAllActionsHaveNullCreatedAt() {
+        NotificationActionEntity action1 = new NotificationActionEntity();
+        action1.setId(1L);
+        action1.setCreatedAt(null);
+
+        NotificationActionEntity action2 = new NotificationActionEntity();
+        action2.setId(2L);
+        action2.setCreatedAt(null);
+
+        DashboardNotificationsEntity entity = new DashboardNotificationsEntity();
+        entity.setId(UUID.randomUUID());
+        entity.setNotificationActions(new ArrayList<>(List.of(action1, action2)));
+
+        Notification notification = Notification.from(entity);
+
+        assertThat(notification.getNotificationAction()).isNotNull();
+        // Since both are null, it depends on which one stream max picks if they are equal,
+        // but it should at least not throw exception and return one of them.
+        assertThat(notification.getNotificationAction().getId()).isIn(1L, 2L);
+    }
+
+    @Test
     void shouldReturnNullNotificationAction_whenNoActionsExist() {
         DashboardNotificationsEntity entity = new DashboardNotificationsEntity();
         entity.setId(UUID.randomUUID());

@@ -62,7 +62,7 @@ public class Notification {
         return notificationActions.stream()
             .max(Comparator.comparing(
                 NotificationActionEntity::getCreatedAt,
-                Comparator.nullsLast(Comparator.naturalOrder())
+                Comparator.nullsFirst(Comparator.naturalOrder())
             ))
             .map(NotificationAction::from)
             .orElse(null);

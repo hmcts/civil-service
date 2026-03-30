@@ -203,7 +203,10 @@ public class DashboardNotificationServiceTest {
     public void saveOrUpdate() {
 
         DashboardNotificationsEntity notification1 = createDashboardNotificationsEntity();
+        notification1.setReference("reference");
         DashboardNotificationsEntity notification2 = createDashboardNotificationsEntity();
+        notification2.setReference("reference");
+
         when(
             dashboardNotificationsRepository
                 .findByReferenceAndCitizenRoleAndName(
@@ -219,6 +222,7 @@ public class DashboardNotificationServiceTest {
         verify(dashboardNotificationsRepository).save(captor.capture());
         assertThat(captor.getValue()).isNotNull();
         assertThat(captor.getValue().getId()).isEqualTo(notification1.getId());
+        assertThat(captor.getValue().getReference()).isEqualTo("reference");
     }
 
     @Test

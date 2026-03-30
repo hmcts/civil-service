@@ -150,7 +150,7 @@ public class DashboardNotificationService {
     private DashboardNotificationsEntity copyNotification(DashboardNotificationsEntity notification) {
         return new DashboardNotificationsEntity(
             notification.getId(),
-            notification.getNotificationActions(),
+            notification.getNotificationActions() != null ? new java.util.ArrayList<>(notification.getNotificationActions()) : null,
             notification.getReference(),
             notification.getName(),
             notification.getCitizenRole(),
