@@ -84,6 +84,7 @@ class CoverLetterServiceTest {
 
         CaseDocument result = coverLetterService.generateDocumentWithCoverLetter(
             party,
+            null,
             caseData,
             List.of(metaData),
             "docName",
@@ -124,6 +125,7 @@ class CoverLetterServiceTest {
             ));
         byte[] result = coverLetterService.generateDocumentWithCoverLetterBinary(
             party,
+            null,
             caseData,
             List.of(metaData),
             "docName",
@@ -161,6 +163,7 @@ class CoverLetterServiceTest {
         assertThatThrownBy(() ->
                                coverLetterService.generateDocumentWithCoverLetterBinary(
                                    party,
+                                   null,
                                    caseData,
                                    List.of(metaData),
                                    "docName",
@@ -175,7 +178,7 @@ class CoverLetterServiceTest {
             .legacyCaseReference("001MC001").build();
         Party party = new PartyBuilder().individual().build();
 
-        JudgementCoverLetter result = coverLetterService.buildTemplateData(party, caseData);
+        JudgementCoverLetter result = coverLetterService.buildTemplateData(party, null, caseData);
 
         assertThat(result).isEqualTo(
             new JudgementCoverLetter()
@@ -216,6 +219,7 @@ class CoverLetterServiceTest {
         assertThatThrownBy(() ->
                                coverLetterService.generateDocumentWithCoverLetterBinary(
                                    party,
+                                   null,
                                    caseData,
                                    List.of(metaData),
                                    "docName",
