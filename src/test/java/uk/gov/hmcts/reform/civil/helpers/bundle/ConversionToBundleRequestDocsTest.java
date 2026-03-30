@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +44,8 @@ class ConversionToBundleRequestDocsTest {
             .setType(Party.Type.INDIVIDUAL);
 
         Document witnessDocument = new Document()
-            .setDocumentUrl("http://example.com/document.pdf")
-            .setDocumentBinaryUrl("http://example.com/documentBinary.pdf")
+            .setDocumentUrl("https://example.com/document.pdf")
+            .setDocumentBinaryUrl("https://example.com/documentBinary.pdf")
             .setDocumentFileName("document.pdf")
             .setCategoryID("SomeCategoryID");
 
@@ -73,8 +74,8 @@ class ConversionToBundleRequestDocsTest {
         PartyType partyType = PartyType.CLAIMANT1;
 
         Document witnessDocument = new Document()
-            .setDocumentUrl("http://example.com/document.pdf")
-            .setDocumentBinaryUrl("http://example.com/documentBinary.pdf")
+            .setDocumentUrl("https://example.com/document.pdf")
+            .setDocumentBinaryUrl("https://example.com/documentBinary.pdf")
             .setDocumentFileName("document.pdf")
             .setCategoryID("SomeCategoryID");
 
@@ -100,8 +101,8 @@ class ConversionToBundleRequestDocsTest {
         PartyType partyType = PartyType.CLAIMANT1;
 
         Document document = new Document()
-            .setDocumentUrl("http://example.com/document.pdf")
-            .setDocumentBinaryUrl("http://example.com/documentBinary.pdf")
+            .setDocumentUrl("https://example.com/document.pdf")
+            .setDocumentBinaryUrl("https://example.com/documentBinary.pdf")
             .setDocumentFileName("document.pdf")
             .setCategoryID("SomeCategoryID");
 
@@ -127,5 +128,57 @@ class ConversionToBundleRequestDocsTest {
         assertNotNull(result);
         assertEquals(2, result.size());
     }
-}
 
+    @Test
+    void shouldUseOriginalDocumentFileNameWhenRequested() {
+        String fileNamePrefix = "DOC_FILE_NAME";
+        String documentType = EvidenceUploadType.COSTS.name();
+        PartyType partyType = PartyType.CLAIMANT1;
+
+        Document document = new Document()
+            .setDocumentUrl("https://example.com/document.pdf")
+            .setDocumentBinaryUrl("https://example.com/documentBinary.pdf")
+            .setDocumentFileName("document.pdf")
+            .setCategoryID("SomeCategoryID");
+
+        UploadEvidenceDocumentType uploadEvidenceDocumentType = new UploadEvidenceDocumentType()
+            .setDocumentIssuedDate(LocalDate.of(2023, 4, 24))
+            .setDocumentUpload(document);
+
+        List<Element<UploadEvidenceDocumentType>> listOfUploadDocumentType =
+            List.of(new Element<UploadEvidenceDocumentType>().setValue(uploadEvidenceDocumentType));
+
+        List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
+            listOfUploadDocumentType, fileNamePrefix, documentType, partyType);
+
+        assertNotNull(result);
+        assertEquals("document", result.getFirst().getDocumentFileName());
+    }
+
+    @Test
+    void shouldUseOriginalDocumentFileNameWithDateWhenRequested() {
+        String fileNamePrefix = "DOC_FILE_NAME %s";
+        String documentType = EvidenceUploadType.COSTS.name();
+        PartyType partyType = PartyType.CLAIMANT1;
+
+        Document document = new Document()
+            .setDocumentUrl("https://example.com/document.pdf")
+            .setDocumentBinaryUrl("https://example.com/documentBinary.pdf")
+            .setDocumentFileName("document.pdf")
+            .setCategoryID("SomeCategoryID");
+
+        UploadEvidenceDocumentType uploadEvidenceDocumentType = new UploadEvidenceDocumentType()
+            .setDocumentIssuedDate(LocalDate.of(2023, 4, 24))
+            .setCreatedDatetime(LocalDateTime.of(2023, 4, 30, 10, 0))
+            .setDocumentUpload(document);
+
+        List<Element<UploadEvidenceDocumentType>> listOfUploadDocumentType =
+            List.of(new Element<UploadEvidenceDocumentType>().setValue(uploadEvidenceDocumentType));
+
+        List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
+            listOfUploadDocumentType, fileNamePrefix, documentType, partyType);
+
+        assertNotNull(result);
+        assertEquals("document 30/04/2023", result.getFirst().getDocumentFileName());
+    }
+}
