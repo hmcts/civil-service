@@ -110,22 +110,24 @@ public class DashboardNotificationService {
     }
 
     public void recordClick(UUID id, String authToken) {
-        Optional<DashboardNotificationsEntity> dashboardNotification = dashboardNotificationsRepository.findById(id);
+        dashboardNotificationsRepository.findById(id).ifPresent(notification -> {
+            NotificationActionEntity notificationAction = notification.getNotificationActions() != null
+                ? notification.getNotificationActions().stream()
+                .filter(action -> clickAction.equals(action.getActionPerformed()))
+                .findFirst()
+                .orElse(new NotificationActionEntity())
+                : new NotificationActionEntity();
 
-        dashboardNotification.ifPresent(notification -> {
-            NotificationActionEntity notificationAction = new NotificationActionEntity(
-                null,
-                notification.getReference(),
-                clickAction,
-                idamApi.retrieveUserDetails(authToken).getFullName(),
-                OffsetDateTime.now(),
-                notification
-            );
+            notificationAction.setReference(notification.getReference());
+            notificationAction.setActionPerformed(clickAction);
+            notificationAction.setCreatedBy(idamApi.retrieveUserDetails(authToken).getFullName());
+            notificationAction.setCreatedAt(OffsetDateTime.now());
+            notificationAction.setDashboardNotification(notification);
 
-            if (nonNull(notification.getNotificationActions())) {
-                notification.getNotificationActions().add(notificationAction);
-            } else {
+            if (notification.getNotificationActions() == null) {
                 notification.setNotificationActions(new java.util.ArrayList<>(java.util.List.of(notificationAction)));
+            } else if (!notification.getNotificationActions().contains(notificationAction)) {
+                notification.getNotificationActions().add(notificationAction);
             }
 
             dashboardNotificationsRepository.save(notification);

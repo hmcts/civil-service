@@ -277,7 +277,7 @@ public class DashboardNotificationServiceTest {
         }
 
         @Test
-        void shouldAppendNewClickActionWhenNotificationAlreadyHasActions() {
+        void shouldReuseExistingClickActionWhenNotificationAlreadyHasActions() {
             DashboardNotificationsEntity notification = getNotification(id);
 
             NotificationActionEntity existingAction = new NotificationActionEntity();
@@ -302,10 +302,9 @@ public class DashboardNotificationServiceTest {
             verify(dashboardNotificationsRepository).save(captor.capture());
 
             DashboardNotificationsEntity saved = captor.getValue();
-            assertThat(saved.getNotificationActions()).hasSize(2);
-            assertThat(saved.getNotificationActions())
-                .extracting(NotificationActionEntity::getActionPerformed)
-                .containsExactly("Click", "Click");
+            assertThat(saved.getNotificationActions()).hasSize(1);
+            assertThat(saved.getNotificationActions().get(0).getId()).isEqualTo(99L);
+            assertThat(saved.getNotificationActions().get(0).getCreatedBy()).isEqualTo("Claimant user");
         }
     }
 }

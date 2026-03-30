@@ -11,7 +11,6 @@ import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Data
@@ -40,28 +39,32 @@ public class Notification {
     private LocalDateTime deadline;
 
     public static Notification from(DashboardNotificationsEntity dashboardNotificationsEntity) {
-        Notification notification = new Notification(
+        return new Notification(
             dashboardNotificationsEntity.getId(),
             dashboardNotificationsEntity.getTitleEn(),
             dashboardNotificationsEntity.getTitleCy(),
             dashboardNotificationsEntity.getDescriptionEn(),
             dashboardNotificationsEntity.getDescriptionCy(),
             dashboardNotificationsEntity.getTimeToLive(),
-            null,
+            getLatestNotificationAction(dashboardNotificationsEntity),
             dashboardNotificationsEntity.getParams(),
             dashboardNotificationsEntity.getCreatedAt(),
             dashboardNotificationsEntity.getDeadline()
         );
+    }
 
-        Optional.ofNullable(dashboardNotificationsEntity.getNotificationActions())
-            .stream()
-            .flatMap(List::stream)
+    private static NotificationAction getLatestNotificationAction(DashboardNotificationsEntity dashboardNotificationsEntity) {
+        List<NotificationActionEntity> notificationActions = dashboardNotificationsEntity.getNotificationActions();
+        if (notificationActions == null || notificationActions.isEmpty()) {
+            return null;
+        }
+
+        return notificationActions.stream()
             .max(Comparator.comparing(
                 NotificationActionEntity::getCreatedAt,
                 Comparator.nullsLast(Comparator.naturalOrder())
             ))
-            .ifPresent(action -> notification.setNotificationAction(NotificationAction.from(action)));
-
-        return notification;
+            .map(NotificationAction::from)
+            .orElse(null);
     }
 }
