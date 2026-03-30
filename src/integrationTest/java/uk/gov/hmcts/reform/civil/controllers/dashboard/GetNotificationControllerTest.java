@@ -8,9 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
+import uk.gov.hmcts.reform.dashboard.data.NotificationAction;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @Sql("/scripts/dashboardNotifications/get_notifications_data.sql")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@Transactional
 public class GetNotificationControllerTest extends BaseIntegrationTest {
 
     @Test
@@ -33,6 +36,16 @@ public class GetNotificationControllerTest extends BaseIntegrationTest {
             .andExpect(content().json(toJson(getNotificationList())));
     }
 
+    @Test
+    @SneakyThrows
+    @Sql(scripts = "/scripts/dashboardNotifications/get_notifications_multiple_actions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void shouldReturnNotificationWithLatestActionWhenMultipleActionsExist() {
+        String getNotificationsEndpoint = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
+        doGet(BEARER_TOKEN, getNotificationsEndpoint, "128", "defendant")
+            .andExpect(status().isOk())
+            .andExpect(content().json(toJson(getNotificationListWithMultipleActions())));
+    }
+
     private List<Notification> getNotificationList() {
         Notification notification = new Notification();
         notification.setId(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e5"));
@@ -42,6 +55,27 @@ public class GetNotificationControllerTest extends BaseIntegrationTest {
         notification.setDescriptionCy("description_cy");
         notification.setCreatedAt(OffsetDateTime.of(LocalDateTime.parse("2024-02-10T10:00:00"), ZoneOffset.UTC));
         notification.setTimeToLive("Click");
+        return List.of(notification);
+    }
+
+    private List<Notification> getNotificationListWithMultipleActions() {
+        Notification notification = new Notification();
+        notification.setId(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e6"));
+        notification.setTitleEn("title_en");
+        notification.setTitleCy("title_cy");
+        notification.setDescriptionEn("description_en");
+        notification.setDescriptionCy("description_cy");
+        notification.setCreatedAt(OffsetDateTime.of(LocalDateTime.parse("2026-02-05T10:00:00.110362"), ZoneOffset.UTC));
+        notification.setTimeToLive("Click");
+
+        NotificationAction action = new NotificationAction();
+        action.setId(1002L);
+        action.setReference("128");
+        action.setActionPerformed("Click");
+        action.setCreatedBy("User 1");
+        action.setCreatedAt(OffsetDateTime.of(LocalDateTime.parse("2026-02-06T13:08:04.163939"), ZoneOffset.UTC));
+        notification.setNotificationAction(action);
+
         return List.of(notification);
     }
 }
