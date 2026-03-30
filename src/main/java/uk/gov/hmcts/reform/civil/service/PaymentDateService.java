@@ -19,6 +19,7 @@ import java.util.Optional;
 @Slf4j
 public class PaymentDateService {
 
+    private static final String PAYMENT_DATE_FOR_CASE_IS = "Payment date for case {} is {}";
     private static final String DATE_PATTERN = "dd MMMM yyyy";
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH);
@@ -30,16 +31,16 @@ public class PaymentDateService {
     public Optional<LocalDate> getPaymentDate(CaseData caseData) {
         if (caseData.getRespondToClaimAdmitPartLRspec() != null
             && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
-            log.info("Payment date for case {} is {}", caseData.getCcdCaseReference(), caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
+            log.info(PAYMENT_DATE_FOR_CASE_IS, caseData.getCcdCaseReference(), caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
             return Optional.of(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
         }
         if (caseData.getRespondToAdmittedClaim() != null
             && caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid() != null) {
-            log.info("Payment date for case {} is {}", caseData.getCcdCaseReference(), caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid());
+            log.info(PAYMENT_DATE_FOR_CASE_IS, caseData.getCcdCaseReference(), caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid());
             return Optional.of(caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid());
         }
         if (caseData.getRespondent1ResponseDate() != null) {
-            log.info("Payment date for case {} is {}", caseData.getCcdCaseReference(), RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
+            log.info(PAYMENT_DATE_FOR_CASE_IS, caseData.getCcdCaseReference(), RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
             return Optional.ofNullable(deadlineCalculatorService.calculateExtendedDeadline(
                 caseData.getRespondent1ResponseDate().toLocalDate(),
                 RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY));

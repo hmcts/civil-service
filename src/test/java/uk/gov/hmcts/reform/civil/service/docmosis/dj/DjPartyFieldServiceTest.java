@@ -20,7 +20,7 @@ class DjPartyFieldServiceTest {
             .defendantDetails(dynamicListWithLabel("Both Defendants"))
             .build();
 
-        assertThat(service.resolveRespondent(caseData)).isEqualTo("Resp One, Resp Two");
+        assertThat(service.resolveRespondent(caseData)).isEqualTo("Resp One, Resp Two".toUpperCase());
     }
 
     @Test
@@ -29,7 +29,7 @@ class DjPartyFieldServiceTest {
             .respondent1Represented(YesOrNo.NO)
             .build();
 
-        assertThat(service.resolveRespondent(caseData)).isEqualTo("Resp One");
+        assertThat(service.resolveRespondent(caseData)).isEqualTo("RESP ONE");
     }
 
     @Test
@@ -43,7 +43,7 @@ class DjPartyFieldServiceTest {
             .defendantDetails(dynamicListWithLabel(respondent2.getPartyName()))
             .build();
 
-        assertThat(service.resolveRespondent(caseData)).isEqualTo(respondent2.getPartyName());
+        assertThat(service.resolveRespondent(caseData)).isEqualTo(respondent2.getPartyName().toUpperCase());
     }
 
     @Test
