@@ -96,7 +96,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder {
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
-    private static final String authToken = "Bearer TestAuthToken";
+    private static final String AUTH_TOKEN = "Bearer TestAuthToken";
     private static final LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
     private static final Applicant1DQ applicant1DQ;
     private static final Respondent1DQ respondent1DQ;
@@ -740,7 +740,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .thenReturn(CaseAssignmentUserRolesResource.builder()
                             .caseAssignmentUserRoles(onlyApplicantSolicitorAssigned()).build());
 
-        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, authToken);
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, AUTH_TOKEN);
         assertTrue(result);
     }
 
@@ -758,7 +758,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .thenReturn(CaseAssignmentUserRolesResource.builder()
                             .caseAssignmentUserRoles(applicant1Respondent2SolAssigned()).build());
 
-        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, authToken);
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, AUTH_TOKEN);
 
         assertFalse(result);
     }

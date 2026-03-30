@@ -69,16 +69,16 @@ public class HearingFormGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName_application = String.format(
+    private static final String FILE_NAME_APPLICATION = String.format(
         HEARING_APPLICATION_AHN.getDocumentTitle(), REFERENCE_NUMBER);
-    private static final String fileName_small_claim = String.format(
+    private static final String FILE_NAME_SMALL_CLAIM = String.format(
         HEARING_SMALL_CLAIMS_AHN.getDocumentTitle(), REFERENCE_NUMBER);
-    private static final String fileName_fast_track = String.format(
+    private static final String FILE_NAME_FAST_TRACK = String.format(
         HEARING_TRIAL_AHN.getDocumentTitle(), REFERENCE_NUMBER);
-    private static final String fileName_other_claim = String.format(
+    private static final String FILE_NAME_OTHER_CLAIM = String.format(
         HEARING_OTHER_AHN.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName_application)
+        .documentName(FILE_NAME_APPLICATION)
         .documentType(DEFAULT_JUDGMENT)
         .build();
     private static final CaseLocationCivil caseManagementLocation = new CaseLocationCivil().setBaseLocation("000000");
@@ -115,7 +115,7 @@ public class HearingFormGeneratorTest {
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_application_ahn() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_APPLICATION_AHN)))
             .thenReturn(new DocmosisDocument(HEARING_APPLICATION_AHN.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -134,14 +134,14 @@ public class HearingFormGeneratorTest {
         assertThat(caseDocuments.size()).isEqualTo(1);
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, HEARING_FORM));
     }
 
     @Test
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_small_claims_ahn() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_SMALL_CLAIMS_AHN)))
             .thenReturn(new DocmosisDocument(HEARING_SMALL_CLAIMS_AHN.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_small_claim, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_SMALL_CLAIM, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -160,14 +160,14 @@ public class HearingFormGeneratorTest {
         assertThat(caseDocuments.size()).isEqualTo(1);
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_small_claim, bytes, HEARING_FORM));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_SMALL_CLAIM, bytes, HEARING_FORM));
     }
 
     @Test
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_fast_track_ahn() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_TRIAL_AHN)))
             .thenReturn(new DocmosisDocument(HEARING_TRIAL_AHN.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_FAST_TRACK, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -186,14 +186,14 @@ public class HearingFormGeneratorTest {
         assertThat(caseDocuments.size()).isEqualTo(1);
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_FAST_TRACK, bytes, HEARING_FORM));
     }
 
     @Test
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_other_ahn() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_OTHER_AHN)))
             .thenReturn(new DocmosisDocument(HEARING_OTHER_AHN.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_other_claim, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_OTHER_CLAIM, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -212,7 +212,7 @@ public class HearingFormGeneratorTest {
         assertThat(caseDocuments.size()).isEqualTo(1);
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_other_claim, bytes, HEARING_FORM));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_OTHER_CLAIM, bytes, HEARING_FORM));
     }
 
     @Test
