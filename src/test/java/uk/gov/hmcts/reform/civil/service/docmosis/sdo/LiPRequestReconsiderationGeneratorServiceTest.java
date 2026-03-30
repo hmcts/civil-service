@@ -37,17 +37,17 @@ public class LiPRequestReconsiderationGeneratorServiceTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String claimantFileName = String.format(REQUEST_FOR_RECONSIDERATION.getDocumentTitle(), "claimant");
+    private static final String CLAIMANT_FILE_NAME = String.format(REQUEST_FOR_RECONSIDERATION.getDocumentTitle(), "claimant");
 
-    private static final String defendantFileName = String.format(REQUEST_FOR_RECONSIDERATION.getDocumentTitle(), "defendant");
+    private static final String DEFENDANT_FILE_NAME = String.format(REQUEST_FOR_RECONSIDERATION.getDocumentTitle(), "defendant");
 
     private static final CaseDocument CLAIMANT_CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(claimantFileName)
+        .documentName(CLAIMANT_FILE_NAME)
         .documentType(DocumentType.REQUEST_FOR_RECONSIDERATION)
         .build();
 
     private static final CaseDocument DEFENDANT_CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(defendantFileName)
+        .documentName(DEFENDANT_FILE_NAME)
         .documentType(DocumentType.REQUEST_FOR_RECONSIDERATION)
         .build();
 
@@ -67,7 +67,7 @@ public class LiPRequestReconsiderationGeneratorServiceTest {
     void shouldGenerateReconsiderationDocumentForApplicant() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(REQUEST_FOR_RECONSIDERATION)))
             .thenReturn(new DocmosisDocument(REQUEST_FOR_RECONSIDERATION.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(claimantFileName, bytes, DocumentType.REQUEST_FOR_RECONSIDERATION)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(CLAIMANT_FILE_NAME, bytes, DocumentType.REQUEST_FOR_RECONSIDERATION)))
             .thenReturn(CLAIMANT_CASE_DOCUMENT);
         when(locationHelper.getHearingLocation(anyString(), any(), anyString())).thenReturn(null);
 
@@ -86,14 +86,14 @@ public class LiPRequestReconsiderationGeneratorServiceTest {
 
         assertThat(caseDocument).isNotNull();
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(claimantFileName, bytes, DocumentType.REQUEST_FOR_RECONSIDERATION));
+            .uploadDocument(BEARER_TOKEN, new PDF(CLAIMANT_FILE_NAME, bytes, DocumentType.REQUEST_FOR_RECONSIDERATION));
     }
 
     @Test
     void shouldGenerateReconsiderationDocumentForRespondent() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(REQUEST_FOR_RECONSIDERATION)))
             .thenReturn(new DocmosisDocument(REQUEST_FOR_RECONSIDERATION.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(defendantFileName, bytes, DocumentType.REQUEST_FOR_RECONSIDERATION)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(DEFENDANT_FILE_NAME, bytes, DocumentType.REQUEST_FOR_RECONSIDERATION)))
             .thenReturn(DEFENDANT_CASE_DOCUMENT);
         when(locationHelper.getHearingLocation(anyString(), any(), anyString())).thenReturn(null);
 
@@ -112,6 +112,6 @@ public class LiPRequestReconsiderationGeneratorServiceTest {
 
         assertThat(caseDocument).isNotNull();
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(defendantFileName, bytes, DocumentType.REQUEST_FOR_RECONSIDERATION));
+            .uploadDocument(BEARER_TOKEN, new PDF(DEFENDANT_FILE_NAME, bytes, DocumentType.REQUEST_FOR_RECONSIDERATION));
     }
 }
