@@ -103,7 +103,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final String TRIAL_HEARING_TYPE = "AAA7-TRI";
 
-    private static final String fileName_application = String.format(
+    private static final String FILENAME_APPLICATION = String.format(
         HEARING_NOTICE_HMC.getDocumentTitle(), REFERENCE_NUMBER);
 
     private static final CaseDocument CASE_DOCUMENT;
@@ -111,12 +111,12 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
 
     static {
         CaseDocument caseDocument = new CaseDocument();
-        caseDocument.setDocumentName(fileName_application);
+        caseDocument.setDocumentName(FILENAME_APPLICATION);
         caseDocument.setDocumentType(HEARING_FORM);
         CASE_DOCUMENT = caseDocument;
 
         CaseDocument caseDocumentWelsh = new CaseDocument();
-        caseDocumentWelsh.setDocumentName(fileName_application);
+        caseDocumentWelsh.setDocumentName(FILENAME_APPLICATION);
         caseDocumentWelsh.setDocumentType(HEARING_FORM_WELSH);
         CASE_DOCUMENT_WELSH = caseDocumentWelsh;
     }
