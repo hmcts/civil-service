@@ -59,6 +59,7 @@ public class LipDefendantCaseAssignmentService {
             Party respondent1 = caseData.getRespondent1();
             respondent1 = respondent1.copy().setPartyEmail(defendantIdamUserDetails.getEmail());
             data.put("respondent1", respondent1);
+            data.put("respondent1DetailsForClaimDetailsTab", respondent1);
             if (caseFlagsLoggingEnabled) {
                 log.info(
                     "case id: {}, respondent flags start of event submission: {}",
