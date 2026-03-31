@@ -81,7 +81,7 @@ class HearingNoticeHmcGeneratorTest {
     private static final String FILE_NAME_APPLICATION = String.format(
         HEARING_NOTICE_HMC.getDocumentTitle(), REFERENCE_NUMBER);
 
-    private static final String fileName_application_welsh = String.format(
+    private static final String FILE_NAME_APPLICATION_WELSH = String.format(
         HEARING_NOTICE_HMC_WELSH.getDocumentTitle(), REFERENCE_NUMBER);
 
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
@@ -674,7 +674,7 @@ class HearingNoticeHmcGeneratorTest {
         var expected = List.of(CASE_DOCUMENT);
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_application_welsh, bytes, HEARING_FORM_WELSH));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION_WELSH, bytes, HEARING_FORM_WELSH));
     }
 
 }

@@ -71,9 +71,17 @@ public class DefaultJudgmentFormGenerator {
                                                               StandardDefaultJudgmentBuilder standardDefaultJudgmentBuilder) {
         List<DefaultJudgmentForm> defaultJudgmentForms = new ArrayList<>();
 
-        defaultJudgmentForms.add(standardDefaultJudgmentBuilder.getDefaultJudgmentForm(caseData, caseData.getRespondent1(), event, true));
+        defaultJudgmentForms.add(standardDefaultJudgmentBuilder.getDefaultJudgmentForm(caseData,
+                                                                                       caseData.getRespondent1(),
+                                                                                       caseData.getRespondent1LitigationFriend(),
+                                                                                       event,
+                                                                                       true));
         if (caseData.getRespondent2() != null) {
-            defaultJudgmentForms.add(standardDefaultJudgmentBuilder.getDefaultJudgmentForm(caseData, caseData.getRespondent2(), event, false));
+            defaultJudgmentForms.add(standardDefaultJudgmentBuilder.getDefaultJudgmentForm(caseData,
+                                                                                           caseData.getRespondent2(),
+                                                                                           caseData.getRespondent2LitigationFriend(),
+                                                                                           event,
+                                                                                           false));
         }
         return defaultJudgmentForms;
 
