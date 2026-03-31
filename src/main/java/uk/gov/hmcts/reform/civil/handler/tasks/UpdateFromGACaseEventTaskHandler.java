@@ -62,7 +62,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
     private CaseData civilCaseData;
     private CaseData data;
 
-    private final Logger log = LoggerFactory.getLogger(UpdateFromGACaseEventTaskHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(UpdateFromGACaseEventTaskHandler.class);
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -129,7 +129,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
         }
         return output;
     }

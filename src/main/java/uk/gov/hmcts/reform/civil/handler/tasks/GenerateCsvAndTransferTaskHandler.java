@@ -28,7 +28,7 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
 
     private final MediationCsvServiceFactory mediationCsvServiceFactory;
 
-    private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
+    private final MediationCSVEmailConfiguration childMediationCSVEmailConfiguration;
 
     private static final String FILENAME = "ocmc_mediation_data.csv";
 
@@ -47,7 +47,7 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
             mediationCSVEmailConfiguration
         );
         this.mediationCsvServiceFactory = mediationCsvServiceFactory;
-        this.mediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
+        this.childMediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
     }
 
     @Override

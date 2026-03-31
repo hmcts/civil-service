@@ -31,7 +31,7 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
 
     private final MediationJsonService mediationJsonService;
 
-    private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
+    private final MediationCSVEmailConfiguration childMediationCSVEmailConfiguration;
 
     private static final String FILENAME = "ocmc_mediation_data.json";
 
@@ -50,7 +50,7 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
             mediationCSVEmailConfiguration
         );
         this.mediationJsonService = mediationJsonService;
-        this.mediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
+        this.childMediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
     }
 
     @Override

@@ -43,7 +43,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
 
     private static final String DEFENDANT = "DEFENDANT";
     private final ObjectMapper objectMapper;
-    protected final WorkingDayIndicator workingDayIndicator;
+    protected final WorkingDayIndicator childWorkingDayIndicator;
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
@@ -63,7 +63,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
                                                 SdoCaseClassificationService sdoCaseClassificationService) {
         super(dashboardScenariosService, mapper, featureToggleService, workingDayIndicator);
         this.objectMapper = objectMapper;
-        this.workingDayIndicator = workingDayIndicator;
+        this.childWorkingDayIndicator = workingDayIndicator;
         this.dashboardNotificationService = dashboardNotificationService;
         this.taskListService = taskListService;
         this.sdoCaseClassificationService = sdoCaseClassificationService;
