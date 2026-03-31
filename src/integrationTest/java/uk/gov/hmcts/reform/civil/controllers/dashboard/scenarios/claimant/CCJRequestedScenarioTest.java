@@ -99,7 +99,6 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
     void should_create_ccj_requested_scenario_duringClaimant_intention() throws Exception {
 
         String caseId = "1234445678";
-        String defendantName = "Mr. Sole Trader";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendantSpec().build()
             .toBuilder().respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .legacyCaseReference("reference")
@@ -114,11 +113,11 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value(
-                "You requested a County Court Judgment against Mr. Sole Trader"),
+                "You requested a County Court Judgment against Mr. Sole Trader T/A Sole Trader co"),
             jsonPath("$[0].descriptionEn").value(
                 "<p class=\"govuk-body\">You rejected the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan</a>. When we've processed the request, we'll post a copy of the judgment to you.</p>"),
             jsonPath("$[0].titleCy").value(
-                "Rydych wedi gwneud cais am Ddyfarniad Llys Sirol (CCJ) yn erbyn Mr. Sole Trader"),
+                "Rydych wedi gwneud cais am Ddyfarniad Llys Sirol (CCJ) yn erbyn Mr. Sole Trader T/A Sole Trader co"),
             jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Rydych wedi gwrthod y <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">cynllun ad-dalu</a>." +
                                                      " Pan fyddwn wedi prosesu’r cais, byddwn yn anfon copi o’r dyfarniad drwy’r post atoch chi.</p>")
         );
