@@ -4,7 +4,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_DEFENDANT;
@@ -13,9 +15,16 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class EvidenceUploadedDefendantDashboardService extends DashboardScenarioService {
 
+    private final DashboardNotificationService dashboardNotificationService;
+    private final TaskListService taskListService;
+
     public EvidenceUploadedDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
-                                                     DashboardNotificationsParamsMapper mapper) {
+                                                     DashboardNotificationsParamsMapper mapper,
+                                                     DashboardNotificationService dashboardNotificationService,
+                                                     TaskListService taskListService) {
         super(dashboardScenariosService, mapper);
+        this.dashboardNotificationService = dashboardNotificationService;
+        this.taskListService = taskListService;
     }
 
     public void notifyCaseEvidenceUploaded(CaseData caseData, String authToken) {
@@ -31,6 +40,13 @@ public class EvidenceUploadedDefendantDashboardService extends DashboardScenario
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isRespondent1NotRepresented();
+    }
+
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        String caseId = String.valueOf(caseData.getCcdCaseReference());
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(caseId, DEFENDANT_ROLE);
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseId, DEFENDANT_ROLE);
     }
 
 }

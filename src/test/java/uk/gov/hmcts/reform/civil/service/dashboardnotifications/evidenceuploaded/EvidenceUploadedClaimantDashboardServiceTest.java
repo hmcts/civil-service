@@ -11,7 +11,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -33,6 +35,12 @@ class EvidenceUploadedClaimantDashboardServiceTest {
 
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+
+    @Mock
+    private TaskListService taskListService;
 
     @InjectMocks
     private EvidenceUploadedClaimantDashboardService service;
@@ -57,6 +65,8 @@ class EvidenceUploadedClaimantDashboardServiceTest {
             "1234",
             new ScenarioRequestParams(new HashMap<>())
         );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("1234", "CLAIMANT");
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("1234", "CLAIMANT");
     }
 
     @Test
@@ -74,6 +84,8 @@ class EvidenceUploadedClaimantDashboardServiceTest {
             "5678",
             new ScenarioRequestParams(new HashMap<>())
         );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("5678", "CLAIMANT");
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("5678", "CLAIMANT");
     }
 
     @Test
@@ -91,6 +103,8 @@ class EvidenceUploadedClaimantDashboardServiceTest {
             "9012",
             new ScenarioRequestParams(new HashMap<>())
         );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("9012", "CLAIMANT");
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("9012", "CLAIMANT");
     }
 
     @Test
@@ -103,5 +117,7 @@ class EvidenceUploadedClaimantDashboardServiceTest {
         service.notifyEvidenceUploaded(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
+        verifyNoInteractions(dashboardNotificationService);
+        verifyNoInteractions(taskListService);
     }
 }

@@ -11,7 +11,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -33,6 +35,12 @@ class EvidenceUploadedDefendantDashboardServiceTest {
 
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+
+    @Mock
+    private TaskListService taskListService;
 
     @InjectMocks
     private EvidenceUploadedDefendantDashboardService service;
@@ -57,6 +65,8 @@ class EvidenceUploadedDefendantDashboardServiceTest {
             "1234",
             new ScenarioRequestParams(new HashMap<>())
         );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("1234", "DEFENDANT");
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("1234", "DEFENDANT");
     }
 
     @Test
@@ -74,6 +84,8 @@ class EvidenceUploadedDefendantDashboardServiceTest {
             "5678",
             new ScenarioRequestParams(new HashMap<>())
         );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("5678", "DEFENDANT");
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("5678", "DEFENDANT");
     }
 
     @Test
@@ -91,6 +103,8 @@ class EvidenceUploadedDefendantDashboardServiceTest {
             "9012",
             new ScenarioRequestParams(new HashMap<>())
         );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("9012", "DEFENDANT");
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("9012", "DEFENDANT");
     }
 
     @Test
@@ -103,5 +117,7 @@ class EvidenceUploadedDefendantDashboardServiceTest {
         service.notifyCaseEvidenceUploaded(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
+        verifyNoInteractions(dashboardNotificationService);
+        verifyNoInteractions(taskListService);
     }
 }
