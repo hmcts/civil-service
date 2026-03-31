@@ -34,7 +34,7 @@ public class NoticeOfChangeRequestCallbackHandlerTest extends BaseCallbackHandle
     @Mock
     private AuthTokenGenerator authTokenGenerator;
 
-    private static final String invalidStateNoC = "Invalid case state for NoC";
+    private static final String INVALID_STATE_NOC = "Invalid case state for NoC";
 
     @Nested
     class AboutToSubmitCallback {
@@ -47,7 +47,7 @@ public class NoticeOfChangeRequestCallbackHandlerTest extends BaseCallbackHandle
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors().contains(invalidStateNoC)).isTrue();
+            assertThat(response.getErrors().contains(INVALID_STATE_NOC)).isTrue();
         }
 
         @Test
@@ -58,7 +58,7 @@ public class NoticeOfChangeRequestCallbackHandlerTest extends BaseCallbackHandle
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors().contains(invalidStateNoC)).isTrue();
+            assertThat(response.getErrors().contains(INVALID_STATE_NOC)).isTrue();
         }
 
         @Test
@@ -69,7 +69,7 @@ public class NoticeOfChangeRequestCallbackHandlerTest extends BaseCallbackHandle
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors().contains(invalidStateNoC)).isTrue();
+            assertThat(response.getErrors().contains(INVALID_STATE_NOC)).isTrue();
         }
 
         @Test
