@@ -71,6 +71,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
@@ -179,11 +180,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @BeforeEach
     public void setUp() throws IOException {
-        when(calc.calculateApplicantResponseDeadline(
-            any(LocalDateTime.class),
-            anyInt()
-        ))
-            .thenReturn(weekdayDate);
+        when(calc.calculateFirstWorkingDay(any(LocalDate.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(calc.plusWorkingDays(any(LocalDate.class), anyInt())).thenReturn(weekdayDate.toLocalDate());
 
         when(workingDayIndicator.isWorkingDay(any())).thenReturn(true);
 
@@ -428,6 +426,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         assertCollectionPopulated(result);
         assertCaseDateEntries(result);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppDateDeadline())
+            .isEqualTo(weekdayDate.toLocalDate().atTime(END_OF_BUSINESS_DAY));
         result.getGeneralApplications().forEach(generalApplicationElement -> {
             assertCaseManagementCategoryPopulated(generalApplicationElement.getValue().getCaseManagementCategory());
         });

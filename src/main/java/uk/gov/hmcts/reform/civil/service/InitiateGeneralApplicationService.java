@@ -373,7 +373,14 @@ public class InitiateGeneralApplicationService {
         if (!(featureToggleService.isGaForWelshEnabled()
                 && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()))) {
             int numberOfDeadlineDays = 5;
-            deadline = deadlinesCalculator.calculateApplicantResponseDeadline(LocalDateTime.now(), numberOfDeadlineDays);
+            LocalDateTime now = LocalDateTime.now();
+            LocalDate deadlineStartDate = deadlinesCalculator.checkIf4pmOrAfter(now)
+                ? now.plusDays(1).toLocalDate()
+                : now.toLocalDate();
+            deadline = deadlinesCalculator.plusWorkingDays(
+                deadlinesCalculator.calculateFirstWorkingDay(deadlineStartDate),
+                numberOfDeadlineDays
+            ).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY);
         }
         applicationBuilder
             .setBusinessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
