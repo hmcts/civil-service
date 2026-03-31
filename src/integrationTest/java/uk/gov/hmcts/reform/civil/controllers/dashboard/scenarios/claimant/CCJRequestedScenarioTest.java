@@ -30,7 +30,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
 
         String caseId = "12345678";
         LocalDateTime responseDeadline = LocalDateTime.now().minusDays(1);
-        String defendantName = "Mr. Sole Trader";
+        String defendantName = "Mr. Sole Trader T/A Sole Trader co";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendantSpec().build()
             .toBuilder().respondent1ResponseDeadline(responseDeadline)
             .applicant1Represented(YesOrNo.NO)
