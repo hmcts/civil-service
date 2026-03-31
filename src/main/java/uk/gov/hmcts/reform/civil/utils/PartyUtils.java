@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -38,9 +39,12 @@ import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
+@Slf4j
 public class PartyUtils {
 
     private static final String SPACE = " ";
+    private static final String TRADING_AS = " T/A %s";
+    private static final String BY_HIS_LITIGATION_FRIEND = "%s (by his litigation friend %s %s) ";
 
     private PartyUtils() {
         //NO-OP
@@ -68,7 +72,7 @@ public class PartyUtils {
 
     private static String buildSoleTraderAs(Party party) {
         return ofNullable(party.getSoleTraderTradingAs())
-            .map(ta -> " T/A " + ta)
+            .map(ta -> String.format(TRADING_AS,  ta))
             .orElse(null);
     }
 
@@ -136,10 +140,15 @@ public class PartyUtils {
         String partyName = ofNullable(party).map(Party::getPartyName).map(name -> upperCase ? name.toUpperCase() : name).orElse(null);
         if (partyName != null) {
             return ofNullable(litigationFriend)
-                .map(lf ->  partyName + " (by his litigation friend " + lf.getFirstName() + " " + lf.getLastName() + ")")
+                .map(friend -> buildPartyNameWithLitigationFriend(partyName, friend))
                 .orElse(partyName);
         }
+        log.error("Party name is null for party {}", party);
         return null;
+    }
+
+    private static String buildPartyNameWithLitigationFriend(String partyName, LitigationFriend litigationFriend) {
+        return String.format(BY_HIS_LITIGATION_FRIEND, partyName, litigationFriend.getFirstName(), litigationFriend.getLastName());
     }
 
     private static String getSoleTraderName(Party party, boolean omitTitle) {
