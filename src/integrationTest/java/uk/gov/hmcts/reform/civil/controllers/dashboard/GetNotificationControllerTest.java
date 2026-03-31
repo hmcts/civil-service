@@ -43,7 +43,7 @@ public class GetNotificationControllerTest extends BaseIntegrationTest {
         String getNotificationsEndpoint = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
         doGet(BEARER_TOKEN, getNotificationsEndpoint, "128", "defendant")
             .andExpect(status().isOk())
-            .andExpect(content().json(toJson(getNotificationListWithMultipleActions())));
+            .andExpect(content().json(toJson(expectedNotificationListWithLatestAction())));
     }
 
     private List<Notification> getNotificationList() {
@@ -58,7 +58,7 @@ public class GetNotificationControllerTest extends BaseIntegrationTest {
         return List.of(notification);
     }
 
-    private List<Notification> getNotificationListWithMultipleActions() {
+    private List<Notification> expectedNotificationListWithLatestAction() {
         Notification notification = new Notification();
         notification.setId(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e6"));
         notification.setTitleEn("title_en");
