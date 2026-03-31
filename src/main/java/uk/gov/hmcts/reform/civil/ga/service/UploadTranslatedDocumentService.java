@@ -46,6 +46,8 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.W
 @Service
 public class UploadTranslatedDocumentService {
 
+    private static final String WRITTEN_REPRESENTATION = "Written representation";
+    private static final String ADDITIONAL_INFORMATION = "Additional information";
     private final AssignCategoryId assignCategoryId;
     private final GaForLipService gaForLipService;
     private final DocUploadDashboardNotificationService docUploadDashboardNotificationService;
@@ -291,7 +293,7 @@ public class UploadTranslatedDocumentService {
                     caseDataBuilder.originalDocumentsBulkPrint(bulkPrintOriginalDocuments);
                 } else if (document.getValue().getDocumentType().equals(WRITTEN_REPRESENTATIONS_APPLICANT)) {
                     Optional<Element<CaseDocument>> preTranslationWrittenRepsApplicant = preTranslationGaDocuments.stream()
-                        .filter(item -> "Written representation".equals(item.getValue().getDocumentName())
+                        .filter(item -> WRITTEN_REPRESENTATION.equals(item.getValue().getDocumentName())
                             && DocUploadUtils.APPLICANT.equals(item.getValue().getCreatedBy()))
                         .findFirst();
                     preTranslationWrittenRepsApplicant.ifPresent(preTranslationGaDocuments::remove);
@@ -302,7 +304,7 @@ public class UploadTranslatedDocumentService {
                     caseDataBuilder.preTranslationGaDocsApplicant(applicantPreTranslation);
                 }  else if (document.getValue().getDocumentType().equals(WRITTEN_REPRESENTATIONS_RESPONDENT)) {
                     Optional<Element<CaseDocument>> preTranslationWrittenRepsRespondent = preTranslationGaDocuments.stream()
-                        .filter(item -> "Written representation".equals(item.getValue().getDocumentName())
+                        .filter(item -> WRITTEN_REPRESENTATION.equals(item.getValue().getDocumentName())
                             && DocUploadUtils.RESPONDENT_ONE.equals(item.getValue().getCreatedBy()))
                         .findFirst();
                     preTranslationWrittenRepsRespondent.ifPresent(preTranslationGaDocuments::remove);
@@ -313,7 +315,7 @@ public class UploadTranslatedDocumentService {
                     caseDataBuilder.preTranslationGaDocsRespondent(respondentPreTranslation);
                 } else if (document.getValue().getDocumentType().equals(REQUEST_MORE_INFORMATION_APPLICANT)) {
                     Optional<Element<CaseDocument>> preTranslationMoreInfoApplicant = preTranslationGaDocuments.stream()
-                        .filter(item -> "Additional information".equals(item.getValue().getDocumentName())
+                        .filter(item -> ADDITIONAL_INFORMATION.equals(item.getValue().getDocumentName())
                             && DocUploadUtils.APPLICANT.equals(item.getValue().getCreatedBy()))
                         .findFirst();
                     preTranslationMoreInfoApplicant.ifPresent(preTranslationGaDocuments::remove);
@@ -324,7 +326,7 @@ public class UploadTranslatedDocumentService {
                     caseDataBuilder.preTranslationGaDocsApplicant(applicantPreTranslation);
                 }  else if (document.getValue().getDocumentType().equals(REQUEST_MORE_INFORMATION_RESPONDENT)) {
                     Optional<Element<CaseDocument>> preTranslationMoreInfoRespondent = preTranslationGaDocuments.stream()
-                        .filter(item -> "Additional information".equals(item.getValue().getDocumentName())
+                        .filter(item -> ADDITIONAL_INFORMATION.equals(item.getValue().getDocumentName())
                             && DocUploadUtils.RESPONDENT_ONE.equals(item.getValue().getCreatedBy()))
                         .findFirst();
                     preTranslationMoreInfoRespondent.ifPresent(preTranslationGaDocuments::remove);
@@ -389,19 +391,19 @@ public class UploadTranslatedDocumentService {
             String role = null;
             switch (translatedDocumentType) {
                 case WRITTEN_REPRESENTATIONS_APPLICANT -> {
-                    documentName = "Written representation";
+                    documentName = WRITTEN_REPRESENTATION;
                     role = DocUploadUtils.APPLICANT;
                 }
                 case WRITTEN_REPRESENTATIONS_RESPONDENT -> {
-                    documentName = "Written representation";
+                    documentName = WRITTEN_REPRESENTATION;
                     role = DocUploadUtils.RESPONDENT_ONE;
                 }
                 case REQUEST_MORE_INFORMATION_APPLICANT -> {
-                    documentName = "Additional information";
+                    documentName = ADDITIONAL_INFORMATION;
                     role = DocUploadUtils.APPLICANT;
                 }
                 case REQUEST_MORE_INFORMATION_RESPONDENT -> {
-                    documentName = "Additional information";
+                    documentName = ADDITIONAL_INFORMATION;
                     role = DocUploadUtils.RESPONDENT_ONE;
                 }
                 default -> { }

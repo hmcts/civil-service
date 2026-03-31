@@ -38,9 +38,9 @@ class LitigantInPersonFormGeneratorTest {
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
-    private static final String fileName = String.format(LIP_CLAIM_FORM.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String FILE_NAME = String.format(LIP_CLAIM_FORM.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName)
+        .documentName(FILE_NAME)
         .documentType(LITIGANT_IN_PERSON_CLAIM_FORM)
         .build();
 
@@ -55,8 +55,9 @@ class LitigantInPersonFormGeneratorTest {
     void shouldGenerateClaimForm_whenInvolked() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(LIP_CLAIM_FORM)))
             .thenReturn(new DocmosisDocument(LIP_CLAIM_FORM.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes,
-                                                                            LITIGANT_IN_PERSON_CLAIM_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(
+            FILE_NAME, bytes,
+            LITIGANT_IN_PERSON_CLAIM_FORM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -66,8 +67,9 @@ class LitigantInPersonFormGeneratorTest {
         CaseDocument caseDocument = litigantInPersonFormGenerator.generate(caseData, BEARER_TOKEN);
 
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes,
-                                                                               LITIGANT_IN_PERSON_CLAIM_FORM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(
+            FILE_NAME, bytes,
+            LITIGANT_IN_PERSON_CLAIM_FORM));
         verify(documentGeneratorService).generateDocmosisDocument(any(LitigantInPersonForm.class), eq(LIP_CLAIM_FORM));
     }
 }
