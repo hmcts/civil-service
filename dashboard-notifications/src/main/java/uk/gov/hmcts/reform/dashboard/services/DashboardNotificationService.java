@@ -36,7 +36,6 @@ public class DashboardNotificationService {
     );
 
     private final IdamApi idamApi;
-
     private final String clickAction = "Click";
 
     @Autowired

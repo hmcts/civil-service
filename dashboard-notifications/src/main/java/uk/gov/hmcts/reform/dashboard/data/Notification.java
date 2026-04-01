@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.UUID;
 
 @Data
@@ -28,30 +27,29 @@ public class Notification {
 
     private String timeToLive;
 
-    private NotificationAction notificationAction;
-
     private HashMap<String, Object> params;
 
     private OffsetDateTime createdAt;
 
     private LocalDateTime deadline;
 
+    private String clickedBy;
+
+    private OffsetDateTime clickedAt;
+
     public static Notification from(DashboardNotificationsEntity dashboardNotificationsEntity) {
-        Notification notification = new Notification(
+        return new Notification(
             dashboardNotificationsEntity.getId(),
             dashboardNotificationsEntity.getTitleEn(),
             dashboardNotificationsEntity.getTitleCy(),
             dashboardNotificationsEntity.getDescriptionEn(),
             dashboardNotificationsEntity.getDescriptionCy(),
             dashboardNotificationsEntity.getTimeToLive(),
-            null,
             dashboardNotificationsEntity.getParams(),
             dashboardNotificationsEntity.getCreatedAt(),
-            dashboardNotificationsEntity.getDeadline()
+            dashboardNotificationsEntity.getDeadline(),
+            dashboardNotificationsEntity.getClickedBy(),
+            dashboardNotificationsEntity.getClickedAt()
         );
-
-        Optional.ofNullable(dashboardNotificationsEntity.getNotificationAction())
-            .ifPresent(action -> notification.setNotificationAction(NotificationAction.from(action)));
-        return notification;
     }
 }

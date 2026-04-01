@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 
 import java.util.Map;
@@ -41,9 +40,6 @@ public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private TaskListRepository taskListRepository;
-
-    @Autowired
-    private NotificationActionRepository notificationActionRepository;
 
     @MockBean
     protected LocationReferenceDataService locationRefDataService;
@@ -73,7 +69,6 @@ public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
     @AfterEach
     public void after() {
         taskListRepository.deleteAll();
-        notificationActionRepository.deleteAll();
         dashboardNotificationsRepository.deleteAll();
     }
 }

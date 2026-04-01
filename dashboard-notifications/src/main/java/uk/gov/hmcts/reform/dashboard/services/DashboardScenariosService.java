@@ -169,7 +169,6 @@ public class DashboardScenariosService {
 
                 DashboardNotificationsEntity notification = new DashboardNotificationsEntity(
                     UUID.randomUUID(),
-                    null,
                     uniqueCaseIdentifier,
                     template.getName(),
                     template.getRole(),
@@ -183,7 +182,9 @@ public class DashboardScenariosService {
                     null,
                     OffsetDateTime.now(),
                     notificationDeadline,
-                    template.getTimeToLive()
+                    template.getTimeToLive(),
+                    null,
+                    null
                 );
 
                 log.info(
