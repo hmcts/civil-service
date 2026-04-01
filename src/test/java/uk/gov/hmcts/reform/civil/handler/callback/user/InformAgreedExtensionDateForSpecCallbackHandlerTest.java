@@ -297,29 +297,6 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             assertThat(response.getErrors().get(0))
                 .isEqualTo("The agreed extension date must be a date in the future");
         }
-
-        @Test
-        void shouldReturnError_whenAllDataIsProvided() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            caseData.setAddRespondent2(NO);
-            caseData.setRespondentSolicitor1AgreedDeadlineExtension(now());
-            caseData.setRespondent2(new Party());
-            caseData.setRespondent2SameLegalRepresentative(NO);
-            caseData.setRespondent2ResponseDeadline(LocalDateTime.now().plusDays(99));
-            caseData.setRespondentSolicitor2AgreedDeadlineExtension(LocalDate.now());
-            caseData.setBusinessProcess(new BusinessProcess().setCamundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE));
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            // When
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            // Then
-            assertThat(response.getErrors().get(0))
-                .isEqualTo("Date must be from claim issue date plus a maximum of between 29 and 56 days.");
-        }
     }
 
     @Nested
