@@ -39,7 +39,7 @@ public class IssueClaimScenarioTest extends DashboardBaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for defendant to respond"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">Mr. Sole Trader has until "
+                    "<p class=\"govuk-body\">Mr. Sole Trader T/A Sole Trader co has until "
                         + DateUtils.formatDate(responseDeadline) + " to respond. They can request an extra 28 days if they need it.</p>")
             );
 
