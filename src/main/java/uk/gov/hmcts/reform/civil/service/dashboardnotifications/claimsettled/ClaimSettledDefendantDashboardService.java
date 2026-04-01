@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 @Service
 public class ClaimSettledDefendantDashboardService extends DashboardScenarioService {
 
-
     protected static final String DEFENDANT = "DEFENDANT";
     protected final FeatureToggleService featureToggleService;
     protected final DashboardNotificationService dashboardNotificationService;
