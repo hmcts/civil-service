@@ -346,9 +346,11 @@ Add the following label to your GitHub PR.
 civilDefinitionBranch:????
 
 where ???? is the branch name you want to point to. e.g civilDefinitionBranch:DTSCCI-1699
+
+"disableWiremock" label to disable WireMock stubs and point API endpoints to real AAT instances.
+By default, preview environments use WireMock for external services (fees-api, send-letter,
+role-assignment, etc.). Add this label when you need to test against live AAT services.
 ```
-
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
