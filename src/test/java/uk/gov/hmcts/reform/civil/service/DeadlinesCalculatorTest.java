@@ -340,7 +340,7 @@ class DeadlinesCalculatorTest {
         @Test
         void shouldReturnEarliestDate() {
             List<LocalDateTime> datelines = new ArrayList<>();
-            LocalDateTime earliestDeadline = LocalDateTime.of(2019, 03, 28, 14, 33, 48);
+            LocalDateTime earliestDeadline = LocalDateTime.of(2019, 3, 28, 14, 33, 48);
             datelines.add(earliestDeadline);
             datelines.add(LocalDateTime.of(2019, 3, 28, 14, 50, 48));
             datelines.add(LocalDateTime.of(2019, 5, 28, 14, 33, 48));
@@ -531,7 +531,7 @@ class DeadlinesCalculatorTest {
         void shouldReturnPlus7workingDaysAt4pm_whenResponseDateIsProvided() {
             //Given
             LocalDateTime providedDate = LocalDate.of(2023, 11, 13).atTime(23, 59);
-            LocalDateTime expectedDeadline = LocalDate.of(2023, 11, 22).atTime(16, 00);
+            LocalDateTime expectedDeadline = LocalDate.of(2023, 11, 22).atTime(16, 0);
             //When
             LocalDateTime deadline = calculator.getRespondToSettlementAgreementDeadline(providedDate);
             //Then
@@ -543,7 +543,7 @@ class DeadlinesCalculatorTest {
         void shouldReturnPlus5workingDaysAt4pm_whenResponseDateIsProvided() {
             //Given
             LocalDateTime providedDate = LocalDate.of(2024, 5, 21).atTime(23, 0);
-            LocalDateTime expectedDeadline = LocalDate.of(2024, 5, 29).atTime(16, 00);
+            LocalDateTime expectedDeadline = LocalDate.of(2024, 5, 29).atTime(16, 0);
             //When
             LocalDateTime paymentDate = calculator.getRespondentToImmediateSettlementAgreement(providedDate);
             //Then
@@ -590,5 +590,85 @@ class DeadlinesCalculatorTest {
 
             org.assertj.core.api.Assertions.assertThat(responseDeadline).isEqualTo(expectedDeadline);
         }
+    }
+
+    @Nested
+    class PlusDaysAt4pmDeadline {
+
+        @Test
+        void shouldAddDaysBefore4pm() {
+            LocalDateTime start = LocalDate.of(2023, 1, 10).atTime(10, 0);
+            LocalDateTime result = calculator.plusDaysSetAt4PMDeadline(start, 5);
+
+            assertThat(result)
+                .isWeekday()
+                .isTheSame(LocalDate.of(2023, 1, 16).atTime(END_OF_BUSINESS_DAY));
+        }
+
+        @Test
+        void shouldAddExtraDayWhenAfter4pm() {
+            LocalDateTime start = LocalDate.of(2023, 1, 10).atTime(17, 0);
+            LocalDateTime result = calculator.plusDaysSetAt4PMDeadline(start, 5);
+
+            assertThat(result)
+                .isWeekday()
+                .isTheSame(LocalDate.of(2023, 1, 16).atTime(END_OF_BUSINESS_DAY));
+        }
+    }
+
+    @Nested
+    class JudicialOrderDeadline {
+
+        @Test
+        void shouldReturnWorkingDayDeadline() {
+            LocalDateTime start = LocalDate.of(2023, 9, 1).atTime(10, 0); // Friday
+            LocalDate result = calculator.getJudicialOrderDeadlineDate(start, 3);
+
+            assertThat(result)
+                .isWeekday()
+                .isTheSame(LocalDate.of(2023, 9, 4));
+        }
+
+        @Test
+        void shouldSkipWeekend() {
+            LocalDateTime start = LocalDate.of(2023, 9, 1).atTime(10, 0); // Friday
+            LocalDate result = calculator.getJudicialOrderDeadlineDate(start, 1);
+
+            assertThat(result)
+                .isWeekday()
+                .isTheSame(LocalDate.of(2023, 9, 4));
+        }
+    }
+
+    @Nested
+    class FirstWorkingDay {
+
+        @Test
+        void shouldReturnSameDateIfWorkingDay() {
+            LocalDate monday = LocalDate.of(2023, 9, 4);
+
+            assertThat(calculator.calculateFirstWorkingDay(monday))
+                .isTheSame(monday);
+        }
+
+        @Test
+        void shouldMoveToNextWorkingDayIfWeekend() {
+            LocalDate saturday = LocalDate.of(2023, 9, 2);
+
+            assertThat(calculator.calculateFirstWorkingDay(saturday))
+                .isMonday();
+        }
+    }
+
+    @Test
+    void shouldReturnTrueWhenTimeIs4pmOrAfter() {
+        LocalDateTime fourPm = LocalDate.of(2023, 9, 1).atTime(16, 0);
+        Assertions.assertTrue(calculator.checkIf4pmOrAfter(fourPm));
+    }
+
+    @Test
+    void shouldReturnFalseWhenBefore4pm() {
+        LocalDateTime before = LocalDate.of(2023, 9, 1).atTime(15, 59);
+        Assertions.assertFalse(calculator.checkIf4pmOrAfter(before));
     }
 }
