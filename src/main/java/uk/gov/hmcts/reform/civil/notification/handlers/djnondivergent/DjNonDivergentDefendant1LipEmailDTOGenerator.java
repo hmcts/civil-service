@@ -17,6 +17,11 @@ public class DjNonDivergentDefendant1LipEmailDTOGenerator extends DefendantEmail
     }
 
     @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.FALSE;
+    }
+
+    @Override
     protected String getEmailTemplateId(CaseData caseData) {
         return notificationsProperties.getNotifyUpdateTemplate();
     }

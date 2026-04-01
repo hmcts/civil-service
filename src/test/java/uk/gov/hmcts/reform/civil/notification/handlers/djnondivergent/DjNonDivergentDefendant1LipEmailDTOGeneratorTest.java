@@ -38,4 +38,11 @@ class DjNonDivergentDefendant1LipEmailDTOGeneratorTest {
         assertThat(referenceTemplate).isEqualTo("dj-non-divergent-defendant-notification-lip-%s");
     }
 
+    @Test
+    void shouldReturnFalseForShouldNotify() {
+        CaseData caseData = CaseData.builder().build();
+
+        assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
+    }
+
 }
