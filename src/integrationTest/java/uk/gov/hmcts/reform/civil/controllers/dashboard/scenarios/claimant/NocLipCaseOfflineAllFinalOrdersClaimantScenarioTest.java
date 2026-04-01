@@ -59,7 +59,7 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
                 .andExpectAll(
                         status().is(HttpStatus.OK.value()),
                         jsonPath("$[0].titleEn")
-                                .value("Mr. Sole Trader has asked for a legal representative to act on their behalf"),
+                                .value("Mr. Sole Trader T/A Sole Trader co has asked for a legal representative to act on their behalf"),
                         jsonPath("$[0].descriptionEn")
                                 .value(
                                         "<p class=\"govuk-body\">Mr. Sole Trader T/A Sole Trader co has asked for a legal representative to act on"
@@ -68,7 +68,7 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
                                                 + "This claim will now move offline.</p>"),
                         jsonPath("$[0].titleCy")
                                 .value(
-                                        "Mae Mr. Sole Trader wedi gofyn i gynrychiolydd cyfreithiol weithredu ar eu rhan"),
+                                        "Mae Mr. Sole Trader T/A Sole Trader co wedi gofyn i gynrychiolydd cyfreithiol weithredu ar eu rhan"),
                         jsonPath("$[0].descriptionCy")
                                 .value("<p class=\"govuk-body\">Mr. Sole Trader T/A Sole Trader co wedi gofyn i gynrychiolydd cyfreithiol"
                                         + " weithredu ar eu rhan.  O hyn ymlaen bydd angen i chi gysylltu â'u cynrychiolydd.<br>"
