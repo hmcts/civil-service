@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -172,6 +173,67 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData()).extracting("respondentSolicitor1AgreedDeadlineExtension")
                 .isEqualTo(caseData.getClaimDetailsNotificationDate().plusDays(42).toLocalDate().toString());
+        }
+
+        @Test
+        void shouldBaseRespondent1DeadlineOnResponseDeadlineWhenCaseStayed() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+            caseData.setPreStayState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
+            LocalDateTime respondent1Deadline = LocalDateTime.now().plusDays(10);
+            caseData.setRespondent1ResponseDeadline(respondent1Deadline);
+            caseData.setRespondent1AcknowledgeNotificationDate(null);
+            caseData.setAddRespondent2(NO);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            when(coreCaseUserService.userHasCaseRole(
+                caseData.getCcdCaseReference().toString(),
+                "uid",
+                RESPONDENTSOLICITORONE
+            )).thenReturn(true);
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            LocalDate expectedMaxDate = respondent1Deadline.toLocalDate()
+                .plusDays(DeadlineExtensionValidator.INITIAL_DEADLINE + DeadlineExtensionValidator.AGREED_EXTENSION);
+
+            assertThat(response.getData()).extracting("respondentSolicitor1AgreedDeadlineExtension")
+                .isEqualTo(expectedMaxDate.toString());
+        }
+
+        @Test
+        void shouldBaseRespondent2DeadlineOnResponseDeadlineWhenCaseStayed() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+            caseData.setPreStayState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
+            LocalDateTime respondent2Deadline = LocalDateTime.of(2026, 4, 5, 16, 0);
+            caseData.setRespondent2ResponseDeadline(respondent2Deadline);
+            caseData.setRespondent2AcknowledgeNotificationDate(null);
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2Represented(YES);
+            caseData.setRespondent2OrgRegistered(YES);
+            caseData.setRespondent2SameLegalRepresentative(NO);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            when(coreCaseUserService.userHasCaseRole(
+                caseData.getCcdCaseReference().toString(),
+                "uid",
+                RESPONDENTSOLICITORTWO
+            )).thenReturn(true);
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            LocalDate expectedMaxDate = respondent2Deadline.toLocalDate()
+                .plusDays(DeadlineExtensionValidator.INITIAL_DEADLINE + DeadlineExtensionValidator.AGREED_EXTENSION);
+
+            assertThat(response.getData()).extracting("respondentSolicitor2AgreedDeadlineExtension")
+                .isEqualTo(expectedMaxDate.toString());
         }
 
         @Test
