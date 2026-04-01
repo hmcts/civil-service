@@ -255,9 +255,7 @@ public final class DirectionsOrderSpecialistTextLibrary {
     /* Personal injury (SDO vs DJ variants share question/answer text) */
     public static final String PERSONAL_INJURY_PERMISSION_SDO =
         "The claimant has permission to rely upon the written expert evidence already uploaded to "
-            + "the Digital Portal with the particulars of claim and in addition has permission to rely upon"
-            + " any associated correspondence or updating report which is uploaded to the Digital Portal by"
-            + " 4pm on";
+            + "the Digital Portal with the particulars of claim";
     public static final String PERSONAL_INJURY_PERMISSION_DJ =
         "The claimant has permission to rely upon the written "
             + "expert evidence already uploaded to the Digital"
@@ -411,13 +409,13 @@ public final class DirectionsOrderSpecialistTextLibrary {
 
     /* Disposal hearings */
     public static final String DISPOSAL_DOCUMENTS_EXCHANGE =
-        "The parties shall serve on each other copies of the documents upon which reliance is to be"
-            + " placed at the disposal hearing by 4pm on";
+        "The parties must upload to the Digital Portal copies of those documents which they wish the court to consider when deciding" +
+            "the amount of damages, by 4pm on";
     public static final String DISPOSAL_DOCUMENTS_UPLOAD =
         "The parties must upload to the Digital Portal copies of those documents which they wish the "
             + "court to consider when deciding the amount of damages, by 4pm on";
     public static final String DISPOSAL_WITNESS_UPLOAD =
-        "The claimant must upload to the Digital Portal copies of the witness statements of all "
+        "The claimant must upload to the Digital Portal copies of the statements of all "
             + "witnesses of fact on whose evidence reliance is to be placed by 4pm on";
     public static final String DISPOSAL_WITNESS_CPR32_6 =
         "The provisions of CPR 32.6 apply to such evidence.";
