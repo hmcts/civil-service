@@ -2,10 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -42,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
 
     private static final String GA_DOC_SUFFIX = "Document";
@@ -61,8 +61,6 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
     private CaseData generalAppCaseData;
     private CaseData civilCaseData;
     private CaseData data;
-
-    private final Logger logger = LoggerFactory.getLogger(UpdateFromGACaseEventTaskHandler.class);
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -129,7 +127,8 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            log.info("civilCaseData case Id {} and generalAppCaseData case Id {} ", civilCaseData.getCcdCaseReference(), generalAppCaseData.getCcdCaseReference());
+            log.error(e.getMessage());
         }
         return output;
     }
