@@ -71,7 +71,7 @@ class GenAppStateHelperServiceTest {
     private static final String APPLICATION_CLOSED_TEXT = "Application Closed";
     private static final String APPLICATION_OFFLINE_TEXT = "Proceeds In Heritage";
     private static final String SET_DATE = "2022-08-31T22:50:11.2509019";
-    private static final String authToken = "Bearer TestAuthToken";
+    private static final String AUTH_TOKEN = "Bearer TestAuthToken";
 
     @Nested
     class StatusChangeInApplicationDetailsInClaim {
@@ -427,7 +427,7 @@ class GenAppStateHelperServiceTest {
             caseLocationCivil.setAddress("Prince William House, Peel Cross Road, Salford");
             caseLocationCivil.setPostcode("M5 4RR");
             Pair<CaseLocationCivil, Boolean> caseLocation = Pair.of(caseLocationCivil, false);
-            CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData, authToken);
+            CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData, AUTH_TOKEN);
 
             assertThat(getGADetailsFromUpdatedCaseData(updatedData, "1234")).isNotNull();
             assertThat(updatedData.getGeneralApplications().get(0).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
@@ -466,7 +466,7 @@ class GenAppStateHelperServiceTest {
                                             Map.of()
                 );
 
-            CaseData response = service.updateApplicationLocationDetailsInClaim(caseData, authToken);
+            CaseData response = service.updateApplicationLocationDetailsInClaim(caseData, AUTH_TOKEN);
 
             CaseData updatedData = mapper.convertValue(response, CaseData.class);
 

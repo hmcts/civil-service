@@ -124,9 +124,9 @@ class DirectionsQuestionnaireGeneratorTest {
     private static final String HNL_FILE_NAME_DEFENDANT = format(DQ_RESPONSE_1V1.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
     private static final String FILE_NAME_CLAIMANT = format(DQ_RESPONSE_1V1.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final String HNL_FILE_NAME_CLAIMANT = format(DQ_RESPONSE_1V1.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
-    private static final String HNL_FILE_NAME_CLAIMANT_1v2 = format(DQ_RESPONSE_1V2_DS.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
-    private static final String FILE_NAME_CLAIMANT_1v2 = format(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
-    private static final String FILE_NAME_CLAIMANT_1v2SS = format(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final String HNL_FILE_NAME_CLAIMANT_1V2 = format(DQ_RESPONSE_1V2_DS.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final String FILE_NAME_CLAIMANT_1V2 = format(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final String FILE_NAME_CLAIMANT_1V2_SS = format(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT_DEFENDANT =
         CaseDocumentBuilder.builder()
             .documentName(FILE_NAME_DEFENDANT)
@@ -455,7 +455,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT)))
                     .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
-                    BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2SS, bytes, DIRECTIONS_QUESTIONNAIRE))
+                    BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1V2_SS, bytes, DIRECTIONS_QUESTIONNAIRE))
                 ).thenReturn(CASE_DOCUMENT_CLAIMANT);
 
                 CaseData caseData = CaseDataBuilder.builder()
@@ -471,7 +471,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
 
                 verify(documentManagementService)
-                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2SS, bytes, DIRECTIONS_QUESTIONNAIRE));
+                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1V2_SS, bytes, DIRECTIONS_QUESTIONNAIRE));
                 verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
                     eq(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT)
                 );
@@ -482,7 +482,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT)))
                     .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
-                    BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE))
+                    BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1V2, bytes, DIRECTIONS_QUESTIONNAIRE))
                 ).thenReturn(CASE_DOCUMENT_CLAIMANT);
 
                 CaseData caseData = CaseDataBuilder.builder()
@@ -503,7 +503,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
 
                 verify(documentManagementService)
-                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE));
+                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1V2, bytes, DIRECTIONS_QUESTIONNAIRE));
                 verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
                     eq(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT)
                 );
@@ -1584,7 +1584,7 @@ class DirectionsQuestionnaireGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V2_DS)))
                 .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_DS.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
-                BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE))
+                BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT_1V2, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(HNL_CASE_DOCUMENT_DEFENDANT);
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -1605,7 +1605,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
             verify(representativeService).getRespondent2Representative(caseData);
             verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE));
+                .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT_1V2, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
                 eq(DQ_RESPONSE_1V2_DS));
         }

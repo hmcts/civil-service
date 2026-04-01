@@ -56,10 +56,10 @@ class SealedClaimFormGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName = format(N1.getDocumentTitle(), REFERENCE_NUMBER);
-    private static final String fileNameDiffSol = format(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String FILE_NAME = format(N1.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String FILE_NAME_DIFF_SOL = format(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName)
+        .documentName(FILE_NAME)
         .documentType(SEALED_CLAIM)
         .build();
 
@@ -92,14 +92,14 @@ class SealedClaimFormGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1)))
             .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
         verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1));
     }
 
@@ -112,7 +112,7 @@ class SealedClaimFormGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1)))
             .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
@@ -120,7 +120,7 @@ class SealedClaimFormGeneratorTest {
 
         verify(representativeService).getRespondent1Representative(caseData);
         verify(representativeService).getRespondent2Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1));
     }
 
@@ -133,13 +133,13 @@ class SealedClaimFormGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL)))
             .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDiffSol, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DIFF_SOL, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
         verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(
             any(SealedClaimForm.class),
             eq(N1_MULTIPARTY_SAME_SOL)
@@ -155,14 +155,14 @@ class SealedClaimFormGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL)))
             .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDiffSol, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DIFF_SOL, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
         verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(
             any(SealedClaimForm.class),
             eq(N1_MULTIPARTY_SAME_SOL)
@@ -178,14 +178,14 @@ class SealedClaimFormGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1)))
                 .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
 
-            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
                 .thenReturn(CASE_DOCUMENT);
 
             CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
             assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
             verify(representativeService).getRespondent1Representative(caseData);
-            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
             verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1));
         }
 
@@ -198,7 +198,7 @@ class SealedClaimFormGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1)))
                 .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
 
-            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
                 .thenReturn(CASE_DOCUMENT);
 
             CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
@@ -206,7 +206,7 @@ class SealedClaimFormGeneratorTest {
 
             verify(representativeService).getRespondent1Representative(caseData);
             verify(representativeService).getRespondent2Representative(caseData);
-            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
             verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1));
         }
 
@@ -219,13 +219,13 @@ class SealedClaimFormGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL)))
                 .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
 
-            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDiffSol, bytes, SEALED_CLAIM)))
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DIFF_SOL, bytes, SEALED_CLAIM)))
                 .thenReturn(CASE_DOCUMENT);
             CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
             assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
             verify(representativeService).getRespondent1Representative(caseData);
-            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(SealedClaimForm.class),
                 eq(N1_MULTIPARTY_SAME_SOL)
@@ -241,14 +241,14 @@ class SealedClaimFormGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL)))
                 .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
 
-            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDiffSol, bytes, SEALED_CLAIM)))
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DIFF_SOL, bytes, SEALED_CLAIM)))
                 .thenReturn(CASE_DOCUMENT);
 
             CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
             assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
             verify(representativeService).getRespondent1Representative(caseData);
-            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(SealedClaimForm.class),
                 eq(N1_MULTIPARTY_SAME_SOL)
