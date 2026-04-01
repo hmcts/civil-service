@@ -6,6 +6,7 @@ public enum CaseManagementOrderAdditional {
     OrderTypeTrialAdditionalDirectionsCreditHire,
     OrderTypeTrialAdditionalDirectionsEmployersLiability,
     OrderTypeTrialAdditionalDirectionsHousingDisrepair,
+    OrderTypeTrialAdditionalDirectionsPPI,
     OrderTypeTrialAdditionalDirectionsPersonalInjury,
     OrderTypeTrialAdditionalDirectionsRoadTrafficAccident
 }
