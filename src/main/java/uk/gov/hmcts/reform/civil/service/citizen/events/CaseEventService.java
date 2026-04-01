@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 
 import java.util.HashMap;
@@ -56,7 +57,7 @@ public class CaseEventService {
         );
     }
 
-    public CaseDetails submitEventForClaim(EventSubmissionParams params) {
+    public CaseDetails submitEventForClaim(EventSubmissionParams params, boolean includeEventSummary) {
         StartEventResponse eventResponse = startEvent(
             params.getAuthorisation(),
             params.getUserId(),
@@ -77,6 +78,14 @@ public class CaseEventService {
                 params.getCaseId(),
                 respondent1.get("flags").toString()
             );
+        }
+        if (includeEventSummary) {
+            CaseData caseData = caseDetailsConverter.toCaseData(params.getUpdates());
+            Party respondent1 = caseData.getRespondent1();
+            if (respondent1 != null) {
+                caseDataContent.getEvent().setSummary("Linked Defendant Email: " + respondent1.getPartyEmail());
+                caseDataContent.getEvent().setDescription("Defendant has been Linked");
+            }
         }
         return coreCaseDataApi.submitEventForCitizen(
             params.getAuthorisation(),
@@ -106,6 +115,6 @@ public class CaseEventService {
         if (params.isDraftClaim()) {
             return submitEventForNewClaim(params);
         }
-        return submitEventForClaim(params);
+        return submitEventForClaim(params, false);
     }
 }
