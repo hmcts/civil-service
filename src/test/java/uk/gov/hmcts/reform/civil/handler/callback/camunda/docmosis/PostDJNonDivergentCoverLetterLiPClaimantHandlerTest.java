@@ -80,7 +80,7 @@ class PostDJNonDivergentCoverLetterLiPClaimantHandlerTest {
         caseData.setDefaultJudgmentDocuments(List.of(element(caseDocument)));
         caseData.setApplicant1Represented(NO);
 
-        when(coverLetterService.generateDocumentWithCoverLetterBinary(any(Party.class), any(CaseData.class), any(), anyString(), anyString()))
+        when(coverLetterService.generateDocumentWithCoverLetterBinary(any(Party.class), any(), any(CaseData.class), any(), anyString(), anyString()))
             .thenReturn("PDF".getBytes());
         when(objectMapper.convertValue(any(), eq(Map.class))).thenReturn(Map.of());
 
