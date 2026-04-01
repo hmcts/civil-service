@@ -46,11 +46,11 @@ public class ClaimantIntendsToProceedMultIntClaimantScenarioTest extends Dashboa
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have responded to Mr. Sole Trader, the court will now review the case, You will be contacted if a hearing is needed in this case.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the Defendant's response</a></p>"
+                    "<p class=\"govuk-body\">You have responded to Mr. Sole Trader T/A Sole Trader co, the court will now review the case, You will be contacted if a hearing is needed in this case.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the Defendant's response</a></p>"
                 ),
                 jsonPath("$[0].titleCy").value("Aros i'r llys adolygu'r achos"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Rydych wedi ymateb i Mr. Sole Trader, bydd y llys nawr yn adolygu'r achos. Cysylltir â chi os oes angen gwrandawiad yn yr achos hwn.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ymateb y Diffynnydd</a></p>")
+                    "<p class=\"govuk-body\">Rydych wedi ymateb i Mr. Sole Trader T/A Sole Trader co, bydd y llys nawr yn adolygu'r achos. Cysylltir â chi os oes angen gwrandawiad yn yr achos hwn.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ymateb y Diffynnydd</a></p>")
             );
     }
 
@@ -79,11 +79,11 @@ public class ClaimantIntendsToProceedMultIntClaimantScenarioTest extends Dashboa
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have responded to Mr. Sole Trader, the court will now review the case, You will be contacted if a hearing is needed in this case.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the Defendant's response</a></p>"
+                    "<p class=\"govuk-body\">You have responded to Mr. Sole Trader T/A Sole Trader co, the court will now review the case, You will be contacted if a hearing is needed in this case.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the Defendant's response</a></p>"
                 ),
                 jsonPath("$[0].titleCy").value("Aros i'r llys adolygu'r achos"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Rydych wedi ymateb i Mr. Sole Trader, bydd y llys nawr yn adolygu'r achos. Cysylltir â chi os oes angen gwrandawiad yn yr achos hwn.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ymateb y Diffynnydd</a></p>")
+                    "<p class=\"govuk-body\">Rydych wedi ymateb i Mr. Sole Trader T/A Sole Trader co, bydd y llys nawr yn adolygu'r achos. Cysylltir â chi os oes angen gwrandawiad yn yr achos hwn.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ymateb y Diffynnydd</a></p>")
             );
     }
 }
