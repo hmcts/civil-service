@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.SdoDJR2TrialCreditHire;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPPI;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 
 import java.time.LocalDate;
@@ -92,5 +93,27 @@ class DjSpecialistNarrativeServiceTest {
         assertThat(housing).isSameAs(expectedHousing);
         verify(roadTrafficAccidentDirectionsService).buildTrialRoadTrafficAccident();
         verify(buildingDisputeDirectionsService).buildTrialHousingDisrepair();
+    }
+
+    @Test
+    void shouldBuildOtherRemedyHousingDisrepair() {
+        TrialHousingDisrepair expected = new TrialHousingDisrepair();
+        when(buildingDisputeDirectionsService.buildTrialHousingDisrepairOtherRemedy()).thenReturn(expected);
+
+        TrialHousingDisrepair housing = service.buildTrialHousingDisrepairOtherRemedy();
+
+        assertThat(housing).isSameAs(expected);
+        verify(buildingDisputeDirectionsService).buildTrialHousingDisrepairOtherRemedy();
+    }
+
+    @Test
+    void shouldBuildTrialPpi() {
+        TrialPPI expected = new TrialPPI();
+        when(buildingDisputeDirectionsService.buildTrialPPI()).thenReturn(expected);
+
+        TrialPPI ppi = service.buildTrialPPI();
+
+        assertThat(ppi).isSameAs(expected);
+        verify(buildingDisputeDirectionsService).buildTrialPPI();
     }
 }

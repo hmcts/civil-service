@@ -7,18 +7,21 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
+import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPPI;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_CLAIMANT_INSTRUCTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_COLUMNS_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_DEFENDANT_INSTRUCTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_INTRO_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_COLUMNS_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_A;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_DEFENDANT_INSTRUCTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_INTRO_DJ;
 
@@ -33,7 +36,7 @@ class DjBuildingDisputeDirectionsServiceTest {
     @BeforeEach
     void setUp() {
         service = new DjBuildingDisputeDirectionsService(deadlineService);
-        when(deadlineService.nextWorkingDayInWeeks(anyInt()))
+        lenient().when(deadlineService.nextWorkingDayInWeeks(anyInt()))
             .thenAnswer(invocation -> LocalDate.of(2025, 6, 1)
                 .plusWeeks(invocation.getArgument(0, Integer.class)));
     }
@@ -60,5 +63,23 @@ class DjBuildingDisputeDirectionsServiceTest {
         assertThat(housing.getInput2()).isEqualTo(HOUSING_SCHEDULE_COLUMNS_DJ);
         assertThat(housing.getInput3()).isEqualTo(HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION);
         assertThat(housing.getInput4()).isEqualTo(HOUSING_SCHEDULE_DEFENDANT_INSTRUCTION);
+    }
+
+    @Test
+    void shouldBuildTrialHousingDisrepairOtherRemedy() {
+        TrialHousingDisrepair housing = service.buildTrialHousingDisrepairOtherRemedy();
+
+        assertThat(housing.getClauseA()).isEqualTo(HOUSING_DISREPAIR_CLAUSE_A);
+        assertThat(housing.getFirstReportDateBy()).isEqualTo(LocalDate.of(2025, 6, 1).plusWeeks(4));
+        assertThat(housing.getJointStatementDateBy()).isEqualTo(LocalDate.of(2025, 6, 1).plusWeeks(8));
+        assertThat(housing.getInput1()).isNull();
+    }
+
+    @Test
+    void shouldBuildTrialPpiWithCalendarDayDeadline() {
+        TrialPPI ppi = service.buildTrialPPI();
+
+        assertThat(ppi.getPpiDate()).isEqualTo(LocalDate.now().plusDays(28));
+        assertThat(ppi.getText()).isEqualTo(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
     }
 }
