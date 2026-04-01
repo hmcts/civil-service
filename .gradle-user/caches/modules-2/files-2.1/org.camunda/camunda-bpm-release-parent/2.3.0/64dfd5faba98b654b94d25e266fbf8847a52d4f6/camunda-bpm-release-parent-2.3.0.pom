@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda</groupId>
+    <artifactId>camunda-release-parent</artifactId>
+    <version>3.7.2</version>
+    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
+    <relativePath />
+  </parent>
+
+  <artifactId>camunda-bpm-release-parent</artifactId>
+  <version>2.3.0</version>
+  <packaging>pom</packaging>
+  <name>Camunda Platform - Release Parent Pom</name>
+
+  <description>
+    This pom defines the required plugins and profiles to allow a Camunda Platform release build.
+  </description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Avoid the message "[WARNING] Using platform encoding (UTF-8 actually) ... also for the failsafe plugin -->
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <!-- we use Java 11 for our projects -->
+    <version.java>11</version.java>
+
+    <plugin.version.license>3.0</plugin.version.license>
+    <plugin.version.nexus-staging>1.6.13</plugin.version.nexus-staging>
+    <plugin.version.compiler>3.6.2</plugin.version.compiler>
+    <plugin.version.javadoc>3.0.1</plugin.version.javadoc>
+    <plugin.version.maven-bundle>4.1.0</plugin.version.maven-bundle>
+
+    <license.inlineHeader>
+Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+under one or more contributor license agreements. See the NOTICE file
+distributed with this work for additional information regarding copyright
+ownership. Camunda licenses this file to you under the Apache License,
+Version 2.0; you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</license.inlineHeader>
+
+    <!-- Properties for license book generation -->
+    <!-- These properties can be overridden by inheriting modules
+      to generate a list of dependencies (called BOM here) 
+      and attach it as a Maven artifact -->
+      
+    <!-- set to false to generate a third party dependency bom -->
+    <skip-third-party-bom>true</skip-third-party-bom>
+    <!-- set the Maven scopes that should be included in the dependency bom.
+      Must be a pipe-separated (|) list of Maven scopes -->
+    <third-party-bom-scopes>compile</third-party-bom-scopes>
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- define common configuration for license checks -->
+        <!-- license plugin -->
+        <plugin>
+          <groupId>com.mycila</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>${plugin.version.license}</version>
+          <configuration>
+            <skipExistingHeaders>false</skipExistingHeaders>
+            <includes>
+              <include>**/*.java</include>
+              <include>**/*.sql</include>
+              <include>**/main/**/engine/**/*.xml</include>
+              <include>**/BpmPlatform.xsd</include>
+              <include>**/ProcessApplication.xsd</include>
+            </includes>
+            <excludes>
+              <exclude>**/org/camunda/bpm/engine/impl/calendar/CronExpression.java</exclude>
+              <exclude>**/org/camunda/bpm/engine/impl/juel/*.java</exclude>
+              <exclude>**/org/camunda/bpm/engine/impl/javax/el/*.java</exclude>
+              <exclude>**/org/camunda/bpm/engine/spring/components/**/*.java</exclude>
+              <exclude>**/org/camunda/bpm/engine/spring/annotations/*.java</exclude>
+              <exclude>**/org/camunda/bpm/engine/impl/digest/_apacheCommonsCodec/*.java</exclude>
+              <exclude>**/org/camunda/bpm/licensecheck/_apacheCommonsCodec/*.java</exclude>
+              <exclude>**/node_modules/**</exclude>
+              <exclude>.mvn/wrapper/MavenWrapperDownloader.java</exclude>
+            </excludes>
+            <mapping>
+              <java>SLASHSTAR_STYLE</java>
+            </mapping>
+          </configuration>
+          <executions>
+            <execution>
+              <id>add-license-header</id>
+              <phase>compile</phase>
+              <goals>
+                <goal>format</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <configuration>
+            <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
+          </configuration>
+        </plugin>
+        <!-- third party license handling -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.2.4</version>
+          <configuration>
+            <!-- Whenever we shade dependencies, concatenate their NOTICE files -->
+            <transformers combine.children="append">
+              <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                <addHeader>false</addHeader>
+              </transformer>
+            </transformers>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${plugin.version.compiler}</version>
+          <configuration>
+            <release>${version.java}</release>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    
+    <!-- Plugins used in the context of creating a license book. -->
+    <!-- If activated (see properties), these plugins create a list of 
+      non-Camunda dependencies and attach it as an artifact to the build.
+      The license book generator uses these files to create the book. -->
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.8</version>
+        <executions>
+          <execution>
+            <id>list-deps</id>
+            <goals>
+              <goal>list</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <skip>${skip-third-party-bom}</skip>
+              <includeScope>test</includeScope><!-- Gives all dependencies; scopes filtering is applied in the ant step -->
+              <sort>true</sort>
+              <excludeGroupIds>org.camunda</excludeGroupIds>
+              <outputFile>${project.build.directory}/dependencies/dependencies-generated.txt</outputFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <!-- Reformats the dependency list:
+            - into a plain list (no header line, no indentation)
+            - Filters all dependencies in unwanted scopes -->
+          <execution>
+            <id>reformat-dependencies</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+                <skip>${skip-third-party-bom}</skip>
+                <target>
+                  <copy file="${project.build.directory}/dependencies/dependencies-generated.txt" tofile="${project.build.directory}/dependencies.txt">
+                    <filterchain>
+                      <linecontains negate="true"><!-- Remove header line -->
+                        <contains value="The following files have been resolved" />
+                      </linecontains>
+                      <linecontainsregexp><!-- only keep the desired scopes -->
+                        <regexp pattern=":(?:${third-party-bom-scopes})$" />
+                      </linecontainsregexp>
+                      <tokenfilter>
+                        <replaceregex pattern=":(?:${third-party-bom-scopes})$" replace="" /> <!-- Remove scope -->
+                        <trim /><!-- Remove whitespace -->
+                        <ignoreblank />
+                      </tokenfilter>
+                    </filterchain>
+                  </copy>
+                </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.9.1</version>
+        <executions>
+          <!-- Attaches the dependency BOM to the Maven build so
+            that it can be consumed as a Maven artifact in the license book
+            module -->
+          <execution>
+            <id>attach-deps</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <skipAttach>${skip-third-party-bom}</skipAttach>
+              <artifacts>
+                <artifact>
+                  <file>${project.build.directory}/dependencies.txt</file>
+                  <type>txt</type>
+                  <classifier>third-party-bom</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>Camunda Services GmbH</name>
+    <url>http://www.camunda.com</url>
+  </organization>
+
+  <scm>
+    <url>https://github.com/camunda/camunda-bpm-release-parent</url>
+    <connection>scm:git:git@github.com:camunda/camunda-bpm-release-parent.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-release-parent.git</developerConnection>
+    <tag>2.3.0</tag>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/camunda/camunda-bpm-platform/issues</url>
+  </issueManagement>
+
+  <repositories>
+    <repository>
+      <id>maven-central</id>
+      <name>Maven Central</name>
+      <url>https://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>camunda-nexus</id>
+      <name>Camunda Nexus</name>
+      <url>https://artifacts.camunda.com/artifactory/internal</url>
+    </repository>
+  </repositories>
+
+</project>

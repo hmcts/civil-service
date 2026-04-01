@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- This module was also published with a richer model, Gradle metadata,  -->
+  <!-- which should be used instead. Do not delete the following line which  -->
+  <!-- is to indicate to Gradle or any Gradle module metadata file consumer  -->
+  <!-- that they should prefer consuming it instead. -->
+  <!-- do_not_remove: published-with-gradle-metadata -->
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.michael-bull.kotlin-result</groupId>
+  <artifactId>kotlin-result</artifactId>
+  <version>1.1.14</version>
+  <name>kotlin-result</name>
+  <description>A Result monad for modelling success or failure operations.</description>
+  <url>https://github.com/michaelbull/kotlin-result</url>
+  <inceptionYear>2017</inceptionYear>
+  <licenses>
+    <license>
+      <name>ISC License</name>
+      <url>https://opensource.org/licenses/isc-license.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Michael Bull</name>
+      <url>https://www.michael-bull.com</url>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+      <name>Kevin Herron</name>
+      <url>https://github.com/kevinherron</url>
+    </contributor>
+    <contributor>
+      <name>Markus Padourek</name>
+      <url>https://github.com/Globegitter</url>
+    </contributor>
+    <contributor>
+      <name>Tristan Hamilton</name>
+      <url>https://github.com/Munzey</url>
+    </contributor>
+    <contributor>
+      <name>Joseph Van der Wee</name>
+      <url>https://github.com/jvanderwee</url>
+    </contributor>
+    <contributor>
+      <name>Gregory Inouye</name>
+      <url>https://github.com/gregoryinouye</url>
+    </contributor>
+    <contributor>
+      <name>Thomas Oddsund</name>
+      <url>https://github.com/oddsund</url>
+    </contributor>
+    <contributor>
+      <name>Jan Müller</name>
+      <url>https://github.com/DerYeger</url>
+    </contributor>
+    <contributor>
+      <name>avently</name>
+      <url>https://github.com/avently</url>
+    </contributor>
+    <contributor>
+      <name>gsteckman</name>
+      <url>https://github.com/gsteckman</url>
+    </contributor>
+    <contributor>
+      <name>Mathias Guelton</name>
+      <url>https://github.com/mguelton</url>
+    </contributor>
+    <contributor>
+      <name>Jordan Bergin</name>
+      <url>https://github.com/MrBergin</url>
+    </contributor>
+    <contributor>
+      <name>Pablo Gonzalez Alonso</name>
+      <url>https://pablisco.com/</url>
+    </contributor>
+    <contributor>
+      <name>Joseph Cooper</name>
+      <url>https://grodin.github.io/</url>
+    </contributor>
+    <contributor>
+      <name>Sebastian Kappen</name>
+      <url>https://github.com/Nimelrian</url>
+    </contributor>
+  </contributors>
+  <scm>
+    <connection>scm:git:https://github.com/michaelbull/kotlin-result</connection>
+    <developerConnection>scm:git:git@github.com:michaelbull/kotlin-result.git</developerConnection>
+    <url>https://github.com/michaelbull/kotlin-result</url>
+  </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/michaelbull/kotlin-result/issues</url>
+  </issueManagement>
+  <ciManagement>
+    <system>GitHub</system>
+    <url>https://github.com/michaelbull/kotlin-result/actions?query=workflow%3Aci</url>
+  </ciManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-stdlib-common</artifactId>
+      <version>1.6.10</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+</project>

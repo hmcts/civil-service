@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda</groupId>
+    <artifactId>camunda-bpm-release-parent</artifactId>
+    <version>2.3.0</version>
+    <relativePath />
+  </parent>
+
+  <groupId>org.camunda.feel</groupId>
+  <artifactId>feel-engine</artifactId>
+  <version>1.16.2</version>
+  <name>FEEL Scala Engine</name>
+
+  <properties>
+    <scala.version>2.13.10</scala.version>
+    <scala.binary.version>2.13.6</scala.binary.version>
+    <version.log4j>2.20.0</version.log4j>
+    <plugin.version.shade>3.4.1</plugin.version.shade>
+    <encoding>UTF-8</encoding>
+    <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
+    <project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
+    <skip-third-party-bom>false</skip-third-party-bom>
+    <plugin.version.javadoc>3.0.1</plugin.version.javadoc>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.scala-lang</groupId>
+        <artifactId>scala-library</artifactId>
+        <version>${scala.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest_2.13</artifactId>
+        <version>3.2.10</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.25</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>${version.log4j}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${version.log4j}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-slf4j-impl</artifactId>
+        <version>${version.log4j}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.lihaoyi</groupId>
+      <artifactId>fastparse_2.13</artifactId>
+      <version>2.3.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.scalatest</groupId>
+      <artifactId>scalatest_2.13</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <defaultGoal>clean install</defaultGoal>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.12.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>3.4.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>1.6.13</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.3.0</version>
+          <configuration>
+            <useDefaultManifestFile>false</useDefaultManifestFile>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>3.1.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <failOnError>false</failOnError>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>4.8.1</version>
+        <configuration>
+          <scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
+          <scalaVersion>${scala.version}</scalaVersion>
+        </configuration>
+        <executions>
+          <execution>
+            <id>scala-compile-first</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>add-source</goal>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>scala-test-compile</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>scala-doc</id>
+            <phase>package</phase>
+            <goals>
+              <goal>doc-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest-maven-plugin</artifactId>
+        <version>2.2.0</version>
+        <configuration>
+          <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+          <junitxml>.</junitxml>
+          <filereports>TestSuite.txt</filereports>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.5.0</version>
+        <configuration>
+          <descriptors>
+            <descriptor>assembly-complete.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.antipathy</groupId>
+        <artifactId>mvn-scalafmt_2.12</artifactId>
+        <version>0.8_1.5.1</version>
+        <configuration>
+          <parameters>--diff</parameters>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>format</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <version>2.8</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <excludes>
+            <!-- public API only -->
+            <exclude>org/camunda/feel/impl/**</exclude>
+            <!-- Clirr has problems with the inner classes that are generated by Scala (ending with "$") -->
+            <exclude>org/camunda/feel/**/*$</exclude>
+            <exclude>org/camunda/feel/**/*$anonfun*</exclude>
+          </excludes>
+          <ignored>
+            <ignored>
+              <!-- ignore changes of the FEEL engine constructor, Java application should use the builder instead -->
+              <className>org/camunda/feel/FeelEngine</className>
+              <differenceType>7004</differenceType>
+              <method>FeelEngine(*)</method>
+            </ignored>
+            <!-- ignore changes of a private generated method -->
+            <ignored>
+              <className>org/camunda/feel/FeelEngine</className>
+              <differenceType>7006</differenceType>
+              <method>scala.util.parsing.combinator.Parsers$ParseResult $*(java.lang.String)</method>
+              <to>fastparse.Parsed</to>
+            </ignored>
+            <!-- Clirr has problems with the inner methods that are generated by Scala (containing "$") -->
+            <ignored>
+              <className>org/camunda/feel/FeelEngine</className>
+              <differenceType>7004</differenceType>
+              <method>* $anonfun*(*)</method>
+            </ignored>
+            <ignored>
+              <className>org/camunda/feel/**</className>
+              <differenceType>7002</differenceType>
+              <method>* $anonfun*(*)</method>
+            </ignored>
+            <ignored>
+              <!-- allow new methods in the interface-->
+              <className>org/camunda/feel/**</className>
+              <differenceType>7012</differenceType>
+              <method>*</method>
+            </ignored>
+            <!-- ignore changes in the abstract syntax tree - only used by the interpreter -->
+            <ignored>
+              <className>org/camunda/feel/syntaxtree/Interval</className>
+              <differenceType>8001</differenceType>
+            </ignored>
+            <ignored>
+              <className>org/camunda/feel/syntaxtree/IntervalBoundary</className>
+              <differenceType>8001</differenceType>
+            </ignored>
+            <ignored>
+              <className>org/camunda/feel/syntaxtree/ClosedIntervalBoundary</className>
+              <differenceType>8001</differenceType>
+            </ignored>
+            <ignored>
+              <className>org/camunda/feel/syntaxtree/OpenIntervalBoundary</className>
+              <differenceType>8001</differenceType>
+            </ignored>
+            <ignored>
+              <className>org/camunda/feel/syntaxtree/Range</className>
+              <differenceType>8001</differenceType>
+            </ignored>
+          </ignored>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>${plugin.version.shade}</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>scala-shaded</shadedClassifierName>
+              <!-- avoid creating a reduced pom - see https://github.com/camunda/feel-scala/issues/450 -->
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
+              <createSourcesJar>true</createSourcesJar>
+              <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+
+              <artifactSet>
+                <excludes>
+                  <exclude>org.slf4j:slf4j-api</exclude>
+                </excludes>
+              </artifactSet>
+
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/MANIFEST.MF</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+
+              <relocations>
+                <relocation>
+                  <pattern>scala</pattern>
+                  <shadedPattern>camundajar.impl.scala</shadedPattern>
+                </relocation>
+
+                <relocation>
+                  <pattern>fastparse</pattern>
+                  <shadedPattern>camundajar.impl.fastparse</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>geny</pattern>
+                  <shadedPattern>camundajar.impl.geny</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>sourcecode</pattern>
+                  <shadedPattern>camundajar.impl.sourcecode</shadedPattern>
+                </relocation>
+
+              </relocations>
+
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
+  </build>
+
+  <profiles>
+    <profile>
+      <id>license-header-check</id>
+      <properties>
+        <plugin.version.license>4.1</plugin.version.license>
+        <license.inlineHeader>
+          Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+          under one or more contributor license agreements. See the NOTICE file
+          distributed with this work for additional information regarding copyright
+          ownership. Camunda licenses this file to you under the Apache License,
+          Version 2.0; you may not use this file except in compliance with the License.
+          You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+          Unless required by applicable law or agreed to in writing, software
+          distributed under the License is distributed on an "AS IS" BASIS,
+          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+          See the License for the specific language governing permissions and
+          limitations under the License.
+        </license.inlineHeader>
+      </properties>
+      <build>
+        <plugins>
+          <!-- license plugin -->
+          <plugin>
+            <groupId>com.mycila</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+            <version>${plugin.version.license}</version>
+            <configuration>
+              <skipExistingHeaders>false</skipExistingHeaders>
+              <includes>
+                <include>**/*.scala</include>
+                <include>**/*.java</include>
+              </includes>
+              <mapping>
+                <java>SLASHSTAR_STYLE</java>
+                <scala>SLASHSTAR_STYLE</scala>
+              </mapping>
+            </configuration>
+            <executions>
+              <execution>
+                <id>add-license-header</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>format</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:git@github.com:camunda/feel-scala.git</connection>
+    <url>scm:git:git@github.com:camunda/feel-scala.git</url>
+    <developerConnection>scm:git:git@github.com:camunda/feel-scala.git</developerConnection>
+    <tag>1.16.2</tag>
+  </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>camunda-nexus</id>
+      <name>camunda platform community extensions</name>
+      <url>https://artifacts.camunda.com/artifactory/camunda-bpm-community-extensions/</url>
+    </repository>
+    <snapshotRepository>
+      <id>camunda-nexus</id>
+      <name>camunda platform community extensions snapshots</name>
+      <url>
+        https://artifacts.camunda.com/artifactory/camunda-bpm-community-extensions-snapshots/
+      </url>
+      <!-- for maven 2 compatibility -->
+      <uniqueVersion>true</uniqueVersion>
+    </snapshotRepository>
+  </distributionManagement>
+
+</project>

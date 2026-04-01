@@ -1,0 +1,126 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.fasterxml.jackson.dataformat",
+    "module": "jackson-dataformat-csv",
+    "version": "2.17.3",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "maven": {
+      "version": "3.6.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.17.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-annotations",
+          "version": {
+            "requires": "2.17.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-core",
+          "version": {
+            "requires": "2.17.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson",
+          "module": "jackson-bom",
+          "version": {
+            "requires": "2.17.3"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        }
+      ],
+      "files": [
+        {
+          "name": "jackson-dataformat-csv-2.17.3.jar",
+          "url": "jackson-dataformat-csv-2.17.3.jar",
+          "size": 101451,
+          "sha512": "5c050e30b74ab42183974af7e266fb4ac1506e778b10d0ba4aff4342024631d1bc342c937435f1f79daec720bf948adaf9478f413f3656354c9c6251e5ea948d",
+          "sha256": "10ed7a7ae138bcdebe647a885feca5493297a4440e0793a62e9f5b69f0def372",
+          "sha1": "a43bfd89036ee78ad2478a3ede5dd465b97c4f1b",
+          "md5": "e285dfbe2e2ffcc8992a87577a1768e2"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.17.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-annotations",
+          "version": {
+            "requires": "2.17.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-core",
+          "version": {
+            "requires": "2.17.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson",
+          "module": "jackson-bom",
+          "version": {
+            "requires": "2.17.3"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        }
+      ],
+      "files": [
+        {
+          "name": "jackson-dataformat-csv-2.17.3.jar",
+          "url": "jackson-dataformat-csv-2.17.3.jar",
+          "size": 101451,
+          "sha512": "5c050e30b74ab42183974af7e266fb4ac1506e778b10d0ba4aff4342024631d1bc342c937435f1f79daec720bf948adaf9478f413f3656354c9c6251e5ea948d",
+          "sha256": "10ed7a7ae138bcdebe647a885feca5493297a4440e0793a62e9f5b69f0def372",
+          "sha1": "a43bfd89036ee78ad2478a3ede5dd465b97c4f1b",
+          "md5": "e285dfbe2e2ffcc8992a87577a1768e2"
+        }
+      ]
+    }
+  ]
+}

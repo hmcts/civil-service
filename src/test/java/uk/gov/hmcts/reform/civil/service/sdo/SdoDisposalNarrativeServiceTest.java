@@ -54,7 +54,7 @@ class SdoDisposalNarrativeServiceTest {
         service.applyWitnessOfFact(caseData);
 
         assertThat(caseData.getDisposalHearingDisclosureOfDocuments().getDate1())
-            .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(10));
+            .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(4));
         assertThat(caseData.getDisposalHearingDisclosureOfDocuments().getInput1())
             .isEqualTo(DISPOSAL_DOCUMENTS_EXCHANGE);
         assertThat(caseData.getDisposalHearingDisclosureOfDocuments().getInput2())
@@ -120,8 +120,7 @@ class SdoDisposalNarrativeServiceTest {
         service.applyFinalDisposalHearing(caseData);
         service.applyHearingTime(caseData);
 
-        LocalDate expected = LocalDate.now().plusWeeks(16);
-        assertThat(caseData.getDisposalHearingFinalDisposalHearing().getDate()).isEqualTo(expected);
-        assertThat(caseData.getDisposalHearingHearingTime().getDateTo()).isEqualTo(expected);
+        assertThat(caseData.getDisposalHearingFinalDisposalHearing().getDate()).isEqualTo(LocalDate.now().plusWeeks(12));
+        assertThat(caseData.getDisposalHearingHearingTime().getDateTo()).isEqualTo(LocalDate.now().plusWeeks(16));
     }
 }

@@ -1,0 +1,111 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.squareup.moshi",
+    "module": "moshi-kotlin",
+    "version": "1.12.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.8.3",
+      "buildId": "wakkzbtch5dh3devjiur6yjzcy"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 7,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.squareup.moshi",
+          "module": "moshi",
+          "version": {
+            "requires": "1.12.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-reflect",
+          "version": {
+            "requires": "1.4.31"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.4.31"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "moshi-kotlin-1.12.0.jar",
+          "url": "moshi-kotlin-1.12.0.jar",
+          "size": 18357,
+          "sha512": "8274888bb124316940c156b399e12bee2e7cbe5f17c7b1dd0870b4601846d9b8f4eefd98e66be2a14b1ae7a3a356a929e3826d363880509987ed5d8ed71385e6",
+          "sha256": "1c436c07c159cd1af032bb79351a48a98e7f781ac807cff8b5711a999b5666df",
+          "sha1": "b320f489271fbad515583ae0e3b4349578ca91a7",
+          "md5": "20037f45bda9e735a6bd62ec76c42eeb"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 7,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.squareup.moshi",
+          "module": "moshi",
+          "version": {
+            "requires": "1.12.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-reflect",
+          "version": {
+            "requires": "1.4.31"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.4.31"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "moshi-kotlin-1.12.0.jar",
+          "url": "moshi-kotlin-1.12.0.jar",
+          "size": 18357,
+          "sha512": "8274888bb124316940c156b399e12bee2e7cbe5f17c7b1dd0870b4601846d9b8f4eefd98e66be2a14b1ae7a3a356a929e3826d363880509987ed5d8ed71385e6",
+          "sha256": "1c436c07c159cd1af032bb79351a48a98e7f781ac807cff8b5711a999b5666df",
+          "sha1": "b320f489271fbad515583ae0e3b4349578ca91a7",
+          "md5": "20037f45bda9e735a6bd62ec76c42eeb"
+        }
+      ]
+    }
+  ]
+}

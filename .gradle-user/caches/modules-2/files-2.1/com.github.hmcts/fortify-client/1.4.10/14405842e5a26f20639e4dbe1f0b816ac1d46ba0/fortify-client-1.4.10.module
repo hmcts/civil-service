@@ -1,0 +1,83 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.hmcts",
+    "module": "fortify-client",
+    "version": "1.4.10",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.0.0"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "fortify-client-1.4.10.jar",
+          "url": "fortify-client-1.4.10.jar",
+          "size": 19227,
+          "sha512": "e3ed4a64bc3e5a7dad84dce02ce284aa4a46c246c8446097466e6830d7736ffa33c1e10091196a165aff9bbfa3a2a35fcf06858318039105e9e12b58996aad05",
+          "sha256": "a3259adb371bbe5ef9e6bf5ab42a5ef8eb0a5db12a74b5e3369b39eedab7115b",
+          "sha1": "62171538ae9d94f6c949881d2bbfcb49ee615949",
+          "md5": "655d1733adfddc7bc950f4e2b0204e11"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "ch.qos.logback",
+          "module": "logback-classic",
+          "version": {
+            "requires": "1.5.18"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-lang3",
+          "version": {
+            "requires": "3.18.0"
+          }
+        },
+        {
+          "group": "commons-io",
+          "module": "commons-io",
+          "version": {
+            "requires": "2.20.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "fortify-client-1.4.10.jar",
+          "url": "fortify-client-1.4.10.jar",
+          "size": 19227,
+          "sha512": "e3ed4a64bc3e5a7dad84dce02ce284aa4a46c246c8446097466e6830d7736ffa33c1e10091196a165aff9bbfa3a2a35fcf06858318039105e9e12b58996aad05",
+          "sha256": "a3259adb371bbe5ef9e6bf5ab42a5ef8eb0a5db12a74b5e3369b39eedab7115b",
+          "sha1": "62171538ae9d94f6c949881d2bbfcb49ee615949",
+          "md5": "655d1733adfddc7bc950f4e2b0204e11"
+        }
+      ]
+    }
+  ]
+}

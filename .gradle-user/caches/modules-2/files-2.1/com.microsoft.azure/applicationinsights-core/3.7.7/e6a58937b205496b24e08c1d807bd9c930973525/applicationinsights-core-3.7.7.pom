@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.microsoft.azure</groupId>
+  <artifactId>applicationinsights-core</artifactId>
+  <version>3.7.7</version>
+  <name>Microsoft Application Insights Java Agent</name>
+  <description>Microsoft Application Insights Java Agent.</description>
+  <url>https://github.com/Microsoft/ApplicationInsights-Java</url>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>Microsoft</id>
+      <name>Microsoft</name>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git://github.com/Microsoft/ApplicationInsights-Java.git</connection>
+    <url>scm:git:https://github.com/Microsoft/ApplicationInsights-Java</url>
+  </scm>
+</project>

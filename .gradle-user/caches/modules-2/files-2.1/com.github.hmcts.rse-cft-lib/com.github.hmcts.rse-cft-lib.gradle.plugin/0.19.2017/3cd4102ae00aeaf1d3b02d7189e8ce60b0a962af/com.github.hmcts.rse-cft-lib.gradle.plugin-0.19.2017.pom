@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.hmcts.rse-cft-lib</groupId>
+  <artifactId>com.github.hmcts.rse-cft-lib.gradle.plugin</artifactId>
+  <version>0.19.2017</version>
+  <packaging>pom</packaging>
+  <name>HMCTS CFT development SDK</name>
+  <description>SDK for local development and testing</description>
+  <dependencies>
+    <dependency>
+      <groupId>com.github.hmcts.rse-cft-lib</groupId>
+      <artifactId>rse-cft-lib-plugin</artifactId>
+      <version>0.19.2017</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,92 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.hmcts",
+    "module": "core-case-data-store-client",
+    "version": "5.1.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.11.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "core-case-data-store-client-5.1.1.jar",
+          "url": "core-case-data-store-client-5.1.1.jar",
+          "size": 102141,
+          "sha512": "6bc39e1040a56a0e4c80817ba09cb2222287cc05ad5ed5f4f33775ec85b8faa5511e27ea202e6bb587802ef3a20e922b7c8c6587727d4571c22e80e8a9328353",
+          "sha256": "f226de4bd830441c4cc7c6ae7bb3023311ebd8fe294741440e6459ae4fc84bb6",
+          "sha1": "009d3002fa4be1f01db5c9a99d7fad3c946ff9c2",
+          "md5": "9fb31cda134ea9748f17901fa48a87c3"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.cloud",
+          "module": "spring-cloud-dependencies",
+          "version": {
+            "requires": "2024.0.1"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        },
+        {
+          "group": "org.springframework.cloud",
+          "module": "spring-cloud-starter-openfeign"
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-actuator"
+        },
+        {
+          "group": "io.github.openfeign",
+          "module": "feign-jackson"
+        },
+        {
+          "group": "org.projectlombok",
+          "module": "lombok",
+          "version": {
+            "requires": "1.18.38"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "core-case-data-store-client-5.1.1.jar",
+          "url": "core-case-data-store-client-5.1.1.jar",
+          "size": 102141,
+          "sha512": "6bc39e1040a56a0e4c80817ba09cb2222287cc05ad5ed5f4f33775ec85b8faa5511e27ea202e6bb587802ef3a20e922b7c8c6587727d4571c22e80e8a9328353",
+          "sha256": "f226de4bd830441c4cc7c6ae7bb3023311ebd8fe294741440e6459ae4fc84bb6",
+          "sha1": "009d3002fa4be1f01db5c9a99d7fad3c946ff9c2",
+          "md5": "9fb31cda134ea9748f17901fa48a87c3"
+        }
+      ]
+    }
+  ]
+}

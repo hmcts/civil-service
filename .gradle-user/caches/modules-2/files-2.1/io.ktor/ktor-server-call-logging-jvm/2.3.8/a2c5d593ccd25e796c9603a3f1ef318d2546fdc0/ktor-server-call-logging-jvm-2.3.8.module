@@ -1,0 +1,233 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "url": "../../ktor-server-call-logging/2.3.8/ktor-server-call-logging-2.3.8.module",
+    "group": "io.ktor",
+    "module": "ktor-server-call-logging",
+    "version": "2.3.8",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.5"
+    }
+  },
+  "variants": [
+    {
+      "name": "jvmApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk7",
+          "version": {
+            "requires": "1.8.22"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.8.22"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-jdk8",
+          "version": {
+            "requires": "1.7.1"
+          },
+          "excludes": [
+            {
+              "group": "*",
+              "module": "kotlin-stdlib-jvm"
+            },
+            {
+              "group": "*",
+              "module": "kotlin-stdlib-jdk8"
+            },
+            {
+              "group": "*",
+              "module": "kotlin-stdlib-jdk7"
+            },
+            {
+              "group": "*",
+              "module": "kotlin-stdlib"
+            }
+          ]
+        },
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api",
+          "version": {
+            "requires": "1.7.36"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
+          "version": {
+            "requires": "1.7.1"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-server-core",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-common",
+          "version": {
+            "requires": "1.8.22"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ktor-server-call-logging-jvm-2.3.8.jar",
+          "url": "ktor-server-call-logging-jvm-2.3.8.jar",
+          "size": 64688,
+          "sha512": "245c00b9dce41f79ad64668e57073b2a16cc670e38232125cc11aecb0a1578fe102d0c344ae1413c1d001d606af56566ffee94c92dbef0a46e551ef2148efb76",
+          "sha256": "a7fc473adffaf24ee5b1729b4887241a5219ec31e9ee579b843035ef1c2bb14c",
+          "sha1": "c1fd699f36aa11e3b0b20ebefdfcf1a9f2367b19",
+          "md5": "1911e7d73877e4b4e4acfa63f3188e9d"
+        }
+      ]
+    },
+    {
+      "name": "jvmRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk7",
+          "version": {
+            "requires": "1.8.22"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.8.22"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-jdk8",
+          "version": {
+            "requires": "1.7.1"
+          },
+          "excludes": [
+            {
+              "group": "*",
+              "module": "kotlin-stdlib-jvm"
+            },
+            {
+              "group": "*",
+              "module": "kotlin-stdlib-jdk8"
+            },
+            {
+              "group": "*",
+              "module": "kotlin-stdlib-jdk7"
+            },
+            {
+              "group": "*",
+              "module": "kotlin-stdlib"
+            }
+          ]
+        },
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api",
+          "version": {
+            "requires": "1.7.36"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
+          "version": {
+            "requires": "1.7.1"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-server-core",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-common",
+          "version": {
+            "requires": "1.8.22"
+          }
+        },
+        {
+          "group": "org.fusesource.jansi",
+          "module": "jansi",
+          "version": {
+            "requires": "2.4.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-slf4j",
+          "version": {
+            "requires": "1.7.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ktor-server-call-logging-jvm-2.3.8.jar",
+          "url": "ktor-server-call-logging-jvm-2.3.8.jar",
+          "size": 64688,
+          "sha512": "245c00b9dce41f79ad64668e57073b2a16cc670e38232125cc11aecb0a1578fe102d0c344ae1413c1d001d606af56566ffee94c92dbef0a46e551ef2148efb76",
+          "sha256": "a7fc473adffaf24ee5b1729b4887241a5219ec31e9ee579b843035ef1c2bb14c",
+          "sha1": "c1fd699f36aa11e3b0b20ebefdfcf1a9f2367b19",
+          "md5": "1911e7d73877e4b4e4acfa63f3188e9d"
+        }
+      ]
+    },
+    {
+      "name": "jvmSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "files": [
+        {
+          "name": "ktor-server-call-logging-jvm-2.3.8-sources.jar",
+          "url": "ktor-server-call-logging-jvm-2.3.8-sources.jar",
+          "size": 6180,
+          "sha512": "ecab10b8110b953d7fda960bcb7e8433fe3d1cab20a7a356c4deb75f06c4689f96884634280dc0d15f7cc30d6c912d96995de4ec571132b7927f3812b7d3398a",
+          "sha256": "74b74417ed8ce16838ac2e45bf7ac369013c3d5c2fd3319fecbecac2f8eb2ed8",
+          "sha1": "7906d7a8bab7bbf42c638f20a6407e3b4bb96fd1",
+          "md5": "50062400078aafc6c236ccfc1e1919c3"
+        }
+      ]
+    }
+  ]
+}

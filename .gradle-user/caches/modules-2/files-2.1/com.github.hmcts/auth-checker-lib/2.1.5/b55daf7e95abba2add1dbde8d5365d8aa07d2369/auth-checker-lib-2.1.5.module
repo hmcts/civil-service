@@ -1,0 +1,148 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.hmcts",
+    "module": "auth-checker-lib",
+    "version": "2.1.5",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.9.9.1"
+          }
+        },
+        {
+          "group": "org.apache.httpcomponents",
+          "module": "httpclient",
+          "version": {
+            "requires": "4.5.9"
+          }
+        },
+        {
+          "group": "io.jsonwebtoken",
+          "module": "jjwt",
+          "version": {
+            "requires": "0.9.1"
+          }
+        },
+        {
+          "group": "com.google.guava",
+          "module": "guava",
+          "version": {
+            "requires": "28.0-jre"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-autoconfigure",
+          "version": {
+            "requires": "2.1.6.RELEASE"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-security",
+          "version": {
+            "requires": "2.1.6.RELEASE"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "auth-checker-lib-2.1.5.jar",
+          "url": "auth-checker-lib-2.1.5.jar",
+          "size": 41714,
+          "sha512": "0438633463fde2cf421654932feed874eb1e97f845f2a29979ad4c00f2ea7015260cf79fe6e1fab99916bf4a99325837cb8170ab4e66294d9f2b1c42aad4c0ca",
+          "sha256": "ed430a14d9cba9319b2b64a1ecaa87f8937e5ec95100e56a149e330d10590475",
+          "sha1": "7dbdc24f3f00d1740417b74beae23936bc7c6f33",
+          "md5": "edd6ebf9f270064f599ed376da2f0b32"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.9.9.1"
+          }
+        },
+        {
+          "group": "org.apache.httpcomponents",
+          "module": "httpclient",
+          "version": {
+            "requires": "4.5.9"
+          }
+        },
+        {
+          "group": "io.jsonwebtoken",
+          "module": "jjwt",
+          "version": {
+            "requires": "0.9.1"
+          }
+        },
+        {
+          "group": "com.google.guava",
+          "module": "guava",
+          "version": {
+            "requires": "28.0-jre"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-autoconfigure",
+          "version": {
+            "requires": "2.1.6.RELEASE"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-security",
+          "version": {
+            "requires": "2.1.6.RELEASE"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "auth-checker-lib-2.1.5.jar",
+          "url": "auth-checker-lib-2.1.5.jar",
+          "size": 41714,
+          "sha512": "0438633463fde2cf421654932feed874eb1e97f845f2a29979ad4c00f2ea7015260cf79fe6e1fab99916bf4a99325837cb8170ab4e66294d9f2b1c42aad4c0ca",
+          "sha256": "ed430a14d9cba9319b2b64a1ecaa87f8937e5ec95100e56a149e330d10590475",
+          "sha1": "7dbdc24f3f00d1740417b74beae23936bc7c6f33",
+          "md5": "edd6ebf9f270064f599ed376da2f0b32"
+        }
+      ]
+    }
+  ]
+}

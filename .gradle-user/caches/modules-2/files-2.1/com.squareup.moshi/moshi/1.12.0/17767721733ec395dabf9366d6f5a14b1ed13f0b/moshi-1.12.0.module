@@ -1,0 +1,97 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.squareup.moshi",
+    "module": "moshi",
+    "version": "1.12.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.8.3",
+      "buildId": "wakkzbtch5dh3devjiur6yjzcy"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 7,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.squareup.okio",
+          "module": "okio",
+          "version": {
+            "requires": "2.10.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.4.31"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "moshi-1.12.0.jar",
+          "url": "moshi-1.12.0.jar",
+          "size": 151753,
+          "sha512": "b534a18e3e9ab01fb4bf02a750c25759a9fed1b86ef8701c1508c8650b686b2d80be3333cdade09044f516ee12cc19719d250bd7f15eb66d2e3f724aa77804cf",
+          "sha256": "ee9091e1d1a5926fa9b4df2642c1fb7bb96aec08639b6219c19e0b8724d42475",
+          "sha1": "acd95d4d815f2752e6507e29e92b258c1323c38d",
+          "md5": "983a07f28f2ca03b6516a4db072481d4"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 7,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.squareup.okio",
+          "module": "okio",
+          "version": {
+            "requires": "2.10.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.4.31"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "moshi-1.12.0.jar",
+          "url": "moshi-1.12.0.jar",
+          "size": 151753,
+          "sha512": "b534a18e3e9ab01fb4bf02a750c25759a9fed1b86ef8701c1508c8650b686b2d80be3333cdade09044f516ee12cc19719d250bd7f15eb66d2e3f724aa77804cf",
+          "sha256": "ee9091e1d1a5926fa9b4df2642c1fb7bb96aec08639b6219c19e0b8724d42475",
+          "sha1": "acd95d4d815f2752e6507e29e92b258c1323c38d",
+          "md5": "983a07f28f2ca03b6516a4db072481d4"
+        }
+      ]
+    }
+  ]
+}

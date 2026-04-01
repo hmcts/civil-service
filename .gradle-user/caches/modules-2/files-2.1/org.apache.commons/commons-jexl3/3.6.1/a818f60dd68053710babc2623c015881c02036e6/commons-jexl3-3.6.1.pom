@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-parent</artifactId>
+        <version>93</version>
+    </parent>
+    <artifactId>commons-jexl3</artifactId>
+    <version>3.6.1</version>
+    <name>Apache Commons JEXL</name>
+    <description>Apache Commons JEXL is a library that enables the implementation of scripting features in Java applications and frameworks.</description>
+    <url>https://commons.apache.org/proper/commons-jexl/</url>
+    <inceptionYear>2001</inceptionYear>
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <commons.componentid>jexl</commons.componentid>
+        <commons.packageId>jexl3</commons.packageId>
+        <commons.module.name>org.apache.commons.jexl3</commons.module.name>
+        <commons.site.path>jexl</commons.site.path>
+        <commons.scmPubUrl>https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl</commons.scmPubUrl>
+        <commons.scmPubCheckoutDirectory>site-content</commons.scmPubCheckoutDirectory>
+        <commons.release.2.version>2.1.1</commons.release.2.version>
+        <!-- Override the default, which is ${project.artifactId}-${commons.release.[23].version} -->
+        <commons.release.name>commons-jexl-${commons.release.version}</commons.release.name>
+        <commons.release.2.name>commons-jexl-${commons.release.2.version}</commons.release.2.name>
+        <commons.release.2.hash>sha1</commons.release.2.hash>
+        <commons.release.3.name>commons-jexl-${commons.release.3.version}</commons.release.3.name>
+        <commons.release.3.hash>sha1</commons.release.3.hash>
+        <commons.release.3.desc>Legacy</commons.release.3.desc>
+        <commons.release.3.version>1.1</commons.release.3.version>
+        <commons.release.3.binary.suffix />
+        <commons.jira.id>JEXL</commons.jira.id>
+        <commons.jira.pid>12310479</commons.jira.pid>
+        <japicmp.skip>false</japicmp.skip>
+        <!-- JaCoCo: Don't make code coverage worse than: -->
+        <commons.jacoco.version>0.8.14</commons.jacoco.version>
+        <commons.jacoco.haltOnFailure>true</commons.jacoco.haltOnFailure>
+        <commons.jacoco.classRatio>0.96</commons.jacoco.classRatio>
+        <commons.jacoco.instructionRatio>0.89</commons.jacoco.instructionRatio>
+        <commons.jacoco.methodRatio>0.89</commons.jacoco.methodRatio>
+        <commons.jacoco.branchRatio>0.80</commons.jacoco.branchRatio>
+        <commons.jacoco.lineRatio>0.89</commons.jacoco.lineRatio>
+        <commons.jacoco.complexityRatio>0.75</commons.jacoco.complexityRatio>
+        <!--
+          Encoding of Java source files: ensures that the compiler and
+          the javadoc generator use the right encoding. Subprojects may
+          overwrite this, if they are using another encoding.
+        -->
+        <commons.encoding>iso-8859-1</commons.encoding>
+        <!-- used in this pom to provide the Javadoc HTML file encoding -->
+        <commons.docEncoding>${commons.encoding}</commons.docEncoding>
+        <!-- Define source encoding for filtering; used by general plugins -->
+        <project.build.sourceEncoding>${commons.encoding}</project.build.sourceEncoding>
+        <!-- This is used by reporting plugins -->
+        <project.reporting.outputEncoding>${commons.encoding}</project.reporting.outputEncoding>
+        <!-- project.build.outputTimestamp is managed by Maven plugins, see https://maven.apache.org/guides/mini/guide-reproducible-builds.html -->
+        <project.build.outputTimestamp>2025-12-09T23:09:00Z</project.build.outputTimestamp>
+        <!-- Commons release plugin -->
+        <commons.bc.version>3.6.0</commons.bc.version>
+        <commons.release.version>3.6.1</commons.release.version>
+        <commons.release.next>3.6.2</commons.release.next>
+        <commons.rc.version>RC1</commons.rc.version>
+        <commons.release.isDistModule>true</commons.release.isDistModule>
+        <commons.distSvnStagingUrl>scm:svn:https://dist.apache.org/repos/dist/dev/commons/${commons.componentid}</commons.distSvnStagingUrl>
+    </properties>
+    <scm>
+      <connection>scm:git:https://gitbox.apache.org/repos/asf/${commons.repo.name}.git</connection>
+      <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/${commons.repo.name}.git</developerConnection>
+      <url>https://gitbox.apache.org/repos/asf?p=${commons.repo.name}.git</url>
+      <tag>rel/${commons.repo.name}-${commons.release.version}</tag>
+    </scm>
+    <distributionManagement>
+        <site>
+            <id>apache.website</id>
+            <name>Apache Commons Site</name>
+            <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl/</url>
+        </site>
+    </distributionManagement>
+    <ciManagement>
+      <system>GitHub</system>
+      <url>https://github.com/apache/commons-jexl/actions</url>
+    </ciManagement>
+    <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.3.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.13.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
+            <artifactId>concurrentlinkedhashmap-lru</artifactId>
+            <version>1.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.20.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <defaultGoal>clean verify apache-rat:check spotbugs:check japicmp:cmp checkstyle:check javadoc:javadoc</defaultGoal>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} -Xmx128m</argLine>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/bin.xml</descriptor>
+                        <descriptor>src/assembly/src.xml</descriptor>
+                    </descriptors>
+                    <tarLongFileMode>gnu</tarLongFileMode>
+                    <finalName>commons-jexl-${project.version}</finalName>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.helger.maven</groupId>
+                <artifactId>ph-javacc-maven-plugin</artifactId>
+                <version>4.1.5</version>
+                <executions>
+                    <execution>
+                        <id>jexl-jjtree</id>
+                        <configuration>
+                            <sourceDirectory>${basedir}/src/main/java/org/apache/commons/jexl3/parser</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
+                        </configuration>
+                        <goals>
+                            <goal>jjtree-javacc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <configuration>
+                            <target>
+                                <!-- change an exception used for signaling to be static -->
+                                <replaceregexp
+                                        file="target/generated-sources/java/org/apache/commons/jexl3/parser/Parser.java"
+                                        byline="true"
+                                        match="private final LookaheadSuccess jj_ls ="
+                                        replace="private static final LookaheadSuccess jj_ls ="/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                            <exclude>**/generated-sources/**/*</exclude>
+                            <exclude>**/org/apache/commons/jexl3/parser/*.class</exclude>
+                            <exclude>**/org/apache/commons/jexl3/**/*Test.class</exclude>
+                            <exclude>**/java/**/*</exclude>
+                            <exclude>**/javax/**/*</exclude>
+                            <exclude>**/com/sun/**/*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <configuration>
+                    <ignorePathsToDelete>
+                        <ignorePathToDelete>javadocs</ignorePathToDelete>
+                    </ignorePathsToDelete>
+                </configuration>
+            </plugin>
+            <!-- Allow checkstyle to be run from command-line. Must agree with config in report section. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
+                    <suppressionsLocation>${basedir}/src/main/config/checkstyle-suppressions.xml</suppressionsLocation>
+                    <excludes>org/apache/commons/jexl3/parser/*.java</excludes>
+                    <headerLocation>${basedir}/src/main/config/header.txt</headerLocation>
+                    <enableRulesSummary>true</enableRulesSummary>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <!-- Needed to define config_loc for use by Eclipse -->
+                    <propertyExpansion>config_loc=${basedir}/src/main/config</propertyExpansion>
+                </configuration>
+            </plugin>
+            <!-- Allow Spotbugs to be run from command-line. Must agree with config in report section. -->
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <configuration>
+                    <effort>Max</effort>
+                    <threshold>High</threshold>
+                    <xmlOutput>true</xmlOutput>
+                    <excludeFilterFile>${basedir}/src/main/config/findbugs-exclude-filter.xml</excludeFilterFile>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.ow2.asm</groupId>
+                        <artifactId>asm</artifactId>
+                        <version>${commons.asm.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <rulesets>
+                        <ruleset>${project.basedir}/src/main/config/pmd.xml</ruleset>
+                    </rulesets>
+                    <excludes>
+                        <exclude>org/apache/commons/jexl3/parser/Parser.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/AST*.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/ParserTokenManager.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/*Constants.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/AbstractCharStream.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/*Provider.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <!-- japicmp -->
+            <plugin>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <configuration>
+                    <parameter>
+                        <excludes>
+                            <exclude>org.apache.commons.jexl3.internal</exclude>
+                            <exclude>org.apache.commons.jexl3.internal.introspection</exclude>
+                            <exclude>org.apache.commons.jexl3.parser</exclude>
+                        </excludes>
+                        <onlyModified>true</onlyModified>
+                        <ignoreMissingClasses>true</ignoreMissingClasses>
+                    </parameter>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <version>${commons.animal-sniffer.version}</version>
+                <configuration>
+                    <ignores>java.lang.invoke.*</ignores>
+		        </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <excludePackageNames>
+                        *.internal:*.internal.introspection:*.parser:
+                    </excludePackageNames>
+                    <show>protected</show>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <excludePackageNames>
+                        *.internal:*.internal.introspection:*.parser:
+                    </excludePackageNames>
+                    <show>protected</show>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
+                    <suppressionsLocation>${basedir}/src/main/config/checkstyle-suppressions.xml</suppressionsLocation>
+                    <excludes>org/apache/commons/jexl3/parser/*.java</excludes>
+                    <headerLocation>${basedir}/src/main/config/header.txt</headerLocation>
+                    <enableRulesSummary>false</enableRulesSummary>
+                    <!-- Needed to define config_loc for use by Eclipse -->
+                    <propertyExpansion>config_loc=${basedir}/src/main/config</propertyExpansion>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <configuration>
+                    <excludeFilterFile>${basedir}/src/main/config/findbugs-exclude-filter.xml</excludeFilterFile>
+                    <xmlOutputDirectory>target/site</xmlOutputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <targetJdk>${maven.compiler.target}</targetJdk>
+                    <rulesets>
+                        <ruleset>${project.basedir}/src/main/config/pmd.xml</ruleset>
+                    </rulesets>
+                    <excludes>
+                        <exclude>org/apache/commons/jexl3/parser/Parser.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/AST*.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/ParserTokenManager.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/*Constants.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/AbstractCharStream.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/*Provider.java</exclude>
+                    </excludes>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>pmd</report>
+                            <report>cpd</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <configuration>
+                    <parameter>
+                        <excludes>
+                            <exclude>org.apache.commons.jexl3.internal</exclude>
+                            <exclude>org.apache.commons.jexl3.internal.introspection</exclude>
+                            <exclude>org.apache.commons.jexl3.parser</exclude>
+                        </excludes>
+                        <onlyModified>true</onlyModified>
+                        <ignoreMissingClasses>true</ignoreMissingClasses>
+                    </parameter>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${commons.jacoco.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/generated-sources/**/*</exclude>
+                        <exclude>**/org/apache/commons/jexl3/parser/*.class</exclude>
+                        <exclude>**/org/apache/commons/jexl3/**/*Test.class</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+    <developers>
+        <developer>
+            <name>dIon Gillard</name>
+            <id>dion</id>
+            <email>dion AT apache DOT org</email>
+            <organization>The Apache Software Foundation</organization>
+        </developer>
+        <developer>
+            <name>Geir Magnusson Jr.</name>
+            <id>geirm</id>
+            <email>geirm AT apache DOT org</email>
+            <organization>independent</organization>
+        </developer>
+        <developer>
+            <name>Tim O'Brien</name>
+            <id>tobrien</id>
+            <email>tobrien AT apache DOT org</email>
+            <organization>independent</organization>
+        </developer>
+        <developer>
+            <name>Peter Royal</name>
+            <id>proyal</id>
+            <email>proyal AT apache DOT org</email>
+            <organization>The Apache Software Foundation</organization>
+        </developer>
+        <developer>
+            <name>James Strachan</name>
+            <id>jstrachan</id>
+            <email>jstrachan AT apache DOT org</email>
+            <organization>SpiritSoft, Inc.</organization>
+        </developer>
+        <developer>
+            <name>Rahul Akolkar</name>
+            <id>rahul</id>
+            <email>rahul AT apache DOT org</email>
+            <organization>The Apache Software Foundation</organization>
+        </developer>
+        <developer>
+            <name>Sebastian Bazley</name>
+            <id>sebb</id>
+            <email>sebb AT apache DOT org</email>
+        </developer>
+        <developer>
+            <name>Henri Biestro</name>
+            <id>henrib</id>
+            <email>henrib AT apache DOT org</email>
+        </developer>
+            <developer>
+            <id>ggregory</id>
+            <name>Gary Gregory</name>
+            <email>ggregory at apache.org</email>
+            <url>https://www.garygregory.com</url>
+            <organization>The Apache Software Foundation</organization>
+            <organizationUrl>https://www.apache.org/</organizationUrl>
+            <roles>
+                <role>PMC Member</role>
+            </roles>
+            <timezone>America/New_York</timezone>
+            <properties>
+                <picUrl>https://people.apache.org/~ggregory/img/garydgregory80.png</picUrl>
+            </properties>
+        </developer>
+    </developers>
+    <contributors>
+        <contributor>
+            <name>Dmitri Blinov</name>
+        </contributor>
+    </contributors>
+</project>

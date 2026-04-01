@@ -1,0 +1,100 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.hibernate.common",
+    "module": "hibernate-commons-annotations",
+    "version": "7.0.3.Final",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.6"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "hibernate-commons-annotations-7.0.3.Final.jar",
+          "url": "hibernate-commons-annotations-7.0.3.Final.jar",
+          "size": 67979,
+          "sha512": "fc9c74b4d69955bc7c508667cc43e753b7195aa29eacc544c37556b74df468c7735898ddeb14b0ed0e1df63c114acaa6550904b54f819989ce49886b8c7d861c",
+          "sha256": "0db2fd57d5e43688ac6ed5cdf36deaf05d84340dcc24c2dd2a2114de38e5175d",
+          "sha1": "e183c4be8bb41d12e9f19b374e00c34a0a85f439",
+          "md5": "6698f99235fe6d36c42caaf2e6b52797"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "hibernate-commons-annotations-7.0.3.Final.jar",
+          "url": "hibernate-commons-annotations-7.0.3.Final.jar",
+          "size": 67979,
+          "sha512": "fc9c74b4d69955bc7c508667cc43e753b7195aa29eacc544c37556b74df468c7735898ddeb14b0ed0e1df63c114acaa6550904b54f819989ce49886b8c7d861c",
+          "sha256": "0db2fd57d5e43688ac6ed5cdf36deaf05d84340dcc24c2dd2a2114de38e5175d",
+          "sha1": "e183c4be8bb41d12e9f19b374e00c34a0a85f439",
+          "md5": "6698f99235fe6d36c42caaf2e6b52797"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "hibernate-commons-annotations-7.0.3.Final-javadoc.jar",
+          "url": "hibernate-commons-annotations-7.0.3.Final-javadoc.jar",
+          "size": 235408,
+          "sha512": "8f2de0af538c19aab2c97d9409a3b30e7ca76526e47c998f9e180ee19ef8c05048c3f5d463a20e21417ee91c14982a7be3ac79ae5057617b7af0502fc83f85fe",
+          "sha256": "748d76ddd07cbbb4c3ad8654af4c0fa91627108691a0f290a99ac8c67cdf5993",
+          "sha1": "e024d5f790e0aae39adcc4261b558bd999c4b3c7",
+          "md5": "69517562fcc6d3c6650993c0610a7c2d"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "hibernate-commons-annotations-7.0.3.Final-sources.jar",
+          "url": "hibernate-commons-annotations-7.0.3.Final-sources.jar",
+          "size": 39079,
+          "sha512": "35516af2a8dc5b3ea19e89391a6430a5dd1c1136c2d42c3e950d0b2af47cc29960eba290886dd3d3c4801341a0a7f1e4bb7ba0166816c9e3b487b56d425065e2",
+          "sha256": "aca0d65e5efc7bab95fe73898d15c7aa3549f7fc20eabdb5fa1ca7363d3e3830",
+          "sha1": "bc6f0ff5d4dab9fcfa101136553b72d8e5fb1561",
+          "md5": "66173615ab21f9548558f3fb15aa7cad"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.springframework.session",
+    "module": "spring-session-bom",
+    "version": "2021.2.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.4.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "platform",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencyConstraints": [
+        {
+          "group": "org.springframework.session",
+          "module": "spring-session-core",
+          "version": {
+            "requires": "2.7.0"
+          }
+        },
+        {
+          "group": "org.springframework.session",
+          "module": "spring-session-data-geode",
+          "version": {
+            "requires": "2.7.0"
+          }
+        },
+        {
+          "group": "org.springframework.session",
+          "module": "spring-session-data-mongodb",
+          "version": {
+            "requires": "2.7.0"
+          }
+        },
+        {
+          "group": "org.springframework.session",
+          "module": "spring-session-data-redis",
+          "version": {
+            "requires": "2.7.0"
+          }
+        },
+        {
+          "group": "org.springframework.session",
+          "module": "spring-session-hazelcast",
+          "version": {
+            "requires": "2.7.0"
+          }
+        },
+        {
+          "group": "org.springframework.session",
+          "module": "spring-session-jdbc",
+          "version": {
+            "requires": "2.7.0"
+          }
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "platform",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencyConstraints": [
+        {
+          "group": "org.springframework.session",
+          "module": "spring-session-core",
+          "version": {
+            "requires": "2.7.0"
+          }
+        },
+        {
+          "group": "org.springframework.session",
+          "module": "spring-session-data-geode",
+          "version": {
+            "requires": "2.7.0"
+          }
+        },
+        {
+          "group": "org.springframework.session",
+          "module": "spring-session-data-mongodb",
+          "version": {
+            "requires": "2.7.0"
+          }
+        },
+        {
+          "group": "org.springframework.session",
+          "module": "spring-session-data-redis",
+          "version": {
+            "requires": "2.7.0"
+          }
+        },
+        {
+          "group": "org.springframework.session",
+          "module": "spring-session-hazelcast",
+          "version": {
+            "requires": "2.7.0"
+          }
+        },
+        {
+          "group": "org.springframework.session",
+          "module": "spring-session-jdbc",
+          "version": {
+            "requires": "2.7.0"
+          }
+        }
+      ]
+    }
+  ]
+}

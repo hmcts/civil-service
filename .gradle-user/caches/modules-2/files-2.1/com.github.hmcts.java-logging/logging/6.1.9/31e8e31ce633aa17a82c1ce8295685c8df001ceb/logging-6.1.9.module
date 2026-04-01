@@ -1,0 +1,100 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.hmcts.java-logging",
+    "module": "logging",
+    "version": "6.1.9",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.13"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "logging-6.1.9.jar",
+          "url": "logging-6.1.9.jar",
+          "size": 1491,
+          "sha512": "1cca9e4c9d801d13a8713fc6be76f2018cd791d96a6e730810a7e043e86faf5a4fa8d18918779320bac417933c6f3cf6780c7332f69dc1602c1df9939a82bd63",
+          "sha256": "6c3ea4385c8107f0a3743fe99bb2e6286729d4762f2a84c6185e79da83b1c759",
+          "sha1": "13617c02f53eb8259c01b67ec4f0fd890d35e62d",
+          "md5": "e800ddb735bb68cfc5a904828f5b610b"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "logging-6.1.9.jar",
+          "url": "logging-6.1.9.jar",
+          "size": 1491,
+          "sha512": "1cca9e4c9d801d13a8713fc6be76f2018cd791d96a6e730810a7e043e86faf5a4fa8d18918779320bac417933c6f3cf6780c7332f69dc1602c1df9939a82bd63",
+          "sha256": "6c3ea4385c8107f0a3743fe99bb2e6286729d4762f2a84c6185e79da83b1c759",
+          "sha1": "13617c02f53eb8259c01b67ec4f0fd890d35e62d",
+          "md5": "e800ddb735bb68cfc5a904828f5b610b"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "logging-6.1.9-javadoc.jar",
+          "url": "logging-6.1.9-javadoc.jar",
+          "size": 261,
+          "sha512": "b73855ad2df7e1feb353821880b3f287181bde00c2398cfaca05ed83d32005e4fc5ac6da277b698fe6e8de7f74974b63fcc54c4b2cf3276544d3ce842deb4692",
+          "sha256": "857edd2850cd24885c29ee4a41ea5fc38d9fa67ae78cb35bb495ab45978c3a98",
+          "sha1": "20cce1c6ad3f734666919b29ec02ad02f5e8b32f",
+          "md5": "06d739b8cc0c171ec89b97d663fa947a"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "logging-6.1.9-sources.jar",
+          "url": "logging-6.1.9-sources.jar",
+          "size": 1491,
+          "sha512": "50bc2024092a1fc80427633f110082bc3357dc18218a8a19ffbfc139eabd24e577517290c8f3b032fc67f7a6deeeefb83dcf00bea1498250626fbe1e6cac8beb",
+          "sha256": "cf40137759cc20ecef33e8859b89537155e9552d74d4b710ab1b2fcac24f7ada",
+          "sha1": "d63c3a86c23ad10506cfa61c69fece2cefa9a1db",
+          "md5": "ae22ac3d10aedea1a2d51a238ac985ef"
+        }
+      ]
+    }
+  ]
+}

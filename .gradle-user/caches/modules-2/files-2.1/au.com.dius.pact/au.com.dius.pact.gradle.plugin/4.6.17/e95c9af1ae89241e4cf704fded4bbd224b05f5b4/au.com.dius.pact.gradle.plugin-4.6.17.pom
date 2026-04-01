@@ -1,0 +1,14 @@
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+      <modelVersion>4.0.0</modelVersion>
+      <groupId>au.com.dius.pact</groupId>
+      <artifactId>au.com.dius.pact.gradle.plugin</artifactId>
+      <version>4.6.17</version>
+      <packaging>pom</packaging>
+      <dependencies>
+        <dependency>
+          <groupId>au.com.dius.pact.provider</groupId>
+          <artifactId>gradle</artifactId>
+          <version>4.6.17</version>
+        </dependency>
+      </dependencies>
+    </project>

@@ -1,0 +1,771 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.sonarsource.parent</groupId>
+  <artifactId>parent</artifactId>
+  <version>83.0.0.2369</version>
+  <packaging>pom</packaging>
+
+  <name>SonarSource OSS parent</name>
+  <description>Parent pom of SonarSource public projects</description>
+  <url>http://docs.sonarqube.org/display/PLUG/Plugin+Library</url>
+  <inceptionYear>2009</inceptionYear>
+  <!-- License defined here, because most of projects uses this license. Can be overridden in children POMs. -->
+  <licenses>
+    <license>
+      <name>GNU LGPL 3</name>
+      <url>http://www.gnu.org/licenses/lgpl.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>ehartmann</id>
+      <name>Eric Hartmann</name>
+      <organization>SonarSource</organization>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>henryju</id>
+      <name>Julien Henry</name>
+      <organization>SonarSource</organization>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>Godin</id>
+      <name>Evgeny Mandrikov</name>
+      <organization>SonarSource</organization>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>olivier.gaudin</id>
+      <name>Olivier Gaudin</name>
+      <organization>SonarSource</organization>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>simonbrandhof</id>
+      <name>Simon Brandhof</name>
+      <organization>SonarSource</organization>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+  <mailingLists>
+    <mailingList>
+      <name>SonarSource Community</name>
+      <archive>https://community.sonarsource.com</archive>
+    </mailingList>
+  </mailingLists>
+
+  <scm>
+    <connection>scm:git:https://github.com/SonarSource/parent-oss.git</connection>
+    <developerConnection>scm:git:git@github.com:SonarSource/parent-oss.git</developerConnection>
+    <url>https://github.com/SonarSource/parent-oss</url>
+    <tag>HEAD</tag>
+  </scm>
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.sonarsource.com</url>
+  </issueManagement>
+  <ciManagement>
+    <system>cirrus-ci</system>
+    <url>https://cirrus-ci.com/github/SonarSource/</url>
+  </ciManagement>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.min.version>3.3.9</maven.min.version>
+    <jdk.min.version>8</jdk.min.version>
+    <timestamp>${maven.build.timestamp}</timestamp>
+    <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssZ</maven.build.timestamp.format>
+    <sonar.snapshotRepository.id>snapshot</sonar.snapshotRepository.id>
+    <sonar.snapshotRepository.url />
+    <artifactory.publish.artifacts>true</artifactory.publish.artifacts>
+
+    <!-- ================ -->
+    <!-- Plugins versions -->
+    <!-- ================ -->
+    <version.assembly.plugin>3.7.1</version.assembly.plugin>
+    <version.clean.plugin>3.4.0</version.clean.plugin>
+    <version.compiler.plugin>3.13.0</version.compiler.plugin>
+    <version.dependency.plugin>3.8.1</version.dependency.plugin>
+    <version.deploy.plugin>3.1.3</version.deploy.plugin>
+    <version.enforcer.plugin>3.5.0</version.enforcer.plugin>
+    <version.surefire.plugin>3.5.2</version.surefire.plugin>
+    <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
+    <version.install.plugin>3.1.3</version.install.plugin>
+    <version.beanshell.plugin>1.4</version.beanshell.plugin>
+    <version.jar.plugin>3.4.2</version.jar.plugin>
+    <version.javadoc.plugin>3.11.1</version.javadoc.plugin>
+    <version.plugin.plugin>3.15.1</version.plugin.plugin>
+    <version.resources.plugin>3.3.1</version.resources.plugin>
+    <version.shade.plugin>3.6.0</version.shade.plugin>
+    <version.source.plugin>3.3.1</version.source.plugin>
+    <version.site.plugin>3.21.0</version.site.plugin>
+    <version.artifactory.plugin>3.5.1</version.artifactory.plugin>
+    <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
+
+    <version.buildnumber.plugin>3.2.1</version.buildnumber.plugin>
+    <version.native2ascii.plugin>2.1.1</version.native2ascii.plugin>
+
+    <version.sonar-packaging.plugin>1.23.0.740</version.sonar-packaging.plugin>
+    <version.sonar-dev.plugin>1.8</version.sonar-dev.plugin>
+
+    <version.codehaus.license.plugin>2.5.0</version.codehaus.license.plugin>
+    <version.mycila.license.plugin>4.6</version.mycila.license.plugin>
+    <version.sign.plugin>1.1.0</version.sign.plugin>
+    <version.cyclonedx.plugin>2.9.1</version.cyclonedx.plugin>
+
+    <!-- To configure maven-license-plugin to check license headers -->
+    <license.name>SSALv1</license.name>
+    <license.owner>SonarSource SA</license.owner>
+    <license.title>${project.name}</license.title>
+    <license.years>${project.inceptionYear}-2025</license.years>
+    <license.mailto>mailto:info AT sonarsource DOT com</license.mailto>
+
+    <gitRepositoryName>parent-oss</gitRepositoryName>
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Plugins ordered by shortname (archetype, assembly ...) -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>${version.assembly.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>buildnumber-maven-plugin</artifactId>
+          <version>${version.buildnumber.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${version.clean.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${version.compiler.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>${version.dependency.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>${version.deploy.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${version.enforcer.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${version.failsafe.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>${version.install.plugin}</version>
+        </plugin>
+        <plugin>
+          <!--
+          This plugin is used to list the licenses of Maven dependencies.
+          Command-line is: mvn license:aggregate-add-third-party
+          -->
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>${version.codehaus.license.plugin}</version>
+          <configuration>
+            <failOnBlacklist>true</failOnBlacklist>
+            <failOnMissing>true</failOnMissing>
+            <includedScopes>compile</includedScopes>
+            <includedLicenses>apache_v2|bouncy_castle|bsd|cddl_gpl|cddl_v1|epl_v1|epl_v2|h2|jaxen|lgpl_v2_1|lgpl_v3|mit|public_domain|tmate|SSALv1</includedLicenses>
+            <licenseMerges>
+              <!-- keep values on a single line -->
+              <licenseMerge>agpl_v3|AGPL 3|GNU Affero General Public License (AGPL) version 3.0|AGPL 3.0</licenseMerge>
+              <licenseMerge>apache_v2|Apache 2|Apache 2.0|Apache-2.0|Apache Public License 2.0|The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache License, version 2.0|Apache Software Licenses|Apache License Version 2.0|ASF 2.0|ASL, version 2|The Apache License, Version 2.0</licenseMerge>
+              <licenseMerge>bouncy_castle|Bouncy Castle Licence</licenseMerge>
+              <licenseMerge>bsd|BSD|BSD License|The BSD License|3-Clause BSD License|The BSD 3-Clause License|New BSD License|New BSD license|BSD 3-Clause|BSD-3-Clause|BSD-style license|Trilead Library License (BSD-Like)|Revised BSD|BSD style</licenseMerge>
+              <licenseMerge>cddl_gpl|Dual license: CDDL 1.0 and GPL v2|Dual license consisting of the CDDL v1.0 and GPL v2|CDDL+GPLv2|CDDL+GPL|CDDL+GPL License|Dual license: CDDL 1.1 and GPL v2|Dual license consisting of the CDDL v1.1 and GPL v2|CDDL1_1+GPLv2|Dual License: CDDL 1.0 and GPL V2 with Classpath Exception|CDDL + GPLv2 with classpath exception|CDDL/GPLv2+CE</licenseMerge>
+              <licenseMerge>cddl_v1|CDDL|CDDL 1.0|CDDL 1.1|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0|Common Development and Distribution License (CDDL) v1.0</licenseMerge>
+              <licenseMerge>epl_v1|EPL 1.0|Eclipse Public License 1.0|Eclipse Public License - v 1.0|Eclipse Public License, Version 1.0|Eclipse Public License v1.0|EPL</licenseMerge>
+              <licenseMerge>epl_v2|Eclipse Public License - v 2.0|Eclipse Public License v2.0|Eclipse Public License 2.0</licenseMerge>
+              <licenseMerge>gpl_v2|GPL 2|GNU General Public License (GPL) version 2.0|GPL 2.0|GNU General Public License (GPL)|GNU General Public Library</licenseMerge>
+              <licenseMerge>gpl_v2_cpe|GPL2 w/ CPE</licenseMerge>
+              <licenseMerge>gpl_v3|GPL 3|GNU General Public License (GPL) version 3.0|GNU General Public License, Version 3|GPL 3.0</licenseMerge>
+              <licenseMerge>h2|The H2 License, Version 1.0</licenseMerge>
+              <licenseMerge>jaxen|http://jaxen.codehaus.org/license.html|Jaxen</licenseMerge>
+              <licenseMerge>lgpl_v2|LGPL 2.0|GNU LGPL 2.0|GNU Lesser General Public License (LGPL), Version 2.0|GNU Lesser General Public License, version 2.0</licenseMerge>
+              <licenseMerge>lgpl_v2_1|LGPL 2.1|GNU LGPL 2.1|GNU Lesser General Public License (LGPL), Version 2.1|GNU Lesser General Public License, version 2.1|LGPL, version 2.1</licenseMerge>
+              <licenseMerge>lgpl_v3|LGPL 3|GNU LGPL 3|GNU LGPL v3|LGPL v.3|GNU LESSER GENERAL PUBLIC LICENSE, Version 3|GNU Lesser General Public Licence|GNU Lesser General Public License|GNU LESSER GENERAL PUBLIC LICENSE</licenseMerge>
+              <licenseMerge>mit|MIT|MIT License|MIT license|The MIT License|The MIT license</licenseMerge>
+              <licenseMerge>public_domain|Public Domain|Public Domain, per Creative Commons CC0|Common Public License Version 1.0</licenseMerge>
+              <licenseMerge>sonarsource|SonarSource|Commercial</licenseMerge>
+              <licenseMerge>tmate|TMate Open Source License</licenseMerge>
+            </licenseMerges>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${version.jar.plugin}</version>
+          <configuration>
+            <archive>
+              <manifestEntries>
+                <Version>${project.version}</Version>
+                <!-- ${buildNumber} is generated by the buildnumber-maven-plugin -->
+                <Implementation-Build>${buildNumber}</Implementation-Build>
+                <!-- This is used to get plugin version at runtime using getPackage().getImplementationVersion() -->
+                <Implementation-Version>${project.version}</Implementation-Version>
+                <Build-Time>${timestamp}</Build-Time>
+              </manifestEntries>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${version.javadoc.plugin}</version>
+          <configuration>
+            <quiet>true</quiet>
+            <doclint>none</doclint>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>${version.plugin.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${version.resources.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>${version.shade.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${version.source.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${version.surefire.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>${version.site.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>native2ascii-maven-plugin</artifactId>
+          <version>${version.native2ascii.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
+          <artifactId>sonar-packaging-maven-plugin</artifactId>
+          <version>${version.sonar-packaging.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.sonar</groupId>
+          <artifactId>sonar-dev-maven-plugin</artifactId>
+          <version>${version.sonar-dev.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>com.github.genthaler</groupId>
+          <artifactId>beanshell-maven-plugin</artifactId>
+          <version>${version.beanshell.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.simplify4u.plugins</groupId>
+          <artifactId>sign-maven-plugin</artifactId>
+	  <version>${version.sign.plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.cyclonedx</groupId>
+          <artifactId>cyclonedx-maven-plugin</artifactId>
+          <version>${version.cyclonedx.plugin}</version>
+          <configuration>
+            <projectType>application</projectType>
+            <includeBomSerialNumber>true</includeBomSerialNumber>
+            <includeCompileScope>true</includeCompileScope>
+            <includeProvidedScope>true</includeProvidedScope>
+            <includeRuntimeScope>true</includeRuntimeScope>
+            <includeSystemScope>true</includeSystemScope>
+            <includeTestScope>true</includeTestScope>
+            <includeLicenseText>false</includeLicenseText>
+            <outputFormat>json</outputFormat>
+            <outputName>bom</outputName>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <doCheck>false</doCheck>
+          <doUpdate>false</doUpdate>
+          <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+          <revisionOnScmFailure>0</revisionOnScmFailure>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${jdk.min.version}</source>
+          <target>${jdk.min.version}</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <runOrder>random</runOrder>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireProperty>
+                  <property>project.description</property>
+                  <message>Project description must be specified (requirement for OSSRH).</message>
+                </requireProperty>
+
+                <requireProperty>
+                  <property>project.name</property>
+                  <message>Project name must be specified (requirement for OSSRH).</message>
+                </requireProperty>
+
+                <requireProperty>
+                  <property>project.url</property>
+                  <message>Project url must be specified (requirement for OSSRH).</message>
+                </requireProperty>
+
+                <requireProperty>
+                  <property>project.licenses</property>
+                  <message>At least on license must be specified (requirement for OSSRH).</message>
+                </requireProperty>
+
+                <requireProperty>
+                  <property>project.developers</property>
+                  <message>At least one developer must be specified (requirement for OSSRH).</message>
+                </requireProperty>
+
+                <requireProperty>
+                  <property>project.scm.connection</property>
+                  <message>scm section should be defined in project (requirement for OSSRH).</message>
+                </requireProperty>
+
+                <requireMavenVersion>
+                  <message>To build this project Maven ${maven.min.version} (or upper) is required. Please install it.
+                  </message>
+                  <version>${maven.min.version}</version>
+                </requireMavenVersion>
+
+                <requireJavaVersion>
+                  <message>To build this project JDK ${jdk.min.version} (or upper) is required. Please install it.
+                  </message>
+                  <version>${jdk.min.version}</version>
+                </requireJavaVersion>
+
+                <requirePluginVersions>
+                  <!--
+                  This rule produces warning under Maven 3.0 :
+                  "This rule is not compatible with the current version of Maven."
+                  -->
+                  <message>Build reproducibility : always define plugin versions!</message>
+                  <banLatest>true</banLatest>
+                  <banRelease>true</banRelease>
+                  <phases>clean,deploy</phases>
+                </requirePluginVersions>
+
+                <!-- TODO SONARPLUGINS-797
+                <DependencyConvergence />
+                -->
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
+        <artifactId>sonar-packaging-maven-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <!-- ${buildNumber} is generated by the buildnumber-maven-plugin -->
+              <Implementation-Build>${buildNumber}</Implementation-Build>
+              <Build-Time>${timestamp}</Build-Time>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${version.mycila.license.plugin}</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.sonarsource.license-headers</groupId>
+            <artifactId>license-headers</artifactId>
+            <version>1.4.0.1404</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <failIfMissing>true</failIfMissing>
+          <strictCheck>true</strictCheck>
+          <encoding>${project.build.sourceEncoding}</encoding>
+          <properties>
+            <license.owner>${license.owner}</license.owner>
+            <license.title>${license.title}</license.title>
+            <license.years>${license.years}</license.years>
+            <license.mailto>${license.mailto}</license.mailto>
+          </properties>
+          <mapping>
+            <java>SLASHSTAR_STYLE</java>
+            <js>SLASHSTAR_STYLE</js>
+            <ts>SLASHSTAR_STYLE</ts>
+            <tsx>SLASHSTAR_STYLE</tsx>
+            <css>SLASHSTAR_STYLE</css>
+            <less>SLASHSTAR_STYLE</less>
+          </mapping>
+          <licenseSets>
+            <licenseSet>
+              <header>sonarsource/licenseheaders/${license.name}.txt</header>
+              <includes>
+                <include>src/*/java/**/*.java</include>
+                <include>src/**/*.js</include>
+                <include>src/**/*.ts</include>
+                <include>src/**/*.tsx</include>
+                <include>src/**/*.css</include>
+                <include>src/**/*.less</include>
+                <include>tests/**/*.test.ts</include>
+              </includes>
+              <excludes>
+                <exclude>src/test/resources/**</exclude>
+              </excludes>
+            </licenseSet>
+          </licenseSets>
+        </configuration>
+        <executions>
+          <execution>
+            <id>enforce-license-headers</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.github.genthaler</groupId>
+        <artifactId>beanshell-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compute-artifact-display-version</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <script><![CDATA[
+                if (! "${project.version}".endsWith("-SNAPSHOT")) {
+                  // example: "6.3.0.1234".
+                  fields = "${project.version}".split("\\.");
+                  if (fields.length == 4) {
+                    digitsCountToDisplay = 0;
+                    if ("0".equals(fields[2])) {
+                      digitsCountToDisplay = 2;
+                    } else {
+                      digitsCountToDisplay = 3;
+                    }
+                    sj = new StringJoiner(".");
+                    for (int i = 0; i < digitsCountToDisplay; ++i) { sj.add(fields[i]); }
+                    project.getProperties().setProperty("sonar.pluginDisplayVersion", sj.toString() + " (build " + fields[3] + ")");
+                  }
+                }
+                ]]>
+              </script>
+              <quiet>true</quiet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>skipSanityChecks</id>
+      <activation>
+        <property>
+          <name>skipSanityChecks</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <properties>
+        <license.skip>true</license.skip>
+        <enforcer.skip>true</enforcer.skip>
+      </properties>
+    </profile>
+    <profile>
+      <id>sign</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.simplify4u.plugins</groupId>
+            <artifactId>sign-maven-plugin</artifactId>
+            <version>${version.sign.plugin}</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <configuration>
+                  <keyPass>${env.PGP_PASSPHRASE}</keyPass>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <!-- This profile is activated when a project is released. -->
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <!-- Generates Javadoc -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>integration-tests</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>integration-test</id>
+                <phase>integration-test</phase>
+                <goals>
+                  <goal>integration-test</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>verify</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>deploy-sonarsource</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>enforce-deploy-settings</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <requireProperty>
+                      <property>gitRepositoryName</property>
+                      <message>You must set name of Git repository in your pom</message>
+                    </requireProperty>
+                    <requireEnvironmentVariable>
+                      <variableName>ARTIFACTORY_URL</variableName>
+                    </requireEnvironmentVariable>
+                    <requireEnvironmentVariable>
+                      <variableName>ARTIFACTORY_DEPLOY_REPO</variableName>
+                    </requireEnvironmentVariable>
+                    <requireEnvironmentVariable>
+                      <variableName>ARTIFACTORY_DEPLOY_USERNAME</variableName>
+                    </requireEnvironmentVariable>
+                    <requireEnvironmentVariable>
+                      <variableName>ARTIFACTORY_DEPLOY_PASSWORD</variableName>
+                    </requireEnvironmentVariable>
+                  </rules>
+                  <fail>true</fail>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.jfrog.buildinfo</groupId>
+            <artifactId>artifactory-maven-plugin</artifactId>
+            <version>${version.artifactory.plugin}</version>
+            <executions>
+              <execution>
+                <id>build-info</id>
+                <goals>
+                  <goal>publish</goal>
+                </goals>
+                <configuration>
+                  <artifactory>
+                    <envVarsIncludePatterns>
+                      GIT_SHA1,
+                      GITHUB_BRANCH,
+                      ARTIFACTS_TO_PUBLISH,
+                      *_VERSION,
+                      JAVA,
+                      CIRRUS_CHANGE_MESSAGE,
+                      PROJECT,
+                      ARTIFACTORY_DEPLOY_REPO,
+                      ARTIFACTORY_DEPLOY_USERNAME,
+                      ARTIFACTORY_PRIVATE_USERNAME,
+                      BUILD_NUMBER
+                    </envVarsIncludePatterns>
+                    <includeEnvVars>true</includeEnvVars>
+                    <timeoutSec>60</timeoutSec>
+                  </artifactory>
+                  <deployProperties>
+                    <vcs.revision>{{GIT_COMMIT|TRAVIS_COMMIT|APPVEYOR_REPO_COMMIT|BUILD_SOURCEVERSION}}</vcs.revision>
+                    <vcs.branch>{{GIT_BRANCH|TRAVIS_BRANCH|APPVEYOR_REPO_BRANCH|SYSTEM_PULLREQUEST_TARGETBRANCH|BUILD_SOURCEBRANCHNAME}}</vcs.branch>
+                    <build.name>${gitRepositoryName}</build.name>
+                    <build.number>{{BUILD_ID|TRAVIS_BUILD_NUMBER|APPVEYOR_BUILD_NUMBER|BUILD_BUILDID}}</build.number>
+                  </deployProperties>
+                  <licenses>
+                    <autoDiscover>true</autoDiscover>
+                    <includePublishedArtifacts>false</includePublishedArtifacts>
+                    <runChecks>true</runChecks>
+                    <scopes>project,provided</scopes>
+                    <violationRecipients>licences-control@sonarsource.com</violationRecipients>
+                  </licenses>
+                  <publisher>
+                    <contextUrl>{{ARTIFACTORY_URL}}</contextUrl>
+                    <repoKey>{{ARTIFACTORY_DEPLOY_REPO}}</repoKey>
+                    <username>{{ARTIFACTORY_DEPLOY_USERNAME}}</username>
+                    <password>{{ARTIFACTORY_DEPLOY_PASSWORD}}</password>
+                    <publishBuildInfo>true</publishBuildInfo>
+                    <publishArtifacts>${artifactory.publish.artifacts}</publishArtifacts>
+                  </publisher>
+                  <buildInfo>
+                    <buildName>${gitRepositoryName}</buildName>
+                    <buildNumber>{{BUILD_ID|TRAVIS_BUILD_NUMBER|APPVEYOR_BUILD_NUMBER|BUILD_BUILDID}}</buildNumber>
+                    <buildUrl>{{CI_BUILD_URL|BUILD_URL}}</buildUrl>
+                    <vcsRevision>{{GIT_COMMIT|TRAVIS_COMMIT|APPVEYOR_REPO_COMMIT|BUILD_SOURCEVERSION}}</vcsRevision>
+                  </buildInfo>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+              <groupId>org.jacoco</groupId>
+              <artifactId>jacoco-maven-plugin</artifactId>
+              <version>${version.jacoco.plugin}</version>
+              <executions>
+                <execution>
+                  <id>prepare-agent</id>
+                  <goals>
+                    <goal>prepare-agent</goal>
+                  </goals>
+                </execution>
+                <execution>
+                  <id>report</id>
+                  <goals>
+                    <goal>report</goal>
+                  </goals>
+                </execution>
+              </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>use-javac-release</id>
+      <activation>
+        <jdk>[9,)</jdk>
+      </activation>
+      <properties>
+        <maven.compiler.release>${jdk.min.version}</maven.compiler.release>
+      </properties>
+    </profile>
+  </profiles>
+</project>

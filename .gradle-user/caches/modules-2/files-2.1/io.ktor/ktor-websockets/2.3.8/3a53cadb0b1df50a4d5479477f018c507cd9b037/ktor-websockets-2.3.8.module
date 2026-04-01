@@ -1,0 +1,845 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "io.ktor",
+    "module": "ktor-websockets",
+    "version": "2.3.8",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.5"
+    }
+  },
+  "variants": [
+    {
+      "name": "metadataApiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.platform.type": "common"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
+          "version": {
+            "requires": "1.7.1"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-http",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-common",
+          "version": {
+            "requires": "1.8.22"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "atomicfu",
+          "version": {
+            "requires": "0.19.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ktor-websockets-metadata-2.3.8.jar",
+          "url": "ktor-websockets-2.3.8.jar",
+          "size": 13477,
+          "sha512": "663e0d09065a1839e54f3b8df67cc9a939d7ffc22067b375fcbb674bd96eadf418da97af2528a8132c7f270b3f0e6a315de1dd65050c8d4047434c61012b1881",
+          "sha256": "5dd2942e9f80855caa1855e24a14f70f1a8759c837b454e995176a3cc9774158",
+          "sha1": "24bcc047cd8d4be934a43c004375bb6521688ffd",
+          "md5": "3f8e262cb4d0b3cc7eab4ba7b0164526"
+        }
+      ]
+    },
+    {
+      "name": "metadataSourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.platform.type": "common"
+      },
+      "files": [
+        {
+          "name": "ktor-websockets-kotlin-2.3.8-sources.jar",
+          "url": "ktor-websockets-2.3.8-sources.jar",
+          "size": 21347,
+          "sha512": "ec962593f7979b4aea6f6227b01e40eda913e700da959c9c9ac6a09458bf5efc4e8fa1690cd91ea5f909925d267ba55d628813befc14dc477b3f80aab310141a",
+          "sha256": "c5368817ec5ba0d5fff0bec4229e8cf205e92cabf61b6898c22b02b01320f98a",
+          "sha1": "149b9bb43cf11dd708fed081f8e1cccc1776e40e",
+          "md5": "0241e1d00695af9d5fa101ee338c428b"
+        }
+      ]
+    },
+    {
+      "name": "iosArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-iosarm64/2.3.8/ktor-websockets-iosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-iosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-iosarm64/2.3.8/ktor-websockets-iosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-iosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-iosarm64/2.3.8/ktor-websockets-iosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-iosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosSimulatorArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "ios_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-iossimulatorarm64/2.3.8/ktor-websockets-iossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-iossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosSimulatorArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "ios_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-iossimulatorarm64/2.3.8/ktor-websockets-iossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-iossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosSimulatorArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "ios_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-iossimulatorarm64/2.3.8/ktor-websockets-iossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-iossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosX64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "ios_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-iosx64/2.3.8/ktor-websockets-iosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-iosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosX64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "ios_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-iosx64/2.3.8/ktor-websockets-iosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-iosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosX64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "ios_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-iosx64/2.3.8/ktor-websockets-iosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-iosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "jsApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.js.compiler": "ir",
+        "org.jetbrains.kotlin.platform.type": "js"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-js/2.3.8/ktor-websockets-js-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-js",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "jsRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.js.compiler": "ir",
+        "org.jetbrains.kotlin.platform.type": "js"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-js/2.3.8/ktor-websockets-js-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-js",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "jsSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.js.compiler": "ir",
+        "org.jetbrains.kotlin.platform.type": "js"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-js/2.3.8/ktor-websockets-js-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-js",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "jvmApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-jvm/2.3.8/ktor-websockets-jvm-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-jvm",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "jvmRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-jvm/2.3.8/ktor-websockets-jvm-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-jvm",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "jvmSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-jvm/2.3.8/ktor-websockets-jvm-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-jvm",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "linuxArm64ApiElements-published",
+      "attributes": {
+        "artifactType": "org.jetbrains.kotlin.klib",
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "linux_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-linuxarm64/2.3.8/ktor-websockets-linuxarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-linuxarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "linuxArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "linux_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-linuxarm64/2.3.8/ktor-websockets-linuxarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-linuxarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "linuxX64ApiElements-published",
+      "attributes": {
+        "artifactType": "org.jetbrains.kotlin.klib",
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "linux_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-linuxx64/2.3.8/ktor-websockets-linuxx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-linuxx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "linuxX64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "linux_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-linuxx64/2.3.8/ktor-websockets-linuxx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-linuxx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "macosArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "macos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-macosarm64/2.3.8/ktor-websockets-macosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-macosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "macosArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "macos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-macosarm64/2.3.8/ktor-websockets-macosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-macosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "macosArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "macos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-macosarm64/2.3.8/ktor-websockets-macosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-macosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "macosX64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "macos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-macosx64/2.3.8/ktor-websockets-macosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-macosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "macosX64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "macos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-macosx64/2.3.8/ktor-websockets-macosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-macosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "macosX64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "macos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-macosx64/2.3.8/ktor-websockets-macosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-macosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "mingwX64ApiElements-published",
+      "attributes": {
+        "artifactType": "org.jetbrains.kotlin.klib",
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "mingw_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-mingwx64/2.3.8/ktor-websockets-mingwx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-mingwx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "mingwX64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "mingw_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-mingwx64/2.3.8/ktor-websockets-mingwx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-mingwx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "tvos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-tvosarm64/2.3.8/ktor-websockets-tvosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-tvosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "tvos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-tvosarm64/2.3.8/ktor-websockets-tvosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-tvosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "tvos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-tvosarm64/2.3.8/ktor-websockets-tvosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-tvosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosSimulatorArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "tvos_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-tvossimulatorarm64/2.3.8/ktor-websockets-tvossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-tvossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosSimulatorArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "tvos_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-tvossimulatorarm64/2.3.8/ktor-websockets-tvossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-tvossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosSimulatorArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "tvos_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-tvossimulatorarm64/2.3.8/ktor-websockets-tvossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-tvossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosX64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "tvos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-tvosx64/2.3.8/ktor-websockets-tvosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-tvosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosX64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "tvos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-tvosx64/2.3.8/ktor-websockets-tvosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-tvosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosX64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "tvos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-tvosx64/2.3.8/ktor-websockets-tvosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-tvosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosArm32ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "watchos_arm32",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-watchosarm32/2.3.8/ktor-websockets-watchosarm32-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-watchosarm32",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosArm32MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "watchos_arm32",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-watchosarm32/2.3.8/ktor-websockets-watchosarm32-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-watchosarm32",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosArm32SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "watchos_arm32",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-watchosarm32/2.3.8/ktor-websockets-watchosarm32-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-watchosarm32",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "watchos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-watchosarm64/2.3.8/ktor-websockets-watchosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-watchosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "watchos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-watchosarm64/2.3.8/ktor-websockets-watchosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-watchosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "watchos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-watchosarm64/2.3.8/ktor-websockets-watchosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-watchosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosSimulatorArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "watchos_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-watchossimulatorarm64/2.3.8/ktor-websockets-watchossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-watchossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosSimulatorArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "watchos_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-watchossimulatorarm64/2.3.8/ktor-websockets-watchossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-watchossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosSimulatorArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "watchos_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-watchossimulatorarm64/2.3.8/ktor-websockets-watchossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-watchossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosX64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "watchos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-watchosx64/2.3.8/ktor-websockets-watchosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-watchosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosX64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "watchos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-watchosx64/2.3.8/ktor-websockets-watchosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-watchosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosX64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "watchos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-websockets-watchosx64/2.3.8/ktor-websockets-watchosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-websockets-watchosx64",
+        "version": "2.3.8"
+      }
+    }
+  ]
+}

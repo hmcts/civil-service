@@ -1,0 +1,116 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.springframework.boot",
+    "module": "spring-boot-properties-migrator",
+    "version": "3.3.7",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.11.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "spring-boot-properties-migrator-3.3.7.jar",
+          "url": "spring-boot-properties-migrator-3.3.7.jar",
+          "size": 22002,
+          "sha512": "e05baa3e7432ce0ff7481e8d167e0427f366d6ca4059af3c8fe4a0302cd4f8cf5513d74c9e9a250a68ad55d5ecfa3a79de3735cf18ad69fee37e2168bc859406",
+          "sha256": "88bcc456c35039e56bada3b81cf41bfddf73b670771c44c1cdb6b0259d380968",
+          "sha1": "723c61a5d4b8cfc0ad65bf6a952e6ebcf7778353",
+          "md5": "fad699df9ce74d4fd1298798a7d55bd2"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot",
+          "version": {
+            "requires": "3.3.7"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-configuration-metadata",
+          "version": {
+            "requires": "3.3.7"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-boot-properties-migrator-3.3.7.jar",
+          "url": "spring-boot-properties-migrator-3.3.7.jar",
+          "size": 22002,
+          "sha512": "e05baa3e7432ce0ff7481e8d167e0427f366d6ca4059af3c8fe4a0302cd4f8cf5513d74c9e9a250a68ad55d5ecfa3a79de3735cf18ad69fee37e2168bc859406",
+          "sha256": "88bcc456c35039e56bada3b81cf41bfddf73b670771c44c1cdb6b0259d380968",
+          "sha1": "723c61a5d4b8cfc0ad65bf6a952e6ebcf7778353",
+          "md5": "fad699df9ce74d4fd1298798a7d55bd2"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-properties-migrator-3.3.7-javadoc.jar",
+          "url": "spring-boot-properties-migrator-3.3.7-javadoc.jar",
+          "size": 4719,
+          "sha512": "1baf0221d469264eb156f117130279c607ae292e7e0cfaa2877c580de4b87f0eb7acc64cb6af2f8cf8e007dbff79e11aeeb4ec92116a81e7f90795fb92958330",
+          "sha256": "03b2a5e0e844e235c767c1adee32f7420072ac245b2bd5ab49eba6c579f46669",
+          "sha1": "2cf39220dcb522c968738a03a58747f3e58f48a8",
+          "md5": "6dfb71b7633b0b217fa25871a2500454"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-properties-migrator-3.3.7-sources.jar",
+          "url": "spring-boot-properties-migrator-3.3.7-sources.jar",
+          "size": 14390,
+          "sha512": "303366f3782cda169a5714a24c26480937d40a589f8814f5bedc182447674c69a5be13b99cb271aa3a2872ff2a67746df267b35a69081a973d8fa485dbb91fae",
+          "sha256": "37b8a59ee257df9f0831c1ee70c04a7a68067305f59132bb801cf15d1653494e",
+          "sha1": "af5ed940cc4556e92fe9ddde9e39446f64cde64a",
+          "md5": "606b4f99cde8448bd30f2f31b7b2d404"
+        }
+      ]
+    }
+  ]
+}

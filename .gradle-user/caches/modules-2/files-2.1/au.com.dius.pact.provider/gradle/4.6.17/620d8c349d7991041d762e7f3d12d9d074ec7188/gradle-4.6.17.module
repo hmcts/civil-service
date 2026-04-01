@@ -1,0 +1,357 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "au.com.dius.pact.provider",
+    "module": "gradle",
+    "version": "4.6.17",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.6.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencyConstraints": [
+        {
+          "group": "org.apache.httpcomponents.client5",
+          "module": "httpclient5",
+          "version": {
+            "requires": "5.3.1"
+          }
+        },
+        {
+          "group": "org.apache.httpcomponents.client5",
+          "module": "httpclient5-fluent",
+          "version": {
+            "requires": "5.3.1"
+          }
+        },
+        {
+          "group": "org.json",
+          "module": "json",
+          "version": {
+            "requires": "20240205"
+          }
+        },
+        {
+          "group": "io.pact.plugin.driver",
+          "module": "core",
+          "version": {
+            "requires": "0.5.1"
+          }
+        },
+        {
+          "group": "org.apache.tika",
+          "module": "tika-core",
+          "version": {
+            "requires": "2.9.1"
+          }
+        },
+        {
+          "group": "io.github.oshai",
+          "module": "kotlin-logging-jvm",
+          "version": {
+            "requires": "5.1.4"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "gradle-4.6.17.jar",
+          "url": "gradle-4.6.17.jar",
+          "size": 108989,
+          "sha512": "12296b87d78dbd813075035682ff2ebc126a545782eed2f1df7d1c73921129d25c557585940de9385b3ba22c582ce345b66cbc840f6dd03dbea1b794f26a8b8d",
+          "sha256": "0ad134d85014cacec685ac53d2a3c617fb480bfc45696420cc7d29df05a7579d",
+          "sha1": "ad6a9ceefa75d748dbab0a5a9ed92bce4ec31278",
+          "md5": "f2c85ce87563d9bf15b61f0d68f2f806"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-bom",
+          "version": {
+            "requires": "1.8.22"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.8.22"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-reflect",
+          "version": {
+            "requires": "1.8.22"
+          }
+        },
+        {
+          "group": "au.com.dius.pact",
+          "module": "provider",
+          "version": {
+            "requires": "4.6.17"
+          }
+        },
+        {
+          "group": "au.com.dius.pact.core",
+          "module": "model",
+          "version": {
+            "requires": "4.6.17"
+          }
+        },
+        {
+          "group": "com.github.ajalt",
+          "module": "mordant",
+          "version": {
+            "requires": "1.2.1"
+          }
+        },
+        {
+          "group": "commons-io",
+          "module": "commons-io",
+          "version": {
+            "requires": "2.11.0"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-lang3"
+        },
+        {
+          "group": "io.github.oshai",
+          "module": "kotlin-logging-jvm"
+        }
+      ],
+      "dependencyConstraints": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib"
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-lang3",
+          "version": {
+            "requires": "3.12.0"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-text",
+          "version": {
+            "requires": "1.10.0"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-collections4",
+          "version": {
+            "requires": "4.4"
+          }
+        },
+        {
+          "group": "org.apache.tika",
+          "module": "tika-core",
+          "version": {
+            "requires": "2.9.1"
+          }
+        },
+        {
+          "group": "com.google.guava",
+          "module": "guava",
+          "version": {
+            "requires": "31.1-jre"
+          }
+        },
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api",
+          "version": {
+            "requires": "2.0.4"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-http-jvm",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-server-netty",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-network-tls-certificates",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-server-call-logging",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "io.netty",
+          "module": "netty-handler",
+          "version": {
+            "requires": "4.1.108.Final"
+          }
+        },
+        {
+          "group": "org.apache.groovy",
+          "module": "groovy",
+          "version": {
+            "requires": "4.0.18"
+          }
+        },
+        {
+          "group": "org.apache.groovy",
+          "module": "groovy-json",
+          "version": {
+            "requires": "4.0.18"
+          }
+        },
+        {
+          "group": "org.apache.groovy",
+          "module": "groovy-xml",
+          "version": {
+            "requires": "4.0.18"
+          }
+        },
+        {
+          "group": "io.pact.plugin.driver",
+          "module": "core",
+          "version": {
+            "requires": "0.5.1"
+          }
+        },
+        {
+          "group": "commons-codec",
+          "module": "commons-codec",
+          "version": {
+            "requires": "1.15"
+          }
+        },
+        {
+          "group": "io.github.oshai",
+          "module": "kotlin-logging-jvm",
+          "version": {
+            "requires": "5.1.4"
+          }
+        },
+        {
+          "group": "org.apache.httpcomponents.client5",
+          "module": "httpclient5",
+          "version": {
+            "requires": "5.3.1"
+          }
+        },
+        {
+          "group": "org.apache.httpcomponents.client5",
+          "module": "httpclient5-fluent",
+          "version": {
+            "requires": "5.3.1"
+          }
+        },
+        {
+          "group": "org.json",
+          "module": "json",
+          "version": {
+            "requires": "20240205"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "gradle-4.6.17.jar",
+          "url": "gradle-4.6.17.jar",
+          "size": 108989,
+          "sha512": "12296b87d78dbd813075035682ff2ebc126a545782eed2f1df7d1c73921129d25c557585940de9385b3ba22c582ce345b66cbc840f6dd03dbea1b794f26a8b8d",
+          "sha256": "0ad134d85014cacec685ac53d2a3c617fb480bfc45696420cc7d29df05a7579d",
+          "sha1": "ad6a9ceefa75d748dbab0a5a9ed92bce4ec31278",
+          "md5": "f2c85ce87563d9bf15b61f0d68f2f806"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "gradle-4.6.17-javadoc.jar",
+          "url": "gradle-4.6.17-javadoc.jar",
+          "size": 261,
+          "sha512": "603941aac067bfd7e461d5778ffd2f485514c663635afe1cafb524cdaba5dffb28f80fa42e4f06bcde9488996457dee23a17ea713651d89aae0ba887083a8ce0",
+          "sha256": "38de5a79bfb7186f2853f28e438709d5c1e5d91a228e7a413a2dee8b9f3d311a",
+          "sha1": "086bc5899eb89a1ce27a92dd34372ee7f99ba417",
+          "md5": "29032d28e21480b737c69f0e7e80f6c0"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "gradle-4.6.17-sources.jar",
+          "url": "gradle-4.6.17-sources.jar",
+          "size": 15319,
+          "sha512": "4ad61e1747f8337865b7fc5184e698c0f8e7c291150f600a56be3091a2d49d98cc587ce36a55adfd1d3ea28e78762360f14289d12e3f6145947f413d9dfb46ec",
+          "sha256": "d00895cdf929d01f600918d70053321b554754ef475d3794f329b24b15bde4a5",
+          "sha1": "4dd785b1ac6247a08569f8a566658d06da1a0343",
+          "md5": "2570480e1a4f3f79991c54665dd5e4c4"
+        }
+      ]
+    }
+  ]
+}

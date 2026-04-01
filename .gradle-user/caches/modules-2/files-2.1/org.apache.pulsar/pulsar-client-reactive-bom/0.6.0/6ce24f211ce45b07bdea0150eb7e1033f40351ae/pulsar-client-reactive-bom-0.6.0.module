@@ -1,0 +1,106 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.apache.pulsar",
+    "module": "pulsar-client-reactive-bom",
+    "version": "0.6.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.9"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "platform",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencyConstraints": [
+        {
+          "group": "org.apache.pulsar",
+          "module": "pulsar-client-reactive-adapter",
+          "version": {
+            "requires": "0.6.0"
+          }
+        },
+        {
+          "group": "org.apache.pulsar",
+          "module": "pulsar-client-reactive-api",
+          "version": {
+            "requires": "0.6.0"
+          }
+        },
+        {
+          "group": "org.apache.pulsar",
+          "module": "pulsar-client-reactive-jackson",
+          "version": {
+            "requires": "0.6.0"
+          }
+        },
+        {
+          "group": "org.apache.pulsar",
+          "module": "pulsar-client-reactive-producer-cache-caffeine",
+          "version": {
+            "requires": "0.6.0"
+          }
+        },
+        {
+          "group": "org.apache.pulsar",
+          "module": "pulsar-client-reactive-producer-cache-caffeine-shaded",
+          "version": {
+            "requires": "0.6.0"
+          }
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "platform",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencyConstraints": [
+        {
+          "group": "org.apache.pulsar",
+          "module": "pulsar-client-reactive-adapter",
+          "version": {
+            "requires": "0.6.0"
+          }
+        },
+        {
+          "group": "org.apache.pulsar",
+          "module": "pulsar-client-reactive-api",
+          "version": {
+            "requires": "0.6.0"
+          }
+        },
+        {
+          "group": "org.apache.pulsar",
+          "module": "pulsar-client-reactive-jackson",
+          "version": {
+            "requires": "0.6.0"
+          }
+        },
+        {
+          "group": "org.apache.pulsar",
+          "module": "pulsar-client-reactive-producer-cache-caffeine",
+          "version": {
+            "requires": "0.6.0"
+          }
+        },
+        {
+          "group": "org.apache.pulsar",
+          "module": "pulsar-client-reactive-producer-cache-caffeine-shaded",
+          "version": {
+            "requires": "0.6.0"
+          }
+        }
+      ]
+    }
+  ]
+}

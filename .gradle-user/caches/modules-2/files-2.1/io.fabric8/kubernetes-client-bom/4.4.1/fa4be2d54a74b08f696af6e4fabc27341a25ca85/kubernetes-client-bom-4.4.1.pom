@@ -1,0 +1,171 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.fabric8</groupId>
+    <artifactId>kubernetes-client-bom</artifactId>
+    <version>4.4.1</version>
+    <name>Fabric8 :: Kubernetes :: Bom</name>
+    <packaging>pom</packaging>
+    <description>Bill of material</description>
+    
+        <url>http://fabric8.io/</url>    
+        <licenses>
+            <license>
+                <name>Apache License, Version 2.0</name>
+                <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+                <distribution>repo</distribution>
+            </license>
+        </licenses>
+    
+    
+        <scm>
+            <connection>scm:git:git@github.com:fabric8io/kubernetes-client.git</connection>
+            <developerConnection>scm:git:git@github.com:fabric8io/kubernetes-client.git</developerConnection>
+            <url>scm:git:git@github.com:fabric8io/kubernetes-client.git</url>
+            <tag>4.4.1</tag>
+        </scm>
+    
+            <developers>
+            <developer>
+                <id>geeks</id>
+                <name>Fabric8 Development Team</name>
+                <organization>fabric8</organization>
+                <organizationUrl>http://fabric8.io/</organizationUrl>
+            </developer>
+        </developers>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-model-common</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-model-annotator</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-model</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-client</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-server-mock</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>openshift-client</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>knative-model-annotator</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>knative-model</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>knative-client</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>knative-mock</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>knative-examples</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>knative-tests</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>tekton-model-annotator</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>tekton-model</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>tekton-client</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>tekton-mock</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>tekton-examples</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>tekton-tests</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>openshift-server-mock</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-examples</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8.kubernetes</groupId>
+                <artifactId>kubernetes-karaf</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8.kubernetes</groupId>
+                <artifactId>kubernetes-karaf-itests</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-test</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-openshift-uberjar</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
+        <build>
+            <pluginManagement>
+                <plugins>
+                </plugins>
+            </pluginManagement>
+        </build>
+    
+</project>

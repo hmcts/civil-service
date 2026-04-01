@@ -1,0 +1,165 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.hmcts",
+    "module": "fees-java-client",
+    "version": "0.1.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.7"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "fees-java-client-0.1.0-plain.jar",
+          "url": "fees-java-client-0.1.0-plain.jar",
+          "size": 44817,
+          "sha512": "dea371831cb3bf02a23bb4e63f4b9d8f2af940082ff7e48811488daea2692774e35c39ac377db6bcc51263426cc6b973f6b2a5a81ce6d0d0896a134d258b2cd0",
+          "sha256": "e57ee8fbacb682cf1807f86d7fdd9ca7ffb8771589afd7b556ebf69804258b9e",
+          "sha1": "e8bfa2a19e767291fd4dd876b88073efa4159e2c",
+          "md5": "77394250fa91aacebd45e35f34129d4d"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.cloud",
+          "module": "spring-cloud-starter-openfeign",
+          "version": {
+            "requires": "4.3.0"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-lang3",
+          "version": {
+            "requires": "3.19.0"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-actuator",
+          "version": {
+            "requires": "3.5.6"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.18.2"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-annotations",
+          "version": {
+            "requires": "2.18.2"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.datatype",
+          "module": "jackson-datatype-jsr310",
+          "version": {
+            "requires": "2.18.2"
+          }
+        },
+        {
+          "group": "ch.qos.logback",
+          "module": "logback-classic",
+          "version": {
+            "requires": "1.5.20"
+          }
+        },
+        {
+          "group": "ch.qos.logback",
+          "module": "logback-core",
+          "version": {
+            "requires": "1.5.20"
+          }
+        },
+        {
+          "group": "com.github.hmcts.java-logging",
+          "module": "logging",
+          "version": {
+            "requires": "6.1.9"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "fees-java-client-0.1.0-plain.jar",
+          "url": "fees-java-client-0.1.0-plain.jar",
+          "size": 44817,
+          "sha512": "dea371831cb3bf02a23bb4e63f4b9d8f2af940082ff7e48811488daea2692774e35c39ac377db6bcc51263426cc6b973f6b2a5a81ce6d0d0896a134d258b2cd0",
+          "sha256": "e57ee8fbacb682cf1807f86d7fdd9ca7ffb8771589afd7b556ebf69804258b9e",
+          "sha1": "e8bfa2a19e767291fd4dd876b88073efa4159e2c",
+          "md5": "77394250fa91aacebd45e35f34129d4d"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "fees-java-client-0.1.0-sources.jar",
+          "url": "fees-java-client-0.1.0-sources.jar",
+          "size": 10799,
+          "sha512": "ff47592afbe27741bacc153c0c40a306cc0cb04fc665429f07b72d394fb1fdc03a4480d7cb36e4763a2c5f216de271e9b9ef4f2ec5a577b138904e82d128c6cb",
+          "sha256": "a579a8c9b443878f38d3834010ee99f5a2281030b44d4014c88469a80514f83e",
+          "sha1": "d664951dcaa43b2c3ca47cf555baec0b732dc0e8",
+          "md5": "2cff4a7413e50ad442a40b7f3b95ffdd"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "fees-java-client-0.1.0-javadoc.jar",
+          "url": "fees-java-client-0.1.0-javadoc.jar",
+          "size": 143253,
+          "sha512": "4786e3514f91c8847aa15b715efe396ef1cefe9f2b03a72ef4ca9454d52501ab909930a00868816d60de866ce4c9551d7ee179ed0462504136140c4b368279f6",
+          "sha256": "631dda964c34b15b117463983725515a90926d1997673dcbc2551562fb5ae477",
+          "sha1": "21f9814bc6cfd70940ef9f104410b17199e92c18",
+          "md5": "fc64b4783f7e8cccf485c6e52486f323"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,450 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "au.com.dius.pact",
+    "module": "consumer",
+    "version": "4.6.17",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.6.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "au.com.dius.pact.core",
+          "module": "support",
+          "version": {
+            "requires": "4.6.17"
+          }
+        },
+        {
+          "group": "au.com.dius.pact.core",
+          "module": "model",
+          "version": {
+            "requires": "4.6.17"
+          }
+        },
+        {
+          "group": "au.com.dius.pact.core",
+          "module": "matchers",
+          "version": {
+            "requires": "4.6.17"
+          }
+        },
+        {
+          "group": "org.apache.httpcomponents.client5",
+          "module": "httpclient5"
+        },
+        {
+          "group": "org.json",
+          "module": "json"
+        }
+      ],
+      "dependencyConstraints": [
+        {
+          "group": "org.apache.httpcomponents.client5",
+          "module": "httpclient5",
+          "version": {
+            "requires": "5.3.1"
+          }
+        },
+        {
+          "group": "org.apache.httpcomponents.client5",
+          "module": "httpclient5-fluent",
+          "version": {
+            "requires": "5.3.1"
+          }
+        },
+        {
+          "group": "org.json",
+          "module": "json",
+          "version": {
+            "requires": "20240205"
+          }
+        },
+        {
+          "group": "io.pact.plugin.driver",
+          "module": "core",
+          "version": {
+            "requires": "0.5.1"
+          }
+        },
+        {
+          "group": "org.apache.tika",
+          "module": "tika-core",
+          "version": {
+            "requires": "2.9.1"
+          }
+        },
+        {
+          "group": "io.github.oshai",
+          "module": "kotlin-logging-jvm",
+          "version": {
+            "requires": "5.1.4"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "consumer-4.6.17.jar",
+          "url": "consumer-4.6.17.jar",
+          "size": 460001,
+          "sha512": "cf19400fe7b553cf846d48e16a150076984ce65d89a846412a57978ba92577533fa9820df9b3677b36ae87453ee14de9c84a6170cf1bac99cad63010a9cac4e3",
+          "sha256": "0d923b3675e4ae047c346959b1d0dcb03a732664a6e840a2646933514d45fa88",
+          "sha1": "c5f948d891ffff9cfca91f210772f75afc37b1f5",
+          "md5": "de3962e1da9f8977d88bae3a067f1ba9"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-bom",
+          "version": {
+            "requires": "1.8.22"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.8.22"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-reflect",
+          "version": {
+            "requires": "1.8.22"
+          }
+        },
+        {
+          "group": "org.apache.httpcomponents.client5",
+          "module": "httpclient5-fluent"
+        },
+        {
+          "group": "com.googlecode.java-diff-utils",
+          "module": "diffutils",
+          "version": {
+            "requires": "1.3.0"
+          }
+        },
+        {
+          "group": "io.netty",
+          "module": "netty-handler",
+          "excludes": [
+            {
+              "group": "*",
+              "module": "netty-transport-native-kqueue"
+            }
+          ]
+        },
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api"
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-server-netty"
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-network-tls-certificates"
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-server-call-logging"
+        },
+        {
+          "group": "io.pact.plugin.driver",
+          "module": "core",
+          "excludes": [
+            {
+              "group": "au.com.dius.pact.core",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-lang3"
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-io",
+          "version": {
+            "requires": "1.3.2"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-text",
+          "version": {
+            "requires": "1.10.0"
+          }
+        },
+        {
+          "group": "org.apache.tika",
+          "module": "tika-core"
+        },
+        {
+          "group": "au.com.dius.pact.core",
+          "module": "support",
+          "version": {
+            "requires": "4.6.17"
+          }
+        },
+        {
+          "group": "au.com.dius.pact.core",
+          "module": "model",
+          "version": {
+            "requires": "4.6.17"
+          }
+        },
+        {
+          "group": "au.com.dius.pact.core",
+          "module": "matchers",
+          "version": {
+            "requires": "4.6.17"
+          }
+        },
+        {
+          "group": "org.apache.httpcomponents.client5",
+          "module": "httpclient5"
+        },
+        {
+          "group": "org.json",
+          "module": "json"
+        }
+      ],
+      "dependencyConstraints": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib"
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-lang3",
+          "version": {
+            "requires": "3.12.0"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-text",
+          "version": {
+            "requires": "1.10.0"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-collections4",
+          "version": {
+            "requires": "4.4"
+          }
+        },
+        {
+          "group": "org.apache.tika",
+          "module": "tika-core",
+          "version": {
+            "requires": "2.9.1"
+          }
+        },
+        {
+          "group": "com.google.guava",
+          "module": "guava",
+          "version": {
+            "requires": "31.1-jre"
+          }
+        },
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api",
+          "version": {
+            "requires": "2.0.4"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-http-jvm",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-server-netty",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-network-tls-certificates",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-server-call-logging",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "io.netty",
+          "module": "netty-handler",
+          "version": {
+            "requires": "4.1.108.Final"
+          }
+        },
+        {
+          "group": "org.apache.groovy",
+          "module": "groovy",
+          "version": {
+            "requires": "4.0.18"
+          }
+        },
+        {
+          "group": "org.apache.groovy",
+          "module": "groovy-json",
+          "version": {
+            "requires": "4.0.18"
+          }
+        },
+        {
+          "group": "org.apache.groovy",
+          "module": "groovy-xml",
+          "version": {
+            "requires": "4.0.18"
+          }
+        },
+        {
+          "group": "io.pact.plugin.driver",
+          "module": "core",
+          "version": {
+            "requires": "0.5.1"
+          }
+        },
+        {
+          "group": "commons-codec",
+          "module": "commons-codec",
+          "version": {
+            "requires": "1.15"
+          }
+        },
+        {
+          "group": "io.github.oshai",
+          "module": "kotlin-logging-jvm",
+          "version": {
+            "requires": "5.1.4"
+          }
+        },
+        {
+          "group": "org.apache.httpcomponents.client5",
+          "module": "httpclient5",
+          "version": {
+            "requires": "5.3.1"
+          }
+        },
+        {
+          "group": "org.apache.httpcomponents.client5",
+          "module": "httpclient5-fluent",
+          "version": {
+            "requires": "5.3.1"
+          }
+        },
+        {
+          "group": "org.json",
+          "module": "json",
+          "version": {
+            "requires": "20240205"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "consumer-4.6.17.jar",
+          "url": "consumer-4.6.17.jar",
+          "size": 460001,
+          "sha512": "cf19400fe7b553cf846d48e16a150076984ce65d89a846412a57978ba92577533fa9820df9b3677b36ae87453ee14de9c84a6170cf1bac99cad63010a9cac4e3",
+          "sha256": "0d923b3675e4ae047c346959b1d0dcb03a732664a6e840a2646933514d45fa88",
+          "sha1": "c5f948d891ffff9cfca91f210772f75afc37b1f5",
+          "md5": "de3962e1da9f8977d88bae3a067f1ba9"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "consumer-4.6.17-javadoc.jar",
+          "url": "consumer-4.6.17-javadoc.jar",
+          "size": 1034456,
+          "sha512": "29fbef1087629e7f9e787f0fb69a2dca98769f76711541c517eb78a84299bd97efc6395384a2f3925cd4e81d0bf90d0c892d2ca53ac93540735c5ab13322f303",
+          "sha256": "17a7b758a9be2e27b19ecd4317ee64469131d54a318ad5db1a286c78223cc66e",
+          "sha1": "9a670beaaef45854f867db79b4ceb2dbf5ceef2f",
+          "md5": "de8ee554b021e733a036ddbc62d2a995"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "consumer-4.6.17-sources.jar",
+          "url": "consumer-4.6.17-sources.jar",
+          "size": 104882,
+          "sha512": "da4456ecd733d68adeeb1ea0ae6754da4f4eabd4bfbf77f1b60f8b5efbe60612f2d052c7a05e4b67d5b4ebecd8774a031613feefaf264af69c52c3e14e4288bc",
+          "sha256": "e469d7f75c13b696c28680cf807061c99fd8ae67ef8e2588a905d5ae14471104",
+          "sha1": "644fb27095b3f2de3cfcb258b8fc62f25025b996",
+          "md5": "78addadda3513def7dd44e985d2698ab"
+        }
+      ]
+    }
+  ]
+}

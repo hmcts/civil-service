@@ -1,0 +1,78 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.gradle",
+    "module": "test-retry-gradle-plugin",
+    "version": "1.6.2",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.12.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "shadowRuntimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "shadowed",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "test-retry-gradle-plugin-1.6.2.jar",
+          "url": "test-retry-gradle-plugin-1.6.2.jar",
+          "size": 228655,
+          "sha512": "2a15aa3d59c239080f112782e5517a637133cb98f673cec03d0a7826b7bee92c16c7b375b47799504bd01a4c47829cfae825b56c88dd3238eafadf4849d6d48c",
+          "sha256": "fcec16c4034693ec8178546695605cf71e88203f7e83b53db4434317019c01d3",
+          "sha1": "da7b6b81ab4c9da816ddc8cf5fd6107fb42b49d9",
+          "md5": "41dbd378be88ad6bce3dea02f50c35ab"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "test-retry-gradle-plugin-1.6.2-javadoc.jar",
+          "url": "test-retry-gradle-plugin-1.6.2-javadoc.jar",
+          "size": 92659,
+          "sha512": "066285bb60242db50274b2880a138fe1ee8c6dddff062dd20a99e0a18b150b0e6df756805977a522b246d2ab560412977b6c317b042df17024346d875f84101c",
+          "sha256": "2ea37207dd48e82b960038f3f08f8250e7473d7c204d682c530b4bcf61810b77",
+          "sha1": "c53460be4ff67b1101bce10ca0348908ce7140a3",
+          "md5": "0e44111fe30a409b89c5529638ad8350"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "test-retry-gradle-plugin-1.6.2-sources.jar",
+          "url": "test-retry-gradle-plugin-1.6.2-sources.jar",
+          "size": 47196,
+          "sha512": "04c8371179c36e5e3085e14a3c3c58a83a0e6d705bb2ca395367d0e03a6f26e2f3f8d596d86dd76b562aa05f256b04bff0e2a6ddb277c33469a02463e0e1faae",
+          "sha256": "dad7c4bd426eb47ee9137a67c11d6d0753e89dda3385a3580d0b0686ffbc2d3b",
+          "sha1": "8d2317265a7333e324331be96ded87017fbc9c7c",
+          "md5": "d9b8034e0e5d7612048662d0050b695e"
+        }
+      ]
+    }
+  ]
+}

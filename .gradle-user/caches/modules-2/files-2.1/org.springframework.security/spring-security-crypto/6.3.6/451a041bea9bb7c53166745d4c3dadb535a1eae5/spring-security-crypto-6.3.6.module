@@ -1,0 +1,100 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.springframework.security",
+    "module": "spring-security-crypto",
+    "version": "6.3.6",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.10.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "spring-security-crypto-6.3.6.jar",
+          "url": "spring-security-crypto-6.3.6.jar",
+          "size": 100227,
+          "sha512": "57e5835b47e3f10a63cc5fa5b1d92b9518c66dff72c2ecb27cc7276b34961501e6aa9272859838deb30bf089572981173038014a2d8858120d26d22b0201be81",
+          "sha256": "2330d814cd9b3ff4cdf50230d70178c010c43b0ea446c545b358df6ae081e9be",
+          "sha1": "94c14964ca3d09629ac095754da7e1605eae7572",
+          "md5": "86f116dd7aebbdfb929e5bfb61eeff8b"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-security-crypto-6.3.6.jar",
+          "url": "spring-security-crypto-6.3.6.jar",
+          "size": 100227,
+          "sha512": "57e5835b47e3f10a63cc5fa5b1d92b9518c66dff72c2ecb27cc7276b34961501e6aa9272859838deb30bf089572981173038014a2d8858120d26d22b0201be81",
+          "sha256": "2330d814cd9b3ff4cdf50230d70178c010c43b0ea446c545b358df6ae081e9be",
+          "sha1": "94c14964ca3d09629ac095754da7e1605eae7572",
+          "md5": "86f116dd7aebbdfb929e5bfb61eeff8b"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-security-crypto-6.3.6-javadoc.jar",
+          "url": "spring-security-crypto-6.3.6-javadoc.jar",
+          "size": 242242,
+          "sha512": "a7a77949b58a8d69e7fcd084b8cf259047247e3b3431e37b14c0705018088b062d5788d7da239bd7cc713e4730c7d2930ea3d663b912e7e8fbbcbd92cf210e5e",
+          "sha256": "b7c1c9ced455c4ed4014eb1f472f3b0412d42641ce26ff42858375a8505281f9",
+          "sha1": "b37460a916fecde574200a3cb3ef284ebffb77d3",
+          "md5": "881af8512272b6ba12933b0a2caaf50e"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-security-crypto-6.3.6-sources.jar",
+          "url": "spring-security-crypto-6.3.6-sources.jar",
+          "size": 86491,
+          "sha512": "67ae819702f0f6b293efbad877328c019f4560fb7b777c76529daafe8c3dad95ef7df9bccf4383882ac51976b199b4121d96e357d7e3329b1cbc6fe3dca57fc9",
+          "sha256": "0a3aac7d2ab942e46cd68e176e8bf6802fbc281fb5826319768e9ca56ee5db75",
+          "sha1": "9f2dbec7d021d123969d6ebac2d6e19d4fb88cd8",
+          "md5": "2b1edb755e2273bfad156485f4e5daf9"
+        }
+      ]
+    }
+  ]
+}

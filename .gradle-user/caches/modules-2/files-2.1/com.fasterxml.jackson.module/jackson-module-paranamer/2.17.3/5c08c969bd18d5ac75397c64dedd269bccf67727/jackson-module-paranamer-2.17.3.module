@@ -1,0 +1,112 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.fasterxml.jackson.module",
+    "module": "jackson-module-paranamer",
+    "version": "2.17.3",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "maven": {
+      "version": "3.9.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.17.3"
+          }
+        },
+        {
+          "group": "com.thoughtworks.paranamer",
+          "module": "paranamer",
+          "version": {
+            "requires": "2.8"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson",
+          "module": "jackson-bom",
+          "version": {
+            "requires": "2.17.3"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        }
+      ],
+      "files": [
+        {
+          "name": "jackson-module-paranamer-2.17.3.jar",
+          "url": "jackson-module-paranamer-2.17.3.jar",
+          "size": 41957,
+          "sha512": "ab4e7fe7d812bfb57cd4022a448ddb740574fca3c8858e9ae14e30785299d91dadb734f0c28193d4c9ad2b6ba97cede419057f220b50b517faa88fbe98f7ad67",
+          "sha256": "9bdbeb407018967c7d7582c4fd64b770e8f3a02e3f86f189cff0b564f2fe0f86",
+          "sha1": "8d6297e675ac9aaf93438901dbd507c360fa1e11",
+          "md5": "99a2b67ee89be14e0444a179beaa3cd7"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.17.3"
+          }
+        },
+        {
+          "group": "com.thoughtworks.paranamer",
+          "module": "paranamer",
+          "version": {
+            "requires": "2.8"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson",
+          "module": "jackson-bom",
+          "version": {
+            "requires": "2.17.3"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        }
+      ],
+      "files": [
+        {
+          "name": "jackson-module-paranamer-2.17.3.jar",
+          "url": "jackson-module-paranamer-2.17.3.jar",
+          "size": 41957,
+          "sha512": "ab4e7fe7d812bfb57cd4022a448ddb740574fca3c8858e9ae14e30785299d91dadb734f0c28193d4c9ad2b6ba97cede419057f220b50b517faa88fbe98f7ad67",
+          "sha256": "9bdbeb407018967c7d7582c4fd64b770e8f3a02e3f86f189cff0b564f2fe0f86",
+          "sha1": "8d6297e675ac9aaf93438901dbd507c360fa1e11",
+          "md5": "99a2b67ee89be14e0444a179beaa3cd7"
+        }
+      ]
+    }
+  ]
+}

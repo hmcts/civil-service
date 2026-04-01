@@ -1,0 +1,779 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "io.ktor",
+    "module": "ktor-network-tls",
+    "version": "2.3.8",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.5"
+    }
+  },
+  "variants": [
+    {
+      "name": "metadataApiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.platform.type": "common"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
+          "version": {
+            "requires": "1.7.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-common",
+          "version": {
+            "requires": "1.8.22"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "atomicfu",
+          "version": {
+            "requires": "0.19.0"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-http",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-network",
+          "version": {
+            "requires": "2.3.8"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-utils",
+          "version": {
+            "requires": "2.3.8"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ktor-network-tls-metadata-2.3.8.jar",
+          "url": "ktor-network-tls-2.3.8.jar",
+          "size": 13547,
+          "sha512": "191dd550d6c61378df871cbb11de01d1d21aac511aaad2336cdafe6ac1a56f899e6577e55cc5d83ab6a741c7abdeb22c81f57d8965e28ac22e3d5e59c9311564",
+          "sha256": "a50933b81dbee2d5a20000b839cd218cdb3dabf6e6bc351532c48cd6a2c9a6a7",
+          "sha1": "7478dfc23e4a8923407dc7299f17ab1821327634",
+          "md5": "d9244671ecb4480ef39ee3fc101d9a7c"
+        }
+      ]
+    },
+    {
+      "name": "metadataSourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.platform.type": "common"
+      },
+      "files": [
+        {
+          "name": "ktor-network-tls-kotlin-2.3.8-sources.jar",
+          "url": "ktor-network-tls-2.3.8-sources.jar",
+          "size": 12586,
+          "sha512": "a47af9b562fa8e239d6d89c9714f61d0694e218dc916e4ed24b8cc4bb64e580fc25cda6443560374e0dc12d2ba7a10a5d80272fb4c9dce8da42d7722a1ae1f75",
+          "sha256": "2229ec54dfc9107d787de8f31266bc750fca0ff52173df8030f01b3c26a10dd4",
+          "sha1": "64e8500d700bae98a4f733b28fe2d5be147c4cd9",
+          "md5": "9b99275f68571af919deb40095740c26"
+        }
+      ]
+    },
+    {
+      "name": "iosArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-iosarm64/2.3.8/ktor-network-tls-iosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-iosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-iosarm64/2.3.8/ktor-network-tls-iosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-iosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-iosarm64/2.3.8/ktor-network-tls-iosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-iosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosSimulatorArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "ios_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-iossimulatorarm64/2.3.8/ktor-network-tls-iossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-iossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosSimulatorArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "ios_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-iossimulatorarm64/2.3.8/ktor-network-tls-iossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-iossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosSimulatorArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "ios_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-iossimulatorarm64/2.3.8/ktor-network-tls-iossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-iossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosX64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "ios_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-iosx64/2.3.8/ktor-network-tls-iosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-iosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosX64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "ios_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-iosx64/2.3.8/ktor-network-tls-iosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-iosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "iosX64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "ios_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-iosx64/2.3.8/ktor-network-tls-iosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-iosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "jvmApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-jvm/2.3.8/ktor-network-tls-jvm-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-jvm",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "jvmRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-jvm/2.3.8/ktor-network-tls-jvm-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-jvm",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "jvmSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-jvm/2.3.8/ktor-network-tls-jvm-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-jvm",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "linuxArm64ApiElements-published",
+      "attributes": {
+        "artifactType": "org.jetbrains.kotlin.klib",
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "linux_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-linuxarm64/2.3.8/ktor-network-tls-linuxarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-linuxarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "linuxArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "linux_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-linuxarm64/2.3.8/ktor-network-tls-linuxarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-linuxarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "linuxX64ApiElements-published",
+      "attributes": {
+        "artifactType": "org.jetbrains.kotlin.klib",
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "linux_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-linuxx64/2.3.8/ktor-network-tls-linuxx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-linuxx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "linuxX64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "linux_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-linuxx64/2.3.8/ktor-network-tls-linuxx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-linuxx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "macosArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "macos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-macosarm64/2.3.8/ktor-network-tls-macosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-macosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "macosArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "macos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-macosarm64/2.3.8/ktor-network-tls-macosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-macosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "macosArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "macos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-macosarm64/2.3.8/ktor-network-tls-macosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-macosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "macosX64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "macos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-macosx64/2.3.8/ktor-network-tls-macosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-macosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "macosX64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "macos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-macosx64/2.3.8/ktor-network-tls-macosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-macosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "macosX64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "macos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-macosx64/2.3.8/ktor-network-tls-macosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-macosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "tvos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-tvosarm64/2.3.8/ktor-network-tls-tvosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-tvosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "tvos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-tvosarm64/2.3.8/ktor-network-tls-tvosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-tvosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "tvos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-tvosarm64/2.3.8/ktor-network-tls-tvosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-tvosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosSimulatorArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "tvos_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-tvossimulatorarm64/2.3.8/ktor-network-tls-tvossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-tvossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosSimulatorArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "tvos_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-tvossimulatorarm64/2.3.8/ktor-network-tls-tvossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-tvossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosSimulatorArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "tvos_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-tvossimulatorarm64/2.3.8/ktor-network-tls-tvossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-tvossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosX64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "tvos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-tvosx64/2.3.8/ktor-network-tls-tvosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-tvosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosX64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "tvos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-tvosx64/2.3.8/ktor-network-tls-tvosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-tvosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "tvosX64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "tvos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-tvosx64/2.3.8/ktor-network-tls-tvosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-tvosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosArm32ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "watchos_arm32",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-watchosarm32/2.3.8/ktor-network-tls-watchosarm32-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-watchosarm32",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosArm32MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "watchos_arm32",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-watchosarm32/2.3.8/ktor-network-tls-watchosarm32-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-watchosarm32",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosArm32SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "watchos_arm32",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-watchosarm32/2.3.8/ktor-network-tls-watchosarm32-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-watchosarm32",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "watchos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-watchosarm64/2.3.8/ktor-network-tls-watchosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-watchosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "watchos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-watchosarm64/2.3.8/ktor-network-tls-watchosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-watchosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "watchos_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-watchosarm64/2.3.8/ktor-network-tls-watchosarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-watchosarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosSimulatorArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "watchos_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-watchossimulatorarm64/2.3.8/ktor-network-tls-watchossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-watchossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosSimulatorArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "watchos_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-watchossimulatorarm64/2.3.8/ktor-network-tls-watchossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-watchossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosSimulatorArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "watchos_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-watchossimulatorarm64/2.3.8/ktor-network-tls-watchossimulatorarm64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-watchossimulatorarm64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosX64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "watchos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-watchosx64/2.3.8/ktor-network-tls-watchosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-watchosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosX64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "watchos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-watchosx64/2.3.8/ktor-network-tls-watchosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-watchosx64",
+        "version": "2.3.8"
+      }
+    },
+    {
+      "name": "watchosX64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "watchos_x64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../ktor-network-tls-watchosx64/2.3.8/ktor-network-tls-watchosx64-2.3.8.module",
+        "group": "io.ktor",
+        "module": "ktor-network-tls-watchosx64",
+        "version": "2.3.8"
+      }
+    }
+  ]
+}

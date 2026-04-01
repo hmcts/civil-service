@@ -1,0 +1,112 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.fasterxml.jackson.jaxrs",
+    "module": "jackson-jaxrs-base",
+    "version": "2.17.3",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "maven": {
+      "version": "3.6.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-core",
+          "version": {
+            "requires": "2.17.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.17.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson",
+          "module": "jackson-bom",
+          "version": {
+            "requires": "2.17.3"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        }
+      ],
+      "files": [
+        {
+          "name": "jackson-jaxrs-base-2.17.3.jar",
+          "url": "jackson-jaxrs-base-2.17.3.jar",
+          "size": 31009,
+          "sha512": "34d6ba76aec5c1c62c2b9e3ae7ff541b6dc85a9e6dffc1423de854d58e770b121c976fa35fa80a389354554aae7d6cf725fed4dc8356e36a822f99db8adbdb26",
+          "sha256": "67b454587e13e262002f67b605d4ed4cc2b5b1871c7ff7f42d8808f574a141e3",
+          "sha1": "b24af57c85e3fd5fb5e1ec25d3de63ea32bf4e1a",
+          "md5": "bc758808039be9525cb4207299c4c836"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-core",
+          "version": {
+            "requires": "2.17.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.17.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson",
+          "module": "jackson-bom",
+          "version": {
+            "requires": "2.17.3"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        }
+      ],
+      "files": [
+        {
+          "name": "jackson-jaxrs-base-2.17.3.jar",
+          "url": "jackson-jaxrs-base-2.17.3.jar",
+          "size": 31009,
+          "sha512": "34d6ba76aec5c1c62c2b9e3ae7ff541b6dc85a9e6dffc1423de854d58e770b121c976fa35fa80a389354554aae7d6cf725fed4dc8356e36a822f99db8adbdb26",
+          "sha256": "67b454587e13e262002f67b605d4ed4cc2b5b1871c7ff7f42d8808f574a141e3",
+          "sha1": "b24af57c85e3fd5fb5e1ec25d3de63ea32bf4e1a",
+          "md5": "bc758808039be9525cb4207299c4c836"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.springframework.boot",
+    "module": "spring-boot-starter-cache",
+    "version": "3.3.7",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.11.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter",
+          "version": {
+            "requires": "3.3.7"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-context-support",
+          "version": {
+            "requires": "6.1.16"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-boot-starter-cache-3.3.7.jar",
+          "url": "spring-boot-starter-cache-3.3.7.jar",
+          "size": 4760,
+          "sha512": "32b03c05fde083dafdd7bcf0702ebfeafb050df561dbd4679a6ec021158c2a965f921d5d331324548fae4894e6b6719a383ac26fd4dbcb48d7dffb8e22a562f2",
+          "sha256": "60809ed5bd03c9017f17af82afe662689bacd9ee81ea1d72fee24bc86da961ea",
+          "sha1": "88d985a0f516e2c0d437b8bab32d24d2023d42fd",
+          "md5": "075399afd0ef8a0019a85437213d42a0"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter",
+          "version": {
+            "requires": "3.3.7"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-context-support",
+          "version": {
+            "requires": "6.1.16"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-boot-starter-cache-3.3.7.jar",
+          "url": "spring-boot-starter-cache-3.3.7.jar",
+          "size": 4760,
+          "sha512": "32b03c05fde083dafdd7bcf0702ebfeafb050df561dbd4679a6ec021158c2a965f921d5d331324548fae4894e6b6719a383ac26fd4dbcb48d7dffb8e22a562f2",
+          "sha256": "60809ed5bd03c9017f17af82afe662689bacd9ee81ea1d72fee24bc86da961ea",
+          "sha1": "88d985a0f516e2c0d437b8bab32d24d2023d42fd",
+          "md5": "075399afd0ef8a0019a85437213d42a0"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-starter-cache-3.3.7-javadoc.jar",
+          "url": "spring-boot-starter-cache-3.3.7-javadoc.jar",
+          "size": 4760,
+          "sha512": "32b03c05fde083dafdd7bcf0702ebfeafb050df561dbd4679a6ec021158c2a965f921d5d331324548fae4894e6b6719a383ac26fd4dbcb48d7dffb8e22a562f2",
+          "sha256": "60809ed5bd03c9017f17af82afe662689bacd9ee81ea1d72fee24bc86da961ea",
+          "sha1": "88d985a0f516e2c0d437b8bab32d24d2023d42fd",
+          "md5": "075399afd0ef8a0019a85437213d42a0"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-starter-cache-3.3.7-sources.jar",
+          "url": "spring-boot-starter-cache-3.3.7-sources.jar",
+          "size": 4760,
+          "sha512": "32b03c05fde083dafdd7bcf0702ebfeafb050df561dbd4679a6ec021158c2a965f921d5d331324548fae4894e6b6719a383ac26fd4dbcb48d7dffb8e22a562f2",
+          "sha256": "60809ed5bd03c9017f17af82afe662689bacd9ee81ea1d72fee24bc86da961ea",
+          "sha1": "88d985a0f516e2c0d437b8bab32d24d2023d42fd",
+          "md5": "075399afd0ef8a0019a85437213d42a0"
+        }
+      ]
+    }
+  ]
+}

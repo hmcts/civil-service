@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.spockframework</groupId>
+  <artifactId>spock-bom</artifactId>
+  <version>2.3-groovy-4.0</version>
+  <packaging>pom</packaging>
+  <name>Spock Framework - Bill of Materials</name>
+  <description>This bill of materials provides managed spock dependencies.</description>
+  <url>https://spockframework.org</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>pniederw</id>
+      <name>Peter Niederwieser</name>
+      <email>peter@pniederw.com</email>
+    </developer>
+    <developer>
+      <id>ldaley</id>
+      <name>Luke Daley</name>
+      <email>ld@ldaley.com</email>
+    </developer>
+    <developer>
+      <id>leonard84</id>
+      <name>Leonard Brünings</name>
+      <email>lord_damokles@gmx.net</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git://github.com/spockframework/spock.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/spockframework/spock.git</developerConnection>
+    <url>https://github.spockframework.org/spock</url>
+  </scm>
+  <properties>
+    <spock.version>2.3-groovy-4.0</spock.version>
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.spockframework</groupId>
+        <artifactId>spock-core</artifactId>
+        <version>${spock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.spockframework</groupId>
+        <artifactId>spock-guice</artifactId>
+        <version>${spock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.spockframework</groupId>
+        <artifactId>spock-junit4</artifactId>
+        <version>${spock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.spockframework</groupId>
+        <artifactId>spock-spring</artifactId>
+        <version>${spock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.spockframework</groupId>
+        <artifactId>spock-tapestry</artifactId>
+        <version>${spock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.spockframework</groupId>
+        <artifactId>spock-unitils</artifactId>
+        <version>${spock.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>

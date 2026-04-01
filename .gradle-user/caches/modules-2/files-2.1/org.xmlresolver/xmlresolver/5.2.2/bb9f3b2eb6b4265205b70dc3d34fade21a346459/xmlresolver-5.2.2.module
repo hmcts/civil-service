@@ -1,0 +1,159 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.xmlresolver",
+    "module": "xmlresolver",
+    "version": "5.2.2",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.1.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "xmlresolver-5.2.2.jar",
+          "url": "xmlresolver-5.2.2.jar",
+          "size": 165689,
+          "sha512": "4213b91ddf162a2ee0515f823d859333fa475b84675277bf657eff03162eff4b91660313ce8c19fa9f30b02e2002d87cf06c492e4c303448a96b577b6928f3c0",
+          "sha256": "efc92bd7ed32b3e57095e0b3e872051ccfbbdcc980831ef33e89e38161a85222",
+          "sha1": "152378e04ba01898847bf38fad5023c7d52f0c9d",
+          "md5": "0de20e8f7acfa5942d78c239d3034deb"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.apache.httpcomponents.client5",
+          "module": "httpclient5",
+          "version": {
+            "requires": "5.1.3"
+          },
+          "excludes": [
+            {
+              "group": "xml-apis",
+              "module": "xml-apis"
+            }
+          ]
+        },
+        {
+          "group": "org.apache.httpcomponents.core5",
+          "module": "httpcore5",
+          "version": {
+            "requires": "5.1.3"
+          },
+          "excludes": [
+            {
+              "group": "xml-apis",
+              "module": "xml-apis"
+            }
+          ]
+        }
+      ],
+      "files": [
+        {
+          "name": "xmlresolver-5.2.2.jar",
+          "url": "xmlresolver-5.2.2.jar",
+          "size": 165689,
+          "sha512": "4213b91ddf162a2ee0515f823d859333fa475b84675277bf657eff03162eff4b91660313ce8c19fa9f30b02e2002d87cf06c492e4c303448a96b577b6928f3c0",
+          "sha256": "efc92bd7ed32b3e57095e0b3e872051ccfbbdcc980831ef33e89e38161a85222",
+          "sha1": "152378e04ba01898847bf38fad5023c7d52f0c9d",
+          "md5": "0de20e8f7acfa5942d78c239d3034deb"
+        }
+      ]
+    },
+    {
+      "name": "validatingApiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "xmlresolver-5.2.2.jar",
+          "url": "xmlresolver-5.2.2.jar",
+          "size": 165689,
+          "sha512": "4213b91ddf162a2ee0515f823d859333fa475b84675277bf657eff03162eff4b91660313ce8c19fa9f30b02e2002d87cf06c492e4c303448a96b577b6928f3c0",
+          "sha256": "efc92bd7ed32b3e57095e0b3e872051ccfbbdcc980831ef33e89e38161a85222",
+          "sha1": "152378e04ba01898847bf38fad5023c7d52f0c9d",
+          "md5": "0de20e8f7acfa5942d78c239d3034deb"
+        }
+      ],
+      "capabilities": [
+        {
+          "group": "org.xmlresolver",
+          "name": "XMLResolver-validating",
+          "version": "unspecified"
+        }
+      ]
+    },
+    {
+      "name": "validatingRuntimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.relaxng",
+          "module": "jing",
+          "version": {
+            "requires": "20220510"
+          },
+          "excludes": [
+            {
+              "group": "xml-apis",
+              "module": "xml-apis"
+            }
+          ]
+        }
+      ],
+      "files": [
+        {
+          "name": "xmlresolver-5.2.2.jar",
+          "url": "xmlresolver-5.2.2.jar",
+          "size": 165689,
+          "sha512": "4213b91ddf162a2ee0515f823d859333fa475b84675277bf657eff03162eff4b91660313ce8c19fa9f30b02e2002d87cf06c492e4c303448a96b577b6928f3c0",
+          "sha256": "efc92bd7ed32b3e57095e0b3e872051ccfbbdcc980831ef33e89e38161a85222",
+          "sha1": "152378e04ba01898847bf38fad5023c7d52f0c9d",
+          "md5": "0de20e8f7acfa5942d78c239d3034deb"
+        }
+      ],
+      "capabilities": [
+        {
+          "group": "org.xmlresolver",
+          "name": "XMLResolver-validating",
+          "version": "unspecified"
+        }
+      ]
+    }
+  ]
+}

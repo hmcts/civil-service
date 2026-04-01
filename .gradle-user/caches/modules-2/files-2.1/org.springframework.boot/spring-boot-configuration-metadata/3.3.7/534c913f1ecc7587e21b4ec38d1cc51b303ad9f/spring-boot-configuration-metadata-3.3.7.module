@@ -1,0 +1,109 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.springframework.boot",
+    "module": "spring-boot-configuration-metadata",
+    "version": "3.3.7",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.11.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "spring-boot-configuration-metadata-3.3.7.jar",
+          "url": "spring-boot-configuration-metadata-3.3.7.jar",
+          "size": 28328,
+          "sha512": "4ffecfa9cef63eb75451f917ef8e4af0b8a2ae78389827309f1a70c739fe64e64902c32fb522d598c641db3a7c00ecf9b41536bf85bedbda8bbca61feab0bfe2",
+          "sha256": "fc7565c0955c06eeb6356c6c3f80752beb91267fc8e65b56790d437bb0f50d85",
+          "sha1": "7326e6db7c4b30557af0c545383817a4d733fe2d",
+          "md5": "6343cd716dbad3492e3f5fcad504a6d8"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.vaadin.external.google",
+          "module": "android-json",
+          "version": {
+            "requires": "0.0.20131108.vaadin1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-boot-configuration-metadata-3.3.7.jar",
+          "url": "spring-boot-configuration-metadata-3.3.7.jar",
+          "size": 28328,
+          "sha512": "4ffecfa9cef63eb75451f917ef8e4af0b8a2ae78389827309f1a70c739fe64e64902c32fb522d598c641db3a7c00ecf9b41536bf85bedbda8bbca61feab0bfe2",
+          "sha256": "fc7565c0955c06eeb6356c6c3f80752beb91267fc8e65b56790d437bb0f50d85",
+          "sha1": "7326e6db7c4b30557af0c545383817a4d733fe2d",
+          "md5": "6343cd716dbad3492e3f5fcad504a6d8"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-configuration-metadata-3.3.7-javadoc.jar",
+          "url": "spring-boot-configuration-metadata-3.3.7-javadoc.jar",
+          "size": 128044,
+          "sha512": "d53faf21ea59d1897c401e85ff32ab08634f5ed5d51a8d3a8d3172c80d7c51b2873990993e5bf6eb3177477d3ef6b8b7cc2d4263ab4756178adcfd340b4c07fd",
+          "sha256": "6d001970033753d376b04ba6f31ac174c74ac2e235d6b2bef00d99beb8973973",
+          "sha1": "41b4b24457917dbbda07bdd53b15865fcf36a817",
+          "md5": "ea3663c9b9f624c3e280d8178b299b58"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-configuration-metadata-3.3.7-sources.jar",
+          "url": "spring-boot-configuration-metadata-3.3.7-sources.jar",
+          "size": 25732,
+          "sha512": "7b13f635f2d0512304f81b6fb00b246f1eaa14deb6645bd943e9381dded84aeacb007c7ff778680794f738acd3729a446467788c0ad1647caad9e2a7939e8564",
+          "sha256": "eaf8761cecac73411dea2e1fb9affaad0dd71b8f1b08591477ec7678b82a39c6",
+          "sha1": "8c34cd8fd1225b7d741b98209d15aa222cfa57b8",
+          "md5": "6214aff50c0a90df07e5152d6c5657b0"
+        }
+      ]
+    }
+  ]
+}

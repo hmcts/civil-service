@@ -1,0 +1,174 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.springframework.boot",
+    "module": "spring-boot-starter-data-jpa",
+    "version": "3.3.7",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.11.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-aop",
+          "version": {
+            "requires": "3.3.7"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-jdbc",
+          "version": {
+            "requires": "3.3.7"
+          }
+        },
+        {
+          "group": "org.hibernate.orm",
+          "module": "hibernate-core",
+          "version": {
+            "requires": "6.5.3.Final"
+          }
+        },
+        {
+          "group": "org.springframework.data",
+          "module": "spring-data-jpa",
+          "version": {
+            "requires": "3.3.7"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-aspects",
+          "version": {
+            "requires": "6.1.16"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-boot-starter-data-jpa-3.3.7.jar",
+          "url": "spring-boot-starter-data-jpa-3.3.7.jar",
+          "size": 4761,
+          "sha512": "e664177338d5c3f4be1ee623622db8900913bfd54341f8d72b02b38704db8ad3c8b052dcff4aeacd361235d6545a9e24a207822553d2385d4686c18edfa368f9",
+          "sha256": "e658a8059389d08949049cbe932d8ef039e5f997aae2c175fb82aa62f15ac5dd",
+          "sha1": "ebb2f9a58580b86e310ca9a5a28becf895970b7c",
+          "md5": "e0b1f8496d439a7a6268c5d1f6f8aaf5"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-aop",
+          "version": {
+            "requires": "3.3.7"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-jdbc",
+          "version": {
+            "requires": "3.3.7"
+          }
+        },
+        {
+          "group": "org.hibernate.orm",
+          "module": "hibernate-core",
+          "version": {
+            "requires": "6.5.3.Final"
+          }
+        },
+        {
+          "group": "org.springframework.data",
+          "module": "spring-data-jpa",
+          "version": {
+            "requires": "3.3.7"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-aspects",
+          "version": {
+            "requires": "6.1.16"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-boot-starter-data-jpa-3.3.7.jar",
+          "url": "spring-boot-starter-data-jpa-3.3.7.jar",
+          "size": 4761,
+          "sha512": "e664177338d5c3f4be1ee623622db8900913bfd54341f8d72b02b38704db8ad3c8b052dcff4aeacd361235d6545a9e24a207822553d2385d4686c18edfa368f9",
+          "sha256": "e658a8059389d08949049cbe932d8ef039e5f997aae2c175fb82aa62f15ac5dd",
+          "sha1": "ebb2f9a58580b86e310ca9a5a28becf895970b7c",
+          "md5": "e0b1f8496d439a7a6268c5d1f6f8aaf5"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-starter-data-jpa-3.3.7-javadoc.jar",
+          "url": "spring-boot-starter-data-jpa-3.3.7-javadoc.jar",
+          "size": 4761,
+          "sha512": "e664177338d5c3f4be1ee623622db8900913bfd54341f8d72b02b38704db8ad3c8b052dcff4aeacd361235d6545a9e24a207822553d2385d4686c18edfa368f9",
+          "sha256": "e658a8059389d08949049cbe932d8ef039e5f997aae2c175fb82aa62f15ac5dd",
+          "sha1": "ebb2f9a58580b86e310ca9a5a28becf895970b7c",
+          "md5": "e0b1f8496d439a7a6268c5d1f6f8aaf5"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-starter-data-jpa-3.3.7-sources.jar",
+          "url": "spring-boot-starter-data-jpa-3.3.7-sources.jar",
+          "size": 4761,
+          "sha512": "e664177338d5c3f4be1ee623622db8900913bfd54341f8d72b02b38704db8ad3c8b052dcff4aeacd361235d6545a9e24a207822553d2385d4686c18edfa368f9",
+          "sha256": "e658a8059389d08949049cbe932d8ef039e5f997aae2c175fb82aa62f15ac5dd",
+          "sha1": "ebb2f9a58580b86e310ca9a5a28becf895970b7c",
+          "md5": "e0b1f8496d439a7a6268c5d1f6f8aaf5"
+        }
+      ]
+    }
+  ]
+}

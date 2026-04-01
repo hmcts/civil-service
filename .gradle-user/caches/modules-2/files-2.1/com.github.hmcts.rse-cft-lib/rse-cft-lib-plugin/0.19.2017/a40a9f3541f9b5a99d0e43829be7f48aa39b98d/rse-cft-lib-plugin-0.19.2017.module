@@ -1,0 +1,88 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.hmcts.rse-cft-lib",
+    "module": "rse-cft-lib-plugin",
+    "version": "0.19.2017",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.7"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "rse-cft-lib-plugin-0.19.2017.jar",
+          "url": "rse-cft-lib-plugin-0.19.2017.jar",
+          "size": 18779,
+          "sha512": "e392c006185278af7559c89946b1f8294303e433e335f99ee48f22a5881ae1f84d8d6e3f682f260e04972838e323c72f27e124bb565fefae9e5afbb257d83374",
+          "sha256": "65b0ddcfd9240278cb2e37b293184edf1cbdab5f1c4d59a30eec175b08c1fd6f",
+          "sha1": "c1689d38e1af31136c8f308ead8f9101535c891d",
+          "md5": "ce731528e0de699f46c50ec42614feae"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.google.guava",
+          "module": "guava",
+          "version": {
+            "requires": "33.4.8-jre"
+          }
+        },
+        {
+          "group": "com.azure",
+          "module": "azure-sdk-bom",
+          "version": {
+            "requires": "1.2.37"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        },
+        {
+          "group": "com.azure",
+          "module": "azure-security-keyvault-secrets"
+        },
+        {
+          "group": "com.azure",
+          "module": "azure-identity"
+        }
+      ],
+      "files": [
+        {
+          "name": "rse-cft-lib-plugin-0.19.2017.jar",
+          "url": "rse-cft-lib-plugin-0.19.2017.jar",
+          "size": 18779,
+          "sha512": "e392c006185278af7559c89946b1f8294303e433e335f99ee48f22a5881ae1f84d8d6e3f682f260e04972838e323c72f27e124bb565fefae9e5afbb257d83374",
+          "sha256": "65b0ddcfd9240278cb2e37b293184edf1cbdab5f1c4d59a30eec175b08c1fd6f",
+          "sha1": "c1689d38e1af31136c8f308ead8f9101535c891d",
+          "md5": "ce731528e0de699f46c50ec42614feae"
+        }
+      ]
+    }
+  ]
+}

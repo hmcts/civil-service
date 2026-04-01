@@ -1,0 +1,132 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.springframework.boot",
+    "module": "spring-boot-starter-hateoas",
+    "version": "3.3.7",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.11.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-web",
+          "version": {
+            "requires": "3.3.7"
+          }
+        },
+        {
+          "group": "org.springframework.hateoas",
+          "module": "spring-hateoas",
+          "version": {
+            "requires": "2.3.4"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-boot-starter-hateoas-3.3.7.jar",
+          "url": "spring-boot-starter-hateoas-3.3.7.jar",
+          "size": 4791,
+          "sha512": "b8db2bb53fba85f97cd8eb0bd43096d92a3a4fc3db6cafce01649aa83982bdb41e8c5ed4531b2cc2c38ff384700a81176ab6bbc2aa3d11b8cc7650b54b714f98",
+          "sha256": "1e808d4a5401466ee2bbb17920f6ed3cffd450f3ed940af3516368a079114206",
+          "sha1": "edfd98bda92ed34f57ef6a966423eeca6a716f51",
+          "md5": "ee912799cedee7146deb59e3ea410258"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-web",
+          "version": {
+            "requires": "3.3.7"
+          }
+        },
+        {
+          "group": "org.springframework.hateoas",
+          "module": "spring-hateoas",
+          "version": {
+            "requires": "2.3.4"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-boot-starter-hateoas-3.3.7.jar",
+          "url": "spring-boot-starter-hateoas-3.3.7.jar",
+          "size": 4791,
+          "sha512": "b8db2bb53fba85f97cd8eb0bd43096d92a3a4fc3db6cafce01649aa83982bdb41e8c5ed4531b2cc2c38ff384700a81176ab6bbc2aa3d11b8cc7650b54b714f98",
+          "sha256": "1e808d4a5401466ee2bbb17920f6ed3cffd450f3ed940af3516368a079114206",
+          "sha1": "edfd98bda92ed34f57ef6a966423eeca6a716f51",
+          "md5": "ee912799cedee7146deb59e3ea410258"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-starter-hateoas-3.3.7-javadoc.jar",
+          "url": "spring-boot-starter-hateoas-3.3.7-javadoc.jar",
+          "size": 4791,
+          "sha512": "b8db2bb53fba85f97cd8eb0bd43096d92a3a4fc3db6cafce01649aa83982bdb41e8c5ed4531b2cc2c38ff384700a81176ab6bbc2aa3d11b8cc7650b54b714f98",
+          "sha256": "1e808d4a5401466ee2bbb17920f6ed3cffd450f3ed940af3516368a079114206",
+          "sha1": "edfd98bda92ed34f57ef6a966423eeca6a716f51",
+          "md5": "ee912799cedee7146deb59e3ea410258"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-starter-hateoas-3.3.7-sources.jar",
+          "url": "spring-boot-starter-hateoas-3.3.7-sources.jar",
+          "size": 4791,
+          "sha512": "b8db2bb53fba85f97cd8eb0bd43096d92a3a4fc3db6cafce01649aa83982bdb41e8c5ed4531b2cc2c38ff384700a81176ab6bbc2aa3d11b8cc7650b54b714f98",
+          "sha256": "1e808d4a5401466ee2bbb17920f6ed3cffd450f3ed940af3516368a079114206",
+          "sha1": "edfd98bda92ed34f57ef6a966423eeca6a716f51",
+          "md5": "ee912799cedee7146deb59e3ea410258"
+        }
+      ]
+    }
+  ]
+}

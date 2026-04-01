@@ -1,0 +1,137 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.ben-manes",
+    "module": "gradle-versions-plugin",
+    "version": "0.53.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.4"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "files": [
+        {
+          "name": "gradle-versions-plugin-0.53.0.jar",
+          "url": "gradle-versions-plugin-0.53.0.jar",
+          "size": 131493,
+          "sha512": "c28e3bcf6d8e8cd54086d52665474156962d211e9861785ef0b1ecab3272f8baba5ba9900293362f788163381276d9d2f502a69a05cd07eccb51d015ae36419a",
+          "sha256": "7f2b2dbdd2397ff3f043d7b662ec0d61baabed3aaa7ab22607aef4d98ef3fa62",
+          "sha1": "85c0f1063e8a13c2b61741f69c346dd3ce9d9cc4",
+          "md5": "f5524f500994a6755fa664e3bbcb3c09"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-bom",
+          "version": {
+            "requires": "2.0.21"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.0.21"
+          }
+        },
+        {
+          "group": "com.squareup.okhttp3",
+          "module": "okhttp",
+          "version": {
+            "requires": "4.12.0"
+          }
+        },
+        {
+          "group": "com.squareup.moshi",
+          "module": "moshi-kotlin",
+          "version": {
+            "requires": "1.12.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "gradle-versions-plugin-0.53.0.jar",
+          "url": "gradle-versions-plugin-0.53.0.jar",
+          "size": 131493,
+          "sha512": "c28e3bcf6d8e8cd54086d52665474156962d211e9861785ef0b1ecab3272f8baba5ba9900293362f788163381276d9d2f502a69a05cd07eccb51d015ae36419a",
+          "sha256": "7f2b2dbdd2397ff3f043d7b662ec0d61baabed3aaa7ab22607aef4d98ef3fa62",
+          "sha1": "85c0f1063e8a13c2b61741f69c346dd3ce9d9cc4",
+          "md5": "f5524f500994a6755fa664e3bbcb3c09"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "gradle-versions-plugin-0.53.0-javadoc.jar",
+          "url": "gradle-versions-plugin-0.53.0-javadoc.jar",
+          "size": 350,
+          "sha512": "b6b3bf24fc858d4356c0a6f508a235612735250283681cc180b857999eea6ba71367ccb3b381ea82fae4f235c9b74278bbadc8b1913097a934c3ff217fb5d72c",
+          "sha256": "26a1c67d2308d1082f95e2cf93c7c18cbcbcd421dc8d83699c6e148776d0ab38",
+          "sha1": "e7ca6c230be44afbec5576af2c5e77f2c9ea2ed2",
+          "md5": "58e0216553ca222e197231b549a2c8b9"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "gradle-versions-plugin-0.53.0-sources.jar",
+          "url": "gradle-versions-plugin-0.53.0-sources.jar",
+          "size": 36030,
+          "sha512": "1da63f6c57fab12b02a014e6a517ef722720a29a78b2e3b1e65062184ed9c5b53a0bdba23952d18d767479d236a65ba992994b42efac873af795967d33d9229e",
+          "sha256": "e69c5c95d28355266715b4127d40056579a00a2e3467b46f80c715eb900df99f",
+          "sha1": "5775097a7727a4d5d5890d78b0b1a538ae7622c2",
+          "md5": "c09d1fcdd2a6a17b314b50a0c5cba118"
+        }
+      ]
+    }
+  ]
+}

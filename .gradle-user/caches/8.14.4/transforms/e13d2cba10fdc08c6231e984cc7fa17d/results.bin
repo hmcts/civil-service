@@ -1,0 +1,3 @@
+o/.gradle-instrumented-classpath.marker
+o/.gradle-agent-instrumented.marker
+o/instrumented/instrumented-netty-resolver-dns-native-macos-4.1.112.Final-osx-x86_64.jar

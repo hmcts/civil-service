@@ -1,0 +1,120 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.junit.platform",
+    "module": "junit-platform-console-standalone",
+    "version": "1.8.2",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "junit-platform-console-standalone-1.8.2.jar",
+          "url": "junit-platform-console-standalone-1.8.2.jar",
+          "size": 2410942,
+          "sha512": "afa89a6f9fd8aeda296d899b31c965ce92fcd7b66b7a4fcb859d042e6db5f30bf400cd6665c094655b0d527efd78c6ad8347be35ff837a682d62d8d11d817cad",
+          "sha256": "dc498f234228f81c818becfb6b7f71f73df2b0e995f93f25c05fced0c77e6356",
+          "sha1": "4b0d2d44da96a6198844d4016198403fd9c6cd58",
+          "md5": "05bfe7cc23a07c291c16335ba4da9727"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "junit-platform-console-standalone-1.8.2.jar",
+          "url": "junit-platform-console-standalone-1.8.2.jar",
+          "size": 2410942,
+          "sha512": "afa89a6f9fd8aeda296d899b31c965ce92fcd7b66b7a4fcb859d042e6db5f30bf400cd6665c094655b0d527efd78c6ad8347be35ff837a682d62d8d11d817cad",
+          "sha256": "dc498f234228f81c818becfb6b7f71f73df2b0e995f93f25c05fced0c77e6356",
+          "sha1": "4b0d2d44da96a6198844d4016198403fd9c6cd58",
+          "md5": "05bfe7cc23a07c291c16335ba4da9727"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "junit-platform-console-standalone-1.8.2-javadoc.jar",
+          "url": "junit-platform-console-standalone-1.8.2-javadoc.jar",
+          "size": 5681,
+          "sha512": "1fae01f45210a2a2a4f67b91eddda48f1d238140a97c49ec9f0d7311679ad4af48265273e5efcefa2f311ccf2e0653ccc76af9050f0807a8fded566d99178fea",
+          "sha256": "87e2e56e44d1ce3a882eff2bed179ea74a27cbcbd888f13536c413a87d32f58a",
+          "sha1": "3c791495768512669e0463f7be775c1ee4ea10c3",
+          "md5": "6c7369516c034cf85e6adbce4a9ed291"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "junit-platform-console-standalone-1.8.2-sources.jar",
+          "url": "junit-platform-console-standalone-1.8.2-sources.jar",
+          "size": 5681,
+          "sha512": "1fae01f45210a2a2a4f67b91eddda48f1d238140a97c49ec9f0d7311679ad4af48265273e5efcefa2f311ccf2e0653ccc76af9050f0807a8fded566d99178fea",
+          "sha256": "87e2e56e44d1ce3a882eff2bed179ea74a27cbcbd888f13536c413a87d32f58a",
+          "sha1": "3c791495768512669e0463f7be775c1ee4ea10c3",
+          "md5": "6c7369516c034cf85e6adbce4a9ed291"
+        }
+      ]
+    },
+    {
+      "name": "shadowRuntimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "shadowed",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "junit-platform-console-standalone-1.8.2.jar",
+          "url": "junit-platform-console-standalone-1.8.2.jar",
+          "size": 2410942,
+          "sha512": "afa89a6f9fd8aeda296d899b31c965ce92fcd7b66b7a4fcb859d042e6db5f30bf400cd6665c094655b0d527efd78c6ad8347be35ff837a682d62d8d11d817cad",
+          "sha256": "dc498f234228f81c818becfb6b7f71f73df2b0e995f93f25c05fced0c77e6356",
+          "sha1": "4b0d2d44da96a6198844d4016198403fd9c6cd58",
+          "md5": "05bfe7cc23a07c291c16335ba4da9727"
+        }
+      ]
+    }
+  ]
+}

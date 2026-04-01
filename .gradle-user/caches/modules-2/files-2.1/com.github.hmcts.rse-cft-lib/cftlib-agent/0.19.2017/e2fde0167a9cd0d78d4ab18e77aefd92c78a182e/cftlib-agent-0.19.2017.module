@@ -1,0 +1,109 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.hmcts.rse-cft-lib",
+    "module": "cftlib-agent",
+    "version": "0.19.2017",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.7"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "cftlib-agent-0.19.2017.jar",
+          "url": "cftlib-agent-0.19.2017.jar",
+          "size": 20691,
+          "sha512": "4b3c04189c279f1a81432d307563909f3cdb2b80a1c46d79abdfb667ff0de6fab593f7148e10a6106f230b1e89af4e12b414183316aec8b77fa3846fd8cf196b",
+          "sha256": "a9cd21c152b8d1c9fe21f7d021c5c454a765908db52ee1266529dfac8ffa4507",
+          "sha1": "5dc66b2e9e41b3d2ff6ef2866ac1a535211f0c73",
+          "md5": "459efe6ac92cff4b800b82c2009d7d90"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.auth0",
+          "module": "java-jwt",
+          "version": {
+            "requires": "3.12.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "cftlib-agent-0.19.2017.jar",
+          "url": "cftlib-agent-0.19.2017.jar",
+          "size": 20691,
+          "sha512": "4b3c04189c279f1a81432d307563909f3cdb2b80a1c46d79abdfb667ff0de6fab593f7148e10a6106f230b1e89af4e12b414183316aec8b77fa3846fd8cf196b",
+          "sha256": "a9cd21c152b8d1c9fe21f7d021c5c454a765908db52ee1266529dfac8ffa4507",
+          "sha1": "5dc66b2e9e41b3d2ff6ef2866ac1a535211f0c73",
+          "md5": "459efe6ac92cff4b800b82c2009d7d90"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "cftlib-agent-0.19.2017-sources.jar",
+          "url": "cftlib-agent-0.19.2017-sources.jar",
+          "size": 12374,
+          "sha512": "28b290987c8e5aa0595c1d8245a516e1414db4a4a08af8418fd5023366d6fd71e73a04bf2fc9d75eec5b76a779c8060dd65c7be2fb6b46f3f721ec4217d146a7",
+          "sha256": "fbd8689df374bad128d06e7a72436f6a3326e3ef26b16e18c48706ba26de15a1",
+          "sha1": "3a04f6f3480bb79662a797c2f2cf49a2ebf1f4b0",
+          "md5": "b7b160a4721774c5ea8780107accfddd"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "cftlib-agent-0.19.2017-javadoc.jar",
+          "url": "cftlib-agent-0.19.2017-javadoc.jar",
+          "size": 110841,
+          "sha512": "4aa257d7f408fcfcb2495f8dc33fe0da32d426ebe9d19860703368ab340f0dd9d8303cecbe1dd5ec515e5a23098bab66de5f803f21a8c19097458402244398a9",
+          "sha256": "3bb0edec96bc1662aba290dbae9b300f10e6923741a93494881124a6e0ce3957",
+          "sha1": "ff954e925e4d4adfb53a685553a937ef7939416b",
+          "md5": "c950b4cb485fbde7218315fa98c987c3"
+        }
+      ]
+    }
+  ]
+}

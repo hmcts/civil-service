@@ -1,0 +1,106 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.springframework",
+    "module": "spring-context-support",
+    "version": "6.1.16",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.11.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework",
+          "module": "spring-beans",
+          "version": {
+            "requires": "6.1.16"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-context",
+          "version": {
+            "requires": "6.1.16"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-core",
+          "version": {
+            "requires": "6.1.16"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-context-support-6.1.16.jar",
+          "url": "spring-context-support-6.1.16.jar",
+          "size": 173472,
+          "sha512": "71ba574b1b0d366592a15c0f8f8dc6df6176866b4064a6e4377d54d0318a0ce49044e250298270aa45bc6121bf8226fda30421c2167221d97f256cc5de1caf84",
+          "sha256": "b09e6648845bd8a0c4a2c791c95fbca7f7bbfc16dcb1b20000b4e6301df5d67a",
+          "sha1": "7089c9435b12229c0649fcb9a83b4f233118d058",
+          "md5": "104c7fa1f550ae235ba21a40c11ae0c8"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework",
+          "module": "spring-beans",
+          "version": {
+            "requires": "6.1.16"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-context",
+          "version": {
+            "requires": "6.1.16"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-core",
+          "version": {
+            "requires": "6.1.16"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-context-support-6.1.16.jar",
+          "url": "spring-context-support-6.1.16.jar",
+          "size": 173472,
+          "sha512": "71ba574b1b0d366592a15c0f8f8dc6df6176866b4064a6e4377d54d0318a0ce49044e250298270aa45bc6121bf8226fda30421c2167221d97f256cc5de1caf84",
+          "sha256": "b09e6648845bd8a0c4a2c791c95fbca7f7bbfc16dcb1b20000b4e6301df5d67a",
+          "sha1": "7089c9435b12229c0649fcb9a83b4f233118d058",
+          "md5": "104c7fa1f550ae235ba21a40c11ae0c8"
+        }
+      ]
+    }
+  ]
+}
