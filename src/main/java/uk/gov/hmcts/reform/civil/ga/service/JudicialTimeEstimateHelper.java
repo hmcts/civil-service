@@ -6,6 +6,9 @@ import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudgesHearingListGAspec;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.util.StringUtils.hasLength;
 
 @Service
@@ -19,38 +22,39 @@ public class JudicialTimeEstimateHelper {
     public String getEstimatedHearingLength(GeneralApplicationCaseData caseData) {
         GAJudgesHearingListGAspec listForHearing = caseData.getJudicialListForHearing();
         GAHearingDuration duration = listForHearing.getJudicialTimeEstimate();
-        if (duration != GAHearingDuration.OTHER) {
-            return duration.getDisplayedValue();
+        return duration != GAHearingDuration.OTHER ? duration.getDisplayedValue() : buildCustomEstimate(listForHearing);
+    }
+
+    private String buildCustomEstimate(GAJudgesHearingListGAspec listForHearing) {
+        List<String> durationParts = new ArrayList<>();
+        addDurationPart(durationParts, listForHearing.getJudicialTimeEstimateDays(), "day");
+        addDurationPart(durationParts, listForHearing.getJudicialTimeEstimateHours(), "hour");
+        addDurationPart(durationParts, listForHearing.getJudicialTimeEstimateMinutes(), "minute");
+        return formatDurationParts(durationParts);
+    }
+
+    private void addDurationPart(List<String> durationParts, String rawValue, String unit) {
+        int value = parseDurationPart(rawValue);
+        if (value > 0) {
+            durationParts.add(String.format("%d %s%s", value, unit, getPlural(value)));
         }
-        StringBuilder hearingLengthText = new StringBuilder();
-        int days = hasLength(listForHearing.getJudicialTimeEstimateDays())
-            ? Integer.valueOf(listForHearing.getJudicialTimeEstimateDays()) : 0;
-        int hours = hasLength(listForHearing.getJudicialTimeEstimateHours())
-            ? Integer.valueOf(listForHearing.getJudicialTimeEstimateHours()) : 0;
-        int minutes = hasLength(listForHearing.getJudicialTimeEstimateMinutes())
-            ? Integer.valueOf(listForHearing.getJudicialTimeEstimateMinutes()) : 0;
-        if (days > 0) {
-            hearingLengthText.append(String.format("%d day%s", days, getPlural(days)));
-            if (hours > 0) {
-                if (minutes > 0) {
-                    hearingLengthText.append(String.format(
-                        ", %d hour%s and %d minute%s", hours, getPlural(hours),
-                        minutes, getPlural(minutes)
-                    ));
-                } else {
-                    hearingLengthText.append(String.format(" and %d hour%s", hours, getPlural(hours)));
-                }
-            } else if (minutes > 0) {
-                hearingLengthText.append(String.format(" and %d minute%s", minutes, getPlural(minutes)));
-            }
-        } else if (hours > 0) {
-            hearingLengthText.append(String.format("%d hour%s", hours, getPlural(hours)));
-            if (minutes > 0) {
-                hearingLengthText.append(String.format(" and %d minute%s", minutes, getPlural(minutes)));
-            }
-        } else {
-            hearingLengthText.append(String.format("%d minute%s", minutes, getPlural(minutes)));
+    }
+
+    private int parseDurationPart(String rawValue) {
+        return hasLength(rawValue) ? Integer.parseInt(rawValue) : 0;
+    }
+
+    private String formatDurationParts(List<String> durationParts) {
+        if (durationParts.isEmpty()) {
+            return "0 minutes";
         }
-        return hearingLengthText.toString();
+
+        if (durationParts.size() == 1) {
+            return durationParts.getFirst();
+        }
+
+        int lastPartIndex = durationParts.size() - 1;
+        return String.join(", ", durationParts.subList(0, lastPartIndex))
+            + " and " + durationParts.get(lastPartIndex);
     }
 }
