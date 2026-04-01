@@ -341,6 +341,17 @@ public class StateGeneratorServiceTest {
         assertThat(caseState).isEqualTo(AWAITING_RESPONDENT_RESPONSE);
     }
 
+    @Test
+    void shouldReturnCurrentStateWhenJudicialDecisionIsMissing() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
+            .build();
+
+        CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);
+
+        assertThat(caseState).isEqualTo(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION);
+    }
+
     private List<GeneralApplicationTypes> applicationTypeJudgement() {
         return List.of(
             GeneralApplicationTypes.STRIKE_OUT
@@ -372,4 +383,3 @@ public class StateGeneratorServiceTest {
         return respondentsResponses;
     }
 }
-
