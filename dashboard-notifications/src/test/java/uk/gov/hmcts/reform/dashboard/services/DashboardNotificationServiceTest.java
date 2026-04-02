@@ -266,4 +266,72 @@ public class DashboardNotificationServiceTest {
         }
     }
 
+    @Test
+    void should_return_dashboard_notification_entities_for_case_and_role() {
+        List<DashboardNotificationsEntity> expected = getNotificationEntityList();
+
+        when(dashboardNotificationsRepository
+                 .findByReferenceAndCitizenRole("123", "Claimant"))
+            .thenReturn(expected);
+
+        List<DashboardNotificationsEntity> actual =
+            dashboardNotificationService
+                .getDashboardNotifications("123", "Claimant");
+
+        assertThat(actual).isEqualTo(expected);
+        verify(dashboardNotificationsRepository)
+            .findByReferenceAndCitizenRole("123", "Claimant");
+    }
+
+    @Test
+    void should_return_only_case_stayed_notifications_when_present() {
+        final UUID normalId = UUID.randomUUID();
+        final UUID stayedId = UUID.randomUUID();
+
+        DashboardNotificationsEntity normal = new DashboardNotificationsEntity();
+        normal.setId(normalId);
+        normal.setName("Some.Other.Template");
+        normal.setCreatedAt(OffsetDateTime.now().minusHours(1));
+
+        DashboardNotificationsEntity stayed = new DashboardNotificationsEntity();
+        stayed.setId(stayedId);
+        stayed.setName("Notice.AAA6.CP.Case.Stayed.Claimant");
+        stayed.setCreatedAt(OffsetDateTime.now());
+
+        when(dashboardNotificationsRepository.findByReferenceAndCitizenRole("case", "role"))
+            .thenReturn(List.of(normal, stayed));
+
+        List<Notification> result =
+            dashboardNotificationService.getNotifications("case", "role");
+
+        assertThat(result)
+            .extracting(Notification::getId)
+            .containsExactly(stayedId);
+    }
+
+    @Test
+    void should_return_all_notifications_when_no_case_stayed_templates_exist() {
+        final UUID id1 = UUID.randomUUID();
+        final UUID id2 = UUID.randomUUID();
+
+        DashboardNotificationsEntity n1 = new DashboardNotificationsEntity();
+        n1.setId(id1);
+        n1.setName("Template.One");
+        n1.setCreatedAt(OffsetDateTime.now());
+
+        DashboardNotificationsEntity n2 = new DashboardNotificationsEntity();
+        n2.setId(id2);
+        n2.setName("Template.Two");
+        n2.setCreatedAt(OffsetDateTime.now().minusHours(1));
+
+        when(dashboardNotificationsRepository.findByReferenceAndCitizenRole("case", "role"))
+            .thenReturn(List.of(n1, n2));
+
+        List<Notification> result =
+            dashboardNotificationService.getNotifications("case", "role");
+
+        assertThat(result)
+            .extracting(Notification::getId)
+            .containsExactly(id1, id2);
+    }
 }
