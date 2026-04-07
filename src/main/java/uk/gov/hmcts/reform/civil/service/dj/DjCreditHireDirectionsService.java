@@ -14,7 +14,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DISCLOSURE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_PARTIES_LIAISE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_DEADLINE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_DJ;
 
@@ -29,7 +28,6 @@ public class DjCreditHireDirectionsService {
     public SdoDJR2TrialCreditHire buildCreditHireDirections() {
         SdoDJR2TrialCreditHireDetails creditHireDetails = new SdoDJR2TrialCreditHireDetails()
             .setInput2(CREDIT_HIRE_STATEMENT_PROMPT_DJ)
-            .setInput3(CREDIT_HIRE_STATEMENT_DEADLINE_DJ)
             .setInput4(CREDIT_HIRE_NON_COMPLIANCE_DJ)
             .setDate2(deadlineService.nextWorkingDayInWeeks(6))
             .setInput5(CREDIT_HIRE_PARTIES_LIAISE);

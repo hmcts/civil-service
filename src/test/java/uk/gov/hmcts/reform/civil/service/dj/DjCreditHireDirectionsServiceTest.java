@@ -20,7 +20,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DISCLOSURE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_PARTIES_LIAISE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_DEADLINE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_DJ;
 
@@ -56,8 +55,6 @@ class DjCreditHireDirectionsServiceTest {
         assertThat(result.getInput8()).isEqualTo(CREDIT_HIRE_WITNESS_LIMIT_DJ);
         assertThat(result.getSdoDJR2TrialCreditHireDetails().getInput2())
             .isEqualTo(CREDIT_HIRE_STATEMENT_PROMPT_DJ);
-        assertThat(result.getSdoDJR2TrialCreditHireDetails().getInput3())
-            .isEqualTo(CREDIT_HIRE_STATEMENT_DEADLINE_DJ);
         assertThat(result.getSdoDJR2TrialCreditHireDetails().getInput4())
             .isEqualTo(CREDIT_HIRE_NON_COMPLIANCE_DJ);
         assertThat(result.getSdoDJR2TrialCreditHireDetails().getInput5())

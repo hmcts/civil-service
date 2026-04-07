@@ -115,7 +115,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DISCLOSURE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_PARTIES_LIAISE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_DEADLINE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_COUNT_LIMIT_NOTE_DJ;
@@ -512,10 +511,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(CREDIT_HIRE_DISCLOSURE_DJ);
             assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("input2")
                 .isEqualTo(CREDIT_HIRE_STATEMENT_PROMPT_DJ);
-            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("input3")
-                .isEqualTo(CREDIT_HIRE_STATEMENT_DEADLINE_DJ);
-            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("date1")
-                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("input4")
                 .isEqualTo(CREDIT_HIRE_NON_COMPLIANCE_DJ);
             assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("input5")
