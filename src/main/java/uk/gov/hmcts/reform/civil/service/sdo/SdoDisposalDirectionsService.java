@@ -11,8 +11,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import java.util.Locale;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.utils.HearingBundleUtils.buildBundleTypeText;
-
 @Service
 public class SdoDisposalDirectionsService {
 
@@ -49,16 +47,8 @@ public class SdoDisposalDirectionsService {
         return "";
     }
 
-    public String getBundleTypeText(CaseData caseData) {
-        if (caseData.getDisposalHearingBundle() != null) {
-            return buildBundleTypeText(caseData.getDisposalHearingBundle().getType());
-        }
-        return "";
-    }
-
     public boolean hasDisposalVariable(CaseData caseData, String variableName) {
         return switch (variableName) {
-            case "disposalHearingBundleToggle" -> caseData.getDisposalHearingBundleToggle() != null;
             case "disposalHearingClaimSettlingToggle" -> caseData.getDisposalHearingClaimSettlingToggle() != null;
             case "disposalHearingCostsToggle" -> caseData.getDisposalHearingCostsToggle() != null;
             case "disposalHearingAddNewDirections" -> caseData.getDisposalHearingAddNewDirections() != null;

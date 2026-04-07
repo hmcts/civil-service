@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.HearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
@@ -19,7 +18,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_SDO;
@@ -107,11 +105,6 @@ public class SdoDisposalNarrativeService {
                                                               ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE,
                                                               sdoDeadlineService.workingDaysFromNow(5).format(DEADLINE_FORMATTER)
                                                           )));
-    }
-
-    public void applyBundle(CaseData caseData) {
-        caseData.setDisposalHearingBundle(new HearingBundle()
-                                                .setInput(DISPOSAL_BUNDLE_REQUIREMENT));
     }
 
     public void applyNotes(CaseData caseData) {

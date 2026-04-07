@@ -42,7 +42,6 @@ public class SdoChecklistService {
         caseData.setDisposalHearingSchedulesOfLossToggle(checkList);
         caseData.setDisposalHearingFinalDisposalHearingToggle(checkList);
         caseData.setDisposalHearingMethodToggle(checkList);
-        caseData.setDisposalHearingBundleToggle(checkList);
         caseData.setDisposalHearingClaimSettlingToggle(checkList);
         caseData.setDisposalHearingCostsToggle(checkList);
         caseData.setSmallClaimsHearingToggle(checkList);

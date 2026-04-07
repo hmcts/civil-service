@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.lenient;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_JUDGES_RECITAL_CLAIM_FORM;
@@ -97,11 +96,10 @@ class SdoDisposalNarrativeServiceTest {
     }
 
     @Test
-    void shouldPopulateSchedulesAndBundleUsingLibraryText() {
+    void shouldPopulateSchedulesUsingLibraryText() {
         CaseData caseData = CaseDataBuilder.builder().build();
 
         service.applySchedulesOfLoss(caseData);
-        service.applyBundle(caseData);
 
         assertThat(caseData.getDisposalHearingSchedulesOfLoss().getInput2())
             .isEqualTo(DISPOSAL_SCHEDULE_CLAIMANT_UPLOAD_SDO);
@@ -109,8 +107,6 @@ class SdoDisposalNarrativeServiceTest {
             .isEqualTo(DISPOSAL_SCHEDULE_COUNTER_SEND);
         assertThat(caseData.getDisposalHearingSchedulesOfLoss().getInput4())
             .isEqualTo(DISPOSAL_SCHEDULE_COUNTER_UPLOAD_SDO);
-        assertThat(caseData.getDisposalHearingBundle().getInput())
-            .isEqualTo(DISPOSAL_BUNDLE_REQUIREMENT);
     }
 
     @Test

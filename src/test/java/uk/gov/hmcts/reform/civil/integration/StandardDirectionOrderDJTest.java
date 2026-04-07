@@ -121,7 +121,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_COUNT_LIMIT_NOTE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_PREFIX;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_SUFFIX_DJ;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ;
@@ -359,9 +358,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(DISPOSAL_FINAL_HEARING_LISTING_DJ);
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingDJ").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());
-
-            assertThat(response.getData()).extracting("disposalHearingBundleDJ").extracting("input")
-                .isEqualTo(DISPOSAL_BUNDLE_REQUIREMENT);
 
             assertThat(response.getData()).extracting("disposalHearingNotesDJ").extracting("input")
                 .isEqualTo(ORDER_WITHOUT_HEARING_UPLOAD_TO_PORTAL_DJ);

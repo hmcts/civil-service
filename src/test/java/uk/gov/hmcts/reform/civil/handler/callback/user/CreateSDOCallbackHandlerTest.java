@@ -1805,7 +1805,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingMethodToggle").isNotNull();
-            assertThat(response.getData()).extracting("disposalHearingBundleToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingClaimSettlingToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingCostsToggle").isNotNull();
             assertThat(response.getData()).extracting("smallClaimsHearingToggle").isNotNull();
@@ -1871,10 +1870,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "before a judge on the first available date after");
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearing").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(12).toString());
-
-            assertThat(response.getData()).extracting("disposalHearingBundle").extracting("input")
-                .isEqualTo("At least 7 days before the disposal hearing, "
-                               + "the claimant must file and serve");
 
             assertThat(response.getData()).extracting("disposalHearingNotes").extracting("input")
                 .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have"

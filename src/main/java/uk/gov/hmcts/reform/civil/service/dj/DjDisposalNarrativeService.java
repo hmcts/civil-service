@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.dj;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.model.common.HearingBundle;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
@@ -13,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesO
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ;
@@ -87,11 +85,6 @@ public class DjDisposalNarrativeService {
         return new DisposalHearingFinalDisposalHearingTimeDJ()
             .setInput(DISPOSAL_FINAL_HEARING_LISTING_DJ)
             .setDate(deadlineService.weeksFromNow(16));
-    }
-
-    public HearingBundle buildBundle() {
-        return new HearingBundle()
-            .setInput(DISPOSAL_BUNDLE_REQUIREMENT);
     }
 
     public DisposalHearingNotesDJ buildNotes() {

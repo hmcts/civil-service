@@ -387,7 +387,6 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<DisposalAndTrialHearingDJToggle> disposalHearingSchedulesOfLossDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingStandardDisposalOrderDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingFinalDisposalHearingDJToggle;
-    private List<DisposalAndTrialHearingDJToggle> disposalHearingBundleDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingClaimSettlingDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingCostsDJToggle;
 

@@ -447,8 +447,6 @@ public final class DirectionsOrderSpecialistTextLibrary {
     public static final String DISPOSAL_SCHEDULE_FUTURE_LOSS =
         "If there is a claim for future pecuniary loss and the parties have not already set out their"
             + " case on periodical payments, they must do so in the respective schedule and counter-schedule.";
-    public static final String DISPOSAL_BUNDLE_REQUIREMENT =
-        "At least 7 days before the disposal hearing, the claimant must file and serve";
     public static final String DISPOSAL_FINAL_HEARING_LISTING_SDO =
         "This claim will be listed for final disposal before a judge on the first available date after";
     public static final String DISPOSAL_FINAL_HEARING_LISTING_DJ =

@@ -27,7 +27,6 @@ public class DjDisposalDirectionsService {
         caseDataBuilder.disposalHearingFinalDisposalHearingDJ(disposalNarrativeService.buildFinalDisposalHearing());
         caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(
             disposalNarrativeService.buildFinalDisposalHearingTime());
-        caseDataBuilder.disposalHearingBundleDJ(disposalNarrativeService.buildBundle());
         caseDataBuilder.disposalHearingNotesDJ(disposalNarrativeService.buildNotes());
 
         // copy of disposalHearingNotesDJ field to update order made without hearing field without breaking

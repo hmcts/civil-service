@@ -13,8 +13,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementSer
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.HearingBundle;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -258,26 +258,25 @@ class DefaultJudgmentOrderFormGeneratorTest {
     }
 
     @Nested
-    class GetDisposalHearingBundleTypeText {
+    class GetTrialBundleTypeText {
         private final DjBundleFieldService bundleFieldService = new DjBundleFieldService();
 
         @Test
         void shouldReturnText_whenAllThreeTypesSelected() {
-            List<String> disposalHearingBundleTypes = List.of(
+            List<String> trialBundleTypes = List.of(
                 "DOCUMENTS",
                 "ELECTRONIC",
                 "SUMMARY"
             );
 
-            HearingBundle disposalHearingBundle = new HearingBundle()
-                .setInput("test")
-                .setType(disposalHearingBundleTypes);
+            TrialHearingTrial trialBundle = new TrialHearingTrial()
+                .setType(trialBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
+                .trialHearingTrialDJ(trialBundle)
                 .build();
 
             String expectedText = "an indexed bundle of documents, with each page clearly numbered"
@@ -289,20 +288,19 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenDocumentsAndElectronicTypesSelected() {
-            List<String> disposalHearingBundleTypes = List.of(
+            List<String> trialBundleTypes = List.of(
                 "DOCUMENTS",
                 "ELECTRONIC"
             );
 
-            HearingBundle disposalHearingBundle = new HearingBundle()
-                .setInput("test")
-                .setType(disposalHearingBundleTypes);
+            TrialHearingTrial trialBundle = new TrialHearingTrial()
+                .setType(trialBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
+                .trialHearingTrialDJ(trialBundle)
                 .build();
 
             String expectedText = "an indexed bundle of documents, with each page clearly numbered"
@@ -313,20 +311,19 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenDocumentsAndSummaryTypesSelected() {
-            List<String> disposalHearingBundleTypes = List.of(
+            List<String> trialBundleTypes = List.of(
                 "DOCUMENTS",
                 "SUMMARY"
             );
 
-            HearingBundle disposalHearingBundle = new HearingBundle()
-                .setInput("test")
-                .setType(disposalHearingBundleTypes);
+            TrialHearingTrial trialBundle = new TrialHearingTrial()
+                .setType(trialBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
+                .trialHearingTrialDJ(trialBundle)
                 .build();
 
             String expectedText = "an indexed bundle of documents, with each page clearly numbered"
@@ -337,20 +334,19 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenElectronicAndSummaryTypesSelected() {
-            List<String> disposalHearingBundleTypes = List.of(
+            List<String> trialBundleTypes = List.of(
                 "ELECTRONIC",
                 "SUMMARY"
             );
 
-            HearingBundle disposalHearingBundle = new HearingBundle()
-                .setInput("test")
-                .setType(disposalHearingBundleTypes);
+            TrialHearingTrial trialBundle = new TrialHearingTrial()
+                .setType(trialBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
+                .trialHearingTrialDJ(trialBundle)
                 .build();
 
             String expectedText = "an electronic bundle of digital documents"
@@ -361,19 +357,18 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenOnlyDocumentsTypeSelected() {
-            List<String> disposalHearingBundleTypes = List.of(
+            List<String> trialBundleTypes = List.of(
                 "DOCUMENTS"
             );
 
-            HearingBundle disposalHearingBundle = new HearingBundle()
-                .setInput("test")
-                .setType(disposalHearingBundleTypes);
+            TrialHearingTrial trialBundle = new TrialHearingTrial()
+                .setType(trialBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
+                .trialHearingTrialDJ(trialBundle)
                 .build();
 
             String expectedText = "an indexed bundle of documents, with each page clearly numbered";
@@ -383,19 +378,18 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenOnlyElectronicTypeSelected() {
-            List<String> disposalHearingBundleTypes = List.of(
+            List<String> trialBundleTypes = List.of(
                 "ELECTRONIC"
             );
 
-            HearingBundle disposalHearingBundle = new HearingBundle()
-                .setInput("test")
-                .setType(disposalHearingBundleTypes);
+            TrialHearingTrial trialBundle = new TrialHearingTrial()
+                .setType(trialBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
+                .trialHearingTrialDJ(trialBundle)
                 .build();
 
             String expectedText = "an electronic bundle of digital documents";
@@ -405,19 +399,18 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenOnlySummaryTypeSelected() {
-            List<String> disposalHearingBundleTypes = List.of(
+            List<String> trialBundleTypes = List.of(
                 "SUMMARY"
             );
 
-            HearingBundle disposalHearingBundle = new HearingBundle()
-                .setInput("test")
-                .setType(disposalHearingBundleTypes);
+            TrialHearingTrial trialBundle = new TrialHearingTrial()
+                .setType(trialBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
+                .trialHearingTrialDJ(trialBundle)
                 .build();
 
             String expectedText = "a case summary containing no more than 500 words";

@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHeari
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.common.HearingBundle;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
@@ -171,8 +170,6 @@ public class CivilCaseData extends BaseCaseData implements MappableObject {
     private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrder;
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
     private DisposalHearingHearingTime disposalHearingHearingTime;
-    private HearingBundle disposalHearingBundle;
-    private HearingBundle disposalHearingBundleDJ;
     private DisposalHearingNotes disposalHearingNotes;
     private String disposalHearingHearingNotes;
     private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
@@ -250,7 +247,6 @@ public class CivilCaseData extends BaseCaseData implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> disposalHearingSchedulesOfLossToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingFinalDisposalHearingToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingMethodToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingBundleToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingClaimSettlingToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingCostsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsHearingToggle;

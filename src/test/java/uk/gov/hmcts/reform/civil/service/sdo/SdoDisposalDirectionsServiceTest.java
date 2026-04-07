@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.HearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
@@ -39,19 +38,6 @@ class SdoDisposalDirectionsServiceTest {
 
         assertThat(service.getTelephoneHearingLabel(caseData)).isEqualTo("the claimant");
         assertThat(service.getVideoConferenceHearingLabel(caseData)).isEqualTo("the defendant");
-    }
-
-    @Test
-    void shouldFormatBundleTypes() {
-        CaseData caseData = CaseDataBuilder.builder().build();
-        HearingBundle bundle = new HearingBundle();
-        bundle.setType(List.of("DOCUMENTS", "ELECTRONIC"));
-        caseData.setDisposalHearingBundle(bundle);
-
-        String expected = "an indexed bundle of documents, with each page clearly numbered"
-            + " / "
-            + "an electronic bundle of digital documents";
-        assertThat(service.getBundleTypeText(caseData)).isEqualTo(expected);
     }
 
     @Test

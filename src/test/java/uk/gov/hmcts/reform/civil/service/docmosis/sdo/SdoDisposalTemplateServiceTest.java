@@ -37,7 +37,6 @@ class SdoDisposalTemplateServiceTest {
         when(disposalDirectionsService.getFinalHearingTimeLabel(caseData)).thenReturn("4 hours");
         when(disposalDirectionsService.getTelephoneHearingLabel(caseData)).thenReturn("claimant");
         when(disposalDirectionsService.getVideoConferenceHearingLabel(caseData)).thenReturn("defendant");
-        when(disposalDirectionsService.getBundleTypeText(caseData)).thenReturn("bundle type");
         when(disposalDirectionsService.hasDisposalVariable(eq(caseData), any())).thenReturn(true);
 
         LocationRefData location = new LocationRefData();
