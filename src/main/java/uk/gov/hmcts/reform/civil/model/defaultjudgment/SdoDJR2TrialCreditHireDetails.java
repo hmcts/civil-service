@@ -15,8 +15,6 @@ import java.time.LocalDate;
 public class SdoDJR2TrialCreditHireDetails {
 
     private String input2;
-    @Future(message = "The date entered must be in the future")
-    private LocalDate date1;
     private String input3;
     private String input4;
     private String input5;

@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,4 +18,5 @@ public class SdoR2SmallClaimsWitnessStatements {
     private YesOrNo isRestrictWitness;
     private YesOrNo isRestrictPages;
     private String text;
+    private LocalDate deadlineDate;
 }

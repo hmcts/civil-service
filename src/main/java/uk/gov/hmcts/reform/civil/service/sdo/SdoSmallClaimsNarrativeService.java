@@ -86,6 +86,7 @@ public class SdoSmallClaimsNarrativeService {
 
         SdoR2SmallClaimsWitnessStatements witnessStatements = new SdoR2SmallClaimsWitnessStatements();
         witnessStatements.setSdoStatementOfWitness(WITNESS_STATEMENT_TEXT);
+        witnessStatements.setDeadlineDate(sdoDeadlineService.nextWorkingDayFromNowWeeks(4));
         witnessStatements.setIsRestrictWitness(NO);
         witnessStatements.setSdoR2SmallClaimsRestrictWitness(restrictWitness);
         witnessStatements.setIsRestrictPages(NO);

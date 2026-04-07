@@ -289,7 +289,7 @@ public final class DirectionsOrderSpecialistTextLibrary {
     /* Small claims – generic Digital Portal paragraphs */
     public static final String SMALL_CLAIMS_DOCUMENTS_UPLOAD =
         "Each party must upload to the Digital Portal copies of all documents which they wish the"
-            + " court to consider when reaching its decision not less than 21 days before the hearing.";
+            + " court to consider when reaching its decision by 4pm on";
     public static final String SMALL_CLAIMS_DOCUMENTS_WARNING =
         "The court may refuse to consider any document which has not been uploaded to the Digital "
             + "Portal by the above date.";

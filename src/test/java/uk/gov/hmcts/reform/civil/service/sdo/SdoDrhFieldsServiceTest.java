@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_WARNING;
 
 @ExtendWith(MockitoExtension.class)
 class SdoDrhFieldsServiceTest {
@@ -65,6 +66,8 @@ class SdoDrhFieldsServiceTest {
         assertThat(caseData.getSdoR2SmallClaimsHearing()).isNotNull();
         assertThat(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing().getValue().getLabel())
             .isEqualTo(HearingMethod.TELEPHONE.getLabel());
+        assertThat(caseData.getSdoR2SmallClaimsUploadDoc().getUploadDocWarning())
+            .isEqualTo(SMALL_CLAIMS_DOCUMENTS_WARNING);
         assertThat(caseData.getSdoR2SmallClaimsUploadDocToggle()).containsExactly(IncludeInOrderToggle.INCLUDE);
     }
 
