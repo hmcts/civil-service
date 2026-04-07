@@ -212,7 +212,7 @@ public final class DirectionsOrderSpecialistTextLibrary {
             + "need or relying on impecuniosity as the case may be at the final hearing, "
             + "save with permission of the Trial Judge.";
     public static final String CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK =
-        "A failure to comply with the above paragraphs providing for disclosure and witness evidence on the issues "
+        "Failure to comply with the above paragraphs providing for disclosure and witness evidence on the issues "
             + "of need and impecuniosity will result in the claimant being debarred from asserting need or relying on "
             + "impecuniosity as the case may be at the final hearing, save with permission of the Trial Judge.";
     public static final String CREDIT_HIRE_PARTIES_LIAISE =
