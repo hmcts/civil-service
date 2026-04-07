@@ -250,7 +250,7 @@ public final class DirectionsOrderSpecialistTextLibrary {
     public static final String CREDIT_HIRE_STATEMENT_DEADLINE_DJ =
         "This statement must be uploaded to the Digital Portal by 4pm on";
     public static final String CREDIT_HIRE_NON_COMPLIANCE_DJ =
-        "A failure to comply will result in the claimant being "
+        "Failure to comply will result in the claimant being "
             + "debarred from asserting need or relying on impecuniosity "
             + "as the case may be at the final hearing, unless they "
             + "have the permission of the trial Judge.";
