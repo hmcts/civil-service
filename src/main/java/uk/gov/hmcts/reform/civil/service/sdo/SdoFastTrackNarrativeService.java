@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,7 +30,6 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.RESTR
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.STATEMENT_WITNESS;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType.DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_INSPECTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_STANDARD_SDO;
@@ -108,8 +106,7 @@ public class SdoFastTrackNarrativeService {
                                             .setDate1(trialStart)
                                             .setDate2(trialEnd)
                                             .setInput2(FAST_TRACK_TRIAL_TIME_WARNING_SDO)
-                                            .setInput3(FAST_TRACK_TRIAL_BUNDLE_NOTICE)
-                                            .setType(Collections.singletonList(DOCUMENTS)));
+                                            .setInput3(FAST_TRACK_TRIAL_BUNDLE_NOTICE));
     }
 
     private void applyHearingTime(CaseData caseData) {
