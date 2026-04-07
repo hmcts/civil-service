@@ -102,7 +102,6 @@ public class DashboardScenariosService {
 
         DashboardNotificationsEntity updated = new DashboardNotificationsEntity(
             existingNotification.getId(),
-            existingNotification.getNotificationAction(),
             existingNotification.getReference(),
             existingNotification.getName(),
             existingNotification.getCitizenRole(),
@@ -116,7 +115,9 @@ public class DashboardScenariosService {
             existingNotification.getUpdatedBy(),
             OffsetDateTime.now(),
             notificationDeadline,
-            template.getTimeToLive()
+            template.getTimeToLive(),
+            existingNotification.getClickedBy(),
+            existingNotification.getClickedAt()
         );
 
         dashboardNotificationService.saveOrUpdate(updated);

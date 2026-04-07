@@ -24,7 +24,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getNotification;
@@ -179,84 +178,28 @@ public class DashboardNotificationServiceTest {
     }
 
     @Test
-    public void saveOrUpdateShouldDeduplicateAndPreserveLatestIdentity() {
-
-        DashboardNotificationsEntity notification1 = createDashboardNotificationsEntity("older");
-        notification1.setCreatedAt(OffsetDateTime.now().minusDays(1));
-        DashboardNotificationsEntity notification2 = createDashboardNotificationsEntity("newer");
-        notification2.setCreatedAt(OffsetDateTime.now());
-
-        when(
-            dashboardNotificationsRepository
-                .findByReferenceAndCitizenRoleAndName(
-                    any(), any(), any())).thenReturn(List.of(notification1, notification2));
-
+    void saveOrUpdateShouldPickExactIdMatch() {
+        UUID specificId = UUID.randomUUID();
         DashboardNotificationsEntity notification = new DashboardNotificationsEntity();
-        notification.setId(UUID.randomUUID());
+        notification.setId(specificId);
         notification.setName("template.name");
-        notification.setReference("reference");
-        notification.setCitizenRole("CLAIMANT");
+
+        DashboardNotificationsEntity earlier = createDashboardNotificationsEntity("earlier");
+        earlier.setId(specificId);
+        earlier.setCreatedAt(OffsetDateTime.now().minusDays(2));
+
+        DashboardNotificationsEntity later = createDashboardNotificationsEntity("later");
+        later.setId(UUID.randomUUID());
+        later.setCreatedAt(OffsetDateTime.now().minusDays(1));
+
+        when(dashboardNotificationsRepository.findByReferenceAndCitizenRoleAndName(any(), any(), any()))
+            .thenReturn(List.of(earlier, later));
 
         dashboardNotificationService.saveOrUpdate(notification);
 
-        verify(dashboardNotificationsRepository, times(1)).deleteById(notification1.getId());
         final ArgumentCaptor<DashboardNotificationsEntity> captor = ArgumentCaptor.forClass(DashboardNotificationsEntity.class);
         verify(dashboardNotificationsRepository).save(captor.capture());
-        assertThat(captor.getValue()).isNotNull();
-        assertThat(captor.getValue().getId()).isEqualTo(notification2.getId());
-    }
-
-    @Test
-    void saveOrUpdateShouldPreserveClickAndCreationState() {
-        DashboardNotificationsEntity existing = createDashboardNotificationsEntity("existing");
-        existing.setCreatedAt(OffsetDateTime.now().minusDays(1));
-        existing.setCreatedBy("Creator User");
-        existing.setClickedAt(OffsetDateTime.now().minusHours(1));
-        existing.setClickedBy("Clicker User");
-
-        when(dashboardNotificationsRepository.findByReferenceAndCitizenRoleAndName(any(), any(), any()))
-            .thenReturn(List.of(existing));
-
-        DashboardNotificationsEntity incoming = new DashboardNotificationsEntity();
-        incoming.setId(UUID.randomUUID());
-        incoming.setName("template.name");
-        incoming.setReference("reference");
-        incoming.setCitizenRole("CLAIMANT");
-        incoming.setTitleEn("New Title");
-
-        dashboardNotificationService.saveOrUpdate(incoming);
-
-        final ArgumentCaptor<DashboardNotificationsEntity> captor = ArgumentCaptor.forClass(DashboardNotificationsEntity.class);
-        verify(dashboardNotificationsRepository).save(captor.capture());
-        DashboardNotificationsEntity saved = captor.getValue();
-
-        assertThat(saved.getId()).isEqualTo(existing.getId());
-        assertThat(saved.getCreatedAt()).isEqualTo(existing.getCreatedAt());
-        assertThat(saved.getCreatedBy()).isEqualTo(existing.getCreatedBy());
-        assertThat(saved.getClickedAt()).isEqualTo(existing.getClickedAt());
-        assertThat(saved.getClickedBy()).isEqualTo(existing.getClickedBy());
-        assertThat(saved.getTitleEn()).isEqualTo("New Title");
-    }
-
-    @Test
-    void saveOrUpdateShouldHandleDeleteFailureGracefully() {
-        DashboardNotificationsEntity notification1 = createDashboardNotificationsEntity("one");
-        notification1.setCreatedAt(OffsetDateTime.now().minusDays(1));
-        DashboardNotificationsEntity notification2 = createDashboardNotificationsEntity("two");
-        notification2.setCreatedAt(OffsetDateTime.now());
-
-        when(dashboardNotificationsRepository.findByReferenceAndCitizenRoleAndName(any(), any(), any()))
-            .thenReturn(List.of(notification1, notification2));
-
-        Mockito.doThrow(new RuntimeException("Delete failed")).when(dashboardNotificationsRepository).deleteById(notification1.getId());
-
-        DashboardNotificationsEntity notification = new DashboardNotificationsEntity();
-        notification.setName("template.name");
-
-        // Should not throw exception
-        dashboardNotificationService.saveOrUpdate(notification);
-
-        verify(dashboardNotificationsRepository).save(any());
+        assertThat(captor.getValue().getId()).isEqualTo(specificId);
     }
 
     @Test
