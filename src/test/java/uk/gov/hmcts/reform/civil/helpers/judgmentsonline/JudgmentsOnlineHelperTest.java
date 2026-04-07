@@ -48,8 +48,8 @@ public class JudgmentsOnlineHelperTest {
 
     @Test
     void shouldCheckIfDateDifferenceIsGreaterThan31Days() {
-        assertThat(checkIfDateDifferenceIsGreaterThanDaysInMonth(LocalDate.now(), LocalDate.now().plusDays(31))).isFalse();
-        assertThat(checkIfDateDifferenceIsGreaterThanDaysInMonth(LocalDate.now(), LocalDate.now().plusDays(32))).isTrue();
+        assertThat(checkIfDateDifferenceIsGreaterThanDaysInMonth(LocalDate.of(2026, 4,  5), LocalDate.of(2026, 4,  7))).isFalse();
+        assertThat(checkIfDateDifferenceIsGreaterThanDaysInMonth(LocalDate.of(2026, 3,  5), LocalDate.of(2026, 4,  7))).isTrue();
     }
 
     @Test
