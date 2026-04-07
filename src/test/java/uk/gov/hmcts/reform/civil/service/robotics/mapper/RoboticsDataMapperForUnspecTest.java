@@ -643,7 +643,7 @@ class RoboticsDataMapperForUnspecTest {
             when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
             RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
-            assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("Multi/Other");
+            assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("CLAIM - MULT/OTHER");
 
             assertThat(roboticsCaseData.getClaimDetails().getCourtFee().intValue()).isEqualTo(2);
         }
@@ -659,7 +659,7 @@ class RoboticsDataMapperForUnspecTest {
             when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
             RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
-            assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("Multi/Other");
+            assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("CLAIM - MULT/OTHER");
 
             assertThat(roboticsCaseData.getClaimDetails().getCourtFee().intValue()).isEqualTo(1);
         }
