@@ -31,7 +31,7 @@ public class DjOrderDetailsService {
         String judgeNameTitle = userDetails.getFullName();
 
         disposalDirectionsService.populateDisposalDirections(caseDataBuilder, judgeNameTitle);
-        trialDirectionsService.populateTrialDirections(caseDataBuilder, judgeNameTitle);
+        trialDirectionsService.populateTrialDirections(caseData, caseDataBuilder, judgeNameTitle);
 
         log.info("Populated DJ trial/disposal screen for caseId {}", caseData.getCcdCaseReference());
         return caseDataBuilder.build();

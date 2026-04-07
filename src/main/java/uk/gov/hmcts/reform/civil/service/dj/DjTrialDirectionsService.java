@@ -16,7 +16,11 @@ public class DjTrialDirectionsService {
     private final DjSpecialistDirectionsService specialistDirectionsService;
     private final DjWelshLanguageService welshLanguageService;
 
-    public void populateTrialDirections(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, String judgeNameTitle) {
+    public void populateTrialDirections(
+        CaseData caseData,
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
+        String judgeNameTitle
+    ) {
         caseDataBuilder.trialHearingJudgesRecitalDJ(trialNarrativeService.buildJudgesRecital(judgeNameTitle));
         caseDataBuilder.trialHearingDisclosureOfDocumentsDJ(trialNarrativeService.buildDisclosureOfDocuments());
         caseDataBuilder.trialHearingWitnessOfFactDJ(trialNarrativeService.buildWitnessOfFact());
@@ -32,7 +36,7 @@ public class DjTrialDirectionsService {
 
         caseDataBuilder.trialHearingNotesDJ(trialNarrativeService.buildTrialHearingNotes());
 
-        specialistDirectionsService.populateSpecialistDirections(caseDataBuilder);
+        specialistDirectionsService.populateSpecialistDirections(caseData, caseDataBuilder);
 
         caseDataBuilder.sdoR2TrialWelshLanguageDJ(
             welshLanguageService.buildWelshUsage());

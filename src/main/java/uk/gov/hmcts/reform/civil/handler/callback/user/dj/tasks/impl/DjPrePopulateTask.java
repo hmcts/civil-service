@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskSupport;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.dj.DjPrePopulateTrialOtherRemedyService;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticipantService;
 
 import java.util.Collections;
@@ -21,15 +22,16 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_OR
 public class DjPrePopulateTask implements DirectionsOrderCallbackTask {
 
     private final DirectionsOrderParticipantService participantService;
+    private final DjPrePopulateTrialOtherRemedyService prePopulateTrialOtherRemedyService;
 
     @Override
     public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
         log.info("DJ pre-populate task for caseId {}", caseData.getCcdCaseReference());
-        CaseData updated = caseData.toBuilder()
-            .applicantVRespondentText(participantService.buildApplicantVRespondentText(caseData))
-            .build();
-        return new DirectionsOrderTaskResult(updated, Collections.emptyList(), null);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
+            .applicantVRespondentText(participantService.buildApplicantVRespondentText(caseData));
+        prePopulateTrialOtherRemedyService.applyOtherRemedyTrialDefaults(caseData, caseDataBuilder);
+        return new DirectionsOrderTaskResult(caseDataBuilder.build(), Collections.emptyList(), null);
     }
 
     @Override

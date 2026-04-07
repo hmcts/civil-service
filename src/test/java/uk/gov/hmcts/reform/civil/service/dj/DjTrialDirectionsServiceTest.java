@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjDirectionsToggleService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -80,14 +81,19 @@ class DjTrialDirectionsServiceTest {
         );
         FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
         when(featureToggleService.isOtherRemedyEnabled()).thenReturn(false);
-        return new DjSpecialistDirectionsService(narrativeService, featureToggleService);
+        return new DjSpecialistDirectionsService(
+            narrativeService,
+            featureToggleService,
+            new DjDirectionsToggleService()
+        );
     }
 
     @Test
     void shouldPopulateTrialDirections() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseDataBuilder.builder().build().toBuilder();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.populateTrialDirections(builder, JUDGE_NAME);
+        service.populateTrialDirections(caseData, builder, JUDGE_NAME);
 
         CaseData result = builder.build();
 

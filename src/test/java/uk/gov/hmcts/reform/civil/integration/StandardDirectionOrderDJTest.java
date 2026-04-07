@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.StandardDirectionOrderDJ;
@@ -55,6 +56,7 @@ import uk.gov.hmcts.reform.civil.service.dj.DjBuildingDisputeDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjClinicalDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjRoadTrafficAccidentDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjOrderDetailsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjPrePopulateTrialOtherRemedyService;
 import uk.gov.hmcts.reform.civil.service.dj.DjValidationService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDocumentService;
 import uk.gov.hmcts.reform.civil.service.dj.DjNarrativeService;
@@ -153,6 +155,7 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
     DirectionsOrderCallbackPipeline.class,
     DirectionsOrderStageExecutor.class,
     DjPrePopulateTask.class,
+    DjPrePopulateTrialOtherRemedyService.class,
     DjOrderDetailsTask.class,
     DjValidationTask.class,
     DjDocumentTask.class,
@@ -305,7 +308,12 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .atStateClaimIssuedDisposalHearing().build();
+                .atStateClaimIssuedDisposalHearing().build()
+                .toBuilder()
+                .caseManagementOrderAdditional(List.of(
+                    CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsHousingDisrepair
+                ))
+                .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -471,7 +479,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                          - Item\s
                          - \
                         Alleged Defect \
-                        
+
                          - Claimant's costing
                          - Defendant's\
                          response
@@ -541,7 +549,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                         The columns should be headed:\s
                          - Item\s
                          - Alleged disrepair \
-                        
+
                          - Defendant's Response\s
                          - Reserved for Judge's Use""");
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("input3")

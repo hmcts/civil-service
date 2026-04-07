@@ -308,7 +308,7 @@ In some setups you will need a mirrord config file specifying the pod as below.
 The script should create a /.mirrord/.mirrord.json config file under the project's root directory.
 
 Specifically for civil-service you might need to exclude a flyway environment variable to allow the startup process to run without errors.
-For that you should have such file as this::
+For that you should have such file as this:
 
 ```json
 {
