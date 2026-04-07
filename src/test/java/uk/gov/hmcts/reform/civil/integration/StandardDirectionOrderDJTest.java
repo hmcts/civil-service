@@ -48,7 +48,6 @@ import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjAuthorisationFieldService;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjBundleFieldService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjDirectionsToggleService;
 import uk.gov.hmcts.reform.civil.service.dj.DjCreditHireDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjBuildingDisputeDirectionsService;
@@ -159,7 +158,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
     DjConfirmationTask.class,
     DjLocationAndToggleService.class,
     DjAuthorisationFieldService.class,
-    DjBundleFieldService.class,
     DjDirectionsToggleService.class,
     DjDisposalDirectionsService.class,
     DjSpecialistDirectionsService.class,

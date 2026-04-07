@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -27,7 +25,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -256,176 +253,4 @@ class DefaultJudgmentOrderFormGeneratorTest {
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
     }
-
-    @Nested
-    class GetTrialBundleTypeText {
-        private final DjBundleFieldService bundleFieldService = new DjBundleFieldService();
-
-        @Test
-        void shouldReturnText_whenAllThreeTypesSelected() {
-            List<String> trialBundleTypes = List.of(
-                "DOCUMENTS",
-                "ELECTRONIC",
-                "SUMMARY"
-            );
-
-            TrialHearingTrial trialBundle = new TrialHearingTrial()
-                .setType(trialBundleTypes);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .trialHearingTrialDJ(trialBundle)
-                .build();
-
-            String expectedText = "an indexed bundle of documents, with each page clearly numbered"
-                + " / an electronic bundle of digital documents"
-                + " / a case summary containing no more than 500 words";
-
-            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnText_whenDocumentsAndElectronicTypesSelected() {
-            List<String> trialBundleTypes = List.of(
-                "DOCUMENTS",
-                "ELECTRONIC"
-            );
-
-            TrialHearingTrial trialBundle = new TrialHearingTrial()
-                .setType(trialBundleTypes);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .trialHearingTrialDJ(trialBundle)
-                .build();
-
-            String expectedText = "an indexed bundle of documents, with each page clearly numbered"
-                + " / an electronic bundle of digital documents";
-
-            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnText_whenDocumentsAndSummaryTypesSelected() {
-            List<String> trialBundleTypes = List.of(
-                "DOCUMENTS",
-                "SUMMARY"
-            );
-
-            TrialHearingTrial trialBundle = new TrialHearingTrial()
-                .setType(trialBundleTypes);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .trialHearingTrialDJ(trialBundle)
-                .build();
-
-            String expectedText = "an indexed bundle of documents, with each page clearly numbered"
-                + " / a case summary containing no more than 500 words";
-
-            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnText_whenElectronicAndSummaryTypesSelected() {
-            List<String> trialBundleTypes = List.of(
-                "ELECTRONIC",
-                "SUMMARY"
-            );
-
-            TrialHearingTrial trialBundle = new TrialHearingTrial()
-                .setType(trialBundleTypes);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .trialHearingTrialDJ(trialBundle)
-                .build();
-
-            String expectedText = "an electronic bundle of digital documents"
-                + " / a case summary containing no more than 500 words";
-
-            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnText_whenOnlyDocumentsTypeSelected() {
-            List<String> trialBundleTypes = List.of(
-                "DOCUMENTS"
-            );
-
-            TrialHearingTrial trialBundle = new TrialHearingTrial()
-                .setType(trialBundleTypes);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .trialHearingTrialDJ(trialBundle)
-                .build();
-
-            String expectedText = "an indexed bundle of documents, with each page clearly numbered";
-
-            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnText_whenOnlyElectronicTypeSelected() {
-            List<String> trialBundleTypes = List.of(
-                "ELECTRONIC"
-            );
-
-            TrialHearingTrial trialBundle = new TrialHearingTrial()
-                .setType(trialBundleTypes);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .trialHearingTrialDJ(trialBundle)
-                .build();
-
-            String expectedText = "an electronic bundle of digital documents";
-
-            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnText_whenOnlySummaryTypeSelected() {
-            List<String> trialBundleTypes = List.of(
-                "SUMMARY"
-            );
-
-            TrialHearingTrial trialBundle = new TrialHearingTrial()
-                .setType(trialBundleTypes);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .trialHearingTrialDJ(trialBundle)
-                .build();
-
-            String expectedText = "a case summary containing no more than 500 words";
-
-            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnEmptyString_whenNoTypesSelected() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build();
-
-            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo("");
-        }
-    }
-
 }

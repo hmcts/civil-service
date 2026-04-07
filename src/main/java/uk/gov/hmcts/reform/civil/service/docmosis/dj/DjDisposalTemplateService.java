@@ -19,7 +19,6 @@ public class DjDisposalTemplateService {
     private final UserService userService;
     private final DocumentHearingLocationHelper locationHelper;
     private final DjAuthorisationFieldService authorisationFieldService;
-    private final DjBundleFieldService bundleFieldService;
     private final DjDirectionsToggleService directionsToggleService;
     private final DjPartyFieldService partyFieldService;
     private final DjHearingMethodFieldService hearingMethodFieldService;
@@ -34,7 +33,6 @@ public class DjDisposalTemplateService {
             .setWrittenByJudge(writtenByJudge)
             .setJudgeNameTitle(caseData.getDisposalHearingJudgesRecitalDJ().getJudgeNameTitle())
             .setCaseNumber(caseData.getLegacyCaseReference())
-            .setTypeBundleInfo(bundleFieldService.buildBundleInfo(caseData))
             .setDisposalHearingDisclosureOfDocumentsDJ(caseData.getDisposalHearingDisclosureOfDocumentsDJ())
             .setDisposalHearingDisclosureOfDocumentsDJAddSection(
                 nonNull(caseData.getDisposalHearingDisclosureOfDocumentsDJ()))
