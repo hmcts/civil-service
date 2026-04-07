@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
@@ -33,7 +34,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.HearingIndividual;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -76,7 +76,7 @@ class HearingNoticeHmcGeneratorTest {
     private static final String EPIMS = "venue-id";
     private static final Long VERSION_NUMBER = 1L;
 
-    private HearingGetResponse baseHearing = new HearingGetResponse();
+    private final HearingGetResponse baseHearing = new HearingGetResponse();
 
     private static final String FILE_NAME_APPLICATION = String.format(
         HEARING_NOTICE_HMC.getDocumentTitle(), REFERENCE_NUMBER);
@@ -101,8 +101,6 @@ class HearingNoticeHmcGeneratorTest {
     private HearingFeesService hearingFeesService;
     @MockBean
     private AssignCategoryId assignCategoryId;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setupTest() {
@@ -113,6 +111,9 @@ class HearingNoticeHmcGeneratorTest {
 
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, HEARING_FORM)))
+            .thenReturn(CASE_DOCUMENT);
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION_WELSH, bytes, HEARING_FORM_WELSH)))
             .thenReturn(CASE_DOCUMENT);
 
         when(locationRefDataService
@@ -135,9 +136,9 @@ class HearingNoticeHmcGeneratorTest {
         );
 
         HearingDay hearingDay = new HearingDay()
-            .setHearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
-            .setHearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0));
-        LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 02, 02, 0, 0, 0);
+            .setHearingStartDateTime(LocalDateTime.of(2023, 1, 1, 0, 0, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 1, 1, 12, 0, 0));
+        LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 2, 2, 0, 0, 0);
         baseHearing
                 .setPartyDetails(hearingIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
                 .setHearingResponse(new HearingResponse().setHearingDaySchedule(
@@ -563,6 +564,42 @@ class HearingNoticeHmcGeneratorTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    void shouldReturnEnglishExternalShortName_whenWelshShortNameIsMissing() {
+        when(locationRefDataService.getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(new LocationRefData()
+                                                                                                   .setEpimmsId(EPIMS)
+                                                                                                   .setExternalShortName("VenueName")
+                                                                                                   .setWelshExternalShortName("")
+                                                                                                   .setSiteName("CML-Site")
+                                                                                                   .setWelshSiteName("CML-Site-Welsh")
+                                                                                                   .setCourtAddress("CourtAddress")
+                                                                                                   .setPostcode("Postcode")));
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(EPIMS))
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+            .build();
+
+        when(hearingFeesService.getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC_WELSH);
+
+        assertEquals("VenueName", actual.getHearingSiteName());
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnListOfExpectedCaseDocuments() {
@@ -599,6 +636,35 @@ class HearingNoticeHmcGeneratorTest {
             .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, HEARING_FORM));
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldAssignCategoryId_whenGeneratingHearingNoticeDocument() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(EPIMS))
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+            .build();
+
+        when(hearingFeesService.getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
+                                        "SiteName - CourtAddress - Postcode", "hearingId",
+                                        HEARING_NOTICE_HMC);
+
+        verify(assignCategoryId).assignCategoryIdToCaseDocument(CASE_DOCUMENT, DocCategory.HEARING_NOTICES.getValue());
+        assertEquals(List.of(CASE_DOCUMENT), actual);
     }
 
     @ParameterizedTest
@@ -673,11 +739,9 @@ class HearingNoticeHmcGeneratorTest {
                                         HEARING_NOTICE_HMC_WELSH);
         var expected = List.of(CASE_DOCUMENT);
 
+        assertEquals(expected, actual);
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION_WELSH, bytes, HEARING_FORM_WELSH));
     }
 
 }
-
-
-
