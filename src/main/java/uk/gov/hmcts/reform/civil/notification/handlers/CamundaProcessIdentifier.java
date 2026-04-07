@@ -60,6 +60,7 @@ public enum CamundaProcessIdentifier {
     CreateSDONotify,
     RaiseQueryNotifier,
     JudgmentByAdmissionNotifier,
+    TrialReadyNotificationNotifier,
     OtherPartyQueryRaisedNotifier,
     NotifyLipGenericTemplateNotifier,
     NotifyLipResetPinNotifier,
