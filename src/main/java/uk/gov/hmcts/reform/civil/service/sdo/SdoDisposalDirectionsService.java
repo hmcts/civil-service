@@ -1,18 +1,17 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.utils.HearingBundleUtils.buildBundleTypeText;
 
 @Service
 public class SdoDisposalDirectionsService {
@@ -51,28 +50,9 @@ public class SdoDisposalDirectionsService {
     }
 
     public String getBundleTypeText(CaseData caseData) {
-        DisposalHearingBundle bundle = caseData.getDisposalHearingBundle();
-
-        if (bundle != null) {
-            List<DisposalHearingBundleType> types = bundle.getType();
-            StringBuilder labels = new StringBuilder();
-
-            if (types != null && !types.isEmpty()) {
-                if (types.size() == 3) {
-                    labels.append(DisposalHearingBundleType.DOCUMENTS.getLabel());
-                    labels.append(" / ").append(DisposalHearingBundleType.ELECTRONIC.getLabel());
-                    labels.append(" / ").append(DisposalHearingBundleType.SUMMARY.getLabel());
-                } else if (types.size() == 2) {
-                    labels.append(types.get(0).getLabel());
-                    labels.append(" / ").append(types.get(1).getLabel());
-                } else {
-                    labels.append(types.get(0).getLabel());
-                }
-                return labels.toString();
-            }
-
+        if (caseData.getDisposalHearingBundle() != null) {
+            return buildBundleTypeText(caseData.getDisposalHearingBundle().getType());
         }
-
         return "";
     }
 

@@ -9,9 +9,9 @@ import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.common.HearingBundle;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
@@ -66,7 +66,7 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private LocationRefData hearingLocation;
     private LocationRefData caseManagementLocation;
 
-    private DisposalHearingBundle disposalHearingBundle;
+    private HearingBundle disposalHearingBundle;
     private String disposalHearingBundleTypeText;
 
     private boolean hasNewDirections;

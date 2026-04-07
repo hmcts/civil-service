@@ -12,10 +12,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.HearingBundle;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -264,13 +263,13 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenAllThreeTypesSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.DOCUMENTS,
-                DisposalHearingBundleType.ELECTRONIC,
-                DisposalHearingBundleType.SUMMARY
+            List<String> disposalHearingBundleTypes = List.of(
+                "DOCUMENTS",
+                "ELECTRONIC",
+                "SUMMARY"
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+            HearingBundle disposalHearingBundle = new HearingBundle()
                 .setInput("test")
                 .setType(disposalHearingBundleTypes);
 
@@ -290,12 +289,12 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenDocumentsAndElectronicTypesSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.DOCUMENTS,
-                DisposalHearingBundleType.ELECTRONIC
+            List<String> disposalHearingBundleTypes = List.of(
+                "DOCUMENTS",
+                "ELECTRONIC"
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+            HearingBundle disposalHearingBundle = new HearingBundle()
                 .setInput("test")
                 .setType(disposalHearingBundleTypes);
 
@@ -314,12 +313,12 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenDocumentsAndSummaryTypesSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.DOCUMENTS,
-                DisposalHearingBundleType.SUMMARY
+            List<String> disposalHearingBundleTypes = List.of(
+                "DOCUMENTS",
+                "SUMMARY"
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+            HearingBundle disposalHearingBundle = new HearingBundle()
                 .setInput("test")
                 .setType(disposalHearingBundleTypes);
 
@@ -338,12 +337,12 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenElectronicAndSummaryTypesSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.ELECTRONIC,
-                DisposalHearingBundleType.SUMMARY
+            List<String> disposalHearingBundleTypes = List.of(
+                "ELECTRONIC",
+                "SUMMARY"
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+            HearingBundle disposalHearingBundle = new HearingBundle()
                 .setInput("test")
                 .setType(disposalHearingBundleTypes);
 
@@ -362,11 +361,11 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenOnlyDocumentsTypeSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.DOCUMENTS
+            List<String> disposalHearingBundleTypes = List.of(
+                "DOCUMENTS"
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+            HearingBundle disposalHearingBundle = new HearingBundle()
                 .setInput("test")
                 .setType(disposalHearingBundleTypes);
 
@@ -384,11 +383,11 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenOnlyElectronicTypeSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.ELECTRONIC
+            List<String> disposalHearingBundleTypes = List.of(
+                "ELECTRONIC"
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+            HearingBundle disposalHearingBundle = new HearingBundle()
                 .setInput("test")
                 .setType(disposalHearingBundleTypes);
 
@@ -406,11 +405,11 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_whenOnlySummaryTypeSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.SUMMARY
+            List<String> disposalHearingBundleTypes = List.of(
+                "SUMMARY"
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+            HearingBundle disposalHearingBundle = new HearingBundle()
                 .setInput("test")
                 .setType(disposalHearingBundleTypes);
 

@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.service.dj;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
+import uk.gov.hmcts.reform.civil.model.common.HearingBundle;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
@@ -89,8 +89,8 @@ public class DjDisposalNarrativeService {
             .setDate(deadlineService.weeksFromNow(16));
     }
 
-    public DisposalHearingBundleDJ buildBundle() {
-        return new DisposalHearingBundleDJ()
+    public HearingBundle buildBundle() {
+        return new HearingBundle()
             .setInput(DISPOSAL_BUNDLE_REQUIREMENT);
     }
 

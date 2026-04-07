@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
+import uk.gov.hmcts.reform.civil.model.common.HearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
@@ -110,7 +110,7 @@ public class SdoDisposalNarrativeService {
     }
 
     public void applyBundle(CaseData caseData) {
-        caseData.setDisposalHearingBundle(new DisposalHearingBundle()
+        caseData.setDisposalHearingBundle(new HearingBundle()
                                                 .setInput(DISPOSAL_BUNDLE_REQUIREMENT));
     }
 

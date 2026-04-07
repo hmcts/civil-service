@@ -1,10 +1,9 @@
-package uk.gov.hmcts.reform.civil.model.defaultjudgment;
+package uk.gov.hmcts.reform.civil.model.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 
 import java.util.List;
 
@@ -12,8 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class DisposalHearingBundleDJ {
+public class HearingBundle {
 
     private String input;
-    private List<DisposalHearingBundleType> type;
+    private List<String> type;
 }

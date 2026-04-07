@@ -2,13 +2,12 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
+import uk.gov.hmcts.reform.civil.model.common.HearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
@@ -45,13 +44,13 @@ class SdoDisposalDirectionsServiceTest {
     @Test
     void shouldFormatBundleTypes() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        DisposalHearingBundle bundle = new DisposalHearingBundle();
-        bundle.setType(List.of(DisposalHearingBundleType.DOCUMENTS, DisposalHearingBundleType.ELECTRONIC));
+        HearingBundle bundle = new HearingBundle();
+        bundle.setType(List.of("DOCUMENTS", "ELECTRONIC"));
         caseData.setDisposalHearingBundle(bundle);
 
-        String expected = DisposalHearingBundleType.DOCUMENTS.getLabel()
+        String expected = "an indexed bundle of documents, with each page clearly numbered"
             + " / "
-            + DisposalHearingBundleType.ELECTRONIC.getLabel();
+            + "an electronic bundle of digital documents";
         assertThat(service.getBundleTypeText(caseData)).isEqualTo(expected);
     }
 
