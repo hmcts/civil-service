@@ -42,125 +42,150 @@ public class GaDashboardNotificationsParamsMapper {
 
     public HashMap<String, Object> mapCaseDataToParams(GeneralApplicationCaseData caseData) {
         HashMap<String, Object> params = new HashMap<>();
-
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
+        addNotificationDeadlineDate(params, caseData);
+        addJudgeRequestMoreInfoDate(params, caseData);
+        addHearingScheduledDate(params, caseData);
+        addApplicationFee(params, caseData);
+        addRemissionAmounts(params, caseData);
+        addFeeTypeLabels(params, caseData);
+        addWrittenRepresentationDeadlines(params, caseData);
+        params.put("testRef", "string");
+        return params;
+    }
 
-        getGeneralAppNotificationDeadlineDate(caseData).ifPresent(date -> {
-            params.put("generalAppNotificationDeadlineDate", date.atTime(END_OF_BUSINESS_DAY));
-            params.put("generalAppNotificationDeadlineDateEn", DateUtils.formatDate(date));
-            params.put("generalAppNotificationDeadlineDateCy", DateUtils.formatDateInWelsh(date, false));
-        });
+    private void addNotificationDeadlineDate(HashMap<String, Object> params, GeneralApplicationCaseData caseData) {
+        getGeneralAppNotificationDeadlineDate(caseData)
+            .ifPresent(date -> putDateTimeVariants(params, "generalAppNotificationDeadlineDate", date));
+    }
 
-        getJudgeRequestMoreInfoByDate(caseData).ifPresent(date -> {
-            params.put("judgeRequestMoreInfoByDate", date.atTime(END_OF_BUSINESS_DAY));
-            params.put("judgeRequestMoreInfoByDateEn", DateUtils.formatDate(date));
-            params.put("judgeRequestMoreInfoByDateCy", DateUtils.formatDateInWelsh(date, false));
-        });
+    private void addJudgeRequestMoreInfoDate(HashMap<String, Object> params, GeneralApplicationCaseData caseData) {
+        getJudgeRequestMoreInfoByDate(caseData)
+            .ifPresent(date -> putDateTimeVariants(params, "judgeRequestMoreInfoByDate", date));
+    }
 
-        if (caseData.getCcdState().equals(CaseState.LISTING_FOR_A_HEARING)) {
-
-            getGeneralAppListingForHearingDate(caseData).ifPresent(date -> {
-                params.put("hearingNoticeApplicationDateEn", DateUtils.formatDate(date));
-                params.put(
-                    "hearingNoticeApplicationDateCy",
-                    DateUtils.formatDateInWelsh(date, false)
-                );
-            });
-
+    private void addHearingScheduledDate(HashMap<String, Object> params, GeneralApplicationCaseData caseData) {
+        if (!CaseState.LISTING_FOR_A_HEARING.equals(caseData.getCcdState())) {
+            return;
         }
 
+        getGeneralAppListingForHearingDate(caseData)
+            .ifPresent(date -> putDateVariants(params, date));
+    }
+
+    private void addApplicationFee(HashMap<String, Object> params, GeneralApplicationCaseData caseData) {
         if (caseData.getGeneralAppPBADetails() != null) {
             params.put(
                 "applicationFee",
-                "£" + MonetaryConversions.penniesToPounds(caseData.getGeneralAppPBADetails().getFee().getCalculatedAmountInPence())
-            );
-        }
-
-        if (caseData.getGaHwfDetails() != null && (caseData.getHwfFeeType() != null && FeeType.APPLICATION == caseData.getHwfFeeType())) {
-            if (caseData.getGaHwfDetails().getHwfCaseEvent() != null
-                && caseData.getGaHwfDetails().getHwfCaseEvent().equals(CaseEvent.PARTIAL_REMISSION_HWF_GA)) {
-                params.put(
-                    "remissionAmount",
-                    "£" + MonetaryConversions.penniesToPounds(caseData.getGaHwfDetails().getRemissionAmount())
-                );
-                params.put(
-                    "outstandingFeeInPounds", "£" + MonetaryConversions
-                        .penniesToPounds(caseData.getGaHwfDetails().getOutstandingFee())
-                );
-            }
-        } else if (caseData.getAdditionalHwfDetails() != null && (caseData.getHwfFeeType() != null
-            && FeeType.ADDITIONAL == caseData.getHwfFeeType())) {
-            if (caseData.getAdditionalHwfDetails().getHwfCaseEvent() != null
-                && caseData.getAdditionalHwfDetails().getHwfCaseEvent().equals(CaseEvent.PARTIAL_REMISSION_HWF_GA)) {
-                params.put(
-                    "remissionAmount", "£" + MonetaryConversions.penniesToPounds(caseData.getAdditionalHwfDetails()
-                                                                                     .getRemissionAmount())
-                );
-                params.put(
-                    "outstandingFeeInPounds", "£" + MonetaryConversions
-                        .penniesToPounds(caseData.getAdditionalHwfDetails().getOutstandingFee())
-                );
-            }
-        }
-
-        if (Objects.nonNull(caseData.getJudicialDecisionRequestMoreInfo())
-            && Objects.nonNull(caseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate())) {
-            params.put(
-                "judgeRequestMoreInfoByDate",
-                caseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate().atTime(
-                    END_OF_BUSINESS_DAY)
-            );
-            params.put(
-                "judgeRequestMoreInfoByDateEn",
-                DateUtils.formatDate(caseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate())
-            );
-            params.put(
-                "judgeRequestMoreInfoByDateCy",
-                DateUtils.formatDateInWelsh(
-                    caseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate(),
-                    false
+                "£" + MonetaryConversions.penniesToPounds(
+                    caseData.getGeneralAppPBADetails().getFee().getCalculatedAmountInPence()
                 )
             );
         }
+    }
 
-        if (Objects.nonNull(caseData.getGeneralAppHelpWithFees())) {
-            if (caseData.getCcdState().equals(CaseState.AWAITING_APPLICATION_PAYMENT)) {
-                params.put("applicationFeeTypeEn", "application");
-                params.put("applicationFeeTypeCy", "gwneud cais");
-            } else if (caseData.getCcdState().equals(CaseState.APPLICATION_ADD_PAYMENT)) {
-                params.put("applicationFeeTypeEn", "additional application");
-                params.put("applicationFeeTypeCy", "ychwanegol i wneud cais");
-            }
+    private void addRemissionAmounts(HashMap<String, Object> params, GeneralApplicationCaseData caseData) {
+        if (hasPartialApplicationRemission(caseData)) {
+            putRemissionAmounts(
+                params,
+                caseData.getGaHwfDetails().getRemissionAmount(),
+                caseData.getGaHwfDetails().getOutstandingFee()
+            );
+            return;
         }
 
-        if (Objects.nonNull(caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations())) {
-            LocalDate applicantDeadlineDate;
-            LocalDate respondentDeadlineDate;
-            if (caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getWrittenOption() == SEQUENTIAL_REPRESENTATIONS) {
-                applicantDeadlineDate = caseData.getParentClaimantIsApplicant() == YesOrNo.YES
-                    ? caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getSequentialApplicantMustRespondWithin()
-                    : caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getWrittenSequentailRepresentationsBy();
-                respondentDeadlineDate = caseData.getParentClaimantIsApplicant() == YesOrNo.YES
-                    ? caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getWrittenSequentailRepresentationsBy()
-                    : caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getSequentialApplicantMustRespondWithin();
-            } else {
-                applicantDeadlineDate = caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getWrittenConcurrentRepresentationsBy();
-                respondentDeadlineDate = caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getWrittenConcurrentRepresentationsBy();
-            }
-            params.put("writtenRepApplicantDeadline", applicantDeadlineDate.atTime(END_OF_BUSINESS_DAY));
-            params.put("writtenRepApplicantDeadlineDateEn", DateUtils.formatDate(applicantDeadlineDate));
-            params.put("writtenRepApplicantDeadlineDateCy", DateUtils.formatDateInWelsh(applicantDeadlineDate, false));
-            params.put("writtenRepRespondentDeadline", respondentDeadlineDate.atTime(END_OF_BUSINESS_DAY));
-            params.put("writtenRepRespondentDeadlineDateEn", DateUtils.formatDate(respondentDeadlineDate));
-            params.put(
-                "writtenRepRespondentDeadlineDateCy",
-                DateUtils.formatDateInWelsh(respondentDeadlineDate, false)
+        if (hasPartialAdditionalRemission(caseData)) {
+            putRemissionAmounts(
+                params,
+                caseData.getAdditionalHwfDetails().getRemissionAmount(),
+                caseData.getAdditionalHwfDetails().getOutstandingFee()
             );
         }
-        //ToDo: refactor below string to allow for notifications that do not require additional params
-        params.put("testRef", "string");
+    }
 
-        return params;
+    private boolean hasPartialApplicationRemission(GeneralApplicationCaseData caseData) {
+        return caseData.getGaHwfDetails() != null
+            && caseData.getHwfFeeType() != null
+            && FeeType.APPLICATION == caseData.getHwfFeeType()
+            && CaseEvent.PARTIAL_REMISSION_HWF_GA.equals(caseData.getGaHwfDetails().getHwfCaseEvent());
+    }
+
+    private boolean hasPartialAdditionalRemission(GeneralApplicationCaseData caseData) {
+        return caseData.getAdditionalHwfDetails() != null
+            && caseData.getHwfFeeType() != null
+            && FeeType.ADDITIONAL == caseData.getHwfFeeType()
+            && CaseEvent.PARTIAL_REMISSION_HWF_GA.equals(caseData.getAdditionalHwfDetails().getHwfCaseEvent());
+    }
+
+    private void putRemissionAmounts(HashMap<String, Object> params,
+                                     java.math.BigDecimal remissionAmount,
+                                     java.math.BigDecimal outstandingFee) {
+        params.put("remissionAmount", "£" + MonetaryConversions.penniesToPounds(remissionAmount));
+        params.put("outstandingFeeInPounds", "£" + MonetaryConversions.penniesToPounds(outstandingFee));
+    }
+
+    private void addFeeTypeLabels(HashMap<String, Object> params, GeneralApplicationCaseData caseData) {
+        if (Objects.isNull(caseData.getGeneralAppHelpWithFees())) {
+            return;
+        }
+
+        if (CaseState.AWAITING_APPLICATION_PAYMENT.equals(caseData.getCcdState())) {
+            params.put("applicationFeeTypeEn", "application");
+            params.put("applicationFeeTypeCy", "gwneud cais");
+        } else if (CaseState.APPLICATION_ADD_PAYMENT.equals(caseData.getCcdState())) {
+            params.put("applicationFeeTypeEn", "additional application");
+            params.put("applicationFeeTypeCy", "ychwanegol i wneud cais");
+        }
+    }
+
+    private void addWrittenRepresentationDeadlines(HashMap<String, Object> params, GeneralApplicationCaseData caseData) {
+        if (Objects.isNull(caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations())) {
+            return;
+        }
+
+        LocalDate applicantDeadlineDate = getApplicantDeadline(caseData);
+        LocalDate respondentDeadlineDate = getRespondentDeadline(caseData);
+        putWrittenRepresentationDeadline(params, "writtenRepApplicantDeadline", applicantDeadlineDate);
+        putWrittenRepresentationDeadline(params, "writtenRepRespondentDeadline", respondentDeadlineDate);
+    }
+
+    private LocalDate getApplicantDeadline(GeneralApplicationCaseData caseData) {
+        if (caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getWrittenOption()
+            != SEQUENTIAL_REPRESENTATIONS) {
+            return caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getWrittenConcurrentRepresentationsBy();
+        }
+
+        return caseData.getParentClaimantIsApplicant() == YesOrNo.YES
+            ? caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getSequentialApplicantMustRespondWithin()
+            : caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getWrittenSequentailRepresentationsBy();
+    }
+
+    private LocalDate getRespondentDeadline(GeneralApplicationCaseData caseData) {
+        if (caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getWrittenOption()
+            != SEQUENTIAL_REPRESENTATIONS) {
+            return caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getWrittenConcurrentRepresentationsBy();
+        }
+
+        return caseData.getParentClaimantIsApplicant() == YesOrNo.YES
+            ? caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getWrittenSequentailRepresentationsBy()
+            : caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getSequentialApplicantMustRespondWithin();
+    }
+
+    private void putDateTimeVariants(HashMap<String, Object> params, String key, LocalDate date) {
+        params.put(key, date.atTime(END_OF_BUSINESS_DAY));
+        params.put(key + "En", DateUtils.formatDate(date));
+        params.put(key + "Cy", DateUtils.formatDateInWelsh(date, false));
+    }
+
+    private void putDateVariants(HashMap<String, Object> params, LocalDate date) {
+        params.put("hearingNoticeApplicationDate" + "En", DateUtils.formatDate(date));
+        params.put("hearingNoticeApplicationDate" + "Cy", DateUtils.formatDateInWelsh(date, false));
+    }
+
+    private void putWrittenRepresentationDeadline(HashMap<String, Object> params, String key, LocalDate date) {
+        params.put(key, date.atTime(END_OF_BUSINESS_DAY));
+        params.put(key + "DateEn", DateUtils.formatDate(date));
+        params.put(key + "DateCy", DateUtils.formatDateInWelsh(date, false));
     }
 
 }

@@ -209,6 +209,61 @@ class DashboardScenariosServiceTest {
         verify(dashboardNotificationService).deleteByNameAndReference("template.missing", "case-id");
     }
 
+    @Test
+    void shouldReconfigureExistingNotifications() {
+        // Arrange
+        final String caseId = "ccd-case-id";
+        final String roleType = "CLAIMANT";
+        final HashMap<String, Object> params = new HashMap<>();
+        params.put("animal", "Tiger");
+        params.put("target", "Safari");
+
+        DashboardNotificationsEntity existingNotification1 = new DashboardNotificationsEntity();
+        existingNotification1.setName(NOTIFICATION_ISSUE_CLAIM_START);
+        existingNotification1.setReference(caseId);
+
+        DashboardNotificationsEntity existingNotification2 = new DashboardNotificationsEntity();
+        existingNotification2.setName("nonexistent.template");
+        existingNotification2.setReference(caseId);
+
+        when(dashboardNotificationService.getDashboardNotifications(caseId, roleType))
+            .thenReturn(List.of(existingNotification1, existingNotification2));
+
+        NotificationTemplateDefinition template = new NotificationTemplateDefinition(
+            NOTIFICATION_ISSUE_CLAIM_START,
+            roleType.toLowerCase(),
+            "The ${animal} jumped over the ${target}.",
+            "The ${animal} jumped over the ${target}.",
+            "The ${animal} jumped over the ${target}.",
+            "The ${animal} jumped over the ${target}.",
+            null,
+            null,
+            false
+        );
+
+        when(notificationTemplateCatalog.findByName(NOTIFICATION_ISSUE_CLAIM_START))
+            .thenReturn(Optional.of(template));
+        when(notificationTemplateCatalog.findByName("nonexistent.template"))
+            .thenReturn(Optional.empty());
+
+        final ScenarioRequestParams scenarioRequestParams = new ScenarioRequestParams(params);
+
+        dashboardScenariosService.reconfigureCaseDashboardNotifications(caseId, scenarioRequestParams, roleType);
+
+        verify(dashboardNotificationService).saveOrUpdate(
+            org.mockito.ArgumentMatchers.argThat(updated ->
+                                                     updated.getTitleEn().equals("The Tiger jumped over the Safari.")
+                                                         && updated.getDescriptionEn().equals("The Tiger jumped over the Safari.")
+                                                         && updated.getReference().equals(caseId)
+            )
+        );
+
+        verify(dashboardNotificationService, never())
+            .saveOrUpdate(org.mockito.ArgumentMatchers.argThat(n ->
+                                                                   n.getName().equals("nonexistent.template")
+            ));
+    }
+
     private ScenarioEntity issueClaimStartScenario() {
         ScenarioEntity scenario = new ScenarioEntity();
         scenario.setId(1L);
@@ -259,5 +314,4 @@ class DashboardScenariosServiceTest {
         template.setTaskNameCy("Pay hearing fee");
         return template;
     }
-
 }
