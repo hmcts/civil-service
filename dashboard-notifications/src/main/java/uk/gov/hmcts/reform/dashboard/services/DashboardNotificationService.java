@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
-import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import java.time.OffsetDateTime;
@@ -29,20 +28,17 @@ import static java.util.Objects.nonNull;
 public class DashboardNotificationService {
 
     private final DashboardNotificationsRepository dashboardNotificationsRepository;
-    private final NotificationActionRepository notificationActionRepository;
     private static final Set<String> CASE_STAY_TEMPLATES = Set.of(
         "Notice.AAA6.CP.Case.Stayed.Claimant",
         "Notice.AAA6.CP.Case.Stayed.Defendant"
     );
 
     private final IdamApi idamApi;
-    private final String clickAction = "Click";
 
     @Autowired
     public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository,
-                                        NotificationActionRepository notificationActionRepository, IdamApi idamApi) {
+                                        IdamApi idamApi) {
         this.dashboardNotificationsRepository = dashboardNotificationsRepository;
-        this.notificationActionRepository = notificationActionRepository;
         this.idamApi = idamApi;
     }
 
@@ -93,35 +89,45 @@ public class DashboardNotificationService {
 
         DashboardNotificationsEntity updated = notification;
         if (nonNull(notification.getName())) {
-            log.info("Query for dashboard notifications using notification reference= {}, citizenRole = {}, templateName = {}",
+            log.debug("Query for dashboard notifications using notification reference= {}, citizenRole = {}, templateName = {}",
                 notification.getReference(),
                 notification.getCitizenRole(),
                 notification.getName()
             );
-            List<DashboardNotificationsEntity> existingNotification = dashboardNotificationsRepository
+            List<DashboardNotificationsEntity> existingNotifications = dashboardNotificationsRepository
                 .findByReferenceAndCitizenRoleAndName(
                     notification.getReference(),
                     notification.getCitizenRole(),
                     notification.getName()
                 );
 
-            log.info("Found {} dashboard notifications in database for reference {}",
-                nonNull(existingNotification) ? existingNotification.size() : null,
+            log.debug("Found {} dashboard notifications in database for reference {}",
+                nonNull(existingNotifications) ? existingNotifications.size() : null,
                 notification.getReference());
-            if (nonNull(existingNotification) && !existingNotification.isEmpty()) {
-                DashboardNotificationsEntity dashboardNotification = existingNotification.get(0);
-                updated = copyNotification(notification);
-                updated.setId(dashboardNotification.getId());
-                for (DashboardNotificationsEntity dashNotification : existingNotification) {
-                    notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(
-                        dashNotification,
-                        clickAction
+            if (nonNull(existingNotifications) && !existingNotifications.isEmpty()) {
+                DashboardNotificationsEntity latest = getLatestNotification(existingNotifications);
+                if (existingNotifications.size() > 1) {
+                    log.warn(
+                        "Deduplicate notification for reference {} role {} name {}. Found {} extra records.",
+                        latest.getReference(), latest.getCitizenRole(), latest.getName(),
+                        existingNotifications.size() - 1
                     );
-                    log.info("Existing notification deleted reference = {}, id = {}", notification.getReference(), dashNotification.getId());
+                    removeOrphanedNotifications(existingNotifications, latest.getId());
                 }
+                updated = copyNotification(notification);
+                updated.setId(latest.getId());
+                if (nonNull(latest.getCreatedAt())) {
+                    updated.setCreatedAt(latest.getCreatedAt());
+                    updated.setCreatedBy(latest.getCreatedBy());
+                }
+                updated.setClickedAt(latest.getClickedAt());
+                updated.setClickedBy(latest.getClickedBy());
+                log.info("Updating existing notification reference = {}", notification.getReference());
+            } else {
+                log.info("Saving new notification reference = {}", notification.getReference());
             }
         } else {
-            log.info("Existing notification not present reference = {}", notification.getReference());
+            log.warn("Notification 'name' not present reference = {}", notification.getReference());
         }
 
         return dashboardNotificationsRepository.save(updated);
@@ -132,23 +138,9 @@ public class DashboardNotificationService {
     }
 
     public void recordClick(UUID id, String authToken) {
-        Optional<DashboardNotificationsEntity> dashboardNotification = dashboardNotificationsRepository.findById(id);
-
-        dashboardNotification.ifPresent(notification -> {
-            NotificationActionEntity notificationAction = new NotificationActionEntity(
-                null,
-                notification.getReference(),
-                clickAction,
-                idamApi.retrieveUserDetails(authToken).getFullName(),
-                OffsetDateTime.now(),
-                notification
-            );
-
-            if (nonNull(notification.getNotificationAction())
-                && notification.getNotificationAction().getActionPerformed().equals(clickAction)) {
-                notificationAction.setId(notification.getNotificationAction().getId());
-            }
-            notification.setNotificationAction(notificationAction);
+        dashboardNotificationsRepository.findById(id).ifPresent(notification -> {
+            notification.setClickedBy(idamApi.retrieveUserDetails(authToken).getFullName());
+            notification.setClickedAt(OffsetDateTime.now());
             dashboardNotificationsRepository.save(notification);
         });
     }
@@ -169,7 +161,6 @@ public class DashboardNotificationService {
     private DashboardNotificationsEntity copyNotification(DashboardNotificationsEntity notification) {
         return new DashboardNotificationsEntity(
             notification.getId(),
-            notification.getNotificationAction(),
             notification.getReference(),
             notification.getName(),
             notification.getCitizenRole(),
@@ -183,7 +174,31 @@ public class DashboardNotificationService {
             notification.getUpdatedBy(),
             notification.getUpdatedOn(),
             notification.getDeadline(),
-            notification.getTimeToLive()
+            notification.getTimeToLive(),
+            notification.getClickedBy(),
+            notification.getClickedAt()
         );
+    }
+
+    private DashboardNotificationsEntity getLatestNotification(List<DashboardNotificationsEntity> existingNotifications) {
+        return existingNotifications.stream()
+            .max(Comparator.comparing(
+                     DashboardNotificationsEntity::getCreatedAt,
+                     Comparator.nullsFirst(Comparator.naturalOrder())
+                 )
+                 .thenComparing(DashboardNotificationsEntity::getId))
+            .orElse(existingNotifications.getFirst());
+    }
+
+    private void removeOrphanedNotifications(List<DashboardNotificationsEntity> existingNotifications, @NotNull UUID latestId) {
+        existingNotifications.stream()
+            .filter(e -> !e.getId().equals(latestId))
+            .forEach(duplicate -> {
+                try {
+                    dashboardNotificationsRepository.deleteById(duplicate.getId());
+                } catch (Exception e) {
+                    log.warn("Failed to delete duplicate notification reference = {}", duplicate.getReference());
+                }
+            });
     }
 }
