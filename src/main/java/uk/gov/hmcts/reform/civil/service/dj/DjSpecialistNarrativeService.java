@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 public class DjSpecialistNarrativeService {
 
     private final DjBuildingDisputeDirectionsService buildingDisputeDirectionsService;
+    private final DjHousingDisrepairDirectionsService housingDisrepairDirectionsService;
+    private final DjPpiDirectionsService ppiDirectionsService;
     private final DjClinicalDirectionsService clinicalDirectionsService;
     private final DjRoadTrafficAccidentDirectionsService roadTrafficAccidentDirectionsService;
     private final DjCreditHireDirectionsService creditHireDirectionsService;
@@ -40,14 +42,14 @@ public class DjSpecialistNarrativeService {
     }
 
     public TrialHousingDisrepair buildTrialHousingDisrepair() {
-        return buildingDisputeDirectionsService.buildTrialHousingDisrepair();
+        return housingDisrepairDirectionsService.buildTrialHousingDisrepair();
     }
 
     public TrialHousingDisrepair buildTrialHousingDisrepairOtherRemedy() {
-        return buildingDisputeDirectionsService.buildTrialHousingDisrepairOtherRemedy();
+        return housingDisrepairDirectionsService.buildTrialHousingDisrepairOtherRemedy();
     }
 
     public TrialPPI buildTrialPPI() {
-        return buildingDisputeDirectionsService.buildTrialPPI();
+        return ppiDirectionsService.buildTrialPPI();
     }
 }

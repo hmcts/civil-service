@@ -25,6 +25,10 @@ class DjSpecialistNarrativeServiceTest {
     @Mock
     private DjBuildingDisputeDirectionsService buildingDisputeDirectionsService;
     @Mock
+    private DjHousingDisrepairDirectionsService housingDisrepairDirectionsService;
+    @Mock
+    private DjPpiDirectionsService ppiDirectionsService;
+    @Mock
     private DjClinicalDirectionsService clinicalDirectionsService;
     @Mock
     private DjRoadTrafficAccidentDirectionsService roadTrafficAccidentDirectionsService;
@@ -37,6 +41,8 @@ class DjSpecialistNarrativeServiceTest {
     void setUp() {
         service = new DjSpecialistNarrativeService(
             buildingDisputeDirectionsService,
+            housingDisrepairDirectionsService,
+            ppiDirectionsService,
             clinicalDirectionsService,
             roadTrafficAccidentDirectionsService,
             creditHireDirectionsService
@@ -84,7 +90,7 @@ class DjSpecialistNarrativeServiceTest {
         TrialRoadTrafficAccident expectedRta = new TrialRoadTrafficAccident();
         TrialHousingDisrepair expectedHousing = new TrialHousingDisrepair();
         when(roadTrafficAccidentDirectionsService.buildTrialRoadTrafficAccident()).thenReturn(expectedRta);
-        when(buildingDisputeDirectionsService.buildTrialHousingDisrepair()).thenReturn(expectedHousing);
+        when(housingDisrepairDirectionsService.buildTrialHousingDisrepair()).thenReturn(expectedHousing);
 
         TrialRoadTrafficAccident rta = service.buildTrialRoadTrafficAccident();
         TrialHousingDisrepair housing = service.buildTrialHousingDisrepair();
@@ -92,28 +98,28 @@ class DjSpecialistNarrativeServiceTest {
         assertThat(rta).isSameAs(expectedRta);
         assertThat(housing).isSameAs(expectedHousing);
         verify(roadTrafficAccidentDirectionsService).buildTrialRoadTrafficAccident();
-        verify(buildingDisputeDirectionsService).buildTrialHousingDisrepair();
+        verify(housingDisrepairDirectionsService).buildTrialHousingDisrepair();
     }
 
     @Test
     void shouldBuildOtherRemedyHousingDisrepair() {
         TrialHousingDisrepair expected = new TrialHousingDisrepair();
-        when(buildingDisputeDirectionsService.buildTrialHousingDisrepairOtherRemedy()).thenReturn(expected);
+        when(housingDisrepairDirectionsService.buildTrialHousingDisrepairOtherRemedy()).thenReturn(expected);
 
         TrialHousingDisrepair housing = service.buildTrialHousingDisrepairOtherRemedy();
 
         assertThat(housing).isSameAs(expected);
-        verify(buildingDisputeDirectionsService).buildTrialHousingDisrepairOtherRemedy();
+        verify(housingDisrepairDirectionsService).buildTrialHousingDisrepairOtherRemedy();
     }
 
     @Test
     void shouldBuildTrialPpi() {
         TrialPPI expected = new TrialPPI();
-        when(buildingDisputeDirectionsService.buildTrialPPI()).thenReturn(expected);
+        when(ppiDirectionsService.buildTrialPPI()).thenReturn(expected);
 
         TrialPPI ppi = service.buildTrialPPI();
 
         assertThat(ppi).isSameAs(expected);
-        verify(buildingDisputeDirectionsService).buildTrialPPI();
+        verify(ppiDirectionsService).buildTrialPPI();
     }
 }

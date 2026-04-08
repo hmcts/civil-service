@@ -11,25 +11,20 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.dj.DjPrePopulateTrialOtherRemedyService;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticipantService;
 
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class DjPrePopulateTaskTest {
 
     @Mock
     private DirectionsOrderParticipantService participantService;
-
-    @Mock
-    private DjPrePopulateTrialOtherRemedyService prePopulateTrialOtherRemedyService;
 
     @InjectMocks
     private DjPrePopulateTask task;
@@ -50,7 +45,6 @@ class DjPrePopulateTaskTest {
         assertThat(result.submittedCallbackResponse()).isNull();
         assertThat(result.updatedCaseData().getApplicantVRespondentText()).isEqualTo("Applicant v Respondent");
         verify(participantService).buildApplicantVRespondentText(caseData);
-        verify(prePopulateTrialOtherRemedyService).applyOtherRemedyTrialDefaults(eq(caseData), any());
     }
 
     @Test

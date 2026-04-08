@@ -16,12 +16,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPPI;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjDirectionsToggleService;
-
-import java.util.List;
-
-import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsHousingDisrepair;
-import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsPPI;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -37,13 +31,11 @@ class DjSpecialistDirectionsServiceTest {
     @Mock
     private FeatureToggleService featureToggleService;
 
-    private final DjDirectionsToggleService directionsToggleService = new DjDirectionsToggleService();
-
     private DjSpecialistDirectionsService service;
 
     @BeforeEach
     void setUp() {
-        service = new DjSpecialistDirectionsService(narrativeService, featureToggleService, directionsToggleService);
+        service = new DjSpecialistDirectionsService(narrativeService, featureToggleService);
     }
 
     @Test
@@ -63,12 +55,10 @@ class DjSpecialistDirectionsServiceTest {
         when(narrativeService.buildTrialRoadTrafficAccident()).thenReturn(rta);
         when(narrativeService.buildTrialHousingDisrepair()).thenReturn(housingDisrepair);
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .caseManagementOrderAdditional(List.of(OrderTypeTrialAdditionalDirectionsHousingDisrepair))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.populateSpecialistDirections(caseData, builder);
+        service.populateSpecialistDirections(builder);
 
         CaseData result = builder.build();
 
@@ -110,15 +100,10 @@ class DjSpecialistDirectionsServiceTest {
         when(narrativeService.buildTrialHousingDisrepairOtherRemedy()).thenReturn(housingOtherRemedy);
         when(narrativeService.buildTrialPPI()).thenReturn(trialPpi);
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .caseManagementOrderAdditional(List.of(
-                OrderTypeTrialAdditionalDirectionsPPI,
-                OrderTypeTrialAdditionalDirectionsHousingDisrepair
-            ))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.populateSpecialistDirections(caseData, builder);
+        service.populateSpecialistDirections(builder);
 
         CaseData result = builder.build();
 
@@ -135,38 +120,5 @@ class DjSpecialistDirectionsServiceTest {
         verify(narrativeService, never()).buildTrialHousingDisrepair();
     }
 
-    @Test
-    void shouldClearPpiAndHousingWhenOtherRemedyEnabledButNotSelectedOnInitialScreen() {
-        TrialBuildingDispute buildingDispute = new TrialBuildingDispute();
-        TrialClinicalNegligence clinicalNegligence = new TrialClinicalNegligence();
-        SdoDJR2TrialCreditHire creditHire = new SdoDJR2TrialCreditHire();
-        TrialPersonalInjury personalInjury = new TrialPersonalInjury();
-        TrialRoadTrafficAccident rta = new TrialRoadTrafficAccident();
-        TrialHousingDisrepair housingOtherRemedy = new TrialHousingDisrepair();
-        TrialPPI trialPpi = new TrialPPI();
-
-        when(featureToggleService.isOtherRemedyEnabled()).thenReturn(true);
-        when(narrativeService.buildTrialBuildingDispute()).thenReturn(buildingDispute);
-        when(narrativeService.buildTrialClinicalNegligence()).thenReturn(clinicalNegligence);
-        when(narrativeService.buildCreditHireDirections()).thenReturn(creditHire);
-        when(narrativeService.buildTrialPersonalInjury()).thenReturn(personalInjury);
-        when(narrativeService.buildTrialRoadTrafficAccident()).thenReturn(rta);
-        when(narrativeService.buildTrialHousingDisrepairOtherRemedy()).thenReturn(housingOtherRemedy);
-        when(narrativeService.buildTrialPPI()).thenReturn(trialPpi);
-
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .caseManagementOrderAdditional(List.of())
-            .build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-
-        service.populateSpecialistDirections(caseData, builder);
-
-        CaseData result = builder.build();
-
-        assertThat(result.getTrialPPI()).isNull();
-        assertThat(result.getTrialHousingDisrepair()).isNull();
-
-        verify(narrativeService).buildTrialHousingDisrepairOtherRemedy();
-        verify(narrativeService).buildTrialPPI();
-    }
+    // No "clear if not selected" behaviour anymore – populated like other specialist narratives.
 }

@@ -54,9 +54,10 @@ import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjDirectionsToggleService;
 import uk.gov.hmcts.reform.civil.service.dj.DjCreditHireDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjBuildingDisputeDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjClinicalDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjHousingDisrepairDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjPpiDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjRoadTrafficAccidentDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjOrderDetailsService;
-import uk.gov.hmcts.reform.civil.service.dj.DjPrePopulateTrialOtherRemedyService;
 import uk.gov.hmcts.reform.civil.service.dj.DjValidationService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDocumentService;
 import uk.gov.hmcts.reform.civil.service.dj.DjNarrativeService;
@@ -155,7 +156,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
     DirectionsOrderCallbackPipeline.class,
     DirectionsOrderStageExecutor.class,
     DjPrePopulateTask.class,
-    DjPrePopulateTrialOtherRemedyService.class,
     DjOrderDetailsTask.class,
     DjValidationTask.class,
     DjDocumentTask.class,
@@ -168,6 +168,8 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
     DjDisposalDirectionsService.class,
     DjSpecialistDirectionsService.class,
     DjBuildingDisputeDirectionsService.class,
+    DjHousingDisrepairDirectionsService.class,
+    DjPpiDirectionsService.class,
     DjClinicalDirectionsService.class,
     DjRoadTrafficAccidentDirectionsService.class,
     DjSpecialistNarrativeService.class,

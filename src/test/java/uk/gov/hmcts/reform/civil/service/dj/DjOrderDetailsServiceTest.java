@@ -70,7 +70,7 @@ class DjOrderDetailsServiceTest {
 
         ArgumentCaptor<CaseData.CaseDataBuilder> builderCaptor = ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
         verify(disposalDirectionsService).populateDisposalDirections(builderCaptor.capture(), org.mockito.Mockito.eq(JUDGE));
-        verify(trialDirectionsService).populateTrialDirections(eq(caseData), builderCaptor.capture(), eq(JUDGE));
+        verify(trialDirectionsService).populateTrialDirections(builderCaptor.capture(), eq(JUDGE));
         assertThat(builderCaptor.getAllValues()).hasSize(2);
     }
 

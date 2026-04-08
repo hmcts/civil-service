@@ -9,8 +9,6 @@ import java.util.List;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsEmployersLiability;
-import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsHousingDisrepair;
-import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsPPI;
 import static uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle.SHOW;
 
 /**
@@ -31,15 +29,5 @@ public class DjDirectionsToggleService {
     public boolean hasEmployerLiability(List<CaseManagementOrderAdditional> additionalDirections) {
         return nonNull(additionalDirections)
             && additionalDirections.contains(OrderTypeTrialAdditionalDirectionsEmployersLiability);
-    }
-
-    public boolean hasPpi(List<CaseManagementOrderAdditional> additionalDirections) {
-        return nonNull(additionalDirections)
-            && additionalDirections.contains(OrderTypeTrialAdditionalDirectionsPPI);
-    }
-
-    public boolean hasHousingDisrepair(List<CaseManagementOrderAdditional> additionalDirections) {
-        return nonNull(additionalDirections)
-            && additionalDirections.contains(OrderTypeTrialAdditionalDirectionsHousingDisrepair);
     }
 }

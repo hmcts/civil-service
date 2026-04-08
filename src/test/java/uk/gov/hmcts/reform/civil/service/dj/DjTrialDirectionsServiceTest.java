@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjDirectionsToggleService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -68,13 +67,17 @@ class DjTrialDirectionsServiceTest {
 
     private static @NotNull DjSpecialistDirectionsService getDjSpecialistDirectionsService(DjDeadlineService djDeadlineService) {
         DjCreditHireDirectionsService creditHireDirectionsService = new DjCreditHireDirectionsService(djDeadlineService);
-        DjBuildingDisputeDirectionsService buildingDisputeDirectionsService =
-            new DjBuildingDisputeDirectionsService(djDeadlineService);
+        DjBuildingDisputeDirectionsService buildingDisputeDirectionsService = new DjBuildingDisputeDirectionsService(djDeadlineService);
+        DjHousingDisrepairDirectionsService housingDisrepairDirectionsService =
+            new DjHousingDisrepairDirectionsService(djDeadlineService);
+        DjPpiDirectionsService ppiDirectionsService = new DjPpiDirectionsService();
         DjClinicalDirectionsService clinicalDirectionsService = new DjClinicalDirectionsService(djDeadlineService);
         DjRoadTrafficAccidentDirectionsService roadTrafficAccidentDirectionsService =
             new DjRoadTrafficAccidentDirectionsService(djDeadlineService);
         DjSpecialistNarrativeService narrativeService = new DjSpecialistNarrativeService(
             buildingDisputeDirectionsService,
+            housingDisrepairDirectionsService,
+            ppiDirectionsService,
             clinicalDirectionsService,
             roadTrafficAccidentDirectionsService,
             creditHireDirectionsService
@@ -83,8 +86,7 @@ class DjTrialDirectionsServiceTest {
         when(featureToggleService.isOtherRemedyEnabled()).thenReturn(false);
         return new DjSpecialistDirectionsService(
             narrativeService,
-            featureToggleService,
-            new DjDirectionsToggleService()
+            featureToggleService
         );
     }
 
@@ -93,7 +95,7 @@ class DjTrialDirectionsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.populateTrialDirections(caseData, builder, JUDGE_NAME);
+        service.populateTrialDirections(builder, JUDGE_NAME);
 
         CaseData result = builder.build();
 
