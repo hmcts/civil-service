@@ -284,6 +284,14 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     @Test
     void shouldThrowExceptionWhenAdditionalSolicitorHasNoCaseRole() {
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L)
+            .applicant1(createParty("Applicant1"))
+            .respondent1(createParty("Respondent1"))
+            .applicantSolicitor1UserDetails(createIdamUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT))
+            .applicant1OrganisationPolicy(organisationPolicy("123", APPLICANTSOLICITORONE.getFormattedName()))
+            .respondent1OrganisationPolicy(organisationPolicy("345", RESPONDENTSOLICITORONE.getFormattedName()))
+            .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+            .build();
 
         when(caseAssignmentApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignmentUserRolesResource.builder()
@@ -298,14 +306,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             IllegalArgumentException.class,
             () -> helper.setRespondentDetailsIfPresent(
                 new GeneralApplication(),
-                CaseDataBuilder.builder().ccdCaseReference(1234L)
-                    .applicant1(createParty("Applicant1"))
-                    .respondent1(createParty("Respondent1"))
-                    .applicantSolicitor1UserDetails(createIdamUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT))
-                    .applicant1OrganisationPolicy(organisationPolicy("123", APPLICANTSOLICITORONE.getFormattedName()))
-                    .respondent1OrganisationPolicy(organisationPolicy("345", RESPONDENTSOLICITORONE.getFormattedName()))
-                    .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
-                    .build(),
+                caseData,
                 getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                 feesService
             )
