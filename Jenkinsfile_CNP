@@ -253,6 +253,12 @@ withPipeline(type, product, component) {
     retry(3) {
       sh """
         eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
+<<<<<<< DTSCCI-5038
+=======
+        ./bin/wait-for.sh definition-store
+        . ./bin/utils/idam-get-tokens.sh
+        ./bin/add-roles.sh
+>>>>>>> master
         ./bin/pull-latest-wiremock-mappings.sh ${wiremockMappingsBranch}
         ./bin/load-wiremock-mappings.sh
         ./bin/pull-latest-camunda-files.sh ${camundaBranch}
@@ -308,6 +314,11 @@ withPipeline(type, product, component) {
   before('smoketest:aat') {
     sh """
       eval \$(./bin/variables/load-staging-environment-variables.sh)
+<<<<<<< DTSCCI-5038
+=======
+      . ./bin/utils/idam-get-tokens.sh
+      ./bin/add-roles.sh
+>>>>>>> master
       ./bin/pull-latest-camunda-files.sh ${camundaBranch}
       ./bin/pull-latest-dmn-files.sh ${dmnBranch}
       ./bin/import-bpmn-diagram.sh .
