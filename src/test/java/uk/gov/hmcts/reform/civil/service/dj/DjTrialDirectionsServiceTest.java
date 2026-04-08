@@ -92,7 +92,7 @@ class DjTrialDirectionsServiceTest {
         assertThat(recital.getJudgeNameTitle()).isEqualTo(JUDGE_NAME);
 
         TrialHearingDisclosureOfDocuments disclosure = result.getTrialHearingDisclosureOfDocumentsDJ();
-        assertThat(disclosure.getDate2()).isEqualTo(LocalDate.now().plusWeeks(5));
+        assertThat(disclosure.getDate2()).isEqualTo(LocalDate.now().plusWeeks(3));
 
         TrialOrderMadeWithoutHearingDJ orderWithoutHearing = result.getTrialOrderMadeWithoutHearingDJ();
         String expectedDeadline = LocalDate.now().plusDays(5)

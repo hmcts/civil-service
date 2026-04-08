@@ -64,7 +64,7 @@ class SdoFastTrackNarrativeServiceTest {
                 FastTrackSchedulesOfLoss::getDate1,
                 FastTrackSchedulesOfLoss::getDate2
             )
-            .containsExactly(workingDayBase.plusWeeks(10), workingDayBase.plusWeeks(12));
+            .containsExactly(workingDayBase.plusWeeks(12), workingDayBase.plusWeeks(14));
         assertThat(caseData.getFastTrackTrial())
             .extracting(FastTrackTrial::getDate1, FastTrackTrial::getDate2)
             .containsExactly(calendarBase.plusDays(22 * 7), calendarBase.plusDays(30 * 7));

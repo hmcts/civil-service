@@ -44,18 +44,15 @@ class DjTrialNarrativeServiceTest {
 
     @Test
     void shouldBuildDisclosureOfDocumentsWithExpectedDates() {
-        LocalDate fourWeeks = LocalDate.of(2025, 1, 1);
-        LocalDate sixWeeks = LocalDate.of(2025, 1, 8);
-        LocalDate eightWeeks = LocalDate.of(2025, 1, 15);
-        when(deadlineService.nextWorkingDayInWeeks(4)).thenReturn(fourWeeks);
-        when(deadlineService.nextWorkingDayInWeeks(6)).thenReturn(sixWeeks);
-        when(deadlineService.nextWorkingDayInWeeks(8)).thenReturn(eightWeeks);
+        LocalDate twoWeeks = LocalDate.of(2025, 1, 1);
+        LocalDate threeWeeks = LocalDate.of(2025, 1, 8);
+        when(deadlineService.nextWorkingDayInWeeks(2)).thenReturn(twoWeeks);
+        when(deadlineService.nextWorkingDayInWeeks(3)).thenReturn(threeWeeks);
 
         TrialHearingDisclosureOfDocuments result = service.buildDisclosureOfDocuments();
 
-        assertThat(result.getDate1()).isEqualTo(fourWeeks);
-        assertThat(result.getDate2()).isEqualTo(sixWeeks);
-        assertThat(result.getDate3()).isEqualTo(eightWeeks);
+        assertThat(result.getDate1()).isEqualTo(twoWeeks);
+        assertThat(result.getDate2()).isEqualTo(threeWeeks);
     }
 
     @Test

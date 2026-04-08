@@ -90,9 +90,9 @@ public class SdoFastTrackNarrativeService {
     private void applySchedulesOfLoss(CaseData caseData) {
         caseData.setFastTrackSchedulesOfLoss(new FastTrackSchedulesOfLoss()
                                                          .setInput1(FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD)
-                                                         .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
+                                                         .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(12))
                                                          .setInput2(FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD)
-                                                         .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(12))
+                                                         .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(14))
                                                          .setInput3(FAST_TRACK_SCHEDULE_FUTURE_LOSS_SDO));
     }
 

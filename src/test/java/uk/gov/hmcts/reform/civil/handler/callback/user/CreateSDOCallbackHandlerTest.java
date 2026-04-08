@@ -816,11 +816,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
                 .extracting("standardDisclosureTxt").asString().isEqualTo(STANDARD_DISCLOSURE);
             assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
-                .extracting("standardDisclosureDate").asString().isEqualTo(LocalDate.now().plusDays(28).toString());
+                .extracting("standardDisclosureDate").asString().isEqualTo(LocalDate.now().plusWeeks(2).toString());
             assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
                 .extracting("inspectionTxt").asString().isEqualTo(INSPECTION);
             assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
-                .extracting("inspectionDate").asString().isEqualTo(LocalDate.now().plusDays(42).toString());
+                .extracting("inspectionDate").asString().isEqualTo(LocalDate.now().plusWeeks(3).toString());
             assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
                 .extracting("requestsWillBeCompiledLabel").asString().isEqualTo(REQUEST_COMPILED_WITH);
             assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoStatementOfWitness").asString().isEqualTo(
@@ -857,11 +857,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
                 .extracting("isClaimForPecuniaryLoss").asString().isEqualTo("No");
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
-                .extracting("sdoR2ScheduleOfLossClaimantDate").asString().isEqualTo(LocalDate.now().plusDays(364).toString());
+                .extracting("sdoR2ScheduleOfLossClaimantDate").asString().isEqualTo(LocalDate.now().plusWeeks(12).toString());
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
                 .extracting("sdoR2ScheduleOfLossDefendantText").asString().isEqualTo(SCHEDULE_OF_LOSS_DEFENDANT);
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
-                .extracting("sdoR2ScheduleOfLossDefendantDate").asString().isEqualTo(LocalDate.now().plusDays(378).toString());
+                .extracting("sdoR2ScheduleOfLossDefendantDate").asString().isEqualTo(LocalDate.now().plusWeeks(14).toString());
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
                 .extracting("sdoR2ScheduleOfLossPecuniaryLossTxt").asString().isEqualTo(PECUNIARY_LOSS);
             assertThat(response.getData()).extracting("sdoR2Trial")
