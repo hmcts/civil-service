@@ -1,14 +1,11 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.requestjudgementbyadmission;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
-
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 public class RequestJudgementByAdmissionApplicantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
@@ -16,13 +13,13 @@ public class RequestJudgementByAdmissionApplicantEmailDTOGenerator extends Claim
     protected static final String REFERENCE_TEMPLATE = "request-judgement-by-admission-applicant-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
-    private final PinInPostConfiguration pipInPostConfiguration;
+    private final RequestJudgementByAdmissionHelper helper;
 
     protected RequestJudgementByAdmissionApplicantEmailDTOGenerator(
         NotificationsProperties notificationsProperties,
-        PinInPostConfiguration pipInPostConfiguration) {
+        RequestJudgementByAdmissionHelper helper) {
         this.notificationsProperties = notificationsProperties;
-        this.pipInPostConfiguration = pipInPostConfiguration;
+        this.helper = helper;
     }
 
     @Override
@@ -42,10 +39,6 @@ public class RequestJudgementByAdmissionApplicantEmailDTOGenerator extends Claim
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
-        properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
-        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
-        properties.put(FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl());
-        return properties;
+        return helper.addLipProperties(properties, caseData);
     }
 }
