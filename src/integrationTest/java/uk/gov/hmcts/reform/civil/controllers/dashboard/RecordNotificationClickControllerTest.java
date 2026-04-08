@@ -55,16 +55,14 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldReturnUnauthorisedWhenBearerTokenMissing() {
         when(userRequestAuthorizerMock.authorise(any())).thenReturn(null);
-        doDelete("", null, NOTIFICATION_CLICK_END_POINT, NOTIFICATION_ID.toString())
+        doPut("", null, NOTIFICATION_CLICK_END_POINT, NOTIFICATION_ID.toString())
             .andExpect(status().isForbidden());
     }
 
     @Test
     @SneakyThrows
     void shouldReturnBadRequestWhenUuidNotInCorrectFormat() {
-
-        doDelete(BEARER_TOKEN, null, NOTIFICATION_CLICK_END_POINT, "126")
+        doPut(BEARER_TOKEN, null, NOTIFICATION_CLICK_END_POINT, "126")
             .andExpect(status().isBadRequest());
-
     }
 }
