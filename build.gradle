@@ -138,6 +138,12 @@ allprojects {
   }
 }
 
+tasks.register('highLevelDataSetup', JavaExec) {
+  mainClass = "uk.gov.hmcts.reform.civil.HighLevelDataSetupApp"
+  classpath += sourceSets.main.runtimeClasspath
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
 sourceSets {
   integrationTest {
     java {
@@ -345,6 +351,7 @@ dependencies {
     exclude group: 'junit', module: 'junit'
   }
   implementation project(':dashboard-notifications')
+  implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4'
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
