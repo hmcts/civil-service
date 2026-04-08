@@ -372,8 +372,26 @@ public class InitiateGeneralApplicationService {
         LocalDateTime deadline = null;
         if (!(featureToggleService.isGaForWelshEnabled()
                 && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()))) {
-            int numberOfDeadlineDays = 5;
-            deadline = deadlinesCalculator.calculateApplicantResponseDeadline(LocalDateTime.now(), numberOfDeadlineDays);
+
+            boolean isNonUrgent = caseData.getGeneralAppUrgencyRequirement() == null
+                || caseData.getGeneralAppUrgencyRequirement().getGeneralAppUrgency() == null
+                || caseData.getGeneralAppUrgencyRequirement().getGeneralAppUrgency() != YES;
+
+            boolean isWithNotice = applicationBuilder.getGeneralAppInformOtherParty() != null
+                && applicationBuilder.getGeneralAppInformOtherParty().getIsWithNotice() == YES;
+
+            log.info("Setting deadline for case {}: isNonUrgent={}, isWithNotice={}",
+                caseData.getCcdCaseReference(), isNonUrgent, isWithNotice);
+
+            if (isNonUrgent && isWithNotice) {
+                int numberOfDeadlineDays = 4;
+                deadline = deadlinesCalculator.calculateApplicantResponseDeadlineWithWeekendCheck(LocalDateTime.now(), numberOfDeadlineDays);
+                log.info("Deadline set for non-urgent with notice case {}: {}", caseData.getCcdCaseReference(), deadline);
+            } else {
+                int numberOfDeadlineDays = 5;
+                deadline = deadlinesCalculator.calculateApplicantResponseDeadline(LocalDateTime.now(), numberOfDeadlineDays);
+                log.info("Deadline set for other case {}: {}", caseData.getCcdCaseReference(), deadline);
+            }
         }
         applicationBuilder
             .setBusinessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
