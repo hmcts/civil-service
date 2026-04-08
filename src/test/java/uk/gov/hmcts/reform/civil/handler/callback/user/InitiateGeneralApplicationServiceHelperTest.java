@@ -292,6 +292,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
             .respondent1OrganisationPolicy(organisationPolicy("345", RESPONDENTSOLICITORONE.getFormattedName()))
             .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
             .build();
+        GeneralApplication generalApplication = new GeneralApplication();
+        UserDetails userDetails = getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT);
 
         when(caseAssignmentApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignmentUserRolesResource.builder()
@@ -304,12 +306,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> helper.setRespondentDetailsIfPresent(
-                new GeneralApplication(),
-                caseData,
-                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
-                feesService
-            )
+            () -> helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails, feesService)
         );
 
         assertThat(exception.getMessage()).contains("Without Case Role");
@@ -317,56 +314,47 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     @Test
     void shouldThrowExceptionIfApplicant1OrganisationPolicyIsNull() {
+        GeneralApplication generalApplication = new GeneralApplication();
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L).build();
+        UserDetails userDetails = getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT);
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> helper
-                        .setRespondentDetailsIfPresent(
-                                new GeneralApplication(),
-                                CaseDataBuilder.builder().ccdCaseReference(1234L).build(),
-                                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
-                                feesService
-                        )
+                () -> helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails, feesService)
         );
 
     }
 
     @Test
     void shouldThrowExceptionIfRespondent1OrganisationPolicyIsNull() {
+        GeneralApplication generalApplication = new GeneralApplication();
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L)
+            .applicant1(createParty("Applicant1"))
+            .respondent2(createParty("Respondent1"))
+            .applicant1OrganisationPolicy(new OrganisationPolicy()).build();
+        UserDetails userDetails = getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT);
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> helper
-                        .setRespondentDetailsIfPresent(
-                                new GeneralApplication(),
-                                CaseDataBuilder.builder().ccdCaseReference(1234L)
-                                        .applicant1(createParty("Applicant1"))
-                                        .respondent2(createParty("Respondent1"))
-                                        .applicant1OrganisationPolicy(new OrganisationPolicy()).build(),
-                                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
-                                feesService
-                        )
+                () -> helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails, feesService)
         );
 
     }
 
     @Test
     void shouldThrowExceptionIfgetRespondent2IsNull() {
+        GeneralApplication generalApplication = new GeneralApplication();
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L)
+            .respondent1OrganisationPolicy(new OrganisationPolicy())
+            .addRespondent2(YesOrNo.YES)
+            .applicant1(createParty("Applicant1"))
+            .respondent2(createParty("Respondent1"))
+            .applicant1OrganisationPolicy(new OrganisationPolicy()).build();
+        UserDetails userDetails = getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT);
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> helper
-                        .setRespondentDetailsIfPresent(
-                                new GeneralApplication(),
-                                CaseDataBuilder.builder().ccdCaseReference(1234L)
-                                        .respondent1OrganisationPolicy(new OrganisationPolicy())
-                                        .addRespondent2(YesOrNo.YES)
-                                        .applicant1(createParty("Applicant1"))
-                                        .respondent2(createParty("Respondent1"))
-                                        .applicant1OrganisationPolicy(new OrganisationPolicy()).build(),
-                                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
-                                feesService
-                        )
+                () -> helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails, feesService)
         );
     }
 
