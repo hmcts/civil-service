@@ -2,7 +2,7 @@
 
 # Fetch tokens once if not already set, so ccd-add-role.sh reuses them
 if [ -z "${USER_TOKEN:-}" ] || [ -z "${SERVICE_TOKEN:-}" ]; then
-  source ./bin/utils/idam-get-tokens.sh
+  . ./bin/utils/idam-get-tokens.sh
 fi
 
 # User used during the CCD import and ccd-role creation
