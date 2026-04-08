@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-public class RequestJudgementByAdmissionRespSolOneEmailDTOGeneratorTest {
+class RequestJudgementByAdmissionRespSolOneEmailDTOGeneratorTest {
 
     @InjectMocks
     private RequestJudgementByAdmissionRespSolOneEmailDTOGenerator emailDTOGenerator;

@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.NotifierTestBase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RequestJudgementByAdmissionNotifierTest extends NotifierTestBase {
+class RequestJudgementByAdmissionNotifierTest extends NotifierTestBase {
 
     @InjectMocks
     private RequestJudgementByAdmissionNotifier notifier;

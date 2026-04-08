@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
+@SuppressWarnings("java:S115")
 public enum CamundaProcessIdentifier {
     ClaimDismissedNotifyParties,
     ClaimantConfirmProceedNotifyParties,
