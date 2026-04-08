@@ -208,8 +208,5 @@ public class GeneralAppsDeadlinesCalculatorTest {
                 .isWeekday()
                 .isTheSame(expectedDeadline);
         }
-
-
     }
-
 }
