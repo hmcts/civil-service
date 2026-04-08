@@ -3,7 +3,7 @@ ALTER TABLE dbs.dashboard_notifications
   ADD COLUMN IF NOT EXISTS clicked_at TIMESTAMP;
 
 -- Migrate data from dbs.notification_action to dbs.dashboard_notifications if it exists
--- Use most recent unique notification action to populate the new columns matching previous update logic.
+-- Use most recent unique notification action to populate the new columns.
 DO $$
 BEGIN
     IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'dbs' AND table_name = 'notification_action') THEN

@@ -75,11 +75,9 @@ public class DashboardNotificationsEntity implements Serializable {
     @Schema(name = "time_to_live")
     private String timeToLive;
 
-    @Column(name = "clicked_by")
     @Schema(name = "clicked_by")
     private String clickedBy;
 
-    @Column(name = "clicked_at")
     @Schema(name = "clicked_at")
     private OffsetDateTime clickedAt;
 }

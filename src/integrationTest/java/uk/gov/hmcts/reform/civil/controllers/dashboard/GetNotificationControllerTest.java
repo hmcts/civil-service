@@ -42,6 +42,8 @@ public class GetNotificationControllerTest extends BaseIntegrationTest {
         notification.setDescriptionCy("description_cy");
         notification.setCreatedAt(OffsetDateTime.of(LocalDateTime.parse("2024-02-10T10:00:00"), ZoneOffset.UTC));
         notification.setTimeToLive("Click");
+        notification.setClickedBy("Click User");
+        notification.setClickedAt(OffsetDateTime.of(LocalDateTime.parse("2024-02-10T10:00:01"), ZoneOffset.UTC));
         return List.of(notification);
     }
 }

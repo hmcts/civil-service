@@ -31,7 +31,8 @@ import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtil
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getNotificationList;
 
 @ExtendWith(MockitoExtension.class)
-public class DashboardNotificationServiceTest {
+@SuppressWarnings("java:S1874")
+class DashboardNotificationServiceTest {
 
     @Mock
     private DashboardNotificationsRepository dashboardNotificationsRepository;
