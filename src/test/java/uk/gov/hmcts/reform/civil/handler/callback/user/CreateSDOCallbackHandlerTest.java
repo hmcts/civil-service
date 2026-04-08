@@ -1797,6 +1797,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLossToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackCostsToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackTrialToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackTrialBundleTitle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackTrialBundleToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackTrialBundleText").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackTrialBundleEndLine").isNotNull();
             assertThat(response.getData()).extracting("fastTrackMethodToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocumentsToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactToggle").isNotNull();

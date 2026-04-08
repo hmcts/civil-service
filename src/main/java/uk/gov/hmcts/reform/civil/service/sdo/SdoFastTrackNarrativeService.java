@@ -25,6 +25,7 @@ import java.util.Locale;
 
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.DEADLINE;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT;
@@ -50,6 +51,8 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 @RequiredArgsConstructor
 public class SdoFastTrackNarrativeService {
 
+    private static final String FAST_TRACK_TRIAL_BUNDLE_TITLE = "Physical trial bundle";
+    private static final String FAST_TRACK_TRIAL_BUNDLE_END_LINE = ".";
     private static final List<DateToShowToggle> DATE_TO_SHOW_TRUE = List.of(DateToShowToggle.SHOW);
     private static final DateTimeFormatter ORDER_DATE_FORMAT =
         DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
@@ -107,6 +110,9 @@ public class SdoFastTrackNarrativeService {
                                             .setDate2(trialEnd)
                                             .setInput2(FAST_TRACK_TRIAL_TIME_WARNING_SDO)
                                             .setInput3(FAST_TRACK_TRIAL_BUNDLE_NOTICE));
+        caseData.setFastTrackTrialBundleTitle(FAST_TRACK_TRIAL_BUNDLE_TITLE);
+        caseData.setFastTrackTrialBundleText(PHYSICAL_TRIAL_BUNDLE);
+        caseData.setFastTrackTrialBundleEndLine(FAST_TRACK_TRIAL_BUNDLE_END_LINE);
     }
 
     private void applyHearingTime(CaseData caseData) {

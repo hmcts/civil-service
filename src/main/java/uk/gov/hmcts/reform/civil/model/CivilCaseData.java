@@ -238,7 +238,10 @@ public class CivilCaseData extends BaseCaseData implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> fastTrackSchedulesOfLossToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackCostsToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackTrialToggle;
+    private String fastTrackTrialBundleTitle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackTrialBundleToggle;
+    private String fastTrackTrialBundleText;
+    private String fastTrackTrialBundleEndLine;
     private List<OrderDetailsPagesSectionsToggle> fastTrackMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingDisclosureOfDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingWitnessOfFactToggle;
