@@ -39,7 +39,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.ALL_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT;
@@ -362,7 +362,7 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setCcdCaseReference(123455L);
-            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
+            caseData.setPreviousCCDState(ALL_FINAL_ORDERS_ISSUED);
             caseData.setCcdState(PROCEEDS_IN_HERITAGE_SYSTEM);
             caseData.setApplicant1Represented(YesOrNo.NO);
             JudgmentDetails activeJudgment = new JudgmentDetails();

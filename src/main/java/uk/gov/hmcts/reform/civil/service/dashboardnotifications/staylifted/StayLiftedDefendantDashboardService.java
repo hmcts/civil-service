@@ -55,7 +55,7 @@ public class StayLiftedDefendantDashboardService extends DashboardScenarioServic
 
     private Map<String, Boolean> getScenariosBasedOnPreStayState(CaseData caseData) {
         return switch (CaseState.valueOf(caseData.getPreStayState())) {
-            case CASE_PROGRESSION, All_FINAL_ORDERS_ISSUED -> Map.of(
+            case CASE_PROGRESSION, ALL_FINAL_ORDERS_ISSUED -> Map.of(
                 getViewDocumentsScenario(caseData).getScenario(), true);
             case HEARING_READINESS, PREPARE_FOR_HEARING_CONDUCT_HEARING, DECISION_OUTCOME -> Map.of(
                 getViewDocumentsScenario(caseData).getScenario(), true,

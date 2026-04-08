@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.migration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MIGRATE_CASE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_FROM_SANCTIONS;
@@ -66,7 +66,7 @@ public class MigrateGaCaseDataCallbackHandlerTest
                         .ccdCaseReference(CHILD_CCD_REF)
                         .build();
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        assertThat(handler.handledEvents()).contains(migrateCase);
+        assertThat(handler.handledEvents()).contains(MIGRATE_CASE);
     }
 
     @Nested

@@ -60,7 +60,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @Test
         void shouldPopulateDate() {
-            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            //Given: Casedata is in ALL_FINAL_ORDERS_ISSUED State and Record Judgement is done
             JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
             paymentPlan.setType(PaymentPlanSelection.PAY_IMMEDIATELY);
             JudgmentDetails judgmentDetails = new JudgmentDetails();
@@ -90,7 +90,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateJudgementStatusAsSatisfied() {
-            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            //Given: Casedata is in ALL_FINAL_ORDERS_ISSUED State and Record Judgement is done
             JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
             paymentPlan.setType(PaymentPlanSelection.PAY_IMMEDIATELY);
             JudgmentDetails judgmentDetails = new JudgmentDetails();
@@ -117,7 +117,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateJudgementStatusAsCancelled() {
-            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            //Given: Casedata is in ALL_FINAL_ORDERS_ISSUED State and Record Judgement is done
             JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
             paymentPlan.setType(PaymentPlanSelection.PAY_IMMEDIATELY);
             JudgmentDetails judgmentDetails = new JudgmentDetails();
@@ -147,7 +147,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateJudgementStatusAsCancelledForDefaultJudgment() {
-            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            //Given: Casedata is in ALL_FINAL_ORDERS_ISSUED State and Record Judgement is done
             JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
             paymentPlan.setType(PaymentPlanSelection.PAY_IMMEDIATELY);
             JudgmentDetails judgmentDetails = new JudgmentDetails();

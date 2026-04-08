@@ -18,7 +18,7 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.ALL_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
@@ -50,7 +50,7 @@ class OrderReviewObligationSearchServiceTest extends ElasticSearchServiceTest {
                                 .should(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
                                 .should(beState(DECISION_OUTCOME))
                                 .should(beState(IN_MEDIATION))
-                                .should(beState(All_FINAL_ORDERS_ISSUED))
+                                .should(beState(ALL_FINAL_ORDERS_ISSUED))
                                 .should(beState(CASE_STAYED))
                                 .should(beState(JUDICIAL_REFERRAL))
                                 .should(beState(CASE_PROGRESSION))

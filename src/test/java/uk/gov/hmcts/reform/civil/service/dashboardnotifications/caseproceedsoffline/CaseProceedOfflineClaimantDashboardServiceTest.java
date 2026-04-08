@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.ALL_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT;
 
@@ -66,7 +66,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
                 .ccdCaseReference(1234L)
-                .previousCCDState(All_FINAL_ORDERS_ISSUED)
+                .previousCCDState(ALL_FINAL_ORDERS_ISSUED)
                 .build();
 
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
@@ -90,7 +90,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
                 .ccdCaseReference(1234L)
-                .previousCCDState(All_FINAL_ORDERS_ISSUED)
+                .previousCCDState(ALL_FINAL_ORDERS_ISSUED)
                 .build();
 
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);

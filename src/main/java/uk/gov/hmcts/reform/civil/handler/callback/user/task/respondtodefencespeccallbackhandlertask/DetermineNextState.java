@@ -212,7 +212,7 @@ public class DetermineNextState extends CallbackHandler {
             || (caseData.isPartAdmitImmediatePaymentClaimSettled())) {
             return AWAITING_APPLICANT_INTENTION.name();
         }
-        return CaseState.All_FINAL_ORDERS_ISSUED.name();
+        return CaseState.ALL_FINAL_ORDERS_ISSUED.name();
     }
 
     private boolean isLipVLipOneVOne(CaseData caseData) {
@@ -226,7 +226,7 @@ public class DetermineNextState extends CallbackHandler {
         String nextState;
         if (featureToggleService.isJudgmentOnlineLive()
             && (caseData.isPayByInstallment() || caseData.isPayBySetDate())) {
-            nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
+            nextState = CaseState.ALL_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
         } else {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();

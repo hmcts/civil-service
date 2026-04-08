@@ -249,7 +249,7 @@ public class DashboardNotificationsParamsMapperTest {
         caseData.setCcdCaseReference(1234L);
         caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
         caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        caseData.setCcdState(CaseState.ALL_FINAL_ORDERS_ISSUED);
         caseData.setJoJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS);
         JudgmentInstalmentDetails instalmentDetails = new JudgmentInstalmentDetails();
         instalmentDetails.setStartDate(LocalDate.of(2022, 12, 12));
@@ -309,7 +309,7 @@ public class DashboardNotificationsParamsMapperTest {
         caseData.setCcdCaseReference(1234L);
         caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
         caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        caseData.setCcdState(CaseState.ALL_FINAL_ORDERS_ISSUED);
         JudgmentInstalmentDetails instalmentDetails2 = new JudgmentInstalmentDetails();
         instalmentDetails2.setAmount("20001");
         instalmentDetails2.setPaymentFrequency(paymentFrequency);
@@ -354,7 +354,7 @@ public class DashboardNotificationsParamsMapperTest {
         caseData.setCcdCaseReference(1234L);
         caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
         caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        caseData.setCcdState(CaseState.ALL_FINAL_ORDERS_ISSUED);
         JudgmentPaymentPlan paymentPlan3 = new JudgmentPaymentPlan();
         paymentPlan3.setType(PAY_IMMEDIATELY);
         JudgmentDetails activeJudgment3 = new JudgmentDetails();
@@ -379,7 +379,7 @@ public class DashboardNotificationsParamsMapperTest {
         caseData.setCcdCaseReference(1234L);
         caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
         caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        caseData.setCcdState(CaseState.ALL_FINAL_ORDERS_ISSUED);
         JudgmentPaymentPlan paymentPlan4 = new JudgmentPaymentPlan();
         paymentPlan4.setType(PAY_BY_DATE);
         paymentPlan4.setPaymentDeadlineDate(LocalDate.of(2050, Month.AUGUST, 19));

@@ -310,7 +310,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CallbackParams params = callbackParamsOf(
                     caseData,
-                    CaseEvent.UpdateNextHearingInfo,
+                    CaseEvent.UPDATE_NEXT_HEARING_INFO,
                     ABOUT_TO_START
                 );
 
@@ -351,7 +351,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CallbackParams params = callbackParamsOf(
                     caseData,
-                    CaseEvent.UpdateNextHearingInfo,
+                    CaseEvent.UPDATE_NEXT_HEARING_INFO,
                     ABOUT_TO_START
                 );
 
@@ -397,7 +397,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CallbackParams params = callbackParamsOf(
                     caseData,
-                    CaseEvent.UpdateNextHearingInfo,
+                    CaseEvent.UPDATE_NEXT_HEARING_INFO,
                     ABOUT_TO_START
                 );
 
@@ -441,7 +441,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CallbackParams params = callbackParamsOf(
                     caseData,
-                    CaseEvent.UpdateNextHearingInfo,
+                    CaseEvent.UPDATE_NEXT_HEARING_INFO,
                     ABOUT_TO_START
                 );
 
@@ -474,7 +474,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CallbackParams params = callbackParamsOf(
                     caseData,
-                    CaseEvent.UpdateNextHearingInfo,
+                    CaseEvent.UPDATE_NEXT_HEARING_INFO,
                     ABOUT_TO_START
                 );
 

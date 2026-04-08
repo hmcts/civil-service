@@ -43,8 +43,8 @@ class EventEmitterServiceTest {
     private MessageCorrelationBuilder messageCorrelationBuilder;
 
     private static final String TEST_EVENT = "TEST_EVENT";
-    private static final String TEST_EVENT_QM = "queryManagementRaiseQuery";
-    private static final String TEST_EVENT_QM_RESPONSE = "queryManagementRespondQuery";
+    private static final String TEST_EVENT_QM = "QUERY_MANAGEMENT_RAISE_QUERY";
+    private static final String TEST_EVENT_QM_RESPONSE = "QUERY_MANAGEMENT_RESPOND_QUERY";
     private static final long CASE_ID = 1L;
     private static final String QUERY_ID = "1";
 

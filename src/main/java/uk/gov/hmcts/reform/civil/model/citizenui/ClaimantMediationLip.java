@@ -28,11 +28,11 @@ public class ClaimantMediationLip {
 
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
-        return MediationDecision.Yes.equals(hasAgreedFreeMediation);
+        return MediationDecision.YES.equals(hasAgreedFreeMediation);
     }
 
     @JsonIgnore
     public boolean hasClaimantNotAgreedToFreeMediation() {
-        return MediationDecision.No.equals(hasAgreedFreeMediation);
+        return MediationDecision.NO.equals(hasAgreedFreeMediation);
     }
 }

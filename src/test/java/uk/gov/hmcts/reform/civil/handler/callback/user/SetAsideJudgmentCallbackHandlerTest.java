@@ -78,7 +78,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateSetAsideDate() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
@@ -109,7 +109,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateDefenceReceivedDate() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
@@ -140,7 +140,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateSetAsideJudgmentErrorText() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
             caseData.setJoSetAsideJudgmentErrorText("Some text");
@@ -171,7 +171,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateOrderType() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
             LocalDateTime nextDeadline = respondent1ResponseDeadline.atTime(16, 0);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
@@ -199,7 +199,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void testSetAsideForDefaultJudgment() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);

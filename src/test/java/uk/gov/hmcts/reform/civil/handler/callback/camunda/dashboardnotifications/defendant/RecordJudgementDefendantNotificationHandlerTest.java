@@ -92,7 +92,7 @@ class RecordJudgementDefendantNotificationHandlerTest extends BaseCallbackHandle
         caseData.setCcdCaseReference(1234L);
         caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
         caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        caseData.setCcdState(CaseState.ALL_FINAL_ORDERS_ISSUED);
         caseData.setJoJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS);
         caseData.setJoInstalmentDetails(instalmentDetails);
         caseData.setJoAmountOrdered("1200");

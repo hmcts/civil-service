@@ -18,14 +18,14 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MIGRATE_CASE;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MigrateGaCaseDataCallbackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(migrateCase);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(MIGRATE_CASE);
 
     private static final String MIGRATION_ID_VALUE = "GAMigration";
     private final ObjectMapper objectMapper;

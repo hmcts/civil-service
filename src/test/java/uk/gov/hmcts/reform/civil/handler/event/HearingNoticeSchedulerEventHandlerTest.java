@@ -112,7 +112,7 @@ class HearingNoticeSchedulerEventHandlerTest {
             CaseState.CASE_DISCONTINUED,
             CaseState.CASE_DISMISSED,
             CaseState.CLOSED,
-            CaseState.All_FINAL_ORDERS_ISSUED
+            CaseState.ALL_FINAL_ORDERS_ISSUED
         }) {
             boolean result = invokeIsNotAllowedState(allowedState.name());
             assertTrue(result, "Allowed state should return false: " + allowedState);

@@ -29,7 +29,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_INFO;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.AWAITING_ACTUALS;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
@@ -42,7 +42,7 @@ import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
 public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        UpdateNextHearingInfo,
+            UPDATE_NEXT_HEARING_INFO,
         UPDATE_NEXT_HEARING_DETAILS
     );
 
@@ -97,7 +97,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
         }
 
         Map<String, Object> data = caseData.toMap(objectMapper);
-        if (callbackParams.getRequest().getEventId().equals(UpdateNextHearingInfo.name())) {
+        if (callbackParams.getRequest().getEventId().equals(UPDATE_NEXT_HEARING_INFO.name())) {
             // When the UpdateNextHearingInfo is triggered via a non caseworker and we have cleared nextHearingDetails field
             // in the caseDataBuilder this change does not persist in database once submitted. This issue does not happen when event
             // is triggered via caseworker CCD endpoint. Adding the field directly into the map and nulling it seems to resolve

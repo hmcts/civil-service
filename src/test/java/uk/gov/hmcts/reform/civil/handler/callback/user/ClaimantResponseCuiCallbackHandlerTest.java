@@ -197,7 +197,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 new CaseDataLiP()
                     .setApplicant1ClaimMediationSpecRequiredLip(
                         new ClaimantMediationLip()
-                            .setHasAgreedFreeMediation(MediationDecision.Yes)));
+                            .setHasAgreedFreeMediation(MediationDecision.YES)));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -247,7 +247,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent1DQ(respondent1DQ);
             caseData.setApplicant1AcceptAdmitAmountPaidSpec(NO);
             caseData.setCaseDataLiP(new CaseDataLiP().setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip().setHasAgreedFreeMediation(
-                    MediationDecision.No)));
+                    MediationDecision.NO)));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -297,7 +297,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent1DQ(respondent1DQ);
             caseData.setApplicant1AcceptAdmitAmountPaidSpec(NO);
             caseData.setCaseDataLiP(new CaseDataLiP().setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip().setHasAgreedFreeMediation(
-                    MediationDecision.No)));
+                    MediationDecision.NO)));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -328,7 +328,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent1DQ(respondent1DQ);
             caseData.setApplicant1AcceptAdmitAmountPaidSpec(NO);
             caseData.setCaseDataLiP(new CaseDataLiP().setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip().setHasAgreedFreeMediation(
-                    MediationDecision.No)));
+                    MediationDecision.NO)));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

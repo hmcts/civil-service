@@ -312,7 +312,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
         return Optional.ofNullable(caseData.getCaseDataLiP())
             .map(cdl -> {
                 var mediation = cdl.getApplicant1ClaimMediationSpecRequiredLip();
-                return isNull(mediation) || MediationDecision.No.equals(mediation.getHasAgreedFreeMediation());
+                return isNull(mediation) || MediationDecision.NO.equals(mediation.getHasAgreedFreeMediation());
             })
             .orElse(false);
     }

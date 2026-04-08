@@ -54,7 +54,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.ALL_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
@@ -476,7 +476,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name())
-                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+                    .caseDetails(CaseDetails.builder().state(ALL_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
             handler.handle(params);
             ArgumentCaptor<String> secondParamCaptor = ArgumentCaptor.forClass(String.class);
             verify(dashboardScenariosService).recordScenarios(
@@ -512,7 +512,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(toggleService.isLocationWhiteListed(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
-                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+                    .caseDetails(CaseDetails.builder().state(ALL_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
             handler.handle(params);
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -538,7 +538,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(toggleService.isLocationWhiteListed(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
-                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+                    .caseDetails(CaseDetails.builder().state(ALL_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
             handler.handle(params);
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -565,7 +565,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(toggleService.isLocationWhiteListed(any())).thenReturn(false);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
-                        .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build())
+                        .caseDetails(CaseDetails.builder().state(ALL_FINAL_ORDERS_ISSUED.toString()).build()).build())
                 .build();
 
             handler.handle(params);
@@ -591,7 +591,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
-                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+                    .caseDetails(CaseDetails.builder().state(ALL_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);

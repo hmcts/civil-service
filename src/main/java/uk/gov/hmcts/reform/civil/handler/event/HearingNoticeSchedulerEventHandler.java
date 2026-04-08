@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
 import java.util.Arrays;
 
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.ALL_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
@@ -51,7 +51,7 @@ public class HearingNoticeSchedulerEventHandler {
         CASE_DISCONTINUED,
         CASE_DISMISSED,
         CLOSED,
-        All_FINAL_ORDERS_ISSUED
+        ALL_FINAL_ORDERS_ISSUED
     };
 
     @Async("asyncHandlerExecutor")

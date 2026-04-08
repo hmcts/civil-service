@@ -25,7 +25,7 @@ class EvidenceUploadNotificationSearchServiceTest extends ElasticSearchServiceTe
                       .should(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING")))
                       .should(boolQuery().must(matchQuery("state", "HEARING_READINESS")))
                       .should(boolQuery().must(matchQuery("state", "DECISION_OUTCOME")))
-                      .should(boolQuery().must(matchQuery("state", "All_FINAL_ORDERS_ISSUED")))
+                      .should(boolQuery().must(matchQuery("state", "ALL_FINAL_ORDERS_ISSUED")))
                       .should(boolQuery().must(matchQuery("state", "CASE_PROGRESSION"))))
             .mustNot(matchQuery("data.evidenceUploadNotificationSent", "Yes"))
             .must(boolQuery()

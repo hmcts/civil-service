@@ -117,7 +117,7 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
                 .ccdCaseReference(5555L)
                 .respondent1Represented(YesOrNo.NO)
                 .activeJudgment(new JudgmentDetails())
-                .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .previousCCDState(CaseState.ALL_FINAL_ORDERS_ISSUED)
                 .build();
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
@@ -138,7 +138,7 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
                 .respondent1Represented(YesOrNo.NO)
                 .activeJudgment(new JudgmentDetails())
                 .responseClaimTrack(AllocatedTrack.FAST_CLAIM.toString())
-                .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .previousCCDState(CaseState.ALL_FINAL_ORDERS_ISSUED)
                 .build();
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
@@ -160,7 +160,7 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
                 .build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .ccdCaseReference(1111L)
-                .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .previousCCDState(CaseState.ALL_FINAL_ORDERS_ISSUED)
                 .build();
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);

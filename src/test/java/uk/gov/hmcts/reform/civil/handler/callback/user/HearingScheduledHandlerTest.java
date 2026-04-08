@@ -544,7 +544,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @EnumSource(
         value = CaseState.class,
-        names = {"HEARING_READINESS", "PREPARE_FOR_HEARING_CONDUCT_HEARING", "DECISION_OUTCOME", "All_FINAL_ORDERS_ISSUED"})
+        names = {"HEARING_READINESS", "PREPARE_FOR_HEARING_CONDUCT_HEARING", "DECISION_OUTCOME", "ALL_FINAL_ORDERS_ISSUED"})
     void shouldNotOverwriteCaseState_listingNonOther_whenAboutToSubmit(CaseState caseState) {
         given(time.now()).willReturn(LocalDateTime.now());
 
@@ -575,7 +575,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @EnumSource(
         value = CaseState.class,
-        names = {"HEARING_READINESS", "PREPARE_FOR_HEARING_CONDUCT_HEARING", "DECISION_OUTCOME", "All_FINAL_ORDERS_ISSUED"})
+        names = {"HEARING_READINESS", "PREPARE_FOR_HEARING_CONDUCT_HEARING", "DECISION_OUTCOME", "ALL_FINAL_ORDERS_ISSUED"})
     void shouldNotOverwriteCaseState_reListing_whenAboutToSubmit(CaseState caseState) {
         given(time.now()).willReturn(LocalDateTime.now());
 
@@ -606,7 +606,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @EnumSource(
         value = CaseState.class,
-        names = {"HEARING_READINESS", "PREPARE_FOR_HEARING_CONDUCT_HEARING", "DECISION_OUTCOME", "All_FINAL_ORDERS_ISSUED"})
+        names = {"HEARING_READINESS", "PREPARE_FOR_HEARING_CONDUCT_HEARING", "DECISION_OUTCOME", "ALL_FINAL_ORDERS_ISSUED"})
     void shouldNotOverwriteCaseState_listingOther_whenAboutToSubmit(CaseState caseState) {
         given(time.now()).willReturn(LocalDateTime.now());
 

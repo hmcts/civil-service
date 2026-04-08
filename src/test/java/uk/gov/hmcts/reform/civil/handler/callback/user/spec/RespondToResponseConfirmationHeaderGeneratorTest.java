@@ -171,7 +171,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .build();
-        caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        caseData.setCcdState(CaseState.ALL_FINAL_ORDERS_ISSUED);
         return caseData;
     }
 
@@ -190,7 +190,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
         CaseData caseData = CaseDataBuilder.builder().build();
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
-        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.Yes);
+        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.YES);
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
         caseData.setCaseDataLiP(caseDataLiP);
         return caseData;
@@ -238,7 +238,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO).build();
         caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
         ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
-        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.NO);
         CaseDataLiP  caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(
             claimantMediationLip);

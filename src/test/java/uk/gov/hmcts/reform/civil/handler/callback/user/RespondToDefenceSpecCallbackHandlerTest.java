@@ -147,7 +147,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.ALL_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
@@ -1001,7 +1001,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
             caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
             ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
-            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.Yes);
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.YES);
             CaseDataLiP caseDataLiP = new CaseDataLiP();
             caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
             caseData.setCaseDataLiP(caseDataLiP);
@@ -1157,7 +1157,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
-                .isEqualTo(All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(ALL_FINAL_ORDERS_ISSUED.name());
         }
 
         @Test
@@ -1200,7 +1200,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
-                .isEqualTo(All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(ALL_FINAL_ORDERS_ISSUED.name());
         }
 
         @Test
@@ -1240,7 +1240,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(CaseState.ALL_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData()).extracting("activeJudgment").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("JUDGMENT_BY_ADMISSION");
@@ -2370,7 +2370,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
             respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(LocalDate.now().plusDays(5));
             caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
-            caseData.setCcdState(All_FINAL_ORDERS_ISSUED);
+            caseData.setCcdState(ALL_FINAL_ORDERS_ISSUED);
             caseData.setAllocatedTrack(MULTI_CLAIM);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
