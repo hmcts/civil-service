@@ -50,6 +50,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @RequiredArgsConstructor
 public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslatedDocumentStrategy {
 
+    private static final String TRANSLATED = "Translated_%s.%s";
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final ObjectMapper objectMapper;
     private final AssignCategoryId assignCategoryId;
@@ -156,7 +157,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         preTranslationFinalOrderDoc.ifPresent(originalDoc -> {
                             document.getValue().getFile().setDocumentFileName(
                                 String.format(
-                                    "Translated_%s.%s",
+                                    TRANSLATED,
                                     getBaseFileName(originalDoc.getValue().getDocumentLink().getDocumentFileName()),
                                     getFileType(document.getValue().getFile().getDocumentFileName())
                                 )
@@ -199,7 +200,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         preTranslationCourtOfficerOrder.ifPresent(originalDoc -> {
                             document.getValue().getFile().setDocumentFileName(
                                 String.format(
-                                    "Translated_%s.%s",
+                                    TRANSLATED,
                                     getBaseFileName(originalDoc.getValue().getDocumentLink().getDocumentFileName()),
                                     getFileType(document.getValue().getFile().getDocumentFileName())
                                 )
@@ -467,7 +468,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                                           Element<TranslatedDocument> translatedDocument) {
         translatedDocument.getValue().getFile().setDocumentFileName(
             String.format(
-                "Translated_%s.%s",
+                TRANSLATED,
                 getBaseFileName(originalDocument.getValue().getDocumentName()),
                 getFileType(translatedDocument.getValue().getFile().getDocumentFileName())
             )

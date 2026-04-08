@@ -49,6 +49,10 @@ public class SdoDocumentFormSmall implements MappableObject {
     private Party respondent1;
     private Party respondent2;
     private boolean hasRespondent2;
+    private String applicant1PartyName;
+    private String applicant2PartyName;
+    private String respondent1PartyName;
+    private String respondent2PartyName;
 
     private List<SmallTrack> smallClaims;
 
