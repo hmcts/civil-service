@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
 @ExtendWith(MockitoExtension.class)
-public class RequestJudgementByAdmissionApplicantEmailDTOGeneratorTest {
+class RequestJudgementByAdmissionApplicantEmailDTOGeneratorTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;
@@ -104,9 +104,10 @@ public class RequestJudgementByAdmissionApplicantEmailDTOGeneratorTest {
         Map<String, String> properties = new HashMap<>();
         Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
 
-        assertThat(updatedProperties).containsEntry(CLAIMANT_NAME, "Applicant Company");
-        assertThat(updatedProperties).containsEntry(RESPONDENT_NAME, "Respondent Company");
-        assertThat(updatedProperties).containsEntry(CLAIM_REFERENCE_NUMBER, "000DC001");
-        assertThat(updatedProperties).containsEntry(FRONTEND_URL, "dummy_cui_front_end_url");
+        assertThat(updatedProperties)
+            .containsEntry(CLAIMANT_NAME, "Applicant Company")
+            .containsEntry(RESPONDENT_NAME, "Respondent Company")
+            .containsEntry(CLAIM_REFERENCE_NUMBER, "000DC001")
+            .containsEntry(FRONTEND_URL, "dummy_cui_front_end_url");
     }
 }

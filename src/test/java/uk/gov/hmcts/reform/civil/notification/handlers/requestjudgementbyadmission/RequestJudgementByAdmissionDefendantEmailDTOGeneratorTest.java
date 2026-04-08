@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-public class RequestJudgementByAdmissionDefendantEmailDTOGeneratorTest {
+class RequestJudgementByAdmissionDefendantEmailDTOGeneratorTest {
 
     @InjectMocks
     private RequestJudgementByAdmissionDefendantEmailDTOGenerator emailDTOGenerator;
@@ -120,8 +120,9 @@ public class RequestJudgementByAdmissionDefendantEmailDTOGeneratorTest {
 
         partyUtilsMockedStatic.close();
 
-        assertThat(updatedProperties).hasSize(2);
-        assertThat(updatedProperties).containsEntry(RESPONDENT_NAME, partyName);
-        assertThat(updatedProperties).containsEntry(CLAIM_REFERENCE_NUMBER, legacyCaseReference);
+        assertThat(updatedProperties)
+            .hasSize(2)
+            .containsEntry(RESPONDENT_NAME, partyName)
+            .containsEntry(CLAIM_REFERENCE_NUMBER, legacyCaseReference);
     }
 }
