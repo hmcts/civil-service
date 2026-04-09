@@ -86,7 +86,6 @@ public class SdoDrhFieldsService {
 
         SdoR2SmallClaimsWitnessStatements witnessStatements = new SdoR2SmallClaimsWitnessStatements();
         witnessStatements.setSdoStatementOfWitness(WITNESS_STATEMENT_TEXT);
-        witnessStatements.setDeadlineDate(sdoDeadlineService.nextWorkingDayFromNowWeeks(4));
         witnessStatements.setIsRestrictWitness(YesOrNo.NO);
         witnessStatements.setIsRestrictPages(YesOrNo.NO);
         witnessStatements.setSdoR2SmallClaimsRestrictWitness(restrictWitness);
