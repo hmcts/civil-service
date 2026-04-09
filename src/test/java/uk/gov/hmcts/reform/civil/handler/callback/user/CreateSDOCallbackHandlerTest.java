@@ -2002,18 +2002,19 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                     "sdoR2FastTrackCreditHireDetails").extracting("input2")
                 .isEqualTo("""
-                        The claimant must upload to the Digital Portal a witness statement addressing
-                        a) the need to hire a replacement vehicle; and
-                        b) impecuniosity""");
+                        The Claimant’s witness statement must address, if relied upon, evidence in support of
+                        a) need to hire a replacement vehicle; and
+                        b) impecuniosity.""");
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                     "sdoR2FastTrackCreditHireDetails").extracting("date1")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                     "sdoR2FastTrackCreditHireDetails").extracting("input3")
                 .isEqualTo(
-                    "A failure to comply with the paragraph above will result in the claimant being debarred "
-                        + "from asserting need or relying on impecuniosity as the case may be at the final "
-                        + "hearing, save with permission of the Trial Judge.");
+                    "Failure to comply with the above paragraphs providing for disclosure and witness evidence on the issues "
+                        + "of need and impecuniosity will result in the claimant being debarred from asserting need or "
+                        + "relying on impecuniosity as the case may be at the final hearing, save with permission of the "
+                        + "Trial Judge.");
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                     "sdoR2FastTrackCreditHireDetails").extracting("input4")
                 .isEqualTo(
@@ -2139,19 +2140,20 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                         claimant.""");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input2")
                 .isEqualTo("""
-                        The claimant must upload to the Digital Portal a witness statement addressing
-                        a) the need to hire a replacement vehicle; and
-                        b) impecuniosity""");
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date1")
+                        The Claimant’s witness statement must address, if relied upon, evidence in support of
+                        a) need to hire a replacement vehicle; and
+                        b) impecuniosity.""");
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date2")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input3")
-                .isEqualTo("A failure to comply with the paragraph above will result in the claimant being debarred "
-                               + "from asserting need or relying on impecuniosity as the case may be at the final "
-                               + "hearing, save with permission of the Trial Judge.");
+                .isEqualTo("Failure to comply with the above paragraphs providing for disclosure and witness evidence on the issues "
+                               + "of need and impecuniosity will result in the claimant being debarred from asserting need or "
+                               + "relying on impecuniosity as the case may be at the final hearing, save with permission of the "
+                               + "Trial Judge.");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input4")
                 .isEqualTo("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
                                + "later than 4pm on");
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date2")
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date3")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input5")
                 .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to"

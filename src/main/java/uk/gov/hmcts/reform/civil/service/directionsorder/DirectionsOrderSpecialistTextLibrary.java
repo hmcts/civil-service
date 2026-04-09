@@ -199,13 +199,13 @@ public final class DirectionsOrderSpecialistTextLibrary {
         "The defendant's evidence is to be uploaded to the Digital Portal by 4pm on";
     public static final String CREDIT_HIRE_STATEMENT_PROMPT_SDO =
             """
-                    The claimant must upload to the Digital Portal a witness statement addressing
-                    a) the need to hire a replacement vehicle; and
-                    b) impecuniosity""";
+                    The Claimant’s witness statement must address, if relied upon, evidence in support of
+                    a) need to hire a replacement vehicle; and
+                    b) impecuniosity.""";
     public static final String CREDIT_HIRE_NON_COMPLIANCE_SDO =
-        "A failure to comply with the paragraph above will result in the claimant being debarred from asserting "
-            + "need or relying on impecuniosity as the case may be at the final hearing, "
-            + "save with permission of the Trial Judge.";
+        "Failure to comply with the above paragraphs providing for disclosure and witness evidence on the issues "
+            + "of need and impecuniosity will result in the claimant being debarred from asserting need or relying on "
+            + "impecuniosity as the case may be at the final hearing, save with permission of the Trial Judge.";
     public static final String CREDIT_HIRE_PARTIES_LIAISE =
         "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no later than 4pm on";
     public static final String CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO =
@@ -233,18 +233,18 @@ public final class DirectionsOrderSpecialistTextLibrary {
         "The defendant’s evidence is to be uploaded to the Digital Portal by 4pm on";
     public static final String CREDIT_HIRE_STATEMENT_PROMPT_DJ =
             """
-                    The Claimant’s witness statement must address, if relied upon, \
-                    evidence in support of\s
-                    a) need to hire a replacement \
+                    The claimant must upload to the Digital Portal a witness \
+                    statement addressing\s
+                    a) the need to hire a replacement \
                     vehicle; and\s
-                    b) impecuniosity.""";
+                    b) impecuniosity""";
     public static final String CREDIT_HIRE_STATEMENT_DEADLINE_DJ =
         "This statement must be uploaded to the Digital Portal by 4pm on";
     public static final String CREDIT_HIRE_NON_COMPLIANCE_DJ =
-        "Failure to comply with the above paragraphs providing for disclosure and witness evidence" +
-            " on the issues of need and impecuniosity will result in the claimant being debarred from" +
-            " asserting need or relying on impecuniosity as the case may be at the final hearing," +
-            " save with permission of the Trial Judge.";
+        "A failure to comply will result in the claimant being "
+            + "debarred from asserting need or relying on impecuniosity "
+            + "as the case may be at the final hearing, unless they "
+            + "have the permission of the trial Judge.";
     public static final String CREDIT_HIRE_CLAIMANT_EVIDENCE_DJ =
         "and the claimant’s evidence in reply if "
             + "so advised is to be uploaded by 4pm on";
@@ -293,6 +293,8 @@ public final class DirectionsOrderSpecialistTextLibrary {
     public static final String SMALL_CLAIMS_DOCUMENTS_WARNING =
         "The court may refuse to consider any document which has not been uploaded to the Digital "
             + "Portal by the above date.";
+    public static final String SMALL_CLAIM_WITNESS_STATEMENT_TEXT = "Each party must upload to the Digital Portal copies of all "
+        + "witness statements of the witnesses(including the parties themselves) upon whose evidence they intend to rely at the hearing by 4pm on";
     public static final String SMALL_CLAIMS_WITNESS_DEADLINE =
         "Witness statements shall be uploaded to the Digital Portal by 4pm on";
     public static final String SMALL_CLAIMS_WITNESS_LATE_WARNING =

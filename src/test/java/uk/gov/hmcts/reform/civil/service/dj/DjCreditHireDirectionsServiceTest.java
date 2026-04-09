@@ -44,10 +44,10 @@ class DjCreditHireDirectionsServiceTest {
         SdoDJR2TrialCreditHire result = service.buildCreditHireDirections();
 
         assertThat(result.getDetailsShowToggle()).isEqualTo(List.of(AddOrRemoveToggle.ADD));
-        assertThat(result.getDate3()).isEqualTo(LocalDate.of(2025, 2, 1).plusWeeks(8));
-        assertThat(result.getDate4()).isEqualTo(LocalDate.of(2025, 2, 1).plusWeeks(10));
+        assertThat(result.getDate3()).isEqualTo(LocalDate.of(2025, 2, 1).plusWeeks(12));
+        assertThat(result.getDate4()).isEqualTo(LocalDate.of(2025, 2, 1).plusWeeks(14));
         assertThat(result.getSdoDJR2TrialCreditHireDetails().getDate2())
-            .isEqualTo(LocalDate.of(2025, 2, 1).plusWeeks(6));
+            .isEqualTo(LocalDate.of(2025, 2, 1).plusWeeks(10));
         assertThat(result.getInput1()).isEqualTo(CREDIT_HIRE_DISCLOSURE_DJ);
         assertThat(result.getInput6())
             .isEqualTo(CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY_DJ + " " + CREDIT_HIRE_DEFENDANT_UPLOAD_DJ);

@@ -29,9 +29,10 @@ public final class SdoR2UiConstantSmallClaim {
         b) The amount of contractual interest already paid on that sum;
         c) The amount of discretionary interest sought under to Section 69 County Courts Act 1984, if claimed, at rates of 1%, 2%, 4% and 8% per annum.""";
     public static final String UPLOAD_DOC_DESCRIPTION = "Each party must upload to the Digital Portal copies of all documents which they wish the court to consider"
-        + " when reaching its decision by 4pm on";
+        + " when reaching its decision not less than 14 days before the hearing. "
+        + "The Court may refuse to consider any document which has not been uploaded to the Digital Portal by the above date.";
     public static final String WITNESS_STATEMENT_TEXT = "Each party must upload to the Digital Portal copies of all "
-        + "witness statements of the witnesses(including the parties themselves)  upon whose evidence they intend to rely at the hearing by 4pm on";
+        + "witness statements of the witnesses upon whose evidence they intend to rely at the hearing not less than 14 days before the hearing.";
     public static final String WITNESS_DESCRIPTION_TEXT = """
         a) Start with the name of the case and the claim number;
         b) State the full name and address of the witness;

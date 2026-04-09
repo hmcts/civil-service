@@ -40,7 +40,6 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.REST
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.UPLOAD_DOC_DESCRIPTION;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITNESS_STATEMENT_TEXT;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_WARNING;
 
 @Service
 @RequiredArgsConstructor
@@ -75,8 +74,6 @@ public class SdoDrhFieldsService {
 
         SdoR2SmallClaimsUploadDoc uploadDoc = new SdoR2SmallClaimsUploadDoc();
         uploadDoc.setSdoUploadOfDocumentsTxt(UPLOAD_DOC_DESCRIPTION);
-        uploadDoc.setUploadDocWarning(SMALL_CLAIMS_DOCUMENTS_WARNING);
-        uploadDoc.setDeadlineDate(sdoDeadlineService.nextWorkingDayFromNowWeeks(4));
         caseData.setSdoR2SmallClaimsUploadDoc(uploadDoc);
 
         SdoR2SmallClaimsRestrictWitness restrictWitness = new SdoR2SmallClaimsRestrictWitness();

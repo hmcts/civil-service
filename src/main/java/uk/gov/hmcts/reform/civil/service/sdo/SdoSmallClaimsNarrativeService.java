@@ -25,32 +25,9 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.REST
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT;
-import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITNESS_STATEMENT_TEXT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_A;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_B;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_D;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_E;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DEFENDANT_UPLOAD_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DISCLOSURE_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_PARTIES_LIAISE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_RELATED_CLAIMS_NOTICE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ROAD_TRAFFIC_ACCIDENT_SMALL_CLAIMS;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_UPLOAD;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_WARNING;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_HEARING_FEE_WARNING;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_HEARING_LISTING_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.*;
 
 @Slf4j
 @Service
@@ -70,6 +47,7 @@ public class SdoSmallClaimsNarrativeService {
         SmallClaimsDocuments documents = new SmallClaimsDocuments();
         documents.setInput1(SMALL_CLAIMS_DOCUMENTS_UPLOAD);
         documents.setInput2(SMALL_CLAIMS_DOCUMENTS_WARNING);
+        documents.setDeadlineDate(sdoDeadlineService.nextWorkingDayFromNowWeeks(4));
         caseData.setSmallClaimsDocuments(documents);
     }
 
@@ -85,7 +63,7 @@ public class SdoSmallClaimsNarrativeService {
         restrictPages.setFontDetails(RESTRICT_NUMBER_PAGES_TEXT2);
 
         SdoR2SmallClaimsWitnessStatements witnessStatements = new SdoR2SmallClaimsWitnessStatements();
-        witnessStatements.setSdoStatementOfWitness(WITNESS_STATEMENT_TEXT);
+        witnessStatements.setSdoStatementOfWitness(SMALL_CLAIM_WITNESS_STATEMENT_TEXT);
         witnessStatements.setDeadlineDate(sdoDeadlineService.nextWorkingDayFromNowWeeks(4));
         witnessStatements.setIsRestrictWitness(NO);
         witnessStatements.setSdoR2SmallClaimsRestrictWitness(restrictWitness);
@@ -99,7 +77,6 @@ public class SdoSmallClaimsNarrativeService {
         SmallClaimsCreditHire creditHire = new SmallClaimsCreditHire();
         creditHire.setInput1(CREDIT_HIRE_DISCLOSURE_SDO);
         creditHire.setInput2(CREDIT_HIRE_STATEMENT_PROMPT_SDO);
-        creditHire.setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4));
         creditHire.setInput3(CREDIT_HIRE_NON_COMPLIANCE_SDO);
         creditHire.setInput4(CREDIT_HIRE_PARTIES_LIAISE);
         creditHire.setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(6));
