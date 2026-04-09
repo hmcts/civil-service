@@ -4,7 +4,6 @@
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
-import uk.gov.hmcts.contino.GradleBuilder
 
 properties([
   copyArtifactPermission('/HMCTS_a_to_c/civil-service/*'),
@@ -16,8 +15,7 @@ def component = "service"
 def camundaBranch = "master"
 def dmnBranch = "master"
 def wiremockMappingsBranch = "master"
-
-GradleBuilder builder = new GradleBuilder(this, product)
+def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
@@ -114,7 +112,7 @@ withPipeline(type, product, component) {
   }
 
   afterAlways('test') {
-    builder.gradle('jacocoTestReport')
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/jacoco/**'
   }
 
   afterAlways('smoketest:preview') {
@@ -176,6 +174,7 @@ withPipeline(type, product, component) {
       """
     }
 
+    yarnBuilder.yarn('install-dependencies')
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.IDAM_TEST_SUPPORT_API_URL = "https://idam-testing-support-api.aat.platform.hmcts.net"
     env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -208,6 +207,7 @@ withPipeline(type, product, component) {
       ./bin/import-gen-apps-ccd-definition.sh "-e *-nonprod.json"
       ./bin/import-bpmn-diagram.sh .
     """
+    yarnBuilder.yarn('install-dependencies')
   }
 
   before('functionalTest:aat') {
