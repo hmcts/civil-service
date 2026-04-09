@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
     private static final String CIVIL_DOC_RESPONDENT_SOL_TWO_SUFFIX = "DocRespondentSolTwo";
     private static final List<String> GA_RESPONDENT_VIEW_DOC_TYPES = List.of("generalOrder", "dismissalOrder", "directionOrder",
                                                                           "hearingNotice", "hearingOrder", "requestForInfo");
+    private static final String GA_DRAFT_DOCUMENT = "gaDraftDocument";
     private static final String GA_DRAFT = "gaDraft";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -215,7 +217,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
      */
     @SuppressWarnings("java:S3776")
     protected void updateDocCollection(Map<String, Object> output, CaseData generalAppCaseData, String fromGaList,
-                                       CaseData civilCaseData, String toCivilList) throws Exception {
+                                       CaseData civilCaseData, String toCivilList) throws ReflectiveOperationException {
         Method gaGetter = getCaseDataGetter(fromGaList);
         Method civilGetter = getCaseDataGetter(toCivilList);
         Method referenceGetter = getReferenceGetter(gaGetter, civilGetter);
@@ -283,11 +285,11 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         String toCivilList,
         Method gaGetter,
         Method civilGetter
-    ) throws Exception {
+    ) throws ReflectiveOperationException {
         List<Element<CaseDocument>> gaDocs = getCaseDocumentCollection(gaGetter, generalAppCaseData);
         List<Element<CaseDocument>> civilDocs = getCaseDocumentCollectionOrEmpty(civilGetter, civilCaseData);
 
-        if (gaDocs != null && !fromGaList.equals("gaDraftDocument")) {
+        if (gaDocs != null && !fromGaList.equals(GA_DRAFT_DOCUMENT)) {
             addMissingCaseDocuments(generalAppCaseData, toCivilList, civilDocs, gaDocs);
         } else if (gaDocs != null && isDraftDocumentUpdate(civilCaseData, fromGaList)) {
             checkDraftDocumentsInMainCase(civilDocs, gaDocs);
@@ -306,11 +308,11 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         String toCivilList,
         Method gaGetter,
         Method civilGetter
-    ) throws Exception {
+    ) throws ReflectiveOperationException {
         List<Element<Document>> gaDocs = getDocumentCollection(gaGetter, generalAppCaseData);
         List<Element<Document>> civilDocs = getDocumentCollectionOrEmpty(civilGetter, civilCaseData);
 
-        if (gaDocs != null && !fromGaList.equals("gaDraftDocument")) {
+        if (gaDocs != null && !fromGaList.equals(GA_DRAFT_DOCUMENT)) {
             addMissingDocumentsById(civilDocs, gaDocs);
         } else if (gaDocs != null && isDraftDocumentUpdate(civilCaseData, fromGaList)) {
             checkDraftDocumentsInMainCase(civilDocs, gaDocs);
@@ -323,7 +325,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
 
     private boolean isDraftDocumentUpdate(CaseData civilCaseData, String fromGaList) {
         return (civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP() || civilCaseData.isApplicantNotRepresented())
-            && fromGaList.equals("gaDraftDocument");
+            && fromGaList.equals(GA_DRAFT_DOCUMENT);
     }
 
     private void addMissingCaseDocuments(
@@ -355,20 +357,24 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private List<Element<CaseDocument>> getCaseDocumentCollection(Method getter, CaseData caseData) throws Exception {
+    private List<Element<CaseDocument>> getCaseDocumentCollection(Method getter, CaseData caseData)
+        throws IllegalAccessException, InvocationTargetException {
         return (List<Element<CaseDocument>>) (getter != null ? getter.invoke(caseData) : null);
     }
 
-    private List<Element<CaseDocument>> getCaseDocumentCollectionOrEmpty(Method getter, CaseData caseData) throws Exception {
+    private List<Element<CaseDocument>> getCaseDocumentCollectionOrEmpty(Method getter, CaseData caseData)
+        throws IllegalAccessException, InvocationTargetException {
         return ofNullable(getCaseDocumentCollection(getter, caseData)).orElse(newArrayList());
     }
 
     @SuppressWarnings("unchecked")
-    private List<Element<Document>> getDocumentCollection(Method getter, CaseData caseData) throws Exception {
+    private List<Element<Document>> getDocumentCollection(Method getter, CaseData caseData)
+        throws IllegalAccessException, InvocationTargetException {
         return (List<Element<Document>>) (getter != null ? getter.invoke(caseData) : null);
     }
 
-    private List<Element<Document>> getDocumentCollectionOrEmpty(Method getter, CaseData caseData) throws Exception {
+    private List<Element<Document>> getDocumentCollectionOrEmpty(Method getter, CaseData caseData)
+        throws IllegalAccessException, InvocationTargetException {
         return ofNullable(getDocumentCollection(getter, caseData)).orElse(newArrayList());
     }
 

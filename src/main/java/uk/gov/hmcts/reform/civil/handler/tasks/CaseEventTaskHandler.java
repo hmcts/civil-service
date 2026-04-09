@@ -148,7 +148,9 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
             return summary;
         }
 
-        log.info("Unexpected flow state {}", flowState.fullName());
+        if (log.isInfoEnabled()) {
+            log.info("Unexpected flow state {}", flowState.fullName());
+        }
         return null;
     }
 

@@ -115,18 +115,26 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
     }
 
     private void publishHearingFeePaidEvent(CaseDetails caseDetails, boolean isPreMultiIntermediate) {
-        log.info("{}HearingFeePaidEvent current case status {}, Case Id {}",
-                 getLogPrefix(isPreMultiIntermediate), caseDetails.getState(), caseDetails.getId());
+        if (log.isInfoEnabled()) {
+            log.info(
+                "{}HearingFeePaidEvent current case status {}, Case Id {}",
+                isPreMultiIntermediate ? "preMultiIntermediateClaimLogic publishing " : "Publishing ",
+                caseDetails.getState(),
+                caseDetails.getId()
+            );
+        }
         applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
     }
 
     private void publishHearingFeeUnpaidEvent(CaseDetails caseDetails, boolean isPreMultiIntermediate) {
-        log.info("{}HearingFeeUnpaidEvent current case status {}, Case Id {}",
-                 getLogPrefix(isPreMultiIntermediate), caseDetails.getState(), caseDetails.getId());
+        if (log.isInfoEnabled()) {
+            log.info(
+                "{}HearingFeeUnpaidEvent current case status {}, Case Id {}",
+                isPreMultiIntermediate ? "preMultiIntermediateClaimLogic publishing " : "Publishing ",
+                caseDetails.getState(),
+                caseDetails.getId()
+            );
+        }
         applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
-    }
-
-    private String getLogPrefix(boolean isPreMultiIntermediate) {
-        return isPreMultiIntermediate ? "preMultiIntermediateClaimLogic publishing " : "Publishing ";
     }
 }

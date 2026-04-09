@@ -47,7 +47,7 @@ import java.util.UUID;
 import static java.lang.Long.parseLong;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -434,7 +434,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             (List<Element<Document>>) output.get("gaEvidenceDocStaff");
 
         assertThat(toUpdatedDocs).isNotNull();
-        assertThat(toUpdatedDocs.size()).isEqualTo(1);
+        assertThat(toUpdatedDocs).hasSize(1);
     }
 
     @Test
@@ -458,7 +458,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             (List<Element<CaseDocument>>) output.get("directionOrderDocClaimant");
 
         assertThat(toUpdatedDocs).isNotNull();
-        assertThat(toUpdatedDocs.size()).isEqualTo(1);
+        assertThat(toUpdatedDocs).hasSize(1);
         assertThat(toUpdatedDocs.getFirst().getValue()).isNull();
     }
 
