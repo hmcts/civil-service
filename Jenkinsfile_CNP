@@ -1,9 +1,10 @@
 #!groovy
 
 @Library("Infrastructure")
-import uk.gov.hmcts.contino.AppPipelineConfig
+
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
+import uk.gov.hmcts.contino.GradleBuilder
 
 properties([
   copyArtifactPermission('/HMCTS_a_to_c/civil-service/*'),
@@ -65,8 +66,6 @@ def secrets = [
     secret('notify-mca-api-key-secret', 'NOTIFY_MCA_API_KEY')
   ],
 ]
-
-def pipelineConf = new AppPipelineConfig()
 
 // Vars for Kubernetes
 env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
