@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Fetch tokens once if not already set, so ccd-add-role.sh reuses them
+if [ -z "${USER_TOKEN:-}" ] || [ -z "${SERVICE_TOKEN:-}" ]; then
+  . ./bin/utils/idam-get-tokens.sh
+fi
+
 # User used during the CCD import and ccd-role creation
 ./bin/utils/ccd-add-role.sh "caseworker-civil"
 ./bin/utils/ccd-add-role.sh "caseworker-caa"
