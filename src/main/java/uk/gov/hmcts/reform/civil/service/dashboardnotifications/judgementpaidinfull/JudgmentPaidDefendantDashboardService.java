@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.judgementpaidinfull;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MARK_PAID_IN_FULL_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
 
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,6 +26,9 @@ public class JudgmentPaidDefendantDashboardService extends DashboardScenarioServ
 
     @Override
     public String getScenario(CaseData caseData) {
+        if (checkMarkPaidInFull(caseData)) {
+            return SCENARIO_AAA6_MARK_PAID_IN_FULL_DEFENDANT.getScenario();
+        }
         return SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_DEFENDANT.getScenario();
     }
 

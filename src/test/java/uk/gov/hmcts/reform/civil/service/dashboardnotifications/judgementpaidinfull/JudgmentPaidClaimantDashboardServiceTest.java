@@ -5,14 +5,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MARK_PAID_IN_FULL_CLAIMANT;
 
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +55,26 @@ class JudgmentPaidClaimantDashboardServiceTest {
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_CLAIMANT.getScenario(),
+            "1234",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+    }
+
+    @Test
+    void shouldRecordScenario_whenInvoked_whenClaimantRepresented_And_MarkedPaid_And_Def_Mark_Paid_In_Full() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(1234L);
+
+        CaseData.CaseDataBuilder<?, ?> caseData2 = caseData.toBuilder();
+        caseData2.activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()));
+        caseData2.certOfSC(new CertOfSC().setDefendantFinalPaymentDate(LocalDate.now()));
+
+        service.notifyJudgmentPaidInFull(caseData2.build(), AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_MARK_PAID_IN_FULL_CLAIMANT.getScenario(),
             "1234",
             new ScenarioRequestParams(new HashMap<>())
         );
