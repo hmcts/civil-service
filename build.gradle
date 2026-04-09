@@ -1,5 +1,3 @@
-import uk.gov.hmcts.rse.AuthMode
-
 plugins {
   id 'application'
   id 'checkstyle'
@@ -11,11 +9,18 @@ plugins {
   id 'org.sonarqube' version '6.3.1.5724'
   id 'au.com.dius.pact' version '4.6.17'
   id "io.freefair.lombok" version "8.14.4"
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.2017'
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.2"
 }
+
+apply plugin: 'java'
+apply plugin: 'jacoco'
+apply plugin: 'checkstyle'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'org.owasp.dependencycheck'
+apply plugin: 'com.github.ben-manes.versions'
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
@@ -42,13 +47,7 @@ allprojects {
     }
   }
 
-  apply plugin: 'java'
-  apply plugin: 'jacoco'
-  apply plugin: 'checkstyle'
-  apply plugin: 'io.spring.dependency-management'
-  apply plugin: 'org.springframework.boot'
-  apply plugin: 'org.owasp.dependencycheck'
-  apply plugin: 'com.github.ben-manes.versions'
+
 
   checkstyle {
     maxWarnings = 0
@@ -63,11 +62,6 @@ allprojects {
       xml.required = false
       html.required = true
     }
-  }
-
-  jacoco {
-    toolVersion = '0.8.14' // jacocoMavenPluginVersion
-    reportsDirectory = file("$buildDir/reports/jacoco")
   }
 
 // before committing a change, make sure task still works
@@ -235,22 +229,37 @@ task functional(description: 'Runs the functional tests.') {
 
 project.tasks['sonarqube'].dependsOn test, jacocoTestReport
 
-// excluding controllers from Sonar due to https://tools.hmcts.net/jira/browse/DTSCCI-254
-// https://tools.hmcts.net/jira/browse/DTSCCI-311 ticket to write unit test for each controller
+def sonarExclusions = [
+  "**/model/**",
+  "**/hmc/model/**",
+  "**/utils/**",
+  "**/filters/**",
+  "**/model/hearingvalues/**",
+  "**/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java",
+  "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java",
+  "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java",
+  "**/handler/callback/camunda/dashboardnotifications/defendant/MoreTimeRequestedDashboardNotificationDefendantHandler.java",
+  "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantMediationSuccessfulDashboardNotificationHandler.java",
+  "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimSettledDashboardNotificationHandler.java",
+  "**/handler/callback/camunda/dashboardnotifications/claimant/HearingScheduledClaimantNotificationHandler.java",
+  "**/handler/callback/camunda/dashboardnotifications/defendant/SettleClaimPaidInFullDefendantDashboardNotificationHandler.java",
+  "**/handler/callback/camunda/dashboardnotifications/defendant/DefendantNotifyDiscontinuanceDashboardNotificationHandler.java",
+  "**/handler/callback/user/RaiseQueryCallbackHandler.java",
+  "**/handler/migration/MigrateCaseQueriesTask.java",
+  "**/handler/callback/user/RespondQueryCallbackHandler.java",
+  "**/service/servicebus/CcdCaseEventsExecutor.java",
+  "**/tasklisteners/MigrateCasesTaskListener.java",
+  "**/migration/MigrationTask.java",
+  "**/migration/CustomRequestScopeAttr.java"
+]
 
 sonarqube {
   properties {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
-    property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/PaymentRequestUpdateCallbackService.java, **/advice/**, **/dashboard/cache/**"
-    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java, **/notification/handlers/respondtoquery/**/*EmailDTOGenerator.java, **/notification/handlers/respondtoquery/RespondToQueryHelper.java"
-    property "sonar.exclusions", "**/model/**, **/hmc/model/**, **/model/hearingvalues/**, **/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java" +
-      ", **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java, **/utils/**, **/filters/**, **/handler/callback/camunda/dashboardnotifications/defendant/MoreTimeRequestedDashboardNotificationDefendantHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantMediationSuccessfulDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimSettledDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/HearingScheduledClaimantNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/defendant/SettleClaimPaidInFullDefendantDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/defendant/DefendantNotifyDiscontinuanceDashboardNotificationHandler.java" +
-      ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java,**/handler/migration/MigrateCaseQueriesTask.java, **/handler/callback/user/RespondQueryCallbackHandler.java, **/service/servicebus/CcdCaseEventsExecutor.java, **/tasklisteners/MigrateCasesTaskListener.java, **/migration/MigrationTask.java, **/migration/CustomRequestScopeAttr.java"
-    property "sonar.host.url", "https://sonar.reform.hmcts.net/"
-    property "sonar.web.javaOpts", "-Xmx2G"
-    property "sonar.gradle.skipCompile", System.getenv("SONAR_SKIP_COMPILE") ?: "false"
+    property "sonar.coverage.jacoco.xmlReportPaths", "${projectDir}/build/reports/jacoco/test/jacocoTestReport.xml"
+    property "sonar.exclusions", sonarExclusions.join(", ")
+    property "sonar.gradle.skipCompile", "true"
     property "sonar.branch.cache.enabled", "true"
     property "sonar.working.directory", "${buildDir}/sonar"
   }
@@ -265,38 +274,12 @@ configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
 }
 
 jacocoTestReport {
-  dependsOn "bootStartScripts"
   executionData(test, integration)
-  executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-  subprojects.each {
-    sourceSets it.sourceSets.main
-  }
   reports {
-    xml.required.set(true)
-    csv.required.set(false)
-    xml.outputLocation.set(file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml"))
+    xml.getRequired().set(true)
+    csv.getRequired().set(false)
+    xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
   }
-  dependsOn tasks.named('bootStartScripts')
-  dependsOn tasks.named('startScripts')
-}
-
-jacocoTestReport.dependsOn {
-  subprojects*.test
-}
-
-jacocoTestReport.dependsOn subprojects.collect { project ->
-  project.tasks.findByName('jacocoTestReport')
-}.findAll { it != null }
-
-jacocoTestReport.dependsOn tasks.matching {
-  it.name.startsWith('compile')
-          || it.name.startsWith('process')
-          || it.name.equals('startScripts')
-          || it.name.equals('bootStartScripts')
-}
-
-tasks.named('test') {
-  finalizedBy jacocoTestReport
 }
 
 ext.libraries = [
@@ -550,31 +533,6 @@ task importBpmnDiagrams(type: Exec) {
   commandLine './bin/import-bpmn-diagram-cftlib.sh'
 }
 
-bootWithCCD {
-  group 'ccd tasks'
-
-  dependsOn(buildCCDXlsx)
-  dependsOn(runOtherServices)
-  dependsOn(importBpmnDiagrams)
-
-  //AAT or Local (IDAM and S2S Simulators)
-  authMode = AuthMode.AAT
-
-  environment 'BASE_COMPOSE_FILES_PATH', './src/cftlib/resources/docker/'
-  environment 'RSE_LIB_ADDITIONAL_DATABASES', 'cmc'
-
-  doFirst() {
-    project.file('./.aat-env').readLines().each() {
-      def index = it.indexOf("=")
-      def key = it.substring(0, index)
-      def value = it.substring(index + 1)
-      environment(key, value)
-    }
-  }
-
-}
-
-
 project.ext {
   pactVersion = getCheckedOutGitCommitHash()
 }
@@ -682,19 +640,6 @@ task loadEnvSecrets() {
         standardOutput = os
       }
       project.file('./.aat-env').write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
-    }
-  }
-}
-
-bootRun {
-  doFirst() {
-    if (project.file('./.aat-env').exists()) {
-      project.file('./.aat-env').readLines().each() {
-        def index = it.indexOf("=")
-        def key = it.substring(0, index)
-        def value = it.substring(index + 1)
-        environment key, value
-      }
     }
   }
 }
