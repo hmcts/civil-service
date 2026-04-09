@@ -77,7 +77,6 @@ withPipeline(type, product, component) {
   env.PACT_BROKER_SCHEME = "https"
   env.ENABLE_SECURE_URL = true
   env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
-  // Only run checkstyle on PR pipeline
   env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
 
   loadVaultSecrets(secrets)
@@ -97,30 +96,23 @@ withPipeline(type, product, component) {
   }
 
   onMaster {
-    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
     env.ENVIRONMENT = "aat"
-    env.URL = "https://civil-service-xui-staging.aat.platform.hmcts.net"
-    env.CIVIL_SERVICE_URL = "https://civil-service-staging.aat.platform.hmcts.net"
-    env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
-    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.IDAM_TEST_SUPPORT_API_URL = "https://idam-testing-support-api.aat.platform.hmcts.net"
-    env.PAYMENT_API_URL = "http://payment-api-aat.service.core-compute-aat.internal"
-    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
-    env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.AAC_API_URL = "https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
+
+    setAatUrls()
+
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
   }
 
   afterAlways('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/jacoco/**'
   }
 
-  afterAlways('smoketest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
-  }
-
   afterAlways('pact-provider-verification') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
+  }
+
+  afterAlways('smoketest:preview') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
   }
 
   afterAlways('functionalTest:preview') {
@@ -154,9 +146,6 @@ withPipeline(type, product, component) {
   }
 
   before('smoketest:preview') {
-    env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
 
     retry(3) {
       sh """
@@ -175,13 +164,7 @@ withPipeline(type, product, component) {
     }
 
     yarnBuilder.yarn('install-dependencies')
-    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.IDAM_TEST_SUPPORT_API_URL = "https://idam-testing-support-api.aat.platform.hmcts.net"
-    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.PAYMENT_API_URL = "http://payment-api-aat.service.core-compute-aat.internal"
-    env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.AAC_API_URL = "https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+
     env.PR_FT_GROUPS = getFunctionalTestsGroups()
   }
 
@@ -283,6 +266,18 @@ def copyPreviousAllureHistory() {
 }
 
 def setPreviewUrls(String product, String component) {
+
+  env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+  env.IDAM_TEST_SUPPORT_API_URL = "https://idam-testing-support-api.aat.platform.hmcts.net"
+  env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+  env.PAYMENT_API_URL = "http://payment-api-aat.service.core-compute-aat.internal"
+  env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+  env.AAC_API_URL = "https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+
   def previewServiceName = "${product}-${component}-pr-${CHANGE_ID}"
   def disableWiremock = checkForDisableWiremockLabel(env.BRANCH_NAME)
   def wiremockUrl = "http://${previewServiceName}-wiremock"
@@ -318,4 +313,17 @@ def setPreviewUrls(String product, String component) {
     env.PREVIEW_SENDGRID_HOST = "${previewServiceName}-wiremock"
     env.PREVIEW_SENDGRID_TEST = "true"
   }
+}
+
+def setAatUrls() {
+  env.URL = "https://civil-service-xui-staging.aat.platform.hmcts.net"
+  env.CIVIL_SERVICE_URL = "https://civil-service-staging.aat.platform.hmcts.net"
+  env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+  env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+  env.IDAM_TEST_SUPPORT_API_URL = "https://idam-testing-support-api.aat.platform.hmcts.net"
+  env.PAYMENT_API_URL = "http://payment-api-aat.service.core-compute-aat.internal"
+  env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+  env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
+  env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+  env.AAC_API_URL = "https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
 }
