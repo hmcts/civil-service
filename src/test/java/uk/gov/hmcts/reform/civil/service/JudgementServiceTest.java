@@ -67,10 +67,11 @@ class JudgementServiceTest {
     @Test
     void shouldReturnClaimAmountWithInterest_whenFullAdmit() {
         CaseData mockData = CaseDataBuilder.builder()
-            .applicant1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.YES)
             .respondent1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .hwfFeeType(FeeType.HEARING)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(550))
             .build();
         mockData.setTotalClaimAmount(BigDecimal.valueOf(100));
@@ -79,5 +80,88 @@ class JudgementServiceTest {
 
         assertThat(result).isEqualTo(BigDecimal.valueOf(11000, 2)); // 100 + 10 interest
     }
+
+    @Test
+    void shouldReturnClaimAmountWithInterest_whenPayImmediatelyFullAdmitConditionsAreMet() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .hwfFeeType(FeeType.HEARING)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(550))
+            .build();
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(200));
+
+        BigDecimal result = judgementService.ccjJudgmentClaimAmountWithInterest(caseData);
+
+        assertThat(result).isEqualTo(BigDecimal.valueOf(21000, 2)); // 200 + 10 interest
+    }
+
+    @Test
+    void shouldReturnClaimAmountWithInterest_whenLipFullAdmitPayImmediately() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .hwfFeeType(FeeType.HEARING)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(550))
+            .build();
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(300));
+
+        BigDecimal result = judgementService.ccjJudgmentClaimAmountWithInterest(caseData);
+
+        assertThat(result).isEqualTo(BigDecimal.valueOf(31000, 2)); // 300 + 10 interest
+    }
+
+    @Test
+    void shouldReturnClaimAmountWithInterest_whenLipOneVOneConditionIsMet() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .hwfFeeType(FeeType.HEARING)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+            .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(550))
+            .build();
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(400));
+
+        BigDecimal result = judgementService.ccjJudgmentClaimAmountWithInterest(caseData);
+
+        assertThat(result).isEqualTo(BigDecimal.valueOf(41000, 2)); // 400 + 10 interest
+    }
+
+    @Test
+    void shouldReturnAdmittedClaimAmount_whenPartAdmitClaimSpecIsTrue() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .hwfFeeType(FeeType.HEARING)
+            .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(550))
+            .build();
+        caseData.setRespondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500));
+
+        BigDecimal result = judgementService.ccjJudgmentClaimAmountWithInterest(caseData);
+
+        assertThat(result).isEqualTo(BigDecimal.valueOf(50000, 2));
+    }
+
+    @Test
+    void shouldReturnTotalClaimAmount_whenNoConditionsAreMet() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .hwfFeeType(FeeType.HEARING)
+            .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(550))
+            .build();
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(600));
+
+        BigDecimal result = judgementService.ccjJudgmentClaimAmountWithInterest(caseData);
+
+        assertThat(result).isEqualTo(BigDecimal.valueOf(60000, 2));
+    }
+
 
 }

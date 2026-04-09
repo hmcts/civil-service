@@ -73,11 +73,17 @@ public class JudgementService {
 
     public BigDecimal ccjJudgmentClaimAmountWithInterest(CaseData caseData) {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
-        if (caseData.isPartAdmitClaimSpec()) {
-            claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
-        } else if (caseData.isFullAdmitClaimSpec()) {
+        if (isLrFullAdmitRepaymentPlan(caseData)
+            || isLrFullAdmitPayImmediately(caseData)
+            || isLipFullAdmitRepaymentPlan(caseData)
+            || isLipFullAdmitPayImmediately(caseData)
+            || isLipvLipOneVOne(caseData)) {
             BigDecimal interest = getLatestInterest(caseData);
             claimAmount = claimAmount.add(interest);
+        } else {
+            if (caseData.isPartAdmitClaimSpec()) {
+                claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
+            }
         }
         return claimAmount.setScale(2);
     }
