@@ -162,6 +162,4 @@ class JudgementServiceTest {
 
         assertThat(result).isEqualTo(BigDecimal.valueOf(60000, 2));
     }
-
-
 }
