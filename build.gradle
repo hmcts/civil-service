@@ -14,14 +14,6 @@ plugins {
   id "org.gradle.test-retry" version "1.6.2"
 }
 
-apply plugin: 'java'
-apply plugin: 'jacoco'
-apply plugin: 'checkstyle'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'org.owasp.dependencycheck'
-apply plugin: 'com.github.ben-manes.versions'
-
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
@@ -47,7 +39,13 @@ allprojects {
     }
   }
 
-
+  apply plugin: 'java'
+  apply plugin: 'jacoco'
+  apply plugin: 'checkstyle'
+  apply plugin: 'io.spring.dependency-management'
+  apply plugin: 'org.springframework.boot'
+  apply plugin: 'org.owasp.dependencycheck'
+  apply plugin: 'com.github.ben-manes.versions'
 
   checkstyle {
     maxWarnings = 0
