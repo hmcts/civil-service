@@ -30,8 +30,10 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -414,6 +416,53 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void shouldUpdateDocumentTypedCollection() throws Exception {
+        String uid = "f000aa01-0451-4000-b000-000000000123";
+        CaseData gaCaseData = caseDataAtStateClaimDraftWithBusinessProcessStatusReady();
+        gaCaseData.setGeneralAppEvidenceDocument(singletonList(new Element<Document>()
+                                                                   .setId(UUID.fromString(uid))
+                                                                   .setValue(pdfDocument1)));
+        Map<String, Object> output = new HashMap<>();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+
+        handler.updateDocCollection(
+            output, gaCaseData, "generalAppEvidenceDocument",
+            caseData, "gaEvidenceDocStaff"
+        );
+
+        List<Element<Document>> toUpdatedDocs =
+            (List<Element<Document>>) output.get("gaEvidenceDocStaff");
+
+        assertThat(toUpdatedDocs).isNotNull();
+        assertThat(toUpdatedDocs.size()).isEqualTo(1);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldTolerateNullCaseDocumentValueWhenUpdatingClaimantCollection() throws Exception {
+        String uid = "f000aa01-0451-4000-b000-000000000124";
+        CaseData gaCaseData = caseDataAtStateClaimDraftWithBusinessProcessStatusReady();
+        gaCaseData.setParentClaimantIsApplicant(YesOrNo.NO)
+            .setDirectionOrderDocument(singletonList(new Element<CaseDocument>()
+                                                         .setId(UUID.fromString(uid))
+                                                         .setValue(null)));
+        Map<String, Object> output = new HashMap<>();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+
+        handler.updateDocCollection(
+            output, gaCaseData, "directionOrderDocument",
+            caseData, "directionOrderDocClaimant"
+        );
+
+        List<Element<CaseDocument>> toUpdatedDocs =
+            (List<Element<CaseDocument>>) output.get("directionOrderDocClaimant");
+
+        assertThat(toUpdatedDocs).isNotNull();
+        assertThat(toUpdatedDocs.size()).isEqualTo(1);
+        assertThat(toUpdatedDocs.getFirst().getValue()).isNull();
+    }
+
+    @Test
     void shouldAddToCivilDocsCopy() throws Exception {
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build());
@@ -430,12 +479,14 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             "get" + StringUtils.capitalize("directionOrderDocStaff")
         );
 
-        List<Element<?>> gaDocs =
-            (List<Element<?>>) (gaGetter != null ? gaGetter.invoke(generalCaseData) : null);
-        List<Element<?>> civilDocs =
-            (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(caseData) : null)
+        @SuppressWarnings("unchecked")
+        List<Element<CaseDocument>> gaDocs =
+            requireNonNull((List<Element<CaseDocument>>) (gaGetter != null ? gaGetter.invoke(generalCaseData) : null));
+        @SuppressWarnings("unchecked")
+        List<Element<CaseDocument>> civilDocs =
+            (List<Element<CaseDocument>>) ofNullable(civilGetter != null ? civilGetter.invoke(caseData) : null)
                 .orElse(newArrayList());
-        List<Element<?>> civilDocsPre = List.copyOf(civilDocs);
+        List<Element<CaseDocument>> civilDocsPre = List.copyOf(civilDocs);
 
         civilDocs = handler.checkDraftDocumentsInMainCase(civilDocs, gaDocs);
 
@@ -443,7 +494,6 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void shouldAddToCivilDocsCopyIfGADocsNotInCivilDocs() throws Exception {
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build());
@@ -461,16 +511,18 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             "get" + StringUtils.capitalize("directionOrderDocStaff")
         );
 
-        List<Element<?>> gaDocs =
-            (List<Element<?>>) (gaGetter != null ? gaGetter.invoke(generalCaseData) : null);
-        List<Element<?>> civilDocs =
-            (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(caseData) : null)
+        @SuppressWarnings("unchecked")
+        List<Element<CaseDocument>> gaDocs =
+            requireNonNull((List<Element<CaseDocument>>) (gaGetter != null ? gaGetter.invoke(generalCaseData) : null));
+        @SuppressWarnings("unchecked")
+        List<Element<CaseDocument>> civilDocs =
+            (List<Element<CaseDocument>>) ofNullable(civilGetter != null ? civilGetter.invoke(caseData) : null)
                 .orElse(new ArrayList<>());
-        List<Element<?>> civilDocsPre = List.copyOf(civilDocs);
+        List<Element<CaseDocument>> civilDocsPre = List.copyOf(civilDocs);
 
         civilDocs = handler.checkDraftDocumentsInMainCase(civilDocs, gaDocs);
 
-        assertNotSame(civilDocs.get(0).getId(), civilDocsPre.get(0).getId());
+        assertNotSame(civilDocs.getFirst().getId(), civilDocsPre.getFirst().getId());
     }
 
     @Test
@@ -1048,11 +1100,11 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void checkIfDocumentExists() {
-        Element<?> same = new Element<CaseDocument>()
+        Element<CaseDocument> same = new Element<CaseDocument>()
             .setId(UUID.randomUUID())
             .setValue(new CaseDocument().setDocumentLink(new Document().setDocumentUrl("string")));
-        List<Element<?>> civilCaseDocumentList = new ArrayList<>();
-        List<Element<?>> gaDocumentList = new ArrayList<>();
+        List<Element<CaseDocument>> civilCaseDocumentList = new ArrayList<>();
+        List<Element<CaseDocument>> gaDocumentList = new ArrayList<>();
         gaDocumentList.add(same);
         assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isNotPositive();
         civilCaseDocumentList.add(same);
@@ -1064,8 +1116,8 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         Element<Document> documentElement = new Element<Document>()
             .setId(UUID.randomUUID())
             .setValue(new Document().setDocumentUrl("string"));
-        List<Element<?>> gaDocumentList = new ArrayList<>();
-        List<Element<?>> civilCaseDocumentList = new ArrayList<>();
+        List<Element<Document>> gaDocumentList = new ArrayList<>();
+        List<Element<Document>> civilCaseDocumentList = new ArrayList<>();
         gaDocumentList.add(documentElement);
         assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(0);
         civilCaseDocumentList.add(documentElement);
@@ -1112,9 +1164,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         when(caseDetailsConverter.toGACaseData(any())).thenThrow(NumberFormatException.class);
 
-        InvalidCaseDataException exceptionThrown = assertThrows(InvalidCaseDataException.class, () -> {
-            handler.handleTask(mockExternalTask);
-        });
+        InvalidCaseDataException exceptionThrown = assertThrows(InvalidCaseDataException.class, () -> handler.handleTask(mockExternalTask));
 
         String messageFromException = exceptionThrown.getMessage();
         System.out.println(messageFromException);
@@ -1132,26 +1182,17 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             CaseData.class,
             "get" + StringUtils.capitalize("gaRespondDoc")
         );
-        gaGetter.setAccessible(false);
-        CaseData finalGaCaseData = gaCaseData;
+        requireNonNull(gaGetter).setAccessible(false);
         CaseData.class.getDeclaredField("gaRespondDoc").setAccessible(false);
-        finalGaCaseData.getClass().getDeclaredField("gaRespondDoc").setAccessible(false);
-        finalGaCaseData.getClass().getMethod("getGaRespondDoc").setAccessible(false);
+        gaCaseData.getClass().getDeclaredField("gaRespondDoc").setAccessible(false);
+        gaCaseData.getClass().getMethod("getGaRespondDoc").setAccessible(false);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
         Map<String, Object> output = new HashMap<>();
-        assertThrows(
-            Exception.class, () -> {
-                when(ReflectionUtils.findMethod(
-                    CaseData.class,
-                    "get" + StringUtils.capitalize("GaRespondDoc")
-                )).thenReturn(gaGetter);
-
-                handler.updateDocCollection(
-                    output, finalGaCaseData, "get" + StringUtils.capitalize("gaRespondDoc"),
-                    caseData, "directionOrderDocStaff"
-                );
-            }
-        );
+        assertDoesNotThrow(() -> handler.updateDocCollection(
+            output, gaCaseData, "get" + StringUtils.capitalize("gaRespondDoc"),
+            caseData, "directionOrderDocStaff"
+        ));
+        assertThat(output.get("directionOrderDocStaff")).isNull();
     }
 
     public final CaseDocument pdfDocument = new CaseDocument()
