@@ -186,6 +186,22 @@ task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
+task highLevelDataSetup(type: JavaExec, description: 'Loads roles and CCD definitions using the high-level data setup flow.') {
+  mainClass = "uk.gov.hmcts.reform.civil.HighLevelDataSetupApp"
+  classpath += sourceSets.main.runtimeClasspath
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
+task buildCcdDefinitionsXls(type: Exec, description: 'Builds CCD XLS definitions.') {
+  doFirst {
+    def dataSetupEnvironment = providers.gradleProperty('dataSetupEnvironment').orNull
+    if (!(dataSetupEnvironment in ['preview', 'aat'])) {
+      throw new GradleException("Property 'dataSetupEnvironment' must be one of: preview, aat")
+    }
+    commandLine './bin/build-civil-xlsx-definitions.sh', dataSetupEnvironment
+  }
+}
+
 task awaitApplicationReadiness(type: Exec, description: 'Awaits until application is ready.') {
   commandLine './bin/wait-for.sh'
   commandLine './bin/wait-for.sh', 'manage-case'
@@ -363,6 +379,7 @@ dependencies {
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.7'
+  implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4'
 
   implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
   implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.2.0'
@@ -501,15 +518,6 @@ bootJar {
 
 wrapper {
   distributionType = Wrapper.DistributionType.ALL
-}
-
-task buildCCDXlsx(type: Exec) {
-  group 'ccd tasks'
-
-  environment 'CCD_DEF_CASE_SERVICE_BASE_URL', 'http://localhost:4000'
-  environment 'CCD_DEF_GEN_APP_SERVICE_BASE_URL', 'http://localhost:9999'
-  environment 'CCD_DEF_AAC_URL', 'http://localhost:4502'
-  commandLine './bin/build-civil-xlsx-definitions.sh'
 }
 
 task runOtherServices(type: Exec) {
