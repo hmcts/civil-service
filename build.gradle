@@ -287,7 +287,8 @@ def sonarExclusions = [
   "**/service/servicebus/CcdCaseEventsExecutor.java",
   "**/tasklisteners/MigrateCasesTaskListener.java",
   "**/migration/MigrationTask.java",
-  "**/migration/CustomRequestScopeAttr.java"
+  "**/migration/CustomRequestScopeAttr.java",
+  "**/HighLevelDataSetupApp.java"
 ]
 
 sonarqube {
