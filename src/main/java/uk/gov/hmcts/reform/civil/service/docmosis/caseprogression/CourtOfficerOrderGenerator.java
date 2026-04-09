@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.CourtOfficerOrderForm;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -61,23 +60,25 @@ public class CourtOfficerOrderGenerator implements TemplateDataGenerator<CourtOf
         caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
-        var courtOfficerOrderBuilder = CourtOfficerOrderForm.builder()
-            .caseNumber(caseData.getCcdCaseReference().toString())
-            .claimant1Name(caseData.getApplicant1().getPartyName())
-            .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
-            .defendant1Name(caseData.getRespondent1().getPartyName())
-            .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
-            .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
-            .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
-            .courtName(caseManagementLocationDetails.getExternalShortName())
-            .courtLocation(getHearingLocationText(caseData))
-            .ordered(caseData.getCourtOfficerOrdered());
-        return courtOfficerOrderBuilder.build();
+        return new CourtOfficerOrderForm(
+            caseData.getCcdCaseReference().toString(),
+            caseData.getApplicant1().getPartyName(),
+            nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null,
+            caseData.getRespondent1().getPartyName(),
+            nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null,
+            nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant",
+            nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant",
+            null,
+            null,
+            getHearingLocationText(caseData),
+            caseManagementLocationDetails.getExternalShortName(),
+            caseData.getCourtOfficerOrdered()
+        );
     }
 
     private String getHearingLocationText(CaseData caseData) {
         return caseData.getHearingLocationText() != null ? caseData.getHearingLocationText()
-            : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails);
+            : LocationReferenceDataService.getDisplayEntry(caseManagementLocationDetails);
     }
 
 }

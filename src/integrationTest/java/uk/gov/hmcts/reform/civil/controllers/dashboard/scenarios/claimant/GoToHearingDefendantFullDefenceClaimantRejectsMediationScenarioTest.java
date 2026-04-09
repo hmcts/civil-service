@@ -34,8 +34,8 @@ public class GoToHearingDefendantFullDefenceClaimantRejectsMediationScenarioTest
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .respondent1Represented(YesOrNo.NO)
             .responseClaimMediationSpecRequired(YesOrNo.YES)
-            .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
-                ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build()).build())
+            .caseDataLiP(new CaseDataLiP().setApplicant1ClaimMediationSpecRequiredLip(
+                new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.No)))
             .build();
 
         // When

@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeep;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
 
+import feign.FeignException;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -89,12 +91,11 @@ public class DocumentRemovalService {
             + "from CaseData JSON for case ID: %s", caseId));
 
         ((ObjectNode) caseDataJson).remove("documentToKeepCollection");
-        return DocumentRemovalCaseDataDTO.builder()
-            .documentsMarkedForDelete(documentsUserWantsDeletedList.stream()
+        return new DocumentRemovalCaseDataDTO()
+            .setDocumentsMarkedForDelete(documentsUserWantsDeletedList.stream()
                 .map(DocumentToKeepCollection::getValue)
                 .toList())
-            .caseData(buildAmendedCaseDataFromRootNode(caseDataJson, caseId))
-            .build();
+            .setCaseData(buildAmendedCaseDataFromRootNode(caseDataJson, caseId));
     }
 
     private LocalDateTime getUploadTimestampFromDocumentNode(JsonNode documentNode) {
@@ -123,22 +124,21 @@ public class DocumentRemovalService {
         for (Map.Entry<JsonNode, String> documentNode : documentNodes.entrySet()) {
             String docUrl = documentNode.getKey().get(DOCUMENT_URL).asText();
             String[] documentUrlAsArray = docUrl.split("/");
+
+            CaseDocumentToKeep caseDocumentToKeep = new CaseDocumentToKeep();
+            caseDocumentToKeep.setDocumentFilename(documentNode.getKey().get(DOCUMENT_FILENAME).asText().trim());
+            caseDocumentToKeep.setDocumentUrl(documentNode.getKey().get(DOCUMENT_URL).asText());
+            caseDocumentToKeep.setDocumentBinaryUrl(documentNode.getKey().get(DOCUMENT_BINARY_URL).asText());
+            caseDocumentToKeep.setUploadTimestamp(getUploadTimestampFromDocumentNode(documentNode.getKey()));
             String docId = documentUrlAsArray[documentUrlAsArray.length - 1];
 
             documentsCollection.add(
-                DocumentToKeepCollection.builder()
-                    .value(DocumentToKeep.builder()
-                        .documentId(docId)
-                        .caseDocumentToKeep(CaseDocumentToKeep.builder()
-                            .documentFilename(documentNode.getKey().get(DOCUMENT_FILENAME).asText())
-                            .documentUrl(documentNode.getKey().get(DOCUMENT_URL).asText())
-                            .documentBinaryUrl(documentNode.getKey().get(DOCUMENT_BINARY_URL).asText())
-                            .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode.getKey()))
-                            .build())
-                        .uploadedDate(getUploadTimestampFromDocumentNode(documentNode.getKey()))
-                        .systemGenerated(getSystemGeneratedFlag(documentNode.getValue(), documentNode.getKey().get(DOCUMENT_FILENAME).asText()))
-                        .build())
-                    .build());
+                new DocumentToKeepCollection()
+                    .setValue(new DocumentToKeep()
+                        .setDocumentId(docId)
+                        .setCaseDocumentToKeep(caseDocumentToKeep)
+                        .setUploadedDate(getUploadTimestampFromDocumentNode(documentNode.getKey()))
+                        .setSystemGenerated(getSystemGeneratedFlag(documentNode.getValue(), documentNode.getKey().get(DOCUMENT_FILENAME).asText().trim()))));
         }
 
         documentsCollection.sort(Comparator.comparing(
@@ -242,11 +242,15 @@ public class DocumentRemovalService {
                 documentUrl));
             documentManagementService.deleteDocument(authorisationToken, documentUrl);
         } catch (Exception e) {
-            log.error(format(
-                "Failed to delete document url %s",
-                documentUrl), e);
-
-            throw new DocumentDeleteException(e.getMessage(), e);
+            if (e.getCause() instanceof FeignException.NotFound) {
+                log.warn("Document not found in CDAM for url {} - may have already been deleted. "
+                    + "Continuing with case data removal.", documentUrl);
+            } else {
+                log.error(format(
+                    "Failed to delete document url %s",
+                    documentUrl), e);
+                throw new DocumentDeleteException(e.getMessage(), e);
+            }
         }
     }
 

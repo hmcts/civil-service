@@ -16,9 +16,9 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,8 +63,10 @@ class WithdrawClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnErrors_whenDateInFuture() {
+            CloseClaim closeClaim = new CloseClaim();
+            closeClaim.setDate(LocalDate.now().plusDays(1));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .withdrawClaim(CloseClaim.builder().date(LocalDate.now().plusDays(1)).build())
+                .withdrawClaim(closeClaim)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -76,8 +78,10 @@ class WithdrawClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoErrors_whenDateInPast() {
+            CloseClaim closeClaim = new CloseClaim();
+            closeClaim.setDate(LocalDate.now().minusDays(1));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .discontinueClaim(CloseClaim.builder().date(LocalDate.now().minusDays(1)).build())
+                .discontinueClaim(closeClaim)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 

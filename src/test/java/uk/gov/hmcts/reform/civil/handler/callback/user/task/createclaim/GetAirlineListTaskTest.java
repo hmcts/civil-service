@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -39,14 +40,20 @@ class GetAirlineListTaskTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldGetAirlineList_whenRequired() {
+        AirlineEpimsId airlineEpimsId = new AirlineEpimsId();
+        airlineEpimsId.setAirline("BA/Cityflyer");
+        airlineEpimsId.setEpimsID("111000");
+        AirlineEpimsId airlineEpimsId1 = new AirlineEpimsId();
+        airlineEpimsId1.setAirline("OTHER");
+        airlineEpimsId1.setEpimsID("111111");
         List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
-        airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
-        airlineEpimsIDList.add(AirlineEpimsId.builder().airline("OTHER").epimsID("111111").build());
+        airlineEpimsIDList.add(airlineEpimsId);
+        airlineEpimsIDList.add(airlineEpimsId1);
 
         given(airlineEpimsDataLoader.getAirlineEpimsIDList())
             .willReturn(airlineEpimsIDList);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         var response = (AboutToStartOrSubmitCallbackResponse) getAirlineListTask.getAirlineList(caseData);
 

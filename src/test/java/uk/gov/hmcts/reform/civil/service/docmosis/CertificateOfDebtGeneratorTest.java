@@ -43,10 +43,10 @@ class CertificateOfDebtGeneratorTest {
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private static final String REFERENCE_NUMBER = "000MC015";
 
-    private static final String fileName = String.format(
+    private static final String FILE_NAME = String.format(
         CERTIFICATE_OF_DEBT_PAYMENT.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument COSC_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName)
+        .documentName(FILE_NAME)
         .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
         .build();
 
@@ -63,7 +63,7 @@ class CertificateOfDebtGeneratorTest {
             .thenReturn(new DocmosisDocument(CERTIFICATE_OF_DEBT_PAYMENT.getDocumentTitle(), LETTER_CONTENT));
 
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)))
             .thenReturn(COSC_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -74,7 +74,7 @@ class CertificateOfDebtGeneratorTest {
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT));
     }
 
     @Test
@@ -85,7 +85,7 @@ class CertificateOfDebtGeneratorTest {
             .thenReturn(new DocmosisDocument(CERTIFICATE_OF_DEBT_PAYMENT.getDocumentTitle(), LETTER_CONTENT));
 
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)))
             .thenReturn(COSC_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -96,7 +96,7 @@ class CertificateOfDebtGeneratorTest {
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT));
     }
 
     @Test
@@ -107,21 +107,20 @@ class CertificateOfDebtGeneratorTest {
             .thenReturn(new DocmosisDocument(CERTIFICATE_OF_DEBT_PAYMENT_WELSH.getDocumentTitle(), LETTER_CONTENT));
 
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)))
             .thenReturn(COSC_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder()
             .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                         .build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1ResponseLanguage(Language.BOTH.toString())))
             .build();
 
         CaseDocument caseDoc = certificateOfDebtGenerator.generateDoc(caseData, BEARER_TOKEN, CERTIFICATE_OF_DEBT_PAYMENT_WELSH);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT));
     }
 }

@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.DefResponse.FullDefenceOrPartAdmin.AlreadyPaid.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "Response to the claim",
+  "titleCy": "Ymateb i’r hawliad",
+  "descriptionEn": "<p class=\"govuk-body\">You have said you already paid ${admissionPaidAmount} on ${claimSettledDateEn}. The claimant can confirm payment and settle, or proceed with the claim. The court will contact you when they respond.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Rydych wedi dweud eich bod wedi talu ${admissionPaidAmount} yn barod ar ${claimSettledDateCy}. Gall yr hawlydd gadarnhau bod y taliad wedi’i wneud a setlo, neu barhau â’r hawliad. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
+}

@@ -11,10 +11,13 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.client.EvidenceManagementApiClient;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
-import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
@@ -24,9 +27,6 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -56,7 +56,6 @@ class BundleCreationServiceTest {
     SystemUpdateUserConfiguration userConfig;
     @Mock
     private CoreCaseDataService coreCaseDataService;
-
     @Mock
     private AuthTokenGenerator authTokenGenerator;
     @Mock
@@ -66,10 +65,12 @@ class BundleCreationServiceTest {
 
     private final String testUrl = "url";
     private final String testFileName = "testFileName.pdf";
+    private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+
     CaseData caseData;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = setupWitnessEvidenceDocs();
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = setupExpertEvidenceDocs();
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = setupOtherEvidenceDocs();
@@ -103,64 +104,61 @@ class BundleCreationServiceTest {
             .documentQuestionsRes2(expertEvidenceDocs)
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
             .servedDocumentFiles(servedDocumentFiles)
-            .applicant1(Party.builder().partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().partyName("respondent1").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setPartyName("applicant1").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setPartyName("respondent1").setType(Party.Type.INDIVIDUAL))
             .addApplicant2(YesOrNo.YES)
             .addRespondent2(YesOrNo.YES)
-            .applicant2(Party.builder().partyName("applicant2").type(Party.Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().partyName("respondent2").type(Party.Type.INDIVIDUAL).build())
+            .applicant2(new Party().setPartyName("applicant2").setType(Party.Type.INDIVIDUAL))
+            .respondent2(new Party().setPartyName("respondent2").setType(Party.Type.INDIVIDUAL))
             .hearingDate(LocalDate.now())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .build();
     }
 
     private List<Element<UploadEvidenceWitness>> setupWitnessEvidenceDocs() {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                         .builder()
-                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                 testUrl)
-                                                                                    .documentFileName(testFileName).build()).build()));
+        witnessEvidenceDocs.add(ElementUtils.element(new UploadEvidenceWitness()
+                                                         .setWitnessOptionDocument(new Document().setDocumentBinaryUrl(
+                                                             testUrl)
+                                                                                         .setDocumentFileName(testFileName))));
         return witnessEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceExpert>> setupExpertEvidenceDocs() {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-                                                        .builder()
-                                                        .expertDocument(Document.builder().documentBinaryUrl(testUrl)
-                                                                            .documentFileName(testFileName).build()).build()));
+        expertEvidenceDocs.add(ElementUtils.element(new UploadEvidenceExpert()
+                                                        .setExpertDocument(new Document().setDocumentBinaryUrl(testUrl)
+                                                                                .setDocumentFileName(testFileName))));
         return expertEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
-        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(testUrl)
-                                                                           .documentFileName(testFileName).build()).build()));
+        otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                       .setDocumentUpload(new Document().setDocumentBinaryUrl(testUrl)
+                                                                           .setDocumentFileName(testFileName))));
         return otherEvidenceDocs;
     }
 
     private List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentClaim =
-            CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
-                testUrl).documentFileName(testFileName).build()).build();
+            new CaseDocument().setDocumentType(DocumentType.SEALED_CLAIM).setDocumentLink(new Document().setDocumentUrl(
+                testUrl).setDocumentFileName(testFileName));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
         CaseDocument caseDocumentDQ =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(testUrl).documentFileName(testFileName).build()).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(testUrl).setDocumentFileName(testFileName));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQ));
         return systemGeneratedCaseDocuments;
     }
 
     private ServedDocumentFiles setupParticularsOfClaimDocs() {
         List<Element<Document>> particularsOfClaim = new ArrayList<>();
-        Document document = Document.builder().documentFileName(testFileName).documentUrl(testUrl).build();
+        Document document = new Document().setDocumentFileName(testFileName).setDocumentUrl(testUrl);
         particularsOfClaim.add(ElementUtils.element(document));
-        return ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
+        return new ServedDocumentFiles().setParticularsOfClaimDocument(particularsOfClaim);
     }
 
     @Test
@@ -170,14 +168,11 @@ class BundleCreationServiceTest {
         given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(any(), any(), any(), any())).willReturn(null);
         given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(null);
         given(coreCaseDataService.getCase(1L)).willReturn(caseDetails);
-        given(userConfig.getUserName()).willReturn("test");
-        given(userConfig.getPassword()).willReturn("test");
         given(objectMapper.convertValue(caseDetails.getData(), CaseData.class)).willReturn(caseData);
         given(authTokenGenerator.generate()).willReturn("test");
-        given(userService.getAccessToken("test", "test")).willReturn("test");
 
         //When: bundlecreation service is called
-        bundlingService.createBundle(new BundleCreationTriggerEvent(1L));
+        bundlingService.createBundle(new BundleCreationTriggerEvent(1L, ACCESS_TOKEN));
 
         //Then: BundleRest API should be called
         verify(evidenceManagementApiClient).createNewBundle(anyString(), anyString(), any());

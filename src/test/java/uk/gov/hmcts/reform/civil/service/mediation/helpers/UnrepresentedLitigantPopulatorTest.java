@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.mediation.helpers;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,7 +18,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -33,26 +33,24 @@ class UnrepresentedLitigantPopulatorTest {
 
     @Test
     void shouldPopulateLitigantWhereMediationLipCarmIsNull() {
-        Party party = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .partyName("John Doe")
-            .partyEmail("party@email.com")
-            .partyPhone("123456789")
-            .build();
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setPartyName("John Doe");
+        party.setPartyEmail("party@email.com");
+        party.setPartyPhone("123456789");
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
-            builder,
+            new MediationLitigant(),
             party,
             "Contact Person",
             null
-        ).build();
+        );
 
         assertThat(litigant.getMediationContactEmail()).isEqualTo("party@email.com");
         assertThat(litigant.getMediationContactNumber()).isEqualTo("123456789");
         assertThat(litigant.getDateRangeToAvoid()).hasSize(1);
-        assertNull(litigant.getDateRangeToAvoid().get(0).getDateFrom());
-        assertNull(litigant.getDateRangeToAvoid().get(0).getDateTo());
+        Assertions.assertNull(litigant.getDateRangeToAvoid().get(0).getDateFrom());
+        Assertions.assertNull(litigant.getDateRangeToAvoid().get(0).getDateTo());
     }
 
     @Test
@@ -63,27 +61,24 @@ class UnrepresentedLitigantPopulatorTest {
         when(mediationLiPCarm.getHasUnavailabilityNextThreeMonths()).thenReturn(YES);
 
         LocalDate fixedDate = LocalDate.of(2024, 6, 10);
-        UnavailableDate unavailableDate = UnavailableDate.builder()
-            .date(fixedDate)
-            .unavailableDateType(SINGLE_DATE)
-            .build();
+        UnavailableDate unavailableDate = new UnavailableDate()
+            .setDate(fixedDate)
+            .setUnavailableDateType(SINGLE_DATE);
         Element<UnavailableDate> elementUnavailableDate = ElementUtils.element(unavailableDate);
         when(mediationLiPCarm.getUnavailableDatesForMediation()).thenReturn(List.of(elementUnavailableDate));
 
-        Party party = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .partyName("John Doe")
-            .partyEmail("party@email.com")
-            .partyPhone("123456789")
-            .build();
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setPartyName("John Doe");
+        party.setPartyEmail("party@email.com");
+        party.setPartyPhone("123456789");
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
-            builder,
+            new MediationLitigant(),
             party,
             "Contact Person",
             mediationLiPCarm
-        ).build();
+        );
 
         assertThat(litigant.getMediationContactEmail()).isEqualTo("party@email.com");
         assertThat(litigant.getMediationContactNumber()).isEqualTo("123456789");
@@ -94,12 +89,11 @@ class UnrepresentedLitigantPopulatorTest {
 
     @Test
     void shouldPopulateLitigantWithAlternativeMediationInfo_whenEmailAndPhoneIncorrect() {
-        Party party = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .partyName("John Doe")
-            .partyEmail("party@email.com")
-            .partyPhone("123456789")
-            .build();
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setPartyName("John Doe");
+        party.setPartyEmail("party@email.com");
+        party.setPartyPhone("123456789");
 
         when(mediationLiPCarm.getIsMediationEmailCorrect()).thenReturn(NO);
         when(mediationLiPCarm.getIsMediationPhoneCorrect()).thenReturn(NO);
@@ -107,13 +101,12 @@ class UnrepresentedLitigantPopulatorTest {
         when(mediationLiPCarm.getAlternativeMediationTelephone()).thenReturn("987654321");
         when(mediationLiPCarm.getHasUnavailabilityNextThreeMonths()).thenReturn(NO);
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
-            builder,
+            new MediationLitigant(),
             party,
             "Contact Person",
             mediationLiPCarm
-        ).build();
+        );
 
         assertThat(litigant.getMediationContactEmail()).isEqualTo("alt@email.com");
         assertThat(litigant.getMediationContactNumber()).isEqualTo("987654321");
@@ -125,24 +118,22 @@ class UnrepresentedLitigantPopulatorTest {
 
     @Test
     void shouldHandleNoUnavailabilityForMediation() {
-        Party party = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .partyName("John Doe")
-            .partyEmail("party@email.com")
-            .partyPhone("123456789")
-            .build();
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setPartyName("John Doe");
+        party.setPartyEmail("party@email.com");
+        party.setPartyPhone("123456789");
 
         when(mediationLiPCarm.getIsMediationEmailCorrect()).thenReturn(YES);
         when(mediationLiPCarm.getIsMediationPhoneCorrect()).thenReturn(YES);
         when(mediationLiPCarm.getHasUnavailabilityNextThreeMonths()).thenReturn(NO);
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
-            builder,
+            new MediationLitigant(),
             party,
             "Contact Person",
             mediationLiPCarm
-        ).build();
+        );
 
         assertThat(litigant.getMediationContactEmail()).isEqualTo("party@email.com");
         assertThat(litigant.getMediationContactNumber()).isEqualTo("123456789");
@@ -152,25 +143,23 @@ class UnrepresentedLitigantPopulatorTest {
 
     @Test
     void shouldUseOriginalMediationContactForNonIndividual() {
-        Party party = Party.builder()
-            .type(Party.Type.ORGANISATION)
-            .partyName("Doe Inc.")
-            .partyEmail("corp@email.com")
-            .partyPhone("123456789")
-            .build();
+        Party party = new Party();
+        party.setType(Party.Type.ORGANISATION);
+        party.setPartyName("Doe Inc.");
+        party.setPartyEmail("corp@email.com");
+        party.setPartyPhone("123456789");
 
         when(mediationLiPCarm.getIsMediationContactNameCorrect()).thenReturn(YES);
         when(mediationLiPCarm.getIsMediationEmailCorrect()).thenReturn(YES);
         when(mediationLiPCarm.getIsMediationPhoneCorrect()).thenReturn(YES);
         when(mediationLiPCarm.getHasUnavailabilityNextThreeMonths()).thenReturn(NO);
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
-            builder,
+            new MediationLitigant(),
             party,
             "Jane Doe",
             mediationLiPCarm
-        ).build();
+        );
 
         assertThat(litigant.getMediationContactName()).isEqualTo("Jane Doe");
         assertThat(litigant.getMediationContactEmail()).isEqualTo("corp@email.com");
@@ -179,24 +168,22 @@ class UnrepresentedLitigantPopulatorTest {
 
     @Test
     void shouldUseAlternativeMediationContactName_whenIncorrect() {
-        Party party = Party.builder()
-            .type(Type.ORGANISATION)
-            .individualFirstName("John")
-            .individualLastName("Doe")
-            .partyEmail("party@email.com")
-            .partyPhone("123456789")
-            .build();
+        Party party = new Party();
+        party.setType(Type.ORGANISATION);
+        party.setIndividualFirstName("John");
+        party.setIndividualLastName("Doe");
+        party.setPartyEmail("party@email.com");
+        party.setPartyPhone("123456789");
 
         when(mediationLiPCarm.getIsMediationContactNameCorrect()).thenReturn(NO);
         when(mediationLiPCarm.getAlternativeMediationContactPerson()).thenReturn("Alternative Contact");
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
-            builder,
+            new MediationLitigant(),
             party,
             "Original Contact",
             mediationLiPCarm
-        ).build();
+        );
 
         assertThat(litigant.getMediationContactName()).isEqualTo("Alternative Contact");
     }

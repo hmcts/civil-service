@@ -54,6 +54,7 @@ class BundleCreationTriggerEventHandlerTest {
 
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
+    private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
 
     @Mock
     private BundleCreationService bundleCreationService;
@@ -69,16 +70,18 @@ class BundleCreationTriggerEventHandlerTest {
     private Bundle bundle;
 
     @BeforeEach
-    public void setup() {
-        bundle = Bundle.builder().value(BundleDetails.builder().title("Trial Bundle").id("1")
-                                            .stitchStatus("new")
-                                            .stitchedDocument(null)
-                                            .fileName("Trial Bundle.pdf")
-                                            .description("This is trial bundle")
-                                            .bundleHearingDate(LocalDate.of(2023, 12, 12))
-                                            .stitchedDocument(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
-                                            .createdOn(LocalDateTime.of(2023, 11, 12, 1, 1, 1))
-                                            .build()).build();
+    void setup() {
+        BundleDetails bundleDetails = new BundleDetails()
+            .setId("1")
+            .setTitle("Trial Bundle")
+            .setDescription("This is trial bundle")
+            .setStitchStatus("new")
+            .setStitchedDocument(new Document().setDocumentUrl(TEST_URL).setDocumentFileName(TEST_FILE_NAME))
+            .setStitchingFailureMessage(null)
+            .setFileName("Trial Bundle.pdf")
+            .setCreatedOn(LocalDateTime.of(2023, 11, 12, 1, 1, 1))
+            .setBundleHearingDate(LocalDate.of(2023, 12, 12));
+        bundle = new Bundle(bundleDetails);
         List<Bundle> bundlesList = new ArrayList<>();
         bundlesList.add(bundle);
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = setupWitnessEvidenceDocs();
@@ -89,8 +92,8 @@ class BundleCreationTriggerEventHandlerTest {
         caseData = generateCaseData(witnessEvidenceDocs, expertEvidenceDocs, otherEvidenceDocs,
                                     systemGeneratedCaseDocuments, servedDocumentFiles);
         caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-        bundleCreateResponse =
-            BundleCreateResponse.builder().data(BundleData.builder().caseBundles(bundlesList).build()).build();
+        BundleData bundleData = new BundleData(bundlesList);
+        bundleCreateResponse = new BundleCreateResponse(bundleData, null);
     }
 
     private CaseData generateCaseData(List<Element<UploadEvidenceWitness>> witnessEvidenceDocs,
@@ -125,71 +128,68 @@ class BundleCreationTriggerEventHandlerTest {
             .documentQuestionsRes2(expertEvidenceDocs)
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
             .servedDocumentFiles(servedDocumentFiles)
-            .applicant1(Party.builder().partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().partyName("respondent1").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setPartyName("applicant1").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setPartyName("respondent1").setType(Party.Type.INDIVIDUAL))
             .addApplicant2(YesOrNo.YES)
             .addRespondent2(YesOrNo.YES)
-            .applicant2(Party.builder().partyName("applicant2").type(Party.Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().partyName("respondent2").type(Party.Type.INDIVIDUAL).build())
+            .applicant2(new Party().setPartyName("applicant2").setType(Party.Type.INDIVIDUAL))
+            .respondent2(new Party().setPartyName("respondent2").setType(Party.Type.INDIVIDUAL))
             .hearingDate(LocalDate.of(2023, 3, 12))
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .caseBundles(prepareCaseBundles())
             .build();
     }
 
     private List<Element<UploadEvidenceWitness>> setupWitnessEvidenceDocs() {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                         .builder()
-                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                 TEST_URL)
-                                                                                    .documentFileName(TEST_FILE_NAME).build()).build()));
+        witnessEvidenceDocs.add(ElementUtils.element(new UploadEvidenceWitness()
+                                                         .setWitnessOptionDocument(new Document().setDocumentBinaryUrl(
+                                                             TEST_URL)
+                                                                                         .setDocumentFileName(TEST_FILE_NAME))));
         return witnessEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceExpert>> setupExpertEvidenceDocs() {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-                                                        .builder()
-                                                        .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                            .documentFileName(TEST_FILE_NAME).build()).build()));
+        expertEvidenceDocs.add(ElementUtils.element(new UploadEvidenceExpert()
+                                                        .setExpertDocument(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                                .setDocumentFileName(TEST_FILE_NAME))));
         return expertEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
-        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                           .documentFileName(TEST_FILE_NAME).build()).build()));
+        otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                       .setDocumentUpload(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                           .setDocumentFileName(TEST_FILE_NAME))));
         return otherEvidenceDocs;
     }
 
     private List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentClaim =
-            CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
-                TEST_URL).documentFileName(TEST_FILE_NAME).build()).build();
+            new CaseDocument().setDocumentType(DocumentType.SEALED_CLAIM).setDocumentLink(new Document().setDocumentUrl(
+                TEST_URL).setDocumentFileName(TEST_FILE_NAME));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
         CaseDocument caseDocumentDQ =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build()).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL).setDocumentFileName(TEST_FILE_NAME));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQ));
         return systemGeneratedCaseDocuments;
     }
 
     private ServedDocumentFiles setupParticularsOfClaimDocs() {
         List<Element<Document>> particularsOfClaim = new ArrayList<>();
-        Document document = Document.builder().documentFileName(TEST_FILE_NAME).documentUrl(TEST_URL).build();
+        Document document = new Document().setDocumentFileName(TEST_FILE_NAME).setDocumentUrl(TEST_URL);
         particularsOfClaim.add(ElementUtils.element(document));
-        return ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
+        return new ServedDocumentFiles().setParticularsOfClaimDocument(particularsOfClaim);
     }
 
     @Test
     void testSendBundleCreationTriggerDoesNotThrowExceptionWhenItsAllGood() {
         // Given: Case details with all type of documents require for bundles
-        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
+        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L, ACCESS_TOKEN);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
         StartEventResponse response = StartEventResponse.builder()
             .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();
@@ -230,9 +230,9 @@ class BundleCreationTriggerEventHandlerTest {
             StartEventResponse.builder().token("123").eventId("event1").caseDetails(caseDetails).build();
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
         caseBundles.add(new IdValue<>("1",
-                                      uk.gov.hmcts.reform.civil.model.Bundle.builder()
-                                          .title("Trial Bundle").fileName("TrialBundle.pdf")
-                                          .stitchStatus(Optional.of("NEW")).build()));
+                                      new uk.gov.hmcts.reform.civil.model.Bundle()
+                                          .setTitle("Trial Bundle").setFileName("TrialBundle.pdf")
+                                          .setStitchStatus(Optional.of("NEW"))));
         // When: I call the prepareCaseContent method
         CaseDataContent caseDataContent = bundleCreationTriggerEventHandler.prepareCaseContent(caseBundles,
                                                                                                startEventResponse);
@@ -247,18 +247,16 @@ class BundleCreationTriggerEventHandlerTest {
 
     private List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> prepareCaseBundles() {
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .createdOn(Optional.of(LocalDateTime.now()))
-            .bundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))
-            .build()));
-        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .createdOn(Optional.of(LocalDateTime.now()))
-            .bundleHearingDate(Optional.of(LocalDate.of(2023, 1, 12)))
-            .build()));
+        caseBundles.add(new IdValue<>("1", new uk.gov.hmcts.reform.civil.model.Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
+            .setCreatedOn(Optional.of(LocalDateTime.now()))
+            .setBundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))));
+        caseBundles.add(new IdValue<>("1", new uk.gov.hmcts.reform.civil.model.Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
+            .setCreatedOn(Optional.of(LocalDateTime.now()))
+            .setBundleHearingDate(Optional.of(LocalDate.of(2023, 1, 12)))));
         return caseBundles;
     }
 
@@ -278,7 +276,7 @@ class BundleCreationTriggerEventHandlerTest {
     @Test
     void verifyBundleNotificationEventTriggeredWhenBundleCreated() {
         // Given: Case details with all type of documents require for bundles
-        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
+        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L, ACCESS_TOKEN);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
         StartEventResponse response = StartEventResponse.builder()
             .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();
@@ -296,7 +294,7 @@ class BundleCreationTriggerEventHandlerTest {
     void verifyNoBundleNotificationEventTriggeredWhenBundleNotCreated() {
         // Given: Case details with all type of documents require for bundles and throws exception from
         // createBundle service
-        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
+        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L, ACCESS_TOKEN);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
         StartEventResponse response = StartEventResponse.builder()
             .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();

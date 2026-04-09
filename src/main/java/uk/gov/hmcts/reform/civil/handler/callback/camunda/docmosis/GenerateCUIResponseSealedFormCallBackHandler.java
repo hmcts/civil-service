@@ -72,8 +72,6 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
         String authToken = callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString();
         CaseDocument sealedForm = formGenerator.generate(caseData, authToken);
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
         if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             log.info("no of document sending for stitch {} for caseId {}", documentMetaDataList.size(), caseId);
@@ -86,27 +84,26 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                                                                     DocumentType.DEFENDANT_DEFENCE,
                                                                     authToken);
                 log.info("Civil stitch service for response cui sealed form {} for caseId {}", stitchedDocument, caseId);
-                addToSystemGeneratedDocuments(caseDataBuilder, stitchedDocument, caseData);
+                addToSystemGeneratedDocuments(stitchedDocument, caseData);
             } else {
-                addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
+                addToSystemGeneratedDocuments(sealedForm, caseData);
             }
         } else {
-            addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
+            addToSystemGeneratedDocuments(sealedForm, caseData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument document, CaseData caseData) {
+    private void addToSystemGeneratedDocuments(CaseDocument document, CaseData caseData) {
         if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
-            caseDataBuilder
-                .bilingualHint(YesOrNo.YES)
-                .preTranslationDocuments(List.of(ElementUtils.element(document)));
+            caseData.setBilingualHint(YesOrNo.YES);
+            caseData.setPreTranslationDocuments(List.of(ElementUtils.element(document)));
         } else {
-            caseDataBuilder.respondent1ClaimResponseDocumentSpec(document)
-                .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+            caseData.setRespondent1ClaimResponseDocumentSpec(document);
+            caseData.setSystemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                     document,
                     caseData
                 ));

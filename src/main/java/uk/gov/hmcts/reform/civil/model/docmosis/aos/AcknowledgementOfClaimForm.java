@@ -5,10 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
@@ -17,23 +18,24 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode
 @ToString
+@Accessors(chain = true)
 public class AcknowledgementOfClaimForm implements MappableObject {
 
     @JsonProperty("courtseal")
-    private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
-    private final String caseName;
-    private final String referenceNumber;
-    private final SolicitorReferences solicitorReferences;
+    private String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
+    private String caseName;
+    private String referenceNumber;
+    private SolicitorReferences solicitorReferences;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate issueDate;
+    private LocalDate issueDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate responseDeadline;
-    private final List<Party> respondent;
-    private final List<String> responseIntentions;
+    private LocalDate responseDeadline;
+    private List<Party> respondent;
+    private List<String> responseIntentions;
 }

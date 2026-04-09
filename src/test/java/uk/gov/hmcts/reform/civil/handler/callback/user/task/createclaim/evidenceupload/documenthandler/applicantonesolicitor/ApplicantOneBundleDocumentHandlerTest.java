@@ -27,9 +27,9 @@ class ApplicantOneBundleDocumentHandlerTest extends BaseDocumentHandlerTest {
 
     @Test
     void shouldNotCopyDocumentsToLegalRep2AndPreserveLegalRep1Changes() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getBundleEvidence().size());
+        assertEquals(2, caseData.getBundleEvidence().size());
         assertFalse(handler.shouldCopyDocumentsToLegalRep2(), "Expected shouldCopyDocumentsToLegalRep2 to return false");
     }
 

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -32,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements.toHearingSupportRequirements;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LR_V_LIP_RESPONSE;
 
+@Slf4j
 @Service
 public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaireGenerator {
 
@@ -53,12 +55,12 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(
+        DirectionsQuestionnaireForm form = dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(
             caseData,
             authorisation
         );
-        builder.respondent1LiPCorrespondenceAddress(caseData.getRespondent1CorrespondenceAddress())
-            .hearingLipSupportRequirements(Optional.ofNullable(
+        form.setRespondent1LiPCorrespondenceAddress(caseData.getRespondent1CorrespondenceAddress())
+            .setHearingLipSupportRequirements(Optional.ofNullable(
                     caseData.getCaseDataLiP())
                 .map(
                     CaseDataLiP::getRespondent1LiPResponse)
@@ -74,80 +76,78 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
             .map(RespondentLiPResponse::getRespondent1DQExtraDetails)
             .orElse(null);
         if (respondent1DQExtraDetails != null) {
-            builder.lipExtraDQ(LipExtraDQ.builder().triedToSettle(respondent1DQExtraDetails.getTriedToSettle())
-                    .requestExtra4weeks(respondent1DQExtraDetails.getRequestExtra4weeks())
-                    .considerClaimantDocuments(respondent1DQExtraDetails.getConsiderClaimantDocuments())
-                    .considerClaimantDocumentsDetails(respondent1DQExtraDetails.getConsiderClaimantDocumentsDetails())
-                    .determinationWithoutHearingRequired(respondent1DQExtraDetails.getDeterminationWithoutHearingRequired())
-                    .determinationWithoutHearingReason(respondent1DQExtraDetails.getDeterminationWithoutHearingReason())
-                    .giveEvidenceYourSelf(respondent1DQExtraDetails.getGiveEvidenceYourSelf())
-                    .whyPhoneOrVideoHearing(respondent1DQExtraDetails.getWhyPhoneOrVideoHearing())
-                    .wantPhoneOrVideoHearing(respondent1DQExtraDetails.getWantPhoneOrVideoHearing())
-                    .giveEvidenceConfirmDetails(getDetails(caseData.getCaseDataLiP().getRespondent1LiPResponse()))
-                    .build())
-                .lipExperts(LipExperts.builder()
-                    .details(respondent1DQExtraDetails
+            form.setLipExtraDQ(new LipExtraDQ()
+                    .setTriedToSettle(respondent1DQExtraDetails.getTriedToSettle())
+                    .setRequestExtra4weeks(respondent1DQExtraDetails.getRequestExtra4weeks())
+                    .setConsiderClaimantDocuments(respondent1DQExtraDetails.getConsiderClaimantDocuments())
+                    .setConsiderClaimantDocumentsDetails(respondent1DQExtraDetails.getConsiderClaimantDocumentsDetails())
+                    .setDeterminationWithoutHearingRequired(respondent1DQExtraDetails.getDeterminationWithoutHearingRequired())
+                    .setDeterminationWithoutHearingReason(respondent1DQExtraDetails.getDeterminationWithoutHearingReason())
+                    .setGiveEvidenceYourSelf(respondent1DQExtraDetails.getGiveEvidenceYourSelf())
+                    .setWhyPhoneOrVideoHearing(respondent1DQExtraDetails.getWhyPhoneOrVideoHearing())
+                    .setWantPhoneOrVideoHearing(respondent1DQExtraDetails.getWantPhoneOrVideoHearing())
+                    .setGiveEvidenceConfirmDetails(getDetails(caseData.getCaseDataLiP().getRespondent1LiPResponse())))
+                .setLipExperts(new LipExperts()
+                    .setDetails(respondent1DQExtraDetails
                         .getReportExpertDetails()
                         .stream()
                         .map(ExpertReportTemplate::toExpertReportTemplate)
                         .toList())
-                    .caseNeedsAnExpert(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
+                    .setCaseNeedsAnExpert(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
                         .map(ExpertLiP::getCaseNeedsAnExpert).orElse(null))
-                    .expertCanStillExamineDetails(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
+                    .setExpertCanStillExamineDetails(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
                         .map(ExpertLiP::getExpertCanStillExamineDetails)
                         .orElse(null))
-                    .expertReportRequired(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
+                    .setExpertReportRequired(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
                         .map(ExpertLiP::getExpertReportRequired)
-                        .orElse(null))
-
-                    .build());
+                        .orElse(null)));
 
         }
-        return builder.build();
+        return form;
     }
 
     @Override
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
-        if (caseData.isRespondent1NotRepresented() && featureToggleService.isPinInPostEnabled()) {
-            return DQ_LR_V_LIP_RESPONSE;
+        if (caseData.isRespondent1NotRepresented()) {
+            final DocmosisTemplates dqLrVLipResponse = DQ_LR_V_LIP_RESPONSE;
+            log.info("{} {}", caseData.getCcdCaseReference(), dqLrVLipResponse.getTemplate());
+            return dqLrVLipResponse;
         }
         return super.getTemplateId(caseData);
     }
 
     protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
-        return List.of(Party.builder()
-            .name(caseData.getRespondent1().getPartyName())
-            .emailAddress(caseData.getRespondent1().getPartyEmail())
-            .phoneNumber(caseData.getRespondent1().getPartyPhone())
-            .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-            .build());
+        return List.of(new Party()
+            .setName(caseData.getRespondent1().getPartyName())
+            .setEmailAddress(caseData.getRespondent1().getPartyEmail())
+            .setPhoneNumber(caseData.getRespondent1().getPartyPhone())
+            .setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress()));
     }
 
     protected RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc != null && null != rc.getCaseLocation()) {
-            return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(YES)
-                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
-                .responseCourtName(rc.getCaseLocation().getBaseLocation())
-                .build();
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setRequestHearingAtSpecificCourt(YES);
+            requestedCourt.setReasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
+            requestedCourt.setResponseCourtName(rc.getCaseLocation().getBaseLocation());
+            return requestedCourt;
         } else {
-            return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(NO)
-                .build();
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setRequestHearingAtSpecificCourt(NO);
+            return requestedCourt;
         }
     }
 
     private LipExtraDQEvidenceConfirmDetails getDetails(RespondentLiPResponse respondentLiPResponse) {
         EvidenceConfirmDetails confirmDetails = respondentLiPResponse.getRespondent1DQEvidenceConfirmDetails();
         if (confirmDetails != null) {
-            return LipExtraDQEvidenceConfirmDetails.builder()
-                .firstName(confirmDetails.getFirstName())
-                .lastName(confirmDetails.getLastName())
-                .email(confirmDetails.getEmail())
-                .phone(confirmDetails.getPhone())
-                .jobTitle(confirmDetails.getJobTitle())
-                .build();
+            return new LipExtraDQEvidenceConfirmDetails()
+                .setFirstName(confirmDetails.getFirstName())
+                .setLastName(confirmDetails.getLastName())
+                .setEmail(confirmDetails.getEmail())
+                .setPhone(confirmDetails.getPhone())
+                .setJobTitle(confirmDetails.getJobTitle());
         }
         return null;
     }

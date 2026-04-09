@@ -70,7 +70,7 @@ class OrderReviewObligationCheckHandlerTest {
         CaseDetails caseDetails = mock(CaseDetails.class);
         CaseData caseData = mock(CaseData.class);
         StoredObligationData obligationData = mock(StoredObligationData.class);
-        Element<StoredObligationData> element = Element.<StoredObligationData>builder().value(obligationData).build();
+        Element<StoredObligationData> element = new Element<StoredObligationData>().setValue(obligationData);
         List<Element<StoredObligationData>> storedObligationData = Collections.singletonList(element);
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
@@ -92,7 +92,7 @@ class OrderReviewObligationCheckHandlerTest {
         CaseDetails caseDetails = mock(CaseDetails.class);
         CaseData caseData = mock(CaseData.class);
         StoredObligationData obligationData = mock(StoredObligationData.class);
-        Element<StoredObligationData> element = Element.<StoredObligationData>builder().value(obligationData).build();
+        Element<StoredObligationData> element = new Element<StoredObligationData>().setValue(obligationData);
         List<Element<StoredObligationData>> storedObligationData = Collections.singletonList(element);
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
@@ -113,7 +113,7 @@ class OrderReviewObligationCheckHandlerTest {
         CaseDetails caseDetails = mock(CaseDetails.class);
         CaseData caseData = mock(CaseData.class);
         StoredObligationData obligationData = mock(StoredObligationData.class);
-        Element<StoredObligationData> element = Element.<StoredObligationData>builder().value(obligationData).build();
+        Element<StoredObligationData> element = new Element<StoredObligationData>().setValue(obligationData);
         List<Element<StoredObligationData>> storedObligationData = Collections.singletonList(element);
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));

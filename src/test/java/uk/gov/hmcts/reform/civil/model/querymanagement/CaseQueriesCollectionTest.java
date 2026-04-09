@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.querymanagement;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,29 +24,22 @@ class CaseQueriesCollectionTest {
     @Test
     void shouldReturnLatestCaseMessage() {
         OffsetDateTime now = OffsetDateTime.of(LocalDateTime.of(2025, 3, 1, 7, 0, 0), ZoneOffset.UTC);
-        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
-            .partyName("John Doe")
-            .roleOnCase("applicant-solicitor")
-            .caseMessages(
-                List.of(
-                    Element.<CaseMessage>builder()
-                        .id(UUID.randomUUID())
-                        .value(
-                            CaseMessage.builder()
-                                .id("query-id")
-                                .isHearingRelated(YES)
-                                .createdOn(now)
-                                .build()).build(),
-                    Element.<CaseMessage>builder()
-                        .id(UUID.randomUUID())
-                        .value(
-                            CaseMessage.builder()
-                                .id("old-query-id")
-                                .isHearingRelated(NO)
-                                .createdOn(now.minusMinutes(10))
-                                .build()).build()
-                ))
-            .build();
+        CaseMessage queryMessage = new CaseMessage();
+        queryMessage.setId("query-id");
+        queryMessage.setIsHearingRelated(YES);
+        queryMessage.setCreatedOn(now);
+        CaseMessage oldQueryMessage = new CaseMessage();
+        oldQueryMessage.setId("old-query-id");
+        oldQueryMessage.setIsHearingRelated(NO);
+        oldQueryMessage.setCreatedOn(now.minusMinutes(10));
+        CaseQueriesCollection caseQueries = buildCaseQueries(
+            "John Doe",
+            "applicant-solicitor",
+            List.of(
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(queryMessage),
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(oldQueryMessage)
+            )
+        );
 
         CaseMessage latest = caseQueries.latest();
 
@@ -54,11 +49,7 @@ class CaseQueriesCollectionTest {
 
     @Test
     void shouldReturnNullWhenCaseMessagesIsEmpty() {
-        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
-            .partyName("John Doe")
-            .roleOnCase("applicant-solicitor")
-            .caseMessages(List.of())
-            .build();
+        CaseQueriesCollection caseQueries = buildCaseQueries("John Doe", "applicant-solicitor", List.of());
 
         CaseMessage latest = caseQueries.latest();
 
@@ -67,11 +58,7 @@ class CaseQueriesCollectionTest {
 
     @Test
     void shouldReturnNullWhenCaseMessagesIsNull() {
-        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
-            .partyName("John Doe")
-            .roleOnCase("applicant-solicitor")
-            .caseMessages(null)
-            .build();
+        CaseQueriesCollection caseQueries = buildCaseQueries("John Doe", "applicant-solicitor", null);
 
         CaseMessage latest = caseQueries.latest();
 
@@ -80,15 +67,9 @@ class CaseQueriesCollectionTest {
 
     @Test
     void shouldReturnTrue_whenCaseQueriesCollectionIsSame() {
-        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
-            .partyName("John Doe")
-            .roleOnCase("applicant-solicitor")
-            .build();
+        CaseQueriesCollection caseQueries = buildCaseQueries("John Doe", "applicant-solicitor", null);
 
-        CaseQueriesCollection sameCaseQueries = CaseQueriesCollection.builder()
-            .partyName("John Doe")
-            .roleOnCase("applicant-solicitor")
-            .build();
+        CaseQueriesCollection sameCaseQueries = buildCaseQueries("John Doe", "applicant-solicitor", null);
 
         boolean result = caseQueries.isSame(sameCaseQueries);
 
@@ -97,10 +78,7 @@ class CaseQueriesCollectionTest {
 
     @Test
     void shouldReturnFalse_whenCaseQueriesCollectionIsNull() {
-        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
-            .partyName("John Doe")
-            .roleOnCase("applicant-solicitor")
-            .build();
+        CaseQueriesCollection caseQueries = buildCaseQueries("John Doe", "applicant-solicitor", null);
 
         boolean result = caseQueries.isSame(null);
 
@@ -109,15 +87,9 @@ class CaseQueriesCollectionTest {
 
     @Test
     void shouldReturnFalse_whenCaseQueriesCollectionIsDifferent() {
-        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
-            .partyName("John Doe")
-            .roleOnCase("applicant-solicitor")
-            .build();
+        CaseQueriesCollection caseQueries = buildCaseQueries("John Doe", "applicant-solicitor", null);
 
-        CaseQueriesCollection differentCaseQueries = CaseQueriesCollection.builder()
-            .partyName("Jane Doe")
-            .roleOnCase("respondent-solicitor")
-            .build();
+        CaseQueriesCollection differentCaseQueries = buildCaseQueries("Jane Doe", "respondent-solicitor", null);
 
         boolean result = caseQueries.isSame(differentCaseQueries);
 
@@ -127,30 +99,23 @@ class CaseQueriesCollectionTest {
     @Test
     void shouldReturnFalse_collectionHasNoQueriesAwaitingAResponse() {
         OffsetDateTime now = OffsetDateTime.now();
-        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
-            .partyName("John Doe")
-            .roleOnCase("applicant-solicitor")
-            .caseMessages(
-                List.of(
-                    Element.<CaseMessage>builder()
-                        .id(UUID.randomUUID())
-                        .value(
-                            CaseMessage.builder()
-                                .id("query-id")
-                                .isHearingRelated(YES)
-                                .createdOn(now)
-                                .build()).build(),
-                    Element.<CaseMessage>builder()
-                        .id(UUID.randomUUID())
-                        .value(
-                            CaseMessage.builder()
-                                .id("response-id")
-                                .isHearingRelated(NO)
-                                .createdOn(now.plusHours(3))
-                                .parentId("query-id")
-                                .build()).build()
-                ))
-            .build();
+        CaseMessage queryMessage = new CaseMessage();
+        queryMessage.setId("query-id");
+        queryMessage.setIsHearingRelated(YES);
+        queryMessage.setCreatedOn(now);
+        CaseMessage responseMessage = new CaseMessage();
+        responseMessage.setId("response-id");
+        responseMessage.setIsHearingRelated(NO);
+        responseMessage.setCreatedOn(now.plusHours(3));
+        responseMessage.setParentId("query-id");
+        CaseQueriesCollection caseQueries = buildCaseQueries(
+            "John Doe",
+            "applicant-solicitor",
+            List.of(
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(queryMessage),
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(responseMessage)
+            )
+        );
 
         assertFalse(caseQueries.hasAQueryAwaitingResponse());
     }
@@ -158,41 +123,133 @@ class CaseQueriesCollectionTest {
     @Test
     void shouldReturnTrue_whenCollectionHasQueryAwaitingResponse() {
         OffsetDateTime now = OffsetDateTime.now();
-        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
-            .partyName("John Doe")
-            .roleOnCase("applicant-solicitor")
-            .caseMessages(
-                List.of(
-                    Element.<CaseMessage>builder()
-                        .id(UUID.randomUUID())
-                        .value(
-                            CaseMessage.builder()
-                                .id("query-id")
-                                .isHearingRelated(YES)
-                                .createdOn(now)
-                                .build()).build(),
-                    Element.<CaseMessage>builder()
-                        .id(UUID.randomUUID())
-                        .value(
-                            CaseMessage.builder()
-                                .id("response-id")
-                                .isHearingRelated(NO)
-                                .createdOn(now.plusHours(3))
-                                .parentId("query-id")
-                                .build()).build(),
-                    Element.<CaseMessage>builder()
-                        .id(UUID.randomUUID())
-                        .value(
-                            CaseMessage.builder()
-                                .id("followup-id")
-                                .isHearingRelated(NO)
-                                .createdOn(now.plusHours(5))
-                                .parentId("query-id")
-                                .build()).build()
-                ))
-            .build();
+        CaseMessage queryMessage = new CaseMessage();
+        queryMessage.setId("query-id");
+        queryMessage.setIsHearingRelated(YES);
+        queryMessage.setCreatedOn(now);
+        CaseMessage responseMessage = new CaseMessage();
+        responseMessage.setId("response-id");
+        responseMessage.setIsHearingRelated(NO);
+        responseMessage.setCreatedOn(now.plusHours(3));
+        responseMessage.setParentId("query-id");
+        CaseMessage followUpMessage = new CaseMessage();
+        followUpMessage.setId("followup-id");
+        followUpMessage.setIsHearingRelated(NO);
+        followUpMessage.setCreatedOn(now.plusHours(5));
+        followUpMessage.setParentId("query-id");
+        CaseQueriesCollection caseQueries = buildCaseQueries(
+            "John Doe",
+            "applicant-solicitor",
+            List.of(
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(queryMessage),
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(responseMessage),
+                new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(followUpMessage)
+            )
+        );
 
         assertTrue(caseQueries.hasAQueryAwaitingResponse());
+    }
+
+    @Test
+    void shouldReturnCorrectThreadForInitialMessage() {
+        OffsetDateTime now = OffsetDateTime.of(LocalDateTime.of(2025, 3, 1, 7, 0, 0), ZoneOffset.UTC);
+        String rootMessageId = "root-msg-id";
+        String childMessageId = "child-msg-id";
+
+        CaseMessage rootMessage = new CaseMessage();
+        rootMessage.setId(rootMessageId);
+        rootMessage.setCreatedOn(now);
+        CaseMessage childMessage = new CaseMessage();
+        childMessage.setId(childMessageId);
+        childMessage.setParentId(rootMessageId);
+        childMessage.setCreatedOn(now.plusMinutes(5));
+        String otherRootId = "other-root-id";
+        CaseMessage otherRootMessage = new CaseMessage();
+        otherRootMessage.setId(otherRootId);
+        otherRootMessage.setCreatedOn(now.minusDays(1));
+
+        CaseQueriesCollection caseQueries = buildCaseQueries(null, null, List.of(
+            new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(rootMessage),
+            new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(childMessage),
+            new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(otherRootMessage)
+        ));
+
+        List<Element<CaseMessage>> thread = caseQueries.messageThread(rootMessage);
+
+        assertNotNull(thread);
+        assertEquals(2, thread.size());
+        assertEquals(rootMessageId, thread.get(0).getValue().getId());
+        assertEquals(childMessageId, thread.get(1).getValue().getId());
+    }
+
+    @Test
+    void shouldReturnCorrectThreadForChildMessage() {
+        OffsetDateTime now = OffsetDateTime.of(LocalDateTime.of(2025, 3, 1, 7, 0, 0), ZoneOffset.UTC);
+        String rootMessageId = "root-msg-id";
+        String childMessageId = "child-msg-id";
+
+        CaseMessage rootMessage = new CaseMessage();
+        rootMessage.setId(rootMessageId);
+        rootMessage.setCreatedOn(now);
+        CaseMessage childMessage = new CaseMessage();
+        childMessage.setId(childMessageId);
+        childMessage.setParentId(rootMessageId);
+        childMessage.setCreatedOn(now.plusMinutes(5));
+        String otherRootId = "other-root-id";
+        CaseMessage otherRootMessage = new CaseMessage();
+        otherRootMessage.setId(otherRootId);
+        otherRootMessage.setCreatedOn(now.minusDays(1));
+
+        CaseQueriesCollection caseQueries = buildCaseQueries(null, null, List.of(
+            new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(rootMessage),
+            new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(childMessage),
+            new Element<CaseMessage>().setId(UUID.randomUUID()).setValue(otherRootMessage)
+        ));
+
+        List<Element<CaseMessage>> thread = caseQueries.messageThread(childMessage);
+
+        assertNotNull(thread);
+        assertEquals(2, thread.size()); // Expecting root and child, as per messageThread(String) logic
+        assertEquals(rootMessageId, thread.get(0).getValue().getId());
+        assertEquals(childMessageId, thread.get(1).getValue().getId());
+    }
+
+    @Test
+    void shouldReturnEmptyList_whenCaseMessagesCollectionIsEmpty() {
+        CaseQueriesCollection caseQueries = buildCaseQueries(null, null, Collections.emptyList());
+
+        CaseMessage message = new CaseMessage();
+        message.setId("some-id");
+        message.setCreatedOn(OffsetDateTime.now());
+        List<Element<CaseMessage>> thread = caseQueries.messageThread(message);
+
+        assertNotNull(thread);
+        assertEquals(0, thread.size());
+        assertTrue(thread.isEmpty());
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenCaseMessagesCollectionIsNull() {
+        CaseQueriesCollection caseQueries = buildCaseQueries(null, null, null);
+
+        CaseMessage message = new CaseMessage();
+        message.setId("some-id");
+        message.setCreatedOn(OffsetDateTime.now());
+        List<Element<CaseMessage>> thread = caseQueries.messageThread(message);
+
+        assertNotNull(thread);
+        assertEquals(0, thread.size());
+        assertTrue(thread.isEmpty());
+    }
+
+    private CaseQueriesCollection buildCaseQueries(String partyName,
+                                                   String roleOnCase,
+                                                   List<Element<CaseMessage>> messages) {
+        CaseQueriesCollection caseQueriesCollection = new CaseQueriesCollection();
+        caseQueriesCollection.setPartyName(partyName);
+        caseQueriesCollection.setRoleOnCase(roleOnCase);
+        caseQueriesCollection.setCaseMessages(messages);
+        return caseQueriesCollection;
     }
 
 }

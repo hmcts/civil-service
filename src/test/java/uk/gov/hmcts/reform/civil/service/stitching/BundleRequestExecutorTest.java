@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.exceptions.RetryableStitchingException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.nio.charset.Charset;
 import java.util.Optional;
@@ -53,7 +54,7 @@ class BundleRequestExecutorTest {
     void whenPostIsCalledAndEndpointWorks_thenTheCallSucceeds() {
         // Given
         String endpoint = "some url";
-        CaseData expectedCaseData = CaseData.builder().build();
+        CaseData expectedCaseData = CaseDataBuilder.builder().build();
         CaseDetails responseCaseDetails = CaseDetails.builder().build();
         ResponseEntity<CaseDetails> responseEntity = new ResponseEntity<>(responseCaseDetails, HttpStatus.OK);
         given(caseDetailsConverter.toCaseData(responseCaseDetails)).willReturn(expectedCaseData);
@@ -61,7 +62,7 @@ class BundleRequestExecutorTest {
             .willReturn(responseEntity);
 
         // When
-        BundleRequest request = BundleRequest.builder().build();
+        BundleRequest request = new BundleRequest();
         var result = bundleRequestExecutor.post(request, endpoint, "not important");
 
         // Then
@@ -81,7 +82,7 @@ class BundleRequestExecutorTest {
                                                        HttpHeaders.EMPTY, errorData.getBytes(),
                                                        Charset.defaultCharset()
             ));
-        BundleRequest request = BundleRequest.builder().build();
+        BundleRequest request = new BundleRequest();
 
         RetryableStitchingException exception = assertThrows(
             RetryableStitchingException.class,
@@ -104,7 +105,43 @@ class BundleRequestExecutorTest {
             .willReturn(responseEntity);
 
         // When
-        BundleRequest request = BundleRequest.builder().build();
+        BundleRequest request = new BundleRequest();
+        RetryableStitchingException exception = assertThrows(
+            RetryableStitchingException.class,
+            () -> bundleRequestExecutor.post(request, endpoint, "not important")
+        );
+
+        assertEquals("Stitching failed, retrying...", exception.getMessage());
+    }
+
+    @Test
+    void whenPostIsCalledAndEndpointReturnsUnknownStatus_thenThrowsRetryable() {
+        String endpoint = "some url";
+        CaseDetails responseCaseDetails = CaseDetails.builder().build();
+        ResponseEntity<CaseDetails> responseEntity = ResponseEntity.status(499).body(responseCaseDetails);
+        given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
+            .willReturn(responseEntity);
+
+        BundleRequest request = new BundleRequest();
+        RetryableStitchingException exception = assertThrows(
+            RetryableStitchingException.class,
+            () -> bundleRequestExecutor.post(request, endpoint, "not important")
+        );
+
+        assertEquals("Stitching failed, retrying...", exception.getMessage());
+    }
+
+    @Test
+    void whenPostIsCalledAndErrorPayloadIsNotJson_thenThrowsRetryable() {
+        String endpoint = "some url";
+        String errorData = "not-json";
+        given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
+            .willThrow(new RestClientResponseException("random exception", 500, "Internal server error",
+                                                       HttpHeaders.EMPTY, errorData.getBytes(),
+                                                       Charset.defaultCharset()
+            ));
+        BundleRequest request = new BundleRequest();
+
         RetryableStitchingException exception = assertThrows(
             RetryableStitchingException.class,
             () -> bundleRequestExecutor.post(request, endpoint, "not important")

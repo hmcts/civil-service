@@ -53,15 +53,11 @@ class JudgmentVariedDeterminationOfMeansRespSolTwoEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CLAIM_REF)
                 .respondent2Represented(YesOrNo.YES)
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                .organisationID("F1")
-                                .build())
-                        .build())
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("F1")))
                 .build();
 
         when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(TEST_ORG_NAME).build()));
+                .thenReturn(Optional.of(new Organisation().setName(TEST_ORG_NAME)));
 
         Map<String, String> properties = new HashMap<>();
 

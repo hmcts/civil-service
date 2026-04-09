@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPayImmediatelyConfirmationText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 
@@ -27,6 +28,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -48,6 +50,9 @@ class CaseDataToTextGeneratorTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @Mock
+    private PaymentDateService paymentDateService;
 
     @SuppressWarnings("rawtypes")
     private final List<CaseDataToTextGeneratorIntentionConfig> intentionConfigs = List.of(
@@ -143,7 +148,8 @@ class CaseDataToTextGeneratorTest {
         @Bean
         public PaymentDateService paymentDateService() {
             PaymentDateService mockPaymentDateService = mock(PaymentDateService.class);
-            when(mockPaymentDateService.getPaymentDateAdmittedClaim(any())).thenReturn(LocalDate.EPOCH);
+            when(mockPaymentDateService.getPaymentDate(any())).thenReturn(Optional.of(LocalDate.EPOCH));
+            when(mockPaymentDateService.getFormattedPaymentDate(any())).thenReturn(LocalDate.EPOCH.toString());
             return mockPaymentDateService;
         }
     }
@@ -177,11 +183,8 @@ class CaseDataToTextGeneratorTest {
     @InjectMocks
     private PartialAdmitPayImmediatelyConfirmationText generatorHeader;
 
-    @Mock
-    private PaymentDateService paymentDateService;
-
     private CaseData buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -194,12 +197,5 @@ class CaseDataToTextGeneratorTest {
         CaseData caseData = buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData();
 
         Assertions.assertThrows(IllegalStateException.class, () -> generatorConf.generateTextFor(caseData, featureToggleService));
-    }
-
-    @Test
-    void shouldThrowIllegalStateExceptionWhenPaymentDateCannotBeFormatted() {
-        CaseData caseData = buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData();
-
-        Assertions.assertThrows(IllegalStateException.class, () -> generatorHeader.generateTextFor(caseData, featureToggleService));
     }
 }

@@ -64,10 +64,10 @@ public class ResetLanguagePreferenceCallbackHandlerTest extends BaseCallbackHand
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .changeOfRepresentation(true, false, NEW_ORG_ID, null, null)
-                .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("xyz@hmcts.com").setId("1234"))
                 .claimantBilingualLanguagePreference("WELSH")
                 .build();
-            caseData = caseData.toBuilder().claimantLanguagePreferenceDisplay(PreferredLanguage.WELSH).build();
+            caseData.setClaimantLanguagePreferenceDisplay(PreferredLanguage.WELSH);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -83,14 +83,13 @@ public class ResetLanguagePreferenceCallbackHandlerTest extends BaseCallbackHand
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .changeOfRepresentation(false, false, NEW_ORG_ID, null, null)
-                .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("xyz@hmcts.com").setId("1234"))
                 .build();
-            caseData = caseData.toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(
-                                     RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()
-                                 ).build())
-                .defendantLanguagePreferenceDisplay(PreferredLanguage.WELSH).build();
+            caseData.setCaseDataLiP(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(
+                                     new RespondentLiPResponse().setRespondent1ResponseLanguage("WELSH")
+                                 ));
+            caseData.setDefendantLanguagePreferenceDisplay(PreferredLanguage.WELSH);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler

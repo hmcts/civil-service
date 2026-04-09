@@ -43,15 +43,13 @@ public class SettlementAgreementFormMapper {
                 getContactPerson(defendantDetails)
         );
 
-        SettlementAgreementForm.SettlementAgreementFormBuilder builder = new SettlementAgreementForm.SettlementAgreementFormBuilder();
-        return builder
-                .claimant(claimant)
-                .defendant(defendant)
-                .claimReferenceNumber(caseData.getLegacyCaseReference())
-                .totalClaimAmount(getClaimAmount(caseData))
-                .settlementAgreedDate(getSettlementDate(caseData))
-                .settlementSubmittedDate(caseData.getRespondent1ResponseDate())
-                .build();
+        return new SettlementAgreementForm()
+            .setClaimant(claimant)
+            .setDefendant(defendant)
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setTotalClaimAmount(getClaimAmount(caseData))
+            .setSettlementAgreedDate(getSettlementDate(caseData))
+            .setSettlementSubmittedDate(caseData.getRespondent1ResponseDate());
     }
 
     private Address getCorrespondenceAddress(Optional<AdditionalLipPartyDetails> partyDetails) {

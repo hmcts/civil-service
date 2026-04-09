@@ -5,9 +5,6 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,22 +82,11 @@ public class BundleTest {
     @Test
     public void shouldConvertNullValuesToOptionalEmptyWhenUsingEmptyConstructor() throws Exception {
 
-        bundle = findPrivateNoArgsConstructor(Bundle.class).newInstance();
+        bundle = new Bundle();
 
         assertEquals(bundle.getStitchStatus(), Optional.empty());
         assertEquals(bundle.getStitchedDocument(), Optional.empty());
 
-    }
-
-    private <T> Constructor<T> findPrivateNoArgsConstructor(Class<T> clazz) {
-
-        return (Constructor<T>)
-            Arrays.stream(clazz.getDeclaredConstructors())
-                .filter(constructor ->
-                            Modifier.isPrivate(constructor.getModifiers()) && constructor.getParameterCount() == 0)
-                .peek(constructor -> constructor.setAccessible(true))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Could not find private no-args constructor"));
     }
 
     private String someRandomString() {

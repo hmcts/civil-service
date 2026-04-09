@@ -1,19 +1,23 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
 @Data
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class LoanCardDebtLRspec {
 
-    private final String loanCardDebtDetail;
+    private String loanCardDebtDetail;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal totalOwed;
+    private BigDecimal totalOwed;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal monthlyPayment;
+    private BigDecimal monthlyPayment;
 
 }

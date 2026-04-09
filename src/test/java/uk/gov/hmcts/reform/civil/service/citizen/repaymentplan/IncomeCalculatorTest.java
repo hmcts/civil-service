@@ -83,21 +83,18 @@ class IncomeCalculatorTest {
     private static List<Element<AccountSimple>> createBankAccountsWithPositiveAndNegativeBalance() {
         List<Element<AccountSimple>> bankAccountElements =
             wrapElements(
-                AccountSimple.builder()
-                    .balance(new BigDecimal(1000.55))
-                    .jointAccount(YesOrNo.YES)
-                    .accountType(CURRENT)
-                    .build(),
-                AccountSimple.builder()
-                    .balance(new BigDecimal(-789))
-                    .jointAccount(YesOrNo.NO)
-                    .accountType(CURRENT)
-                    .build(),
-                AccountSimple.builder()
-                    .balance(new BigDecimal(500))
-                    .jointAccount(YesOrNo.YES)
-                    .accountType(CURRENT)
-                    .build()
+                new AccountSimple()
+                    .setBalance(new BigDecimal(1000.55))
+                    .setJointAccount(YesOrNo.YES)
+                    .setAccountType(CURRENT),
+                new AccountSimple()
+                    .setBalance(new BigDecimal(-789))
+                    .setJointAccount(YesOrNo.NO)
+                    .setAccountType(CURRENT),
+                new AccountSimple()
+                    .setBalance(new BigDecimal(500))
+                    .setJointAccount(YesOrNo.YES)
+                    .setAccountType(CURRENT)
             );
         return bankAccountElements;
     }
@@ -105,27 +102,24 @@ class IncomeCalculatorTest {
     private static List<Element<RecurringIncomeLRspec>> createRecurringIncomeWithPositiveAndNegativeAmount() {
         return
             wrapElements(
-                RecurringIncomeLRspec.builder()
-                    .amount(new BigDecimal(10000))
-                    .frequency(ONCE_TWO_WEEKS)
-                    .type(JOB)
-                    .build(),
-                RecurringIncomeLRspec.builder()
-                    .amount(new BigDecimal(-6000))
-                    .frequency(ONCE_TWO_WEEKS)
-                    .type(JOB)
-                    .build(),
-                RecurringIncomeLRspec.builder()
-                    .amount(new BigDecimal(150000))
-                    .frequency(ONCE_THREE_WEEKS)
-                    .type(JOB)
-                    .build()
+                new RecurringIncomeLRspec()
+                    .setAmount(new BigDecimal(10000))
+                    .setFrequency(ONCE_TWO_WEEKS)
+                    .setType(JOB),
+                new RecurringIncomeLRspec()
+                    .setAmount(new BigDecimal(-6000))
+                    .setFrequency(ONCE_TWO_WEEKS)
+                    .setType(JOB),
+                new RecurringIncomeLRspec()
+                    .setAmount(new BigDecimal(150000))
+                    .setFrequency(ONCE_THREE_WEEKS)
+                    .setType(JOB)
             );
     }
 
     private static Respondent1SelfEmploymentLRspec createAnnualIncome() {
-        return Respondent1SelfEmploymentLRspec.builder()
-            .annualTurnover(new BigDecimal(6700000))
-            .build();
+        return new Respondent1SelfEmploymentLRspec()
+            .setAnnualTurnover(new BigDecimal(6700000))
+            ;
     }
 }

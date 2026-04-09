@@ -31,7 +31,7 @@ public interface DQ {
     default Experts getExperts(Experts experts) {
         if (experts != null && experts.getExpertRequired() != null
             && experts.getExpertRequired().equals(NO)) {
-            return experts.toBuilder().details(null).build();
+            return experts.copy().setDetails(null);
         }
         return experts;
     }
@@ -41,7 +41,7 @@ public interface DQ {
     default Witnesses getWitnesses(Witnesses witnesses) {
         if (witnesses != null && witnesses.getWitnessesToAppear() != null
             && witnesses.getWitnessesToAppear().equals(NO)) {
-            return witnesses.toBuilder().details(null).build();
+            return witnesses.copy().setDetails(null);
         }
         return witnesses;
     }
@@ -51,7 +51,7 @@ public interface DQ {
     default Hearing getHearing(Hearing hearing) {
         if (hearing != null && hearing.getUnavailableDatesRequired() != null
             && hearing.getUnavailableDatesRequired().equals(NO)) {
-            return hearing.toBuilder().unavailableDates(null).build();
+            return hearing.copy().setUnavailableDates(null);
         }
         return hearing;
     }
@@ -61,7 +61,7 @@ public interface DQ {
     default SmallClaimHearing getSmallClaimHearing(SmallClaimHearing smallClaimHearing) {
         if (smallClaimHearing != null && smallClaimHearing.getUnavailableDatesRequired() != null
             && smallClaimHearing.getUnavailableDatesRequired().equals(NO)) {
-            return smallClaimHearing.toBuilder().smallClaimUnavailableDate(null).build();
+            return smallClaimHearing.copy().setSmallClaimUnavailableDate(null);
         }
         return smallClaimHearing;
     }

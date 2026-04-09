@@ -9,13 +9,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
 import java.util.Set;
@@ -39,7 +40,7 @@ class RoboticsNotifierTest {
     @Mock
     private JsonSchemaValidationService jsonSchemaValidationService;
     @Mock
-    private RoboticsDataMapper roboticsDataMapper;
+    private RoboticsDataMapperForUnspec roboticsDataMapper;
     @Mock
     private RoboticsDataMapperForSpec roboticsDataMapperForSpec;
     @Mock
@@ -61,8 +62,8 @@ class RoboticsNotifierTest {
 
     @Test
     void shouldSendNotifications_whenValidSpecClaim() throws JsonProcessingException {
-        RoboticsCaseDataSpec roboticsCaseDataSpec = RoboticsCaseDataSpec.builder().build();
-        CaseData caseData = CaseData.builder().legacyCaseReference(LEGACY_REFERENCE)
+        RoboticsCaseDataSpec roboticsCaseDataSpec = new RoboticsCaseDataSpec();
+        CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
         when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
@@ -76,8 +77,8 @@ class RoboticsNotifierTest {
 
     @Test
     void shouldThrowJsonSchemaValidationException_whenInvalidSpecClaim() throws JsonProcessingException {
-        RoboticsCaseDataSpec roboticsCaseDataSpec = RoboticsCaseDataSpec.builder().build();
-        CaseData caseData = CaseData.builder().legacyCaseReference(LEGACY_REFERENCE)
+        RoboticsCaseDataSpec roboticsCaseDataSpec = new RoboticsCaseDataSpec();
+        CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
         when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
@@ -91,9 +92,9 @@ class RoboticsNotifierTest {
 
     @Test
     void shouldSendNotifications_whenValidUnspecClaim() throws JsonProcessingException {
-        CaseData caseData = CaseData.builder().legacyCaseReference(LEGACY_REFERENCE)
+        CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
-        RoboticsCaseData roboticsCaseData = RoboticsCaseData.builder().build();
+        RoboticsCaseData roboticsCaseData = new RoboticsCaseData();
 
         when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
         when(roboticsDataMapper.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseData);
@@ -106,8 +107,8 @@ class RoboticsNotifierTest {
 
     @Test
     void shouldThrowJsonSchemaValidationException_whenInvalidUnspecClaim() throws JsonProcessingException {
-        RoboticsCaseData roboticsCaseData = RoboticsCaseData.builder().build();
-        CaseData caseData = CaseData.builder().legacyCaseReference(LEGACY_REFERENCE)
+        RoboticsCaseData roboticsCaseData = new RoboticsCaseData();
+        CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
 
         when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);

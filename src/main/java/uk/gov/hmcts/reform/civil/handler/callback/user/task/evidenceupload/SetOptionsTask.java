@@ -28,23 +28,22 @@ public abstract class SetOptionsTask {
 
     public CallbackResponse setOptions(CaseData caseData) {
         List<String> dynamicListOptions = setPartyOptions(caseData);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         //Evidence upload will have different screen for Fast claims and Small claims.
         // We use show hide in CCD to do this, using utility field caseProgAllocatedTrack to hold the value of the claim track
         // for either spec claims (ResponseClaimTrack) or unspec claims (AllocatedTrack)
         if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
-            caseDataBuilder.caseProgAllocatedTrack(caseData.getAllocatedTrack().name());
+            caseData.setCaseProgAllocatedTrack(caseData.getAllocatedTrack().name());
         } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
-            caseDataBuilder.caseProgAllocatedTrack(caseData.getResponseClaimTrack());
+            caseData.setCaseProgAllocatedTrack(caseData.getResponseClaimTrack());
         }
-        caseDataBuilder.evidenceUploadOptions(DynamicList.fromList(dynamicListOptions));
+        caseData.setEvidenceUploadOptions(DynamicList.fromList(dynamicListOptions));
         // was unable to null value properly in EvidenceUploadNotificationEventHandler after emails are sent,
         // so do it here if required.
         if (nonNull(caseData.getNotificationText()) && caseData.getNotificationText().equals("NULLED")) {
-            caseDataBuilder.notificationText(null);
+            caseData.setNotificationText(null);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

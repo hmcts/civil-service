@@ -37,8 +37,8 @@ public class ApplicantOneExpertAnswersDocumentHandler extends
     }
 
     @Override
-    protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceExpert>> evidenceDocsToAdd) {
-        builder.documentAnswersApp2(evidenceDocsToAdd);
+    protected void addDocumentsToCopyToCaseData(CaseData caseData, List<Element<UploadEvidenceExpert>> evidenceDocsToAdd) {
+        caseData.setDocumentAnswersApp2(evidenceDocsToAdd);
     }
 
     @Override

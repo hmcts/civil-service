@@ -95,7 +95,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
             when(notificationsProperties.getEvidenceUploadTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
@@ -139,11 +139,9 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = createCaseDataForLip(NOTIFICATION_TEXT).toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                             .build())
-                                 .build())
+                .caseDataLiP(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();
             //when: RepondentNotificationhandler for respondent 1 is called
 
@@ -162,12 +160,12 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             //given: case data has two respondent solicitor
             when(notificationsProperties.getEvidenceUploadTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData = createCaseDataWithText(NOTIFICATION_TEXT).toBuilder()
-                .respondent2(Party.builder().build())
+                .respondent2(new Party())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .respondentSolicitor2EmailAddress(RESPONDENT2_SOLICITOR_EMAIL)
@@ -213,11 +211,11 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .notificationText(notificationText)
                 .respondent1Represented(YesOrNo.NO)
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .individualFirstName("John")
-                                 .individualLastName("Doe")
-                                 .partyName("Billy").partyEmail(RESPONDENT1_LIP_EMAIL).build())
+                .respondent1(new Party()
+                                 .setType(Party.Type.INDIVIDUAL)
+                                 .setIndividualFirstName("John")
+                                 .setIndividualLastName("Doe")
+                                 .setPartyName("Billy").setPartyEmail(RESPONDENT1_LIP_EMAIL))
                 .build();
         }
 

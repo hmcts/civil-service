@@ -33,9 +33,9 @@ public class ClaimantAttendsOrRepresentedTextBuilderTest {
             FinalOrdersClaimantDefendantNotAttending.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderRecitals(null)
-                .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
-                    ClaimantAndDefendantHeard.builder().trialProcedureClaimantComplex(TrialNoticeProcedure.builder().list(
-                        finalOrdersClaimantDefendantNotAttending).build()).build()).build())
+                .finalOrderRepresentation(new FinalOrderRepresentation().setTypeRepresentationComplex(
+                    new ClaimantAndDefendantHeard().setTrialProcedureClaimantComplex(new TrialNoticeProcedure().setList(
+                        finalOrdersClaimantDefendantNotAttending))))
                 .build();
             String name = caseData.getApplicant1().getPartyName();
             FinalOrdersClaimantRepresentationList finalOrdersClaimantRepresentationList = CLAIMANT_NOT_ATTENDING;
@@ -63,11 +63,11 @@ public class ClaimantAttendsOrRepresentedTextBuilderTest {
             FinalOrdersClaimantDefendantNotAttending.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addApplicant2(YesOrNo.YES)
-                .applicant2(PartyBuilder.builder().individual().build())
+                .applicant2(new PartyBuilder().individual().build())
                 .finalOrderRecitals(null)
-                .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
-                    ClaimantAndDefendantHeard.builder().trialProcedClaimTwoComplex(TrialNoticeProcedure.builder().listClaimTwo(
-                        finalOrdersClaimantDefendantNotAttending).build()).build()).build())
+                .finalOrderRepresentation(new FinalOrderRepresentation().setTypeRepresentationComplex(
+                    new ClaimantAndDefendantHeard().setTrialProcedClaimTwoComplex(new TrialNoticeProcedure().setListClaimTwo(
+                        finalOrdersClaimantDefendantNotAttending))))
                 .build();
             String name = caseData.getApplicant2().getPartyName();
             FinalOrdersClaimantRepresentationList finalOrdersClaimantRepresentationList = CLAIMANT_NOT_ATTENDING;
@@ -96,9 +96,9 @@ public class ClaimantAttendsOrRepresentedTextBuilderTest {
             FinalOrdersClaimantRepresentationList.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderRecitals(null)
-                .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
-                    ClaimantAndDefendantHeard.builder().typeRepresentationClaimantList(
-                        finalOrdersClaimantRepresentationList).build()).build())
+                .finalOrderRepresentation(new FinalOrderRepresentation().setTypeRepresentationComplex(
+                    new ClaimantAndDefendantHeard().setTypeRepresentationClaimantList(
+                        finalOrdersClaimantRepresentationList)))
                 .build();
             String name = caseData.getApplicant1().getPartyName();
             String response = claimantAttendsOrRepresentedTextBuilder.claimantBuilder(caseData, false);
@@ -120,11 +120,11 @@ public class ClaimantAttendsOrRepresentedTextBuilderTest {
             FinalOrdersClaimantRepresentationList.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addApplicant2(YesOrNo.YES)
-                .applicant2(PartyBuilder.builder().individual().build())
+                .applicant2(new PartyBuilder().individual().build())
                 .finalOrderRecitals(null)
-                .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
-                    ClaimantAndDefendantHeard.builder().typeRepresentationClaimantListTwo(
-                        finalOrdersClaimantRepresentationList).build()).build())
+                .finalOrderRepresentation(new FinalOrderRepresentation().setTypeRepresentationComplex(
+                    new ClaimantAndDefendantHeard().setTypeRepresentationClaimantListTwo(
+                        finalOrdersClaimantRepresentationList)))
                 .build();
             String name = caseData.getApplicant2().getPartyName();
             String response = claimantAttendsOrRepresentedTextBuilder.claimantBuilder(caseData, true);

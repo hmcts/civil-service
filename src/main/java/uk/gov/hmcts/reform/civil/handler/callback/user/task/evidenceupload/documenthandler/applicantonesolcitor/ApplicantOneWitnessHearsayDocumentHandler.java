@@ -36,8 +36,8 @@ public class ApplicantOneWitnessHearsayDocumentHandler extends
     }
 
     @Override
-    protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceWitness>> evidenceDocsToAdd) {
-        builder.documentHearsayNoticeApp2(evidenceDocsToAdd);
+    protected void addDocumentsToCopyToCaseData(CaseData caseData, List<Element<UploadEvidenceWitness>> evidenceDocsToAdd) {
+        caseData.setDocumentHearsayNoticeApp2(evidenceDocsToAdd);
     }
 
     @Override

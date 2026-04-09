@@ -41,23 +41,22 @@ public class CalculateSpecFeeTask {
     }
 
     public CallbackResponse calculateSpecFee(CaseData caseData, String authorizationToken) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        updatePaymentDetails(caseData);
 
-        updatePaymentDetails(caseData, caseDataBuilder);
+        calculateAndUpdateClaimFee(caseData);
 
-        calculateAndUpdateClaimFee(caseData, caseDataBuilder);
+        handlePbaAndPaymentType(authorizationToken, caseData);
 
-        handlePbaAndPaymentType(authorizationToken, caseDataBuilder);
-
-        return buildCallbackResponse(caseDataBuilder);
+        return buildCallbackResponse(caseData);
     }
 
-    private void updatePaymentDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void updatePaymentDetails(CaseData caseData) {
         String solicitorReference = getSolicitorReference(caseData);
         String customerReference = getCustomerReference(caseData, solicitorReference);
 
-        PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
-        caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
+        PaymentDetails updatedDetails = new PaymentDetails();
+        updatedDetails.setCustomerReference(customerReference);
+        caseData.setClaimIssuedPaymentDetails(updatedDetails);
     }
 
     private String getSolicitorReference(CaseData caseData) {
@@ -72,25 +71,25 @@ public class CalculateSpecFeeTask {
             .orElse(solicitorReference);
     }
 
-    private void calculateAndUpdateClaimFee(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void calculateAndUpdateClaimFee(CaseData caseData) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         BigDecimal totalClaimAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
 
-        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(totalClaimAmountWithInterest))
-            .totalInterest(interest);
+        caseData.setClaimFee(feesService.getFeeDataByTotalClaimAmount(totalClaimAmountWithInterest));
+        caseData.setTotalInterest(interest);
     }
 
-    private void handlePbaAndPaymentType(String authorizationToken, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        caseDataBuilder.paymentTypePBASpec("PBAv3");
+    private void handlePbaAndPaymentType(String authorizationToken, CaseData caseData) {
+        caseData.setPaymentTypePBASpec("PBAv3");
 
         List<String> pbaNumbers = getPbaAccounts(authorizationToken);
-        caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
+        caseData.setApplicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers));
+        caseData.setApplicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
     }
 
-    private CallbackResponse buildCallbackResponse(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private CallbackResponse buildCallbackResponse(CaseData caseData) {
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

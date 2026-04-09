@@ -41,13 +41,13 @@ class AcknowledgementOfClaimGeneratorForSpecTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName = format(N10.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String FILE_NAME = format(N10.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName)
+        .documentName(FILE_NAME)
         .documentType(ACKNOWLEDGEMENT_OF_SERVICE)
         .build();
 
-    private final Representative representative = Representative.builder().organisationName("test org").build();
+    private final Representative representative = new Representative().setOrganisationName("test org");
 
     @Mock
     private SecuredDocumentManagementService documentManagementService;
@@ -73,7 +73,7 @@ class AcknowledgementOfClaimGeneratorForSpecTest {
             .willReturn(new DocmosisDocument(N10.getDocumentTitle(), bytes));
 
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_SERVICE)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, ACKNOWLEDGEMENT_OF_SERVICE)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
@@ -88,29 +88,28 @@ class AcknowledgementOfClaimGeneratorForSpecTest {
 
         verify(representativeService).getRespondent1Representative(caseData);
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_SERVICE));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, ACKNOWLEDGEMENT_OF_SERVICE));
         verify(documentGeneratorService)
             .generateDocmosisDocument(expectedDocmosisData, N10);
     }
 
     private AcknowledgementOfClaimFormForSpec getExpectedFormData(CaseData caseData) {
-        return AcknowledgementOfClaimFormForSpec.builder()
-            .caseName("Mr. John Rambo \nvs Mr. Sole Trader T/A Sole Trader co")
-            .referenceNumber(LEGACY_CASE_REFERENCE)
-            .submittedOn(LocalDate.now())
-            .solicitorReferences(caseData.getSolicitorReferences())
-            .issueDate(caseData.getIssueDate())
-            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
-            .respondent(
-                Party.builder()
-                    .name(caseData.getRespondent1().getPartyName())
-                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                    .representative(representative)
-                    .litigationFriendName(
-                        ofNullable(caseData.getRespondent1LitigationFriend())
-                            .map(LitigationFriend::getFullName)
-                            .orElse(""))
-                    .build())
-            .build();
+        return new AcknowledgementOfClaimFormForSpec(
+            "[userImage:courtseal.PNG]",
+            "Mr. John Rambo \nvs Mr. Sole Trader T/A Sole Trader co",
+            LEGACY_CASE_REFERENCE,
+            caseData.getSolicitorReferences(),
+            caseData.getIssueDate(),
+            LocalDate.now(),
+            caseData.getRespondent1ResponseDeadline().toLocalDate(),
+            new Party()
+                .setName(caseData.getRespondent1().getPartyName())
+                .setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                .setRepresentative(representative)
+                .setLitigationFriendName(
+                    ofNullable(caseData.getRespondent1LitigationFriend())
+                        .map(LitigationFriend::getFullName)
+                        .orElse(""))
+        );
     }
 }

@@ -1,19 +1,19 @@
 package uk.gov.hmcts.reform.civil.model.sdo;
 
+import jakarta.validation.constraints.Future;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 
 import java.time.LocalDate;
 import java.util.List;
-import javax.validation.constraints.Future;
 
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class FastTrackTrial {
 
     private String input1;

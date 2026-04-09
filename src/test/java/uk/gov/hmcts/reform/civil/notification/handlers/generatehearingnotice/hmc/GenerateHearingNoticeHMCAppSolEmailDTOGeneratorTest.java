@@ -73,10 +73,10 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     void getEmailTemplateId_feeNotRequired_returnsNoFeeTemplate() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
-                .thenReturn(HearingNoticeVariables.builder().hearingType(TYPE_ANY).build());
+                .thenReturn(new HearingNoticeVariables().setHearingType(TYPE_ANY));
 
         try (MockedStatic<HearingUtils> mocked = mockStatic(HearingUtils.class)) {
             mocked.when(() -> hearingFeeRequired(TYPE_ANY)).thenReturn(false);
@@ -93,11 +93,11 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     void getEmailTemplateId_paymentSuccess_returnsNoFeeOnSuccess() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
-                .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
+                .hearingFeePaymentDetails(new PaymentDetails().setStatus(SUCCESS))
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
-                .thenReturn(HearingNoticeVariables.builder().hearingType(TYPE_FAST).build());
+                .thenReturn(new HearingNoticeVariables().setHearingType(TYPE_FAST));
 
         try (MockedStatic<HearingUtils> mocked = mockStatic(HearingUtils.class)) {
             mocked.when(() -> hearingFeeRequired(TYPE_FAST)).thenReturn(true);
@@ -114,11 +114,11 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     void getEmailTemplateId_requiresAndNoPayment_returnsFeeTemplate() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .hearingFeePaymentDetails(null)
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
-                .thenReturn(HearingNoticeVariables.builder().hearingType(TYPE_FAST).build());
+                .thenReturn(new HearingNoticeVariables().setHearingType(TYPE_FAST));
 
         try (MockedStatic<HearingUtils> mocked = mockStatic(HearingUtils.class)) {
             mocked.when(() -> hearingFeeRequired(TYPE_FAST)).thenReturn(true);
@@ -140,12 +140,11 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     void addCustomProperties_feeNonNull_populatesAllFields() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
-                .thenReturn(HearingNoticeVariables.builder()
-                        .hearingStartDateTime(START_DATE_TIME_1)
-                        .build());
+                .thenReturn(new HearingNoticeVariables()
+                        .setHearingStartDateTime(START_DATE_TIME_1));
         Fee fakeFee = mock(Fee.class);
         when(fakeFee.formData()).thenReturn("123.45");
 
@@ -175,12 +174,11 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     void addCustomProperties_feeNull_defaultsToZero() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
-                .thenReturn(HearingNoticeVariables.builder()
-                        .hearingStartDateTime(START_DATE_TIME_2)
-                        .build());
+                .thenReturn(new HearingNoticeVariables()
+                        .setHearingStartDateTime(START_DATE_TIME_2));
 
         try (MockedStatic<HearingFeeUtils> mocked = mockStatic(HearingFeeUtils.class);
              MockedStatic<NotificationUtils> mockedUtils = mockStatic(NotificationUtils.class)) {

@@ -79,8 +79,10 @@ public class SendFinalOrderBulkPrintService {
                                                                       caseDocuments.toArray(new CaseDocument[0]));
 
         List<String> recipients = List.of(recipient.getPartyName());
+        List<String> bulkPrintFileNames = new ArrayList<>();
+        caseDocuments.forEach(document -> bulkPrintFileNames.add(document.getDocumentLink().getDocumentFileName()));
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                     caseData.getLegacyCaseReference(), letterType, recipients);
+                                     caseData.getLegacyCaseReference(), letterType, recipients, bulkPrintFileNames);
     }
 
     private boolean checkFinalOrderDocumentAvailable(CaseData caseData, Language language) {
@@ -103,14 +105,11 @@ public class SendFinalOrderBulkPrintService {
     }
 
     private boolean checkTranslatedFinalOrderDocumentAvailable(CaseData caseData, String task) {
-        if (featureToggleService.isCaseProgressionEnabled()) {
-            List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-            return (!caseData.getSystemGeneratedCaseDocuments().isEmpty())
+        List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
+        return (!caseData.getSystemGeneratedCaseDocuments().isEmpty())
                 && isEligibleToGetTranslatedOrder(caseData, task)
                 && systemGeneratedDocuments
                 .get(systemGeneratedDocuments.size() - 1).getValue().getDocumentType().equals(ORDER_NOTICE_TRANSLATED_DOCUMENT);
-        }
-        return false;
     }
 
     private boolean isDefendantPrint(String task) {

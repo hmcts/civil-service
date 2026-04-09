@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -15,8 +15,9 @@ import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -47,6 +48,8 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService toggleService;
+    @Spy
+    private SdoCaseClassificationService sdoCaseClassificationService = new SdoCaseClassificationService();
 
     public static final String TASK_ID = "CreateHearingFeeUnpaidDashboardNotificationsForClaimant";
 
@@ -68,10 +71,6 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-        }
 
         @Test
         void shouldRecordScenario_notTrialReady_whenInvoked() {
@@ -81,13 +80,12 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateHearingFeeDueUnpaid().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .build();
+                .atStateHearingFeeDueUnpaid().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1.name()).build()
             ).build();
@@ -98,7 +96,7 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
                 caseData.getCcdCaseReference().toString(), "CLAIMANT");
@@ -124,7 +122,7 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -136,13 +134,12 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTrialReadyApplicant().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .build();
+                .atStateTrialReadyApplicant().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1.name()).build()
             ).build();
@@ -153,7 +150,7 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

@@ -47,13 +47,14 @@ public class PostDJNonDivergentPinInLetterLiPDefendant1HandlerTest extends BaseC
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
+        Party party = new Party();
+        party.setIndividualFirstName("FirstName");
+        party.setIndividualLastName("LastName");
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setPartyName("test");
+        party.setPartyEmail("email");
         CaseData caseData = CaseDataBuilder.builder()
-            .respondent1(Party.builder()
-                             .individualFirstName("FirstName")
-                             .individualLastName("LastName")
-                             .type(Party.Type.INDIVIDUAL)
-                             .partyName("test")
-                             .partyEmail("email").build())
+            .respondent1(party)
             .respondent1Represented(YesOrNo.NO)
             .build();
 

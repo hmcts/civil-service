@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,25 +15,31 @@ import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class JudgmentPaidInFullOnlineMapper extends JudgmentOnlineMapper {
+
+    public JudgmentPaidInFullOnlineMapper(Time time) {
+        super(time);
+    }
 
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData, LocalDate paymentDate) {
 
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
+        if (activeJudgment == null) {
+            activeJudgment = new JudgmentDetails();
+            caseData.setActiveJudgment(activeJudgment);
+        }
         JudgmentState state = getJudgmentState(caseData, paymentDate);
-        JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
-            .state(state)
-            .fullyPaymentMadeDate(nonNull(paymentDate) ? paymentDate : caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())
-            .lastUpdateTimeStamp(LocalDateTime.now())
-            .rtlState(getJudgmentRTLStatus(state))
-            .cancelledTimeStamp(JudgmentState.CANCELLED.equals(state) ? LocalDateTime.now() : null)
-            .cancelDate(JudgmentState.CANCELLED.equals(state) ? LocalDate.now() : null)
-            .build();
+        activeJudgment
+            .setState(state)
+            .setFullyPaymentMadeDate(nonNull(paymentDate) ? paymentDate : caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())
+            .setLastUpdateTimeStamp(LocalDateTime.now())
+            .setRtlState(getJudgmentRTLStatus(state))
+            .setCancelledTimeStamp(JudgmentState.CANCELLED.equals(state) ? LocalDateTime.now() : null)
+            .setCancelDate(JudgmentState.CANCELLED.equals(state) ? LocalDate.now() : null);
 
-        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
 
-        return activeJudgmentDetails;
+        return activeJudgment;
     }
 
     @Override

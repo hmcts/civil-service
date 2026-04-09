@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docum
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,23 +29,21 @@ class ApplicantOneDisclosureDocumentHandlerTest extends BaseDocumentHandlerTest 
 
     @Test
     void shouldCopyDisclosureDocumentsToLegalRep2() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getDocumentForDisclosureApp2().size());
+        assertEquals(2, caseData.getDocumentForDisclosureApp2().size());
     }
 
     @Test
     void shouldNotRenameDocuments() {
-        CaseData caseData = CaseData.builder()
-                .documentForDisclosureRes(List.of(
-                        Element.<UploadEvidenceDocumentType>builder()
-                                .value(UploadEvidenceDocumentType.builder()
-                                        .documentIssuedDate(LocalDate.of(2022, 2, 10))
-                                        .typeOfDocument("typeOfDocument")
-                                        .documentUpload(document)
-                                        .build())
-                                .build()))
-                .build();
+        UploadEvidenceDocumentType uploadEvidenceDocumentType = new UploadEvidenceDocumentType();
+        uploadEvidenceDocumentType.setDocumentIssuedDate(LocalDate.of(2022, 2, 10));
+        uploadEvidenceDocumentType.setTypeOfDocument("typeOfDocument");
+        uploadEvidenceDocumentType.setDocumentUpload(document);
+        Element<UploadEvidenceDocumentType> element = new Element<>();
+        element.setValue(uploadEvidenceDocumentType);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentForDisclosureRes(List.of(element));
 
         StringBuilder notificationBuilder = new StringBuilder();
         handler.handleDocuments(caseData, RESPONDENT, notificationBuilder);

@@ -25,9 +25,9 @@ class RespondentOneDisclosureListDocumentHandlerTest extends BaseDocumentHandler
 
     @Test
     void shouldCopyDisclosureListDocumentsToLegalRep2() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getDocumentDisclosureListRes2().size());
+        assertEquals(2, caseData.getDocumentDisclosureListRes2().size());
     }
 
     @Test

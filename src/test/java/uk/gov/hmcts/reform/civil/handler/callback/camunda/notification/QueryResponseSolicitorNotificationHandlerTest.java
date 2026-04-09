@@ -3,9 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -75,7 +74,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     private static final String TEMPLATE_ID_LIP_WELSH = "template-id-lip-welsh";
     private static final String TEMPLATE_PUBLIC_LIP_ID = "template-public-lip-id";
     private static final String TEMPLATE_PUBLIC_WELSH_LIP_ID = "template-public-welsh-lip-id";
-    private static final String TEMPLATE_PUBLIC_lR_ID = "template-public-lr-id";
+    private static final String TEMPLATE_PUBLIC_LR_ID = "template-public-lr-id";
     @Mock
     private NotificationService notificationService;
     @Mock
@@ -94,244 +93,87 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     private QueryResponseSolicitorNotificationHandler handler;
 
     private CaseData createCaseDataWithMultipleFollowUpQueries(OffsetDateTime now) {
-        CaseQueriesCollection caseQueriesCollection = CaseQueriesCollection.builder()
-            .caseMessages(wrapElements(
-                CaseMessage.builder()
-                    .id("1")
-                    .createdBy("LR")
-                    .build(),
-                CaseMessage.builder()
-                    .id("5")
-                    .createdBy("admin")
-                    .createdOn(now.minusHours(3))
-                    .parentId("1")
-                    .build(),
-                CaseMessage.builder()
-                    .id("6")
-                    .createdBy("LR")
-                    .createdOn(now.minusHours(2))
-                    .parentId("1")
-                    .build(),
-                CaseMessage.builder()
-                    .id("7")
-                    .createdBy("admin")
-                    .createdOn(now.minusHours(1))
-                    .parentId("1")
-                    .build(),
-                CaseMessage.builder()
-                    .id("7")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("1")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build(),
-                CaseMessage.builder()
-                    .id("2")
-                    .createdBy("LR")
-                    .build(),
-                CaseMessage.builder()
-                    .id("9")
-                    .createdBy("admin")
-                    .createdOn(now.minusHours(2))
-                    .parentId("2")
-                    .build(),
-                CaseMessage.builder()
-                    .id("10")
-                    .createdBy("LR")
-                    .createdOn(now.minusHours(1))
-                    .parentId("2")
-                    .build(),
-                CaseMessage.builder()
-                    .id("11")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("2")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build(),
-                CaseMessage.builder()
-                    .id("3")
-                    .createdBy("LR")
-                    .build(),
-                CaseMessage.builder()
-                    .id("13")
-                    .createdBy("admin")
-                    .createdOn(now.minusHours(2))
-                    .parentId("3")
-                    .build(),
-                CaseMessage.builder()
-                    .id("14")
-                    .createdBy("LR")
-                    .createdOn(now.minusHours(1))
-                    .parentId("3")
-                    .build(),
-                CaseMessage.builder()
-                    .id("15")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("3")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build(),
-                CaseMessage.builder()
-                    .id("5")
-                    .createdBy("Lip")
-                    .build(),
-                CaseMessage.builder()
-                    .id("13")
-                    .createdBy("admin")
-                    .createdOn(now.minusHours(2))
-                    .parentId("5")
-                    .build(),
-                CaseMessage.builder()
-                    .id("14")
-                    .createdBy("Lip")
-                    .createdOn(now.minusHours(1))
-                    .parentId("5")
-                    .build(),
-                CaseMessage.builder()
-                    .id("15")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("5")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build()
-            ))
-            .build();
+        CaseQueriesCollection caseQueriesCollection = new CaseQueriesCollection();
+        caseQueriesCollection.setCaseMessages(wrapElements(
+            createCaseMessage("1", "LR", null, null),
+            createCaseMessage("5", "admin", now.minusHours(3), "1"),
+            createCaseMessage("6", "LR", now.minusHours(2), "1"),
+            createCaseMessage("7", "admin", now.minusHours(1), "1"),
+            createCaseMessage("7", "admin", now, "1"),
+            createCaseMessage("8", "LR", now.plusDays(1), "80"),
+            createCaseMessage("2", "LR", null, null),
+            createCaseMessage("9", "admin", now.minusHours(2), "2"),
+            createCaseMessage("10", "LR", now.minusHours(1), "2"),
+            createCaseMessage("11", "admin", now, "2"),
+            createCaseMessage("8", "LR", now.plusDays(1), "80"),
+            createCaseMessage("3", "LR", null, null),
+            createCaseMessage("13", "admin", now.minusHours(2), "3"),
+            createCaseMessage("14", "LR", now.minusHours(1), "3"),
+            createCaseMessage("15", "admin", now, "3"),
+            createCaseMessage("8", "LR", now.plusDays(1), "80"),
+            createCaseMessage("5", "Lip", null, null),
+            createCaseMessage("13", "admin", now.minusHours(2), "5"),
+            createCaseMessage("14", "Lip", now.minusHours(1), "5"),
+            createCaseMessage("15", "admin", now, "5"),
+            createCaseMessage("8", "LR", now.plusDays(1), "80")
+        ));
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("applicant@email.com")
-                                                .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("applicant@email.com")
+                                                )
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .queries(caseQueriesCollection)
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("123")
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setProcessInstanceId("123"))
             .build();
     }
 
     private CaseData createCaseDataWithQueries(OffsetDateTime now) {
-        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
-            .caseMessages(wrapElements(
-                CaseMessage.builder()
-                    .id("1")
-                    .createdBy("LR")
-                    .createdOn(now)
-                    .build(),
-                CaseMessage.builder()
-                    .id("5")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("1")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build(),
-                CaseMessage.builder()
-                    .id("2")
-                    .createdBy("LR")
-                    .createdOn(now)
-                    .build(),
-                CaseMessage.builder()
-                    .id("9")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("2")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build(),
-                CaseMessage.builder()
-                    .id("3")
-                    .createdBy("LR")
-                    .createdOn(now)
-                    .build(),
-                CaseMessage.builder()
-                    .id("13")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("3")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build(),
-                CaseMessage.builder()
-                    .id("144")
-                    .createdBy("Lip")
-                    .build(),
-                CaseMessage.builder()
-                    .id("13")
-                    .createdBy("admin")
-                    .createdOn(now.minusHours(2))
-                    .parentId("144")
-                    .build(),
-                CaseMessage.builder()
-                    .id("14")
-                    .createdBy("Lip")
-                    .createdOn(now.minusHours(1))
-                    .parentId("144")
-                    .build(),
-                CaseMessage.builder()
-                    .id("15")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("144")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("Lip")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build()
-            ))
-            .build();
+        CaseQueriesCollection caseQueries = new CaseQueriesCollection();
+        caseQueries.setCaseMessages(wrapElements(
+            createCaseMessage("1", "LR", now, null),
+            createCaseMessage("5", "admin", now, "1"),
+            createCaseMessage("8", "LR", now.plusDays(1), "80"),
+            createCaseMessage("2", "LR", now, null),
+            createCaseMessage("9", "admin", now, "2"),
+            createCaseMessage("8", "LR", now.plusDays(1), "80"),
+            createCaseMessage("3", "LR", now, null),
+            createCaseMessage("13", "admin", now, "3"),
+            createCaseMessage("8", "LR", now.plusDays(1), "80"),
+            createCaseMessage("144", "Lip", null, null),
+            createCaseMessage("13", "admin", now.minusHours(2), "144"),
+            createCaseMessage("14", "Lip", now.minusHours(1), "144"),
+            createCaseMessage("15", "admin", now, "144"),
+            createCaseMessage("8", "Lip", now.plusDays(1), "80")
+        ));
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("applicant@email.com")
-                                                .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("applicant@email.com")
+                                                )
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .queries(caseQueries)
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("123")
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setProcessInstanceId("123"))
             .build();
     }
 
+    private CaseMessage createCaseMessage(String id, String createdBy, OffsetDateTime createdOn, String parentId) {
+        CaseMessage caseMessage = new CaseMessage();
+        caseMessage.setId(id);
+        caseMessage.setCreatedBy(createdBy);
+        caseMessage.setCreatedOn(createdOn);
+        caseMessage.setParentId(parentId);
+        return caseMessage;
+    }
+
     @NotNull
-    private Map<String, String> getNotificationDataForLip(LocalDateTime now, boolean publicQmEnabled) {
+    private Map<String, String> getNotificationDataForLip(LocalDateTime now) {
         Map<String, String> expectedProperties = new HashMap<>(Map.of(
             "partyReferences",
             "Claimant reference: 12345 - Defendant reference: 6789",
@@ -350,17 +192,11 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        if (publicQmEnabled) {
-            expectedProperties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
-            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
-            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
-        } else {
-            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
-            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
-        }
+
+        expectedProperties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+        expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
         return expectedProperties;
     }
 
@@ -391,9 +227,9 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @BeforeEach
         void setUp() {
             when(organisationService.findOrganisationById(any()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getQueryResponseReceived()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_lR_ID);
+            when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_LR_ID);
             when(notificationsProperties.getQueryLipWelshPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_WELSH_LIP_ID);
             when(notificationsProperties.getQueryLipPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_LIP_ID);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -408,14 +244,10 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldNotifyApplicantLR_whenResponseToQueryReceivedMultipleFollowUpQueries(boolean publicQuery) {
-            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
+        @Test
+        void shouldNotifyApplicantLR_whenResponseToQueryReceivedMultipleFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("7")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("7"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -428,20 +260,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "applicant@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
+                TEMPLATE_PUBLIC_LR_ID,
                 getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldNotifyRespondent1LR_whenResponseToQueryReceivedMultipleFollowUpQueries(boolean publicQuery) {
-            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
+        @Test
+        void shouldNotifyRespondent1LR_whenResponseToQueryReceivedMultipleFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("11")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("11"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -454,20 +282,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "respondent1@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
+                TEMPLATE_PUBLIC_LR_ID,
                 getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldNotifyRespondent2LR_whenResponseToQueryReceivedMultipleFollowUpQueries(boolean publicQuery) {
-            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
+        @Test
+        void shouldNotifyRespondent2LR_whenResponseToQueryReceivedMultipleFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("15")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("15"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -480,20 +304,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "respondent2@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
+                TEMPLATE_PUBLIC_LR_ID,
                 getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldNotifyApplicantLR_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
-            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
+        @Test
+        void shouldNotifyApplicantLR_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("5")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("5"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -506,20 +326,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "applicant@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
+                TEMPLATE_PUBLIC_LR_ID,
                 getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldNotifyRespondent1LR_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
-            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
+        @Test
+        void shouldNotifyRespondent1LR_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("9")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("9"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -532,20 +348,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "respondent1@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
+                TEMPLATE_PUBLIC_LR_ID,
                 getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldNotifyRespondent2LR_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
-            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
+        @Test
+        void shouldNotifyRespondent2LR_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("5")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("5"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -558,7 +370,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "respondent2@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
+                TEMPLATE_PUBLIC_LR_ID,
                 getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
@@ -591,7 +403,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapLipRes(LocalDateTime now, boolean publicQmEnabled) {
+        private Map<String, String> getNotificationDataMapLipRes(LocalDateTime now) {
             Map<String, String> expectedProperties = new HashMap<>(Map.of(
                 "partyReferences",
                 "Claimant reference: 12345 - Defendant reference: 6789",
@@ -610,28 +422,18 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            if (publicQmEnabled) {
-                expectedProperties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
-                expectedProperties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
-                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
-            } else {
-                expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
-                expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
-            }
+
+            expectedProperties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
             return expectedProperties;
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldNotifyClaimantLip_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
-            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
+        @Test
+        void shouldNotifyClaimantLip_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("5")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("5"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -646,20 +448,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "rambo@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_LIP_ID : TEMPLATE_ID_LIP,
-                getNotificationDataForLip(now.toLocalDateTime(), publicQuery),
+                TEMPLATE_PUBLIC_LIP_ID,
+                getNotificationDataForLip(now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldNotifyClaimantLipForBilingual_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
-            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
+        @Test
+        void shouldNotifyClaimantLipForBilingual_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("5")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("5"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -675,20 +473,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "rambo@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_WELSH_LIP_ID : TEMPLATE_ID_LIP_WELSH,
-                getNotificationDataForLip(now.toLocalDateTime(), publicQuery),
+                TEMPLATE_PUBLIC_WELSH_LIP_ID,
+                getNotificationDataForLip(now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldNotifyDefendantLip_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
-            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
+        @Test
+        void shouldNotifyDefendantLip_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("15")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("15"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -697,7 +491,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
-                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
                 .respondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -706,20 +500,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_LIP_ID : TEMPLATE_ID_LIP,
-                getNotificationDataMapLipRes(now.toLocalDateTime(), publicQuery),
+                TEMPLATE_PUBLIC_LIP_ID,
+                getNotificationDataMapLipRes(now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldNotifyDefendantLipBilingual_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
-            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
+        @Test
+        void shouldNotifyDefendantLipBilingual_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("15")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("15"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -728,9 +518,9 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
                 .respondent1Represented(YesOrNo.NO)
-                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
-                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
-                    RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build())
+                .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
+                .caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+                    new RespondentLiPResponse().setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -738,8 +528,8 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_WELSH_LIP_ID : TEMPLATE_ID_LIP_WELSH,
-                getNotificationDataMapLipRes(now.toLocalDateTime(), publicQuery),
+                TEMPLATE_PUBLIC_WELSH_LIP_ID,
+                getNotificationDataMapLipRes(now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }

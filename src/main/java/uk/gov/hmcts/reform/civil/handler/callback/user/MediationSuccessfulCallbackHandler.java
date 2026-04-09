@@ -52,10 +52,9 @@ public class MediationSuccessfulCallbackHandler extends CallbackHandler {
         List<Element<ManageDocument>> updatedManageDocumentsList =
             updateManageDocumentsListWithMediationAgreementDocument(callbackParams);
 
-        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(MEDIATION_SUCCESSFUL))
-            .manageDocuments(updatedManageDocumentsList)
-            .build();
+        CaseData caseDataUpdated = callbackParams.getCaseData();
+        caseDataUpdated.setBusinessProcess(BusinessProcess.ready(MEDIATION_SUCCESSFUL));
+        caseDataUpdated.setManageDocuments(updatedManageDocumentsList);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
@@ -72,11 +71,10 @@ public class MediationSuccessfulCallbackHandler extends CallbackHandler {
             .map(MediationSuccessful::getMediationAgreement);
 
         mediationAgreementDocument.ifPresent(document -> {
-            ManageDocument manageDocument = ManageDocument.builder()
-                .documentLink(document.getDocument())
-                .documentName(document.getName())
-                .documentType(DocumentTypeMapper.mapDocumentTypeToManageDocumentType(document.getDocumentType()))
-                .build();
+            ManageDocument manageDocument = new ManageDocument();
+            manageDocument.setDocumentLink(document.getDocument());
+            manageDocument.setDocumentName(document.getName());
+            manageDocument.setDocumentType(DocumentTypeMapper.mapDocumentTypeToManageDocumentType(document.getDocumentType()));
             manageDocumentsList.add(element(manageDocument));
         });
         return manageDocumentsList;

@@ -24,9 +24,9 @@ public abstract class ApplicantOneSolicitorDocumentHandler<T> extends LegalRepre
     }
 
     @Override
-    protected void applyDocumentUpdateToCollection(CaseData.CaseDataBuilder<?, ?> caseDetailsBuilder,
+    protected void applyDocumentUpdateToCollection(CaseData caseData,
                                                    List<Element<UploadEvidenceDocumentType>> finalAdditionalBundleDoc) {
-        caseDetailsBuilder.applicantDocsUploadedAfterBundle(finalAdditionalBundleDoc);
+        caseData.setApplicantDocsUploadedAfterBundle(finalAdditionalBundleDoc);
     }
 
 }

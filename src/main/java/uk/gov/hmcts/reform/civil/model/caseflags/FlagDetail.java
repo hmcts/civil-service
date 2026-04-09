@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.caseflags;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
@@ -9,19 +11,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class FlagDetail {
 
-    private final String name;
-    private final String subTypeValue;
-    private final String subTypeKey;
-    private final String otherDescription;
-    private final String flagComment;
-    private final LocalDateTime dateTimeModified;
-    private final LocalDateTime dateTimeCreated;
-    private final List<Element<String>> path;
-    private final YesOrNo hearingRelevant;
-    private final String flagCode;
-    private final String status;
+    private String name;
+    private String subTypeValue;
+    private String subTypeKey;
+    private String otherDescription;
+    private String flagComment;
+    private LocalDateTime dateTimeModified;
+    private LocalDateTime dateTimeCreated;
+    private List<Element<String>> path;
+    private YesOrNo hearingRelevant;
+    private String flagCode;
+    private String status;
 
 }

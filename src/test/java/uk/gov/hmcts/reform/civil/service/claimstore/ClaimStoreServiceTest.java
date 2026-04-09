@@ -50,32 +50,29 @@ public class ClaimStoreServiceTest {
     private static final LocalDate CREATE_DATE = LocalDate.of(2023, 1, 22);
     private static final LocalDateTime CREATE_DATETIME = CREATE_DATE.atTime(0, 0);
     private static final List<DashboardClaimInfo> EXPECTED_CLAIM_RESULT
-        = Arrays.asList(DashboardClaimInfo.builder()
-                            .claimNumber(
+        = Arrays.asList(new DashboardClaimInfo()
+                            .setClaimNumber(
                                 REFERENCE_NUMBER)
-                            .claimAmount(TOTAL_AMOUNT)
-                            .claimantName(CLAIMANT_NAME)
-                            .defendantName(
+                            .setClaimAmount(TOTAL_AMOUNT)
+                            .setClaimantName(CLAIMANT_NAME)
+                            .setDefendantName(
                                 DEFENDANT_NAME)
-                            .responseDeadline(
+                            .setResponseDeadline(
                                 RESPONSE_DEADLINE)
-                            .responseDeadlineTime(RESPONSE_DEADLINE.atStartOfDay())
-                            .ocmc(true)
-                            .createdDate(CREATE_DATETIME)
-                            .build());
+                            .setResponseDeadlineTime(RESPONSE_DEADLINE.atStartOfDay())
+                            .setOcmc(true)
+                            .setCreatedDate(CREATE_DATETIME));
 
     @BeforeEach
     void setUp() {
-        CmcClaim cmcClaim = CmcClaim.builder()
-            .claimData(ClaimData.builder()
-                           .defendants(Arrays.asList(CmcParty.builder().name(DEFENDANT_NAME).build()))
-                           .claimants(Arrays.asList(CmcParty.builder().name(CLAIMANT_NAME).build()))
-                           .build())
-            .referenceNumber(REFERENCE_NUMBER)
-            .responseDeadline(RESPONSE_DEADLINE)
-            .totalAmountTillToday(TOTAL_AMOUNT)
-            .createdAt(CREATE_DATETIME)
-            .build();
+        CmcClaim cmcClaim = new CmcClaim()
+            .setClaimData(new ClaimData()
+                           .setDefendants(Arrays.asList(new CmcParty().setName(DEFENDANT_NAME)))
+                           .setClaimants(Arrays.asList(new CmcParty().setName(CLAIMANT_NAME))))
+            .setReferenceNumber(REFERENCE_NUMBER)
+            .setResponseDeadline(RESPONSE_DEADLINE)
+            .setTotalAmountTillToday(TOTAL_AMOUNT)
+            .setCreatedAt(CREATE_DATETIME);
         given(claimStoreApi.getClaimsForClaimant(any(), any())).willReturn(Collections.singletonList(cmcClaim));
         given(claimStoreApi.getClaimsForDefendant(any(), any())).willReturn(Collections.singletonList(cmcClaim));
     }
@@ -114,7 +111,7 @@ public class ClaimStoreServiceTest {
 
     @Test
     void shouldReturnDefendantLinkStatusFalseIfLinked() {
-        given(claimStoreApi.isDefendantLinked(anyString())).willReturn(DefendantLinkStatus.builder().linked(true).build());
+        given(claimStoreApi.isDefendantLinked(anyString())).willReturn(new DefendantLinkStatus().setLinked(true));
         DefendantLinkStatus status = claimStoreService.isOcmcDefendantLinked("620MC123");
         verify(claimStoreApi).isDefendantLinked(anyString());
         assertTrue(status.isLinked());

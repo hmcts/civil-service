@@ -76,7 +76,6 @@ class DashboardClaimStatusFactoryTest {
 
     @BeforeEach
     void prepare() {
-        Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
         Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
     }
 
@@ -315,20 +314,17 @@ class DashboardClaimStatusFactoryTest {
                              .createdDate(LocalDateTime.now())
                              .id(CaseEvent.CREATE_SDO.name())
                              .build());
-        CaseDocument sdoDocument = CaseDocument.builder()
-            .documentType(DocumentType.SDO_ORDER)
-            .createdDatetime(LocalDateTime.now())
-            .build();
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        CaseDocument sdoDocument = new CaseDocument()
+            .setDocumentType(DocumentType.SDO_ORDER)
+            .setCreatedDatetime(LocalDateTime.now());
+        DynamicListElement selectedCourt = new DynamicListElement().setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
 
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.CASE_PROGRESSION)
             .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
             .totalClaimAmount(BigDecimal.valueOf(1000))
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
-                                                      .value(sdoDocument).build()))
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
+            .systemGeneratedCaseDocuments(List.of(new Element<CaseDocument>().setValue(sdoDocument)))
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .build();
@@ -384,13 +380,12 @@ class DashboardClaimStatusFactoryTest {
                              .id(CaseEvent.HEARING_SCHEDULED.name())
                              .build());
 
-        CaseDocument hearingForm = CaseDocument.builder()
-            .createdDatetime(LocalDateTime.now())
-            .documentType(DocumentType.HEARING_FORM)
-            .build();
+        CaseDocument hearingForm = new CaseDocument()
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentType(DocumentType.HEARING_FORM);
         List<Element<CaseDocument>> systemGenerated = new ArrayList<>(caseDataBuilder.build()
                                                                           .getSystemGeneratedCaseDocuments());
-        systemGenerated.add(Element.<CaseDocument>builder().value(hearingForm).build());
+        systemGenerated.add(new Element<CaseDocument>().setValue(hearingForm));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGenerated);
         CaseData caseData = caseDataBuilder.ccdState(CaseState.HEARING_READINESS).build();
         checkStatus(caseData, eventHistory,
@@ -411,10 +406,9 @@ class DashboardClaimStatusFactoryTest {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = previous.toBuilder()
             .caseBundles(List.of(new IdValue<>(
                 "bundle1",
-                Bundle.builder()
-                    .bundleHearingDate(Optional.of(previous.getHearingDate()))
-                    .createdOn(Optional.of(LocalDateTime.now()))
-                    .build()
+                new Bundle()
+                    .setBundleHearingDate(Optional.of(previous.getHearingDate()))
+                    .setCreatedOn(Optional.of(LocalDateTime.now()))
             )));
 
         DashboardClaimStatus expectedStatus = DashboardClaimStatus.BUNDLE_CREATED;
@@ -455,9 +449,8 @@ class DashboardClaimStatusFactoryTest {
         );
         CaseData caseData = previous.toBuilder()
             .hwfFeeType(FeeType.HEARING)
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.INVALID_HWF_REFERENCE)
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setHwfCaseEvent(CaseEvent.INVALID_HWF_REFERENCE))
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER,
@@ -475,9 +468,8 @@ class DashboardClaimStatusFactoryTest {
             new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
         );
         CaseData caseData = previous.toBuilder()
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER)
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setHwfCaseEvent(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER))
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER,
@@ -495,9 +487,8 @@ class DashboardClaimStatusFactoryTest {
             new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
         );
         CaseData caseData = previous.toBuilder()
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF)
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setHwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF))
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.HWF_MORE_INFORMATION_NEEDED,
@@ -515,9 +506,8 @@ class DashboardClaimStatusFactoryTest {
             new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
         );
         CaseData caseData = previous.toBuilder()
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.NO_REMISSION_HWF)
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setHwfCaseEvent(CaseEvent.NO_REMISSION_HWF))
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION,
@@ -535,9 +525,9 @@ class DashboardClaimStatusFactoryTest {
             new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
         );
         CaseData caseData = previous.toBuilder()
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME,
@@ -547,19 +537,16 @@ class DashboardClaimStatusFactoryTest {
     }
 
     private CaseData smallClaim(List<CaseEventDetail> eventHistory, FeatureToggleService toggleService) {
-        CaseDocument sdoDocument = CaseDocument.builder()
-            .documentType(DocumentType.SDO_ORDER)
-            .createdDatetime(LocalDateTime.now())
-            .build();
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        CaseDocument sdoDocument = new CaseDocument()
+            .setDocumentType(DocumentType.SDO_ORDER)
+            .setCreatedDatetime(LocalDateTime.now());
+        DynamicListElement selectedCourt = new DynamicListElement().setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.CASE_PROGRESSION)
             .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
             .totalClaimAmount(BigDecimal.valueOf(999))
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
-                                                      .value(sdoDocument).build()))
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
+            .systemGeneratedCaseDocuments(List.of(new Element<CaseDocument>().setValue(sdoDocument)))
             .build();
         if (toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())) {
             checkStatus(caseData, eventHistory,
@@ -586,9 +573,8 @@ class DashboardClaimStatusFactoryTest {
         CaseData caseData = previous.toBuilder()
             .ccdState(CaseState.HEARING_READINESS)
             .hwfFeeType(FeeType.HEARING)
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED)
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setHwfCaseEvent(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED))
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_PARTIAL_REMISSION,
@@ -617,9 +603,8 @@ class DashboardClaimStatusFactoryTest {
         CaseData caseData = previous.toBuilder()
             .ccdState(CaseState.HEARING_READINESS)
             .hwfFeeType(FeeType.HEARING)
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF)
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setHwfCaseEvent(CaseEvent.FULL_REMISSION_HWF))
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_FULL_REMISSION,
@@ -705,10 +690,9 @@ class DashboardClaimStatusFactoryTest {
                 previous.getFinalOrderDocumentCollection())
             .map(ArrayList::new)
             .orElseGet(ArrayList::new);
-        CaseDocument document = CaseDocument.builder()
-            .createdDatetime(created)
-            .build();
-        orderList.add(Element.<CaseDocument>builder().value(document).build());
+        CaseDocument document = new CaseDocument()
+            .setCreatedDatetime(created);
+        orderList.add(new Element<CaseDocument>().setValue(document));
         CaseData caseData = previous.toBuilder()
             .finalOrderDocumentCollection(orderList)
             .ccdState(orderType == OrderType.DIRECTIONS_ORDER_ALL ? CaseState.All_FINAL_ORDERS_ISSUED
@@ -733,9 +717,8 @@ class DashboardClaimStatusFactoryTest {
                              .createdDate(created)
                              .id(CaseEvent.COURT_OFFICER_ORDER.name())
                              .build());
-        CaseDocument document = CaseDocument.builder()
-            .createdDatetime(created)
-            .build();
+        CaseDocument document = new CaseDocument()
+            .setCreatedDatetime(created);
         CaseData caseData = previous.toBuilder()
             .ccdState(CaseState.CASE_PROGRESSION)
             .previewCourtOfficerOrder(document)
@@ -771,29 +754,43 @@ class DashboardClaimStatusFactoryTest {
         eventHistory.replaceAll(caseEventDetail -> caseEventDetail.toBuilder()
             .createdDate(caseEventDetail.getCreatedDate().minusDays(deltaDays))
             .build());
-        builder.systemGeneratedCaseDocuments(
-            previous.getSystemGeneratedCaseDocuments().stream()
-                .map(e -> {
-                    CaseDocument old = e.getValue();
-                    return Element.<CaseDocument>builder()
-                        .value(moveToThePast(old, deltaDays))
-                        .build();
-                }).toList());
+        if (previous.getSystemGeneratedCaseDocuments() != null) {
+            builder.systemGeneratedCaseDocuments(
+                previous.getSystemGeneratedCaseDocuments().stream()
+                    .map(e -> new Element<CaseDocument>().setValue(moveToThePast(e.getValue(), deltaDays))).toList());
+        }
         builder.previewCourtOfficerOrder(
             Optional.ofNullable(previous.getPreviewCourtOfficerOrder())
-                .map(c -> c.toBuilder().createdDatetime(c.getCreatedDatetime().minusDays(deltaDays)).build())
+                .map(c -> new CaseDocument()
+                    .setDocumentLink(c.getDocumentLink())
+                    .setDocumentName(c.getDocumentName())
+                    .setDocumentType(c.getDocumentType())
+                    .setDocumentSize(c.getDocumentSize())
+                    .setCreatedDatetime(c.getCreatedDatetime().minusDays(deltaDays))
+                    .setCreatedBy(c.getCreatedBy())
+                    .setOwnedBy(c.getOwnedBy()))
                 .orElse(null));
-        builder.finalOrderDocumentCollection(
-            previous.getFinalOrderDocumentCollection().stream()
-                .map(e -> Element.<CaseDocument>builder()
-                    .value(moveToThePast(e.getValue(), deltaDays))
-                    .build()).toList()
-        );
+        if (previous.getFinalOrderDocumentCollection() != null) {
+            builder.finalOrderDocumentCollection(
+                previous.getFinalOrderDocumentCollection().stream()
+                    .map(e -> new Element<CaseDocument>().setValue(moveToThePast(e.getValue(), deltaDays))).toList()
+            );
+        }
         return builder.build();
     }
 
     private static CaseDocument moveToThePast(CaseDocument c, int days) {
-        return c.toBuilder().createdDatetime(c.getCreatedDatetime().minusDays(days)).build();
+        if (c == null) {
+            return null;
+        }
+        return new CaseDocument()
+            .setDocumentLink(c.getDocumentLink())
+            .setDocumentName(c.getDocumentName())
+            .setDocumentType(c.getDocumentType())
+            .setDocumentSize(c.getDocumentSize())
+            .setCreatedDatetime(c.getCreatedDatetime().minusDays(days))
+            .setCreatedBy(c.getCreatedBy())
+            .setOwnedBy(c.getOwnedBy());
     }
 
     static Stream<Arguments> caseToExpectedStatus() {
@@ -854,30 +851,25 @@ class DashboardClaimStatusFactoryTest {
     private static Stream<Arguments> provideSDOOrderCreatedPreCPScenarios() {
         LocalDateTime beforeTargetDate = LocalDateTime.of(2024, 12, 4, 23, 59);
         LocalDateTime afterTargetDate = LocalDateTime.of(2024, 12, 5, 0, 1);
-        CaseDocument sdoDocumentBefore = CaseDocument.builder()
-            .documentType(DocumentType.SDO_ORDER)
-            .createdDatetime(beforeTargetDate)
-            .build();
-        CaseDocument sdoDocumentAfter = CaseDocument.builder()
-            .documentType(DocumentType.SDO_ORDER)
-            .createdDatetime(afterTargetDate)
-            .build();
+        CaseDocument sdoDocumentBefore = new CaseDocument()
+            .setDocumentType(DocumentType.SDO_ORDER)
+            .setCreatedDatetime(beforeTargetDate);
+        CaseDocument sdoDocumentAfter = new CaseDocument()
+            .setDocumentType(DocumentType.SDO_ORDER)
+            .setCreatedDatetime(afterTargetDate);
 
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        DynamicListElement selectedCourt = new DynamicListElement().setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
 
         CaseData caseData1 = CaseData.builder()
             .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
-                                                 .value(sdoDocumentBefore).build()))
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
+            .systemGeneratedCaseDocuments(List.of(new Element<CaseDocument>().setValue(sdoDocumentBefore)))
             .build();
 
         CaseData caseData2 = CaseData.builder()
             .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
-                                                      .value(sdoDocumentAfter).build()))
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
+            .systemGeneratedCaseDocuments(List.of(new Element<CaseDocument>().setValue(sdoDocumentAfter)))
             .build();
 
         return Stream.of(
@@ -892,9 +884,7 @@ class DashboardClaimStatusFactoryTest {
         eventHistory.add(CaseEventDetail.builder().id("GENERATE_DIRECTIONS_ORDER").createdDate(LocalDateTime.now()).build());
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .preTranslationDocuments(List.of(element(CaseDocument.builder().documentType(DocumentType.HEARING_FORM).build())))
-
-            .build();
+            .preTranslationDocuments(List.of(element(new CaseDocument().setDocumentType(DocumentType.HEARING_FORM)))).build();
 
         DashboardClaimStatus claimantStatus = claimStatusFactory.getDashboardClaimStatus(
             new CcdDashboardClaimantClaimMatcher(caseData, toggleService, eventHistory)

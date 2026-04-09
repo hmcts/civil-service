@@ -24,9 +24,9 @@ class RespondentOneWitnessSummaryDocumentHandlerTest extends BaseDocumentHandler
 
     @Test
     void shouldCopyWitnessSummaryDocumentsToLegalRep2() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getDocumentWitnessSummaryRes2().size());
+        assertEquals(2, caseData.getDocumentWitnessSummaryRes2().size());
     }
 
     @Test

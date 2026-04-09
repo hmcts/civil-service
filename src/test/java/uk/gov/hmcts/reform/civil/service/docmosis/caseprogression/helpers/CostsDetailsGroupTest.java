@@ -34,50 +34,49 @@ public class CostsDetailsGroupTest {
     void shouldPopulateCostsDetails_WhenAllFieldsArePresent() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .makeAnOrderForCostsYesOrNo(YES)
-                                                  .assistedOrderAssessmentSecondDropdownList1(INDEMNITY_BASIS)
-                                                  .assistedOrderAssessmentSecondDropdownList2(CostEnums.YES)
-                                                  .makeAnOrderForCostsList(CLAIMANT)
-                                                  .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L)) // £100
-                                                  .assistedOrderCostsFirstDropdownDate(LocalDate.of(2023, 12, 31))
-                                                  .assistedOrderClaimantDefendantFirstDropdown(COSTS)
-                                                  .build())
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
+                                                  .setMakeAnOrderForCostsYesOrNo(YES)
+                                                  .setAssistedOrderAssessmentSecondDropdownList1(INDEMNITY_BASIS)
+                                                  .setAssistedOrderAssessmentSecondDropdownList2(CostEnums.YES)
+                                                  .setMakeAnOrderForCostsList(CLAIMANT)
+                                                  .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L)) // £100
+                                                  .setAssistedOrderCostsFirstDropdownDate(LocalDate.of(2023, 12, 31))
+                                                  .setAssistedOrderClaimantDefendantFirstDropdown(COSTS))
             .publicFundingCostsProtection(YES)
             .build();
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = costsDetailsGroup.populateCostsDetails(builder, caseData);
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = costsDetailsGroup.populateCostsDetails(form, caseData);
 
-        Assertions.assertNull(builder.build().getCostsReservedText());
+        Assertions.assertNull(form.getCostsReservedText());
         Assertions.assertEquals(
             "The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
                              + "in the sum of £100.00. Such sum shall be paid by 4pm on",
-            builder.build().getSummarilyAssessed());
-        Assertions.assertEquals(LocalDate.of(2023, 12, 31), builder.build().getSummarilyAssessedDate());
+            form.getSummarilyAssessed());
+        Assertions.assertEquals(LocalDate.of(2023, 12, 31), form.getSummarilyAssessedDate());
     }
 
     @Test
     void shouldReturnNull_WhenSummarilyAssessedCostsAreNotPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .makeAnOrderForCostsYesOrNo(YES).build())
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
+                                                  .setMakeAnOrderForCostsYesOrNo(YES))
                                                   .publicFundingCostsProtection(YES).build();
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = costsDetailsGroup.populateCostsDetails(builder, caseData);
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = costsDetailsGroup.populateCostsDetails(form, caseData);
 
-        Assertions.assertNull(builder.build().getSummarilyAssessed());
-        Assertions.assertNull(builder.build().getSummarilyAssessedDate());
+        Assertions.assertNull(form.getSummarilyAssessed());
+        Assertions.assertNull(form.getSummarilyAssessedDate());
     }
 
     @Test
     void testPopulateInterimPaymentText() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails
-                                                  .builder().assistedOrderAssessmentThirdDropdownAmount(BigDecimal.valueOf(
-                    10000L)).build())
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
+                                                  .setAssistedOrderAssessmentThirdDropdownAmount(BigDecimal.valueOf(
+                    10000L)))
             .build();
         String response = costsDetailsGroup.populateInterimPaymentText(caseData);
         assertEquals(format(
@@ -88,14 +87,14 @@ public class CostsDetailsGroupTest {
     @Test
     void testPopulateSummarilyAssessedText() {
         CaseData caseDataClaimant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .makeAnOrderForCostsList(CLAIMANT)
-                                                  .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L)).build())
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
+                                                  .setMakeAnOrderForCostsList(CLAIMANT)
+                                                  .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L)))
             .build();
         CaseData caseDataDefendant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .makeAnOrderForCostsList(DEFENDANT)
-                                                  .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L)).build())
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
+                                                  .setMakeAnOrderForCostsList(DEFENDANT)
+                                                  .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L)))
             .build();
         String responseClaimant = costsDetailsGroup.populateSummarilyAssessedText(caseDataClaimant);
         String responseDefendant = costsDetailsGroup.populateSummarilyAssessedText(caseDataDefendant);
@@ -114,14 +113,14 @@ public class CostsDetailsGroupTest {
     @Test
     void testPopulateDetailedAssessmentText() {
         CaseData caseDataClaimant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .assistedOrderAssessmentSecondDropdownList1(INDEMNITY_BASIS)
-                                                  .makeAnOrderForCostsList(CLAIMANT).build())
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
+                                                  .setAssistedOrderAssessmentSecondDropdownList1(INDEMNITY_BASIS)
+                                                  .setMakeAnOrderForCostsList(CLAIMANT))
             .build();
         CaseData caseDataDefendant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .assistedOrderAssessmentSecondDropdownList1(COSTS)
-                                                  .makeAnOrderForCostsList(DEFENDANT).build())
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
+                                                  .setAssistedOrderAssessmentSecondDropdownList1(COSTS)
+                                                  .setMakeAnOrderForCostsList(DEFENDANT))
             .build();
         String responseClaimant = costsDetailsGroup.populateDetailedAssessmentText(caseDataClaimant);
         String responseDefendant = costsDetailsGroup.populateDetailedAssessmentText(caseDataDefendant);

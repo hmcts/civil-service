@@ -31,9 +31,9 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
 
         String caseId = "1234678914";
         LocalDateTime respondent1SettlementDeadline = LocalDateTime.now().plusDays(7);
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-            .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                       .applicant1SignedSettlementAgreement(YesOrNo.YES).build()).build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP()
+            .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                       .setApplicant1SignedSettlementAgreement(YesOrNo.YES));
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
             .toBuilder()
@@ -47,10 +47,10 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
             .respondent1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTestForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .ccdState(CaseState.CASE_SETTLED)
-            .respondToAdmittedClaim(RespondToClaim.builder()
-                                        .howMuchWasPaid(BigDecimal.valueOf(300000))
-                                        .whenWasThisAmountPaid(LocalDate.of(2024, 3, 16))
-                                        .build())
+            .respondToAdmittedClaim(new RespondToClaim()
+                                        .setHowMuchWasPaid(BigDecimal.valueOf(300000))
+                                        .setWhenWasThisAmountPaid(LocalDate.of(2024, 3, 16))
+                                        )
             .respondent1RespondToSettlementAgreementDeadline(respondent1SettlementDeadline)
             .build();
 

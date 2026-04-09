@@ -1,27 +1,25 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.sdo;
 
-import lombok.Getter;
-import lombok.Builder;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 import java.time.LocalDate;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-@ToString
+@Accessors(chain = true)
 public class LiPRequestForReconsiderationForm implements MappableObject {
 
-    private final String caseNumber;
+    private String caseNumber;
 
-    private final LocalDate currentDate;
-    private final String countyCourt;
-    private final String partyName;
-    private final Address partyAddress;
-    private final String requestReason;
+    private LocalDate currentDate;
+    private String countyCourt;
+    private String partyName;
+    private Address partyAddress;
+    private String requestReason;
 }

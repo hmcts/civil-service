@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -63,18 +64,6 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
     }
 
     @Test
-    void shouldNotCallRecordScenario_whenCaseProgressionIsDisabled() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-            .build();
-
-        handler.handle(callbackParams);
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
@@ -88,19 +77,18 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
     @Test
     void createDashboardNotifications() {
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
+        locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .responseClaimTrack("FAST_CLAIM")
-            .respondent1Represented(YesOrNo.NO)
-            .build().toBuilder().hearingLocation(list).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setResponseClaimTrack("FAST_CLAIM");
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setHearingLocation(list);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -111,7 +99,7 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         recordScenarioForTrialArrangementsAndDocumentsUpload(caseData);
     }
@@ -119,17 +107,16 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
     @Test
     void doNotCreateDashboardNotifications() {
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.YES)
-            .build().toBuilder().hearingLocation(list).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setHearingLocation(list);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -144,13 +131,13 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }

@@ -117,13 +117,13 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v1() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("1530")
@@ -148,13 +148,13 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v1AndNoSolicitorReferences() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("1530")
@@ -180,19 +180,19 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v1AndNoSolicitorReferencesForDef1() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("1530")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .solicitorReferences(SolicitorReferences.builder().build())
+                .solicitorReferences(new SolicitorReferences())
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
@@ -212,21 +212,21 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvokedNoFeeAnd1v2() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .respondentSolicitor2EmailAddress("respondent2email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("1530")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YES)
-                .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
-                .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference("6789").build())
+                .respondent2(new Party().setType(Party.Type.COMPANY).setCompanyName("Party2"))
+                .solicitorReferences(new SolicitorReferences().setRespondentSolicitor1Reference("6789"))
                 .respondentSolicitor2Reference("10111213")
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -249,21 +249,21 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvokedNoFeeAnd1v2WithSameSolicitor() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .respondentSolicitor2EmailAddress(null)
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("1530")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YES)
-                .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
-                .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference("6789").build())
+                .respondent2(new Party().setType(Party.Type.COMPANY).setCompanyName("Party2"))
+                .solicitorReferences(new SolicitorReferences().setRespondentSolicitor1Reference("6789"))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT2_HEARING").build()).build();
@@ -286,13 +286,13 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd2v1() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("1530")
@@ -331,14 +331,14 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .respondent1Represented(YesOrNo.NO)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .applicant1(Party.builder()
-                                .individualFirstName("John")
-                                .individualLastName("Doe")
-                                .partyName("John").partyEmail("applicant1@example.com").type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder()
-                                 .individualFirstName("John")
-                                 .individualLastName("Doe")
-                                 .partyName("Mark").partyEmail("respondent1@example.com").type(Party.Type.INDIVIDUAL).build())
+                .applicant1(new Party()
+                                .setIndividualFirstName("John")
+                                .setIndividualLastName("Doe")
+                                .setPartyName("John").setPartyEmail("applicant1@example.com").setType(Party.Type.INDIVIDUAL))
+                .respondent1(new Party()
+                                 .setIndividualFirstName("John")
+                                 .setIndividualLastName("Doe")
+                                 .setPartyName("Mark").setPartyEmail("respondent1@example.com").setType(Party.Type.INDIVIDUAL))
                 .hearingReferenceNumber("000HN001")
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -357,13 +357,12 @@ public class NotificationDefendantOfHearingHandlerTest {
         void shouldNotifyRespondentLip_whenInvokedAnd1v1HMC() {
             // When
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
-                                .hearingStartDateTime(java.time.LocalDateTime.of(
+                .thenReturn(new uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables()
+                                .setHearingStartDateTime(java.time.LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     java.time.LocalTime.of(13, 0)
                                 ))
-                                .hearingId("123456")
-                                .build());
+                                .setHearingId("123456"));
             when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
                 .thenReturn("test-template-defendant-lip-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -377,16 +376,16 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .respondent1Represented(YesOrNo.NO)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .applicant1(Party.builder()
-                                .individualFirstName("John")
-                                .individualLastName("Doe")
-                                .partyName("John").partyEmail("applicant1@example.com").type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder()
-                                 .individualFirstName("John")
-                                 .individualLastName("Doe")
-                                 .partyName("Mark").partyEmail("respondent1@example.com").type(Party.Type.INDIVIDUAL).build())
+                .applicant1(new Party()
+                                .setIndividualFirstName("John")
+                                .setIndividualLastName("Doe")
+                                .setPartyName("John").setPartyEmail("applicant1@example.com").setType(Party.Type.INDIVIDUAL))
+                .respondent1(new Party()
+                                 .setIndividualFirstName("John")
+                                 .setIndividualLastName("Doe")
+                                 .setPartyName("Mark").setPartyEmail("respondent1@example.com").setType(Party.Type.INDIVIDUAL))
                 .hearingReferenceNumber("000HN001")
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING_HMC").build()).build();
@@ -411,11 +410,9 @@ public class NotificationDefendantOfHearingHandlerTest {
 
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                             .build())
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .hearingTimeHourMinute("1100")
@@ -424,14 +421,14 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
 
-                .applicant1(Party.builder()
-                                .individualFirstName("John")
-                                .individualLastName("Doe")
-                                .partyName("John").partyEmail("applicant1@example.com").type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder()
-                                 .individualFirstName("John")
-                                 .individualLastName("Doe")
-                                 .partyName("Mark").partyEmail("respondent1@example.com").type(Party.Type.INDIVIDUAL).build())
+                .applicant1(new Party()
+                                .setIndividualFirstName("John")
+                                .setIndividualLastName("Doe")
+                                .setPartyName("John").setPartyEmail("applicant1@example.com").setType(Party.Type.INDIVIDUAL))
+                .respondent1(new Party()
+                                 .setIndividualFirstName("John")
+                                 .setIndividualLastName("Doe")
+                                 .setPartyName("Mark").setPartyEmail("respondent1@example.com").setType(Party.Type.INDIVIDUAL))
                 .hearingReferenceNumber("000HN001")
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -463,18 +460,18 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .respondent1Represented(YesOrNo.NO)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YES)
-                .applicant1(Party.builder()
-                                .individualFirstName("John")
-                                .individualLastName("Doe")
-                                .partyName("John").partyEmail("applicant1@example.com").type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder()
-                                 .individualFirstName("John")
-                                 .individualLastName("Doe")
-                                 .partyName("Mark").partyEmail("respondent1@example.com").type(Party.Type.INDIVIDUAL).build())
-                .respondent2(Party.builder()
-                                 .individualFirstName("John")
-                                 .individualLastName("Doe")
-                                 .partyName("Peter").partyEmail("respondent2@example.com").type(Party.Type.INDIVIDUAL).build())
+                .applicant1(new Party()
+                                .setIndividualFirstName("John")
+                                .setIndividualLastName("Doe")
+                                .setPartyName("John").setPartyEmail("applicant1@example.com").setType(Party.Type.INDIVIDUAL))
+                .respondent1(new Party()
+                                 .setIndividualFirstName("John")
+                                 .setIndividualLastName("Doe")
+                                 .setPartyName("Mark").setPartyEmail("respondent1@example.com").setType(Party.Type.INDIVIDUAL))
+                .respondent2(new Party()
+                                 .setIndividualFirstName("John")
+                                 .setIndividualLastName("Doe")
+                                 .setPartyName("Peter").setPartyEmail("respondent2@example.com").setType(Party.Type.INDIVIDUAL))
                 .hearingReferenceNumber("000HN001")
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -508,18 +505,18 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .respondent1Represented(YesOrNo.NO)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YES)
-                .applicant1(Party.builder()
-                                .individualFirstName("John")
-                                .individualLastName("Doe")
-                                .partyName("John").partyEmail("applicant1@example.com").type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder()
-                                 .individualFirstName("John")
-                                 .individualLastName("Doe")
-                                 .partyName("Mark").partyEmail("respondent1@example.com").type(Party.Type.INDIVIDUAL).build())
-                .respondent2(Party.builder()
-                                 .individualFirstName("John")
-                                 .individualLastName("Doe")
-                                 .partyName("Peter").partyEmail("respondent2@example.com").type(Party.Type.INDIVIDUAL).build())
+                .applicant1(new Party()
+                                .setIndividualFirstName("John")
+                                .setIndividualLastName("Doe")
+                                .setPartyName("John").setPartyEmail("applicant1@example.com").setType(Party.Type.INDIVIDUAL))
+                .respondent1(new Party()
+                                 .setIndividualFirstName("John")
+                                 .setIndividualLastName("Doe")
+                                 .setPartyName("Mark").setPartyEmail("respondent1@example.com").setType(Party.Type.INDIVIDUAL))
+                .respondent2(new Party()
+                                 .setIndividualFirstName("John")
+                                 .setIndividualLastName("Doe")
+                                 .setPartyName("Peter").setPartyEmail("respondent2@example.com").setType(Party.Type.INDIVIDUAL))
                 .hearingReferenceNumber("000HN001")
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -553,18 +550,18 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .respondent1Represented(YesOrNo.NO)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YES)
-                .applicant1(Party.builder()
-                                .individualFirstName("John")
-                                .individualLastName("Doe")
-                                .partyName("John").partyEmail("applicant1@example.com").type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder()
-                                 .individualFirstName("John")
-                                 .individualLastName("Doe")
-                                 .partyName("Mark").partyEmail("respondent1@example.com").type(Party.Type.INDIVIDUAL).build())
-                .respondent2(Party.builder()
-                                 .individualFirstName("John")
-                                 .individualLastName("Doe")
-                                 .partyName("Peter").type(Party.Type.INDIVIDUAL).build())
+                .applicant1(new Party()
+                                .setIndividualFirstName("John")
+                                .setIndividualLastName("Doe")
+                                .setPartyName("John").setPartyEmail("applicant1@example.com").setType(Party.Type.INDIVIDUAL))
+                .respondent1(new Party()
+                                 .setIndividualFirstName("John")
+                                 .setIndividualLastName("Doe")
+                                 .setPartyName("Mark").setPartyEmail("respondent1@example.com").setType(Party.Type.INDIVIDUAL))
+                .respondent2(new Party()
+                                 .setIndividualFirstName("John")
+                                 .setIndividualLastName("Doe")
+                                 .setPartyName("Peter").setType(Party.Type.INDIVIDUAL))
                 .hearingReferenceNumber("000HN001")
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -584,28 +581,27 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v1HMC() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             // When
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
-                                .hearingStartDateTime(java.time.LocalDateTime.of(
+                .thenReturn(new uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables()
+                                .setHearingStartDateTime(java.time.LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     java.time.LocalTime.of(15, 30)
                                 ))
-                                .hearingId("123456")
-                                .build());
+                                .setHearingId("123456"));
             when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC())
                 .thenReturn("test-template-no-fee-defendant-id-hmc");
 
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING_HMC").build()).build();
@@ -622,31 +618,30 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v2DS_HMC() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .respondentSolicitor2EmailAddress("respondent2email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.YES)
-                .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .respondent2(new Party().setType(Party.Type.COMPANY).setCompanyName("Party2"))
+                .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build().toBuilder()
                 .respondentSolicitor2Reference("6789").build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT2_HEARING_HMC").build()).build();
             // When
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
-                                .hearingStartDateTime(java.time.LocalDateTime.of(
+                .thenReturn(new uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables()
+                                .setHearingStartDateTime(java.time.LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     java.time.LocalTime.of(15, 30)
                                 ))
-                                .hearingId("123456")
-                                .build());
+                                .setHearingId("123456"));
             when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC())
                 .thenReturn("test-template-no-fee-defendant-id-hmc");
             handler.handle(params);

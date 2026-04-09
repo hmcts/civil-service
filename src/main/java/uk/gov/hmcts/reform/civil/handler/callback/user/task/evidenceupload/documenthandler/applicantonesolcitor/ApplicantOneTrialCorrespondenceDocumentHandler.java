@@ -39,8 +39,8 @@ public class ApplicantOneTrialCorrespondenceDocumentHandler extends
     }
 
     @Override
-    protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
-        builder.documentEvidenceForTrialApp2(evidenceDocsToAdd);
+    protected void addDocumentsToCopyToCaseData(CaseData caseData, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
+        caseData.setDocumentEvidenceForTrialApp2(evidenceDocsToAdd);
 
     }
 

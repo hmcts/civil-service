@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -13,6 +14,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getApplicant1NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getApplicant2NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameWithLitigiousFriend;
 
 public class JudgmentOnlineUtils {
 
@@ -66,39 +70,50 @@ public class JudgmentOnlineUtils {
         return null;
     }
 
-    public static List<Party> getApplicant(uk.gov.hmcts.reform.civil.model.Party applicant1,
-                                           uk.gov.hmcts.reform.civil.model.Party applicant2) {
+    public static List<Party> getApplicants(CaseData caseData) {
+        uk.gov.hmcts.reform.civil.model.Party applicant1 = caseData.getApplicant1();
+        uk.gov.hmcts.reform.civil.model.Party applicant2 = caseData.getApplicant2();
 
         List<Party> applicants = new ArrayList<>();
-        applicants.add(Party.builder()
-                           .name(applicant1.getPartyName())
-                           .primaryAddress(applicant1.getPrimaryAddress())
-                           .build());
+        applicants.add(new Party()
+                           .setName(getApplicant1NameWithLitigiousFriend(caseData))
+                           .setPrimaryAddress(applicant1.getPrimaryAddress()));
         if (applicant2 != null) {
-            applicants.add(Party.builder()
-                               .name(" and " + applicant2.getPartyName())
-                               .primaryAddress(applicant2.getPrimaryAddress())
-                               .build());
+            applicants.add(new Party()
+                               .setName(" and " + getApplicant2NameWithLitigiousFriend(caseData))
+                               .setPrimaryAddress(applicant2.getPrimaryAddress()));
         }
         return applicants;
     }
 
     public static Address getAddress(ContactInformation address) {
-        return Address.builder().addressLine1(address.getAddressLine1())
-            .addressLine2(address.getAddressLine2())
-            .addressLine3(address.getAddressLine3())
-            .country(address.getCountry())
-            .county(address.getCounty())
-            .postCode(address.getPostCode())
-            .postTown(address.getTownCity())
-            .build();
+        Address result = new Address();
+        result.setAddressLine1(address.getAddressLine1());
+        result.setAddressLine2(address.getAddressLine2());
+        result.setAddressLine3(address.getAddressLine3());
+        result.setCountry(address.getCountry());
+        result.setCounty(address.getCounty());
+        result.setPostCode(address.getPostCode());
+        result.setPostTown(address.getTownCity());
+        return result;
     }
 
-    public static Party getPartyDetails(uk.gov.hmcts.reform.civil.model.Party party) {
-        return Party.builder()
-            .name(party.getPartyName())
-            .primaryAddress(party.getPrimaryAddress())
-            .build();
+    public static Party getApplicant1Details(CaseData caseData) {
+        return getPartyDetails(caseData.getApplicant1LitigationFriend(), caseData.getApplicant1());
+    }
+
+    public static Party getRespondent1Details(CaseData caseData) {
+        return getPartyDetails(caseData.getRespondent1LitigationFriend(), caseData.getRespondent1());
+    }
+
+    public static Party getRespondent2Details(CaseData caseData) {
+        return getPartyDetails(caseData.getRespondent2LitigationFriend(), caseData.getRespondent2());
+    }
+
+    public static Party getPartyDetails(LitigationFriend litigationFriend, uk.gov.hmcts.reform.civil.model.Party party) {
+        return new Party()
+            .setName(getPartyNameWithLitigiousFriend(party, litigationFriend))
+            .setPrimaryAddress(party.getPrimaryAddress());
     }
 
     public static Party getOrgDetails(OrganisationPolicy organisationPolicy, OrganisationService organisationService) {
@@ -106,10 +121,9 @@ public class JudgmentOnlineUtils {
             .map(OrganisationPolicy::getOrganisation)
             .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
             .map(organisationService::findOrganisationById)
-            .flatMap(value -> value.map(o -> Party.builder()
-                .name(o.getName())
-                .primaryAddress(getAddress(o.getContactInformation().get(0)))
-                .build())).orElse(null);
+            .flatMap(value -> value.map(o -> new Party()
+                .setName(o.getName())
+                .setPrimaryAddress(getAddress(o.getContactInformation().get(0))))).orElse(null);
     }
 
 }

@@ -47,29 +47,25 @@ class Applicant1DQTest extends DQTest {
         String lengthHours = "6";
         YesOrNo hasUnavailableDates = YES;
         List<Element<UnavailableDate>> lrDates = Stream.of(
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.of(2020, 5, 2))
-                .who("who 1")
-                .build(),
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .fromDate(LocalDate.of(2020, 5, 2))
-                .toDate(LocalDate.of(2020, 6, 2))
-                .who("who 2")
-                .build()
-        ).map(ElementUtils::element).toList();
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.of(2020, 5, 2))
+                .setWho("who 1"),
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setFromDate(LocalDate.of(2020, 5, 2))
+                .setToDate(LocalDate.of(2020, 6, 2))
+                .setWho("who 2")).map(ElementUtils::element).toList();
 
-        Hearing hearing = buildApplicant1Dq().toBuilder()
-            .applicant1DQHearing(null)
-            .applicant1DQHearingLRspec(Hearing.builder()
-                                               .hearingLength(length)
-                                               .hearingLengthDays(lengthDays)
-                                               .hearingLengthHours(lengthHours)
-                                               .unavailableDatesRequired(hasUnavailableDates)
-                                               .unavailableDates(lrDates)
-                                               .build())
-            .build().getHearing();
+        Hearing hearing = buildApplicant1Dq().copy()
+            .setApplicant1DQHearing(null)
+            .setApplicant1DQHearingLRspec(new Hearing()
+                                              .setHearingLength(length)
+                                              .setHearingLengthDays(lengthDays)
+                                              .setHearingLengthHours(lengthHours)
+                                              .setUnavailableDatesRequired(hasUnavailableDates)
+                                              .setUnavailableDates(lrDates))
+            .getHearing();
 
         assertThat(hearing.getHearingLength()).isEqualTo(length);
         assertThat(hearing.getHearingLengthDays()).isEqualTo(lengthDays);
@@ -90,26 +86,22 @@ class Applicant1DQTest extends DQTest {
     void shouldReturnSmallClaimHearing_whenHearingNull() {
         YesOrNo hasUnavailableDates = YES;
         List<Element<UnavailableDate>> lrDates = Stream.of(
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.of(2020, 5, 2))
-                .who("who 1")
-                .build(),
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .fromDate(LocalDate.of(2020, 5, 2))
-                .toDate(LocalDate.of(2020, 6, 2))
-                .who("who 2")
-                .build()
-        ).map(ElementUtils::element).toList();
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.of(2020, 5, 2))
+                .setWho("who 1"),
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setFromDate(LocalDate.of(2020, 5, 2))
+                .setToDate(LocalDate.of(2020, 6, 2))
+                .setWho("who 2")).map(ElementUtils::element).toList();
 
-        Hearing hearing = buildApplicant1Dq().toBuilder()
-            .applicant1DQHearing(null)
-            .applicant1DQSmallClaimHearing(SmallClaimHearing.builder()
-                                                .unavailableDatesRequired(hasUnavailableDates)
-                                                .smallClaimUnavailableDate(lrDates)
-                                                .build())
-            .build().getHearing();
+        Hearing hearing = buildApplicant1Dq().copy()
+            .setApplicant1DQHearing(null)
+            .setApplicant1DQSmallClaimHearing(new SmallClaimHearing()
+                                                  .setUnavailableDatesRequired(hasUnavailableDates)
+                                                  .setSmallClaimUnavailableDate(lrDates))
+            .getHearing();
 
         assertThat(hearing.getUnavailableDatesRequired()).isEqualTo(hasUnavailableDates);
         for (int i = 0; i < hearing.getUnavailableDates().size(); i++) {
@@ -124,28 +116,26 @@ class Applicant1DQTest extends DQTest {
     }
 
     private Applicant1DQ buildApplicant1Dq() {
-        return Applicant1DQ.builder()
-            .applicant1DQDisclosureOfElectronicDocuments(disclosureOfElectronicDocuments())
-            .applicant1DQDisclosureOfNonElectronicDocuments(disclosureOfNonElectronicDocuments())
-            .applicant1DQDisclosureReport(disclosureReport())
-            .applicant1DQDraftDirections(draftDirections())
-            .applicant1DQExperts(experts())
-            .applicant1DQFileDirectionsQuestionnaire(fileDirectionsQuestionnaire())
-            .applicant1DQFurtherInformation(furtherInformation())
-            .applicant1DQHearing(hearing())
-            .applicant1DQHearingSupport(hearingSupport())
-            .applicant1DQRequestedCourt(requestedCourt())
-            .applicant1DQStatementOfTruth(statementOfTruth())
-            .applicant1DQWitnesses(witnesses())
-            .applicant1DQLanguage(welshLanguageRequirements())
-            .applicant1DQVulnerabilityQuestions(vulnerabilityQuestions())
-            .build();
+        return new Applicant1DQ()
+            .setApplicant1DQDisclosureOfElectronicDocuments(disclosureOfElectronicDocuments())
+            .setApplicant1DQDisclosureOfNonElectronicDocuments(disclosureOfNonElectronicDocuments())
+            .setApplicant1DQDisclosureReport(disclosureReport())
+            .setApplicant1DQDraftDirections(draftDirections())
+            .setApplicant1DQExperts(experts())
+            .setApplicant1DQFileDirectionsQuestionnaire(fileDirectionsQuestionnaire())
+            .setApplicant1DQFurtherInformation(furtherInformation())
+            .setApplicant1DQHearing(hearing())
+            .setApplicant1DQHearingSupport(hearingSupport())
+            .setApplicant1DQRequestedCourt(requestedCourt())
+            .setApplicant1DQStatementOfTruth(statementOfTruth())
+            .setApplicant1DQWitnesses(witnesses())
+            .setApplicant1DQLanguage(welshLanguageRequirements())
+            .setApplicant1DQVulnerabilityQuestions(vulnerabilityQuestions());
     }
 
     private Applicant1DQ buildApplicant1DqHearingLRSpec() {
-        return Applicant1DQ.builder()
-            .applicant1DQHearingLRspec(hearingLRspec())
-            .build();
+        return new Applicant1DQ()
+            .setApplicant1DQHearingLRspec(hearingLRspec());
     }
 
     @Nested
@@ -154,11 +144,9 @@ class Applicant1DQTest extends DQTest {
         @Test
         void shouldRemoveDetails_whenNoExpertsRequired() {
             Applicant1DQ dq = buildApplicant1Dq();
-            dq = dq.toBuilder()
-                .applicant1DQExperts(dq.getExperts().toBuilder()
-                                          .expertRequired(NO)
-                                          .build())
-                .build();
+            dq = dq.copy()
+                .setApplicant1DQExperts(dq.getExperts().copy()
+                                            .setExpertRequired(NO));
 
             assertThat(dq.getExperts().getDetails()).isNull();
         }
@@ -166,11 +154,9 @@ class Applicant1DQTest extends DQTest {
         @Test
         void shouldNotRemoveDetails_whenExpertsRequired() {
             Applicant1DQ dq = buildApplicant1Dq();
-            dq = dq.toBuilder()
-                .applicant1DQExperts(dq.getExperts().toBuilder()
-                                          .expertRequired(YES)
-                                          .build())
-                .build();
+            dq = dq.copy()
+                .setApplicant1DQExperts(dq.getExperts().copy()
+                                            .setExpertRequired(YES));
 
             assertThat(dq.getExperts()).isEqualTo(experts());
         }
@@ -178,9 +164,8 @@ class Applicant1DQTest extends DQTest {
         @Test
         void shouldReturnNull_whenExpertsIsNull() {
             Applicant1DQ dq = buildApplicant1Dq();
-            dq = dq.toBuilder()
-                .applicant1DQExperts(null)
-                .build();
+            dq = dq.copy()
+                .setApplicant1DQExperts(null);
 
             assertThat(dq.getExperts()).isNull();
         }
@@ -192,11 +177,9 @@ class Applicant1DQTest extends DQTest {
         @Test
         void shouldRemoveDetails_whenNoWitnessesToAppear() {
             Applicant1DQ dq = buildApplicant1Dq();
-            dq = dq.toBuilder()
-                .applicant1DQWitnesses(dq.getWitnesses().toBuilder()
-                                            .witnessesToAppear(NO)
-                                            .build())
-                .build();
+            dq = dq.copy()
+                .setApplicant1DQWitnesses(dq.getWitnesses().copy()
+                                              .setWitnessesToAppear(NO));
 
             assertThat(dq.getWitnesses().getDetails()).isNull();
         }
@@ -204,11 +187,9 @@ class Applicant1DQTest extends DQTest {
         @Test
         void shouldNotRemoveDetails_whenWitnessesToAppear() {
             Applicant1DQ dq = buildApplicant1Dq();
-            dq = dq.toBuilder()
-                .applicant1DQWitnesses(dq.getWitnesses().toBuilder()
-                                            .witnessesToAppear(YES)
-                                            .build())
-                .build();
+            dq = dq.copy()
+                .setApplicant1DQWitnesses(dq.getWitnesses().copy()
+                                              .setWitnessesToAppear(YES));
 
             assertThat(dq.getWitnesses()).isEqualTo(witnesses());
         }
@@ -216,9 +197,8 @@ class Applicant1DQTest extends DQTest {
         @Test
         void shouldReturnNull_whenWitnessesIsNull() {
             Applicant1DQ dq = buildApplicant1Dq();
-            dq = dq.toBuilder()
-                .applicant1DQWitnesses(null)
-                .build();
+            dq = dq.copy()
+                .setApplicant1DQWitnesses(null);
 
             assertThat(dq.getWitnesses()).isNull();
         }
@@ -230,11 +210,9 @@ class Applicant1DQTest extends DQTest {
         @Test
         void shouldRemoveUnavailableDates_whenNoUnavailableDatesRequired() {
             Applicant1DQ dq = buildApplicant1Dq();
-            dq = dq.toBuilder()
-                .applicant1DQHearing(dq.getHearing().toBuilder()
-                                          .unavailableDatesRequired(NO)
-                                          .build())
-                .build();
+            dq = dq.copy()
+                .setApplicant1DQHearing(dq.getHearing().copy()
+                                            .setUnavailableDatesRequired(NO));
 
             assertThat(dq.getHearing().getUnavailableDates()).isNull();
         }
@@ -242,11 +220,9 @@ class Applicant1DQTest extends DQTest {
         @Test
         void shouldNotRemoveUnavailableDates_whenUnavailableDatesRequired() {
             Applicant1DQ dq = buildApplicant1Dq();
-            dq = dq.toBuilder()
-                .applicant1DQHearing(dq.getHearing().toBuilder()
-                                          .unavailableDatesRequired(YES)
-                                          .build())
-                .build();
+            dq = dq.copy()
+                .setApplicant1DQHearing(dq.getHearing().copy()
+                                            .setUnavailableDatesRequired(YES));
 
             assertThat(dq.getHearing().getUnavailableDates()).isEqualTo(hearing().getUnavailableDates());
         }
@@ -254,9 +230,8 @@ class Applicant1DQTest extends DQTest {
         @Test
         void shouldReturnNull_whenUnavailableDatesIsNull() {
             Applicant1DQ dq = buildApplicant1Dq();
-            dq = dq.toBuilder()
-                .applicant1DQHearing(null)
-                .build();
+            dq = dq.copy()
+                .setApplicant1DQHearing(null);
 
             assertThat(dq.getHearing()).isNull();
         }

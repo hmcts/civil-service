@@ -48,16 +48,15 @@ public class CitizenClaimIssueFeePaymentCallbackHandler extends CallbackHandler 
     private CallbackResponse citizenClaimIssuePayment(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
         if (caseData.getClaimIssuedPaymentDetails() != null && caseData.getClaimIssuedPaymentDetails().getStatus().equals(SUCCESS)) {
 
-            dataBuilder.issueDate(LocalDate.now());
-            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC_AFTER_PAYMENT));
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setBusinessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC_AFTER_PAYMENT));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

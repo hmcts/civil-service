@@ -6,10 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DismissedPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.time.LocalDateTime;
@@ -19,11 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.NotificationAcknowledgedTimeExtensionTransitionBuilder.caseDismissedAfterClaimAcknowledgedExtension;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.NotificationAcknowledgedTimeExtensionTransitionBuilder.claimDismissalOutOfTime;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.NotificationAcknowledgedTimeExtensionTransitionBuilder.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.NotificationAcknowledgedTimeExtensionTransitionBuilder.takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
@@ -55,12 +53,44 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
     }
 
     @Test
+    void shouldTransitionToAwaitingResponsesFullDefence_whenCaseNotTakenOfflineAfterNotificationAckTimeExtension() {
+        Transition awaitingFullDefence = result.get(1);
+
+        CaseData baseCaseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledgedTimeExtension_1v2DS()
+            .build();
+
+        CaseData caseData = baseCaseData.toBuilder()
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .takenOfflineByStaffDate(null)
+            .build();
+
+        assertTrue(awaitingFullDefence.getCondition().test(caseData));
+    }
+
+    @Test
+    void shouldNotTransitionToAwaitingResponsesFullDefence_whenCaseTakenOfflineAfterNotificationAckTimeExtension() {
+        Transition awaitingFullDefence = result.get(1);
+
+        CaseData baseCaseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledgedTimeExtension_1v2DS()
+            .build();
+
+        CaseData caseData = baseCaseData.toBuilder()
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .takenOfflineByStaffDate(LocalDateTime.now())
+            .build();
+
+        assertFalse(awaitingFullDefence.getCondition().test(caseData));
+    }
+
+    @Test
     void shouldReturnTrue_whenTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE, true)
             .build();
-        assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
-        assertFalse(takenOfflineAfterSDO.test(caseData));
+        assertTrue(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseExtension).test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
@@ -68,15 +98,15 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE, false)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseExtension).test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenTakenOfflineAfterSDONotDrawnNotificationAcknowledgedTimeExtension() {
         CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
-        assertTrue(takenOfflineAfterSDO.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseExtension).test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
@@ -84,8 +114,8 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, true)
             .build();
-        assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
-        assertFalse(takenOfflineAfterSDO.test(caseData));
+        assertTrue(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseExtension).test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
@@ -93,45 +123,45 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, false)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseExtension).test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenTakenOfflineAfterSDONotDrawnNotificationAcknowledgedTimeExtension_1v2() {
         CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
-        assertTrue(takenOfflineAfterSDO.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseExtension).test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenTakenOfflineByStaffAfterNotificationAcknowledgedExtension_1v1() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension().build();
-        assertTrue(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension.test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedAckExtension).test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenTakenOfflineByStaffAfterNotificationAcknowledgedExtension_1v2() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension()
-            .respondent2(Party.builder().partyName("Respondent 2").build())
+            .respondent2(new Party().setPartyName("Respondent 2"))
             .respondent2SameLegalRepresentative(YES)
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now().minusDays(2))
             .respondent2TimeExtensionDate(LocalDateTime.now().minusDays(1))
             .build();
-        assertTrue(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension.test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedAckExtension).test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenNotificationAcknowledgedExtension_1v2() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledgedRespondent1TimeExtension()
-            .respondent2(Party.builder().partyName("Respondent 2").build())
+            .respondent2(new Party().setPartyName("Respondent 2"))
             .respondent2SameLegalRepresentative(YES)
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now().minusDays(2))
             .build();
-        assertFalse(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension.test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedAckExtension).test(caseData));
     }
 
     @Test
@@ -140,7 +170,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
             .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
             .takenOfflineByStaffDate(null)
             .build();
-        assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        assertTrue(DismissedPredicate.afterClaimAcknowledgedExtension.test(caseData));
     }
 
     @Test
@@ -149,7 +179,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
             .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
             .takenOfflineByStaffDate(LocalDateTime.now())
             .build();
-        assertFalse(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        assertFalse(DismissedPredicate.afterClaimAcknowledgedExtension.test(caseData));
     }
 
     @Test
@@ -159,7 +189,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
             .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
             .takenOfflineByStaffDate(null)
             .build();
-        assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        assertTrue(DismissedPredicate.afterClaimAcknowledgedExtension.test(caseData));
     }
 
     @Test
@@ -169,7 +199,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
             .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
             .takenOfflineByStaffDate(LocalDateTime.now())
             .build();
-        assertFalse(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        assertFalse(DismissedPredicate.afterClaimAcknowledgedExtension.test(caseData));
     }
 
     @Test
@@ -179,7 +209,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
             .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
             .takenOfflineByStaffDate(null)
             .build();
-        assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        assertTrue(DismissedPredicate.afterClaimAcknowledgedExtension.test(caseData));
     }
 
     @Test
@@ -189,7 +219,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
             .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
             .takenOfflineByStaffDate(LocalDateTime.now())
             .build();
-        assertFalse(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        assertFalse(DismissedPredicate.afterClaimAcknowledgedExtension.test(caseData));
     }
 
     @Test
@@ -198,8 +228,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
             .claimDismissedDeadline(LocalDateTime.now().minusDays(1))  // setting a past date
             .atStateClaimDismissed()  // this sets the applicant1ResponseDeadline to a past date
             .build();
-
-        assertTrue(claimDismissalOutOfTime.test(caseData));
+        assertTrue(DismissedPredicate.pastClaimDeadline.test(caseData));
     }
 
     @Test
@@ -208,8 +237,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
             .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
             .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
             .build();
-
-        assertFalse(claimDismissalOutOfTime.test(caseData));
+        assertFalse(DismissedPredicate.pastClaimDeadline.test(caseData));
     }
 
     @Test
@@ -218,8 +246,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
             .claimDismissedDeadline(null)
             .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
             .build();
-
-        assertFalse(claimDismissalOutOfTime.test(caseData));
+        assertFalse(DismissedPredicate.pastClaimDeadline.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

@@ -24,9 +24,9 @@ class RespondentOneExpertQuestionsDocumentHandlerTest extends BaseDocumentHandle
 
     @Test
     void shouldCopyQuestionsDocumentsToLegalRep2() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getDocumentQuestionsRes2().size());
+        assertEquals(2, caseData.getDocumentQuestionsRes2().size());
     }
 
     @Test

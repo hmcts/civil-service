@@ -49,13 +49,11 @@ public class DismissClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse updateBusinessStatusToReady(CallbackParams callbackParams) {
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
-
-        CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
-            .businessProcess(BusinessProcess.ready(DISMISS_CLAIM))
-            .claimDismissedDate(time.now());
+        data.setBusinessProcess(BusinessProcess.ready(DISMISS_CLAIM));
+        data.setClaimDismissedDate(time.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(data.toMap(objectMapper))
             .build();
     }
 }

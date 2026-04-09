@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -10,14 +9,18 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
+
+    public EditJudgmentOnlineMapper(Time time) {
+        super(time);
+    }
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
@@ -28,17 +31,16 @@ public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
         );
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
         if (activeJudgment != null) {
-            activeJudgment = activeJudgment.toBuilder()
-                .state(getJudgmentState(caseData))
-                .instalmentDetails(caseData.getJoInstalmentDetails())
-                .paymentPlan(caseData.getJoPaymentPlan())
-                .isRegisterWithRTL(getIsRegisterWithRtl(activeJudgment, caseData.getJoIsRegisteredWithRTL()))
-                .rtlState(getRtlState(caseData.getJoIsRegisteredWithRTL(), activeJudgment.getRtlState()))
-                .issueDate(caseData.getJoOrderMadeDate())
-                .orderedAmount(orderAmount.toString())
-                .costs(costs.toString())
-                .totalAmount(orderAmount.add(costs).add(claimFeeAmount).toString())
-                .build();
+            activeJudgment
+                .setState(getJudgmentState(caseData))
+                .setInstalmentDetails(caseData.getJoInstalmentDetails())
+                .setPaymentPlan(caseData.getJoPaymentPlan())
+                .setIsRegisterWithRTL(getIsRegisterWithRtl(activeJudgment, caseData.getJoIsRegisteredWithRTL()))
+                .setRtlState(getRtlState(caseData.getJoIsRegisteredWithRTL(), activeJudgment.getRtlState()))
+                .setIssueDate(caseData.getJoOrderMadeDate())
+                .setOrderedAmount(orderAmount.toString())
+                .setCosts(costs.toString())
+                .setTotalAmount(orderAmount.add(costs).add(claimFeeAmount).toString());
             super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
         }
 

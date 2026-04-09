@@ -78,8 +78,8 @@ class NotifyDefendantStayLiftedHandlerTest {
         @BeforeEach
         void setUp() {
             caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
-                .respondent2(Party.builder().individualFirstName("Jim").individualLastName("Jameson").type(Party.Type.INDIVIDUAL).build())
+                .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson").setType(Party.Type.INDIVIDUAL))
+                .respondent2(new Party().setIndividualFirstName("Jim").setIndividualLastName("Jameson").setType(Party.Type.INDIVIDUAL))
                 .build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
@@ -108,8 +108,8 @@ class NotifyDefendantStayLiftedHandlerTest {
                 .respondent1Represented(YesOrNo.YES)
                 .respondent2Represented(YesOrNo.YES)
                 .build();
-            CallbackParams params = CallbackParams.builder().caseData(caseData)
-                .request(CallbackRequest.builder().eventId(caseEvent.toString()).build()).build();
+            CallbackParams params = new CallbackParams().caseData(caseData)
+                .request(CallbackRequest.builder().eventId(caseEvent.toString()).build());
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
@@ -151,25 +151,25 @@ class NotifyDefendantStayLiftedHandlerTest {
 
         private CaseDataBuilder commonCaseData() {
             return CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
-                .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                                .type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
-                                 .partyEmail("defendant@hmcts.net")
-                                 .type(Party.Type.INDIVIDUAL).build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
+                .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
+                                .setType(Party.Type.INDIVIDUAL))
+                .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson")
+                                 .setPartyEmail("defendant@hmcts.net")
+                                 .setType(Party.Type.INDIVIDUAL))
                 .respondentSolicitor1EmailAddress("solicitor@example.com");
         }
 
         private CaseData getCaseData(boolean isRespondentLiP, boolean isRespondentBilingual) {
-            RespondentLiPResponse respondentLip = RespondentLiPResponse.builder()
-                .respondent1ResponseLanguage(isRespondentBilingual ? Language.BOTH.toString()
-                                                 : Language.ENGLISH.toString()).build();
+            RespondentLiPResponse respondentLip = new RespondentLiPResponse()
+                .setRespondent1ResponseLanguage(isRespondentBilingual ? Language.BOTH.toString()
+                                                 : Language.ENGLISH.toString());
             return commonCaseData()
                 .respondent1Represented(isRespondentLiP ? YesOrNo.NO : YesOrNo.YES)
 
                 .build().toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(respondentLip).build())
+                .caseDataLiP(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(respondentLip))
                 .build();
         }
 
@@ -189,11 +189,10 @@ class NotifyDefendantStayLiftedHandlerTest {
                 .builder()
                 .eventId(CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE.name())
                 .build();
-            final CallbackParams params = CallbackParams.builder()
+            final CallbackParams params = new CallbackParams()
                 .request(callbackRequest)
                 .caseData(caseData)
-                .type(ABOUT_TO_SUBMIT)
-                .build();
+                .type(ABOUT_TO_SUBMIT);
 
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
@@ -250,18 +249,18 @@ class NotifyDefendantStayLiftedHandlerTest {
     @BeforeEach
     void setUp() {
         caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().individualFirstName("Jim").individualLastName("Jameson").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson").setType(Party.Type.INDIVIDUAL))
+            .respondent2(new Party().setIndividualFirstName("Jim").setIndividualLastName("Jameson").setType(Party.Type.INDIVIDUAL))
             .build();
     }
 
     @Test
     void checkCamundaActivityDefendantTest() {
         caseData = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_LIFTED.toString()).build()).build();
+        CallbackParams params = new CallbackParams().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_LIFTED.toString()).build());
         var response = handler.camundaActivityId(params);
         assertEquals("NotifyDefendantStayLifted", response);
     }
@@ -269,10 +268,10 @@ class NotifyDefendantStayLiftedHandlerTest {
     @Test
     void checkCamundaActivityDefendant2Test() {
         caseData = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT2_STAY_LIFTED.toString()).build()).build();
+        CallbackParams params = new CallbackParams().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT2_STAY_LIFTED.toString()).build());
         var response = handler.camundaActivityId(params);
         assertEquals("NotifyDefendant2StayLifted", response);
     }

@@ -33,13 +33,13 @@ public class CCJRequestForBrokenSettlementAgreementScenarioTest extends Dashboar
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(LocalDate.now().minusDays(1)))
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1))
-            .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES)
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                         .applicant1SignedSettlementAgreement(
-                                                                             YesOrNo.YES).build()).build())
+            .caseDataLiP(new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.YES)
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                                         .setApplicant1SignedSettlementAgreement(
+                                                                             YesOrNo.YES)))
             .build();
         handler.handle(callbackParams(caseData));
 
@@ -76,14 +76,14 @@ public class CCJRequestForBrokenSettlementAgreementScenarioTest extends Dashboar
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(LocalDate.now().minusDays(1)))
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1))
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondentSignSettlementAgreement(YesOrNo.YES)
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                         .applicant1SignedSettlementAgreement(
-                                                                             YesOrNo.YES).build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondentSignSettlementAgreement(YesOrNo.YES)
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                                         .setApplicant1SignedSettlementAgreement(
+                                                                             YesOrNo.YES)))
             .build();
         handler.handle(callbackParams(caseData));
 

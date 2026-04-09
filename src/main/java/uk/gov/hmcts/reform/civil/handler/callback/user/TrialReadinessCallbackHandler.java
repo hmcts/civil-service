@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -83,7 +82,6 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateValues(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         List<String> userRoles = getUserRoles(callbackParams);
 
         var isApplicant = YesOrNo.NO;
@@ -93,18 +91,18 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
                  caseData.getCcdCaseReference());
         if (isApplicantSolicitor(userRoles)) {
             isApplicant = YesOrNo.YES;
-            updatedData.hearingDurationTextApplicant(formatHearingDuration(caseData.getHearingDuration()));
+            caseData.setHearingDurationTextApplicant(formatHearingDuration(caseData.getHearingDuration()));
         } else if (isRespondentSolicitorOne(userRoles)) {
             isRespondent1 = YesOrNo.YES;
-            updatedData.hearingDurationTextRespondent1(formatHearingDuration(caseData.getHearingDuration()));
+            caseData.setHearingDurationTextRespondent1(formatHearingDuration(caseData.getHearingDuration()));
         } else if (isRespondentSolicitorTwo(userRoles)) {
             isRespondent2 = YesOrNo.YES;
-            updatedData.hearingDurationTextRespondent2(formatHearingDuration(caseData.getHearingDuration()));
+            caseData.setHearingDurationTextRespondent2(formatHearingDuration(caseData.getHearingDuration()));
         }
 
-        updatedData.isApplicant1(isApplicant);
-        updatedData.isRespondent1(isRespondent1);
-        updatedData.isRespondent2(isRespondent2);
+        caseData.setIsApplicant1(isApplicant);
+        caseData.setIsRespondent1(isRespondent1);
+        caseData.setIsRespondent2(isRespondent2);
 
         ArrayList<String> errors = new ArrayList<>();
         if (nonNull(caseData.getHearingDate())
@@ -118,37 +116,36 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.isEmpty() ? updatedData.build().toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? caseData.toMap(objectMapper) : null)
             .build();
     }
 
     private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         List<String> userRoles = getUserRoles(callbackParams);
 
         if (isApplicantSolicitor(userRoles) || isLIPClaimant(userRoles)) {
             if (caseData.getTrialReadyApplicant() == YesOrNo.YES) {
-                updatedData.businessProcess(BusinessProcess.ready(APPLICANT_TRIAL_READY_NOTIFY_OTHERS));
+                caseData.setBusinessProcess(BusinessProcess.ready(APPLICANT_TRIAL_READY_NOTIFY_OTHERS));
             } else {
-                updatedData.businessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_APPLICANT));
+                caseData.setBusinessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_APPLICANT));
             }
         } else if (isRespondentSolicitorOne(userRoles) || isLIPDefendant(userRoles)) {
             if (caseData.getTrialReadyRespondent1() == YesOrNo.YES) {
-                updatedData.businessProcess(BusinessProcess.ready(RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS));
+                caseData.setBusinessProcess(BusinessProcess.ready(RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS));
             } else {
-                updatedData.businessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT1));
+                caseData.setBusinessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT1));
             }
         } else {
             if (caseData.getTrialReadyRespondent2() == YesOrNo.YES) {
-                updatedData.businessProcess(BusinessProcess.ready(RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS));
+                caseData.setBusinessProcess(BusinessProcess.ready(RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS));
             } else {
-                updatedData.businessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT2));
+                caseData.setBusinessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT2));
             }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

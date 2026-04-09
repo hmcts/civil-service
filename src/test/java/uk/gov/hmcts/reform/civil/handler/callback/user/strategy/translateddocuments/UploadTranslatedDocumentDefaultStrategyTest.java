@@ -20,10 +20,12 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,6 +67,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     private FeatureToggleService featureToggleService;
     @Mock
     private AssignCategoryId assignCategoryId;
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -73,43 +77,46 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         objectMapper.registerModule(new JavaTimeModule());
         uploadTranslatedDocumentDefaultStrategy = new UploadTranslatedDocumentDefaultStrategy(systemGeneratedDocumentService,
                                                                                               objectMapper, assignCategoryId,
-                                                                                              featureToggleService);
+                                                                                              featureToggleService,
+                                                                                              deadlinesCalculator
+        );
     }
 
     @Test
     void shouldReturnDocumentListWithTranslatedDocument() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(DEFENDANT_RESPONSE)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-        TranslatedDocument translatedDocument2 = TranslatedDocument
-            .builder()
-            .documentType(DEFENDANT_RESPONSE)
-            .file(Document.builder().documentFileName(FILE_NAME_2).build())
-            .build();
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(DEFENDANT_RESPONSE);
+        Document document = new Document();
+        document.setDocumentFileName(FILE_NAME_1);
+        translatedDocument1.setFile(document);
+        TranslatedDocument translatedDocument2 = new TranslatedDocument();
+        translatedDocument2.setDocumentType(DEFENDANT_RESPONSE);
+        Document document1 = new Document();
+        document1.setDocumentFileName(FILE_NAME_2);
+        translatedDocument2.setFile(document1);
 
         List<Element<TranslatedDocument>> translatedDocument = List.of(
             element(translatedDocument1),
             element(translatedDocument2)
         );
-
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any())).thenReturn(LocalDateTime.now()
+                                                                                               .plusDays(28));
         CaseData caseData = CaseDataBuilder
             .builder()
-            .atStatePendingClaimIssued()
-            .build()
-            .builder()
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+            .atStatePendingClaimIssued().build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        CaseDocument caseDocument1 = new CaseDocument();
+        caseDocument1.setDocumentName(FILE_NAME_1);
+        CaseDocument caseDocument2 = new CaseDocument();
+        caseDocument2.setDocumentName(FILE_NAME_2);
         List<Element<CaseDocument>> documents = List.of(
-            element(CaseDocument.builder().documentName(FILE_NAME_1).build()),
-            element(CaseDocument.builder().documentName(FILE_NAME_2).build()));
+            element(caseDocument1),
+            element(caseDocument2));
         @SuppressWarnings("unchecked")
         List<Element<TranslatedDocument>> expectedTranslatedDocs = (List<Element<TranslatedDocument>>) any(List.class);
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
@@ -117,6 +124,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             any(CaseData.class)
         )).willReturn(documents);
         //When
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
         //Then
@@ -131,43 +139,48 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldReturnDocumentListWithTranslatedDocumentWithPreTranslatedDocumentsAdded() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(CLAIMANT_INTENTION)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-        CaseDocument originalDocument = CaseDocument
-            .builder()
-            .documentType(DocumentType.CLAIMANT_DEFENCE)
-            .documentLink(Document.builder().documentFileName("claimant_response.pdf")
-                              .categoryID("aapId").build())
-            .documentName("claimant_response.pdf")
-            .build();
+        Document document1 = new Document();
+        document1.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(CLAIMANT_INTENTION);
+        translatedDocument1.setFile(document1);
 
-        List<Element<CaseDocument>> preTranslatedDocuments = new ArrayList<>(List.of(
-            element(originalDocument)
-        ));
+        Document documentLink = new Document();
+        documentLink.setDocumentFileName("claimant_response.pdf");
+        documentLink.setCategoryID("aapId");
+        CaseDocument originalDocument = new CaseDocument();
+        originalDocument.setDocumentType(DocumentType.CLAIMANT_DEFENCE);
+        originalDocument.setDocumentLink(documentLink);
+        originalDocument.setDocumentName("claimant_response.pdf");
 
         List<Element<TranslatedDocument>> translatedDocument = List.of(
             element(translatedDocument1)
         );
 
-        CaseData caseData = CaseDataBuilder
-            .builder()
-            .atStatePendingClaimIssued()
-            .build()
-            .builder()
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData.toBuilder().preTranslationDocuments(preTranslatedDocuments).build()).build();
+        CaseDataBuilder
+                .builder()
+                .atStatePendingClaimIssued()
+                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        CaseDataLiP  caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        List<Element<CaseDocument>> preTranslatedDocuments = new ArrayList<>(List.of(
+            element(originalDocument)
+        ));
+        caseData.setPreTranslationDocuments(preTranslatedDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        CaseDocument doc1 = new CaseDocument();
+        doc1.setDocumentName(FILE_NAME_1);
+        CaseDocument doc2 = new CaseDocument();
+        doc2.setDocumentName("claimant_response.pdf");
+        CaseDocument doc3 = new CaseDocument();
+        doc3.setDocumentName("claimant_response.pdf");
         List<Element<CaseDocument>> documents = List.of(
-            element(CaseDocument.builder().documentName(FILE_NAME_1).build()),
-            element(CaseDocument.builder().documentName("claimant_response.pdf").build()),
-            element(CaseDocument.builder().documentName("claimant_response.pdf").build())
+            element(doc1),
+            element(doc2),
+            element(doc3)
         );
         @SuppressWarnings("unchecked")
         List<Element<TranslatedDocument>> expectedTranslatedDocs = (List<Element<TranslatedDocument>>) any(List.class);
@@ -175,8 +188,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             expectedTranslatedDocs,
             any(CaseData.class)
         )).willReturn(documents);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         //When
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
         //Then
@@ -192,12 +205,16 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     void shouldReturnExistingSystemGeneratedDocumentListWhenNothingReturnedFromService() {
         //Given
         CaseData caseData = CaseDataBuilder
-            .builder()
-            .atStatePendingClaimIssued()
-            .build()
-            .builder()
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+                .builder()
+                .atStatePendingClaimIssued()
+                .build();
+        TranslatedDocument translatedDoc = new TranslatedDocument();
+        translatedDoc.setDocumentType(CLAIM_ISSUE);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDoc)));
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -211,16 +228,19 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         //Given
         CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued()
-                .build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdState(CaseState.PENDING_CASE_ISSUED)
-                .ccdCaseReference(123L)
-                .build();
+                .applicant1Represented(YesOrNo.NO).build();
+        caseData.setCcdState(CaseState.PENDING_CASE_ISSUED);
+        caseData.setCcdCaseReference(123L);
+        TranslatedDocument translatedDoc = new TranslatedDocument();
+        translatedDoc.setDocumentType(CLAIM_ISSUE);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDoc)));
+        caseData.setCaseDataLiP(caseDataLiP);
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
                 callbackParams);
@@ -235,17 +255,20 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     void shouldUpdateBusinessProcess_WhenLipVsLRAndCcdState_In_Awaiting_Claimant_Response_NocOnlineFlagEnabled() {
         //Given
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
-            .build().toBuilder()
-            .respondent1Represented(YesOrNo.YES)
-            .specRespondent1Represented(YesOrNo.YES)
-            .applicant1Represented(YesOrNo.NO)
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .ccdCaseReference(123L)
-            .build();
+                .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
+                .respondent1Represented(YesOrNo.YES)
+                .specRespondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO).build();
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        caseData.setCcdCaseReference(123L);
+        TranslatedDocument translatedDoc = new TranslatedDocument();
+        translatedDoc.setDocumentType(CLAIM_ISSUE);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDoc)));
+        caseData.setCaseDataLiP(caseDataLiP);
 
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -260,38 +283,36 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     void shouldUpdateBusinessProcess_WhenLrVsLipAndCcdState_InAwaitingClaimantResponse() {
         //Given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(CLAIMANT_INTENTION)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
+        Document doc = new Document();
+        doc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(CLAIMANT_INTENTION);
+        translatedDocument1.setFile(doc);
 
-        List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
-            element(translatedDocument1)
-        ));
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document docForPreTranslation = new Document();
+        docForPreTranslation.setDocumentFileName("claimant.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("claimant.pdf").build(),
+            docForPreTranslation,
             DocumentType.CLAIMANT_INTENTION_TRANSLATED_DOCUMENT
         )));
 
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
-            .build().toBuilder()
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.YES)
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .ccdCaseReference(123L)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .build();
+            .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        caseData.setCcdCaseReference(123L);
+        List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
+            element(translatedDocument1)
+        ));
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -309,16 +330,16 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeIsOrderNotice_ToggleEnabledCP() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(ORDER_NOTICE)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-        TranslatedDocument translatedDocument2 = TranslatedDocument
-            .builder()
-            .documentType(ORDER_NOTICE)
-            .file(Document.builder().documentFileName(FILE_NAME_2).build())
-            .build();
+        Document orderDoc = new Document();
+        orderDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(ORDER_NOTICE);
+        translatedDocument1.setFile(orderDoc);
+        Document doc2 = new Document();
+        doc2.setDocumentFileName(FILE_NAME_2);
+        TranslatedDocument translatedDocument2 = new TranslatedDocument();
+        translatedDocument2.setDocumentType(ORDER_NOTICE);
+        translatedDocument2.setFile(doc2);
 
         List<Element<TranslatedDocument>> translatedDocument = List.of(
             element(translatedDocument1),
@@ -326,18 +347,14 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         );
 
         CaseData caseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .ccdCaseReference(123L)
-            .build();
+            .atStatePendingClaimIssued().build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -349,81 +366,37 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
-    void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeIsOrderNotice_ToggleDisabledCP() {
-        //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(ORDER_NOTICE)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-        TranslatedDocument translatedDocument2 = TranslatedDocument
-            .builder()
-            .documentType(ORDER_NOTICE)
-            .file(Document.builder().documentFileName(FILE_NAME_2).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1),
-            element(translatedDocument2)
-        );
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .ccdCaseReference(123L)
-            .build();
-
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
-        //When
-        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
-            callbackParams);
-        //Then
-        assertThat(response.getData())
-            .extracting("businessProcess")
-            .extracting("camundaEvent")
-            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT.name());
-    }
-
-    @Test
     void shouldSetBusinessProcess_WhenDocumentTypeIsStandardDirectionOrder() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(STANDARD_DIRECTION_ORDER)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1)
-        );
+        Document sdoFileDoc = new Document();
+        sdoFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(STANDARD_DIRECTION_ORDER);
+        translatedDocument1.setFile(sdoFileDoc);
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document sdoDoc = new Document();
+        sdoDoc.setDocumentFileName("standard_direction_order.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("standard_direction_order.pdf").build(),
+            sdoDoc,
             DocumentType.SDO_ORDER
         )));
 
         CaseData caseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
-            .build();
+            .atStatePendingClaimIssued().build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
+
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -437,38 +410,36 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldSetBusinessProcess_WhenDocumentTypeIsInterlocJudgment() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(INTERLOCUTORY_JUDGMENT)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1)
-        );
+        Document interlocFileDoc = new Document();
+        interlocFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(INTERLOCUTORY_JUDGMENT);
+        translatedDocument1.setFile(interlocFileDoc);
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
 
+        Document interlocDoc = new Document();
+        interlocDoc.setDocumentFileName("interlocutory_judgment.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("interlocutory_judgment.pdf").build(),
+            interlocDoc,
             DocumentType.INTERLOCUTORY_JUDGEMENT
         )));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -482,37 +453,35 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldSetBusinessProcess_WhenDocumentTypeIsManualDetermination() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(MANUAL_DETERMINATION)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1)
-        );
+        Document manualFileDoc = new Document();
+        manualFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(MANUAL_DETERMINATION);
+        translatedDocument1.setFile(manualFileDoc);
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document manualDoc = new Document();
+        manualDoc.setDocumentFileName("manual_determination.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("manual_determination.pdf").build(),
+            manualDoc,
             DocumentType.LIP_MANUAL_DETERMINATION
         )));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -526,37 +495,35 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldSetBusinessProcess_WhenDocumentTypeIsFinalOrder() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(FINAL_ORDER)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1)
-        );
+        Document finalOrderFileDoc = new Document();
+        finalOrderFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(FINAL_ORDER);
+        translatedDocument1.setFile(finalOrderFileDoc);
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document finalOrderDoc = new Document();
+        finalOrderDoc.setDocumentFileName("final_order.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("final_order.pdf").build(),
-                                                                        DocumentType.JUDGE_FINAL_ORDER
+            finalOrderDoc,
+            DocumentType.JUDGE_FINAL_ORDER
         )));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .finalOrderDocumentCollection(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setFinalOrderDocumentCollection(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -571,33 +538,32 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     void shouldUpdateBusinessProcess_WhenDocumentTypeIsSettlementAgreement() {
 
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(SETTLEMENT_AGREEMENT)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
+        Document settlementFileDoc = new Document();
+        settlementFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(SETTLEMENT_AGREEMENT);
+        translatedDocument1.setFile(settlementFileDoc);
+
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document settlementDoc = new Document();
+        settlementDoc.setDocumentFileName("settlement_agreement.pdf");
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            settlementDoc,
+            DocumentType.SETTLEMENT_AGREEMENT)));
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
         List<Element<TranslatedDocument>> translatedDocument = List.of(
             element(translatedDocument1)
         );
-        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("settlement_agreement.pdf").build(),
-                                                                        DocumentType.SETTLEMENT_AGREEMENT)));
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
-            .build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -612,36 +578,34 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldSetBusinessProcess_WhenDocumentTypeIsDecisionMadeOnApplications() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(DECISION_MADE_ON_APPLICATIONS)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1)
-        );
+        Document decisionFileDoc = new Document();
+        decisionFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(DECISION_MADE_ON_APPLICATIONS);
+        translatedDocument1.setFile(decisionFileDoc);
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document decisionDoc = new Document();
+        decisionDoc.setDocumentFileName("decision_made.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("decision_made.pdf").build(),
-                                                                        DocumentType.DECISION_MADE_ON_APPLICATIONS)));
+            decisionDoc,
+            DocumentType.DECISION_MADE_ON_APPLICATIONS)));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -655,35 +619,32 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldSetBusinessProcess_WhenDocumentTypeIsSdo() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(STANDARD_DIRECTION_ORDER)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1)
-        );
+        Document sdoFileDoc = new Document();
+        sdoFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(STANDARD_DIRECTION_ORDER);
+        translatedDocument1.setFile(sdoFileDoc);
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().build(),
+        Document ccjDoc = new Document();
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(ccjDoc,
                                                                         DocumentType.CCJ_REQUEST_DETERMINATION)));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -698,38 +659,36 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     void shouldCopyOtherDocumentExceptSealedClaimForm() {
         //Given
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(CLAIM_ISSUE)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1)
-        );
+        Document claimIssueFileDoc = new Document();
+        claimIssueFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(CLAIM_ISSUE);
+        translatedDocument1.setFile(claimIssueFileDoc);
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document claimantDqDoc = new Document();
+        claimantDqDoc.setDocumentFileName("claimant_dq.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("claimant_dq.pdf").build(),
-                                                                        DocumentType.CLAIMANT_CLAIM_FORM)));
+            claimantDqDoc,
+            DocumentType.CLAIMANT_CLAIM_FORM)));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
-            .build().toBuilder()
-            .ccdState(CaseState.PENDING_CASE_ISSUED)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
+        caseData.setCcdState(CaseState.PENDING_CASE_ISSUED);
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -745,45 +704,46 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         //Given
         @SuppressWarnings("unchecked")
         List<Element<TranslatedDocument>> expectedTranslatedDocs = (List<Element<TranslatedDocument>>) any(List.class);
+        CaseDocument sealedClaimDoc = new CaseDocument();
+        sealedClaimDoc.setDocumentName("000MC001-sealed-claim-form.pdf");
+        sealedClaimDoc.setDocumentType(DocumentType.SEALED_CLAIM);
         List<Element<CaseDocument>> documents = List.of(
-            element(CaseDocument.builder().documentName("000MC001-sealed-claim-form.pdf").documentType(DocumentType.SEALED_CLAIM).build()));
+            element(sealedClaimDoc));
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
             expectedTranslatedDocs,
             any(CaseData.class)
         )).willReturn(documents);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(CLAIM_ISSUE)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1)
-        );
+        Document claimIssueFileDoc = new Document();
+        claimIssueFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(CLAIM_ISSUE);
+        translatedDocument1.setFile(claimIssueFileDoc);
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document sealedFormDoc = new Document();
+        sealedFormDoc.setDocumentFileName("sealed_form.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("sealed_form.pdf").build(),
-                                                                        DocumentType.SEALED_CLAIM)));
+            sealedFormDoc,
+            DocumentType.SEALED_CLAIM)));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
-            .build().toBuilder()
-            .ccdState(CaseState.PENDING_CASE_ISSUED)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
+        caseData.setCcdState(CaseState.PENDING_CASE_ISSUED);
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -801,28 +761,28 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         //Given
         @SuppressWarnings("unchecked")
         List<Element<TranslatedDocument>> expectedTranslatedDocs = (List<Element<TranslatedDocument>>) any(List.class);
+        CaseDocument sealedClaimFormDoc = new CaseDocument();
+        sealedClaimFormDoc.setDocumentName("000MC001-sealed-claim-form.pdf");
+        sealedClaimFormDoc.setDocumentType(DocumentType.SEALED_CLAIM);
         List<Element<CaseDocument>> documents = List.of(
-            element(CaseDocument.builder().documentName("000MC001-sealed-claim-form.pdf")
-                        .documentType(DocumentType.SEALED_CLAIM).build()));
+            element(sealedClaimFormDoc));
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
             expectedTranslatedDocs,
             any(CaseData.class)
         )).willReturn(documents);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(CLAIM_ISSUE)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1)
-        );
+        Document claimIssueFileDoc = new Document();
+        claimIssueFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(CLAIM_ISSUE);
+        translatedDocument1.setFile(claimIssueFileDoc);
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document sealedFormDoc = new Document();
+        sealedFormDoc.setDocumentFileName("sealed_form.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("sealed_form.pdf").build(),
+            sealedFormDoc,
             DocumentType.SEALED_CLAIM
         )));
 
@@ -830,19 +790,19 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .atStatePendingClaimIssued()
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
-            .build().toBuilder()
-            .ccdState(CaseState.PENDING_CASE_ISSUED)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
+        caseData.setCcdState(CaseState.PENDING_CASE_ISSUED);
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -858,35 +818,33 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenDocumentTypeIsCourtOfficerOrder() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(COURT_OFFICER_ORDER)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1)
-        );
+        Document courtOfficerFileDoc = new Document();
+        courtOfficerFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(COURT_OFFICER_ORDER);
+        translatedDocument1.setFile(courtOfficerFileDoc);
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document courtOfficerDoc = new Document();
+        courtOfficerDoc.setDocumentFileName("court_officer_order.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("court_officer_order.pdf").build(),
+            courtOfficerDoc,
             DocumentType.COURT_OFFICER_ORDER
         )));
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -902,35 +860,36 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenDocumentTypeIsDefendantDefence() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(DEFENDANT_RESPONSE)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
+        Document defendantResponseFileDoc = new Document();
+        defendantResponseFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(DEFENDANT_RESPONSE);
+        translatedDocument1.setFile(defendantResponseFileDoc);
 
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document responseSealedDoc = new Document();
+        responseSealedDoc.setDocumentFileName("response_sealed_form.pdf");
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            responseSealedDoc,
+            DocumentType.DEFENDANT_DEFENCE
+        )));
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any())).thenReturn(LocalDateTime.now()
+                                                                                               .plusDays(28));
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
         List<Element<TranslatedDocument>> translatedDocument = List.of(
             element(translatedDocument1)
         );
-        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("response_sealed_form.pdf").build(),
-            DocumentType.DEFENDANT_DEFENCE
-        )));
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
-            .build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -947,34 +906,33 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenDocumentTypeIsHearingNotice() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(HEARING_NOTICE)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1)
-        );
+        Document hearingNoticeFileDoc = new Document();
+        hearingNoticeFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(HEARING_NOTICE);
+        translatedDocument1.setFile(hearingNoticeFileDoc);
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().documentFileName("hearing_small_claim.pdf").build(),
+        Document hearingDoc = new Document();
+        hearingDoc.setDocumentFileName("hearing_small_claim.pdf");
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(hearingDoc,
                                                                         DocumentType.HEARING_FORM)));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
+
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -990,36 +948,35 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentType_discontinue_claim() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT)
-            .file(Document.builder().documentFileName(FILE_NAME_2).build())
-            .build();
+        Document noticeDiscontinueFileDoc = new Document();
+        noticeDiscontinueFileDoc.setDocumentFileName(FILE_NAME_2);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT);
+        translatedDocument1.setFile(noticeDiscontinueFileDoc);
 
-        List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
-            element(translatedDocument1)
-        ));
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document noticeDoc = new Document();
+        noticeDoc.setDocumentFileName("notice_of_discontinuance.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
+            noticeDoc,
             DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT
         )));
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .courtPermissionNeeded(NO)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
+            element(translatedDocument1)
+        ));
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setCourtPermissionNeeded(NO);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -1033,36 +990,35 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentType_discontinue_claimForJudgeVerification() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT)
-            .file(Document.builder().documentFileName(FILE_NAME_2).build())
-            .build();
+        Document noticeDiscontinueFileDoc = new Document();
+        noticeDiscontinueFileDoc.setDocumentFileName(FILE_NAME_2);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT);
+        translatedDocument1.setFile(noticeDiscontinueFileDoc);
 
-        List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
-            element(translatedDocument1)
-        ));
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document noticeDoc = new Document();
+        noticeDoc.setDocumentFileName("notice_of_discontinuance.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
+            noticeDoc,
             DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT
         )));
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .courtPermissionNeeded(YES)
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
+            element(translatedDocument1)
+        ));
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setCourtPermissionNeeded(YES);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -1074,42 +1030,45 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeDefendantResponseOfLr() {
         //Given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(DEFENDANT_RESPONSE)
-            .file(Document.builder().documentFileName(FILE_NAME_2).build())
-            .build();
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(DEFENDANT_RESPONSE);
+        Document document = new Document();
+        document.setDocumentFileName(FILE_NAME_2);
+        translatedDocument1.setFile(document);
 
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document noticeSealedDoc = new Document();
+        noticeSealedDoc.setDocumentFileName("notice_of_discontinuance.pdf");
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            noticeSealedDoc,
+            DocumentType.SEALED_CLAIM
+        )));
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any())).thenReturn(LocalDateTime.now()
+                                                                                               .plusDays(28));
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build();
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
         List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
             element(translatedDocument1)
         ));
-        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
-            DocumentType.SEALED_CLAIM
-        )));
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .respondent1Represented(YesOrNo.YES)
-            .claimantBilingualLanguagePreference("BOTH")
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1OriginalDqDoc(CaseDocument.toCaseDocument(
-                Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        Document dqDoc = new Document();
+        dqDoc.setDocumentFileName("notice_of_discontinuance.pdf");
+        caseData.setRespondent1OriginalDqDoc(CaseDocument.toCaseDocument(
+                dqDoc,
                 DocumentType.DIRECTIONS_QUESTIONNAIRE
-            ))
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
-            .build();
+            ));
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -1128,41 +1087,42 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeDefendantResponseOfLrWhenNoTranslatedDOc() {
         //Given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT)
-            .file(Document.builder().documentFileName(FILE_NAME_2).build())
-            .build();
-        List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
-            element(translatedDocument1)
-        ));
+        Document noticeDiscontinueFileDoc = new Document();
+        noticeDiscontinueFileDoc.setDocumentFileName(FILE_NAME_2);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT);
+        translatedDocument1.setFile(noticeDiscontinueFileDoc);
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document noticeSealedDoc = new Document();
+        noticeSealedDoc.setDocumentFileName("notice_of_discontinuance.pdf");
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
+            noticeSealedDoc,
             DocumentType.SEALED_CLAIM
         )));
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
-            .build().toBuilder()
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .preTranslationDocuments(preTranslationDocuments)
-            .respondent1Represented(YesOrNo.YES)
-            .claimantBilingualLanguagePreference("BOTH")
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1OriginalDqDoc(CaseDocument.toCaseDocument(
-                Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
-                DocumentType.DIRECTIONS_QUESTIONNAIRE
-            ))
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .ccdCaseReference(123L)
             .build();
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+        List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
+            element(translatedDocument1)
+        ));
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        Document dqDoc = new Document();
+        dqDoc.setDocumentFileName("notice_of_discontinuance.pdf");
+        caseData.setRespondent1OriginalDqDoc(CaseDocument.toCaseDocument(
+                dqDoc,
+                DocumentType.DIRECTIONS_QUESTIONNAIRE
+            ));
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);

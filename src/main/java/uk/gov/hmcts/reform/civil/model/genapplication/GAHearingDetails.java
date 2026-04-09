@@ -2,9 +2,10 @@ package uk.gov.hmcts.reform.civil.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements;
@@ -17,34 +18,36 @@ import java.util.List;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@Accessors(chain = true)
 public class GAHearingDetails {
 
-    private final YesOrNo hearingYesorNo;
-    private final LocalDate hearingDate;
-    private final YesOrNo judgeRequiredYesOrNo;
-    private final String judgeName;
-    private final YesOrNo trialRequiredYesOrNo;
-    private final LocalDate trialDateFrom;
-    private final LocalDate trialDateTo;
-    private final GAHearingType hearingPreferencesPreferredType;
-    private final String telephoneHearingPreferredType;
-    private final String reasonForPreferredHearingType;
-    private final DynamicList hearingPreferredLocation;
-    private final String hearingDetailsTelephoneNumber;
-    private final String hearingDetailsEmailID;
-    private final GAHearingDuration hearingDuration;
-    private final String generalAppHearingDays;
-    private final String generalAppHearingHours;
-    private final String generalAppHearingMinutes;
-    private final YesOrNo unavailableTrialRequiredYesOrNo;
-    private final List<Element<GAUnavailabilityDates>> generalAppUnavailableDates;
-    private final YesOrNo vulnerabilityQuestionsYesOrNo;
-    private final String vulnerabilityQuestion;
-    private final List<GAHearingSupportRequirements> supportRequirement;
-    private final String supportRequirementSignLanguage;
-    private final String supportRequirementLanguageInterpreter;
-    private final String supportRequirementOther;
+    private YesOrNo hearingYesorNo;
+    private LocalDate hearingDate;
+    private YesOrNo judgeRequiredYesOrNo;
+    private String judgeName;
+    private YesOrNo trialRequiredYesOrNo;
+    private LocalDate trialDateFrom;
+    private LocalDate trialDateTo;
+    private GAHearingType hearingPreferencesPreferredType;
+    private String telephoneHearingPreferredType;
+    private String reasonForPreferredHearingType;
+    private DynamicList hearingPreferredLocation;
+    private String hearingDetailsTelephoneNumber;
+    private String hearingDetailsEmailID;
+    private GAHearingDuration hearingDuration;
+    private String generalAppHearingDays;
+    private String generalAppHearingHours;
+    private String generalAppHearingMinutes;
+    private YesOrNo unavailableTrialRequiredYesOrNo;
+    private List<Element<GAUnavailabilityDates>> generalAppUnavailableDates;
+    private YesOrNo vulnerabilityQuestionsYesOrNo;
+    private String vulnerabilityQuestion;
+    private List<GAHearingSupportRequirements> supportRequirement;
+    private String supportRequirementSignLanguage;
+    private String supportRequirementLanguageInterpreter;
+    private String supportRequirementOther;
+    private String respondentResponsePartyName;
 
     @JsonCreator
     GAHearingDetails(@JsonProperty("hearingYesorNo") YesOrNo hearingYesorNo,
@@ -73,7 +76,8 @@ public class GAHearingDetails {
                      @JsonProperty("SupportRequirementSignLanguage") String supportRequirementSignLanguage,
                      @JsonProperty("SupportRequirementLanguageInterpreter")
                              String supportRequirementLanguageInterpreter,
-                     @JsonProperty("SupportRequirementOther") String supportRequirementOther) {
+                     @JsonProperty("SupportRequirementOther") String supportRequirementOther,
+                     @JsonProperty("respondentResponsePartyName") String respondentResponsePartyName) {
         this.hearingYesorNo = hearingYesorNo;
         this.hearingDate = hearingDate;
         this.judgeRequiredYesOrNo = judgeRequiredYesOrNo;
@@ -99,5 +103,36 @@ public class GAHearingDetails {
         this.supportRequirementSignLanguage = supportRequirementSignLanguage;
         this.supportRequirementLanguageInterpreter = supportRequirementLanguageInterpreter;
         this.supportRequirementOther = supportRequirementOther;
+        this.respondentResponsePartyName = respondentResponsePartyName;
+    }
+
+    public GAHearingDetails copy() {
+        return new GAHearingDetails()
+            .setHearingYesorNo(hearingYesorNo)
+            .setHearingDate(hearingDate)
+            .setJudgeRequiredYesOrNo(judgeRequiredYesOrNo)
+            .setJudgeName(judgeName)
+            .setTrialRequiredYesOrNo(trialRequiredYesOrNo)
+            .setTrialDateFrom(trialDateFrom)
+            .setTrialDateTo(trialDateTo)
+            .setHearingPreferencesPreferredType(hearingPreferencesPreferredType)
+            .setTelephoneHearingPreferredType(telephoneHearingPreferredType)
+            .setReasonForPreferredHearingType(reasonForPreferredHearingType)
+            .setHearingPreferredLocation(hearingPreferredLocation)
+            .setHearingDetailsTelephoneNumber(hearingDetailsTelephoneNumber)
+            .setHearingDetailsEmailID(hearingDetailsEmailID)
+            .setHearingDuration(hearingDuration)
+            .setGeneralAppHearingDays(generalAppHearingDays)
+            .setGeneralAppHearingHours(generalAppHearingHours)
+            .setGeneralAppHearingMinutes(generalAppHearingMinutes)
+            .setUnavailableTrialRequiredYesOrNo(unavailableTrialRequiredYesOrNo)
+            .setGeneralAppUnavailableDates(generalAppUnavailableDates)
+            .setVulnerabilityQuestionsYesOrNo(vulnerabilityQuestionsYesOrNo)
+            .setVulnerabilityQuestion(vulnerabilityQuestion)
+            .setSupportRequirement(supportRequirement)
+            .setSupportRequirementSignLanguage(supportRequirementSignLanguage)
+            .setSupportRequirementLanguageInterpreter(supportRequirementLanguageInterpreter)
+            .setSupportRequirementOther(supportRequirementOther)
+            .setRespondentResponsePartyName(respondentResponsePartyName);
     }
 }

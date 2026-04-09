@@ -89,16 +89,18 @@ class StartHearingNoticeBusinessProcessTaskHandlerTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, names = {"READY", "DISPATCHED", "FINISHED"})
     void shouldStartBusinessProcess_whenValidBusinessProcessStatus(BusinessProcessStatus status) {
-        BusinessProcess businessProcess = BusinessProcess.builder().status(status).build();
+        BusinessProcess businessProcess = new BusinessProcess().setStatus(status);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().businessProcess(businessProcess).build();
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
         when(mockTask.getTopicName()).thenReturn("test");
         when(stateFlowEngine.getStateFlow(any(CaseData.class)))
-            .thenReturn(StateFlowDTO.builder().state(State.from("MAIN.DRAFT")).flags(Map.of()).build());
+            .thenReturn(new StateFlowDTO()
+                            .setState(State.from("MAIN.DRAFT"))
+                            .setFlags(Map.of()));
 
         handler.execute(mockTask, externalTaskService);
 
@@ -111,7 +113,7 @@ class StartHearingNoticeBusinessProcessTaskHandlerTest {
     void shouldRaiseBpmnError_whenBusinessProcessStatusIsStarted_AndHaveSameProcessInstanceId() {
         BusinessProcess businessProcess = getBusinessProcess(STARTED, PROCESS_INSTANCE_ID);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().businessProcess(businessProcess).build();
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
@@ -142,9 +144,8 @@ class StartHearingNoticeBusinessProcessTaskHandlerTest {
     }
 
     private BusinessProcess getBusinessProcess(BusinessProcessStatus started, String processInstanceId) {
-        return BusinessProcess.builder()
-            .status(started)
-            .processInstanceId(processInstanceId)
-            .build();
+        return new BusinessProcess()
+            .setStatus(started)
+            .setProcessInstanceId(processInstanceId);
     }
 }

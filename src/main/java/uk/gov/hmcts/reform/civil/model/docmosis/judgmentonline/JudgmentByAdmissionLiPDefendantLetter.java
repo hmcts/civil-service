@@ -1,24 +1,24 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@Accessors(chain = true)
 public class JudgmentByAdmissionLiPDefendantLetter implements MappableObject {
 
-    private final Party defendant;
-    private final String claimantName;
-    private final String claimReferenceNumber;
-    private final String respondToClaimUrl;
-    private final String pin;
-    private final String varyJudgmentFee;
-    private final String certifOfSatisfactionFee;
+    private Party defendant;
+    private String claimantName;
+    private String claimReferenceNumber;
+    private String respondToClaimUrl;
+    private String pin;
+    private String varyJudgmentFee;
+    private String certifOfSatisfactionFee;
 
 }

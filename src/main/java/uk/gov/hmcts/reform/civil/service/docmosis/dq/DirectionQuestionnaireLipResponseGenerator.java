@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -11,11 +12,11 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.RespondentTemplateForDQGenerator;
 
-import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LIP_RESPONSE;
 
+@Slf4j
 @Service
 public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuestionnaireGenerator {
 
@@ -38,36 +39,30 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(
+        DirectionsQuestionnaireForm form = dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(
             caseData,
             authorisation
         );
         DQLipFormMapper mapper = MAPPER_FACTORY.getDQLipFormMapper(caseData);
-        builder.lipStatementOfTruthName(mapper.getStatementOfTruthName(caseData))
-            .applicant(Party.toLipParty(caseData.getApplicant1()))
-            .respondent1LiPCorrespondenceAddress(caseData.getRespondent1CorrespondenceAddress())
-            .allocatedTrack(caseData.getResponseClaimTrack())
-            .fixedRecoverableCosts(mapper.getFixedRecoverableCostsIntermediate(caseData))
-            .disclosureOfElectronicDocuments(mapper.getDisclosureOfElectronicDocuments(caseData))
-            .disclosureOfNonElectronicDocuments(mapper.getDisclosureOfNonElectronicDocuments(caseData))
-            .documentsToBeConsidered(mapper.getDocumentsToBeConsidered(caseData));
-        return mapper.addLipDQs(builder.build(), Optional.ofNullable(caseData.getCaseDataLiP()));
+        form.setLipStatementOfTruthName(mapper.getStatementOfTruthName(caseData))
+            .setApplicant(Party.toLipParty(caseData.getApplicant1()))
+            .setRespondent1LiPCorrespondenceAddress(caseData.getRespondent1CorrespondenceAddress())
+            .setAllocatedTrack(caseData.getResponseClaimTrack())
+            .setFixedRecoverableCosts(mapper.getFixedRecoverableCostsIntermediate(caseData))
+            .setDisclosureOfElectronicDocuments(mapper.getDisclosureOfElectronicDocuments(caseData))
+            .setDisclosureOfNonElectronicDocuments(mapper.getDisclosureOfNonElectronicDocuments(caseData))
+            .setDocumentsToBeConsidered(mapper.getDocumentsToBeConsidered(caseData));
+        return mapper.addLipDQs(form, Optional.ofNullable(caseData.getCaseDataLiP()));
     }
 
     @Override
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
         if ((caseData.isRespondent1NotRepresented() || caseData.isApplicantNotRepresented())
             && featureToggleService.isLipVLipEnabled()) {
-            return DQ_LIP_RESPONSE;
+            final DocmosisTemplates dqLipResponse = DQ_LIP_RESPONSE;
+            log.info("{} {}", caseData.getCcdCaseReference(), dqLipResponse.getTemplate());
+            return dqLipResponse;
         }
         return super.getTemplateId(caseData);
-    }
-
-    protected List<Party> getApplicants(CaseData caseData) {
-        return List.of(Party.toLipParty(caseData.getApplicant1()));
-    }
-
-    protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
-        return List.of(Party.toLipParty(caseData.getRespondent1()));
     }
 }

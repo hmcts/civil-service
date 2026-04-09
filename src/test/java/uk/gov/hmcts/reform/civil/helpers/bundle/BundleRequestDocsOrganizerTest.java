@@ -35,23 +35,20 @@ class BundleRequestDocsOrganizerTest {
 
         List<Element<UploadEvidenceWitness>> witnessEvidenceList = new ArrayList<>();
 
-        UploadEvidenceWitness witness1 = UploadEvidenceWitness.builder()
-            .witnessOptionName("WitnessA")
-            .witnessOptionUploadDate(LocalDate.of(2023, 2, 5))
-            .build();
-        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness1).build());
+        UploadEvidenceWitness witness1 = new UploadEvidenceWitness()
+            .setWitnessOptionName("WitnessA")
+            .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 5));
+        witnessEvidenceList.add(new Element<UploadEvidenceWitness>().setValue(witness1));
 
-        UploadEvidenceWitness witness2 = UploadEvidenceWitness.builder()
-            .witnessOptionName("WitnessA")
-            .witnessOptionUploadDate(LocalDate.of(2023, 3, 10))
-            .build();
-        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness2).build());
+        UploadEvidenceWitness witness2 = new UploadEvidenceWitness()
+            .setWitnessOptionName("WitnessA")
+            .setWitnessOptionUploadDate(LocalDate.of(2023, 3, 10));
+        witnessEvidenceList.add(new Element<UploadEvidenceWitness>().setValue(witness2));
 
-        UploadEvidenceWitness witness3 = UploadEvidenceWitness.builder()
-            .witnessOptionName("WitnessB")
-            .witnessOptionUploadDate(LocalDate.of(2023, 4, 15))
-            .build();
-        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness3).build());
+        UploadEvidenceWitness witness3 = new UploadEvidenceWitness()
+            .setWitnessOptionName("WitnessB")
+            .setWitnessOptionUploadDate(LocalDate.of(2023, 4, 15));
+        witnessEvidenceList.add(new Element<UploadEvidenceWitness>().setValue(witness3));
 
         Map<String, List<Element<UploadEvidenceWitness>>> result =
             bundleRequestDocsOrganizer.groupWitnessStatementsByName(witnessEvidenceList);
@@ -65,19 +62,17 @@ class BundleRequestDocsOrganizerTest {
 
     @Test
     void shouldSortWitnessListByDate() {
-        UploadEvidenceWitness witness1 = UploadEvidenceWitness.builder()
-            .witnessOptionName("WitnessA")
-            .witnessOptionUploadDate(LocalDate.of(2023, 2, 5))
-            .build();
+        UploadEvidenceWitness witness1 = new UploadEvidenceWitness()
+            .setWitnessOptionName("WitnessA")
+            .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 5));
 
-        UploadEvidenceWitness witness2 = UploadEvidenceWitness.builder()
-            .witnessOptionName("WitnessB")
-            .witnessOptionUploadDate(LocalDate.of(2023, 3, 10))
-            .build();
+        UploadEvidenceWitness witness2 = new UploadEvidenceWitness()
+            .setWitnessOptionName("WitnessB")
+            .setWitnessOptionUploadDate(LocalDate.of(2023, 3, 10));
 
         List<Element<UploadEvidenceWitness>> witnessEvidenceList = new ArrayList<>();
-        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness1).build());
-        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness2).build());
+        witnessEvidenceList.add(new Element<UploadEvidenceWitness>().setValue(witness1));
+        witnessEvidenceList.add(new Element<UploadEvidenceWitness>().setValue(witness2));
 
         bundleRequestDocsOrganizer.sortWitnessListByDate(witnessEvidenceList, false);
 
@@ -88,19 +83,17 @@ class BundleRequestDocsOrganizerTest {
     @Test
     void shouldSortExpertListByDate() {
 
-        UploadEvidenceExpert expert1 = UploadEvidenceExpert.builder()
-            .expertOptionName("ExpertA")
-            .expertOptionUploadDate(LocalDate.of(2023, 2, 5))
-            .build();
+        UploadEvidenceExpert expert1 = new UploadEvidenceExpert()
+            .setExpertOptionName("ExpertA")
+            .setExpertOptionUploadDate(LocalDate.of(2023, 2, 5));
 
-        UploadEvidenceExpert expert2 = UploadEvidenceExpert.builder()
-            .expertOptionName("ExpertB")
-            .expertOptionUploadDate(LocalDate.of(2023, 3, 10))
-            .build();
+        UploadEvidenceExpert expert2 = new UploadEvidenceExpert()
+            .setExpertOptionName("ExpertB")
+            .setExpertOptionUploadDate(LocalDate.of(2023, 3, 10));
 
         List<Element<UploadEvidenceExpert>> expertEvidenceList = new ArrayList<>();
-        expertEvidenceList.add(Element.<UploadEvidenceExpert>builder().value(expert1).build());
-        expertEvidenceList.add(Element.<UploadEvidenceExpert>builder().value(expert2).build());
+        expertEvidenceList.add(new Element<UploadEvidenceExpert>().setValue(expert1));
+        expertEvidenceList.add(new Element<UploadEvidenceExpert>().setValue(expert2));
 
         bundleRequestDocsOrganizer.sortExpertListByDate(expertEvidenceList);
 
@@ -111,25 +104,22 @@ class BundleRequestDocsOrganizerTest {
     @Test
     void shouldGroupExpertStatementsByName() {
 
-        UploadEvidenceExpert expert1 = UploadEvidenceExpert.builder()
-            .expertOptionName("ExpertA")
-            .expertOptionUploadDate(LocalDate.of(2023, 2, 5))
-            .build();
+        UploadEvidenceExpert expert1 = new UploadEvidenceExpert()
+            .setExpertOptionName("ExpertA")
+            .setExpertOptionUploadDate(LocalDate.of(2023, 2, 5));
 
-        UploadEvidenceExpert expert2 = UploadEvidenceExpert.builder()
-            .expertOptionName("ExpertA")
-            .expertOptionUploadDate(LocalDate.of(2023, 3, 10))
-            .build();
+        UploadEvidenceExpert expert2 = new UploadEvidenceExpert()
+            .setExpertOptionName("ExpertA")
+            .setExpertOptionUploadDate(LocalDate.of(2023, 3, 10));
 
-        UploadEvidenceExpert expert3 = UploadEvidenceExpert.builder()
-            .expertOptionName("ExpertB")
-            .expertOptionUploadDate(LocalDate.of(2023, 4, 15))
-            .build();
+        UploadEvidenceExpert expert3 = new UploadEvidenceExpert()
+            .setExpertOptionName("ExpertB")
+            .setExpertOptionUploadDate(LocalDate.of(2023, 4, 15));
 
         List<Element<UploadEvidenceExpert>> expertEvidenceList = new ArrayList<>();
-        expertEvidenceList.add(Element.<UploadEvidenceExpert>builder().value(expert1).build());
-        expertEvidenceList.add(Element.<UploadEvidenceExpert>builder().value(expert2).build());
-        expertEvidenceList.add(Element.<UploadEvidenceExpert>builder().value(expert3).build());
+        expertEvidenceList.add(new Element<UploadEvidenceExpert>().setValue(expert1));
+        expertEvidenceList.add(new Element<UploadEvidenceExpert>().setValue(expert2));
+        expertEvidenceList.add(new Element<UploadEvidenceExpert>().setValue(expert3));
 
         Map<String, List<Element<UploadEvidenceExpert>>> result =
             bundleRequestDocsOrganizer.groupExpertStatementsByName(expertEvidenceList);
@@ -144,17 +134,15 @@ class BundleRequestDocsOrganizerTest {
     @Test
     void shouldSortEvidenceUploadByDate() {
 
-        UploadEvidenceDocumentType doc1 = UploadEvidenceDocumentType.builder()
-            .documentIssuedDate(LocalDate.of(2023, 2, 5))
-            .build();
+        UploadEvidenceDocumentType doc1 = new UploadEvidenceDocumentType()
+            .setDocumentIssuedDate(LocalDate.of(2023, 2, 5));
 
-        UploadEvidenceDocumentType doc2 = UploadEvidenceDocumentType.builder()
-            .documentIssuedDate(LocalDate.of(2023, 3, 10))
-            .build();
+        UploadEvidenceDocumentType doc2 = new UploadEvidenceDocumentType()
+            .setDocumentIssuedDate(LocalDate.of(2023, 3, 10));
 
         List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
-        documentList.add(Element.<UploadEvidenceDocumentType>builder().value(doc1).build());
-        documentList.add(Element.<UploadEvidenceDocumentType>builder().value(doc2).build());
+        documentList.add(new Element<UploadEvidenceDocumentType>().setValue(doc1));
+        documentList.add(new Element<UploadEvidenceDocumentType>().setValue(doc2));
 
         bundleRequestDocsOrganizer.sortEvidenceUploadByDate(documentList, false);
 
@@ -173,21 +161,17 @@ class BundleRequestDocsOrganizerTest {
     private List<Element<UploadEvidenceDocumentType>> getDocumentEvidenceForTrial() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
         Arrays.stream(TypeOfDocDocumentaryEvidenceOfTrial.values()).toList().forEach(type -> {
-            otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                           .builder()
-                                                           .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                               .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                           .typeOfDocument(type.getDisplayNames().get(0))
-                                                           .documentIssuedDate(LocalDate.of(2023, 1, 12))
-                                                           .build()));
+            otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                           .setDocumentUpload(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                               .setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
+                                                           .setTypeOfDocument(type.getDisplayNames().get(0))
+                                                           .setDocumentIssuedDate(LocalDate.of(2023, 1, 12))));
         });
-        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                           .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                       .typeOfDocument("Other")
-                                                       .documentIssuedDate(LocalDate.of(2023, 1, 12))
-                                                       .build()));
+        otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                       .setDocumentUpload(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                           .setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
+                                                       .setTypeOfDocument("Other")
+                                                       .setDocumentIssuedDate(LocalDate.of(2023, 1, 12))));
         return otherEvidenceDocs;
     }
 }

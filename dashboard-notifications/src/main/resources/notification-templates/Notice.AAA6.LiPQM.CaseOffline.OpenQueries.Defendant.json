@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "Your case is now offline, but the court has not answered a message sent on the case",
+  "titleCy": "Mae eich achos bellach all-lein, ond nid yw’r llys wedi ateb neges a anfonwyd ar yr achos",
+  "descriptionEn": "<p class=\"govuk-body\">The message may still be answered on your dashboard, but all other updates on your case will be by email or post.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae’n bosibl y byddwch yn dal i gael ateb i’ch neges ar eich dangosfwrdd, ond bydd yr holl ddiweddariadau eraill ar eich achos trwy e-bost neu'r post.</p>"
+}

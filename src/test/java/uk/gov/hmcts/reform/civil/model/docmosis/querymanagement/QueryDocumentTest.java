@@ -25,39 +25,32 @@ class QueryDocumentTest {
     private static String QUERY_ID = "query-id";
     private static String PARENT_QUERY_ID = "parent-id";
 
-    private static CaseMessage INITIAL_QUERY = CaseMessage.builder()
-        .id(PARENT_QUERY_ID)
-        .name("Solicitor")
-        .isHearingRelated(YES)
-        .hearingDate(HEARING_DATE)
-        .subject("initial query")
-        .createdOn(DATE_QUERY_RAISED)
-        .createdBy(SOLICITOR_ID.toString())
-        .build();
+    private static final CaseMessage INITIAL_QUERY = createCaseMessage(
+        PARENT_QUERY_ID,
+        "Solicitor",
+        "initial query",
+        null,
+        SOLICITOR_ID,
+        DATE_QUERY_RAISED
+    );
 
-    private static CaseMessage QUERY_RESPONSE =
-        CaseMessage.builder()
-            .id(QUERY_ID)
-            .name("Caseworker")
-            .subject("A response")
-            .parentId(PARENT_QUERY_ID)
-            .isHearingRelated(YES)
-            .hearingDate(HEARING_DATE)
-            .createdOn(DATE_QUERY_RAISED.plusDays(1))
-            .createdBy(CASEWORKER_ID.toString())
-            .build();
+    private static final CaseMessage QUERY_RESPONSE = createCaseMessage(
+        QUERY_ID,
+        "Caseworker",
+        "A response",
+        PARENT_QUERY_ID,
+        CASEWORKER_ID,
+        DATE_QUERY_RAISED.plusDays(1)
+    );
 
-    private static CaseMessage QUERY_FOLLOWUP =
-        CaseMessage.builder()
-            .id(QUERY_ID)
-            .name("Solicitor")
-            .subject("A follow up")
-            .parentId(PARENT_QUERY_ID)
-            .isHearingRelated(YES)
-            .hearingDate(HEARING_DATE)
-            .createdOn(DATE_QUERY_RAISED.plusDays(2))
-            .createdBy(SOLICITOR_ID.toString())
-            .build();
+    private static final CaseMessage QUERY_FOLLOWUP = createCaseMessage(
+        QUERY_ID,
+        "Solicitor",
+        "A follow up",
+        PARENT_QUERY_ID,
+        SOLICITOR_ID,
+        DATE_QUERY_RAISED.plusDays(2)
+    );
 
     @Test
     void shouldReturnQueryDocument() {
@@ -70,36 +63,50 @@ class QueryDocumentTest {
 
         QueryDocument result = QueryDocument.from(CASE_ID, messageThread);
 
-        assertEquals(QueryDocument.builder()
-                         .referenceNumber(CASE_ID)
-                         .messages(List.of(
-                             DocumentQueryMessage.builder()
-                                 .id(INITIAL_QUERY.getId())
-                                 .messageType("Query")
-                                 .name(INITIAL_QUERY.getName())
-                                 .subject(INITIAL_QUERY.getSubject())
-                                 .hearingDate("15-03-2025")
-                                 .createdOn("15-01-2025 12:00")
-                                 .isHearingRelated(INITIAL_QUERY.getIsHearingRelated())
-                                 .attachments(INITIAL_QUERY.getAttachments())
-                                 .build(),
-                             DocumentQueryMessage.builder()
-                                 .id(QUERY_RESPONSE.getId())
-                                 .messageType("Caseworker response")
-                                 .name("Caseworker")
-                                 .createdOn("16-01-2025 12:00")
-                                 .attachments(QUERY_RESPONSE.getAttachments())
-                                 .build(),
-                             DocumentQueryMessage.builder()
-                                 .id(QUERY_FOLLOWUP.getId())
-                                 .messageType("Follow up")
-                                 .name(QUERY_FOLLOWUP.getName())
-                                 .createdOn("17-01-2025 12:00")
-                                 .attachments(QUERY_FOLLOWUP.getAttachments())
-                                 .build()
-                         ))
-                         .build(), result);
+        assertEquals(new QueryDocument()
+                         .setReferenceNumber(CASE_ID)
+                         .setMessages(List.of(
+                             new DocumentQueryMessage()
+                                 .setId(INITIAL_QUERY.getId())
+                                 .setMessageType("Query")
+                                 .setName(INITIAL_QUERY.getName())
+                                 .setSubject(INITIAL_QUERY.getSubject())
+                                 .setHearingDate("15-03-2025")
+                                 .setCreatedOn("15-01-2025 12:00")
+                                 .setIsHearingRelated(INITIAL_QUERY.getIsHearingRelated())
+                                 .setAttachments(INITIAL_QUERY.getAttachments()),
+                             new DocumentQueryMessage()
+                                 .setId(QUERY_RESPONSE.getId())
+                                 .setMessageType("Caseworker response")
+                                 .setName("Caseworker")
+                                 .setCreatedOn("16-01-2025 12:00")
+                                 .setAttachments(QUERY_RESPONSE.getAttachments()),
+                             new DocumentQueryMessage()
+                                 .setId(QUERY_FOLLOWUP.getId())
+                                 .setMessageType("Follow up")
+                                 .setName(QUERY_FOLLOWUP.getName())
+                                 .setCreatedOn("17-01-2025 12:00")
+                                 .setAttachments(QUERY_FOLLOWUP.getAttachments())
+                        )), result);
 
+    }
+
+    private static CaseMessage createCaseMessage(String id,
+                                                 String name,
+                                                 String subject,
+                                                 String parentId,
+                                                 UUID createdBy,
+                                                 OffsetDateTime createdOn) {
+        CaseMessage caseMessage = new CaseMessage();
+        caseMessage.setId(id);
+        caseMessage.setName(name);
+        caseMessage.setSubject(subject);
+        caseMessage.setParentId(parentId);
+        caseMessage.setIsHearingRelated(YES);
+        caseMessage.setHearingDate(HEARING_DATE);
+        caseMessage.setCreatedOn(createdOn);
+        caseMessage.setCreatedBy(createdBy.toString());
+        return caseMessage;
     }
 
 }

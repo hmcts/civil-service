@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.ClaimIssue.Response.Await",
+  "role": "CLAIMANT",
+  "titleEn": "Wait for defendant to respond",
+  "titleCy": "Aros i'r diffynnydd ymateb",
+  "descriptionEn": "<p class=\"govuk-body\">${respondent1PartyName} has until ${respondent1ResponseDeadlineEn} to respond. They can request an extra 28 days if they need it.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae gan ${respondent1PartyName} hyd at ${respondent1ResponseDeadlineCy} i ymateb. Gallant ofyn am 28 diwrnod ychwanegol os oes arnynt angen hynny.</p>"
+}

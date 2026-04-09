@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentTabDetails;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
@@ -31,7 +32,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -47,6 +48,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,7 +81,7 @@ public class SubmitClaimTask {
     private final FeesService feesService;
     private final UserService userService;
     private final Time time;
-    private final SpecReferenceNumberRepository specReferenceNumberRepository;
+    private final CasemanReferenceNumberRepository casemanReferenceNumberRepository;
     private final OrganisationService organisationService;
     private final AirlineEpimsService airlineEpimsService;
     private final LocationReferenceDataService locationRefDataService;
@@ -92,222 +94,209 @@ public class SubmitClaimTask {
     public CallbackResponse submitClaim(CaseData caseData, String eventId, String authorisationToken, YesOrNo isFlightDelayClaim,
                                         FlightDelayDetails flightDelayDetails) {
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(caseData, authorisationToken, eventId);
+        setSharedData(caseData, authorisationToken, eventId);
 
         // moving statement of truth value to correct field, this was not possible in mid event.
         // resetting statement of truth to make sure it's empty the next time it appears in the UI.
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
-        dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
+        caseData.setUiStatementOfTruth(new StatementOfTruth());
+        caseData.setApplicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
         if (eventId != null) {
             var respondent1Represented = caseData.getSpecRespondent1Represented();
-            dataBuilder.respondent1Represented(respondent1Represented);
+            caseData.setRespondent1Represented(respondent1Represented);
             var respondent2Represented = caseData.getSpecRespondent2Represented();
-            dataBuilder.respondent2Represented(respondent2Represented);
+            caseData.setRespondent2Represented(respondent2Represented);
         }
 
-        addOrgPolicy2ForSameLegalRepresentative(dataBuilder.build(), dataBuilder);
+        addOrgPolicy2ForSameLegalRepresentative(caseData);
 
-        boolean pinInPostCaseMatched = isPinInPostCaseMatched(caseData);
-        log.info("Pin In Post Case Matched {} for caseId {}", pinInPostCaseMatched, caseData.getCcdCaseReference());
-        if (pinInPostCaseMatched) {
-            log.info("Pin In Post Matched for caseId {}", caseData.getCcdCaseReference());
-            dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
+        boolean caseMatched = isCaseMatched(caseData);
+        log.info("Post Case Matched {} for caseId {}", caseMatched, caseData.getCcdCaseReference());
+        if (caseMatched) {
+            log.info("Matched for caseId {}", caseData.getCcdCaseReference());
+            caseData.setRespondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
-        dataBuilder
-            .caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build())
-            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build())
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM);
+        CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+        caseLocationCivil.setRegion(regionId);
+        caseLocationCivil.setBaseLocation(epimmsId);
+        caseData.setCaseManagementLocation(caseLocationCivil);
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            //    added this to show location name  on location column in my tasks tab
-            List<LocationRefData> locations = (locationRefDataService
-                .getCourtLocationsByEpimmsIdAndCourtType(authorisationToken, epimmsId));
-            if (!locations.isEmpty()) {
-                LocationRefData locationRefData = locations.get(0);
-                dataBuilder.locationName(locationRefData.getSiteName());
-            }
+        List<LocationRefData> locations = (locationRefDataService
+            .getCourtLocationsByEpimmsId(authorisationToken, epimmsId));
 
-        }
+        Optional.ofNullable(locations)
+            .orElseGet(Collections::emptyList).stream().findFirst()
+            .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));
 
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
-        }
+        PopulateRespondentTabDetails.updateDataForClaimDetailsTab(caseData, objectMapper, false);
 
-        dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
-        dataBuilder.featureToggleWA(toggleConfiguration.getFeatureToggle());
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
 
         //assign case management category to the case and caseNameHMCTSinternal
-        dataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
-        dataBuilder.caseNamePublic(buildCaseName(caseData));
+        caseData.setCaseNameHmctsInternal(buildCaseName(caseData));
+        caseData.setCaseNamePublic(buildCaseName(caseData));
 
-        CaseManagementCategoryElement civil =
-            CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+        CaseManagementCategoryElement civil = new CaseManagementCategoryElement();
+        civil.setCode("Civil");
+        civil.setLabel("Civil");
         List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
         itemList.add(element(civil));
-        dataBuilder.caseManagementCategory(
-            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+        CaseManagementCategory caseManagementCategory = new CaseManagementCategory();
+        caseManagementCategory.setValue(civil);
+        caseManagementCategory.setList_items(itemList);
+        caseData.setCaseManagementCategory(caseManagementCategory);
 
-        OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
+        OrgPolicyUtils.addMissingOrgPolicies(caseData);
 
-        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, dataBuilder);
+        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, caseData);
 
-        defaultInterestClaimUntil(caseData, dataBuilder);
+        defaultInterestClaimUntil(caseData);
 
-        CaseData temporaryCaseData = dataBuilder.build();
-
-        if (temporaryCaseData.getRespondent1OrgRegistered() == YES
-            && temporaryCaseData.getRespondent1Represented() == YES
-            && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
+        if (caseData.getRespondent1OrgRegistered() == YES
+            && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent2SameLegalRepresentative() == YES) {
             // Predicate: Def1 registered, Def 2 unregistered.
             // This is required to ensure mutual exclusion in 1v2 same solicitor case.
-            dataBuilder
-                .respondent2OrgRegistered(YES)
-                .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
+            caseData.setRespondent2OrgRegistered(YES);
+            caseData.setRespondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
             Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
             references.ifPresent(ref -> {
-                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
-                    .applicantSolicitor1Reference(ref.getApplicantSolicitor1Reference())
-                    .respondentSolicitor1Reference(ref.getRespondentSolicitor1Reference())
-                    .respondentSolicitor2Reference(ref.getRespondentSolicitor1Reference())
-                    .build();
-                dataBuilder.solicitorReferences(updatedSolicitorReferences);
+                SolicitorReferences updatedSolicitorReferences = new SolicitorReferences();
+                updatedSolicitorReferences.setApplicantSolicitor1Reference(ref.getApplicantSolicitor1Reference());
+                updatedSolicitorReferences.setRespondentSolicitor1Reference(ref.getRespondentSolicitor1Reference());
+                updatedSolicitorReferences.setRespondentSolicitor2Reference(ref.getRespondentSolicitor1Reference());
+                caseData.setSolicitorReferences(updatedSolicitorReferences);
             });
-            dataBuilder
-                .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
-            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
-        } else if (temporaryCaseData.getRespondent1OrgRegistered() == NO
-            && temporaryCaseData.getRespondent1Represented() == YES
-            && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
-            dataBuilder
-                .respondent2OrgRegistered(NO)
-                .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
+            caseData.setRespondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
+            caseData.setRespondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
+        } else if (caseData.getRespondent1OrgRegistered() == NO
+            && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent2SameLegalRepresentative() == YES) {
+            caseData.setRespondent2OrgRegistered(NO);
+            caseData.setRespondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
             Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
             references.ifPresent(ref -> {
-                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
-                    .applicantSolicitor1Reference(ref.getApplicantSolicitor1Reference())
-                    .respondentSolicitor1Reference(ref.getRespondentSolicitor1Reference())
-                    .respondentSolicitor2Reference(ref.getRespondentSolicitor1Reference())
-                    .build();
-                dataBuilder.solicitorReferences(updatedSolicitorReferences);
+                SolicitorReferences updatedSolicitorReferences = new SolicitorReferences();
+                updatedSolicitorReferences.setApplicantSolicitor1Reference(ref.getApplicantSolicitor1Reference());
+                updatedSolicitorReferences.setRespondentSolicitor1Reference(ref.getRespondentSolicitor1Reference());
+                updatedSolicitorReferences.setRespondentSolicitor2Reference(ref.getRespondentSolicitor1Reference());
+                caseData.setSolicitorReferences(updatedSolicitorReferences);
             });
-            dataBuilder
-                .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
-            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
-            dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
+            caseData.setRespondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
+            caseData.setRespondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
+            caseData.setRespondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
         }
-        dataBuilder
-            .allPartyNames(getAllPartyNames(caseData))
-            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferencesSpec(caseData));
 
-        populateWithPartyIds(dataBuilder);
+        caseData.setAllPartyNames(getAllPartyNames(caseData));
+        caseData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferencesSpec(caseData));
 
-        dataBuilder.anyRepresented(YES);
+        populateWithPartyIds(caseData);
+
+        caseData.setAnyRepresented(YES);
 
         if (caseData.getSdtRequestIdFromSdt() != null) {
             // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed
             List<Element<String>> stdRequestIdList = new ArrayList<>();
             stdRequestIdList.add(element(caseData.getSdtRequestIdFromSdt()));
-            dataBuilder.sdtRequestId(stdRequestIdList);
+            caseData.setSdtRequestId(stdRequestIdList);
             BigDecimal bulkInterest = interestCalculator.calculateBulkInterest(caseData);
             if (!bulkInterest.equals(BigDecimal.ZERO)) {
-                dataBuilder.interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST);
+                caseData.setInterestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST);
             }
-            dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(bulkInterest)));
+            caseData.setClaimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(bulkInterest)));
             //PBA manual selection
             List<String> pbaNumbers = getPbaAccounts(authorisationToken);
-            dataBuilder.applicantSolicitor1PbaAccounts(DynamicList.builder()
-                .value(DynamicListElement.builder()
-                    .label(pbaNumbers.get(0))
-                    .build()).build());
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel(pbaNumbers.get(0));
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(dynamicListElement);
+            caseData.setApplicantSolicitor1PbaAccounts(dynamicList);
         }
 
         List<String> errors = new ArrayList<>();
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP
             && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
             // to keep with heading tab
-            dataBuilder
-                .specRespondent2CorrespondenceAddressRequired(
-                    caseData.getSpecRespondentCorrespondenceAddressRequired())
-                .specRespondent2CorrespondenceAddressdetails(
-                    caseData.getSpecRespondentCorrespondenceAddressdetails());
+            caseData.setSpecRespondent2CorrespondenceAddressRequired(caseData.getSpecRespondentCorrespondenceAddressRequired());
+            caseData.setSpecRespondent2CorrespondenceAddressdetails(caseData.getSpecRespondentCorrespondenceAddressdetails());
         }
 
         if (isFlightDelayClaim != null && isFlightDelayClaim.equals(YES)) {
+            caseData.setClaimType(ClaimType.FLIGHT_DELAY);
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(flightDelayDetails.getAirlineList().getValue());
+            FlightDelayDetails flightDelayDetails1 = new FlightDelayDetails();
+            flightDelayDetails1.setAirlineList(dynamicList);
+            flightDelayDetails1.setNameOfAirline(flightDelayDetails.getNameOfAirline());
+            flightDelayDetails1.setFlightNumber(flightDelayDetails.getFlightNumber());
+            flightDelayDetails1.setScheduledDate(flightDelayDetails.getScheduledDate());
             String selectedAirlineCode = flightDelayDetails.getAirlineList().getValue().getCode();
-            dataBuilder.claimType(ClaimType.FLIGHT_DELAY)
-                .flightDelayDetails(FlightDelayDetails.builder()
-                    .airlineList(DynamicList.builder().value(flightDelayDetails.getAirlineList().getValue()).build())
-                    .nameOfAirline(flightDelayDetails.getNameOfAirline())
-                    .flightNumber(flightDelayDetails.getFlightNumber())
-                    .scheduledDate(flightDelayDetails.getScheduledDate())
-                    .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, authorisationToken))
-                    .build());
+            flightDelayDetails1.setFlightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, authorisationToken));
+            caseData.setFlightDelayDetails(flightDelayDetails1);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(dataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void defaultInterestClaimUntil(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
+    private void defaultInterestClaimUntil(CaseData caseData) {
         if (caseData.getInterestClaimFrom() != null && caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)) {
-            dataBuilder.interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
-                .build();
+            caseData.setInterestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE);
         }
     }
 
-    private CaseData.CaseDataBuilder getSharedData(CaseData caseData, String authToken, String eventId) {
+    private void setSharedData(CaseData caseData, String authToken, String eventId) {
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         UserDetails userDetails = userService.getUserDetails(authToken);
-        IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
+        IdamUserDetails idam = new IdamUserDetails();
+        idam.setId(userDetails.getId());
         CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
         if (applicantSolicitor1CheckEmail != null && applicantSolicitor1CheckEmail.isCorrect()) {
-            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1CheckEmail.getEmail()).build());
+            idam.setEmail(applicantSolicitor1CheckEmail.getEmail());
+            caseData.setApplicantSolicitor1UserDetails(idam);
         } else {
             IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
-            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
+            idam.setEmail(applicantSolicitor1UserDetails.getEmail());
+            caseData.setApplicantSolicitor1UserDetails(idam);
         }
 
-        dataBuilder.submittedDate(time.now());
+        caseData.setSubmittedDate(time.now());
 
         if (null != eventId) {
-            dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
-            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
+            caseData.setLegacyCaseReference(casemanReferenceNumberRepository.next("spec"));
+            caseData.setBusinessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
         }
 
         //set check email field to null for GDPR
-        dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
-        return dataBuilder;
+        caseData.setApplicantSolicitor1CheckEmail(new CorrectEmail());
     }
 
-    private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData) {
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
-            OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
-
+            OrganisationPolicy respondent2OrganisationPolicy = new OrganisationPolicy();
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
             if (respondent1OrganisationPolicy != null) {
-                organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
-                    .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                    .build();
+                respondent2OrganisationPolicy
+                    .setOrganisation(respondent1OrganisationPolicy.getOrganisation())
+                    .setOrgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference());
             }
-            organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
-            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
+            respondent2OrganisationPolicy.setOrgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
+            caseData.setRespondent2OrganisationPolicy(respondent2OrganisationPolicy);
         }
     }
 
-    private boolean isPinInPostCaseMatched(CaseData caseData) {
-        log.info("Respondent1Represented =={}== AddRespondent2 =={}== AddApplicant2 =={}== and isPinInPostEnabled {} for caseId ={}=",
-            caseData.getRespondent1Represented(), caseData.getAddRespondent2(), caseData.getAddApplicant2(),
-            featureToggleService.isPinInPostEnabled(), caseData.getCcdCaseReference());
+    private boolean isCaseMatched(CaseData caseData) {
+        log.info("Respondent1Represented =={}== AddRespondent2 =={}== AddApplicant2 =={}== for caseId ={}=",
+            caseData.getRespondent1Represented(), caseData.getAddRespondent2(), caseData.getAddApplicant2(), caseData.getCcdCaseReference());
         return (caseData.getRespondent1Represented() == NO
             && caseData.getAddRespondent2() == NO
-            && caseData.getAddApplicant2() == NO
-            && featureToggleService.isPinInPostEnabled());
+            && caseData.getAddApplicant2() == NO);
     }
 
     private List<String> getPbaAccounts(String authToken) {
@@ -326,9 +315,10 @@ public class SubmitClaimTask {
         if (matchedLocations.isEmpty()) {
             throw new CallbackException(String.format(LOCATION_NOT_FOUND_MESSAGE, locationEpimmsId));
         } else {
-            return CaseLocationCivil.builder()
-                .region(matchedLocations.get(0).getRegionId())
-                .baseLocation(matchedLocations.get(0).getEpimmsId()).build();
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setRegion(matchedLocations.get(0).getRegionId());
+            caseLocationCivil.setBaseLocation(matchedLocations.get(0).getEpimmsId());
+            return caseLocationCivil;
         }
     }
 

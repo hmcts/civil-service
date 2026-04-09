@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -50,6 +52,8 @@ class TrialArrangementsClaimantNotificationHandlerTest extends BaseCallbackHandl
 
     @Mock
     private FeatureToggleService featureToggleService;
+    @Spy
+    private SdoCaseClassificationService sdoCaseClassificationService = new SdoCaseClassificationService();
 
     public static final String TASK_ID = "GenerateDashboardClaimantNotificationTrialArrangements";
 
@@ -76,7 +80,6 @@ class TrialArrangementsClaimantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -89,7 +92,7 @@ class TrialArrangementsClaimantNotificationHandlerTest extends BaseCallbackHandl
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         } else {
             verifyNoInteractions(dashboardScenariosService);
@@ -97,28 +100,22 @@ class TrialArrangementsClaimantNotificationHandlerTest extends BaseCallbackHandl
     }
 
     private static Stream<Arguments> provideCaseData() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setDrawDirectionsOrderRequired(YES);
+        caseData.setDrawDirectionsOrderSmallClaims(NO);
+        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setOrderType(OrderType.DECIDE_DAMAGES);
+        CaseData caseDataReady = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseDataReady.setApplicant1Represented(YesOrNo.NO);
+        caseDataReady.setDrawDirectionsOrderRequired(YES);
+        caseDataReady.setDrawDirectionsOrderSmallClaims(NO);
+        caseDataReady.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseDataReady.setOrderType(OrderType.DECIDE_DAMAGES);
+        caseDataReady.setTrialReadyApplicant(YES);
         return Stream.of(
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimIssued().build()
-                    .toBuilder().applicant1Represented(YesOrNo.NO)
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .claimsTrack(ClaimsTrack.fastTrack)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .build(),
-                true
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimIssued().build()
-                    .toBuilder().applicant1Represented(YesOrNo.NO)
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .claimsTrack(ClaimsTrack.fastTrack)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .trialReadyApplicant(YES)
-                    .build(),
-                false
-            )
+            Arguments.of(caseData, true),
+            Arguments.of(caseDataReady, false)
         );
     }
 

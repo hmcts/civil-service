@@ -66,14 +66,13 @@ class TrialArrangementsNotifyOtherPartyDefendantNotificationHandlerTest  extends
         @Test
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build())
+                .caseDataLip(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.YES)
+                                 .setApplicant1ClaimSettledDate(
+                                     LocalDate.now()))
                 .respondent1Represented(YesOrNo.NO).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_DEFENDANT.name()).build()
@@ -84,7 +83,7 @@ class TrialArrangementsNotifyOtherPartyDefendantNotificationHandlerTest  extends
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

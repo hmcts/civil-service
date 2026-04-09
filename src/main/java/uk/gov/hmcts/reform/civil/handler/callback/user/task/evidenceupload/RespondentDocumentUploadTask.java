@@ -23,8 +23,8 @@ public class RespondentDocumentUploadTask extends DocumentUploadTask<RespondentS
     }
 
     @Override
-    void applyDocumentUploadDate(CaseData.CaseDataBuilder caseDataBuilder, LocalDateTime now) {
-        caseDataBuilder.caseDocumentUploadDateRes(now);
+    void applyDocumentUploadDate(CaseData caseData, LocalDateTime now) {
+        caseData.setCaseDocumentUploadDateRes(now);
     }
 
     @Override

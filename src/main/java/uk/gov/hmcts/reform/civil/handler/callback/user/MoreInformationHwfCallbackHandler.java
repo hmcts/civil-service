@@ -75,23 +75,24 @@ public class MoreInformationHwfCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitMoreInformationHwf(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
+        caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
 
         if (caseData.isHWFTypeHearing()) {
             HelpWithFeesDetails hearingFeeDetails =
                 Optional.ofNullable(caseData.getHearingHwfDetails()).orElse(new HelpWithFeesDetails());
-            updatedData.hearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(MORE_INFORMATION_HWF).build());
+            hearingFeeDetails.setHwfCaseEvent(MORE_INFORMATION_HWF);
+            caseData.setHearingHwfDetails(hearingFeeDetails);
         }
         if (caseData.isHWFTypeClaimIssued()) {
             HelpWithFeesDetails claimIssuedHwfDetails =
                 Optional.ofNullable(caseData.getClaimIssuedHwfDetails()).orElse(new HelpWithFeesDetails());
-            updatedData.claimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(MORE_INFORMATION_HWF).build());
+            claimIssuedHwfDetails.setHwfCaseEvent(MORE_INFORMATION_HWF);
+            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
 
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

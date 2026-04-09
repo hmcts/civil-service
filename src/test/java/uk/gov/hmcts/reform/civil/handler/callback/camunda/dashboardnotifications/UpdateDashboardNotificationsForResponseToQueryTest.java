@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -48,9 +47,6 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
     private DashboardScenariosService dashboardScenariosService;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
     public static final String TASK_ID = "UpdateDashboardNotificationsResponseToQuery";
@@ -72,29 +68,26 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
-        CaseQueriesCollection claimantQueries = CaseQueriesCollection.builder()
-            .caseMessages(wrapElements(List.of(CaseMessage.builder()
-                                                   .id("123457")
-                                                   .createdBy("claimant")
-                                                   .build(),
-                    CaseMessage.builder()
-                        .id("queryId")
-                        .createdBy("claimant")
-                        .parentId("123457")
-                        .build())))
-            .build();
+        CaseMessage claimantQuery = new CaseMessage();
+        claimantQuery.setId("123457");
+        claimantQuery.setCreatedBy("claimant");
+        CaseMessage claimantResponse = new CaseMessage();
+        claimantResponse.setId("queryId");
+        claimantResponse.setCreatedBy("claimant");
+        claimantResponse.setParentId("123457");
+        CaseQueriesCollection claimantQueries = new CaseQueriesCollection();
+        claimantQueries.setCaseMessages(wrapElements(List.of(claimantQuery, claimantResponse)));
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
-                ).build()
+                new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
+                )
             )
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.YES)
-            .qmLatestQuery(LatestQuery.builder().queryId("queryId").build())
+            .qmLatestQuery(createLatestQuery("queryId"))
             .queries(claimantQueries)
             .legacyCaseReference("reference")
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
@@ -108,13 +101,13 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
             "BEARER_TOKEN",
                 SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService, times(1)).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }
@@ -125,24 +118,21 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
-        CaseQueriesCollection defendantQueries = CaseQueriesCollection.builder()
-                .caseMessages(wrapElements(List.of(CaseMessage.builder()
-                                                       .id("123457")
-                                                       .createdBy("defendant")
-                                                       .build(),
-                                                   CaseMessage.builder()
-                                                       .id("queryId")
-                                                       .createdBy("defendant")
-                                                       .parentId("123457")
-                                                       .build())))
-                .build();
+        CaseMessage defendantQuery = new CaseMessage();
+        defendantQuery.setId("123457");
+        defendantQuery.setCreatedBy("defendant");
+        CaseMessage defendantResponse = new CaseMessage();
+        defendantResponse.setId("queryId");
+        defendantResponse.setCreatedBy("defendant");
+        defendantResponse.setParentId("123457");
+        CaseQueriesCollection defendantQueries = new CaseQueriesCollection();
+        defendantQueries.setCaseMessages(wrapElements(List.of(defendantQuery, defendantResponse)));
         CaseData caseData = CaseData.builder()
-            .qmLatestQuery(LatestQuery.builder().queryId("queryId").build())
+            .qmLatestQuery(createLatestQuery("queryId"))
             .queries(defendantQueries)
             .legacyCaseReference("reference")
             .respondent1Represented(YesOrNo.NO)
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
@@ -153,17 +143,23 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         handler.handle(callbackParams);
 
         verify(dashboardScenariosService, times(1)).recordScenarios(
-                "BEARER_TOKEN",
-                SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+            "BEARER_TOKEN",
+            SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService, times(1)).recordScenarios(
-                "BEARER_TOKEN",
-                SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+            "BEARER_TOKEN",
+            SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            new ScenarioRequestParams(params)
         );
         verifyNoMoreInteractions(dashboardScenariosService);
+    }
+
+    private LatestQuery createLatestQuery(String queryId) {
+        LatestQuery latestQuery = new LatestQuery();
+        latestQuery.setQueryId(queryId);
+        return latestQuery;
     }
 }

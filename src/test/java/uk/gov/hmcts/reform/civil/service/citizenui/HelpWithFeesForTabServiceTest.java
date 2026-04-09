@@ -29,26 +29,23 @@ public class HelpWithFeesForTabServiceTest {
     @Test
     public void shouldSetUpClaimIssueHelpWithFeeTab() {
         // Given
-        CaseData.CaseDataBuilder builder = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .hwfFeeType(FeeType.CLAIMISSUED)
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-               .remissionAmount(new BigDecimal("50000"))
-               .outstandingFeeInPounds(new BigDecimal("30"))
-               .build())
-            .caseDataLip(CaseDataLiP.builder()
-                .helpWithFees(HelpWithFees.builder()
-                .helpWithFeesReferenceNumber("HWF-REF")
-                .build()).build())
-            .claimFee(Fee.builder()
-                .calculatedAmountInPence(new BigDecimal("1000"))
-                .code("CODE").build())
-            .build().toBuilder();
+            .claimIssuedHwfDetails(new HelpWithFeesDetails()
+               .setRemissionAmount(new BigDecimal("50000"))
+               .setOutstandingFeeInPounds(new BigDecimal("30")))
+            .caseDataLip(new CaseDataLiP()
+                .setHelpWithFees(new HelpWithFees()
+                .setHelpWithFeesReferenceNumber("HWF-REF")))
+            .claimFee(new Fee()
+                .setCalculatedAmountInPence(new BigDecimal("1000"))
+                .setCode("CODE"))
+            .build();
 
         // When
-        helpWithFeesForTabService.setUpHelpWithFeeTab(builder);
+        helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
 
         // Then
-        CaseData caseData = builder.build();
         HelpWithFeesForTab hwfForTab = caseData.getClaimIssuedHwfForTab();
         assertThat(hwfForTab.getClaimFee()).isEqualTo("10.00");
         assertThat(hwfForTab.getFeeCode()).isEqualTo("CODE");
@@ -61,27 +58,24 @@ public class HelpWithFeesForTabServiceTest {
     @Test
     public void shouldSetUpHearingHelpWithFeeTab() {
         // Given
-        CaseData.CaseDataBuilder builder = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .hwfFeeType(FeeType.HEARING)
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-               .remissionAmount(new BigDecimal("50000"))
-               .outstandingFeeInPounds(new BigDecimal("30"))
-               .build())
-            .caseDataLip(CaseDataLiP.builder()
-                .helpWithFees(HelpWithFees.builder()
-                .helpWithFeesReferenceNumber("HWF-REF")
-                .build()).build())
-            .hearingFee(Fee.builder()
-                .calculatedAmountInPence(new BigDecimal("1000"))
-                .code("CODE").build())
-            .build().toBuilder()
-            .hearingHelpFeesReferenceNumber("HWF-REF");
+            .hearingHwfDetails(new HelpWithFeesDetails()
+               .setRemissionAmount(new BigDecimal("50000"))
+               .setOutstandingFeeInPounds(new BigDecimal("30")))
+            .caseDataLip(new CaseDataLiP()
+                .setHelpWithFees(new HelpWithFees()
+                .setHelpWithFeesReferenceNumber("HWF-REF")))
+            .hearingFee(new Fee()
+                .setCalculatedAmountInPence(new BigDecimal("1000"))
+                .setCode("CODE"))
+            .build();
+        caseData.setHearingHelpFeesReferenceNumber("HWF-REF");
 
         // When
-        helpWithFeesForTabService.setUpHelpWithFeeTab(builder);
+        helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
 
         // Then
-        CaseData caseData = builder.build();
         HelpWithFeesForTab hwfForTab = caseData.getHearingHwfForTab();
         assertThat(hwfForTab.getClaimFee()).isEqualTo("10.00");
         assertThat(hwfForTab.getFeeCode()).isEqualTo("CODE");

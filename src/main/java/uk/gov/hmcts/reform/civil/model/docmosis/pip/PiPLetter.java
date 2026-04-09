@@ -4,33 +4,33 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@Accessors(chain = true)
 public class PiPLetter implements MappableObject {
 
-    private final Party defendant;
-    private final String claimantName;
-    private final String respondToClaimUrl;
-    private final BigDecimal totalAmountOfClaim;
-    private final String claimReferenceNumber;
-    private final String pin;
-    private final String ccdCaseNumber;
+    private Party defendant;
+    private String claimantName;
+    private String respondToClaimUrl;
+    private BigDecimal totalAmountOfClaim;
+    private String claimReferenceNumber;
+    private String pin;
+    private String ccdCaseNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate responseDeadline;
+    private LocalDate responseDeadline;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate issueDate;
+    private LocalDate issueDate;
 
 }

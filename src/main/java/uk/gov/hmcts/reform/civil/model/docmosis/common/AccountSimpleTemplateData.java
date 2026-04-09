@@ -2,12 +2,10 @@ package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
 
 import java.math.RoundingMode;
 
-@SuperBuilder
 @AllArgsConstructor
 @Getter
 public class AccountSimpleTemplateData extends AccountSimple {

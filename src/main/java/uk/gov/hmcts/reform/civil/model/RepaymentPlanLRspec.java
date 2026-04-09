@@ -3,8 +3,9 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -12,15 +13,16 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 
+@Accessors(chain = true)
 @Data
-@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class RepaymentPlanLRspec {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal paymentAmount;
-    private final PaymentFrequencyLRspec repaymentFrequency;
-    private final LocalDate firstRepaymentDate;
+    private BigDecimal paymentAmount;
+    private PaymentFrequencyLRspec repaymentFrequency;
+    private LocalDate firstRepaymentDate;
 
     @JsonIgnore
     public LocalDate finalPaymentBy(BigDecimal totalAmount) {

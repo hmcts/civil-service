@@ -84,16 +84,15 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //Given
-            Party party = PartyBuilder.builder()
+            Party party = new PartyBuilder()
                 .individual(defendantName)
                 .partyEmail(defendantEmail)
                 .build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.BOTH.toString()).build())
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .setClaimTypeToSpecClaim()
                 .respondent1(party)
                 .build();
@@ -126,16 +125,15 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmail"));
             //Given
-            Party party = PartyBuilder.builder()
+            Party party = new PartyBuilder()
                 .individual(defendantName)
                 .partyEmail(defendantEmail)
                 .build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.ENGLISH.toString()).build())
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage(Language.ENGLISH.toString())))
                 .setClaimTypeToSpecClaim()
                 .respondent1(party)
                 .build();

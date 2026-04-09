@@ -33,7 +33,7 @@ public class ClaimFeeRequiredScenarioTest extends DashboardBaseIntegrationTest {
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(7000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(7000)))
             .applicant1Represented(YesOrNo.NO)
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .build();
@@ -104,7 +104,7 @@ public class ClaimFeeRequiredScenarioTest extends DashboardBaseIntegrationTest {
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(7000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(7000)))
             .applicant1Represented(YesOrNo.NO)
             .totalClaimAmount(BigDecimal.valueOf(10001))
             .build();

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ObligationReason;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -24,7 +26,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +41,11 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW_FINAL_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps.STILL_TASKS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
@@ -81,14 +84,11 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
     private CallbackResponse cleanObligationData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
-        caseDataBuilder
-            .obligationDatePresent(null)
-            .courtStaffNextSteps(null);
+        caseData.setObligationDatePresent(null);
+        caseData.setCourtStaffNextSteps(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -127,12 +127,11 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
     private CallbackResponse confirmOrderReview(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
         if (YesOrNo.YES.equals(caseData.getObligationDatePresent())) {
-            updatedCaseData.businessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW));
+            caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW));
         } else if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
-            updatedCaseData.businessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW_FINAL_ORDER));
+            caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW_FINAL_ORDER));
         }
 
         if (nonNull(caseData.getObligationData())) {
@@ -146,36 +145,61 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
             combinedData.addAll(storedObligationData);
 
             caseData.getObligationData().forEach(obligation -> {
-                StoredObligationData storedObligation = StoredObligationData.builder()
-                    .createdBy(officerName)
-                    .createdOn(time.now())
-                    .obligationDate(obligation.getValue().getObligationDate())
-                    .obligationReason(obligation.getValue().getObligationReason())
-                    .otherObligationReason(obligation.getValue().getOtherObligationReason())
-                    .reasonText(obligation.getValue().getObligationReason().equals(ObligationReason.OTHER)
+                StoredObligationData storedObligation = new StoredObligationData();
+                storedObligation.setCreatedBy(officerName);
+                storedObligation.setCreatedOn(time.now());
+                storedObligation.setObligationDate(obligation.getValue().getObligationDate());
+                storedObligation.setObligationReason(obligation.getValue().getObligationReason());
+                storedObligation.setOtherObligationReason(obligation.getValue().getOtherObligationReason());
+                storedObligation.setReasonText(obligation.getValue().getObligationReason().equals(ObligationReason.OTHER)
                                     ? ObligationReason.OTHER.getDisplayedValue() + ": " + obligation.getValue().getOtherObligationReason()
-                                    : obligation.getValue().getObligationReason().getDisplayedValue())
-                    .obligationAction(obligation.getValue().getObligationAction())
-                    .obligationWATaskRaised(YesOrNo.NO)
-                    .build();
+                                    : obligation.getValue().getObligationReason().getDisplayedValue());
+                storedObligation.setObligationAction(obligation.getValue().getObligationAction());
+                storedObligation.setObligationWATaskRaised(YesOrNo.NO);
 
                 combinedData.add(element(storedObligation));
             });
 
-            updatedCaseData.obligationData(null)
-                .storedObligationData(combinedData);
+            caseData.setObligationData(null);
+            caseData.setStoredObligationData(combinedData);
         }
 
         if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
+            caseData.setEnableUploadEvent(shouldEvidenceUploadEventBeAvailable(caseData));
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedCaseData.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .state(CaseState.All_FINAL_ORDERS_ISSUED.toString())
                 .build();
         }
-
+        caseData.setEnableUploadEvent(YesOrNo.YES);
+        if (CaseState.DECISION_OUTCOME.toString().equals(callbackParams.getRequest().getCaseDetails().getState())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper))
+                .state(CaseState.CASE_PROGRESSION.toString())
+                .build();
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
+    }
+
+    private YesOrNo shouldEvidenceUploadEventBeAvailable(CaseData caseData) {
+        YesOrNo eaCourtLocation = caseData.getEaCourtLocation();
+        boolean eaFlag = eaCourtLocation == null || YesOrNo.YES.equals(eaCourtLocation);
+        boolean result = isMultiOrIntTrack(caseData) && eaFlag;
+        log.info("Evidence upload event is enabled for minti claim {}, eaCourtLocation {}, for caseId {}",
+                 result, eaFlag, caseData.getCcdCaseReference());
+        return result ? YesOrNo.YES : YesOrNo.NO;
+    }
+
+    private boolean isMultiOrIntTrack(CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
+        } else {
+            return AllocatedTrack.INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())
+                || AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack());
+        }
     }
 
     private CallbackResponse fillConfirmationScreen(CallbackParams callbackParams) {

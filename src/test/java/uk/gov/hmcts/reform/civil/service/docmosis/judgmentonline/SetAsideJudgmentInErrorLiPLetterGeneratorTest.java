@@ -54,21 +54,21 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     private static final CaseDocument SET_ASIDE = CaseDocumentBuilder.builder()
-        .documentName(null)
+        .documentName("set-aside-judgment-letter.pdf")
         .documentType(DocumentType.SET_ASIDE_JUDGMENT_LETTER)
         .build();
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
+        Party applicant = new PartyBuilder().soleTrader().build();
+        Party defendant = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1Represented(YesOrNo.NO)
             .applicant1(applicant)
             .respondent1(defendant)
             .buildJudmentOnlineCaseDataWithPaymentByInstalment();
-        caseData.setHistoricJudgment(wrapElements(JudgmentDetails.builder().issueDate(LocalDate.now()).build()));
+        caseData.setHistoricJudgment(wrapElements(new JudgmentDetails().setIssueDate(LocalDate.now())));
         caseData.setJoIssuedDate(LocalDate.now());
         caseData.setJoSetAsideJudgmentErrorText("Some text");
 
@@ -104,7 +104,8 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
                 caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(),
                 SET_ASIDE_JUDGMENT_LETTER,
-                List.of(caseData.getRespondent1().getPartyName())
+                List.of(caseData.getRespondent1().getPartyName()),
+                List.of(SET_ASIDE.getDocumentLink().getDocumentFileName())
             );
     }
 

@@ -41,21 +41,20 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
     private CallbackResponse generateResponseDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder();
         if (shouldGenerateJudgmentDoc(caseEvent, caseData)) {
             CaseDocument claimantResponseDoc = requestJudgmentByAdmissionOrDeterminationResponseDocGenerator.generate(
                 caseEvent,
                 caseData,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
             );
-            updatedCaseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+            caseData.setSystemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                 claimantResponseDoc,
                 caseData
             ));
 
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

@@ -83,45 +83,42 @@ class ExpenditureCalculatorTest {
     }
 
     private List<Element<RecurringExpenseLRspec>> createExpensesList() {
-        return wrapElements(RecurringExpenseLRspec.builder()
-                                .amount(new BigDecimal(20000))
-                                .frequency(ONCE_TWO_WEEKS)
-                                .type(MORTGAGE)
-                                .build());
+        return wrapElements(new RecurringExpenseLRspec()
+                                .setAmount(new BigDecimal(20000))
+                                .setFrequency(ONCE_TWO_WEEKS)
+                                .setType(MORTGAGE));
     }
 
     private Respondent1DebtLRspec createDebtsWithoutCreditCard() {
-        return Respondent1DebtLRspec.builder()
-            .debtDetails(createDebts())
-            .hasLoanCardDebt(YesOrNo.NO)
-            .build();
+        return new Respondent1DebtLRspec()
+            .setDebtDetails(createDebts())
+            .setHasLoanCardDebt(YesOrNo.NO)
+            ;
     }
 
     private Respondent1DebtLRspec createDebtWithCreditCard() {
-        return Respondent1DebtLRspec.builder()
-            .debtDetails(createDebts())
-            .hasLoanCardDebt(YesOrNo.YES)
-            .loanCardDebtDetails(createLoanCardDents())
-            .build();
+        return new Respondent1DebtLRspec()
+            .setDebtDetails(createDebts())
+            .setHasLoanCardDebt(YesOrNo.YES)
+            .setLoanCardDebtDetails(createLoanCardDents())
+            ;
     }
 
     private List<Element<DebtLRspec>> createDebts() {
-        return wrapElements(DebtLRspec.builder()
-                                .debtType(DebtTypeLRspec.MORTGAGE)
-                                .paymentAmount(new BigDecimal(20000))
-                                .paymentFrequency(ONCE_TWO_WEEKS)
-                                .build());
+        return wrapElements(new DebtLRspec()
+                                .setDebtType(DebtTypeLRspec.MORTGAGE)
+                                .setPaymentAmount(new BigDecimal(20000))
+                                .setPaymentFrequency(ONCE_TWO_WEEKS));
     }
 
     private List<Element<LoanCardDebtLRspec>> createLoanCardDents() {
-        return wrapElements(LoanCardDebtLRspec.builder()
-                                .monthlyPayment(new BigDecimal(30000))
-                                .build());
+        return wrapElements(new LoanCardDebtLRspec().setMonthlyPayment(new BigDecimal(30000))
+                                );
     }
 
     private List<Element<Respondent1CourtOrderDetails>> createCourtOrders() {
-        return wrapElements(Respondent1CourtOrderDetails.builder()
-                                .monthlyInstalmentAmount(new BigDecimal(30000))
-                                .build());
+        return wrapElements(new Respondent1CourtOrderDetails()
+                                .setMonthlyInstalmentAmount(new BigDecimal(30000))
+                                );
     }
 }

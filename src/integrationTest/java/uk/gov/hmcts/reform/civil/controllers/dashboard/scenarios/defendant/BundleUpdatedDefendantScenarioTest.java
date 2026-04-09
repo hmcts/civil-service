@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
@@ -21,7 +21,7 @@ import java.util.Optional;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class BundleUpdatedDefendantScenarioTest extends CaseProgressionDashboardBaseIntegrationTest {
+public class BundleUpdatedDefendantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private BundleUpdatedDefendantNotificationHandler handler;
@@ -52,8 +52,8 @@ public class BundleUpdatedDefendantScenarioTest extends CaseProgressionDashboard
 
     private CaseData createCaseData(YesOrNo respondentRepresented, boolean isFastTrack) {
         List<IdValue<Bundle>> bundles = List.of(
-            new IdValue<>("1", Bundle.builder().createdOn(Optional.of(LocalDateTime.of(2024, 3, 1, 0, 0))).build()),
-            new IdValue<>("2", Bundle.builder().createdOn(Optional.of(LocalDateTime.of(2024, 4, 1, 0, 0))).build())
+              new IdValue<>("1", new Bundle().setCreatedOn(Optional.of(LocalDateTime.of(2024, 3, 1, 0, 0)))),
+              new IdValue<>("2", new Bundle().setCreatedOn(Optional.of(LocalDateTime.of(2024, 4, 1, 0, 0))))
         );
 
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()

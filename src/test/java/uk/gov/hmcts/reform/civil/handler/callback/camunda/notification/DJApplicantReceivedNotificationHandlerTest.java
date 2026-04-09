@@ -103,7 +103,7 @@ class DJApplicantReceivedNotificationHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -127,20 +127,16 @@ class DJApplicantReceivedNotificationHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1AndBothSelected() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Both")
-                                                     .build())
-                                          .build())
+                .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("Both")))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -157,21 +153,17 @@ class DJApplicantReceivedNotificationHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1AndBothNotSelected() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested())
                 .thenReturn("test-template-requested-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Requested email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("David")
-                                                     .build())
-                                          .build())
+                .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("David")))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -199,10 +191,10 @@ class DJApplicantReceivedNotificationHandlerTest {
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .claimantUserDetails(IdamUserDetails.builder()
-                                         .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                                         .email("test@gmail.com")
-                                         .build())
+                .claimantUserDetails(new IdamUserDetails()
+                                         .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                                         .setEmail("test@gmail.com")
+                                         )
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -226,10 +218,8 @@ class DJApplicantReceivedNotificationHandlerTest {
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                    .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                            .build())
-                    .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                            .build())
+                    .applicant1(new PartyBuilder().individual().build())
+                    .respondent1(new PartyBuilder().soleTrader().build())
                     .respondent1Represented(YesOrNo.NO)
                     .specRespondent1Represented(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.NO)

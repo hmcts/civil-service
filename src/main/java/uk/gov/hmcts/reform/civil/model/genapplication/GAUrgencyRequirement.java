@@ -2,21 +2,23 @@ package uk.gov.hmcts.reform.civil.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.time.LocalDate;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@Accessors(chain = true)
 public class GAUrgencyRequirement {
 
-    private final YesOrNo generalAppUrgency;
-    private final String reasonsForUrgency;
-    private final LocalDate urgentAppConsiderationDate;
+    private YesOrNo generalAppUrgency;
+    private String reasonsForUrgency;
+    private LocalDate urgentAppConsiderationDate;
 
     @JsonCreator
     GAUrgencyRequirement(@JsonProperty("generalAppUrgency") YesOrNo generalAppUrgency,

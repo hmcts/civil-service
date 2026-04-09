@@ -1,14 +1,16 @@
 package uk.gov.hmcts.reform.civil.model.docmosis;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class DocmosisDocument {
 
-    private final String documentTitle;
-    private final byte[] bytes;
+    private String documentTitle;
+    private byte[] bytes;
 }

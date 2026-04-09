@@ -1,22 +1,24 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
-@Builder
+@NoArgsConstructor
+@Accessors(chain = true)
 public class PartnerAndDependentsLRspec {
 
-    private final YesOrNo liveWithPartnerRequired;
-    private final YesOrNo partnerAgedOver;
-    private final YesOrNo haveAnyChildrenRequired;
-    private final YesOrNo receiveDisabilityPayments;
-    private final ChildrenByAgeGroupLRspec howManyChildrenByAgeGroup;
-    private final YesOrNo supportedAnyoneFinancialRequired;
-    private final String supportPeopleNumber;
-    private final String supportPeopleDetails;
+    private YesOrNo liveWithPartnerRequired;
+    private YesOrNo partnerAgedOver;
+    private YesOrNo haveAnyChildrenRequired;
+    private YesOrNo receiveDisabilityPayments;
+    private ChildrenByAgeGroupLRspec howManyChildrenByAgeGroup;
+    private YesOrNo supportedAnyoneFinancialRequired;
+    private String supportPeopleNumber;
+    private String supportPeopleDetails;
 
     @JsonIgnore
     public boolean hasPartner() {

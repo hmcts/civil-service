@@ -1,15 +1,19 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 
 @Data
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class CaseNote {
 
-    private final String createdBy;
-    private final LocalDateTime createdOn;
-    private final String note;
+    private String createdBy;
+    private LocalDateTime createdOn;
+    private String note;
 }

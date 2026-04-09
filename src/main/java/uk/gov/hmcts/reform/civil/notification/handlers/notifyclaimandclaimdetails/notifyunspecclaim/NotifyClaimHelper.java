@@ -10,12 +10,10 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import java.util.Map;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.BOTH_DEFENDANTS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_DETAILS_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.NOTIFY_BOTH;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 @AllArgsConstructor
@@ -31,7 +29,6 @@ public class NotifyClaimHelper {
 
     public Map<String, String> retrieveCustomProperties(CaseData caseData) {
         return Map.of(
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_DETAILS_NOTIFICATION_DEADLINE,
             formatLocalDate(caseData
                                 .getClaimDetailsNotificationDeadline()
@@ -40,10 +37,10 @@ public class NotifyClaimHelper {
     }
 
     protected boolean checkIfThisDefendantToBeNotified(final CaseData caseData, String defendantName) {
-        String defendantNotifyClaimInfo = Optional.ofNullable(caseData.getDefendantDetails())
+        String defendantNotifyClaimInfo = Optional.ofNullable(caseData.getDefendantSolicitorNotifyClaimOptions())
             .map(DynamicList::getValue)
             .map(DynamicListElement::getLabel)
             .orElse("");
-        return defendantNotifyClaimInfo.equals(defendantName) || BOTH_DEFENDANTS.equals(defendantNotifyClaimInfo);
+        return defendantNotifyClaimInfo.contains(defendantName) || NOTIFY_BOTH.equals(defendantNotifyClaimInfo);
     }
 }

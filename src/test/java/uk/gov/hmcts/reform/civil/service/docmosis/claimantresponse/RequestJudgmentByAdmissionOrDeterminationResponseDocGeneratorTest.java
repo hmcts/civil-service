@@ -84,7 +84,7 @@ class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .build();
         when(judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData, GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC))
-            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+            .thenReturn(new JudgmentByAdmissionOrDetermination());
 
         // When
         CaseDocument actual = generator.generate(GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC, caseData, BEARER_TOKEN);
@@ -111,7 +111,7 @@ class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .build();
         when(judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData, GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC))
-            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+            .thenReturn(new JudgmentByAdmissionOrDetermination());
 
         // When
         CaseDocument actual = generator.generate(GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC, caseData, BEARER_TOKEN);
@@ -138,7 +138,7 @@ class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .build();
         when(judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData, GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC))
-            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+            .thenReturn(new JudgmentByAdmissionOrDetermination());
 
         // When
         CaseDocument actual = generator.generate(GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC, caseData, BEARER_TOKEN);
@@ -166,7 +166,7 @@ class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .build();
         when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData))
-            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+            .thenReturn(new JudgmentByAdmissionOrDetermination());
 
         // When
         List<CaseDocument> actual = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
@@ -196,7 +196,7 @@ class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .build();
         when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData))
-            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+            .thenReturn(new JudgmentByAdmissionOrDetermination());
 
         // When
         List<CaseDocument> actual = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
@@ -219,7 +219,7 @@ class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .claimantBilingualLanguagePreference("BOTH")
             .build();
-        JudgmentByAdmissionOrDetermination builder = JudgmentByAdmissionOrDetermination.builder().build();
+        JudgmentByAdmissionOrDetermination builder = new JudgmentByAdmissionOrDetermination();
 
         when(documentGeneratorService.generateDocmosisDocument(any(JudgmentByAdmissionOrDetermination.class), eq(JUDGMENT_BY_ADMISSION_CLAIMANT)))
             .thenReturn(new DocmosisDocument(JUDGMENT_BY_ADMISSION_CLAIMANT.getDocumentTitle(), bytes));
@@ -232,10 +232,10 @@ class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         ).thenReturn(caseDocument);
 
         when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData))
-            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+            .thenReturn(new JudgmentByAdmissionOrDetermination());
 
         when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentWelshDocs(caseData, builder))
-            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+            .thenReturn(new JudgmentByAdmissionOrDetermination());
 
         when(civilStitchService.generateStitchedCaseDocument(anyList(), any(), anyLong(), eq(DocumentType.JUDGMENT_BY_ADMISSION_CLAIMANT),
            anyString())).thenReturn(caseDocument);
@@ -264,7 +264,7 @@ class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .claimantBilingualLanguagePreference("BOTH")
             .build();
-        JudgmentByAdmissionOrDetermination builder = JudgmentByAdmissionOrDetermination.builder().build();
+        JudgmentByAdmissionOrDetermination builder = new JudgmentByAdmissionOrDetermination();
 
         when(documentGeneratorService.generateDocmosisDocument(any(JudgmentByAdmissionOrDetermination.class), eq(JUDGMENT_BY_ADMISSION_DEFENDANT)))
             .thenReturn(new DocmosisDocument(JUDGMENT_BY_ADMISSION_DEFENDANT.getDocumentTitle(), bytes));
@@ -277,10 +277,10 @@ class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         ).thenReturn(caseDocument);
 
         when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData))
-            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+            .thenReturn(new JudgmentByAdmissionOrDetermination());
 
         when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentWelshDocs(caseData, builder))
-            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+            .thenReturn(new JudgmentByAdmissionOrDetermination());
 
         when(civilStitchService.generateStitchedCaseDocument(anyList(), any(), anyLong(), eq(DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT),
             anyString())).thenReturn(caseDocument);

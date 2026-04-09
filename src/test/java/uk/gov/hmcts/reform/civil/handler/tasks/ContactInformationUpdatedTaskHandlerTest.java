@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -76,19 +77,19 @@ class ContactInformationUpdatedTaskHandlerTest {
 
     @Test
     void shouldHaveCorrectEventDetails_whenContactDetailsUpdatedEventIsProvided() {
-        CaseData caseData = CaseData.builder()
-            .contactDetailsUpdatedEvent(
-                ContactDetailsUpdatedEvent.builder()
-                    .description("Best description")
-                    .summary("Even better summary")
-                    .submittedByCaseworker(YES).build())
+        CaseData caseData = new CaseDataBuilder()
             .businessProcess(
-                BusinessProcess.builder()
-                    .status(BusinessProcessStatus.READY)
-                    .processInstanceId("process-id").build())
-            .build();
+                new BusinessProcess()
+                    .setStatus(BusinessProcessStatus.READY)
+                    .setProcessInstanceId("process-id"))
+            .build()
+            .setContactDetailsUpdatedEvent(
+                new ContactDetailsUpdatedEvent()
+                    .setDescription("Best description")
+                    .setSummary("Even better summary")
+                    .setSubmittedByCaseworker(YES));
 
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         when(coreCaseDataService.startUpdate(CASE_ID, CONTACT_INFORMATION_UPDATED))
             .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
                             .eventId(CONTACT_INFORMATION_UPDATED.name()).build());
@@ -157,14 +158,14 @@ class ContactInformationUpdatedTaskHandlerTest {
 
     @Test
     void shouldHandleFailureWithExpectedErrorMessage_whenContactDetailsUpdatedEventIsNotProvided() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseDataBuilder()
             .businessProcess(
-                BusinessProcess.builder()
-                    .status(BusinessProcessStatus.READY)
-                    .processInstanceId("process-id").build())
+                new BusinessProcess()
+                    .setStatus(BusinessProcessStatus.READY)
+                    .setProcessInstanceId("process-id"))
             .build();
 
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         when(coreCaseDataService.startUpdate(CASE_ID, CONTACT_INFORMATION_UPDATED))
             .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
                             .eventId(CONTACT_INFORMATION_UPDATED.name()).build());

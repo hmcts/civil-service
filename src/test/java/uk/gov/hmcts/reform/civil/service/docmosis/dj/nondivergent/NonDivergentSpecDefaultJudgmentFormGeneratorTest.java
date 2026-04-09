@@ -26,6 +26,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjWelshDocumentService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjWelshTextService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.JudgmentAmountsCalculator;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -62,6 +64,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_
     NonDivergentSpecDefaultJudgementFormBuilder.class,
     JudgmentAmountsCalculator.class,
     DefaultJudgmentFormBuilder.class,
+    DjWelshTextService.class,
+    DjWelshDocumentService.class,
     JacksonAutoConfiguration.class
 })
 class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
@@ -69,9 +73,9 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName = String.format(N121_SPEC.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String FILE_NAME = String.format(N121_SPEC.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName)
+        .documentName(FILE_NAME)
         .documentType(DEFAULT_JUDGMENT)
         .build();
     @MockBean
@@ -104,10 +108,10 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC_CLAIMANT.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_CLAIMANT1)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT_CLAIMANT1)))
             .thenReturn(CASE_DOCUMENT);
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_CLAIMANT2)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT_CLAIMANT2)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
@@ -115,9 +119,9 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors()
             .totalClaimAmount(new BigDecimal(2000))
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .addApplicant2(YesOrNo.YES)
-            .applicant2(PartyBuilder.builder().individual().build())
+            .applicant2(new PartyBuilder().individual().build())
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
             .repaymentDate(LocalDate.now().plusMonths(4))
@@ -137,10 +141,10 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC_DEFENDANT.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_DEFENDANT1)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT_DEFENDANT1)))
             .thenReturn(CASE_DOCUMENT);
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_DEFENDANT2)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT_DEFENDANT2)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
@@ -148,7 +152,7 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors()
             .totalClaimAmount(new BigDecimal(2000))
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
         List<CaseDocument> caseDocuments = nonDivergentSpecDefaultJudgmentFormGenerator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
@@ -165,7 +169,7 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC_DEFENDANT.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_DEFENDANT1)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT_DEFENDANT1)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
@@ -173,7 +177,7 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
             .totalClaimAmount(new BigDecimal(2000))
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .paymentTypeSelection(DJPaymentTypeSelection.SET_DATE)
             .paymentSetDate(LocalDate.now().plusDays(5))
             .build();
@@ -191,10 +195,10 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC_CLAIMANT.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_CLAIMANT1)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT_CLAIMANT1)))
             .thenReturn(CASE_DOCUMENT);
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_CLAIMANT2)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT_CLAIMANT2)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
@@ -202,7 +206,7 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
             .totalClaimAmount(new BigDecimal(2000))
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_WEEK)
             .repaymentDate(LocalDate.now().plusMonths(4))
@@ -222,19 +226,19 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC_DEFENDANT.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_DEFENDANT1)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT_DEFENDANT1)))
             .thenReturn(CASE_DOCUMENT);
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_DEFENDANT2)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT_DEFENDANT2)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
             .thenReturn(new BigDecimal(10));
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v2Respondent2LiP()
-            .respondent2(PartyBuilder.builder().company().build())
+            .respondent2(new PartyBuilder().company().build())
             .totalClaimAmount(new BigDecimal(2000))
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)
             .repaymentDate(LocalDate.now().plusMonths(4))
@@ -258,7 +262,7 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC_CLAIMANT_WELSH.getDocumentTitle(), bytes));
 
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_CLAIMANT1)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT_CLAIMANT1)))
             .thenReturn(CASE_DOCUMENT);
 
         when(civilStitchService.generateStitchedCaseDocument(anyList(), any(), anyLong(), eq(DocumentType.DEFAULT_JUDGMENT_CLAIMANT1),

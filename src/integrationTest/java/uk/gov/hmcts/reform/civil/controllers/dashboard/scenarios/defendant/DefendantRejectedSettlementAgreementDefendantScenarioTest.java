@@ -26,8 +26,8 @@ public class DefendantRejectedSettlementAgreementDefendantScenarioTest extends D
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
-                ).build()
+                new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
+                )
             )
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))

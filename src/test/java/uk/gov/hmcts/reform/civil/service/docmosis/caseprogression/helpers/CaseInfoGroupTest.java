@@ -21,14 +21,13 @@ public class CaseInfoGroupTest {
 
     @Test
     void shouldPopulateCaseInfo_WhenAllFieldsPresent() {
-        Party applicant1 = Party.builder().partyName("Claimant 1").type(Type.COMPANY).build();
-        Party applicant2 = Party.builder().partyName("Claimant 2").type(Type.COMPANY).build();
-        Party respondent1 = Party.builder().partyName("Defendant 1").type(Type.COMPANY).build();
-        Party respondent2 = Party.builder().partyName("Defendant 2").type(Type.COMPANY).build();
-        SolicitorReferences solicitorReferences = SolicitorReferences.builder()
-            .applicantSolicitor1Reference("ClaimantRef")
-            .respondentSolicitor1Reference("DefendantRef")
-            .build();
+        Party applicant1 = new Party().setPartyName("Claimant 1").setType(Type.COMPANY);
+        Party applicant2 = new Party().setPartyName("Claimant 2").setType(Type.COMPANY);
+        Party respondent1 = new Party().setPartyName("Defendant 1").setType(Type.COMPANY);
+        Party respondent2 = new Party().setPartyName("Defendant 2").setType(Type.COMPANY);
+        SolicitorReferences solicitorReferences = new SolicitorReferences()
+            .setApplicantSolicitor1Reference("ClaimantRef")
+            .setRespondentSolicitor1Reference("DefendantRef");
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
             .applicant1(applicant1)
@@ -39,21 +38,21 @@ public class CaseInfoGroupTest {
             .caseNameHmctsInternal("Test Case Name")
             .build();
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = caseInfoPopulator.populateCaseInfo(builder, caseData);
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = caseInfoPopulator.populateCaseInfo(form, caseData);
 
-        Assertions.assertEquals("1234567890123456", builder.build().getCaseNumber());
-        Assertions.assertEquals("Claimant 1", builder.build().getClaimantNum());
-        Assertions.assertEquals("Defendant 1", builder.build().getDefendantNum());
-        Assertions.assertEquals("Test Case Name", builder.build().getCaseName());
-        Assertions.assertEquals("ClaimantRef", builder.build().getClaimantReference());
-        Assertions.assertEquals("DefendantRef", builder.build().getDefendantReference());
+        Assertions.assertEquals("1234567890123456", form.getCaseNumber());
+        Assertions.assertEquals("Claimant 1", form.getClaimantNum());
+        Assertions.assertEquals("Defendant 1", form.getDefendantNum());
+        Assertions.assertEquals("Test Case Name", form.getCaseName());
+        Assertions.assertEquals("ClaimantRef", form.getClaimantReference());
+        Assertions.assertEquals("DefendantRef", form.getDefendantReference());
     }
 
     @Test
     void shouldPopulateCaseInfo_WhenOnlySingleClaimantAndDefendantPresent() {
-        Party applicant1 = Party.builder().partyName("Claimant 1").type(Type.COMPANY).build();
-        Party respondent1 = Party.builder().partyName("Defendant 1").type(Type.COMPANY).build();
+        Party applicant1 = new Party().setPartyName("Claimant 1").setType(Type.COMPANY);
+        Party respondent1 = new Party().setPartyName("Defendant 1").setType(Type.COMPANY);
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
             .applicant1(applicant1)
@@ -61,24 +60,24 @@ public class CaseInfoGroupTest {
             .caseNameHmctsInternal("Test Case Name")
             .build();
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
 
-        builder = caseInfoPopulator.populateCaseInfo(builder, caseData);
+        form = caseInfoPopulator.populateCaseInfo(form, caseData);
 
-        Assertions.assertEquals("1234567890123456", builder.build().getCaseNumber());
-        Assertions.assertNull(builder.build().getClaimant2Name());
-        Assertions.assertNull(builder.build().getDefendant2Name());
-        Assertions.assertEquals("Claimant", builder.build().getClaimantNum());
-        Assertions.assertEquals("Defendant", builder.build().getDefendantNum());
-        Assertions.assertEquals("Test Case Name", builder.build().getCaseName());
-        Assertions.assertNull(builder.build().getClaimantReference());
-        Assertions.assertNull(builder.build().getDefendantReference());
+        Assertions.assertEquals("1234567890123456", form.getCaseNumber());
+        Assertions.assertNull(form.getClaimant2Name());
+        Assertions.assertNull(form.getDefendant2Name());
+        Assertions.assertEquals("Claimant", form.getClaimantNum());
+        Assertions.assertEquals("Defendant", form.getDefendantNum());
+        Assertions.assertEquals("Test Case Name", form.getCaseName());
+        Assertions.assertNull(form.getClaimantReference());
+        Assertions.assertNull(form.getDefendantReference());
     }
 
     @Test
     void shouldPopulateCaseInfo_WhenSolicitorReferencesAreAbsent() {
-        Party applicant1 = Party.builder().partyName("Claimant 1").type(Type.COMPANY).build();
-        Party respondent1 = Party.builder().partyName("Defendant 1").type(Type.COMPANY).build();
+        Party applicant1 = new Party().setPartyName("Claimant 1").setType(Type.COMPANY);
+        Party respondent1 = new Party().setPartyName("Defendant 1").setType(Type.COMPANY);
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
             .applicant1(applicant1)
@@ -86,12 +85,12 @@ public class CaseInfoGroupTest {
             .caseNameHmctsInternal("Test Case Name")
             .build();
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
 
-        builder = caseInfoPopulator.populateCaseInfo(builder, caseData);
+        form = caseInfoPopulator.populateCaseInfo(form, caseData);
 
-        assertNull(builder.build().getClaimantReference());
-        assertNull(builder.build().getDefendantReference());
+        assertNull(form.getClaimantReference());
+        assertNull(form.getDefendantReference());
     }
 
 }

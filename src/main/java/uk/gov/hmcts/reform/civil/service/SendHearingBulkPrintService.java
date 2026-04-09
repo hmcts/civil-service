@@ -81,8 +81,10 @@ public class SendHearingBulkPrintService {
             letterContent = coverLetterAppendService.makeDocumentMailable(caseData, authorisation, recipient, documentType,
                                                                           caseDocuments.toArray(new CaseDocument[0]));
             List<String> recipients = List.of(recipient.getPartyName());
+            List<String> bulkPrintFileNames = new ArrayList<>();
+            caseDocuments.forEach(document -> bulkPrintFileNames.add(document.getDocumentLink().getDocumentFileName()));
             bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                         caseData.getLegacyCaseReference(), letterType, recipients);
+                                         caseData.getLegacyCaseReference(), letterType, recipients, bulkPrintFileNames);
 
         }
     }
@@ -117,6 +119,11 @@ public class SendHearingBulkPrintService {
                                     || TASK_ID_CLAIMANT_DRO.equals(taskId))
             ? caseData.getClaimantBilingualLanguagePreference()
             : caseData.getDefendantBilingualLanguagePreference();
+
+        if (languagePreference == null) {
+            return Language.ENGLISH;
+        }
+
         return switch (languagePreference) {
             case "WELSH" -> WELSH;
             case "BOTH" -> BOTH;

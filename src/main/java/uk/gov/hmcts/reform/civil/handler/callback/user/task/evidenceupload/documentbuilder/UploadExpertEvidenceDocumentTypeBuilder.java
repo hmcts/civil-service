@@ -9,22 +9,21 @@ public class UploadExpertEvidenceDocumentTypeBuilder implements DocumentTypeBuil
 
     @Override
     public UploadEvidenceExpert buildElementTypeWithDocumentCopy(UploadEvidenceExpert fromValue, String categoryId) {
-        Document newDoc = Document.builder()
-            .categoryID(categoryId)
-            .documentBinaryUrl(fromValue.getExpertDocument().getDocumentBinaryUrl())
-            .documentFileName(fromValue.getExpertDocument().getDocumentFileName())
-            .documentHash(fromValue.getExpertDocument().getDocumentHash())
-            .documentUrl(fromValue.getExpertDocument().getDocumentUrl())
-            .build();
-        return UploadEvidenceExpert.builder()
-            .expertOptionName(fromValue.getExpertOptionName())
-            .expertOptionExpertise(fromValue.getExpertOptionExpertise())
-            .expertOptionExpertises(fromValue.getExpertOptionExpertises())
-            .expertOptionOtherParty(fromValue.getExpertOptionOtherParty())
-            .expertDocumentQuestion(fromValue.getExpertDocumentQuestion())
-            .expertDocumentAnswer(fromValue.getExpertDocumentAnswer())
-            .expertOptionUploadDate(fromValue.getExpertOptionUploadDate())
-            .expertDocument(newDoc)
-            .build();
+        Document newDoc = new Document();
+        newDoc.setCategoryID(categoryId)
+            .setDocumentBinaryUrl(fromValue.getExpertDocument().getDocumentBinaryUrl())
+            .setDocumentFileName(fromValue.getExpertDocument().getDocumentFileName())
+            .setDocumentHash(fromValue.getExpertDocument().getDocumentHash())
+            .setDocumentUrl(fromValue.getExpertDocument().getDocumentUrl());
+        UploadEvidenceExpert uploadEvidenceExpert = new UploadEvidenceExpert();
+        uploadEvidenceExpert.setExpertOptionName(fromValue.getExpertOptionName());
+        uploadEvidenceExpert.setExpertOptionExpertise(fromValue.getExpertOptionExpertise());
+        uploadEvidenceExpert.setExpertOptionExpertises(fromValue.getExpertOptionExpertises());
+        uploadEvidenceExpert.setExpertOptionOtherParty(fromValue.getExpertOptionOtherParty());
+        uploadEvidenceExpert.setExpertDocumentQuestion(fromValue.getExpertDocumentQuestion());
+        uploadEvidenceExpert.setExpertDocumentAnswer(fromValue.getExpertDocumentAnswer());
+        uploadEvidenceExpert.setExpertOptionUploadDate(fromValue.getExpertOptionUploadDate());
+        uploadEvidenceExpert.setExpertDocument(newDoc);
+        return uploadEvidenceExpert;
     }
 }

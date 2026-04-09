@@ -30,10 +30,9 @@ public class RoboticsDataUtil {
     private static NoticeOfChange getLatestChange(OrganisationPolicy orgPolicy, String litigantCode) {
         var latestChange = OrgPolicyUtils.getLatestOrganisationChanges(orgPolicy);
         if (latestChange != null) {
-            return NoticeOfChange.builder()
-                .litigiousPartyID(litigantCode)
-                .dateOfNoC(latestChange.getToTimestamp().format(ISO_DATE))
-                .build();
+            return new NoticeOfChange()
+                .setLitigiousPartyID(litigantCode)
+                .setDateOfNoC(latestChange.getToTimestamp().format(ISO_DATE));
         } else {
             return null;
         }

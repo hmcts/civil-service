@@ -21,6 +21,12 @@ class CaseTakenOfflineAllPartiesEmailGeneratorTest {
     @Mock
     private CaseTakenOfflineRespSolTwoEmailDTOGenerator respSolTwoGenerator;
 
+    @Mock
+    private CaseTakenOfflineAppLipSolOneEmailDTOGenerator appSolLipOneGenerator;
+
+    @Mock
+    private CaseTakenOfflineRespLipSolOneEmailDTOGenerator respLipSolOneEmailDTOGenerator;
+
     @InjectMocks
     private CaseTakenOfflineAllPartiesEmailGenerator emailGenerator;
 

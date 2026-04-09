@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class HearingMethodUtils {
 
     private static final String ACTIVE_FLAG = "Y";
@@ -35,11 +38,15 @@ public class HearingMethodUtils {
         Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
             authToken, HEARING_CHANNEL, hmctsServiceId
         );
-
-        return categorySearchResult.map(searchResult -> searchResult.getCategories().stream()
-            .filter(category -> category.getActiveFlag().equals(ACTIVE_FLAG))
-            .collect(Collectors.toMap(Category::getValueEn, Category::getKey)))
-            .orElse(null);
+        log.info("categorySearchResult {}", categorySearchResult);
+        final Map<String, String> hearingMethodCodes =
+            categorySearchResult.map(searchResult -> searchResult.getCategories().stream()
+                    .filter(category -> category.getActiveFlag().equals(ACTIVE_FLAG))
+                    .collect(Collectors.toMap(Category::getValueEn, Category::getKey)))
+                .orElse(null);
+        
+        log.info("hearingMethodCodes {}", hearingMethodCodes);
+        return hearingMethodCodes;
     }
 
 }

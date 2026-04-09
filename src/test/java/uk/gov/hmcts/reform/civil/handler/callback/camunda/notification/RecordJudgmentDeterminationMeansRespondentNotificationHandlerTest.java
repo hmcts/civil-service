@@ -102,18 +102,19 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
                 .legacyCaseReference("000DC001")
                 .ccdCaseReference(12345L)
                 .addRespondent2(YesOrNo.YES)
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
-                                 .partyName("Test")
-                                 .individualLastName("Test Lastname")
-                                 .individualFirstName("Test Firstname").build())
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
-                                 .partyName("Test2")
-                                 .individualLastName("Test2 Lastname")
-                                 .individualFirstName("Test2 Firstname").build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                            .organisationID(ORG_NAME_RESPONDENT1).build()).build()).build();
+                .respondent1(new Party().setType(Party.Type.INDIVIDUAL)
+                                 .setPartyName("Test")
+                                 .setIndividualLastName("Test Lastname")
+                                 .setIndividualFirstName("Test Firstname"))
+                .respondent2(new Party().setType(Party.Type.INDIVIDUAL)
+                                 .setPartyName("Test2")
+                                 .setIndividualLastName("Test2 Lastname")
+                                 .setIndividualFirstName("Test2 Firstname"))
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(
+                    new uk.gov.hmcts.reform.ccd.model.Organisation()
+                        .setOrganisationID(ORG_NAME_RESPONDENT1))).build();
 
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME_RESPONDENT1).build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation().setName(ORG_NAME_RESPONDENT1)));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT.name()).build()
@@ -140,17 +141,17 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
                 .legacyCaseReference("000DC001")
                 .ccdCaseReference(12345L)
                 .addRespondent2(YesOrNo.YES)
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
-                                 .partyName("Test")
-                                 .individualLastName("Test Lastname")
-                                 .individualFirstName("Test Firstname").build())
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
-                                 .partyName("Test2")
-                                 .individualLastName("Test2 Lastname")
-                                 .individualFirstName("Test2 Firstname").build())
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                             .organisationID(ORG_NAME_RESPONDENT2).build()).build()).build();
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME_RESPONDENT2).build()));
+                .respondent1(new Party().setType(Party.Type.INDIVIDUAL)
+                                 .setPartyName("Test")
+                                 .setIndividualLastName("Test Lastname")
+                                 .setIndividualFirstName("Test Firstname"))
+                .respondent2(new Party().setType(Party.Type.INDIVIDUAL)
+                                 .setPartyName("Test2")
+                                 .setIndividualLastName("Test2 Lastname")
+                                 .setIndividualFirstName("Test2 Firstname"))
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(
+                    new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(ORG_NAME_RESPONDENT2))).build();
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation().setName(ORG_NAME_RESPONDENT2)));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -177,11 +178,11 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
 
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
-                .applicant1(Party.builder()
-                                .individualFirstName("Applicant1").individualLastName("ApplicantLastName").partyName("Applicant1")
-                                .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
-                .respondent1(Party.builder().partyName("Respondent1").individualFirstName("Respondent1").individualLastName("RespondentLastName")
-                                 .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
+                .applicant1(new Party()
+                                .setIndividualFirstName("Applicant1").setIndividualLastName("ApplicantLastName").setPartyName("Applicant1")
+                                .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
+                .respondent1(new Party().setPartyName("Respondent1").setIndividualFirstName("Respondent1").setIndividualLastName("RespondentLastName")
+                                 .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
                 .respondent1Represented(null)
                 .legacyCaseReference("000DC001")
                 .specRespondent1Represented(YesOrNo.NO)

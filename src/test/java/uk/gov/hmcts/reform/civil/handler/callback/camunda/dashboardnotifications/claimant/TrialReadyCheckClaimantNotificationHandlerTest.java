@@ -70,7 +70,6 @@ class TrialReadyCheckClaimantNotificationHandlerTest extends BaseCallbackHandler
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_TRIAL_READY_CHECK_CLAIMANT1.name()).build()
@@ -81,7 +80,7 @@ class TrialReadyCheckClaimantNotificationHandlerTest extends BaseCallbackHandler
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -93,7 +92,6 @@ class TrialReadyCheckClaimantNotificationHandlerTest extends BaseCallbackHandler
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_TRIAL_READY_CHECK_CLAIMANT1.name()).build()
@@ -111,7 +109,6 @@ class TrialReadyCheckClaimantNotificationHandlerTest extends BaseCallbackHandler
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_TRIAL_READY_CHECK_CLAIMANT1.name()).build()
@@ -129,7 +126,6 @@ class TrialReadyCheckClaimantNotificationHandlerTest extends BaseCallbackHandler
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_TRIAL_READY_CHECK_CLAIMANT1.name()).build()

@@ -78,25 +78,21 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
                 );
                 var paymentReference = pbaServiceRequestResponse.getPaymentReference();
                 PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-                    .map(PaymentDetails::toBuilder)
-                    .orElse(PaymentDetails.builder())
-                    .status(SUCCESS)
-                    .reference(paymentReference)
-                    .errorCode(null)
-                    .errorMessage(null)
-                    .build();
+                    .orElse(new PaymentDetails());
+                paymentDetails.setStatus(SUCCESS);
+                paymentDetails.setReference(paymentReference);
+                paymentDetails.setErrorCode(null);
+                paymentDetails.setErrorMessage(null);
 
-                caseData = caseData.toBuilder()
-                    .claimIssuedPaymentDetails(paymentDetails)
-                    .paymentSuccessfulDate(time.now())
-                    .ccdState(CaseState.CASE_ISSUED)
-                    .build();
+                caseData.setClaimIssuedPaymentDetails(paymentDetails);
+                caseData.setPaymentSuccessfulDate(time.now());
+                caseData.setCcdState(CaseState.CASE_ISSUED);
 
                 log.info("Payment Successful completed for the case: " + caseData.getCcdCaseReference());
             } catch (FeignException exception) {
                 log.info(String.format("Http Status %s ", exception.status()), exception);
                 if (exception.status() == 403 || exception.status() == 422 || exception.status() == 504) {
-                    caseData = updateWithBusinessError(caseData, exception);
+                    updateWithBusinessError(caseData, exception);
                 } else {
                     errors.add(ERROR_MESSAGE);
                 }
@@ -104,7 +100,7 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
                 log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",
                                         caseData.getCcdCaseReference(), exception.getMessage()
                 ));
-                caseData = updateWithDuplicatePaymentError(caseData);
+                updateWithDuplicatePaymentError(caseData);
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -114,20 +110,17 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
 
     }
 
-    private CaseData updateWithBusinessError(CaseData caseData, FeignException exception) {
+    private void updateWithBusinessError(CaseData caseData, FeignException exception) {
         try {
             var paymentObject = objectMapper.readValue(exception.contentUTF8(), PaymentDto.class);
             var status = paymentObject.getStatusHistories()[0];
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-                .map(PaymentDetails::toBuilder).orElse(PaymentDetails.builder())
-                .status(FAILED)
-                .errorCode(status.getErrorCode())
-                .errorMessage(status.getErrorMessage())
-                .build();
+                .orElse(new PaymentDetails());
+            paymentDetails.setStatus(FAILED);
+            paymentDetails.setErrorCode(status.getErrorCode());
+            paymentDetails.setErrorMessage(status.getErrorMessage());
 
-            return caseData.toBuilder()
-                .claimIssuedPaymentDetails(paymentDetails)
-                .build();
+            caseData.setClaimIssuedPaymentDetails(paymentDetails);
         } catch (JsonProcessingException jsonException) {
             log.error(jsonException.getMessage());
             log.error(String.format("Unknown bulk payment error for case: %s, response body: %s",
@@ -137,16 +130,14 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CaseData updateWithDuplicatePaymentError(CaseData caseData) {
-        var paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-            .map(PaymentDetails::toBuilder)
-            .orElse(PaymentDetails.builder())
-            .status(FAILED)
-            .errorCode(null)
-            .errorMessage(DUPLICATE_BULK_PAYMENT_MESSAGE)
-            .build();
+    private void updateWithDuplicatePaymentError(CaseData caseData) {
+        PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
+            .orElse(new PaymentDetails());
+        paymentDetails.setStatus(FAILED);
+        paymentDetails.setErrorCode(null);
+        paymentDetails.setErrorMessage(DUPLICATE_BULK_PAYMENT_MESSAGE);
 
-        return caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
+        caseData.setClaimIssuedPaymentDetails(paymentDetails);
     }
 
 }

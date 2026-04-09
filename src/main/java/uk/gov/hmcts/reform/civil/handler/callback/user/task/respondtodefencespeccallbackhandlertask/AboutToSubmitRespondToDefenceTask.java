@@ -16,14 +16,17 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -47,13 +50,15 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
+import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DATE_FORMATTER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
-import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistPartyAddress;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
@@ -75,206 +80,229 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private final DetermineNextState determineNextState;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
     private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
-    @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
-    @Value("${court-location.specified-claim.region-id}") String cnbcRegionId;
+    private final PaymentDateService paymentDateService;
+    @Value("${court-location.specified-claim.epimms-id}")
+    String cnbcEpimsId;
+    @Value("${court-location.specified-claim.region-id}")
+    String cnbcRegionId;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
 
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
         CaseData caseData = persistPartyAddress(oldCaseData, callbackParams.getCaseData());
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().applicant1ResponseDate(time.now());
 
-        persistFlagsForParties(oldCaseData, caseData, builder);
-        setResponseDocumentNull(builder);
-        updateCaselocationDetails(callbackParams, caseData, builder);
-        updateApplicant1DQ(callbackParams, caseData, builder);
-        assignApplicant1DQExpertsIfPresent(caseData, builder);
-        assignApplicant2DQExpertsIfPresent(caseData, builder);
+        caseData.setApplicant1ResponseDate(time.now());
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+        setResponseDocumentNull(caseData);
+        updateApplicant1DQ(callbackParams, caseData);
+        updateCaselocationDetails(caseData);
+        assignApplicant1DQExpertsIfPresent(caseData);
+        assignApplicant2DQExpertsIfPresent(caseData);
 
-        addEventAndDateAddedToApplicantExperts(builder);
-        addEventAndDateAddedToApplicantWitnesses(builder);
-        populateDQPartyIds(builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(caseData);
 
-        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
-        moveClaimToMediation(callbackParams, caseData, builder);
+        addEventAndDateAddedToApplicantExperts(caseData);
+        addEventAndDateAddedToApplicantWitnesses(caseData);
+        populateDQPartyIds(caseData);
+
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, caseData);
+        moveClaimToMediation(callbackParams, caseData);
 
         String nextState = putCaseStateInJudicialReferral(caseData);
         BusinessProcess businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
-        nextState = determineNextState.determineNextState(caseData, callbackParams, builder, nextState, businessProcess);
 
-        is1v1RespondImmediately(caseData, builder);
+        nextState = determineNextState.determineNextState(
+            caseData,
+            callbackParams,
+            nextState,
+            businessProcess
+        );
+
+        is1v1RespondImmediately(caseData);
 
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
 
-        builder.claimantResponseDocuments(
-            dqResponseDocumentUtils.buildClaimantResponseDocuments(builder.build()));
+        caseData.setClaimantResponseDocuments(
+            dqResponseDocumentUtils.buildClaimantResponseDocuments(caseData));
 
-        clearTempDocuments(builder);
+        setApplicant1DefenceResponseDocumentCategory(caseData);
+
+        clearTempDocuments(caseData);
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
                 || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
                 && caseData.isLipCase())) {
-                builder.isMintiLipCase(YES);
+                caseData.setIsMintiLipCase(YES);
             }
 
             updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                builder
+                caseData
             ));
         }
 
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, builder);
-        builder.nextDeadline(null);
-        builder.previousCCDState(caseData.getCcdState());
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, caseData);
+        caseData.setNextDeadline(null);
+        caseData.setPreviousCCDState(caseData.getCcdState());
+        if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
+            LocalDate whenBePaid = paymentDateService.calculatePaymentDeadline();
+            caseData.setWhenToBePaidText(whenBePaid.format(DATE_FORMATTER));
+            RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+            respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenBePaid);
+            caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .state(nextState)
             .build();
     }
 
-    private void moveClaimToMediation(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private void moveClaimToMediation(CallbackParams callbackParams, CaseData caseData) {
         if ((V_2.equals(callbackParams.getVersion())
-            && featureToggleService.isPinInPostEnabled()
             && isOneVOne(caseData)
             && caseData.hasClaimantAgreedToFreeMediation())
             || (featureToggleService.isCarmEnabledForCase(caseData)
             && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
             && caseData.hasApplicantProceededWithClaim())) {
-            builder.claimMovedToMediationOn(LocalDate.now());
+            caseData.setClaimMovedToMediationOn(LocalDate.now());
             log.info("Moved Claim to mediation for Case : {}", caseData.getCcdCaseReference());
         }
     }
 
-    private static void assignApplicant2DQExpertsIfPresent(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private boolean isDefendantPartAdmitPayImmediatelyAccepted(CaseData caseData) {
+        return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
+            && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            && (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            && YES.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec());
+    }
+
+    private static void assignApplicant2DQExpertsIfPresent(CaseData caseData) {
         if (caseData.getApplicant2DQ() != null
             && caseData.getApplicant2DQ().getSmallClaimExperts() != null) {
             Expert expert = fromSmallClaimExpertDetails(caseData.getApplicant2DQ().getSmallClaimExperts());
-            builder.applicant2DQ(
-                builder.build().getApplicant2DQ().toBuilder()
-                    .applicant2DQExperts(Experts.builder()
-                                             .expertRequired(caseData.getApplicantMPClaimExpertSpecRequired())
-                                             .details(wrapElements(expert))
-                                             .build())
-                    .build());
+            Experts experts = new Experts();
+            experts.setExpertRequired(caseData.getApplicantMPClaimExpertSpecRequired());
+            experts.setDetails(wrapElements(expert));
+            Applicant2DQ applicant2DQ = caseData.getApplicant2DQ();
+            applicant2DQ.setApplicant2DQExperts(experts);
+            caseData.setApplicant2DQ(applicant2DQ);
         } else if (caseData.getApplicant2DQ() != null
             && caseData.getApplicantMPClaimExpertSpecRequired() != null
             && NO.equals(caseData.getApplicantMPClaimExpertSpecRequired())) {
-            builder.applicant2DQ(
-                builder.build().getApplicant2DQ().toBuilder()
-                    .applicant2DQExperts(Experts.builder()
-                                             .expertRequired(NO)
-                                             .build())
-                    .build());
+            Experts experts = new Experts();
+            experts.setExpertRequired(NO);
+            Applicant2DQ applicant2DQ = caseData.getApplicant2DQ();
+            applicant2DQ.setApplicant2DQExperts(experts);
+            caseData.setApplicant2DQ(applicant2DQ);
         }
     }
 
-    private static void assignApplicant1DQExpertsIfPresent(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private static void assignApplicant1DQExpertsIfPresent(CaseData caseData) {
         if (caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ().getSmallClaimExperts() != null) {
             Expert expert = fromSmallClaimExpertDetails(caseData.getApplicant1DQ().getSmallClaimExperts());
             YesOrNo expertRequired = TWO_V_ONE.equals(getMultiPartyScenario(caseData)) ? caseData.getApplicantMPClaimExpertSpecRequired()
                 : caseData.getApplicant1ClaimExpertSpecRequired();
-            builder.applicant1DQ(
-                builder.build().getApplicant1DQ().toBuilder()
-                    .applicant1DQExperts(Experts.builder()
-                                             .expertRequired(expertRequired)
-                                             .details(wrapElements(expert))
-                                             .build())
-                    .build());
+            Experts experts = new Experts();
+            experts.setExpertRequired(expertRequired);
+            experts.setDetails(wrapElements(expert));
+            Applicant1DQ applicant1DQ = caseData.getApplicant1DQ();
+            applicant1DQ.setApplicant1DQExperts(experts);
+            caseData.setApplicant1DQ(applicant1DQ);
         } else if (caseData.getApplicant1DQ() != null
             && (NO.equals(caseData.getApplicantMPClaimExpertSpecRequired())
             || NO.equals(caseData.getApplicant1ClaimExpertSpecRequired()))) {
-            builder.applicant1DQ(
-                builder.build().getApplicant1DQ().toBuilder()
-                    .applicant1DQExperts(Experts.builder()
-                                             .expertRequired(NO)
-                                             .build())
-                    .build());
+            Experts experts = new Experts();
+            experts.setExpertRequired(NO);
+            Applicant1DQ applicant1DQ = caseData.getApplicant1DQ();
+            applicant1DQ.setApplicant1DQExperts(experts);
+            caseData.setApplicant1DQ(applicant1DQ);
         }
     }
 
-    private void updateApplicant1DQ(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private void updateApplicant1DQ(CallbackParams callbackParams, CaseData caseData) {
         if (caseData.hasApplicantProceededWithClaim() || (caseData.isPartAdmitClaimSpec() && caseData.isPartAdmitClaimNotSettled())) {
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-            Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
-                .applicant1DQStatementOfTruth(statementOfTruth);
+            Applicant1DQ dq = caseData.getApplicant1DQ();
+            dq.setApplicant1DQStatementOfTruth(statementOfTruth);
 
-            if (notTransferredOnline(caseData) && (!isFlightDelayAndSmallClaim(caseData)
+            // For flight delay small claims with a specific airline (not OTHER), update CML to flight location
+            if (isFlightDelaySmallClaimAndAirline(caseData)) {
+                caseData.setCaseManagementLocation(caseData.getFlightDelayDetails().getFlightCourtLocation());
+            } else if (notTransferredOnline(caseData) && (!isFlightDelayAndSmallClaim(caseData)
                 || isFlightDelaySmallClaimAndOther(caseData))) {
-                updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
+                updateDQCourtLocations(
+                    callbackParams,
+                    caseData,
+                    dq,
+                    isFlightDelaySmallClaimAndOther(caseData)
+                );
+                dq.setApplicant1DQStatementOfTruth(statementOfTruth);
             }
 
-            var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
+            var smallClaimWitnesses = caseData.getApplicant1DQWitnessesSmallClaim();
             if (smallClaimWitnesses != null) {
-                dq.applicant1DQWitnesses(smallClaimWitnesses);
+                dq.setApplicant1DQWitnesses(smallClaimWitnesses);
             }
 
-            builder.applicant1DQ(dq.build());
-            builder.uiStatementOfTruth(StatementOfTruth.builder().build());
+            caseData.setApplicant1DQ(dq);
+            caseData.setUiStatementOfTruth(new StatementOfTruth());
         }
     }
 
-    private void updateCaselocationDetails(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private void updateCaselocationDetails(CaseData caseData) {
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
             && isMultiOrIntTrackSpec(caseData)
             && caseData.isLipCase()) {
             // If case is Multi or Intermediate, and has a LIP involved, and even if transferred online
             // CML should be set/maintained at CNBC for transfer offline tasks (takeCaseOfflineMinti)
-            builder.caseManagementLocation(CaseLocationCivil.builder().baseLocation(cnbcEpimsId).region(cnbcRegionId).build());
-            // Otherwise If not Multi or Intermediate, and has a LIP involved,
-            // if case has been transferred online (i.e. current CML is NOT CNBC) we maintain that CML
-        } else if (notTransferredOnline(caseData)) {
-            // If neither, we update CML using logic in location helper (either preferred court, or under 1000 logic)
-            updateCaseManagementLocation(callbackParams, builder);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation(cnbcEpimsId);
+            caseLocationCivil.setRegion(cnbcRegionId);
+            caseData.setCaseManagementLocation(caseLocationCivil);
         }
+        // For non-Minti cases, CML updates are handled in updateDQCourtLocations() method
+        // We maintain whatever CML is currently set (whether CNBC or transferred location)
 
         if (log.isDebugEnabled()) {
-            log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
+            log.debug(
+                "Case management location for {} is {}",
+                caseData.getLegacyCaseReference(),
+                caseData.getCaseManagementLocation()
+            );
         }
     }
 
-    private static void setResponseDocumentNull(CaseData.CaseDataBuilder<?, ?> builder) {
+    private static void setResponseDocumentNull(CaseData caseData) {
         log.info("Resetting Documents");
-        builder.respondent1GeneratedResponseDocument(null);
-        builder.respondent2GeneratedResponseDocument(null);
-        builder.respondent1ClaimResponseDocumentSpec(null);
+        caseData.setRespondent1GeneratedResponseDocument(null);
+        caseData.setRespondent2GeneratedResponseDocument(null);
+        caseData.setRespondent1ClaimResponseDocumentSpec(null);
     }
 
     private String putCaseStateInJudicialReferral(CaseData caseData) {
         if (caseData.isRespondentResponseFullDefence()
-            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))) {
+            && JudicialReferralUtils.shouldMoveToJudicialReferral(
+            caseData,
+            featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+        )) {
             return CaseState.JUDICIAL_REFERRAL.name();
         }
         return null;
     }
 
     public boolean notTransferredOnline(CaseData caseData) {
-        return caseData.getCaseManagementLocation().getBaseLocation().equals(cnbcEpimsId);
-    }
-
-    private void updateCaseManagementLocation(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = callbackParams.getCaseData();
-        if (isFlightDelaySmallClaimAndAirline(caseData)) {
-            builder.caseManagementLocation(caseData.getFlightDelayDetails().getFlightCourtLocation());
-        } else if (!isFlightDelayAndSmallClaim(caseData)) {
-            locationHelper.getCaseManagementLocation(caseData)
-                .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                    builder,
-                    requestedCourt,
-                    () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                        CallbackParams.Params.BEARER_TOKEN).toString())
-                ));
-        }
+        return caseData.getCaseManagementLocation() != null
+            && caseData.getCaseManagementLocation().getBaseLocation() != null
+            && caseData.getCaseManagementLocation().getBaseLocation().equals(cnbcEpimsId);
     }
 
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
         return (caseData.getIsFlightDelayClaim() != null
             && caseData.getIsFlightDelayClaim().equals(YES)
-            &&  SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()));
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()));
     }
 
     private boolean isFlightDelaySmallClaimAndAirline(CaseData caseData) {
@@ -289,50 +317,56 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             .getValue().getCode().equals("OTHER"));
     }
 
-    private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
-                                        Applicant1DQ.Applicant1DQBuilder dq, boolean forceClaimantCourt) {
-        handleCourtLocationData(caseData, builder, dq, callbackParams);
+    private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData,
+                                        Applicant1DQ dq, boolean forceClaimantCourt) {
+        handleCourtLocationData(caseData, dq, callbackParams);
+
+        caseData.setApplicant1DQ(dq);
+
         Optional<RequestedCourt> newCourt;
 
         if (forceClaimantCourt) {
-            newCourt = locationHelper.getClaimantRequestedCourt(builder.applicant1DQ(dq.build()).build());
+            newCourt = locationHelper.getClaimantRequestedCourt(caseData);
         } else {
-            newCourt = locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build());
+            newCourt = locationHelper.getCaseManagementLocation(caseData);
         }
 
         newCourt.ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-            builder,
+            caseData,
             requestedCourt,
             () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
         ));
+
         if (log.isDebugEnabled()) {
-            log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
+            log.debug(
+                "Case management location for {} is {}",
+                caseData.getLegacyCaseReference(),
+                caseData.getCaseManagementLocation()
+            );
         }
     }
 
-    private void clearTempDocuments(CaseData.CaseDataBuilder<?, ?> builder) {
-        Applicant1DQ applicant1DQ = builder.build().getApplicant1DQ();
+    private void clearTempDocuments(CaseData caseData) {
+        Applicant1DQ applicant1DQ = caseData.getApplicant1DQ();
         if (nonNull(applicant1DQ)) {
-            builder.applicant1DQ(builder.build().getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
+            caseData.getApplicant1DQ().setApplicant1DQDraftDirections(null);
+            caseData.setApplicant1DQ(caseData.getApplicant1DQ());
         }
     }
 
-    private void handleCourtLocationData(CaseData caseData, CaseData.CaseDataBuilder dataBuilder,
-                                         Applicant1DQ.Applicant1DQBuilder dq,
+    private void handleCourtLocationData(CaseData caseData,
+                                         Applicant1DQ dq,
                                          CallbackParams callbackParams) {
         RequestedCourt requestedCourt = caseData.getApplicant1DQ().getApplicant1DQRequestedCourt();
         if (requestedCourt != null) {
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), requestedCourt.getResponseCourtLocations());
             if (nonNull(courtLocation)) {
-                dataBuilder
-                    .applicant1DQ(dq.applicant1DQRequestedCourt(
-                        caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
-                            .responseCourtLocations(null)
-                            .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
-                            .responseCourtCode(courtLocation.getCourtLocationCode()).build()
-                    ).build());
+                requestedCourt.setResponseCourtLocations(null);
+                requestedCourt.setCaseLocation(LocationHelper.buildCaseLocation(courtLocation));
+                requestedCourt.setResponseCourtCode(courtLocation.getCourtLocationCode());
+                dq.setApplicant1DQRequestedCourt(requestedCourt);
             }
         }
     }
@@ -342,13 +376,13 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
-    private void is1v1RespondImmediately(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private void is1v1RespondImmediately(CaseData caseData) {
         if (featureToggleService.isJudgmentOnlineLive()
             && isOneVOne(caseData)
             && caseData.isPayImmediately()
             && ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
             || caseData.isPartAdmitImmediatePaymentClaimSettled())) {
-            builder.respondForImmediateOption(YesOrNo.YES);
+            caseData.setRespondForImmediateOption(YesOrNo.YES);
         }
     }
 
@@ -357,4 +391,13 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
     }
 
+    private void setApplicant1DefenceResponseDocumentCategory(CaseData caseData) {
+        if (caseData.getApplicant1DefenceResponseDocumentSpec() != null
+            && caseData.getApplicant1DefenceResponseDocumentSpec().getFile() != null) {
+
+            caseData.getApplicant1DefenceResponseDocumentSpec()
+                .getFile()
+                .setCategoryID("directionsQuestionnaire");
+        }
+    }
 }

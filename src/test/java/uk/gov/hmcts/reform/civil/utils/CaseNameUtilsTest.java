@@ -19,10 +19,10 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnExpectedPartyName_withValidParty() {
-            var party = Party.builder()
-                .individualFirstName("Applicant")
-                .individualLastName("One")
-                .type(Party.Type.INDIVIDUAL).build();
+            var party = new Party()
+                .setIndividualFirstName("Applicant")
+                .setIndividualLastName("One")
+                .setType(Party.Type.INDIVIDUAL);
 
             var actual = CaseNameUtils.getFormattedPartyName(party);
 
@@ -42,7 +42,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnExpectedLitigationFriendName_withValidLitigationFriend() {
-            var litigationFriend = LitigationFriend.builder().firstName("Litigation").lastName("Friend").build();
+            var litigationFriend = new LitigationFriend().setFirstName("Litigation").setLastName("Friend");
 
             var actual = CaseNameUtils.getFormattedLitigationFriendName(litigationFriend);
 
@@ -71,48 +71,41 @@ class CaseNameUtilsTest {
 
         @BeforeEach
         void setupParties() {
-            applicant1 = Party.builder()
-                .individualFirstName("Applicant")
-                .individualLastName("One")
-                .type(Party.Type.INDIVIDUAL).build();
+            applicant1 = new Party()
+                .setIndividualFirstName("Applicant")
+                .setIndividualLastName("One")
+                .setType(Party.Type.INDIVIDUAL);
 
-            applicant1LitigationFriend = LitigationFriend.builder()
-                .firstName("ApplicantOne")
-                .lastName("LitigationFriend")
-                .build();
+            applicant1LitigationFriend = new LitigationFriend().setFirstName("ApplicantOne")
+                .setLastName("LitigationFriend")
+                ;
 
-            applicant2 = Party.builder()
-                .individualFirstName("Applicant")
-                .individualLastName("Two")
-                .type(Party.Type.INDIVIDUAL)
-                .build();
+            applicant2 = new Party()
+                .setIndividualFirstName("Applicant")
+                .setIndividualLastName("Two")
+                .setType(Party.Type.INDIVIDUAL);
 
-            applicant2LitigationFriend = LitigationFriend.builder()
-                .firstName("ApplicantTwo")
-                .lastName("LitigationFriend")
-                .build();
+            applicant2LitigationFriend = new LitigationFriend().setFirstName("ApplicantTwo")
+                .setLastName("LitigationFriend")
+                ;
 
-            respondent1 = Party.builder()
-                .individualFirstName("Respondent")
-                .individualLastName("One")
-                .type(Party.Type.INDIVIDUAL)
-                .build();
+            respondent1 = new Party()
+                .setIndividualFirstName("Respondent")
+                .setIndividualLastName("One")
+                .setType(Party.Type.INDIVIDUAL);
 
-            respondent1LitigationFriend = LitigationFriend.builder()
-                .firstName("RespondentOne")
-                .lastName("LitigationFriend")
-                .build();
+            respondent1LitigationFriend = new LitigationFriend().setFirstName("RespondentOne")
+                .setLastName("LitigationFriend")
+                ;
 
-            respondent2 = Party.builder()
-                .individualFirstName("Respondent")
-                .individualLastName("Two")
-                .type(Party.Type.INDIVIDUAL)
-                .build();
+            respondent2 = new Party()
+                .setIndividualFirstName("Respondent")
+                .setIndividualLastName("Two")
+                .setType(Party.Type.INDIVIDUAL);
 
-            respondent2LitigationFriend = LitigationFriend.builder()
-                .firstName("RespondentTwo")
-                .lastName("LitigationFriend")
-                .build();
+            respondent2LitigationFriend = new LitigationFriend().setFirstName("RespondentTwo")
+                .setLastName("LitigationFriend")
+                ;
         }
 
         @Test

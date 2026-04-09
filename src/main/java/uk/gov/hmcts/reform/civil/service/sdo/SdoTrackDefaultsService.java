@@ -1,0 +1,114 @@
+package uk.gov.hmcts.reform.civil.service.sdo;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
+import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.sdo.PPI;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.DEFAULT_PENAL_NOTICE;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class SdoTrackDefaultsService {
+
+    private final SdoJourneyToggleService sdoJourneyToggleService;
+    private final SdoChecklistService sdoChecklistService;
+    private final SdoDisposalOrderDefaultsService sdoDisposalOrderDefaultsService;
+    private final SdoFastTrackOrderDefaultsService sdoFastTrackOrderDefaultsService;
+    private final SdoSmallClaimsOrderDefaultsService sdoSmallClaimsOrderDefaultsService;
+    private final SdoExpertEvidenceFieldsService sdoExpertEvidenceFieldsService;
+    private final SdoDisclosureOfDocumentsFieldsService sdoDisclosureOfDocumentsFieldsService;
+    private final SdoJudgementDeductionService sdoJudgementDeductionService;
+    private final FeatureToggleService featureToggleService;
+
+    private static final List<IncludeInOrderToggle> INCLUDE_IN_ORDER_TOGGLE = List.of(IncludeInOrderToggle.INCLUDE);
+
+    public void applyBaseTrackDefaults(CaseData caseData) {
+        initialiseTrackDefaults(caseData);
+        sdoJourneyToggleService.applyJourneyFlags(caseData);
+
+        List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
+        sdoChecklistService.applyOrderChecklists(caseData, checkList);
+        sdoJudgementDeductionService.populateJudgementDeductionValues(caseData);
+
+        sdoDisposalOrderDefaultsService.populateDisposalOrderDetails(caseData);
+        sdoFastTrackOrderDefaultsService.populateFastTrackOrderDetails(caseData);
+        sdoSmallClaimsOrderDefaultsService.populateSmallClaimsOrderDetails(caseData, checkList);
+
+        sdoExpertEvidenceFieldsService.populateFastTrackExpertEvidence(caseData);
+        sdoDisclosureOfDocumentsFieldsService.populateFastTrackDisclosureOfDocuments(caseData);
+
+        populatePenalNoticeFields(caseData);
+        populatePpiFields(caseData);
+    }
+
+    private void populatePenalNoticeFields(CaseData caseData) {
+        boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
+        log.info("Populating Penal Notice fields for case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
+
+        if (otherRemedyEnabled) {
+            caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
+            caseData.setFastTrackPenalNotice(DEFAULT_PENAL_NOTICE);
+            caseData.setSmallClaimsPenalNoticeToggle(new ArrayList<>());
+            caseData.setFastTrackPenalNoticeToggle(new ArrayList<>());
+            log.debug("Penal Notice fields populated for case: {}", caseData.getCcdCaseReference());
+        }
+    }
+
+    private void populatePpiFields(CaseData caseData) {
+        boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
+        log.info("Populating PPI fields for case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
+
+        if (otherRemedyEnabled) {
+            PPI ppi = new PPI();
+            ppi.setPpiDate(LocalDate.now().plusDays(28));
+            ppi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
+            caseData.setSmallClaimsPPI(ppi);
+            caseData.setFastTrackPPI(ppi);
+            log.debug("PPI fields populated for case: {}", caseData.getCcdCaseReference());
+        } else {
+            caseData.setSmallClaimsPPI(null);
+            caseData.setFastTrackPPI(null);
+            log.debug("PPI fields set to null for case: {}", caseData.getCcdCaseReference());
+        }
+    }
+
+    public void applyR2Defaults(CaseData caseData) {
+        sdoChecklistService.applyR2Checklists(caseData, INCLUDE_IN_ORDER_TOGGLE);
+        caseData.setSdoR2FastTrackUseOfWelshLanguage(buildWelshLanguageUsage());
+        caseData.setSdoR2SmallClaimsUseOfWelshLanguage(buildWelshLanguageUsage());
+        caseData.setSdoR2DisposalHearingUseOfWelshLanguage(buildWelshLanguageUsage());
+    }
+
+    public List<IncludeInOrderToggle> defaultIncludeInOrderToggle() {
+        return INCLUDE_IN_ORDER_TOGGLE;
+    }
+
+    private void initialiseTrackDefaults(CaseData caseData) {
+        caseData.setSmallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
+        caseData.setFastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
+    }
+
+    private SdoR2WelshLanguageUsage buildWelshLanguageUsage() {
+        SdoR2WelshLanguageUsage welshLanguageUsage = new SdoR2WelshLanguageUsage();
+        welshLanguageUsage.setDescription(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION);
+        return welshLanguageUsage;
+    }
+
+}

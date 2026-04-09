@@ -24,9 +24,9 @@ class ApplicantOneExpertReportDocumentHandlerTest extends BaseDocumentHandlerTes
 
     @Test
     void shouldCopyExpertReportDocumentsToLegalRep2() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getDocumentExpertReportApp2().size());
+        assertEquals(2, caseData.getDocumentExpertReportApp2().size());
     }
 
     @Test

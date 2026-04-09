@@ -11,12 +11,14 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -40,68 +42,101 @@ class LocationServiceTest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
-    private static final Respondent1DQ respondent1DQ =
-        Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                .responseCourtCode("respondent1DQRequestedCourt")
-                                                                .caseLocation(CaseLocationCivil.builder()
-                                                                                  .region("2")
-                                                                                  .baseLocation("11111")
-                                                                                  .build())
-                                                                .build()).build();
-    private static final Respondent2DQ respondent2DQ =
-        Respondent2DQ.builder().respondent2DQRequestedCourt(RequestedCourt.builder()
-                                                                .responseCourtCode("respondent2DQRequestedCourt")
-                                                                .caseLocation(CaseLocationCivil.builder()
-                                                                                  .region("3")
-                                                                                  .baseLocation("22222")
-                                                                                  .build())
-                                                                .build()).build();
+    private static final Respondent1DQ respondent1DQ;
+    private static final Respondent2DQ respondent2DQ;
+
+    static {
+        CaseLocationCivil location1 = new CaseLocationCivil();
+        location1.setRegion("2");
+        location1.setBaseLocation("11111");
+        RequestedCourt requestedCourt1 = new RequestedCourt();
+        requestedCourt1.setResponseCourtCode("respondent1DQRequestedCourt");
+        requestedCourt1.setCaseLocation(location1);
+        respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt1);
+
+        CaseLocationCivil location2 = new CaseLocationCivil();
+        location2.setRegion("3");
+        location2.setBaseLocation("22222");
+        RequestedCourt requestedCourt2 = new RequestedCourt();
+        requestedCourt2.setResponseCourtCode("respondent2DQRequestedCourt");
+        requestedCourt2.setCaseLocation(location2);
+        respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt2);
+    }
 
     @Test
     void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefDataQMoff() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CaseState.JUDICIAL_REFERRAL, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ
             );
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdoNotInRefData());
+        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(new ArrayList<>(List.of()));
 
         assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, "authToken"));
     }
 
     @Test
     void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefDataQMOn() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CaseState.JUDICIAL_REFERRAL, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ
             );
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdoNotInRefData());
+        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(new ArrayList<>(List.of()));
 
         assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, "authToken"));
     }
 
     @Test
     void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefDataCaseDiscontinued() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CaseState.CASE_DISCONTINUED, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ).toBuilder()
             .previousCCDState(null).build();
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdoNotInRefData());
+        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(new ArrayList<>(List.of()));
 
         assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, "authToken"));
     }
 
+    @Test
+    void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInCaseData() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(new ArrayList<>(List.of()));
+
+        assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, "authToken"));
+    }
+
+    @Test
+    void shouldNotThrowException_whenApplicationMadeAfterSDOMainCaseCMLInRefData() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(CaseState.CASE_DISCONTINUED, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
+                                          respondent2DQ).toBuilder()
+            .previousCCDState(null).build();
+        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(getSampleCourLocationsRefObjectPostSdoNotInRefData());
+
+        assertEquals(getExpectedGACaseLocation(), service.getWorkAllocationLocation(caseData, "authToken").getLeft());
+    }
+
     protected List<LocationRefData> getSampleCourLocationsRefObjectPostSdoNotInRefData() {
         return new ArrayList<>(List.of(
-            LocationRefData.builder()
-                .epimmsId("xxxxx")
-                .siteName("xxxxx")
-                .courtAddress("xxxxx")
-                .postcode("xxxxx")
-                .regionId("xxxxx")
-                .courtLocationCode("xxxxx").build()
+            new LocationRefData()
+                .setEpimmsId("xxxxx")
+                .setSiteName("xxxxx")
+                .setCourtAddress("xxxxx")
+                .setPostcode("xxxxx")
+                .setRegionId("xxxxx")
+                .setCourtLocationCode("xxxxx")
         ));
+    }
+
+    protected  uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getExpectedGACaseLocation() {
+        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil =
+            new uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil();
+        caseLocationCivil.setRegion("xxxxx");
+        caseLocationCivil.setBaseLocation("xxxxx");
+        caseLocationCivil.setSiteName("xxxxx");
+        caseLocationCivil.setAddress("xxxxx");
+        caseLocationCivil.setPostcode("xxxxx");
+        return caseLocationCivil;
     }
 }

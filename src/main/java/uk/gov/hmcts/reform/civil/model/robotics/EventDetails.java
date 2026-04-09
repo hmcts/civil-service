@@ -2,15 +2,15 @@ package uk.gov.hmcts.reform.civil.model.robotics;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
+@Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EventDetails {
 

@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import java.time.LocalDateTime;
@@ -12,9 +12,9 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
 @Data
-@Builder(toBuilder = true)
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
+@Accessors(chain = true)
 public class BusinessProcess {
 
     private String processInstanceId;
@@ -26,7 +26,17 @@ public class BusinessProcess {
     private LocalDateTime readyOn;
 
     public static BusinessProcess ready(CaseEvent caseEvent) {
-        return BusinessProcess.builder().status(READY).camundaEvent(caseEvent.name()).readyOn(LocalDateTime.now()).build();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setStatus(READY);
+        businessProcess.setCamundaEvent(caseEvent.name());
+        businessProcess.setReadyOn(LocalDateTime.now());
+        return businessProcess;
+    }
+
+    public static BusinessProcess readyGa(CaseEvent caseEvent) {
+        return new BusinessProcess()
+            .setStatus(READY)
+            .setCamundaEvent(caseEvent.name());
     }
 
     @JsonIgnore
@@ -57,6 +67,17 @@ public class BusinessProcess {
     public BusinessProcess updateActivityId(String activityId) {
         this.activityId = activityId;
         return this;
+    }
+
+    @JsonIgnore
+    public BusinessProcess copy() {
+        return new BusinessProcess(
+            processInstanceId,
+            status,
+            activityId,
+            camundaEvent,
+            readyOn
+        );
     }
 
     @JsonIgnore

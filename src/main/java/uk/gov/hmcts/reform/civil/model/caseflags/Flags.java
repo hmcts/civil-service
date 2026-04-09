@@ -3,18 +3,18 @@ package uk.gov.hmcts.reform.civil.model.caseflags;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.List;
 
 @Data
-@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class Flags {
 
-    private String partyName;
-    private String roleOnCase;
-    private List<Element<FlagDetail>> details;
+    protected String partyName;
+    protected String roleOnCase;
+    protected List<Element<FlagDetail>> details;
 }

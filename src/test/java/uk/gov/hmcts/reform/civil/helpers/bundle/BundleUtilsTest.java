@@ -8,6 +8,7 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BundleUtilsTest {
 
@@ -54,11 +55,10 @@ class BundleUtilsTest {
     void shouldBuildBundlingRequestDocWithGivenParameters() {
 
         String docName = "TestDocument";
-        Document document = Document.builder()
-            .documentUrl("http://example.com/document.pdf")
-            .documentBinaryUrl("http://example.com/document-binary.pdf")
-            .documentFileName("document.pdf")
-            .build();
+        Document document = new Document()
+            .setDocumentUrl("http://example.com/document.pdf")
+            .setDocumentBinaryUrl("http://example.com/document-binary.pdf")
+            .setDocumentFileName("document.pdf");
         String docType = "TestDocType";
 
         BundlingRequestDocument result = BundleUtils.buildBundlingRequestDoc(docName, document, docType);
@@ -69,5 +69,30 @@ class BundleUtilsTest {
         assertEquals("http://example.com/document.pdf", result.getDocumentLink().getDocumentUrl());
         assertEquals("http://example.com/document-binary.pdf", result.getDocumentLink().getDocumentBinaryUrl());
         assertEquals("document.pdf", result.getDocumentLink().getDocumentFilename());
+    }
+
+    @Test
+    void shouldTruncateDocNameWhenExceedsMaxLength() {
+        String longParam = "A".repeat(300); // More than 255 characters
+        String fileName = "%s";
+        LocalDate date = LocalDate.of(2023, 10, 5);
+
+        String result = BundleUtils.generateDocName(fileName, longParam, "Param2", date);
+
+        assertEquals(BundleUtils.MAX_DOC_TITLE_LENGTH, result.length());
+        assertEquals(longParam.substring(0, BundleUtils.MAX_DOC_TITLE_LENGTH), result);
+    }
+
+    @Test
+    void shouldTruncateDocNameWhenDateAndParamsCauseOverflow() {
+        String longParam1 = "X".repeat(200);
+        String longParam2 = "Y".repeat(100); // Together > 255 chars
+        String fileName = "%s_%s_%s";
+        LocalDate date = LocalDate.of(2023, 10, 5);
+
+        String result = BundleUtils.generateDocName(fileName, longParam1, longParam2, date);
+
+        assertEquals(BundleUtils.MAX_DOC_TITLE_LENGTH, result.length());
+        assertTrue(result.startsWith(longParam1.substring(0, 200))); // still starts with part of first param
     }
 }

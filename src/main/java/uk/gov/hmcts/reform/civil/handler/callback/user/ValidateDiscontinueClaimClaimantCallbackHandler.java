@@ -62,20 +62,18 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
 
     private CallbackResponse populateJudgeNameAndDateCopies(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
-            .permissionGrantedJudgeCopy(caseData.getPermissionGrantedComplex() == null ? null
-                                                : caseData.getPermissionGrantedComplex().getPermissionGrantedJudge())
-            .permissionGrantedDateCopy(caseData.getPermissionGrantedComplex() == null ? null
+        caseData.setPermissionGrantedJudgeCopy(caseData.getPermissionGrantedComplex() == null ? null
+                                                : caseData.getPermissionGrantedComplex().getPermissionGrantedJudge());
+        caseData.setPermissionGrantedDateCopy(caseData.getPermissionGrantedComplex() == null ? null
                                                : caseData.getPermissionGrantedComplex().getPermissionGrantedDate());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         AboutToStartOrSubmitCallbackResponse
             .AboutToStartOrSubmitCallbackResponseBuilder aboutToStartOrSubmitCallbackResponseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
@@ -106,15 +104,15 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
                 .getPreTranslationDocuments();
             caseData.getRespondent1NoticeOfDiscontinueCWViewDoc().setDocumentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT);
             translatedDocuments.add(element(caseData.getRespondent1NoticeOfDiscontinueCWViewDoc()));
-            caseDataBuilder.bilingualHint(YesOrNo.YES);
-            caseDataBuilder.preTranslationDocuments(translatedDocuments);
-            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE);
-            caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(null);
+            caseData.setBilingualHint(YesOrNo.YES);
+            caseData.setPreTranslationDocuments(translatedDocuments);
+            caseData.setPreTranslationDocumentType(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE);
+            caseData.setRespondent1NoticeOfDiscontinueCWViewDoc(null);
         } else {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT));
+            caseData.setBusinessProcess(BusinessProcess.ready(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT));
         }
 
-        return aboutToStartOrSubmitCallbackResponseBuilder.data(caseDataBuilder.build().toMap(objectMapper)).build();
+        return aboutToStartOrSubmitCallbackResponseBuilder.data(caseData.toMap(objectMapper)).build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

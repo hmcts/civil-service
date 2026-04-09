@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class DisclosureReport {
 
-    private final YesOrNo disclosureFormFiledAndServed;
-    private final YesOrNo disclosureProposalAgreed;
-    private final String draftOrderNumber;
+    private YesOrNo disclosureFormFiledAndServed;
+    private YesOrNo disclosureProposalAgreed;
+    private String draftOrderNumber;
 }

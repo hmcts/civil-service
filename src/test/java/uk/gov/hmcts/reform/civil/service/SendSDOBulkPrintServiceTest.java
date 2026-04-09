@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoCoverLetterAppendService;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,7 +65,7 @@ class SendSDOBulkPrintServiceTest {
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
-        verifyPrintLetter(caseData, respondent1);
+        verifyPrintLetter(caseData, respondent1, List.of("test"));
     }
 
     @Test
@@ -76,22 +77,25 @@ class SendSDOBulkPrintServiceTest {
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test"));
     }
 
     @Test
     void shouldPrintLetterSuccessfullyForDefendantLIPInEnglishIfWelshNotEnabled() {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithSDOOrder(applicant1);
-        caseData = caseData.toBuilder().caseDataLiP(
-            CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()).build()).build();
+        RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+        respondentLiPResponse.setRespondent1ResponseLanguage("WELSH");
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test"));
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(1);
@@ -101,15 +105,18 @@ class SendSDOBulkPrintServiceTest {
     void shouldPrintLetterSuccessfullyForDefendantLIPInWelsh() {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithTranslatedSDOOrder(applicant1);
-        caseData = caseData.toBuilder().caseDataLiP(
-            CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()).build()).build();
+        RespondentLiPResponse respondentLiPResponse2 = new RespondentLiPResponse();
+        respondentLiPResponse2.setRespondent1ResponseLanguage("WELSH");
+        CaseDataLiP caseDataLiP2 = new CaseDataLiP();
+        caseDataLiP2.setRespondent1LiPResponse(respondentLiPResponse2);
+        caseData.setCaseDataLiP(caseDataLiP2);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test"));
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(1);
@@ -119,15 +126,18 @@ class SendSDOBulkPrintServiceTest {
     void shouldPrintLetterSuccessfullyForDefendantLIPInBothLanguages() {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithEnglishAndTranslatedSDOOrder(applicant1);
-        caseData = caseData.toBuilder().caseDataLiP(
-            CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build()).build();
+        RespondentLiPResponse respondentLiPResponse3 = new RespondentLiPResponse();
+        respondentLiPResponse3.setRespondent1ResponseLanguage("BOTH");
+        CaseDataLiP caseDataLiP3 = new CaseDataLiP();
+        caseDataLiP3.setRespondent1LiPResponse(respondentLiPResponse3);
+        caseData.setCaseDataLiP(caseDataLiP3);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test", "test"));
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(2);
@@ -137,14 +147,14 @@ class SendSDOBulkPrintServiceTest {
     void shouldPrintLetterSuccessfullyForClaimantLIPInEnglishIfWelshNotEnabled() {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithSDOOrder(applicant1);
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("WELSH").build();
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test"));
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(1);
@@ -154,14 +164,14 @@ class SendSDOBulkPrintServiceTest {
     void shouldPrintLetterSuccessfullyForClaimantLIPInWelsh() {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithTranslatedSDOOrder(applicant1);
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("WELSH").build();
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test"));
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(1);
@@ -171,14 +181,14 @@ class SendSDOBulkPrintServiceTest {
     void shouldPrintLetterSuccessfullyForClaimantLIPInBothLanguages() {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithEnglishAndTranslatedSDOOrder(applicant1);
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test", "test"));
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(2);
@@ -203,62 +213,62 @@ class SendSDOBulkPrintServiceTest {
         verifyNoInteractions(bulkPrintService);
     }
 
-    private void verifyPrintLetter(CaseData caseData, Party party) {
+    private void verifyPrintLetter(CaseData caseData, Party party, List<String> fileNames) {
         verify(bulkPrintService).printLetter(
             LETTER_CONTENT,
             caseData.getLegacyCaseReference(),
             caseData.getLegacyCaseReference(),
             SDO_ORDER_PACK_LETTER_TYPE,
-            Collections.singletonList(party.getPartyName())
+            Collections.singletonList(party.getPartyName()),
+            fileNames
         );
     }
 
     private Party createSoleTraderParty() {
-        return PartyBuilder.builder().soleTrader().build();
+        return new PartyBuilder().soleTrader().build();
     }
 
     private CaseData createCaseDataWithSDOOrder(Party party) {
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(SDO_ORDER);
+        caseDocument.setDocumentLink(DOCUMENT_LINK);
         return CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
-                                                           .documentType(SDO_ORDER)
-                                                           .documentLink(DOCUMENT_LINK)
-                                                           .build()))
+            .systemGeneratedCaseDocuments(wrapElements(caseDocument))
             .respondent1(party)
             .applicant1(party)
             .build();
     }
 
     private CaseData createCaseDataWithTranslatedSDOOrder(Party party) {
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(SDO_TRANSLATED_DOCUMENT);
+        caseDocument.setDocumentLink(DOCUMENT_LINK);
         return CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
-                                                           .documentType(SDO_TRANSLATED_DOCUMENT)
-                                                           .documentLink(DOCUMENT_LINK)
-                                                           .build()))
+            .systemGeneratedCaseDocuments(wrapElements(caseDocument))
             .respondent1(party)
             .applicant1(party)
             .build();
     }
 
     private CaseData createCaseDataWithEnglishAndTranslatedSDOOrder(Party party) {
+        CaseDocument caseDocument1 = new CaseDocument();
+        caseDocument1.setDocumentType(SDO_ORDER);
+        caseDocument1.setDocumentLink(DOCUMENT_LINK);
+        CaseDocument caseDocument2 = new CaseDocument();
+        caseDocument2.setDocumentType(SDO_TRANSLATED_DOCUMENT);
+        caseDocument2.setDocumentLink(DOCUMENT_LINK);
         return CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
-                                                           .documentType(SDO_ORDER)
-                                                           .documentLink(DOCUMENT_LINK)
-                                                           .build(),
-                                                       CaseDocument.builder()
-                                                           .documentType(SDO_TRANSLATED_DOCUMENT)
-                                                           .documentLink(DOCUMENT_LINK)
-                                                           .build()))
+            .systemGeneratedCaseDocuments(wrapElements(caseDocument1, caseDocument2))
             .respondent1(party)
             .applicant1(party)
             .build();
     }
 
     private CaseData createCaseDataWithSealedClaim() {
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(SEALED_CLAIM);
         return CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
-                                                           .documentType(SEALED_CLAIM)
-                                                           .build()))
+            .systemGeneratedCaseDocuments(wrapElements(caseDocument))
             .build();
     }
 }

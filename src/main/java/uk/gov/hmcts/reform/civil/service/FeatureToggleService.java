@@ -3,14 +3,16 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
+import static uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowPredicate.caseContainsLiPGa;
 import static uk.gov.hmcts.reform.civil.utils.JudgeReallocatedClaimTrack.judgeReallocatedTrackOrAlreadyMinti;
 
 @Slf4j
@@ -24,24 +26,12 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
-    public boolean isGeneralApplicationsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
-    }
-
     public boolean isBulkClaimEnabled() {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
 
-    public boolean isPinInPostEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
-    }
-
     public boolean isRPAEmailEnabled() {
         return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
-    }
-
-    public boolean isFastTrackUpliftsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("fast-track-uplifts");
     }
 
     public boolean isLipVLipEnabled() {
@@ -60,14 +50,6 @@ public class FeatureToggleService {
                 );
     }
 
-    public boolean isTransferOnlineCaseEnabled() {
-        return featureToggleApi.isFeatureEnabled("isTransferOnlineCaseEnabled");
-    }
-
-    public boolean isCaseProgressionEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-progression");
-    }
-
     public boolean isJudgmentOnlineLive() {
         return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }
@@ -83,10 +65,6 @@ public class FeatureToggleService {
         return isSpecClaim
             && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
                                                         epoch, false);
-    }
-
-    public boolean isGaForLipsEnabled() {
-        return featureToggleApi.isFeatureEnabled("GaForLips");
     }
 
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
@@ -122,20 +100,14 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
     }
 
-    public boolean isCoSCEnabled() {
-        return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
-    }
-
     public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
         return location != null
-            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
-            && isCaseProgressionEnabled();
+            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true);
     }
 
-    public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
+    public boolean isLocationWhiteListed(String location) {
         return location != null
-            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
-            && isGaForLipsEnabled();
+            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false);
     }
 
     public boolean isJOLiveFeedActive() {
@@ -154,25 +126,23 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
     }
 
-    public boolean isHmcForLipEnabled() {
-        return featureToggleApi.isFeatureEnabled("hmc-cui-enabled");
-    }
-
     public boolean isQueryManagementLRsEnabled() {
         return featureToggleApi.isFeatureEnabled("query-management");
     }
 
     // if deleting this, also handle isQMPdfGeneratorEnabled() below
     public boolean isPublicQueryManagementEnabled(CaseData caseData) {
-        if (caseContainsLiP.test(caseData)) {
+        if (LipPredicate.caseContainsLiP.test(caseData)) {
             return isLipQueryManagementEnabled(caseData);
         }
-        return featureToggleApi.isFeatureEnabled("public-query-management");
+        return true;
     }
 
-    public boolean isQMPdfGeneratorDisabled() {
-        // only generate pdf if flag is off
-        return featureToggleApi.isFeatureEnabled("public-query-management");
+    public boolean isPublicQueryManagementEnabledGa(GeneralApplicationCaseData caseData) {
+        if (caseContainsLiPGa.test(caseData)) {
+            return isLipQueryManagementEnabledGa(caseData);
+        }
+        return true;
     }
 
     public boolean isGaForWelshEnabled() {
@@ -189,7 +159,25 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
     }
 
-    public boolean isLrAdmissionBulkEnabled() {
-        return featureToggleApi.isFeatureEnabled("lr-admission-bulk");
+    public boolean isLipQueryManagementEnabledGa(GeneralApplicationCaseData caseData) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime mainCaseSubmittedDate = caseData.getMainCaseSubmittedDate();
+        if (mainCaseSubmittedDate == null) {
+            return false;
+        }
+        long epoch = mainCaseSubmittedDate.atZone(zoneId).toEpochSecond();
+        return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
+    }
+
+    public boolean isCuiGaNroEnabled() {
+        return featureToggleApi.isFeatureEnabled("cui-ga-nro");
+    }
+
+    public boolean isOtherRemedyEnabled() {
+        return featureToggleApi.isFeatureEnabled("other-remedy-enabled");
+    }
+
+    public boolean isLinkDefendantTestingEnabled() {
+        return featureToggleApi.isFeatureEnabled("link-defendant-testing-enabled");
     }
 }

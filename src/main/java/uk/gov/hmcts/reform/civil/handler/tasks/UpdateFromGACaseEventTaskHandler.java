@@ -2,10 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -37,10 +36,12 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
 
     private static final String GA_DOC_SUFFIX = "Document";
@@ -60,8 +61,6 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
     private CaseData generalAppCaseData;
     private CaseData civilCaseData;
     private CaseData data;
-
-    private final Logger log = LoggerFactory.getLogger(UpdateFromGACaseEventTaskHandler.class);
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -92,7 +91,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
                     getUpdatedCaseData(caseData, generalAppCaseData)
                 )
             );
-            return ExternalTaskData.builder().caseData(caseData).generalApplicationCaseData(generalAppCaseData).build();
+            return new ExternalTaskData().setCaseData(caseData).setGeneralApplicationData(generalAppCaseData);
         } catch (NumberFormatException ne) {
             throw new InvalidCaseDataException(
                 "Conversion to long datatype failed for general application for a case ", ne
@@ -120,8 +119,15 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
             updateDocCollection(output, generalAppCaseData, "gaRespondDoc", civilCaseData, "gaRespondDoc");
             generalAppCaseData = mergeBundle(generalAppCaseData);
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaAddl");
-
+            if (featureToggleService.isGaForWelshEnabled() && (civilCaseData.isClaimantBilingual() || civilCaseData.isRespondentResponseBilingual())) {
+                if (generalAppCaseData.getParentClaimantIsApplicant() == YES) {
+                    updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsApplicant", civilCaseData, "gaAddlDocClaimant");
+                } else {
+                    updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsRespondent", civilCaseData, "gaAddlDocRespondentSol");
+                }
+            }
         } catch (Exception e) {
+            log.info("civilCaseData case Id {} and generalAppCaseData case Id {} ", civilCaseData.getCcdCaseReference(), generalAppCaseData.getCcdCaseReference());
             log.error(e.getMessage());
         }
         return output;
@@ -134,7 +140,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
                 newGaAddlDoc = new ArrayList<>();
             }
             newGaAddlDoc.addAll(generalAppCaseData.getGaAddlDocBundle());
-            return generalAppCaseData.toBuilder().gaAddlDoc(newGaAddlDoc).build();
+            return generalAppCaseData.setGaAddlDoc(newGaAddlDoc);
         }
         return generalAppCaseData;
     }
@@ -252,7 +258,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
                     civilDocs.add(gaDoc);
                 }
             }
-        } else if (featureToggleService.isGaForLipsEnabled() && (civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP()
+        } else if ((civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP()
             || civilCaseData.isApplicantNotRepresented()) && (gaDocs != null && (fromGaList.equals("gaDraftDocument")))) {
 
             checkDraftDocumentsInMainCase(civilDocs, gaDocs);
@@ -294,7 +300,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         }
         List<Element<GeneralApplicationsDetails>> gaAppDetails = civilCaseData.getClaimantGaAppDetails();
 
-        if (generalAppCaseData.getParentClaimantIsApplicant() == YesOrNo.NO
+        if (generalAppCaseData.getParentClaimantIsApplicant() == NO
             && ((generalAppCaseData.getGeneralAppInformOtherParty()) != null && YES.equals(generalAppCaseData.getGeneralAppInformOtherParty().getIsWithNotice())
                 || (generalAppCaseData.getGeneralAppRespondentAgreement() != null && generalAppCaseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES)))) {
             return true;

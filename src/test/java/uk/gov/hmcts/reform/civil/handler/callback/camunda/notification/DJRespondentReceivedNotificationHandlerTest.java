@@ -104,7 +104,7 @@ class DJRespondentReceivedNotificationHandlerTest {
             when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Received email
@@ -134,10 +134,10 @@ class DJRespondentReceivedNotificationHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent1Represented(YES)
-                .respondent1(PartyBuilder.builder().company().build())
+                .respondent1(new PartyBuilder().company().build())
                 .addRespondent2(YesOrNo.NO)
                 .specRespondent1Represented(YES)
-                .applicant1(PartyBuilder.builder().company().build())
+                .applicant1(new PartyBuilder().company().build())
                 .applicant1Represented(NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).version(V_1).build();
@@ -183,19 +183,15 @@ class DJRespondentReceivedNotificationHandlerTest {
             when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both")
-                                                 .build())
-                                      .build())
+                .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("Both")))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -214,19 +210,15 @@ class DJRespondentReceivedNotificationHandlerTest {
             when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested())
                 .thenReturn("test-template-requested-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Requested email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("steve")
-                                                     .build())
-                                          .build())
+                .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("steve")))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -248,10 +240,9 @@ class DJRespondentReceivedNotificationHandlerTest {
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //send Received email
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent1Represented(null)
-                .respondent1(PartyBuilder.builder().company().build())
+                .respondent1(new PartyBuilder().company().build())
                 .addRespondent2(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .build();
@@ -338,10 +329,9 @@ class DJRespondentReceivedNotificationHandlerTest {
     @Test
     void shouldReturn_whenInvokedAnd1v1AndLRvLiP_NoEmail() {
         //send Received email
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .respondent1Represented(null)
-            .respondent1(PartyBuilder.builder().company().partyEmail(null).build())
+            .respondent1(new PartyBuilder().company().partyEmail(null).build())
             .addRespondent2(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
             .build();

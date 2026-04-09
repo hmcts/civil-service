@@ -30,6 +30,26 @@ java:
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
+    TASK_MANAGEMENT_ENABLED: false
+    IDAM_CLIENT_ID: civil-service
+    IDAM_CLIENT_REDIRECT_URI: https://civil-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/oauth2/callback
+    IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
+    IDAM_WEB_URL: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net
+    IDAM_S2S_AUTH_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    IDAM_SCOPE: openid profile roles search-user
+    MANAGE_CASE_UI_BASE_URL: https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net
+    SPRING_SECURITY_ENABLED: true
+    RESPONSE_DEADLINE_CHECK_EVENT_EMITTER_ENABLED: false
+    PAY_CALLBACK_URL: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUERURI: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net/o/jwks
+    AUTH_IDAM_CLIENT_BASEURL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
+    AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    FEES_API_URL: http://fees-register-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    GENAPP_LRD_URL: http://rd-location-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+
   keyVaults:
     civil:
       resourceGroup: civil
@@ -80,12 +100,14 @@ java:
           alias: mediation.emails.jsonRecipient
         - name: hmc-servicebus-shared-access-key-tf
           alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
+        - name: AppInsightsInstrumentationKey
+          alias: azure.application-insights.instrumentation-key
   postgresql:
     enabled: true
     image:
-      registry: hmctspublic.azurecr.io
+      registry: hmctsprod.azurecr.io
       repository: imported/bitnami/postgresql
-      tag: '11.6.0'
+      tag: '16.5.0'
     primary:
       persistence:
         enabled: false
@@ -110,62 +132,12 @@ idam-pr:
     XUI:
       - https://civil-service-xui-staging.aat.platform.hmcts.net/oauth2/callback
 
-civil-general-applications:
-  enabled: true
-  java:
-    releaseNameOverride: ${SERVICE_NAME}-ga
-    ingressHost: civil-service-ga-staging.aat.platform.hmcts.net
-    keyVaults:
-      civil:
-        resourceGroup: civil
-        secrets:
-          - name: civil-idam-client-secret
-            alias: idam.client.secret
-          - name: microservicekey-civil-service
-            alias: CIVIL_CLIENT_TOTP_SECRET
-          - name: system-update-user-username
-            alias: CIVIL_SYSTEM_UPDATE_USERNAME
-          - name: system-update-user-password
-            alias: CIVIL_SYSTEM_UPDATE_PASSWORD
-          - name: cross-access-user-username
-            alias: CIVIL_CROSS_ACCESS_USERNAME
-          - name: cross-access-user-password
-            alias: CIVIL_CROSS_ACCESS_PASSWORD
-          - name: prd-admin-user-username
-            alias: CIVIL_PRD_ADMIN_USERNAME
-          - name: prd-admin-user-password
-            alias: CIVIL_PRD_ADMIN_PASSWORD
-          - name: appinsights-instrumentation-key
-            alias: azure.application-insights.instrumentation-key
-          - name: docmosis-api-key
-            alias: docmosis.tornado.key
-          - name: gov-notify-api-key
-            alias: GOV_NOTIFY_API_KEY
-          - name: sendgrid-api-key
-            alias: SENDGRID_API_KEY
-          - name: robotics-notification-sender
-            alias: robotics.notification.sender
-          - name: robotics-notification-recipient
-            alias: robotics.notification.recipient
-          - name: launch-darkly-sdk-key
-            alias: LAUNCH_DARKLY_SDK_KEY
-          - name: robotics-notification-multipartyrecipient
-            alias: robotics.notification.multipartyrecipient
-      civil-gen-apps:
-        resourceGroup: civil
-        secrets:
-          - name: microservicekey-civil-general-applications
-            alias: idam.s2s-auth.totp_secret
-    environment:
-      LAUNCH_DARKLY_ENV: service-staging
-      PAY_CALLBACK_URL: https://civil-service-ga-staging.aat.platform.hmcts.net/service-request-update
-
 xui-webapp:
   enabled: true
   nodejs:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
-    image: hmctspublic.azurecr.io/xui/webapp:latest
+    image: hmctsprod.azurecr.io/xui/webapp:latest
     ingressHost: civil-service-xui-staging.aat.platform.hmcts.net
     memoryRequests: 2Gi
     cpuRequests: 2000m
@@ -220,7 +192,7 @@ ccd:
 
   ccd-api-gateway-web:
     nodejs:
-      image: hmctspublic.azurecr.io/ccd/api-gateway-web:latest
+      image: hmctsprod.azurecr.io/ccd/api-gateway-web:latest
       imagePullPolicy: Always
       environment:
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
@@ -233,7 +205,7 @@ ccd:
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
-      devcpuRequests: 500m
+      devcpuRequests: 1000m
       devmemoryRequests: 2048Mi
       devmemoryLimits: 8Gi
       autoscaling:
@@ -270,10 +242,9 @@ ccd:
   ccd-definition-store-api:
     java:
       imagePullPolicy: Always
-      devcpuRequests: 500m
-      devmemoryRequests: 512Mi
-      devcpuLimits: 2
-      devmemoryLimits: 8Gi
+      devcpuRequests: 1000m
+      devmemoryRequests: 4096Mi
+      devmemoryLimits: 8192Mi
       environment:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_DB_OPTIONS: "?stringtype=unspecified"
@@ -301,8 +272,8 @@ camunda-bpm:
     disableKeyVaults: true
     releaseNameOverride: ${SERVICE_NAME}-camunda
     ingressHost: civil-service-camunda-staging-aat.service.core-compute-aat.internal
-    devcpuRequests: 500m
-    devmemoryRequests: 512Mi
+    devcpuRequests: 1000m
+    devmemoryRequests: 1024Mi
     devcpuLimits: 1
     devmemoryLimits: 1Gi
     environment:
@@ -321,7 +292,7 @@ aac-manage-case-assignment:
   java:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
-    image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
+    image: hmctsprod.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: civil-service-manage-case-assignment-staging.aat.platform.hmcts.net
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net

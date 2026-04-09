@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "Response to the claim",
+  "titleCy": "Ymateb i’r hawliad",
+  "descriptionEn": "<p class=\"govuk-body\">You have offered to pay ${applicant1PartyName} ${defendantAdmittedAmount} ${defendantAmountIncludesTextEn} in instalments of ${instalmentAmount} ${paymentFrequency}. You have offered to do this starting from ${instalmentStartDateEn}. You need to send the claimant your financial details. The court will contact you when they respond.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Rydych wedi cynnig talu ${defendantAdmittedAmount} ${defendantAmountIncludesTextCy} mewn rhandaliadau o ${instalmentAmount} i ${applicant1PartyName} ${paymentFrequencyWelsh}. Rydych wedi cynnig gwneud hyn o ${instalmentStartDateCy} ymlaen. Mae angen i chi anfon eich manylion ariannol at yr hawlydd. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
+}

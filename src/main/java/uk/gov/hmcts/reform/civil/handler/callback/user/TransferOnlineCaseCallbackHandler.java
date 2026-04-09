@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -54,131 +52,172 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     private static final String CONFIRMATION_HEADER = "# Case transferred to new location";
     private final FeatureToggleService featureToggleService;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
-    @Value("${court_location_dmn.enabled}") String courtToggle;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::locationList)
+            .put(callbackKey(ABOUT_TO_START), this::populateTransferCourtLocationList)
             .put(callbackKey(MID, "validate-court-location"), this::validateCourtLocation)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::saveTransferOnlineCase)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
+    }
+
+    private CallbackResponse populateTransferCourtLocationList(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setTransferCourtLocationList(toDynamicList(fetchLocationData(callbackParams)));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
+            .build();
+    }
+
     private CallbackResponse validateCourtLocation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
 
-        if (ifSameCourtSelected(callbackParams)) {
+        if (isSameCourtSelected(callbackParams)) {
             errors.add(ERROR_SELECT_DIFF_LOCATION);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
 
+    /**
+     * Handles the AboutToSubmit event for Case Transfer.
+     * Updates the case management location, location name, and EA court location.
+     * Also updates Work Allocation locations if the case is in multi or intermediate track.
+     *
+     * @param callbackParams the callback parameters containing case data and bearer token
+     * @return the callback response with updated case data and business process
+     */
+    private CallbackResponse saveTransferOnlineCase(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        Optional<LocationRefData> newCourtLocation = Optional.ofNullable(courtLocationUtils.findPreferredLocationData(
+            fetchLocationData(callbackParams),
+            caseData.getTransferCourtLocationList()
+        ));
+
+        newCourtLocation.ifPresent(location -> {
+            caseData.setCaseManagementLocation(LocationHelper.buildCaseLocation(location));
+            caseData.setLocationName(location.getSiteName());
+            if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+                updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+                    callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                    caseData
+                ));
+            }
+            caseData.setEaCourtLocation(determineEaCourtLocation(caseData, location.getEpimmsId()));
+        });
+
+        // Clear the list items to avoid large data payloads in the response
+        if (caseData.getTransferCourtLocationList() != null) {
+            caseData.getTransferCourtLocationList().setListItems(null);
+        }
+        caseData.setBusinessProcess(BusinessProcess.ready(TRIGGER_TASK_RECONFIG_GA));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
+            .build();
+    }
+
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        String newCourtLocationSiteName = courtLocationUtils.findPreferredLocationData(
+        String siteName = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams),
             callbackParams.getCaseData().getTransferCourtLocationList()
         ).getSiteName();
+
+        String body = String.format(
+            "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                + "The case has now been transferred to %s. "
+                + "If the case has moved out of your region, you will no longer see it.<br><br>",
+            siteName
+        );
+
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(CONFIRMATION_HEADER)
-            .confirmationBody(getBody(newCourtLocationSiteName))
+            .confirmationBody(body)
             .build();
     }
 
-    private CallbackResponse locationList(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        List<LocationRefData> locations = fetchLocationData(callbackParams);
-        caseDataBuilder.transferCourtLocationList(getLocationsFromList(locations));
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
-        return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
-                .append(" - ").append(location.getCourtAddress())
-                .append(" - ").append(location.getPostcode()).toString())
-                            .toList());
-    }
-
-    private String getBody(String siteName) {
-        return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-            + "The case has now been transferred to "
-            + siteName
-            + ". If the case has moved out of your region, you will no longer see it.<br><br>";
-    }
-
-    private CallbackResponse saveTransferOnlineCase(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        LocationRefData newCourtLocation = courtLocationUtils.findPreferredLocationData(
-            fetchLocationData(callbackParams),
-            callbackParams.getCaseData().getTransferCourtLocationList()
-        );
-        if (nonNull(newCourtLocation)) {
-            caseDataBuilder.caseManagementLocation(LocationHelper.buildCaseLocation(newCourtLocation));
-            caseDataBuilder.locationName(newCourtLocation.getSiteName());
-            if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-                updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
-                    callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                    caseDataBuilder
-                ));
-            }
+    /**
+     * Determines whether the EA court location should be set to YES based on business rules:
+     * 1. Welsh cases (for main case) are always set to YES.
+     * 2. Litigant in Person (LiP) cases are set based on specific progression and whitelisting rules.
+     * 3. Other cases are whitelisted by default for case progression.
+     *
+     * @param caseData the case data
+     * @param epimmsId the epimmsId of the new court location
+     * @return YES or NO based on the conditions
+     */
+    private YesOrNo determineEaCourtLocation(CaseData caseData, String epimmsId) {
+        if (featureToggleService.isWelshEnabledForMainCase()) {
+            return YES;
         }
-
-        if (nonNull(newCourtLocation)) {
-            boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-            if (featureToggleService.isWelshEnabledForMainCase()) {
-                caseDataBuilder.eaCourtLocation(YES);
-            } else {
-                if (!isLipCase) {
-                    log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                    caseDataBuilder.eaCourtLocation(YES);
-                } else {
-                    boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, newCourtLocation.getEpimmsId());
-                    caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
-                }
-            }
+        if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
+            return isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, epimmsId) ? YES : YesOrNo.NO;
         }
-
-        DynamicList tempLocationList = caseData.getTransferCourtLocationList();
-        tempLocationList.setListItems(null);
-        caseDataBuilder.transferCourtLocationList(tempLocationList);
-        caseDataBuilder.businessProcess(BusinessProcess.ready(TRIGGER_TASK_RECONFIG_GA));
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+        return YES;
     }
 
+    /**
+     * Checks if a LiP case meets the requirements for case progression and location whitelisting.
+     * These requirements include specific party representation combinations and feature toggle states.
+     *
+     * @param caseData the case data
+     * @param newCourtLocation the epimmsId of the target location
+     * @return true if the LiP case is eligible for case progression at the new location
+     */
     private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData, String newCourtLocation) {
         return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()
             || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData)))
             && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(newCourtLocation);
     }
 
-    private boolean ifSameCourtSelected(CallbackParams callbackParams) {
-        LocationRefData newCourtLocation = courtLocationUtils.findPreferredLocationData(
-            fetchLocationData(callbackParams),
-            callbackParams.getCaseData().getTransferCourtLocationList()
-        );
-        LocationRefData caseManagementLocation =
-            getLocationRefData(callbackParams);
-        return caseManagementLocation != null && newCourtLocation.getCourtLocationCode().equals(caseManagementLocation.getCourtLocationCode());
+    /**
+     * Validates whether the newly selected court location is different from the current case management location.
+     *
+     * @param callbackParams the callback parameters
+     * @return true if the selected location is the same as the current location
+     */
+    private boolean isSameCourtSelected(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return Optional.ofNullable(courtLocationUtils.findPreferredLocationData(
+                fetchLocationData(callbackParams),
+                caseData.getTransferCourtLocationList()
+            ))
+            .map(LocationRefData::getCourtLocationCode)
+            .flatMap(newCode -> Optional.ofNullable(getCurrentLocation(callbackParams))
+                .map(current -> newCode.equals(current.getCourtLocationCode())))
+            .orElse(false);
     }
 
-    private LocationRefData getLocationRefData(CallbackParams callbackParams) {
-        List<LocationRefData> locations = fetchLocationData(callbackParams);
-        String baseLocation = callbackParams.getCaseData().getCaseManagementLocation() == null ? null : callbackParams.getCaseData().getCaseManagementLocation().getBaseLocation();
-        var matchedLocations = locations.stream().filter(loc -> loc.getEpimmsId().equals(baseLocation)).toList();
-        return !matchedLocations.isEmpty() ? matchedLocations.get(0) : null;
+    /**
+     * Retrieves the current case management location details from reference data.
+     * Matches the epimmsId from the case data's base location against the available location reference data.
+     *
+     * @param callbackParams the callback parameters
+     * @return the matching LocationRefData, or null if not found
+     */
+    private LocationRefData getCurrentLocation(CallbackParams callbackParams) {
+        String baseLocation = Optional.ofNullable(callbackParams.getCaseData().getCaseManagementLocation())
+            .map(uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil::getBaseLocation)
+            .orElse(null);
+        if (baseLocation == null) {
+            return null;
+        }
+        return fetchLocationData(callbackParams).stream()
+            .filter(loc -> loc.getEpimmsId().equals(baseLocation))
+            .findFirst()
+            .orElse(null);
     }
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
@@ -186,8 +225,9 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
-    @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
+    private DynamicList toDynamicList(final List<LocationRefData> locations) {
+        return fromList(locations.stream()
+                            .map(loc -> String.format("%s - %s - %s", loc.getSiteName(), loc.getCourtAddress(), loc.getPostcode()))
+                            .toList());
     }
 }

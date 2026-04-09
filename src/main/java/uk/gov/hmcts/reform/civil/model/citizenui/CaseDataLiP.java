@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.experimental.Accessors;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -13,8 +13,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@Accessors(chain = true)
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseDataLiP {

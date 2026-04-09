@@ -2,15 +2,15 @@ package uk.gov.hmcts.reform.civil.model.dmnacourttasklocation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class DmnListingLocations  {
+@Accessors(chain = true)
+public class DmnListingLocations {
 
     @JsonProperty("CMC")
     private DmnListingLocationsModel cmcListingLocation;

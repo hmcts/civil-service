@@ -42,7 +42,7 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
     void shouldCallNotifier() {
         when(factory.getCaseHandledOfflineSolicitorNotifier(any())).thenReturn(notifier);
 
-        handler.handle(CallbackParams.builder().type(CallbackType.ABOUT_TO_SUBMIT).caseData(CaseData.builder().build()).build());
+        handler.handle(new CallbackParams().type(CallbackType.ABOUT_TO_SUBMIT).caseData(CaseData.builder().build()));
 
         verify(notifier).notifyApplicantSolicitorForCaseHandedOffline(any());
     }

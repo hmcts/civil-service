@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -12,7 +13,6 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingScheduledClaimantNotificationHandler.fillPreferredLocationData;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HearingScheduledDefendantNotificationHandler extends CallbackHandler {
@@ -39,14 +40,11 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
     public static final String TASK_ID = "GenerateDashboardNotificationHearingScheduledDefendant";
     private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService toggleService;
     private final LocationReferenceDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return toggleService.isCaseProgressionEnabled()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHearingScheduled)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHearingScheduled);
     }
 
     @Override
@@ -67,26 +65,32 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
             .getHearingCourtLocations(authToken));
         LocationRefData locationRefData = fillPreferredLocationData(locations, caseData.getHearingLocation());
         if (nonNull(locationRefData)) {
-            caseData = caseData.toBuilder().hearingLocationCourtName(locationRefData.getSiteName()).build();
+            caseData.setHearingLocationCourtName(locationRefData.getSiteName());
         }
 
+        log.info("HearingScheduledDefendantNotificationHandler with caseId: {}, isRespondent1NotRepresented: {}", caseId, caseData.isRespondent1NotRepresented());
+
         if (caseData.isRespondent1NotRepresented()) {
+            log.info("HearingScheduledDefendantNotificationHandler: Recording hearing scheduled scenario for caseid: {}", caseId);
             dashboardScenariosService.recordScenarios(authToken,
                                               SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(), caseId,
-                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                                              new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
             );
 
             if (AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
                 && isNull(caseData.getTrialReadyRespondent1())) {
+                log.info("HearingScheduledDefendantNotificationHandler: Recording trial arrangements scenario for caseid: {}", caseId);
                 dashboardScenariosService.recordScenarios(authToken,
                                                   SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario(), caseId,
-                                                  ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                                                  new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
                 );
             }
 
+            log.info("HearingScheduledDefendantNotificationHandler: Recording upload documents scenario for caseid: {}", caseId);
+
             dashboardScenariosService.recordScenarios(authToken,
                                               SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(), caseId,
-                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                                              new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
             );
         }
 

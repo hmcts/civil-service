@@ -19,8 +19,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -66,12 +66,11 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse addTakenOfflineDate(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(CASE_PROCEEDS_IN_CASEMAN))
-            .takenOfflineByStaffDate(time.now())
-            .coSCApplicationStatus(updateCoScApplicationStatus(callbackParams))
-            .previousCCDState(getPreviousCaseSate(callbackParams))
-            .build();
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setBusinessProcess(BusinessProcess.ready(CASE_PROCEEDS_IN_CASEMAN));
+        caseData.setTakenOfflineByStaffDate(time.now());
+        caseData.setCoSCApplicationStatus(updateCoScApplicationStatus(callbackParams));
+        caseData.setPreviousCCDState(getPreviousCaseSate(callbackParams));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))
@@ -90,7 +89,7 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
 
     private CoscApplicationStatus updateCoScApplicationStatus(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isCoSCEnabled() && (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())) {
+        if (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()) {
             return CoscApplicationStatus.ACTIVE.equals(caseData.getCoSCApplicationStatus())
                 ? CoscApplicationStatus.INACTIVE
                 : caseData.getCoSCApplicationStatus();

@@ -4,15 +4,18 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
@@ -21,13 +24,14 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -42,12 +46,14 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,10 +80,11 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
         TransitionsTestConfiguration.class,
         EventHistorySequencer.class,
         EventHistoryMapper.class,
-        RoboticsDataMapper.class,
+        RoboticsDataMapperForUnspec.class,
         RoboticsAddressMapper.class,
         AddressLinesMapper.class,
-        OrganisationService.class
+        OrganisationService.class,
+        RoboticsNotificationServiceTest.RoboticsStrategyTestConfiguration.class
     },
     properties = {
         "sendgrid.api-key:some-key",
@@ -90,12 +97,21 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 )
 class RoboticsNotificationServiceTest {
 
+    @Configuration
+    @ComponentScan(basePackages = {
+        "uk.gov.hmcts.reform.civil.service.robotics.strategy",
+        "uk.gov.hmcts.reform.civil.service.robotics.support"
+    })
+    static class RoboticsStrategyTestConfiguration {
+        // Test-only configuration to register strategy/support beans for EventHistoryMapper.
+    }
+
     @Autowired
     RoboticsNotificationService service;
     @Autowired
     RoboticsEmailConfiguration emailConfiguration;
     @Autowired
-    RoboticsDataMapper roboticsDataMapper;
+    RoboticsDataMapperForUnspec roboticsDataMapper;
     @MockBean
     FeatureToggleService featureToggleService;
 
@@ -136,9 +152,7 @@ class RoboticsNotificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         if (caseData.getRespondent2OrgRegistered() != null
             && caseData.getRespondent2Represented() == null) {
-            caseData = caseData.toBuilder()
-                .respondent2Represented(YES)
-                .build();
+            caseData.setRespondent2Represented(YES);
         }
 
         // When
@@ -166,18 +180,17 @@ class RoboticsNotificationServiceTest {
     @SneakyThrows
     void shouldSendNotificationEmailLRSpec_whenCaseDataIsProvided() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(YES).caseAccessCategory(SPEC_CLAIM).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(YES);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
         if (caseData.getRespondent2OrgRegistered() != null
             && caseData.getRespondent2Represented() == null) {
-            caseData = caseData.toBuilder()
-                .respondent2Represented(YES)
-                .build();
+            caseData.setRespondent2Represented(YES);
         }
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = roboticsCaseDataSpecBuilder()
+            .events(eventHistoryBuilder()
+                .miscellaneous(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
                     .build())
@@ -217,16 +230,13 @@ class RoboticsNotificationServiceTest {
     @SneakyThrows
     void shouldSendNotificationEmailForMultiParty_whenCaseDataIsProvided() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YES)
-            .respondent2SameLegalRepresentative(NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent2(createIndividualRespondent());
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2SameLegalRepresentative(NO);
         if (caseData.getRespondent2OrgRegistered() != null
             && caseData.getRespondent2Represented() == null) {
-            caseData = caseData.toBuilder()
-                .respondent2Represented(YES)
-                .build();
+            caseData.setRespondent2Represented(YES);
         }
 
         // When
@@ -257,17 +267,16 @@ class RoboticsNotificationServiceTest {
     @SneakyThrows
     void shouldSendNotificationEmailForMultiPartySpec_whenCaseDataIsProvided() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YES)
-            .respondent2SameLegalRepresentative(NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setRespondent2(createIndividualRespondent());
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2SameLegalRepresentative(NO);
 
         String lastEventText = "event text";
-        RoboticsCaseDataSpec roboticsCaseData = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder().miscellaneous(
-                Event.builder().eventDetailsText(lastEventText)
+        RoboticsCaseDataSpec roboticsCaseData = roboticsCaseDataSpecBuilder()
+            .events(eventHistoryBuilder().miscellaneous(
+                eventBuilder().eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
                     .build()
             ).build())
@@ -303,14 +312,12 @@ class RoboticsNotificationServiceTest {
             .atState(FlowState.Main.FULL_DEFENCE)
             .respondent2Responds1v2SameSol(FULL_DEFENCE)
             .respondentResponseIsSame(YES)
-            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1DQ(new Respondent1DQ())
             .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
             .build();
         if (caseData.getRespondent2OrgRegistered() != null
             && caseData.getRespondent2Represented() == null) {
-            caseData = caseData.toBuilder()
-                .respondent2Represented(YES)
-                .build();
+            caseData.setRespondent2Represented(YES);
         }
 
         // When
@@ -341,13 +348,14 @@ class RoboticsNotificationServiceTest {
     @Test
     void shouldSendNotificationEmailForLRvsLiP_whenCaseDataIsProvided() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
 
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = roboticsCaseDataSpecBuilder()
+            .events(eventHistoryBuilder()
+                .miscellaneous(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
                     .build())
@@ -377,15 +385,15 @@ class RoboticsNotificationServiceTest {
     }
 
     @Test
-    void shouldNotifyJudgementLiP_whenPinInPostEnabledAndLipDefendant() {
+    void shouldNotifyJudgementLiP_whenLipDefendant() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = roboticsCaseDataSpecBuilder()
+            .events(eventHistoryBuilder()
+                .miscellaneous(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
                     .build())
@@ -412,14 +420,14 @@ class RoboticsNotificationServiceTest {
     @Test
     void shouldNotifyDefaultJudgementLiP_whenLipDefendant() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM).paymentTypeSelection(
-                DJPaymentTypeSelection.SET_DATE).build();
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setPaymentTypeSelection(DJPaymentTypeSelection.SET_DATE);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = roboticsCaseDataSpecBuilder()
+            .events(eventHistoryBuilder()
+                .miscellaneous(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
                     .build())
@@ -446,14 +454,14 @@ class RoboticsNotificationServiceTest {
     @Test
     void shouldNotifyJudgementByAdmissionLiP_whenLipDefendant() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM)
-            .ccjPaymentDetails(CCJPaymentDetails.builder().ccjPaymentPaidSomeOption(YES).build()).build();
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setCcjPaymentDetails(ccjPaymentDetailsBuilder().ccjPaymentPaidSomeOption().build());
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = roboticsCaseDataSpecBuilder()
+            .events(eventHistoryBuilder()
+                .miscellaneous(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
                     .build())
@@ -480,14 +488,15 @@ class RoboticsNotificationServiceTest {
     @Test
     void shouldNotifyJudgementLiP_whenLipvsLiPEnabled() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setApplicant1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = roboticsCaseDataSpecBuilder()
+            .events(eventHistoryBuilder()
+                .miscellaneous(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
                     .build())
@@ -511,25 +520,25 @@ class RoboticsNotificationServiceTest {
         assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
-    @Test
-    void shouldNotifyDefaultJudgementLiP_whenLipvsLiPEnabled() {
+    @ParameterizedTest
+    @CsvSource({"DEFAULT_JUDGEMENT_SPEC", "DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC"})
+    void shouldNotifyDefaultJudgementLiP_whenLipvsLiPEnabled(String camundaEvent) {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder()
-            .respondent1Represented(NO)
-            .applicant1Represented(NO)
-            .caseAccessCategory(SPEC_CLAIM).paymentTypeSelection(
-                DJPaymentTypeSelection.SET_DATE)
-            .businessProcess(BusinessProcess.builder()
-                .camundaEvent(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())
-                .build())
-            .build();
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setApplicant1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setPaymentTypeSelection(DJPaymentTypeSelection.SET_DATE);
+        caseData.setBusinessProcess(businessProcessBuilder()
+            .camundaEvent(camundaEvent)
+            .build());
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = roboticsCaseDataSpecBuilder()
+            .events(eventHistoryBuilder()
+                .miscellaneous(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
                     .build())
@@ -556,15 +565,16 @@ class RoboticsNotificationServiceTest {
     @Test
     void shouldNotifyJudgementByAdmissionLiP_whenLipvsLiPEnabled() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM)
-            .ccjPaymentDetails(CCJPaymentDetails.builder().ccjPaymentPaidSomeOption(YES).build()).build();
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setApplicant1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setCcjPaymentDetails(ccjPaymentDetailsBuilder().ccjPaymentPaidSomeOption().build());
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = roboticsCaseDataSpecBuilder()
+            .events(eventHistoryBuilder()
+                .miscellaneous(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
                     .build())
@@ -594,15 +604,13 @@ class RoboticsNotificationServiceTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
 
-        caseData = caseData.toBuilder()
-                .applicant1Represented(NO)
-                .respondent1Represented(YES)
-                .caseAccessCategory(SPEC_CLAIM)
-                .build();
+        caseData.setApplicant1Represented(NO);
+        caseData.setRespondent1Represented(YES);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                        .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = roboticsCaseDataSpecBuilder()
+            .events(eventHistoryBuilder()
+                        .miscellaneous(eventBuilder()
                                            .eventDetailsText(lastEventText)
                                            .dateReceived(LocalDateTime.now())
                                            .build())
@@ -637,16 +645,14 @@ class RoboticsNotificationServiceTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
 
-        caseData = caseData.toBuilder()
-            .applicant1Represented(NO)
-            .respondent1Represented(YES)
-            .caseAccessCategory(SPEC_CLAIM)
-            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-            .build();
+        caseData.setApplicant1Represented(NO);
+        caseData.setRespondent1Represented(YES);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                        .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = roboticsCaseDataSpecBuilder()
+            .events(eventHistoryBuilder()
+                        .miscellaneous(eventBuilder()
                                            .eventDetailsText(lastEventText)
                                            .dateReceived(LocalDateTime.now())
                                            .build())
@@ -673,5 +679,112 @@ class RoboticsNotificationServiceTest {
         assertThat(capturedEmailData.getAttachments())
             .extracting("filename", "contentType")
             .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
+    }
+
+    private Party createIndividualRespondent() {
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setIndividualTitle("Mr.");
+        party.setIndividualFirstName("John");
+        party.setIndividualLastName("Rambo");
+        party.setIndividualDateOfBirth(LocalDate.now().minusYears(30));
+        party.setPartyName("Mr. John Rambo");
+        Address address = new Address();
+        address.setAddressLine1("1 Example Street");
+        address.setPostCode("AB1 1AB");
+        party.setPrimaryAddress(address);
+        party.setPartyPhone("01234 567890");
+        party.setPartyEmail("john.rambo@example.com");
+        return party;
+    }
+
+    private static RoboticsCaseDataSpecBuilder roboticsCaseDataSpecBuilder() {
+        return new RoboticsCaseDataSpecBuilder();
+    }
+
+    private static EventHistoryBuilder eventHistoryBuilder() {
+        return new EventHistoryBuilder();
+    }
+
+    private static EventBuilder eventBuilder() {
+        return new EventBuilder();
+    }
+
+    private static CcjPaymentDetailsBuilder ccjPaymentDetailsBuilder() {
+        return new CcjPaymentDetailsBuilder();
+    }
+
+    private static BusinessProcessBuilder businessProcessBuilder() {
+        return new BusinessProcessBuilder();
+    }
+
+    private static final class RoboticsCaseDataSpecBuilder {
+        private final RoboticsCaseDataSpec roboticsCaseDataSpec = new RoboticsCaseDataSpec();
+
+        private RoboticsCaseDataSpecBuilder events(EventHistory events) {
+            roboticsCaseDataSpec.setEvents(events);
+            return this;
+        }
+
+        private RoboticsCaseDataSpec build() {
+            return roboticsCaseDataSpec;
+        }
+    }
+
+    private static final class EventHistoryBuilder {
+        private final EventHistory eventHistory = new EventHistory();
+
+        private EventHistoryBuilder miscellaneous(Event event) {
+            eventHistory.setMiscellaneous(List.of(event));
+            return this;
+        }
+
+        private EventHistory build() {
+            return eventHistory;
+        }
+    }
+
+    private static final class EventBuilder {
+        private final Event event = new Event();
+
+        private EventBuilder eventDetailsText(String value) {
+            event.setEventDetailsText(value);
+            return this;
+        }
+
+        private EventBuilder dateReceived(LocalDateTime value) {
+            event.setDateReceived(value);
+            return this;
+        }
+
+        private Event build() {
+            return event;
+        }
+    }
+
+    private static final class CcjPaymentDetailsBuilder {
+        private final CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+
+        private CcjPaymentDetailsBuilder ccjPaymentPaidSomeOption() {
+            ccjPaymentDetails.setCcjPaymentPaidSomeOption(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES);
+            return this;
+        }
+
+        private CCJPaymentDetails build() {
+            return ccjPaymentDetails;
+        }
+    }
+
+    private static final class BusinessProcessBuilder {
+        private final BusinessProcess businessProcess = new BusinessProcess();
+
+        private BusinessProcessBuilder camundaEvent(String value) {
+            businessProcess.setCamundaEvent(value);
+            return this;
+        }
+
+        private BusinessProcess build() {
+            return businessProcess;
+        }
     }
 }

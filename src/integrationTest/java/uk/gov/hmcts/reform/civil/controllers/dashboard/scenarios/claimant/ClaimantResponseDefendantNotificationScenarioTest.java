@@ -115,12 +115,12 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
             .respondent1Represented(NO)
             .applicant1Represented(YES)
             .applicant1ProceedWithClaim(null)
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("White").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("White").setType(Party.Type.INDIVIDUAL))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(whenWillThisAmountBePaid)
+                                               )
             .build();
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
@@ -134,13 +134,13 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Immediate payment"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">John White has accepted your offer to pay £9001 immediately" +
+                    "<p class=\"govuk-body\">John White has accepted your offer to pay £9001, plus the claim fee and any fixed costs claimed, immediately" +
                         " in full and final settlement of the claim. Funds must be received in <a href={VIEW_INFO_ABOUT_CLAIMANT} class=\"govuk-link\">their account</a>" +
                         " by " + DateUtils.formatDate(whenWillThisAmountBePaid) + ".</p><p class=\"govuk-body\">If they don't receive the money by then," +
                         " they can request a County Court Judgment (CCJ).</p>"),
                 jsonPath("$[0].titleCy").value("Talu ar unwaith"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae John White wedi derbyn eich cynnig i dalu £9001 " +
+                    "<p class=\"govuk-body\">Mae John White wedi derbyn eich cynnig i dalu £9001, ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog a hawlir, " +
                         "yn llawn ar unwaith fel setliad llawn a therfynol o’r hawliad.  Rhaid i’r arian fod yn <a href={VIEW_INFO_ABOUT_CLAIMANT} class=\"govuk-link\">ei g/chyfrif</a> erbyn "
                         + DateUtils.formatDateInWelsh(whenWillThisAmountBePaid, false) + ".</p><p class=\"govuk-body\"> Os na fydd yr arian wedi cyrraedd erbyn hynny," +
                         " gallant ofyn am Ddyfarniad Llys Sirol (CCJ).</p>"));

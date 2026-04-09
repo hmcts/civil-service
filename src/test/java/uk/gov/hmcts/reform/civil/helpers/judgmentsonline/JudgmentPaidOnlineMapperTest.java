@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -26,14 +28,20 @@ public class JudgmentPaidOnlineMapperTest {
 
     private InterestCalculator interestCalculator = new InterestCalculator();
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
-    private JudgmentPaidInFullOnlineMapper judgmentPaidInFullOnlineMapper = new JudgmentPaidInFullOnlineMapper();
-    private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
-    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+    private JudgmentPaidInFullOnlineMapper judgmentPaidInFullOnlineMapper;
+    private RecordJudgmentOnlineMapper recordJudgmentMapper;
+    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
+
+    @Mock
+    private Time time;
 
     @BeforeEach
     public void setUp() {
         interestCalculator = new InterestCalculator();
-        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+        judgmentPaidInFullOnlineMapper = new JudgmentPaidInFullOnlineMapper(time);
+        recordJudgmentMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
+        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(time, interestCalculator, addressMapper);
+        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(time, interestCalculator, addressMapper);
     }
 
     @Test
@@ -42,10 +50,10 @@ public class JudgmentPaidOnlineMapperTest {
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
         //PAID IN FULL
-        caseData.setJoJudgmentPaidInFull(JudgmentPaidInFull.builder()
-            .dateOfFullPaymentMade(LocalDate.of(2023, 1, 15))
-            .confirmFullPaymentMade(List.of("CONFIRMED"))
-            .build());
+        JudgmentPaidInFull paid = new JudgmentPaidInFull();
+        paid.setDateOfFullPaymentMade(LocalDate.of(2023, 1, 15));
+        paid.setConfirmFullPaymentMade(List.of("CONFIRMED"));
+        caseData.setJoJudgmentPaidInFull(paid);
         caseData.setActiveJudgment(judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData));
 
         assertNotNull(caseData.getActiveJudgment());
@@ -67,10 +75,10 @@ public class JudgmentPaidOnlineMapperTest {
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
-        caseData.setJoJudgmentPaidInFull(JudgmentPaidInFull.builder()
-            .dateOfFullPaymentMade(LocalDate.of(2012, 12, 15))
-            .confirmFullPaymentMade(List.of("CONFIRMED"))
-            .build());
+        JudgmentPaidInFull paid2 = new JudgmentPaidInFull();
+        paid2.setDateOfFullPaymentMade(LocalDate.of(2012, 12, 15));
+        paid2.setConfirmFullPaymentMade(List.of("CONFIRMED"));
+        caseData.setJoJudgmentPaidInFull(paid2);
         caseData.setActiveJudgment(judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData));
 
         assertNotNull(caseData.getActiveJudgment());
@@ -84,10 +92,10 @@ public class JudgmentPaidOnlineMapperTest {
         CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
         caseData.setActiveJudgment(defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
 
-        caseData.setJoJudgmentPaidInFull(JudgmentPaidInFull.builder()
-            .dateOfFullPaymentMade(LocalDate.now().plusDays(15))
-            .confirmFullPaymentMade(List.of("CONFIRMED"))
-            .build());
+        JudgmentPaidInFull paid3 = new JudgmentPaidInFull();
+        paid3.setDateOfFullPaymentMade(LocalDate.now().plusDays(15));
+        paid3.setConfirmFullPaymentMade(List.of("CONFIRMED"));
+        caseData.setJoJudgmentPaidInFull(paid3);
         caseData.setActiveJudgment(judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData));
 
         assertNotNull(caseData.getActiveJudgment());

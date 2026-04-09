@@ -21,13 +21,12 @@ class UploadEvidenceExpertRetrieverTest {
 
     @Test
     void shouldReturnDocument() {
-        Document document = Document.builder().documentFileName("OriginalName.pdf").build();
-        UploadEvidenceExpert uploadEvidenceExpert = UploadEvidenceExpert.builder()
-                .expertDocument(document)
-                .build();
-        Element<UploadEvidenceExpert> element = Element.<UploadEvidenceExpert>builder()
-                .value(uploadEvidenceExpert)
-                .build();
+        Document document = new Document();
+        document.setDocumentFileName("OriginalName.pdf");
+        UploadEvidenceExpert uploadEvidenceExpert = new UploadEvidenceExpert();
+        uploadEvidenceExpert.setExpertDocument(document);
+        Element<UploadEvidenceExpert> element = new Element<>();
+        element.setValue(uploadEvidenceExpert);
 
         Document result = uploadEvidenceExpertRetriever.getDocument(element);
 
@@ -37,12 +36,10 @@ class UploadEvidenceExpertRetrieverTest {
     @Test
     void shouldReturnDocumentDateTime() {
         LocalDateTime dateTime = LocalDateTime.of(2022, 2, 10, 10, 0);
-        UploadEvidenceExpert uploadEvidenceExpert = UploadEvidenceExpert.builder()
-                .createdDatetime(dateTime)
-                .build();
-        Element<UploadEvidenceExpert> element = Element.<UploadEvidenceExpert>builder()
-                .value(uploadEvidenceExpert)
-                .build();
+        UploadEvidenceExpert uploadEvidenceExpert = new UploadEvidenceExpert();
+        uploadEvidenceExpert.setCreatedDatetime(dateTime);
+        Element<UploadEvidenceExpert> element = new Element<>();
+        element.setValue(uploadEvidenceExpert);
 
         LocalDateTime result = uploadEvidenceExpertRetriever.getDocumentDateTime(element);
 

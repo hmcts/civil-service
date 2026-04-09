@@ -116,13 +116,12 @@ public class PrepareEventTask {
             addDefendant2Options(dynamicListOptions, caseData, false);
         }
 
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().updateDetailsForm(
-            UpdateDetailsForm.builder()
-                .partyChosen(DynamicList.fromDynamicListElementList(dynamicListOptions))
-                .build());
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setPartyChosen(DynamicList.fromDynamicListElementList(dynamicListOptions));
+        caseData.setUpdateDetailsForm(updateDetailsForm);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

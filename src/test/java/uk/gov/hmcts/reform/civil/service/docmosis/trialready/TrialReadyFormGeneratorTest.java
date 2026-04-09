@@ -44,10 +44,10 @@ class TrialReadyFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName_application = String.format(
+    private static final String FILE_NAME_APPLICATION = String.format(
         TRIAL_READY.getDocumentTitle(), "Rambo", formatLocalDate(LocalDate.now(), DATE));
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName_application)
+        .documentName(FILE_NAME_APPLICATION)
         .documentType(TRIAL_READY_DOCUMENT)
         .build();
     @MockBean
@@ -65,14 +65,14 @@ class TrialReadyFormGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(TRIAL_READY)))
             .thenReturn(new DocmosisDocument(TRIAL_READY.getDocumentTitle(), bytes));
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, TRIAL_READY_DOCUMENT)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, TRIAL_READY_DOCUMENT)))
             .thenReturn(CASE_DOCUMENT);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder().trialReadyApplicant(YesOrNo.YES)
-            .applicantRevisedHearingRequirements(
-                RevisedHearingRequirements.builder()
-                    .revisedHearingRequirements(YesOrNo.YES)
-                    .revisedHearingComments("Revised Hearing Comments").build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setTrialReadyApplicant(YesOrNo.YES);
+        RevisedHearingRequirements revisedHearingRequirements = new RevisedHearingRequirements();
+        revisedHearingRequirements.setRevisedHearingRequirements(YesOrNo.YES);
+        revisedHearingRequirements.setRevisedHearingComments("Revised Hearing Comments");
+        caseData.setApplicantRevisedHearingRequirements(revisedHearingRequirements);
         // When
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormApplicant",
                                                        CaseRole.APPLICANTSOLICITORONE);
@@ -80,7 +80,7 @@ class TrialReadyFormGeneratorTest {
         assertThat(caseDocument).isNotNull();
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, TRIAL_READY_DOCUMENT));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, TRIAL_READY_DOCUMENT));
     }
 
     @Test
@@ -93,12 +93,12 @@ class TrialReadyFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT)))
             .thenReturn(CASE_DOCUMENT);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder().trialReadyRespondent1(YesOrNo.YES)
-            .respondent1RevisedHearingRequirements(
-                RevisedHearingRequirements.builder()
-                    .revisedHearingRequirements(YesOrNo.YES)
-                    .revisedHearingComments("Revised Hearing Comments").build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setTrialReadyRespondent1(YesOrNo.YES);
+        RevisedHearingRequirements revisedHearingRequirements = new RevisedHearingRequirements();
+        revisedHearingRequirements.setRevisedHearingRequirements(YesOrNo.YES);
+        revisedHearingRequirements.setRevisedHearingComments("Revised Hearing Comments");
+        caseData.setRespondent1RevisedHearingRequirements(revisedHearingRequirements);
         // When
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent1",
                                                        CaseRole.RESPONDENTSOLICITORONE);
@@ -119,13 +119,16 @@ class TrialReadyFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT)))
             .thenReturn(CASE_DOCUMENT);
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.COMPANY);
+        respondent2.setCompanyName("Company");
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Company").build())
-            .build().toBuilder().trialReadyRespondent2(YesOrNo.NO)
-            .respondent2RevisedHearingRequirements(
-                RevisedHearingRequirements.builder()
-                    .revisedHearingRequirements(YesOrNo.YES)
-                    .revisedHearingComments("Revised Hearing Comments").build()).build();
+            .respondent2(respondent2).build();
+        caseData.setTrialReadyRespondent2(YesOrNo.NO);
+        RevisedHearingRequirements revisedHearingRequirements = new RevisedHearingRequirements();
+        revisedHearingRequirements.setRevisedHearingRequirements(YesOrNo.YES);
+        revisedHearingRequirements.setRevisedHearingComments("Revised Hearing Comments");
+        caseData.setRespondent2RevisedHearingRequirements(revisedHearingRequirements);
         // When
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2",
                                                        CaseRole.RESPONDENTSOLICITORTWO);
@@ -146,13 +149,16 @@ class TrialReadyFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT)))
             .thenReturn(CASE_DOCUMENT);
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.ORGANISATION);
+        respondent2.setOrganisationName("Organisation");
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .respondent2(Party.builder().type(Party.Type.ORGANISATION).organisationName("Organisation").build())
-            .build().toBuilder().trialReadyRespondent2(YesOrNo.YES)
-            .respondent2RevisedHearingRequirements(
-                RevisedHearingRequirements.builder()
-                    .revisedHearingRequirements(YesOrNo.NO)
-                    .revisedHearingComments("Revised Hearing Comments").build()).build();
+            .respondent2(respondent2).build();
+        caseData.setTrialReadyRespondent2(YesOrNo.YES);
+        RevisedHearingRequirements revisedHearingRequirements = new RevisedHearingRequirements();
+        revisedHearingRequirements.setRevisedHearingRequirements(YesOrNo.NO);
+        revisedHearingRequirements.setRevisedHearingComments("Revised Hearing Comments");
+        caseData.setRespondent2RevisedHearingRequirements(revisedHearingRequirements);
         // When
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2",
                                                        CaseRole.RESPONDENTSOLICITORTWO);

@@ -29,11 +29,9 @@ public class UploadHearingDocumentsClaimantScenarioTest extends DashboardBaseInt
     void shouldCreateUploadDocumentCaseProgresionScenario() throws Exception {
 
         String caseId = "12345188432991";
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        DynamicListElement selectedCourt = new DynamicListElement().setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
@@ -44,7 +42,7 @@ public class UploadHearingDocumentsClaimantScenarioTest extends DashboardBaseInt
             .responseClaimMediationSpecRequired(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(1000))
             .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .build();
 
         handler.handle(callbackParams(caseData));

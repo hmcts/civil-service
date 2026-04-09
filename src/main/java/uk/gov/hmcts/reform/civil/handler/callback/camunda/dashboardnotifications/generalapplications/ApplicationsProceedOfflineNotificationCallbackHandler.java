@@ -56,7 +56,6 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
     @Override
     protected Map<String, Callback> callbacks() {
         return featureToggleService.isLipVLipEnabled()
-            && featureToggleService.isGeneralApplicationsEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForProceedOffline)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }
@@ -85,7 +84,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
         if (notificationType == null) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
-        ScenarioRequestParams notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+        ScenarioRequestParams notificationParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
         dashboardScenariosService.recordScenarios(
             authToken,
             notificationType.equals(CLAIMANT)

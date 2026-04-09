@@ -53,7 +53,7 @@ class RequestForReconsiderationNotificationDeadlineCallbackHandlerTest {
 
         @Test
         void shouldDeleteNotifications_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().caseDetails(CaseDetails.builder().id(123456L).build())
                     .eventId(REQUEST_FOR_RECONSIDERATION_DEADLINE_CHECK.name()).build()

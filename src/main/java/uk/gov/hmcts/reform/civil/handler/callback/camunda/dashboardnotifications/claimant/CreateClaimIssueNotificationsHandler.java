@@ -17,6 +17,8 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MESSAGES_TO_THE_COURT;
 
 @Service
 public class CreateClaimIssueNotificationsHandler extends DashboardCallbackHandler {
@@ -54,15 +56,28 @@ public class CreateClaimIssueNotificationsHandler extends DashboardCallbackHandl
             authToken,
             DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+            new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
         );
+        if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
+            dashboardScenariosService.recordScenarios(
+                authToken,
+                SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
+            );
+            dashboardScenariosService.recordScenarios(
+                authToken,
+                SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
+            );
+        }
         if (caseData.isHWFTypeClaimIssued() && caseData.claimIssueFullRemissionNotGrantedHWF()) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_PHONE_PAYMENT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder()
-                    .params(mapper.mapCaseDataToParams(caseData)).build()
+                new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();

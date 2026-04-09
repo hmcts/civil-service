@@ -41,17 +41,22 @@ public class CaseCategoriesService {
             : caseData.getResponseClaimTrack(); //spec
 
         String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, allocatedTrack);
+        log.info("Searching for category caseNumber={}, hmctsServiceID={}, allocatedTrack={}, categoryKey={}, categoryType={}",
+                 caseData.getCcdCaseReference(), hmctsServiceID, allocatedTrack, categoryKey, categoryType);
 
         if (caseTypeResult.isPresent()) {
             CategorySearchResult categorySearchResult = caseTypeResult.get();
+            log.info("CategorySearchResult found with {} categories", categorySearchResult.getCategories() == null ? null : categorySearchResult.getCategories().size());
+
             Category categoryResult = categorySearchResult.getCategories().stream().filter(c -> c.getKey().equals(
                 categoryKey)).collect(toSingleton());
+            log.info("Category found: parentKey={}, key={}", categoryResult.getParentKey(), categoryResult.getKey());
 
-            return CaseCategoryModel.builder()
-                .categoryParent(categoryResult.getParentKey())
-                .categoryType(getCategoryTypeFromResult(categoryResult))
-                .categoryValue(categoryResult.getKey())
-                .build();
+            CaseCategoryModel caseCategoryModel = new CaseCategoryModel();
+            caseCategoryModel.setCategoryParent(categoryResult.getParentKey());
+            caseCategoryModel.setCategoryType(getCategoryTypeFromResult(categoryResult));
+            caseCategoryModel.setCategoryValue(categoryResult.getKey());
+            return caseCategoryModel;
         }
         return null;
     }

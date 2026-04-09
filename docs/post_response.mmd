@@ -1,0 +1,76 @@
+stateDiagram-v2
+  %% Post-Response Outcomes & Settlement
+  state "NOTIFICATION_ACKNOWLEDGED (from Defence flow)" as POST_RESPONSE_IN_0
+  state "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION (from Defence flow)" as POST_RESPONSE_IN_1
+  FULL_ADMIT_JUDGMENT_ADMISSION --> TAKEN_OFFLINE_BY_STAFF : HMCTS staff have manually taken the case offline.
+  FULL_ADMIT_PAY_IMMEDIATELY --> TAKEN_OFFLINE_BY_STAFF : HMCTS staff have manually taken the case offline
+  FULL_ADMIT_PAY_IMMEDIATELY --> FULL_ADMIT_JUDGMENT_ADMISSION : Applicant has requested a CCJ by admission
+  FULL_ADMIT_REJECT_REPAYMENT --> TAKEN_OFFLINE_BY_STAFF : HMCTS staff have manually taken the case offline.
+  FULL_ADMISSION --> FULL_ADMIT_PAY_IMMEDIATELY : SPEC 1v1 full admission where the defendant proposes to pay immedia…
+  FULL_ADMISSION --> FULL_ADMIT_PROCEED : Claimant elects to proceed against the defendants.
+  FULL_ADMISSION --> FULL_ADMIT_NOT_PROCEED : Claimant indicates they do not wish to proceed against the defendants.
+  FULL_ADMISSION --> FULL_ADMIT_AGREE_REPAYMENT : Applicant accepts the defendant's repayment plan for LiP 1v1 the ca…
+  FULL_ADMISSION --> FULL_ADMIT_REJECT_REPAYMENT : Applicant rejected the defendant’s repayment plan and case remains …
+  FULL_ADMISSION --> FULL_ADMIT_JUDGMENT_ADMISSION : Applicant has requested a CCJ by admission
+  FULL_ADMISSION --> TAKEN_OFFLINE_BY_STAFF : Staff took the case offline after a defendant response and before c…
+  FULL_ADMISSION --> PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA : Claimant response deadline has passed with no response and staff ha…
+  FULL_ADMISSION --> TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA : Defendant Notice of Change online feature flag is active for this case
+  FULL_ADMIT_AGREE_REPAYMENT --> SIGN_SETTLEMENT_AGREEMENT : Defendant has signed the digital settlement agreement.
+  FULL_ADMIT_AGREE_REPAYMENT --> TAKEN_OFFLINE_BY_STAFF : HMCTS staff have manually taken the case offline.
+  FULL_ADMIT_AGREE_REPAYMENT --> TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA : Defendant Notice of Change online feature flag is active for this case
+  FULL_DEFENCE_PROCEED --> IN_HEARING_READINESS : Hearing has been listed and the case is in hearing readiness no dis…
+  FULL_DEFENCE_PROCEED --> CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE : Hearing fee due date has passed without payment.
+  FULL_DEFENCE_PROCEED --> TAKEN_OFFLINE_BY_STAFF : Staff took the case offline after claimant response but before an S…
+  FULL_DEFENCE_PROCEED --> TAKEN_OFFLINE_AFTER_SDO : Claim was taken offline after directions SDO were drawn.
+  FULL_DEFENCE_PROCEED --> TAKEN_OFFLINE_SDO_NOT_DRAWN : Case was taken offline because it was marked not suitable for an SDO.
+  FULL_DEFENCE --> IN_MEDIATION : Claimant opted into free mediation
+  FULL_DEFENCE --> IN_MEDIATION : Case meets CARM pilot criteria for represented parties in SPEC smal…
+  FULL_DEFENCE --> FULL_DEFENCE_PROCEED : Claimant elects to proceed against the defendants
+  FULL_DEFENCE --> FULL_DEFENCE_PROCEED : Claimant elects to proceed against the defendants
+  FULL_DEFENCE --> FULL_DEFENCE_PROCEED : Claimant elects to proceed against the defendants
+  FULL_DEFENCE --> FULL_DEFENCE_PROCEED : Claimant elects to proceed against the defendants.\nOR Claimant ind…
+  FULL_DEFENCE --> FULL_DEFENCE_PROCEED : Claimant indicates the claim has been settled
+  FULL_DEFENCE --> FULL_DEFENCE_NOT_PROCEED : Claimant indicates they do not wish to proceed against the defendants.
+  FULL_DEFENCE --> TAKEN_OFFLINE_BY_STAFF : Staff took the case offline after a defendant response and before c…
+  FULL_DEFENCE --> PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA : Claimant response deadline has passed with no response and staff ha…
+  IN_MEDIATION --> MEDIATION_UNSUCCESSFUL_PROCEED : Mediation service recorded the session as unsuccessful.
+  IN_MEDIATION --> TAKEN_OFFLINE_BY_STAFF : Staff took the case offline before mediation recorded an outcome.
+  MEDIATION_UNSUCCESSFUL_PROCEED --> IN_HEARING_READINESS : Hearing has been listed and the case is in hearing readiness no dis…
+  MEDIATION_UNSUCCESSFUL_PROCEED --> CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE : Hearing fee due date has passed without payment
+  MEDIATION_UNSUCCESSFUL_PROCEED --> TAKEN_OFFLINE_BY_STAFF : HMCTS staff have manually taken the case offline.
+  MEDIATION_UNSUCCESSFUL_PROCEED --> TAKEN_OFFLINE_AFTER_SDO : Claim was taken offline after directions SDO were drawn.
+  MEDIATION_UNSUCCESSFUL_PROCEED --> TAKEN_OFFLINE_SDO_NOT_DRAWN : Case was taken offline because it was marked not suitable for an SDO.
+  POST_RESPONSE_IN_1 --> TAKEN_OFFLINE_BY_STAFF : Staff took the case offline after acknowledgement while a time exte…
+  POST_RESPONSE_IN_1 --> TAKEN_OFFLINE_SDO_NOT_DRAWN : Case marked not suitable for SDO and taken offline after acknowledg…
+  POST_RESPONSE_IN_0 --> TAKEN_OFFLINE_BY_STAFF : Staff took the case offline after service acknowledgement and befor…
+  POST_RESPONSE_IN_0 --> TAKEN_OFFLINE_SDO_NOT_DRAWN : Case marked not suitable for SDO and taken offline after service ac…
+  PART_ADMIT_AGREE_REPAYMENT --> TAKEN_OFFLINE_BY_STAFF : HMCTS staff have manually taken the case offline.
+  PART_ADMIT_AGREE_REPAYMENT --> TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA : Defendant Notice of Change online feature flag is active for this case
+  PART_ADMIT_AGREE_SETTLE --> TAKEN_OFFLINE_BY_STAFF : HMCTS staff have manually taken the case offline.
+  PART_ADMIT_PAY_IMMEDIATELY --> TAKEN_OFFLINE_BY_STAFF : HMCTS staff have manually taken the case offline.
+  PART_ADMIT_PAY_IMMEDIATELY --> TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA : Defendant Notice of Change online feature flag is active for this case
+  PART_ADMIT_REJECT_REPAYMENT --> TAKEN_OFFLINE_BY_STAFF : HMCTS staff have manually taken the case offline.
+  PART_ADMISSION --> IN_MEDIATION : Claimant opted into free mediation
+  PART_ADMISSION --> IN_MEDIATION : carmMediation
+  PART_ADMISSION --> PART_ADMIT_PROCEED : partAdmitProceed
+  PART_ADMISSION --> PART_ADMIT_NOT_PROCEED : Claimant indicates they do not wish to proceed against the defendants.
+  PART_ADMISSION --> PART_ADMIT_PAY_IMMEDIATELY : Defendant offered to pay the part-admitted amount immediately and c…
+  PART_ADMISSION --> PART_ADMIT_AGREE_SETTLE : Claimant confirms the part-admission offer settles the dispute.
+  PART_ADMISSION --> PART_ADMIT_AGREE_REPAYMENT : Applicant accepts the defendant's repayment plan for LiP 1v1 the ca…
+  PART_ADMISSION --> PART_ADMIT_REJECT_REPAYMENT : Applicant rejected the defendant’s repayment plan and case remains …
+  PART_ADMISSION --> TAKEN_OFFLINE_BY_STAFF : Staff took the case offline after a defendant response and before c…
+  PART_ADMISSION --> PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA : Claimant response deadline has passed with no response and staff ha…
+  PART_ADMIT_AGREE_REPAYMENT --> SIGN_SETTLEMENT_AGREEMENT : Defendant has signed the digital settlement agreement.
+  SIGN_SETTLEMENT_AGREEMENT --> FULL_ADMIT_JUDGMENT_ADMISSION : Applicant has requested a CCJ by admission.
+  note right of CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE : 🔚 Terminal state
+  note right of FULL_ADMIT_NOT_PROCEED : 🔚 Terminal state
+  note right of FULL_ADMIT_PROCEED : 🔚 Terminal state
+  note right of FULL_DEFENCE_NOT_PROCEED : 🔚 Terminal state
+  note right of IN_HEARING_READINESS : 🔚 Terminal state
+  note right of PART_ADMIT_NOT_PROCEED : 🔚 Terminal state
+  note right of PART_ADMIT_PROCEED : 🔚 Terminal state
+  note right of PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA : 🔚 Terminal state
+  note right of TAKEN_OFFLINE_AFTER_SDO : 🔚 Terminal state
+  note right of TAKEN_OFFLINE_BY_STAFF : 🔚 Terminal state
+  note right of TAKEN_OFFLINE_SDO_NOT_DRAWN : 🔚 Terminal state
+  note right of TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA : 🔚 Terminal state

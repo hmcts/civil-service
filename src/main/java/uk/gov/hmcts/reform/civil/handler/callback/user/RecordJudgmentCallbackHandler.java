@@ -52,17 +52,15 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateDates(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = JudgmentsOnlineHelper.validateMidCallbackData(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
 
     private CallbackResponse clearAllFields(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        // If first time (IsLiveJudgmentExists = null) do not clear them
         if (caseData.getJoIsLiveJudgmentExists() != null) {
             caseData.setJoOrderMadeDate(null);
             caseData.setJoPaymentPlan(null);
@@ -72,10 +70,10 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
             caseData.setJoAmountCostOrdered(null);
             caseData.setJoIsRegisteredWithRTL(null);
             caseData.setJoIssuedDate(null);
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
             return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+                .data(caseData.toMap(objectMapper))
+                .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -97,19 +95,22 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         caseData.setJoSetAsideReason(null);
         caseData.setJoSetAsideJudgmentErrorText(null);
         caseData.setJoJudgmentPaidInFull(null);
+
         if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
             caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
         }
+
         caseData.setActiveJudgment(recordJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment(), interest));
+        caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(
+            caseData.getActiveJudgment(), interest));
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS) {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(RECORD_JUDGMENT_NOTIFICATION));
+            caseData.setBusinessProcess(BusinessProcess.ready(RECORD_JUDGMENT_NOTIFICATION));
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

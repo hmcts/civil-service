@@ -74,62 +74,27 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
         @BeforeEach
         void setup() {
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
-        }
-
-        @Test
-        void shouldRecordScenarioQmLrIsOff_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .applicant1Represented(YesOrNo.NO)
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build()).build();
-
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
-            scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
-
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name()).build()
-            ).build();
-
-            handler.handle(params);
-            verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT");
-            verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                "Application.View");
-
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                "Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant",
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
         }
 
         @Test
         void shouldRecordScenarioQmLrIsOnAndIsNonEaCourt_whenInvoked() {
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("test");
+            caseLocationCivil.setRegion("test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedSmallClaim()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("test").region(
-                    "test").build())
+                .caseManagementLocation(caseLocationCivil)
                 .applicant1Represented(YesOrNo.NO)
-
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build()).build();
+                .caseDataLip(caseDataLiP).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
             scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name()).build()
@@ -148,28 +113,30 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordScenarioQmLrIsOnAndisEaCourt_whenInvoked() {
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("test");
+            caseLocationCivil.setRegion("test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedSmallClaim()
                 .applicant1Represented(YesOrNo.NO)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("test").region(
-                    "test").build())
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build()).build();
+                .caseManagementLocation(caseLocationCivil)
+                .caseDataLip(caseDataLiP).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
             scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name()).build()
@@ -188,7 +155,53 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioQmLrIsOnAndIsNonEaCourt_whenInvokedForNro() {
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("test");
+            caseLocationCivil.setRegion("test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmittedSmallClaim()
+                .applicant1Represented(YesOrNo.NO)
+                .caseManagementLocation(caseLocationCivil)
+                .caseDataLip(caseDataLiP).build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
+            scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
+            when(featureToggleService.isCuiGaNroEnabled()).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name())
+                    .build()
+            ).build();
+
+            handler.handle(params);
+            verify(dashboardNotificationService, never()).deleteByReferenceAndCitizenRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT"
+            );
+            verify(taskListService, never()).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                "Application.View"
+            );
+
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                "Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant",
+                caseData.getCcdCaseReference().toString(),
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

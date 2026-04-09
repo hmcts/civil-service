@@ -35,6 +35,9 @@ import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DivergencePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ResponsePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
@@ -55,8 +58,7 @@ import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
+
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED;
@@ -151,11 +153,9 @@ class SimpleStateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
         }
@@ -181,11 +181,9 @@ class SimpleStateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
         }
@@ -198,9 +196,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -216,13 +212,11 @@ class SimpleStateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(14).contains(
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -251,12 +245,11 @@ class SimpleStateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(14).contains(
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -287,9 +280,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -315,9 +306,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -430,12 +419,10 @@ class SimpleStateFlowEngineTest {
                         PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -463,11 +450,9 @@ class SimpleStateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -479,9 +464,9 @@ class SimpleStateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued1v1UnrepresentedDefendant()
                     .defendant1LIPAtClaimIssued(YES)
-                    .build().toBuilder()
-                    .takenOfflineDate(null)
-                    .caseAccessCategory(SPEC_CLAIM).build();
+                    .build();
+                caseData.setTakenOfflineDate(null);
+                caseData.setCaseAccessCategory(SPEC_CLAIM);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -499,11 +484,9 @@ class SimpleStateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -535,12 +518,10 @@ class SimpleStateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -570,12 +551,10 @@ class SimpleStateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true)
                 );
             }
 
@@ -605,12 +584,10 @@ class SimpleStateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true)
                 );
             }
 
@@ -640,12 +617,10 @@ class SimpleStateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -675,12 +650,11 @@ class SimpleStateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+                );
             }
 
             // 1v2 spec
@@ -692,8 +666,8 @@ class SimpleStateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant2()
                     .defendant2LIPAtClaimIssued(YES)
-                    .build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM).build();
+                    .build();
+                caseData.setCaseAccessCategory(SPEC_CLAIM);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -712,11 +686,9 @@ class SimpleStateFlowEngineTest {
                         TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
         }
@@ -746,11 +718,9 @@ class SimpleStateFlowEngineTest {
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -778,10 +748,8 @@ class SimpleStateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -791,8 +759,8 @@ class SimpleStateFlowEngineTest {
             @Test
             void shouldReturnProceedsWithOfflineJourney_whenRespondentsNotRegisteredSpec() {
                 // Given
-                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendants().build()
-                    .toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendants().build();
+                caseData.setCaseAccessCategory(SPEC_CLAIM);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -810,10 +778,8 @@ class SimpleStateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -841,11 +807,9 @@ class SimpleStateFlowEngineTest {
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -857,9 +821,7 @@ class SimpleStateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendant2().build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -879,11 +841,9 @@ class SimpleStateFlowEngineTest {
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -910,11 +870,9 @@ class SimpleStateFlowEngineTest {
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
         }
@@ -945,10 +903,8 @@ class SimpleStateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true)
                 );
             }
 
@@ -977,10 +933,8 @@ class SimpleStateFlowEngineTest {
                         TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -992,9 +946,7 @@ class SimpleStateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -1011,12 +963,10 @@ class SimpleStateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -1040,12 +990,11 @@ class SimpleStateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1067,12 +1016,11 @@ class SimpleStateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1081,9 +1029,7 @@ class SimpleStateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -1102,12 +1048,11 @@ class SimpleStateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1118,9 +1063,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -1141,13 +1084,12 @@ class SimpleStateFlowEngineTest {
                     CLAIM_ISSUED.fullName(),
                     TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName()
                 );
-            assertThat(stateFlow.getFlags()).hasSize(14).contains(
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1158,9 +1100,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -1181,13 +1121,12 @@ class SimpleStateFlowEngineTest {
                     CLAIM_ISSUED.fullName(),
                     CLAIM_NOTIFIED.fullName()
                 );
-            assertThat(stateFlow.getFlags()).hasSize(14).contains(
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1196,9 +1135,7 @@ class SimpleStateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -1217,10 +1154,8 @@ class SimpleStateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false));
         }
@@ -1247,10 +1182,8 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true));
         }
 
@@ -1262,9 +1195,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -1284,12 +1215,11 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(14).contains(
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1300,9 +1230,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -1346,11 +1274,10 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1359,9 +1286,7 @@ class SimpleStateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -1381,9 +1306,8 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true));
         }
 
         @Test
@@ -1393,9 +1317,7 @@ class SimpleStateFlowEngineTest {
                 .atStateNotificationAcknowledgedRespondent1TimeExtension().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -1416,20 +1338,20 @@ class SimpleStateFlowEngineTest {
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
         }
 
         @Test
         void shouldReturnClaimDismissed_whenCaseDataAtStateClaimAcknowledgeAndCcdStateIsDismissed() {
             // Given
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDate(LocalDateTime.now())
                 .claimDismissedDeadline(LocalDateTime.now().minusHours(4))
-                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
+                .reasonNotSuitableSDO(reasonNotSuitableSDO)
                 .build();
 
             // When
@@ -1452,12 +1374,11 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1482,11 +1403,10 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
         }
 
         @Nested
@@ -1517,10 +1437,8 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true));
             }
 
@@ -1532,9 +1450,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -1561,10 +1477,8 @@ class SimpleStateFlowEngineTest {
                         FULL_ADMISSION.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true));
             }
 
@@ -1599,11 +1513,10 @@ class SimpleStateFlowEngineTest {
                         PART_ADMISSION.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+                );
             }
 
             @Test
@@ -1612,9 +1525,7 @@ class SimpleStateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateRespondentCounterClaim().build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -1641,11 +1552,10 @@ class SimpleStateFlowEngineTest {
                         COUNTER_CLAIM.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+                );
             }
         }
 
@@ -1662,9 +1572,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -1685,12 +1593,11 @@ class SimpleStateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+                );
             }
 
             //1v2 Different solicitor scenario-first response FullDefence received
@@ -1703,9 +1610,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -1726,12 +1631,11 @@ class SimpleStateFlowEngineTest {
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+                );
             }
 
             //1v2 Different solicitor scenario-first response FullDefence received
@@ -1744,9 +1648,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -1767,12 +1669,11 @@ class SimpleStateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+                );
             }
 
             //1v2 Different solicitor scenario-first party acknowledges, not responds
@@ -1786,9 +1687,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -1809,11 +1708,9 @@ class SimpleStateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true));
             }
 
@@ -1827,9 +1724,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -1850,11 +1745,9 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true));
             }
 
@@ -1869,9 +1762,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -1892,11 +1783,9 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true));
             }
 
@@ -1912,9 +1801,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -1935,11 +1822,9 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true));
             }
 
@@ -1955,9 +1840,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -1978,11 +1861,9 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -1997,9 +1878,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -2020,11 +1899,9 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2040,9 +1917,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -2063,11 +1938,9 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -2081,9 +1954,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -2104,12 +1975,10 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
 
@@ -2123,9 +1992,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -2146,11 +2013,9 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_ADMISSION.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2180,11 +2045,9 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -2245,23 +2108,18 @@ class SimpleStateFlowEngineTest {
             }
 
             if (flowState == FlowState.Main.FULL_DEFENCE_NOT_PROCEED) {
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true)
                 );
             } else if (flowState == TAKEN_OFFLINE_AFTER_SDO) {
-                assertThat(stateFlow.getFlags()).hasSize(16).contains(
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.SDO_ENABLED.name(), true),
                     entry(FlowFlag.MINTI_ENABLED.name(), false),
-                    entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
                     entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false)
                 );
             }
@@ -2273,8 +2131,8 @@ class SimpleStateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
                 .takenOfflineDate(LocalDateTime.now())
-                .build().toBuilder()
-                .drawDirectionsOrderRequired(NO).build();
+                .build();
+            caseData.setDrawDirectionsOrderRequired(NO);
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -2306,9 +2164,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -2335,13 +2191,11 @@ class SimpleStateFlowEngineTest {
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(14).contains(
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -2357,9 +2211,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -2387,12 +2239,10 @@ class SimpleStateFlowEngineTest {
                     FULL_DEFENCE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(14).contains(
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true)
             );
         }
@@ -2409,9 +2259,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -2433,12 +2281,10 @@ class SimpleStateFlowEngineTest {
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(14).contains(
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -2463,8 +2309,7 @@ class SimpleStateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
         }
@@ -2545,10 +2390,8 @@ class SimpleStateFlowEngineTest {
                     TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
         }
@@ -2559,9 +2402,7 @@ class SimpleStateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimPastClaimNotificationDeadline().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -2607,15 +2448,12 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(16).contains(
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(13).contains(
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.MINTI_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.SDO_ENABLED.name(), true),
-                entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
                 entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false)
             );
         }
@@ -2656,9 +2494,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -2704,11 +2540,9 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
         }
@@ -2737,7 +2571,7 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(16).contains(
+            assertThat(stateFlow.getFlags()).hasSize(13).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.SDO_ENABLED.name(), true)
             );
@@ -2761,9 +2595,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -2785,20 +2617,17 @@ class SimpleStateFlowEngineTest {
                     FULL_DEFENCE_PROCEED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(18).contains(
+            assertThat(stateFlow.getFlags()).hasSize(15).contains(
                 entry("BULK_CLAIM_ENABLED", false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.IS_MULTI_TRACK.name(), true),
                 entry(FlowFlag.MINTI_ENABLED.name(), false),
                 entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                 entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                 entry(FlowFlag.SDO_ENABLED.name(), false),
-                entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false),
-                entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false)
+                entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false)
             );
         }
     }
@@ -2828,12 +2657,10 @@ class SimpleStateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -2859,12 +2686,10 @@ class SimpleStateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -2890,12 +2715,10 @@ class SimpleStateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -2921,12 +2744,10 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -2954,12 +2775,10 @@ class SimpleStateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -2987,12 +2806,10 @@ class SimpleStateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -3021,12 +2838,10 @@ class SimpleStateFlowEngineTest {
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -3039,9 +2854,7 @@ class SimpleStateFlowEngineTest {
 
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -3063,13 +2876,11 @@ class SimpleStateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(14).contains(
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -3097,12 +2908,10 @@ class SimpleStateFlowEngineTest {
                     ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -3132,12 +2941,10 @@ class SimpleStateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -3167,12 +2974,10 @@ class SimpleStateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
     }
@@ -3186,9 +2991,7 @@ class SimpleStateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder().atStatePastClaimDismissedDeadline().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -3215,9 +3018,7 @@ class SimpleStateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder().atStatePastClaimDismissedDeadline_1v2().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -3270,9 +3071,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -3293,12 +3092,10 @@ class SimpleStateFlowEngineTest {
                     PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -3311,9 +3108,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -3336,28 +3131,25 @@ class SimpleStateFlowEngineTest {
                 );
 
             assertThat(stateFlow.getFlags())
-                .hasSize(13)
+                .hasSize(10)
                 .contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
         }
 
         @Test
         void shouldReturnClaimDismissedPastDeadline_whenDeadlinePassedAfterStateNotificationAcknowledged() {
             // Given
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
-                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
+                .reasonNotSuitableSDO(reasonNotSuitableSDO)
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -3379,21 +3171,20 @@ class SimpleStateFlowEngineTest {
                     PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
         @Test
         void shouldReturnDismissedState_whenDeadlinePassedAfterNotificationAcknowledgedAndProcessedByCamunda() {
             // Given
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
-                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
+                .reasonNotSuitableSDO(reasonNotSuitableSDO)
                 .claimDismissedDate(LocalDateTime.now())
                 .build();
 
@@ -3417,12 +3208,10 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
 
@@ -3434,9 +3223,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -3469,9 +3256,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -3519,12 +3304,10 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
             );
         }
     }
@@ -3569,9 +3352,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -3592,11 +3373,10 @@ class SimpleStateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
@@ -3612,9 +3392,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -3635,11 +3413,10 @@ class SimpleStateFlowEngineTest {
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3654,9 +3431,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -3677,12 +3452,11 @@ class SimpleStateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3698,9 +3472,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -3721,11 +3493,10 @@ class SimpleStateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3739,9 +3510,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -3762,11 +3531,10 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
@@ -3782,9 +3550,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -3805,12 +3571,11 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3827,9 +3592,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -3850,11 +3613,10 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
@@ -3872,9 +3634,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -3895,11 +3655,10 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
@@ -3915,9 +3674,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -3938,12 +3695,11 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3959,9 +3715,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -3982,10 +3736,9 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(13).contains(
+                assertThat(stateFlow.getFlags()).hasSize(10).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -4000,9 +3753,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -4023,11 +3774,10 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -4042,9 +3792,7 @@ class SimpleStateFlowEngineTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 // When
@@ -4065,11 +3813,10 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_ADMISSION.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(14).contains(
+                assertThat(stateFlow.getFlags()).hasSize(11).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
@@ -4082,123 +3829,121 @@ class SimpleStateFlowEngineTest {
 
         @Test
         void claimIssue_fullAdmitAndDivergentRespondGoOffline() {
-            CaseData caseData = CaseData.builder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .applicant1(Party.builder().build())
-                .respondent1(Party.builder().build())
-                .respondent2(Party.builder().build())
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .respondentResponseIsSame(YES)
-                .build();
-            assertThat(FlowPredicate.fullAdmissionSpec.test(caseData))
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setApplicant1(new Party());
+            caseData.setRespondent1(new Party());
+            caseData.setRespondent2(new Party());
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+            caseData.setRespondentResponseIsSame(YES);
+            assertThat(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_ADMISSION).test(caseData))
                 .isTrue();
-            assertThat(divergentRespondGoOfflineSpec.and(specClaim).test(caseData))
+            assertThat(DivergencePredicate.divergentRespondGoOfflineSpec.and(ClaimPredicate.isSpec).test(caseData))
                 .isFalse();
         }
 
         @Test
         void claim1v1_reachFullAdmitProceed() {
-            CaseData.CaseDataBuilder<?, ?> builder = claim1v1Submitted();
+            CaseData caseData = claim1v1Submitted();
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(CLAIM_SUBMITTED.fullName());
 
-            payPBA(builder);
+            payPBA(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
 
-            issuedAndRepresented(builder);
+            issuedAndRepresented(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(PENDING_CLAIM_ISSUED.fullName());
 
-            issued(builder);
+            issued(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(CLAIM_ISSUED.fullName());
 
-            fullAdmit1v1(builder);
+            fullAdmit1v1(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(FULL_ADMISSION.fullName());
 
-            applicantProceeds1v1(builder);
+            applicantProceeds1v1(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(FULL_ADMIT_PROCEED.fullName());
         }
 
         @Test
         void claim1v1_reachFullAdmitNoProceed() {
-            CaseData.CaseDataBuilder<?, ?> builder = claim1v1Submitted();
+            CaseData caseData = claim1v1Submitted();
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(CLAIM_SUBMITTED.fullName());
 
-            payPBA(builder);
+            payPBA(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
 
-            issuedAndRepresented(builder);
+            issuedAndRepresented(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(PENDING_CLAIM_ISSUED.fullName());
 
-            issued(builder);
+            issued(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(CLAIM_ISSUED.fullName());
 
-            fullAdmit1v1(builder);
+            fullAdmit1v1(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(FULL_ADMISSION.fullName());
 
-            applicantDoesntProceed1v1(builder);
+            applicantDoesntProceed1v1(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(FULL_ADMIT_NOT_PROCEED.fullName());
         }
 
-        private CaseData.CaseDataBuilder<?, ?> claim1v1Submitted() {
-            return CaseData.builder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .applicant1(Party.builder().build())
-                .respondent1(Party.builder().build())
-                .submittedDate(LocalDateTime.now());
+        private CaseData claim1v1Submitted() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setApplicant1(new Party());
+            caseData.setRespondent1(new Party());
+            caseData.setSubmittedDate(LocalDateTime.now());
+            return caseData;
         }
 
-        private void payPBA(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder.paymentSuccessfulDate(LocalDateTime.now());
+        private void payPBA(CaseData caseData) {
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
         }
 
-        private void issuedAndRepresented(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder
-                .issueDate(LocalDate.now())
-                .respondent1Represented(YesOrNo.YES)
-                .respondent1OrgRegistered(YesOrNo.YES);
+        private void issuedAndRepresented(CaseData caseData) {
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1Represented(YesOrNo.YES);
+            caseData.setRespondent1OrgRegistered(YesOrNo.YES);
         }
 
-        private void issued(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder
-                .claimNotificationDeadline(LocalDateTime.now().plusDays(14));
+        private void issued(CaseData caseData) {
+            caseData.setClaimNotificationDeadline(LocalDateTime.now().plusDays(14));
         }
 
-        private void fullAdmit1v1(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder.respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        private void fullAdmit1v1(CaseData caseData) {
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
         }
 
-        private void applicantProceeds1v1(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder.applicant1ProceedWithClaim(YES);
+        private void applicantProceeds1v1(CaseData caseData) {
+            caseData.setApplicant1ProceedWithClaim(YES);
         }
 
-        private void applicantDoesntProceed1v1(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder.applicant1ProceedWithClaim(NO);
+        private void applicantDoesntProceed1v1(CaseData caseData) {
+            caseData.setApplicant1ProceedWithClaim(NO);
         }
     }
 
@@ -4208,24 +3953,17 @@ class SimpleStateFlowEngineTest {
         @Test
         void fullDefenceNoMediationSpec() {
             // Given
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // full defence
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4233,9 +3971,8 @@ class SimpleStateFlowEngineTest {
             // Then
             assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
-            StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
-                                                              .applicant1ProceedWithClaim(YES)
-                                                              .build());
+            caseData.setApplicant1ProceedWithClaim(YES);
+            StateFlow newState = stateFlowEngine.evaluate(caseData);
 
             assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
             assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
@@ -4244,27 +3981,19 @@ class SimpleStateFlowEngineTest {
         @Test
         void fullDefencePartialMediationSpec() {
             // Given
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // full defence
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                // defendant agrees to mediation
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(YES);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4272,14 +4001,10 @@ class SimpleStateFlowEngineTest {
             // Then
             assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
-            StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
-                                                              .applicant1ProceedWithClaim(YES)
-                                                              .applicant1ClaimMediationSpecRequired(
-                                                                  SmallClaimMedicalLRspec.builder()
-                                                                      .hasAgreedFreeMediation(NO)
-                                                                      .build()
-                                                              )
-                                                              .build());
+            caseData.setApplicant1ProceedWithClaim(YES);
+            SmallClaimMedicalLRspec smallClaimMedicalLRspec = new SmallClaimMedicalLRspec(NO);
+            caseData.setApplicant1ClaimMediationSpecRequired(smallClaimMedicalLRspec);
+            StateFlow newState = stateFlowEngine.evaluate(caseData);
 
             assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
             assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
@@ -4288,29 +4013,21 @@ class SimpleStateFlowEngineTest {
         @Test
         void fullDefenceAllMediationSpec() {
             // Given
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // full defence
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                // defendant agrees to mediation
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                          .hasAgreedFreeMediation(YES).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(YES);
+            SmallClaimMedicalLRspec mediationSpec = new SmallClaimMedicalLRspec(YES);
+            caseData.setApplicant1ClaimMediationSpecRequired(mediationSpec);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4318,14 +4035,10 @@ class SimpleStateFlowEngineTest {
             // Then
             assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
-            StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
-                                                              .applicant1ProceedWithClaim(YES)
-                                                              .applicant1ClaimMediationSpecRequired(
-                                                                  SmallClaimMedicalLRspec.builder()
-                                                                      .hasAgreedFreeMediation(YES)
-                                                                      .build()
-                                                              )
-                                                              .build());
+            caseData.setApplicant1ProceedWithClaim(YES);
+            SmallClaimMedicalLRspec smallClaimMedicalLRspec = new SmallClaimMedicalLRspec(YES);
+            caseData.setApplicant1ClaimMediationSpecRequired(smallClaimMedicalLRspec);
+            StateFlow newState = stateFlowEngine.evaluate(caseData);
 
             assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
             assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
@@ -4341,8 +4054,8 @@ class SimpleStateFlowEngineTest {
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
                 .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.defaults().build())
-                .build().toBuilder()
-                .caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -4360,13 +4073,11 @@ class SimpleStateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CONTACT_DETAILS_CHANGE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(14).contains(
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
         }
@@ -4377,32 +4088,25 @@ class SimpleStateFlowEngineTest {
         @Test
         void partAdmitInMediationSpec() {
             // Given
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .applicant1ClaimMediationSpecRequiredLip(
-                                     ClaimantMediationLip.builder()
-                                         .hasAgreedFreeMediation(MediationDecision.Yes)
-                                         .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(YES);
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
+            ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.Yes);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
+            caseData.setCaseDataLiP(caseDataLiP);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4414,32 +4118,25 @@ class SimpleStateFlowEngineTest {
         @Test
         void partAdmitPartMediationSpec() {
             // Given
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .applicant1ClaimMediationSpecRequiredLip(
-                                     ClaimantMediationLip.builder()
-                                         .hasAgreedFreeMediation(MediationDecision.No)
-                                         .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(YES);
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
+            ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
+            caseData.setCaseDataLiP(caseDataLiP);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4450,27 +4147,20 @@ class SimpleStateFlowEngineTest {
 
         @Test
         void partAdmitNoMediationSpec() {
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(NO)
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(NO);
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4484,30 +4174,23 @@ class SimpleStateFlowEngineTest {
     class FromPartAdmitNotSettledNoMediation {
         @Test
         void partAdmitNoMediationSpec() {
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(NO)
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .reasonNotSuitableSDO(new ReasonNotSuitableSDO("test"))
-                .takenOfflineDate(LocalDateTime.now())
-                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(NO);
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
+            caseData.setReasonNotSuitableSDO(new ReasonNotSuitableSDO("test"));
+            caseData.setTakenOfflineDate(LocalDateTime.now());
+            caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4524,10 +4207,9 @@ class SimpleStateFlowEngineTest {
         void shouldReturnInHearingReadiness_whenTransitionedFromCaseDetailsNotified() {
             // Given
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .hearingReferenceNumber("11111111")
-                .listingOrRelisting(ListingOrRelisting.LISTING)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setHearingReferenceNumber("10101010");
+            caseData.setListingOrRelisting(ListingOrRelisting.LISTING);
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -4546,11 +4228,9 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), IN_HEARING_READINESS.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true));
         }
@@ -4558,27 +4238,24 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnInHearingReadiness_whenTransitionedFromFullDefenseProceed() {
             // Given
-            CaseData caseData = CaseData.builder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                .paymentSuccessfulDate(LocalDateTime.now())
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                .claimNotificationDeadline(LocalDateTime.now())
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .applicant1ProceedWithClaim(YES)
-                .applicant1ClaimMediationSpecRequired(
-                    SmallClaimMedicalLRspec.builder()
-                        .hasAgreedFreeMediation(NO)
-                        .build())
-                .hearingReferenceNumber("11111111")
-                .listingOrRelisting(ListingOrRelisting.LISTING)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(YES);
+            caseData.setApplicant1ProceedWithClaim(YES);
+            SmallClaimMedicalLRspec mediationSpec = new SmallClaimMedicalLRspec(NO);
+            caseData.setApplicant1ClaimMediationSpecRequired(mediationSpec);
+            caseData.setHearingReferenceNumber("10101010");
+            caseData.setListingOrRelisting(ListingOrRelisting.LISTING);
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -4600,29 +4277,22 @@ class SimpleStateFlowEngineTest {
 
         @Test
         void shouldReturnInHearingReadiness_whenTransitionedFromPartAdmitNotSettledNoMediation() {
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(NO)
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .hearingReferenceNumber("11111111")
-                .listingOrRelisting(ListingOrRelisting.LISTING)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(NO);
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
+            caseData.setHearingReferenceNumber("10101010");
+            caseData.setListingOrRelisting(ListingOrRelisting.LISTING);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4637,7 +4307,7 @@ class SimpleStateFlowEngineTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder()
             .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
-            .hearingReferenceNumber("11111111")
+            .hearingReferenceNumber("10101010")
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .build();
 
@@ -4687,9 +4357,8 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true));
         }
 
@@ -4717,10 +4386,9 @@ class SimpleStateFlowEngineTest {
                     TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false));
         }
 
         @Test
@@ -4731,9 +4399,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -4754,11 +4420,10 @@ class SimpleStateFlowEngineTest {
                     TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false));
         }
 
         @Test
@@ -4769,9 +4434,7 @@ class SimpleStateFlowEngineTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             // When
@@ -4792,20 +4455,21 @@ class SimpleStateFlowEngineTest {
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(), TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(13).contains(
+            assertThat(stateFlow.getFlags()).hasSize(10).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
         }
 
         @Test
         void shouldReturnTakenOfflineSDONotDrawn_whenTransitionedFromMediationUnsuccessfulProceed() {
             // Given
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+            reasonNotSuitableSDO.setInput("Unsuitable");
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
-                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().input("Unsuitable").build())
+                .reasonNotSuitableSDO(reasonNotSuitableSDO)
                 .takenOfflineDate(LocalDateTime.now())
                 .build();
 
@@ -4837,14 +4501,13 @@ class SimpleStateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1UnrepresentedDefendant()
                 .applicant1Represented(NO)
-                .build().toBuilder()
-                .takenOfflineDate(null)
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            caseData.setTakenOfflineDate(null);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
 
             // When
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
             // Then
@@ -4854,7 +4517,6 @@ class SimpleStateFlowEngineTest {
                 .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
 
             assertThat(stateFlow.getFlags()).contains(
-                entry(FlowFlag.PIP_ENABLED.name(), true),
                 entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                 entry(FlowFlag.LIP_CASE.name(), true)
             );
@@ -4866,15 +4528,14 @@ class SimpleStateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1UnrepresentedDefendant()
                 .applicant1Represented(NO)
-                .build().toBuilder()
-                .takenOfflineDate(null)
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            caseData.setTakenOfflineDate(null);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
             caseData.setClaimantBilingualLanguagePreference("BOTH");
 
             // When
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
             // Then
@@ -4884,7 +4545,6 @@ class SimpleStateFlowEngineTest {
                 .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
 
             assertThat(stateFlow.getFlags()).contains(
-                entry(FlowFlag.PIP_ENABLED.name(), true),
                 entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                 entry(FlowFlag.LIP_CASE.name(), true),
                 entry(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true)
@@ -4898,20 +4558,20 @@ class SimpleStateFlowEngineTest {
                 .atStateClaimIssued1v1UnrepresentedDefendant()
                 .applicant1Represented(NO)
                 .respondent1Represented(NO)
-                .build().toBuilder()
-                .takenOfflineDate(null)
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .hwfFeeType(CLAIMISSUED)
-                .caseDataLiP(CaseDataLiP.builder().helpWithFees(
-                    HelpWithFees.builder()
-                        .helpWithFee(YesOrNo.YES)
-                        .helpWithFeesReferenceNumber("12345678912")
-                        .build()).build())
-                .caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            caseData.setTakenOfflineDate(null);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            caseData.setHwfFeeType(CLAIMISSUED);
+            HelpWithFees helpWithFees = new HelpWithFees();
+            helpWithFees.setHelpWithFee(YesOrNo.YES);
+            helpWithFees.setHelpWithFeesReferenceNumber("12345678912");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setHelpWithFees(helpWithFees);
+            caseData.setCaseDataLiP(caseDataLiP);
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
 
             // When
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
             // Then
@@ -4921,7 +4581,6 @@ class SimpleStateFlowEngineTest {
                 .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
 
             assertThat(stateFlow.getFlags()).contains(
-                entry(FlowFlag.PIP_ENABLED.name(), true),
                 entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                 entry(FlowFlag.LIP_CASE.name(), true),
                 entry(FlowFlag.CLAIM_ISSUE_HWF.name(), true)
@@ -4935,22 +4594,21 @@ class SimpleStateFlowEngineTest {
                 .atStateClaimIssued1v1UnrepresentedDefendant()
                 .applicant1Represented(YES)
                 .respondent1Represented(NO)
-                .build().toBuilder()
-                .takenOfflineDate(null)
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .helpWithFees(HelpWithFees.builder()
-                                                   .helpWithFeesReferenceNumber("Test")
-                                                   .build())
-                                 .build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .hwfFullRemissionGrantedForClaimIssue(YES)
-                                              .build())
-                .caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            caseData.setTakenOfflineDate(null);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            HelpWithFees helpWithFees = new HelpWithFees();
+            helpWithFees.setHelpWithFeesReferenceNumber("Test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setHelpWithFees(helpWithFees);
+            caseData.setCaseDataLiP(caseDataLiP);
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForClaimIssue(YES);
+            caseData.setFeePaymentOutcomeDetails(feePaymentOutcomeDetails);
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
 
             // When
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
             // Then
@@ -4972,22 +4630,21 @@ class SimpleStateFlowEngineTest {
                 .atStateClaimIssued1v1UnrepresentedDefendant()
                 .applicant1Represented(NO)
                 .respondent1Represented(NO)
-                .build().toBuilder()
-                .takenOfflineDate(null)
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .helpWithFees(HelpWithFees.builder()
-                                                   .helpWithFeesReferenceNumber("Test")
-                                                   .build())
-                                 .build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .hwfFullRemissionGrantedForClaimIssue(YES)
-                                              .build())
-                .caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            caseData.setTakenOfflineDate(null);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            HelpWithFees helpWithFees = new HelpWithFees();
+            helpWithFees.setHelpWithFeesReferenceNumber("Test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setHelpWithFees(helpWithFees);
+            caseData.setCaseDataLiP(caseDataLiP);
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForClaimIssue(YES);
+            caseData.setFeePaymentOutcomeDetails(feePaymentOutcomeDetails);
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
 
             // When
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
             // Then
@@ -5005,29 +4662,26 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnProceedsInHeritageSystem_whenFullDefenceDefendantNotPaid() {
             // Given
-            DefendantPinToPostLRspec respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
-                .accessCode("TEST")
-                .build();
+            DefendantPinToPostLRspec respondent1PinToPostLRspec = new DefendantPinToPostLRspec();
+            respondent1PinToPostLRspec.setAccessCode("TEST");
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1UnrepresentedDefendant()
                 .applicant1Represented(NO)
-                .build().toBuilder()
-                .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
-                .takenOfflineDate(null)
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .caseAccessCategory(SPEC_CLAIM)
-                .claimNotificationDeadline(LocalDateTime.now())
-                .claimNotificationDate(LocalDateTime.now())
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .applicant1FullDefenceConfirmAmountPaidSpec(YesOrNo.NO)
                 .build();
+            caseData.setRespondent1PinToPostLRspec(respondent1PinToPostLRspec);
+            caseData.setTakenOfflineDate(null);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setApplicant1FullDefenceConfirmAmountPaidSpec(YesOrNo.NO);
 
             // When
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
             // Then
@@ -5046,31 +4700,27 @@ class SimpleStateFlowEngineTest {
     class FromPartAdmitRepaymentAgreed {
         @Test
         void partAdmitRepaymentAgreedSpec() {
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
-                    .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
-                    .build())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .applicant1PartAdmitConfirmAmountPaidSpec(YES)
-                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondentSignSettlementAgreement(YES);
+            caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
+            caseData.setCaseDataLiP(caseDataLiP);
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(YES);
+            caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+            caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YES);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -5082,34 +4732,30 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnProceedsInHeritageSystem_whenPartAdmitRepaymentAcceptedWithCCJ() {
             // Given
-            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YES)
-                .build();
-            DefendantPinToPostLRspec respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
-                .accessCode("TEST")
-                .build();
+            CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+            ccjPaymentDetails.setCcjPaymentPaidSomeOption(YES);
+            DefendantPinToPostLRspec respondent1PinToPostLRspec = new DefendantPinToPostLRspec();
+            respondent1PinToPostLRspec.setAccessCode("TEST");
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1UnrepresentedDefendant()
                 .applicant1Represented(NO)
-                .build().toBuilder()
-                .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
-                .takenOfflineDate(null)
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .caseAccessCategory(SPEC_CLAIM)
-                .claimNotificationDeadline(LocalDateTime.now())
-                .claimNotificationDate(LocalDateTime.now())
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-                .ccjPaymentDetails(ccjPaymentDetails)
                 .build();
+            caseData.setRespondent1PinToPostLRspec(respondent1PinToPostLRspec);
+            caseData.setTakenOfflineDate(null);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE);
+            caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
 
             // When
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
             // Then
@@ -5127,29 +4773,26 @@ class SimpleStateFlowEngineTest {
     class FromFullAdmitRepaymentAgreed {
         @Test
         void fullAdmitRepaymentAgreedSpec() {
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
-                    .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
-                    .build())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondentSignSettlementAgreement(YES);
+            caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
+            caseData.setCaseDataLiP(caseDataLiP);
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+            caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YES);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -5161,38 +4804,34 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnProceedsInHeritageSystemState_whenFullAdmitRepaymentAcceptedWithCCJ() {
             // Given
-            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YES)
-                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
-                .build();
-            DefendantPinToPostLRspec respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
-                .accessCode("TEST")
-                .build();
+            CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+            ccjPaymentDetails.setCcjPaymentPaidSomeOption(YES);
+            ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0));
+            ccjPaymentDetails.setCcjJudgmentLipInterest(BigDecimal.valueOf(300));
+            ccjPaymentDetails.setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(0));
+            DefendantPinToPostLRspec respondent1PinToPostLRspec = new DefendantPinToPostLRspec();
+            respondent1PinToPostLRspec.setAccessCode("TEST");
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1UnrepresentedDefendant()
                 .applicant1Represented(NO)
-                .build().toBuilder()
-                .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
-                .takenOfflineDate(null)
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .caseAccessCategory(SPEC_CLAIM)
-                .claimNotificationDeadline(LocalDateTime.now())
-                .claimNotificationDate(LocalDateTime.now())
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .respondent1Represented(YesOrNo.NO)
-                .specRespondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-                .ccjPaymentDetails(ccjPaymentDetails)
                 .build();
+            caseData.setRespondent1PinToPostLRspec(respondent1PinToPostLRspec);
+            caseData.setTakenOfflineDate(null);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setSpecRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE);
+            caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
 
             // When
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
             // Then
@@ -5216,25 +4855,28 @@ class SimpleStateFlowEngineTest {
                 .atStateClaimIssued1v1UnrepresentedDefendantSpec()
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
-                .build().toBuilder()
-                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .changeOfRepresentation(ChangeOfRepresentation.builder().caseRole("RESPONDENTSOLICITORONE")
-                    .timestamp(LocalDateTime.now())
-                    .organisationToAddID("HA160")
-                    .build())
-                .caseDataLiP(CaseDataLiP.builder()
-                    .helpWithFees(HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("Test")
-                        .build())
-                    .build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                    .hwfFullRemissionGrantedForClaimIssue(YES)
-                    .build())
-                .ccdState(CaseState.CASE_PROGRESSION)
-                .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
-                .caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            ChangeOfRepresentation changeOfRepresentation = new ChangeOfRepresentation();
+            changeOfRepresentation.setCaseRole("RESPONDENTSOLICITORONE");
+            changeOfRepresentation.setTimestamp(LocalDateTime.now());
+            changeOfRepresentation.setOrganisationToAddID("HA160");
+            caseData.setChangeOfRepresentation(changeOfRepresentation);
+            HelpWithFees helpWithFees = new HelpWithFees();
+            helpWithFees.setHelpWithFeesReferenceNumber("Test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setHelpWithFees(helpWithFees);
+            caseData.setCaseDataLiP(caseDataLiP);
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForClaimIssue(YES);
+            caseData.setFeePaymentOutcomeDetails(feePaymentOutcomeDetails);
+            caseData.setCcdState(CaseState.CASE_PROGRESSION);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now().plusDays(2));
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
 
             // When
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
@@ -5259,26 +4901,29 @@ class SimpleStateFlowEngineTest {
                 .atStateClaimIssued1v1UnrepresentedDefendantSpec()
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
-                .build().toBuilder()
-                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
-                .takenOfflineDate(LocalDateTime.now())
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .changeOfRepresentation(ChangeOfRepresentation.builder().caseRole("RESPONDENTSOLICITORONE")
-                    .timestamp(LocalDateTime.now())
-                    .organisationToAddID("HA160")
-                    .build())
-                .caseDataLiP(CaseDataLiP.builder()
-                    .helpWithFees(HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("Test")
-                        .build())
-                    .build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                    .hwfFullRemissionGrantedForClaimIssue(YES)
-                    .build())
-                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-                .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
-                .caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
+            caseData.setTakenOfflineDate(LocalDateTime.now());
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            ChangeOfRepresentation changeOfRepresentation = new ChangeOfRepresentation();
+            changeOfRepresentation.setCaseRole("RESPONDENTSOLICITORONE");
+            changeOfRepresentation.setTimestamp(LocalDateTime.now());
+            changeOfRepresentation.setOrganisationToAddID("HA160");
+            caseData.setChangeOfRepresentation(changeOfRepresentation);
+            HelpWithFees helpWithFees = new HelpWithFees();
+            helpWithFees.setHelpWithFeesReferenceNumber("Test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setHelpWithFees(helpWithFees);
+            caseData.setCaseDataLiP(caseDataLiP);
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForClaimIssue(YES);
+            caseData.setFeePaymentOutcomeDetails(feePaymentOutcomeDetails);
+            caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now().plusDays(2));
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
 
             // When
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
@@ -5298,25 +4943,28 @@ class SimpleStateFlowEngineTest {
                 .atStateClaimIssued1v1UnrepresentedDefendantSpec()
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
-                .build().toBuilder()
-                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .changeOfRepresentation(ChangeOfRepresentation.builder().caseRole("RESPONDENTSOLICITORONE")
-                                            .timestamp(LocalDateTime.now())
-                                            .organisationToAddID("HA160")
-                                            .build())
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .helpWithFees(HelpWithFees.builder()
-                                                   .helpWithFeesReferenceNumber("Test")
-                                                   .build())
-                                 .build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .hwfFullRemissionGrantedForClaimIssue(YES)
-                                              .build())
-                .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-                .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
-                .caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            ChangeOfRepresentation changeOfRepresentation = new ChangeOfRepresentation();
+            changeOfRepresentation.setCaseRole("RESPONDENTSOLICITORONE");
+            changeOfRepresentation.setTimestamp(LocalDateTime.now());
+            changeOfRepresentation.setOrganisationToAddID("HA160");
+            caseData.setChangeOfRepresentation(changeOfRepresentation);
+            HelpWithFees helpWithFees = new HelpWithFees();
+            helpWithFees.setHelpWithFeesReferenceNumber("Test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setHelpWithFees(helpWithFees);
+            caseData.setCaseDataLiP(caseDataLiP);
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForClaimIssue(YES);
+            caseData.setFeePaymentOutcomeDetails(feePaymentOutcomeDetails);
+            caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now().plusDays(2));
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
 
             // When
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
@@ -5336,21 +4984,23 @@ class SimpleStateFlowEngineTest {
                 .atStateClaimIssued1v1UnrepresentedDefendantSpec()
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
-                .build().toBuilder()
-                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .caseDataLiP(CaseDataLiP.builder()
-                    .helpWithFees(HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("Test")
-                        .build())
-                    .build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                    .hwfFullRemissionGrantedForClaimIssue(YES)
-                    .build())
-                .ccdState(CaseState.CASE_PROGRESSION)
-                .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
-                .caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            HelpWithFees helpWithFees = new HelpWithFees();
+            helpWithFees.setHelpWithFeesReferenceNumber("Test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setHelpWithFees(helpWithFees);
+            caseData.setCaseDataLiP(caseDataLiP);
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForClaimIssue(YES);
+            caseData.setFeePaymentOutcomeDetails(feePaymentOutcomeDetails);
+            caseData.setCcdState(CaseState.CASE_PROGRESSION);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now().plusDays(2));
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -5384,21 +5034,23 @@ class SimpleStateFlowEngineTest {
                 .atStateClaimIssued1v1UnrepresentedDefendant()
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
-                .build().toBuilder()
-                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .caseDataLiP(CaseDataLiP.builder()
-                    .helpWithFees(HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("Test")
-                        .build())
-                    .build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                    .hwfFullRemissionGrantedForClaimIssue(YES)
-                    .build())
-                .ccdState(CaseState.CASE_ISSUED)
-                .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
-                .caseAccessCategory(UNSPEC_CLAIM).build();
+                .build();
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            HelpWithFees helpWithFees = new HelpWithFees();
+            helpWithFees.setHelpWithFeesReferenceNumber("Test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setHelpWithFees(helpWithFees);
+            caseData.setCaseDataLiP(caseDataLiP);
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForClaimIssue(YES);
+            caseData.setFeePaymentOutcomeDetails(feePaymentOutcomeDetails);
+            caseData.setCcdState(CaseState.CASE_ISSUED);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now().plusDays(2));
+            caseData.setCaseAccessCategory(UNSPEC_CLAIM);
 
             // When
             StateFlowDTO stateFlowDTO = stateFlowEngine.getStateFlow(caseData);
@@ -5415,21 +5067,23 @@ class SimpleStateFlowEngineTest {
                 .atStateClaimIssued1v1UnrepresentedDefendantSpec()
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
-                .build().toBuilder()
-                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .helpWithFees(HelpWithFees.builder()
-                                                   .helpWithFeesReferenceNumber("Test")
-                                                   .build())
-                                 .build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .hwfFullRemissionGrantedForClaimIssue(YES)
-                                              .build())
-                .ccdState(CaseState.CASE_ISSUED)
-                .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
-                .caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            HelpWithFees helpWithFees = new HelpWithFees();
+            helpWithFees.setHelpWithFeesReferenceNumber("Test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setHelpWithFees(helpWithFees);
+            caseData.setCaseDataLiP(caseDataLiP);
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForClaimIssue(YES);
+            caseData.setFeePaymentOutcomeDetails(feePaymentOutcomeDetails);
+            caseData.setCcdState(CaseState.CASE_ISSUED);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now().plusDays(2));
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
 
             // When
             StateFlowDTO stateFlowDTO = stateFlowEngine.getStateFlow(caseData);
@@ -5446,20 +5100,22 @@ class SimpleStateFlowEngineTest {
                 .atStateClaimIssued1v1UnrepresentedDefendantSpec()
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
-                .build().toBuilder()
-                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .caseDataLiP(CaseDataLiP.builder()
-                    .helpWithFees(HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("Test")
-                        .build())
-                    .build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                    .hwfFullRemissionGrantedForClaimIssue(YES)
-                    .build())
-                .ccdState(CaseState.CASE_ISSUED)
-                .caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
+            caseData.setPaymentSuccessfulDate(null);
+            caseData.setClaimIssuedPaymentDetails(null);
+            HelpWithFees helpWithFees = new HelpWithFees();
+            helpWithFees.setHelpWithFeesReferenceNumber("Test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setHelpWithFees(helpWithFees);
+            caseData.setCaseDataLiP(caseDataLiP);
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForClaimIssue(YES);
+            caseData.setFeePaymentOutcomeDetails(feePaymentOutcomeDetails);
+            caseData.setCcdState(CaseState.CASE_ISSUED);
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
 
             // When
             StateFlowDTO stateFlowDTO = stateFlowEngine.getStateFlowSpec(caseData);

@@ -95,7 +95,7 @@ class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest exte
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
-            Party respondent1 = PartyBuilder.builder().soleTrader()
+            Party respondent1 = new PartyBuilder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
 
@@ -126,7 +126,7 @@ class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest exte
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
-            Party respondent1 = PartyBuilder.builder()
+            Party respondent1 = new PartyBuilder()
                 .soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -137,8 +137,8 @@ class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest exte
                 .respondent1OrgRegistered(null)
                 .respondent1Represented(null)
                 .specRespondent1Represented(YesOrNo.NO)
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
-                    "BOTH").build()).build())
+                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(
+                    "BOTH")))
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder()

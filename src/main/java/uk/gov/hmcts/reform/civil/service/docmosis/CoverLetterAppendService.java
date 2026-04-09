@@ -99,9 +99,7 @@ public class CoverLetterAppendService {
     }
 
     private CoverLetter getTemplateData(Party recipient) {
-        return CoverLetter
-            .builder()
-            .party(recipient)
-            .build();
+        return new CoverLetter()
+            .setParty(recipient);
     }
 }

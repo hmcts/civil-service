@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,11 +40,11 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
     private ResetPinDefendantLipEmailDTOGenerator emailDTOGenerator;
 
     private final DefendantPinToPostLRspec pin =
-        DefendantPinToPostLRspec.builder()
-            .expiryDate(LocalDate.now())
-            .citizenCaseRole("citizen")
-            .respondentCaseRole("citizen")
-            .accessCode("TEST1234").build();
+        new DefendantPinToPostLRspec()
+            .setExpiryDate(LocalDate.now())
+            .setCitizenCaseRole("citizen")
+            .setRespondentCaseRole("citizen")
+            .setAccessCode("TEST1234");
 
     @BeforeEach
     void setUp() {
@@ -54,7 +55,7 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
     @Test
     void shouldNotify_whenRespondentIsLiPAndHasEmail() {
         CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().partyEmail("respondent@example.com").build()).respondent1Represented(YesOrNo.NO)
+            .respondent1(new Party().setPartyEmail("respondent@example.com")).respondent1Represented(YesOrNo.NO)
             .respondent1PinToPostLRspec(pin)
             .build();
 
@@ -66,7 +67,7 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
     @Test
     void shouldNotNotify_whenRespondentIsNotLiP() {
         CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().partyEmail("respondent@example.com").build())
+            .respondent1(new Party().setPartyEmail("respondent@example.com"))
             .respondent1PinToPostLRspec(pin)
             .build();
 
@@ -79,8 +80,8 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
     void shouldAddPropertiesCorrectly() {
 
         CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Party.Type.ORGANISATION).organisationName("Mr. Sole Trader").build())
-            .applicant1(Party.builder().type(Party.Type.ORGANISATION).organisationName("Claimant Name").build())
+            .respondent1(new Party().setType(Party.Type.ORGANISATION).setOrganisationName("Mr. Sole Trader"))
+            .applicant1(new Party().setType(Party.Type.ORGANISATION).setOrganisationName("Claimant Name"))
             .issueDate(LocalDate.of(2023, 1, 1))
             .legacyCaseReference(LEGACY_CASE_REFERENCE)
             .ccdCaseReference(1234567890123456L)
@@ -93,7 +94,8 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
         when(pipInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
         when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
 
-        Map<String, String> properties = emailDTOGenerator.addProperties(caseData);
+        Map<String, String> initialProps = new HashMap<>();
+        Map<String, String> properties = emailDTOGenerator.addCustomProperties(initialProps, caseData);
 
         assertThat(properties).containsEntry(RESPONDENT_NAME, "Mr. Sole Trader");
         assertThat(properties).containsEntry(CLAIMANT_NAME, "Claimant Name");
@@ -111,7 +113,7 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailAddress() {
         CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Party.Type.ORGANISATION).partyEmail("respondent@example.com").build())
+            .respondent1(new Party().setType(Party.Type.ORGANISATION).setPartyEmail("respondent@example.com"))
             .build();
 
         String emailAddress = emailDTOGenerator.getEmailAddress(caseData);
@@ -129,4 +131,3 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
         assertThat(templateId).isEqualTo("template-id");
     }
 }
-

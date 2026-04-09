@@ -1,35 +1,55 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class Party {
 
-    private final String type;
-    private final String name;
-    private final String phoneNumber;
-    private final String emailAddress;
-    private final Address primaryAddress;
-    private final Representative representative;
-    private final String litigationFriendName;
-    private final String litigationFriendFirstName;
-    private final String litigationFriendLastName;
-    private final String soleTraderTradingAs;
-    private final String litigationFriendPhoneNumber;
-    private final String litigationFriendEmailAddress;
-    private final String legalRepHeading;
+    private String type;
+    private String name;
+    private String phoneNumber;
+    private String emailAddress;
+    private Address primaryAddress;
+    private Representative representative;
+    private String litigationFriendName;
+    private String litigationFriendFirstName;
+    private String litigationFriendLastName;
+    private String soleTraderTradingAs;
+    private String litigationFriendPhoneNumber;
+    private String litigationFriendEmailAddress;
+    private String legalRepHeading;
 
     public static Party toLipParty(uk.gov.hmcts.reform.civil.model.Party party) {
-        return Party.builder()
-            .name(party.getPartyName())
-            .emailAddress(party.getPartyEmail())
-            .type(party.getType().getDisplayValue())
-            .phoneNumber(party.getPartyPhone())
-            .primaryAddress(party.getPrimaryAddress())
-            .build();
+        return new Party()
+            .setName(party.getPartyName())
+            .setEmailAddress(party.getPartyEmail())
+            .setType(party.getType().getDisplayValue())
+            .setPhoneNumber(party.getPartyPhone())
+            .setPrimaryAddress(party.getPrimaryAddress());
+    }
+
+    public Party copy() {
+        return new Party()
+            .setType(this.type)
+            .setName(this.name)
+            .setPhoneNumber(this.phoneNumber)
+            .setEmailAddress(this.emailAddress)
+            .setPrimaryAddress(this.primaryAddress)
+            .setRepresentative(this.representative)
+            .setLitigationFriendName(this.litigationFriendName)
+            .setLitigationFriendFirstName(this.litigationFriendFirstName)
+            .setLitigationFriendLastName(this.litigationFriendLastName)
+            .setSoleTraderTradingAs(this.soleTraderTradingAs)
+            .setLitigationFriendPhoneNumber(this.litigationFriendPhoneNumber)
+            .setLitigationFriendEmailAddress(this.litigationFriendEmailAddress)
+            .setLegalRepHeading(this.legalRepHeading);
     }
 }

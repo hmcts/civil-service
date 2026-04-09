@@ -84,12 +84,14 @@ public class AssignCaseToLipUserHandlerTest extends BaseCallbackHandlerTest {
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .claimantUserDetails(IdamUserDetails.builder()
-                                         .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                                         .email("test@gmail.com")
-                                         .build())
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .build();
+            IdamUserDetails claimantUserDetails = new IdamUserDetails();
+            claimantUserDetails.setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9");
+            claimantUserDetails.setEmail("test@gmail.com");
+            caseData.setClaimantUserDetails(claimantUserDetails);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setStatus(BusinessProcessStatus.READY);
+            caseData.setBusinessProcess(businessProcess);
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });

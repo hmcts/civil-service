@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -82,6 +84,8 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
     @Mock
     private WorkingDayIndicator workingDayIndicator;
+    @Spy
+    private SdoCaseClassificationService sdoCaseClassificationService = new SdoCaseClassificationService();
 
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderDefendant";
     private static final List<MediationDocumentsType> MEDIATION_NON_ATTENDANCE_OPTION = List.of(NON_ATTENDANCE_STATEMENT);
@@ -113,12 +117,11 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldRecordScenario_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .finalOrderDocumentCollection(List.of(ElementUtils.element(CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl(
-                    "url").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setFinalOrderDocumentCollection(List.of(ElementUtils.element(
+                new CaseDocument().setDocumentLink(new Document().setDocumentBinaryUrl("url")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setDecisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "url");
@@ -136,17 +139,17 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.OrderMade.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordScenarioInSdoDj_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -163,17 +166,17 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.OrderMade.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordScenarioInSDO_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -190,26 +193,24 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.OrderMade.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordScenarioInSDO_whenInvokedMediationUnsuccessfulCarmWithoutUploadDocuments() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack(FAST_CLAIM.name())
-                .totalClaimAmount(BigDecimal.valueOf(999))
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
-                                   NOT_CONTACTABLE_CLAIMANT_ONE,
-                                   NOT_CONTACTABLE_DEFENDANT_ONE
-                               ))
-                               .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack(FAST_CLAIM.name());
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(999));
+            caseData.setMediation(new Mediation()
+                .setMediationUnsuccessfulReasonsMultiSelect(List.of(
+                    NOT_CONTACTABLE_CLAIMANT_ONE,
+                    NOT_CONTACTABLE_DEFENDANT_ONE
+                )));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -226,7 +227,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.MediationUnsuccessfulWithoutUploadDocuments.TrackChange.CARM.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -234,20 +235,18 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         void shouldRecordScenarioInSDO_whenInvokedMediationUnsuccessfulCarmWithUploadDocuments() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .uploadMediationByDocumentTypes(MEDIATION_NON_ATTENDANCE_OPTION)
-                .build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack(FAST_CLAIM.name())
-                .totalClaimAmount(BigDecimal.valueOf(999))
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
-                                   NOT_CONTACTABLE_CLAIMANT_ONE,
-                                   NOT_CONTACTABLE_DEFENDANT_ONE
-                               ))
-                               .build())
                 .build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack(FAST_CLAIM.name());
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(999));
+            caseData.setMediation(new Mediation()
+                .setMediationUnsuccessfulReasonsMultiSelect(List.of(
+                    NOT_CONTACTABLE_CLAIMANT_ONE,
+                    NOT_CONTACTABLE_DEFENDANT_ONE
+                )));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -264,26 +263,24 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldNotRecordScenarioInDJSdo_whenInvokedMediationUnsuccessfulCarmWithoutUploadDocuments() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack(FAST_CLAIM.name())
-                .totalClaimAmount(BigDecimal.valueOf(999))
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
-                                   NOT_CONTACTABLE_CLAIMANT_ONE,
-                                   NOT_CONTACTABLE_DEFENDANT_ONE
-                               ))
-                               .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack(FAST_CLAIM.name());
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(999));
+            caseData.setMediation(new Mediation()
+                .setMediationUnsuccessfulReasonsMultiSelect(List.of(
+                    NOT_CONTACTABLE_CLAIMANT_ONE,
+                    NOT_CONTACTABLE_DEFENDANT_ONE
+                )));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -300,7 +297,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.MediationUnsuccessfulWithoutUploadDocuments.TrackChange.CARM.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -308,20 +305,18 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         void shouldNotRecordScenarioInDJSdo_whenInvokedMediationUnsuccessfulCarmWithUploadDocuments() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .uploadMediationByDocumentTypes(MEDIATION_NON_ATTENDANCE_OPTION)
-                .build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack(FAST_CLAIM.name())
-                .totalClaimAmount(BigDecimal.valueOf(999))
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
-                                   NOT_CONTACTABLE_CLAIMANT_ONE,
-                                   NOT_CONTACTABLE_DEFENDANT_ONE
-                               ))
-                               .build())
                 .build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack(FAST_CLAIM.name());
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(999));
+            caseData.setMediation(new Mediation()
+                .setMediationUnsuccessfulReasonsMultiSelect(List.of(
+                    NOT_CONTACTABLE_CLAIMANT_ONE,
+                    NOT_CONTACTABLE_DEFENDANT_ONE
+                )));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -339,26 +334,24 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldNotRecordScenarioInSDO_whenInvokedMediationUnsuccessfulCarmFastClaim() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack(FAST_CLAIM.name())
-                .totalClaimAmount(BigDecimal.valueOf(11111111))
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
-                                   NOT_CONTACTABLE_CLAIMANT_ONE,
-                                   NOT_CONTACTABLE_DEFENDANT_ONE
-                               ))
-                               .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack(FAST_CLAIM.name());
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(11111111));
+            caseData.setMediation(new Mediation()
+                .setMediationUnsuccessfulReasonsMultiSelect(List.of(
+                    NOT_CONTACTABLE_CLAIMANT_ONE,
+                    NOT_CONTACTABLE_DEFENDANT_ONE
+                )));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -375,17 +368,17 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordScenarioInSDOPreCPRelease_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -401,7 +394,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -409,12 +402,11 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         void shouldRecordScenarioInSdoLegalAdviser_whenInvoked() {
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -433,7 +425,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.OrderMade.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -445,11 +437,10 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .responseClaimTrack("SMALL_CLAIM")
-                .totalClaimAmount(BigDecimal.valueOf(500))
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setResponseClaimTrack("SMALL_CLAIM");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(500));
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name()).build()
@@ -460,7 +451,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 eq("BEARER_TOKEN"),
                 secondParamCaptor.capture(),
                 eq(caseData.getCcdCaseReference().toString()),
-                eq(ScenarioRequestParams.builder().params(scenarioParams).build())
+                eq(new ScenarioRequestParams(scenarioParams))
             );
             String capturedSecondParam = secondParamCaptor.getValue();
             Assertions.assertNotEquals("Scenario.AAA6.CP.SDOMadebyLA.Defendant", capturedSecondParam);
@@ -477,12 +468,11 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
-                .responseClaimTrack("SMALL_CLAIM")
-                .totalClaimAmount(totalClaimAmount)
-                .respondent1Represented(YesOrNo.NO)
-                .decisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+            caseData.setResponseClaimTrack("SMALL_CLAIM");
+            caseData.setTotalClaimAmount(totalClaimAmount);
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setDecisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name())
@@ -493,7 +483,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 eq("BEARER_TOKEN"),
                 secondParamCaptor.capture(),
                 eq(caseData.getCcdCaseReference().toString()),
-                eq(ScenarioRequestParams.builder().params(scenarioParams).build())
+                eq(new ScenarioRequestParams(scenarioParams))
             );
             String capturedSecondParam = secondParamCaptor.getValue();
             if (expectedScenario.startsWith("not ")) {
@@ -515,12 +505,11 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldRecordScenarioDefendantFinalOrder_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(toggleService.isLocationWhiteListed(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
@@ -534,47 +523,19 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-        }
-
-        @Test
-        void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvokedNotInEa() {
-            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .build();
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
-            when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
-            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
-                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
-
-            handler.handle(params);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
-            // Then
-            verifyDeleteNotificationsAndTaskListUpdatesNotInEa(caseData);
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant",
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(toggleService.isLocationWhiteListed(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
@@ -588,18 +549,45 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvokedForNro() {
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(toggleService.isCuiGaNroEnabled()).thenReturn(true);
+            when(toggleService.isLocationWhiteListed(any())).thenReturn(false);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
+                        .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build())
+                .build();
+
+            handler.handle(params);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant",
+                caseData.getCcdCaseReference().toString(),
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordScenarioDefendantFinalOrderFastTrackTrialReady_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .trialReadyRespondent1(YesOrNo.YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+            caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
@@ -614,7 +602,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 "BEARER_TOKEN",
                 "Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

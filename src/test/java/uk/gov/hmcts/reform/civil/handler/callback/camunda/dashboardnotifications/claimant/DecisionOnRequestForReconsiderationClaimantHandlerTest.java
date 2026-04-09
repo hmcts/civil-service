@@ -66,7 +66,6 @@ class DecisionOnRequestForReconsiderationClaimantHandlerTest {
     @Test
     void shouldCreateDashboardNotifications_whenDashboardIsEnabled() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTrialReadyCheckLiP(false)
@@ -82,14 +81,13 @@ class DecisionOnRequestForReconsiderationClaimantHandlerTest {
             "BEARER_TOKEN",
             SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
     @Test
     void shouldNotCreateDashboardNotifications_whenApplicantRepresented() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTrialReadyCheckLiP(false)

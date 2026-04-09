@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Fetch tokens once if not already set, so ccd-add-role.sh reuses them
+if [ -z "${USER_TOKEN:-}" ] || [ -z "${SERVICE_TOKEN:-}" ]; then
+  . ./bin/utils/idam-get-tokens.sh
+fi
+
 # User used during the CCD import and ccd-role creation
 ./bin/utils/ccd-add-role.sh "caseworker-civil"
 ./bin/utils/ccd-add-role.sh "caseworker-caa"
@@ -14,7 +19,7 @@
 ./bin/utils/ccd-add-role.sh "RES-SOL-ONE-SPEC-PROFILE"
 ./bin/utils/ccd-add-role.sh "RES-SOL-TWO-UNSPEC-PROFILE"
 ./bin/utils/ccd-add-role.sh "RES-SOL-TWO-SPEC-PROFILE"
-./bin/utils/ccd-add-role.sh "basic-access" #remove after GS_profile is added
+./bin/utils/ccd-add-role.sh "ga-basic-access"
 ./bin/utils/ccd-add-role.sh "GS_profile"
 ./bin/utils/ccd-add-role.sh "legal-adviser"
 ./bin/utils/ccd-add-role.sh "caseworker-ras-validation"
@@ -35,6 +40,7 @@
 ./bin/utils/ccd-add-role.sh "citizen"
 ./bin/utils/ccd-add-role.sh "caseworker-civil-citizen-ui-pcqextractor"
 ./bin/utils/ccd-add-role.sh "judge"
+./bin/utils/ccd-add-role.sh "caseworker-civil-judge"
 ./bin/utils/ccd-add-role.sh "hearing-centre-admin"
 ./bin/utils/ccd-add-role.sh "national-business-centre"
 ./bin/utils/ccd-add-role.sh "hearing-centre-team-leader"

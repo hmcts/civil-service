@@ -84,12 +84,11 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .applicant1ProceedWithClaim(NO)
             .caseDataLiP(
-                CaseDataLiP.builder()
-                    .respondent1LiPResponse(
-                        RespondentLiPResponse.builder()
-                            .respondent1ResponseLanguage(BOTH.toString())
-                            .build()
-                    ).build())
+                new CaseDataLiP()
+                    .setRespondent1LiPResponse(
+                        new RespondentLiPResponse()
+                            .setRespondent1ResponseLanguage(BOTH.toString())
+                    ))
             .build();
         String expectedTemplateId = "template-id";
 
@@ -152,7 +151,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectCustomPropertiesWhenLipVLipEnabledAndClaimantDontWantToProceedWithFulLDefenceFD() {
-        Party party = Party.builder().build();
+        Party party = new Party();
         String legacyCaseNumber = "legacyCaseNumber";
         CaseData caseData = CaseData.builder()
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
@@ -179,7 +178,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectCustomPropertiesWhenCaseIsPartAdmitPayImmediatelyAccepted() {
-        Party party = Party.builder().build();
+        Party party = new Party();
         String legacyCaseNumber = "legacyCaseNumber";
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
@@ -205,7 +204,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectCustomPropertiesWhenIsNotPartAdmitPayImmediatelyAcceptedAndNotClaimantDontWantToProceedWithFulLDefenceFD() {
-        Party party = Party.builder().build();
+        Party party = new Party();
         CaseData caseData = CaseData.builder().respondent1(party).build();
 
         String partyName = "partyName";
@@ -223,7 +222,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectCustomPropertiesWhenIsNotPartAdmitPayImmediatelyAcceptedAndLipVLipDisabled() {
-        Party party = Party.builder().build();
+        Party party = new Party();
         CaseData caseData = CaseData.builder()
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .applicant1ProceedWithClaim(NO)

@@ -39,10 +39,10 @@ public class DefendantSignSettlementAgreementCallbackHandlerTest extends BaseCal
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondentSignSettlementAgreement(YesOrNo.NO);
             CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondentSignSettlementAgreement(YesOrNo.NO)
-                                 .build())
+                .caseDataLip(caseDataLiP)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -57,10 +57,10 @@ public class DefendantSignSettlementAgreementCallbackHandlerTest extends BaseCal
 
         @Test
         void shouldUpdateBusinessProcess() {
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondentSignSettlementAgreement(YesOrNo.NO);
             CaseData caseData = CaseDataBuilder.builder()
-                    .caseDataLip(CaseDataLiP.builder()
-                            .respondentSignSettlementAgreement(YesOrNo.NO)
-                            .build())
+                    .caseDataLip(caseDataLiP)
                     .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

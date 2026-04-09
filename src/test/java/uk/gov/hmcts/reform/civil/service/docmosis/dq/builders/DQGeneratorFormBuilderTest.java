@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq.builders;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,10 +24,10 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -89,17 +90,17 @@ class DQGeneratorFormBuilderTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondent2DQWithFixedRecoverableCosts()
             .build().toBuilder()
-            .respondent2(PartyBuilder.builder()
+            .respondent2(new PartyBuilder()
                              .individual()
                              .legalRepHeading()
                              .build())
             .build();
 
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder result =
-            dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(caseData, DEFENDANT);
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
 
         assertNotNull(result);
-        assertThat(result.build().getStatementOfTruthText()).startsWith("The defendant believes");
+        assertThat(result.getStatementOfTruthText()).startsWith("The defendant believes");
     }
 
     @Test
@@ -114,11 +115,11 @@ class DQGeneratorFormBuilderTest {
             .build().toBuilder()
             .build();
 
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder result =
-            dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(caseData, DEFENDANT);
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
 
         assertNotNull(result);
-        assertThat(result.build().getStatementOfTruthText()).startsWith("The defendant believes");
+        assertThat(result.getStatementOfTruthText()).startsWith("The defendant believes");
     }
 
     @Test
@@ -131,7 +132,7 @@ class DQGeneratorFormBuilderTest {
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .legacyCaseReference("reference")
             .build().toBuilder()
-            .respondent2(PartyBuilder.builder()
+            .respondent2(new PartyBuilder()
                              .individual()
                              .legalRepHeading()
                              .build())
@@ -139,12 +140,12 @@ class DQGeneratorFormBuilderTest {
 
         when(state.getName()).thenReturn(FULL_ADMISSION.fullName());
 
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder result =
-            dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(caseData, DEFENDANT);
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
 
         assertNotNull(result);
-        assertEquals("reference", result.build().getReferenceNumber());
-        assertNull(result.build().getWitnessesIncludingDefendants());
+        assertEquals("reference", result.getReferenceNumber());
+        assertNull(result.getWitnessesIncludingDefendants());
 
     }
 
@@ -156,17 +157,17 @@ class DQGeneratorFormBuilderTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondent2DQWithFixedRecoverableCosts()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .respondent2(PartyBuilder.builder()
+            .respondent2(new PartyBuilder()
                              .individual()
                              .legalRepHeading()
                              .build())
             .build();
 
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder result =
-            dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(caseData, DEFENDANT);
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
 
         assertNotNull(result);
-        assertEquals(2, result.build().getWitnessesIncludingDefendants());
+        assertEquals(2, result.getWitnessesIncludingDefendants());
     }
 
     @Test
@@ -177,17 +178,17 @@ class DQGeneratorFormBuilderTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondent2DQWithFixedRecoverableCosts()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .respondent2(PartyBuilder.builder()
+            .respondent2(new PartyBuilder()
                              .individual()
                              .legalRepHeading()
                              .build())
             .build();
 
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder result =
-            dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(caseData, DEFENDANT);
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
 
         assertNotNull(result);
-        assertEquals(2, result.build().getWitnessesIncludingDefendants());
+        assertEquals(2, result.getWitnessesIncludingDefendants());
 
     }
 
@@ -222,12 +223,31 @@ class DQGeneratorFormBuilderTest {
                 .claimantBilingualLanguagePreference("BOTH").build().toBuilder().ccdState(
                     CaseState.CASE_DISMISSED).build();
 
-        Exception exception = assertThrows(IllegalStateException.class, () -> {
-            dqGeneratorFormBuilder.isRespondentState(caseData);
-        });
+        Exception exception = assertThrows(
+            IllegalStateException.class, () -> {
+                dqGeneratorFormBuilder.isRespondentState(caseData);
+            }
+        );
 
         String actualMessage = exception.getMessage();
+        Assertions.assertTrue(actualMessage.contains(ERROR_FLOW_STATE_PAST_DEADLINE));
+    }
 
-        assertTrue(actualMessage.contains(ERROR_FLOW_STATE_PAST_DEADLINE));
+    @Test
+    void shouldNotSetStatementOfTruthTextWhenSpecClaim() {
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .respondent1DQ()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .build();
+
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        assertNotNull(result);
+        assertNull(result.getStatementOfTruthText());
     }
 }

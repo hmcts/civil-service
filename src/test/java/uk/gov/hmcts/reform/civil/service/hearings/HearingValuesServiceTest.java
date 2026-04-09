@@ -29,11 +29,10 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
-import uk.gov.hmcts.reform.civil.exceptions.IncludesLitigantInPersonException;
 import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -127,28 +126,34 @@ public class HearingValuesServiceTest {
     void prepare() {
         ReflectionTestUtils.setField(hearingValuesService, "mapper", mapper);
         when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
-        when(featuretoggleService.isHmcForLipEnabled()).thenReturn(false);
     }
 
     @Test
     void shouldReturnExpectedHearingValuesWhenCaseDataIsReturned() throws Exception {
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
+        applicant1WelshLang.setCourt(Language.ENGLISH);
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQLanguage(applicant1WelshLang);
+        WelshLanguageRequirements respondent1WelshLang = new WelshLanguageRequirements();
+        respondent1WelshLang.setCourt(Language.WELSH);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
+
+        Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
+            .caseReference(caseId)
             .caseAccessCategory(UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                        .region(WELSH_REGION_ID).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                        .setRegion(WELSH_REGION_ID))
             .applicant1DQ(applicant1DQ)
             .respondent1DQ(respondent1DQ)
             .build();
-        caseData = caseData.toBuilder()
-            .applicant1(caseData.getApplicant1().toBuilder()
-                            .flags(Flags.builder().partyName("party name").build())
-                            .build()).build();
-        Long caseId = 1L;
+        Flags flags = new Flags();
+        flags.setPartyName("party name");
+        Party applicant1 = caseData.getApplicant1();
+        applicant1.setFlags(flags);
+        caseData.setApplicant1(applicant1);
         CaseDetails caseDetails = CaseDetails.builder()
             .data(caseData.toMap(mapper))
             .id(caseId).build();
@@ -156,91 +161,95 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
-        Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
-        Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
-        CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+        Category inPerson = hearingChannel("INTER", "In Person");
+        Category video = hearingChannel("VID", "Video");
+        Category telephone = hearingChannel("TEL", "Telephone");
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(inPerson, video, telephone));
 
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
             Optional.of(categorySearchResult));
 
+        HearingLocationModel expectedLocation = new HearingLocationModel();
+        expectedLocation.setLocationId(BASE_LOCATION_ID);
+        expectedLocation.setLocationType(COURT);
+        List<HearingLocationModel> expectedHearingLocation = List.of(expectedLocation);
+
+        JudiciaryModel expectedJudiciary = new JudiciaryModel();
+
         List<CaseCategoryModel> expectedCaseCategories = getExpectedCaseCategories();
-
-        List<HearingLocationModel> expectedHearingLocation = List.of(HearingLocationModel.builder()
-                                                       .locationId(BASE_LOCATION_ID)
-                                                       .locationType(COURT)
-                                                       .build());
-
-        JudiciaryModel expectedJudiciary = JudiciaryModel.builder().build();
-
-        ServiceHearingValuesModel expected = ServiceHearingValuesModel.builder()
-            .hmctsServiceID("AAA7")
-            .hmctsInternalCaseName("Mr. John Rambo v Mr. Sole Trader")
-            .publicCaseName("John Rambo v Sole Trader")
-            .caseAdditionalSecurityFlag(false)
-            .caseCategories(expectedCaseCategories)
-            .caseDeepLink("http://localhost:3333/cases/case-details/1")
-            .caseRestrictedFlag(false)
-            .externalCaseReference(null)
-            .caseManagementLocationCode(BASE_LOCATION_ID)
-            .caseSLAStartDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-            .autoListFlag(false)
-            .hearingType(null)
-            .hearingWindow(null)
-            .duration(0)
-            .hearingPriorityType("Standard")
-            .numberOfPhysicalAttendees(0)
-            .hearingInWelshFlag(true)
-            .hearingLocations(expectedHearingLocation)
-            .facilitiesRequired(null)
-            .listingComments(null)
-            .hearingRequester("")
-            .privateHearingRequiredFlag(false)
-            .caseInterpreterRequiredFlag(false)
-            .panelRequirements(null)
-            .leadJudgeContractType("")
-            .judiciary(expectedJudiciary)
-            .hearingIsLinkedFlag(false)
-            .parties(getExpectedPartyModel())
-            .screenFlow(getScreenFlow())
-            .vocabulary(List.of(VocabularyModel.builder().build()))
-            .hearingChannels(null)
-            .caseFlags(getCaseFlags(caseData))
-            .build();
+        VocabularyModel vocabularyModel = new VocabularyModel();
+        ServiceHearingValuesModel expected = new ServiceHearingValuesModel();
+        expected.setHmctsServiceID("AAA7");
+        expected.setHmctsInternalCaseName("Mr. John Rambo v Mr. Sole Trader");
+        expected.setPublicCaseName("John Rambo v Sole Trader");
+        expected.setCaseAdditionalSecurityFlag(false);
+        expected.setCaseCategories(expectedCaseCategories);
+        expected.setCaseDeepLink("http://localhost:3333/cases/case-details/1");
+        expected.setCaseRestrictedFlag(false);
+        expected.setExternalCaseReference(null);
+        expected.setCaseManagementLocationCode(BASE_LOCATION_ID);
+        expected.setCaseSLAStartDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        expected.setAutoListFlag(false);
+        expected.setHearingType(null);
+        expected.setHearingWindow(null);
+        expected.setDuration(0);
+        expected.setHearingPriorityType("Standard");
+        expected.setNumberOfPhysicalAttendees(0);
+        expected.setHearingInWelshFlag(true);
+        expected.setHearingLocations(expectedHearingLocation);
+        expected.setFacilitiesRequired(null);
+        expected.setListingComments(null);
+        expected.setHearingRequester("");
+        expected.setPrivateHearingRequiredFlag(false);
+        expected.setCaseInterpreterRequiredFlag(false);
+        expected.setPanelRequirements(null);
+        expected.setLeadJudgeContractType("");
+        expected.setJudiciary(expectedJudiciary);
+        expected.setHearingIsLinkedFlag(false);
+        expected.setParties(getExpectedPartyModel());
+        expected.setScreenFlow(getScreenFlow());
+        expected.setVocabulary(List.of(vocabularyModel));
+        expected.setHearingChannels(null);
+        expected.setCaseFlags(getCaseFlags(caseData));
 
         ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "auth");
+        ServiceHearingValuesModel actualFromCaseData = hearingValuesService.getValues(caseData, "auth");
 
         verify(caseDetailsConverter).toCaseData(eq(caseDetails.getData()));
         verify(caseDataService, times(0)).triggerEvent(any(), any(), any());
         assertThat(actual).isEqualTo(expected);
+        assertThat(actualFromCaseData).isEqualTo(expected);
     }
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventAndThrowMissingFieldsUpdatedExceptionIfPartyIdMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventIfPartyIdMissingFromApplicant1() throws Exception {
         Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseReference(caseId)
-            .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                            .flags(Flags.builder().partyName("party name").build()).build())
-            .respondent1(PartyBuilder.builder().company().build())
-            .respondent2(PartyBuilder.builder().company().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().company().build())
+            .respondent2(new PartyBuilder().company().build())
             .multiPartyClaimTwoDefendantSolicitors()
             .caseAccessCategory(UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                        .region(WELSH_REGION_ID).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                        .setRegion(WELSH_REGION_ID))
             .build();
+        Flags flags = new Flags();
+        flags.setPartyName("party name");
+        caseData.getApplicant1().setFlags(flags);
         CaseDetails caseDetails = CaseDetails.builder()
             .data(caseData.toMap(mapper))
             .id(caseId).build();
@@ -248,36 +257,34 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        assertThrows(MissingFieldsUpdatedException.class, () -> {
-            hearingValuesService.getValues(caseId, "auth");
-        });
+        hearingValuesService.getValues(caseId, "auth");
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
     }
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventAndThrowMissingFieldsUpdatedExceptionIfCaseFlagsMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventIfCaseFlagsMissingFromApplicant1() throws Exception {
         Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseReference(caseId)
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().company().build())
-            .respondent2(PartyBuilder.builder().company().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().company().build())
+            .respondent2(new PartyBuilder().company().build())
             .caseAccessCategory(UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                        .region(WELSH_REGION_ID).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                        .setRegion(WELSH_REGION_ID))
             .build();
         CaseDetails caseDetails = CaseDetails.builder()
             .data(caseData.toMap(mapper))
@@ -286,44 +293,35 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        assertThrows(MissingFieldsUpdatedException.class, () -> {
-            hearingValuesService.getValues(caseId, "auth");
-        });
+        hearingValuesService.getValues(caseId, "auth");
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
     }
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventAndThrowMissingFieldsUpdatedExceptionIfUnavailableDatesMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventIfUnavailableDatesMissingFromApplicant1() throws Exception {
         Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseReference(caseId)
-            .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                            .partyID("party-id")
-                            .flags(Flags.builder().partyName("party name").build())
-                            .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
-                                                                       .unavailableDateType(SINGLE_DATE)
-                                                                       .date(LocalDate.of(2023, 10, 5))
-                                                                       .build())))
-                            .build())
-            .respondent1(PartyBuilder.builder().company().build())
-            .respondent2(PartyBuilder.builder().company().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().company().build())
+            .respondent2(new PartyBuilder().company().build())
             .multiPartyClaimTwoDefendantSolicitors()
             .caseAccessCategory(UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                        .region(WELSH_REGION_ID).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                        .setRegion(WELSH_REGION_ID))
             .build();
         CaseDetails caseDetails = CaseDetails.builder()
             .data(caseData.toMap(mapper))
@@ -332,54 +330,53 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        assertThrows(MissingFieldsUpdatedException.class, () -> {
-            hearingValuesService.getValues(caseId, "auth");
-        });
+        hearingValuesService.getValues(caseId, "auth");
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
     }
 
     @Test
     void shouldNotTriggerEventIfPartyIdCaseFlagsUnavailableDatesExistsForApplicant1() throws Exception {
+        WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
+        applicant1WelshLang.setCourt(Language.ENGLISH);
+        UnavailableDate unavailableDate1 = new UnavailableDate();
+        unavailableDate1.setUnavailableDateType(SINGLE_DATE);
+        unavailableDate1.setDate(LocalDate.of(2023, 10, 20));
+        Hearing applicant1Hearing = new Hearing();
+        applicant1Hearing.setUnavailableDates(wrapElements(List.of(unavailableDate1)));
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQLanguage(applicant1WelshLang);
+        applicant1DQ.setApplicant1DQHearing(applicant1Hearing);
+        WelshLanguageRequirements respondent1WelshLang = new WelshLanguageRequirements();
+        respondent1WelshLang.setCourt(Language.WELSH);
+        UnavailableDate unavailableDate2 = new UnavailableDate();
+        unavailableDate2.setUnavailableDateType(SINGLE_DATE);
+        unavailableDate2.setDate(LocalDate.of(2023, 10, 20));
+        Hearing respondent1Hearing = new Hearing();
+        respondent1Hearing.setUnavailableDates(wrapElements(List.of(unavailableDate2)));
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
+        respondent1DQ.setRespondent1DQHearing(respondent1Hearing);
+
         Long caseId = 1L;
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build())
-            .applicant1DQHearing(Hearing.builder()
-                                     .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
-                                                                                .unavailableDateType(SINGLE_DATE)
-                                                                                .date(LocalDate.of(2023, 10, 20))
-                                                                                .build()))).build())
-            .build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build())
-            .respondent1DQHearing(Hearing.builder()
-                                     .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
-                                                                                .unavailableDateType(SINGLE_DATE)
-                                                                                .date(LocalDate.of(2023, 10, 20))
-                                                                                .build()))).build())
-            .build();
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
-            .applicant1(PartyBuilder.builder().build()
-                            .toBuilder()
-                            .partyID("party-id")
-                            .build())
             .caseReference(caseId)
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().company().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().company().build())
             .caseAccessCategory(UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                        .region(WELSH_REGION_ID).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                        .setRegion(WELSH_REGION_ID))
             .applicant1DQ(applicant1DQ)
             .respondent1DQ(respondent1DQ)
             .build();
@@ -390,13 +387,13 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
@@ -407,18 +404,22 @@ public class HearingValuesServiceTest {
     @SneakyThrows
     @Test
     void shouldThrowFeinExceptionIfCaseDataServiceThrowsException() {
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
+        applicant1WelshLang.setCourt(Language.ENGLISH);
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQLanguage(applicant1WelshLang);
+        WelshLanguageRequirements respondent1WelshLang = new WelshLanguageRequirements();
+        respondent1WelshLang.setCourt(Language.WELSH);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().company().build())
-            .respondent2(PartyBuilder.builder().company().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().company().build())
+            .respondent2(new PartyBuilder().company().build())
             .caseAccessCategory(UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                        .region(WELSH_REGION_ID).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                        .setRegion(WELSH_REGION_ID))
             .applicant1DQ(applicant1DQ)
             .respondent1DQ(respondent1DQ)
             .build();
@@ -439,16 +440,14 @@ public class HearingValuesServiceTest {
 
     @NotNull
     private List<CaseCategoryModel> getExpectedCaseCategories() {
-        CaseCategoryModel caseType = CaseCategoryModel.builder()
-            .categoryParent("")
-            .categoryType(CategoryType.CASE_TYPE)
-            .categoryValue("AAA7-SMALL_CLAIM")
-            .build();
-        CaseCategoryModel caseSubtype = CaseCategoryModel.builder()
-            .categoryParent("AAA7-SMALL_CLAIM")
-            .categoryType(CategoryType.CASE_SUBTYPE)
-            .categoryValue("AAA7-SMALL_CLAIM")
-            .build();
+        CaseCategoryModel caseType = new CaseCategoryModel();
+        caseType.setCategoryParent("");
+        caseType.setCategoryType(CategoryType.CASE_TYPE);
+        caseType.setCategoryValue("AAA7-SMALL_CLAIM");
+        CaseCategoryModel caseSubtype = new CaseCategoryModel();
+        caseSubtype.setCategoryParent("AAA7-SMALL_CLAIM");
+        caseSubtype.setCategoryType(CategoryType.CASE_SUBTYPE);
+        caseSubtype.setCategoryValue("AAA7-SMALL_CLAIM");
 
         List<CaseCategoryModel> expectedCaseCategories = List.of(caseType, caseSubtype);
 
@@ -475,28 +474,35 @@ public class HearingValuesServiceTest {
 
     @Nested
     class EarlyAdopter {
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        Applicant1DQ applicant1DQ;
+        Respondent1DQ respondent1DQ;
 
         @BeforeEach
         void setup() {
+            WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
+            applicant1WelshLang.setCourt(Language.ENGLISH);
+            applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQLanguage(applicant1WelshLang);
+            WelshLanguageRequirements respondent1WelshLang = new WelshLanguageRequirements();
+            respondent1WelshLang.setCourt(Language.WELSH);
+            respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
             when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-                .thenReturn(Optional.of(Organisation.builder()
-                                            .name(APPLICANT_LR_ORG_NAME)
-                                            .build()));
+                .thenReturn(Optional.of(new Organisation()
+                                            .setName(APPLICANT_LR_ORG_NAME)
+                                            ));
             when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-                .thenReturn(Optional.of(Organisation.builder()
-                                            .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                            .build()));
+                .thenReturn(Optional.of(new Organisation()
+                                            .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                            ));
             given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
             given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-            Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
-            Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
-            Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+            Category inPerson = hearingChannel("INTER", "In Person");
+            Category video = hearingChannel("VID", "Video");
+            Category telephone = hearingChannel("TEL", "Telephone");
+            CategorySearchResult categorySearchResult = new CategorySearchResult();
+            categorySearchResult.setCategories(List.of(inPerson, video, telephone));
             when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
                 Optional.of(categorySearchResult));
         }
@@ -504,27 +510,27 @@ public class HearingValuesServiceTest {
         @SneakyThrows
         @Test
         void shouldThrowErrorIfLocationIsNotWhiteListed() {
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                            .region(WELSH_REGION_ID).build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                            .setRegion(WELSH_REGION_ID))
                 .applicant1Represented(YesOrNo.NO)
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-            when(featuretoggleService.isHmcForLipEnabled()).thenReturn(true);
             when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(false);
 
             assertThrows(NotEarlyAdopterCourtException.class, () -> {
@@ -534,26 +540,26 @@ public class HearingValuesServiceTest {
 
         @Test
         void shouldThrowNotThrowErrorIfLocationIsWhiteListed() {
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                            .region(WELSH_REGION_ID).build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                            .setRegion(WELSH_REGION_ID))
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-            when(featuretoggleService.isHmcForLipEnabled()).thenReturn(true);
             when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
 
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
@@ -561,54 +567,53 @@ public class HearingValuesServiceTest {
 
         @SneakyThrows
         @Test
-        void shouldThrowErrorIfApplicantLiPPresent() {
-            Long caseId = 1L;
+        void shouldNotThrowErrorIfLocationIsNotWhiteListedButWelshEnabled() {
+            when(featuretoggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                            .region(WELSH_REGION_ID).build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                            .setRegion(WELSH_REGION_ID))
                 .applicant1Represented(YesOrNo.NO)
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(false);
 
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
-            assertThrows(IncludesLitigantInPersonException.class, () -> {
-                hearingValuesService.getValues(caseId, "auth");
-            });
+            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
         @SneakyThrows
         @Test
-        void shouldNotThrowErrorIfApplicantLiPPresentAndHmcLipToggleOn() {
-
-            when(featuretoggleService.isHmcForLipEnabled()).thenReturn(true);
-            Long caseId = 1L;
+        void shouldNotThrowErrorIfApplicantLiPPresent() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                            .region(WELSH_REGION_ID).build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                            .setRegion(WELSH_REGION_ID))
                 .applicant1Represented(YesOrNo.NO)
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -617,58 +622,27 @@ public class HearingValuesServiceTest {
 
             when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
-        }
-
-        @SneakyThrows
-        @Test
-        void shouldThrowErrorIfRespondentLiPPresent() {
-            Long caseId = 1L;
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                            .region(WELSH_REGION_ID).build())
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
-                .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
-
-            CaseDetails caseDetails = CaseDetails.builder()
-                .data(caseData.toMap(mapper))
-                .id(caseId).build();
-            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
-            assertThrows(IncludesLitigantInPersonException.class, () -> {
-                hearingValuesService.getValues(caseId, "auth");
-            });
         }
 
         @SneakyThrows
         @Test
         void shouldNotThrowErrorIfRespondentLiPPresentAndHmcLipToggleOn() {
-
-            when(featuretoggleService.isHmcForLipEnabled()).thenReturn(true);
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                            .region(WELSH_REGION_ID).build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                            .setRegion(WELSH_REGION_ID))
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -681,53 +655,23 @@ public class HearingValuesServiceTest {
 
         @SneakyThrows
         @Test
-        void shouldThrowErrorIfRespondent2LiPPresent() {
-            Long caseId = 1L;
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                            .region(WELSH_REGION_ID).build())
-                .respondent2Represented(YesOrNo.NO)
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
-                .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
-
-            CaseDetails caseDetails = CaseDetails.builder()
-                .data(caseData.toMap(mapper))
-                .id(caseId).build();
-            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
-            assertThrows(IncludesLitigantInPersonException.class, () -> {
-                hearingValuesService.getValues(caseId, "auth");
-            });
-        }
-
-        @SneakyThrows
-        @Test
         void shouldNotThrowErrorIfRespondent2LiPPresentAndHmcLipEnabled() {
-            when(featuretoggleService.isHmcForLipEnabled()).thenReturn(true);
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                            .region(WELSH_REGION_ID).build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                            .setRegion(WELSH_REGION_ID))
                 .respondent2Represented(YesOrNo.NO)
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -741,20 +685,21 @@ public class HearingValuesServiceTest {
         @SneakyThrows
         @Test
         void shouldNotThrowErrorIfNoLiPPresent() {
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                            .region(WELSH_REGION_ID).build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                            .setRegion(WELSH_REGION_ID))
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -767,21 +712,22 @@ public class HearingValuesServiceTest {
 
         @Test
         void shouldThrowNotThrowErrorIfEaCourtIsYes() {
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                            .region(WELSH_REGION_ID).build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
+                                            .setRegion(WELSH_REGION_ID))
                 .eaCourtLocation(YesOrNo.YES)
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -830,51 +776,56 @@ public class HearingValuesServiceTest {
                                                                   String partyName, String partyRole,
                                                                   String email) {
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
-        IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
-            .firstName(firstName)
-            .lastName(lastName)
-            .interpreterLanguage(null)
-            .reasonableAdjustments(emptyList())
-            .vulnerableFlag(false)
-            .vulnerabilityDetails(null)
-            .hearingChannelEmail(hearingChannelEmail)
-            .hearingChannelPhone(List.of("0123456789"))
-            .relatedParties(emptyList())
-            .custodyStatus(null)
-            .build();
+        IndividualDetailsModel individualDetails = new IndividualDetailsModel();
+        individualDetails.setFirstName(firstName);
+        individualDetails.setLastName(lastName);
+        individualDetails.setInterpreterLanguage(null);
+        individualDetails.setReasonableAdjustments(emptyList());
+        individualDetails.setVulnerableFlag(false);
+        individualDetails.setVulnerabilityDetails(null);
+        individualDetails.setHearingChannelEmail(hearingChannelEmail);
+        individualDetails.setHearingChannelPhone(List.of("0123456789"));
+        individualDetails.setRelatedParties(emptyList());
+        individualDetails.setCustodyStatus(null);
 
-        return PartyDetailsModel.builder()
-            .partyID(partyId)
-            .partyType(IND)
-            .partyName(partyName)
-            .partyRole(partyRole)
-            .individualDetails(individualDetails)
-            .organisationDetails(null)
-            .unavailabilityDOW(null)
-            .unavailabilityRanges(null)
-            .hearingSubChannel(null)
-            .build();
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(partyId);
+        partyDetails.setPartyType(IND);
+        partyDetails.setPartyName(partyName);
+        partyDetails.setPartyRole(partyRole);
+        partyDetails.setIndividualDetails(individualDetails);
+        partyDetails.setOrganisationDetails(null);
+        partyDetails.setUnavailabilityDOW(null);
+        partyDetails.setUnavailabilityRanges(null);
+        partyDetails.setHearingSubChannel(null);
+        return partyDetails;
     }
 
     private PartyDetailsModel buildExpectedOrganisationPartyObject(String name,
                                                                    String cftOrganisationID) {
-        OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
-            .name(name)
-            .organisationType(ORG.getLabel())
-            .cftOrganisationID(cftOrganisationID)
-            .build();
+        OrganisationDetailsModel organisationDetails = new OrganisationDetailsModel();
+        organisationDetails.setName(name);
+        organisationDetails.setOrganisationType(ORG.getLabel());
+        organisationDetails.setCftOrganisationID(cftOrganisationID);
 
-        return PartyDetailsModel.builder()
-            .partyID(cftOrganisationID)
-            .partyType(ORG)
-            .partyName(name)
-            .partyRole("LGRP")
-            .individualDetails(null)
-            .organisationDetails(organisationDetails)
-            .unavailabilityDOW(null)
-            .unavailabilityRanges(null)
-            .hearingSubChannel(null)
-            .build();
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(cftOrganisationID);
+        partyDetails.setPartyType(ORG);
+        partyDetails.setPartyName(name);
+        partyDetails.setPartyRole("LGRP");
+        partyDetails.setIndividualDetails(null);
+        partyDetails.setOrganisationDetails(organisationDetails);
+        partyDetails.setUnavailabilityDOW(null);
+        partyDetails.setUnavailabilityRanges(null);
+        partyDetails.setHearingSubChannel(null);
+        return partyDetails;
+    }
+
+    private Category hearingChannel(String key, String valueEn) {
+        return new Category()
+            .setCategoryKey("HearingChannel")
+            .setKey(key)
+            .setValueEn(valueEn)
+            .setActiveFlag("Y");
     }
 }
-

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.time.LocalDate;
@@ -37,12 +39,15 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private final InterestCalculator interestCalculator = new InterestCalculator();
 
+    @Mock
+    Time time;
+
     @BeforeEach
     void setup() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper = new JudgmentPaidInFullOnlineMapper();
+        JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper = new JudgmentPaidInFullOnlineMapper(time);
         handler = new JudgmentPaidInFullCallbackHandler(objectMapper, paidInFullJudgmentOnlineMapper, interestCalculator);
     }
 
@@ -56,14 +61,16 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateDate() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
+            paymentPlan.setType(PaymentPlanSelection.PAY_IMMEDIATELY);
+            JudgmentDetails judgmentDetails = new JudgmentDetails();
+            judgmentDetails.setIssueDate(LocalDate.now());
+            judgmentDetails.setPaymentPlan(paymentPlan);
+            judgmentDetails.setOrderedAmount("100");
+            judgmentDetails.setCosts("50");
+            judgmentDetails.setTotalAmount("150");
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                           .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
-                                           .orderedAmount("100")
-                                           .costs("50")
-                                           .totalAmount("150")
-                                           .build());
+            caseData.setActiveJudgment(judgmentDetails);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -84,14 +91,16 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateJudgementStatusAsSatisfied() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
+            paymentPlan.setType(PaymentPlanSelection.PAY_IMMEDIATELY);
+            JudgmentDetails judgmentDetails = new JudgmentDetails();
+            judgmentDetails.setIssueDate(LocalDate.now());
+            judgmentDetails.setPaymentPlan(paymentPlan);
+            judgmentDetails.setOrderedAmount("100");
+            judgmentDetails.setCosts("50");
+            judgmentDetails.setTotalAmount("150");
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                           .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
-                                           .orderedAmount("100")
-                                           .costs("50")
-                                           .totalAmount("150")
-                                           .build());
+            caseData.setActiveJudgment(judgmentDetails);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -109,15 +118,16 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateJudgementStatusAsCancelled() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
+            paymentPlan.setType(PaymentPlanSelection.PAY_IMMEDIATELY);
+            JudgmentDetails judgmentDetails = new JudgmentDetails();
+            judgmentDetails.setIssueDate(LocalDate.now());
+            judgmentDetails.setPaymentPlan(paymentPlan);
+            judgmentDetails.setOrderedAmount("100");
+            judgmentDetails.setCosts("50");
+            judgmentDetails.setTotalAmount("150");
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                           .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY)
-                                                            .build())
-                                           .orderedAmount("100")
-                                           .costs("50")
-                                           .totalAmount("150")
-                                           .build());
+            caseData.setActiveJudgment(judgmentDetails);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -138,15 +148,17 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateJudgementStatusAsCancelledForDefaultJudgment() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
+            paymentPlan.setType(PaymentPlanSelection.PAY_IMMEDIATELY);
+            JudgmentDetails judgmentDetails = new JudgmentDetails();
+            judgmentDetails.setIssueDate(LocalDate.now());
+            judgmentDetails.setPaymentPlan(paymentPlan);
+            judgmentDetails.setOrderedAmount("100");
+            judgmentDetails.setCosts("50");
+            judgmentDetails.setTotalAmount("150");
             CaseData caseData = CaseDataBuilder.builder()
                 .getDefaultJudgment1v1CaseJudgmentPaid();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                           .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
-                                           .orderedAmount("100")
-                                           .costs("50")
-                                           .totalAmount("150")
-                                           .build());
+            caseData.setActiveJudgment(judgmentDetails);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -168,12 +180,11 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidatePaymentMadeDate() {
 
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(LocalDate.now().minusDays(2));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().contains("Date must be in past"));
+            assertThat(response.getErrors()).contains("Date must be in past");
         }
 
         @Test
@@ -186,7 +197,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().contains("Paid in full date must be on or after the date of the judgment"));
+            assertThat(response.getErrors()).contains("Paid in full date must be on or after the date of the judgment");
         }
 
         @Test
@@ -199,7 +210,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().contains("Paid in full date must be on or after the date of the judgment"));
+            assertThat(response.getErrors()).contains("Paid in full date must be on or after the date of the judgment");
         }
     }
 
@@ -208,10 +219,9 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void whenSubmitted_thenIncludeHeader() {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
-                .type(CallbackType.SUBMITTED)
-                .build();
+                .type(CallbackType.SUBMITTED);
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) handler.handle(params);
             Assertions.assertTrue(response.getConfirmationHeader().contains("# Judgment marked as paid in full"));

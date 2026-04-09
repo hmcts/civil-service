@@ -37,7 +37,7 @@ class UpdateVisibilityNoticeOfDiscontinuanceHandlerTest extends BaseCallbackHand
     @Autowired
     private UpdateVisibilityNoticeOfDiscontinuanceHandler handler;
 
-    private static final String processId = "process-id";
+    private static final String PROCESS_ID = "process-id";
     private static final CaseDocument caseDocument = CaseDocumentBuilder.builder()
             .documentName("document name")
             .documentType(DocumentType.NOTICE_OF_DISCONTINUANCE)
@@ -51,23 +51,22 @@ class UpdateVisibilityNoticeOfDiscontinuanceHandlerTest extends BaseCallbackHand
         void shouldUpdateCamundaVariables_whenInvoked(Boolean toggleState) {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(processId).build()).build();
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID)).build();
             caseData.setConfirmOrderGivesPermission(
                 toggleState ? ConfirmOrderGivesPermission.YES : ConfirmOrderGivesPermission.NO);
             caseData.setRespondent1NoticeOfDiscontinueCWViewDoc(caseDocument);
             caseData.setApplicant1NoticeOfDiscontinueCWViewDoc(caseDocument);
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.UPDATE_VISIBILITY_NOTICE_OF_DISCONTINUANCE.name())
-                             .build())
-                .build();
+                             .build());
             //When
             handler.handle(params);
             //Then
-            verify(runTimeService).setVariable(processId, "discontinuanceValidationSuccess", toggleState);
+            verify(runTimeService).setVariable(PROCESS_ID, "discontinuanceValidationSuccess", toggleState);
         }
 
     }

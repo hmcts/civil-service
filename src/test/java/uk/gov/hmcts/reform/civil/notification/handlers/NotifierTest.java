@@ -1,18 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.ClaimDismissedAllLegalRepsEmailGenerator;
-import uk.gov.hmcts.reform.civil.notify.NotificationException;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
-import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
-
-import java.util.Map;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -26,6 +13,20 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.confirmproceed.ClaimantConfirmProceedDefendantEmailDTOGenerator.NO_EMAIL_OPERATION;
+
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.ClaimDismissedAllLegalRepsEmailGenerator;
+import uk.gov.hmcts.reform.civil.notify.NotificationException;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
+
+import java.util.Map;
+import java.util.Set;
+
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 
 class NotifierTest {
 
@@ -46,7 +47,7 @@ class NotifierTest {
     CaseData caseData;
     String taskId = "taskId";
 
-    private class TestNotifier extends Notifier {
+    private static class TestNotifier extends Notifier {
         public TestNotifier(NotificationService notificationService,
                             CaseTaskTrackingService caseTaskTrackingService,
                             PartiesEmailGenerator emailGenerator) {
@@ -70,26 +71,23 @@ class NotifierTest {
         when(caseData.getCcdCaseReference()).thenReturn(CASE_ID);
 
         MockitoAnnotations.openMocks(this);
-        party1 = EmailDTO.builder()
-            .targetEmail("applicantsolicitor@example.com")
-            .emailTemplate("template-id")
-            .parameters(getNotificationDataMap())
-            .reference("claim-dismissed-applicant-notification-000DC001")
-            .build();
+        party1 = new EmailDTO();
+        party1.setTargetEmail("applicantsolicitor@example.com");
+        party1.setEmailTemplate("template-id");
+        party1.setParameters(getNotificationDataMap());
+        party1.setReference("claim-dismissed-applicant-notification-000DC001");
 
-        party2 = EmailDTO.builder()
-            .targetEmail("respondentsolicitor@example.com")
-            .emailTemplate("template-id")
-            .parameters(getNotificationDataMap())
-            .reference("claim-dismissed-respondent-notification-000DC001")
-            .build();
+        party2 = new EmailDTO();
+        party2.setTargetEmail("respondentsolicitor@example.com");
+        party2.setEmailTemplate("template-id");
+        party2.setParameters(getNotificationDataMap());
+        party2.setReference("claim-dismissed-respondent-notification-000DC001");
 
-        party3 = EmailDTO.builder()
-            .targetEmail("respondentsolicitor2@example.com")
-            .emailTemplate("template-id")
-            .parameters(getNotificationDataMap())
-            .reference("claim-dismissed-respondent-notification-000DC001")
-            .build();
+        party3 = new EmailDTO();
+        party3.setTargetEmail("respondentsolicitor2@example.com");
+        party3.setEmailTemplate("template-id");
+        party3.setParameters(getNotificationDataMap());
+        party3.setReference("claim-dismissed-respondent-notification-000DC001");
         expected = Set.of(party1, party2, party3);
     }
 

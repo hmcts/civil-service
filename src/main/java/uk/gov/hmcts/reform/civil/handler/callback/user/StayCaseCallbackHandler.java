@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -54,22 +55,23 @@ public class StayCaseCallbackHandler extends CallbackHandler {
 
     private CallbackResponse stayCase(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_CASE));
-        caseDataBuilder.preStayState(callbackParams.getRequest().getCaseDetailsBefore().getState())
-            .hearingDate(null).hearingDueDate(null)
-            .hearingNoticeList(null)
-            .listingOrRelisting(null)
-            .hearingLocation(null)
-            .channel(null)
-            .hearingTimeHourMinute(null)
-            .hearingDuration(null)
-            .information(null)
-            .hearingNoticeListOther(null).build();
+        caseData.setBusinessProcess(BusinessProcess.ready(STAY_CASE));
+        caseData.setPreStayState(callbackParams.getRequest().getCaseDetailsBefore().getState());
+        caseData.setHearingDate(null);
+        caseData.setListingOrRelisting(null);
+        caseData.setHearingTimeHourMinute(null);
+        caseData.setHearingDuration(null);
+        caseData.setInformation(null);
+        caseData.setHearingLocation(null);
+        caseData.setChannel(null);
+        caseData.setHearingNoticeListOther(null);
+        caseData.setHearingDueDate(null);
+        caseData.setHearingNoticeList(null);
+        caseData.setCaseStayDate(LocalDate.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(mapper))
+            .data(caseData.toMap(mapper))
             .build();
     }
 

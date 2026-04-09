@@ -67,10 +67,11 @@ public class JudgmentPaidClaimantNotificationHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldNotRecordScenario_whenInvoked_whenClaimantRepresented() {
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build())
+                .caseDataLip(caseDataLiP)
                 .applicant1Represented(YesOrNo.YES).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -88,11 +89,13 @@ public class JudgmentPaidClaimantNotificationHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldRecordScenario_whenInvoked_whenClaimantRepresented() {
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build())
-                .applicant1Represented(YesOrNo.NO).build().toBuilder().caseDocumentUploadDate(LocalDateTime.now()).build();
+                .caseDataLip(caseDataLiP)
+                .applicant1Represented(YesOrNo.NO).build();
+            caseData.setCaseDocumentUploadDate(LocalDateTime.now());
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -108,7 +111,7 @@ public class JudgmentPaidClaimantNotificationHandlerTest extends BaseCallbackHan
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

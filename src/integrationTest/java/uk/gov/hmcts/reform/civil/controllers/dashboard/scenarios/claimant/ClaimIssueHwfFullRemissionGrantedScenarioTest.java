@@ -33,8 +33,8 @@ public class ClaimIssueHwfFullRemissionGrantedScenarioTest extends DashboardBase
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(45500)))
+            .claimIssuedHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(CaseEvent.FULL_REMISSION_HWF))
             .hwfFeeType(FeeType.CLAIMISSUED)
             .applicant1Represented(YesOrNo.NO)
             .build();

@@ -53,8 +53,8 @@ class CoScNotificationForCaseNotMarkPaidInFullClaimantHandlerTest extends BaseCa
 
         @Test
         void shouldRecordScenario_whenInvokedCoScCaseNotMarkedPaidInFull() {
-            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder().applicant1Represented(
-                YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -68,7 +68,7 @@ class CoScNotificationForCaseNotMarkPaidInFullClaimantHandlerTest extends BaseCa
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

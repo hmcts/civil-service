@@ -9,16 +9,22 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
 class RespondentTemplateForDQGeneratorTest {
@@ -53,8 +59,7 @@ class RespondentTemplateForDQGeneratorTest {
             .atStateApplicantRespondToDefenceAndProceed()
             .build()
             .toBuilder()
-            .businessProcess(BusinessProcess.builder()
-                                 .camundaEvent("CLAIMANT_RESPONSE").build())
+            .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
             .build();
 
         DirectionsQuestionnaireForm result =
@@ -77,8 +82,7 @@ class RespondentTemplateForDQGeneratorTest {
             .respondent2SameLegalRepresentative(YES)
             .build()
             .toBuilder()
-            .businessProcess(BusinessProcess.builder()
-                                 .camundaEvent("CLAIMANT_RESPONSE").build())
+            .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
             .build();
 
         DirectionsQuestionnaireForm result =
@@ -101,8 +105,7 @@ class RespondentTemplateForDQGeneratorTest {
             .responseClaimTrack(FAST_CLAIM.name())
             .build()
             .toBuilder()
-            .businessProcess(BusinessProcess.builder()
-                                 .camundaEvent("CLAIMANT_RESPONSE").build())
+            .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
             .build();
 
         DirectionsQuestionnaireForm result =
@@ -111,5 +114,54 @@ class RespondentTemplateForDQGeneratorTest {
         assertNotNull(result);
         assertNotNull(result.getExperts());
         assertEquals(NO, result.getExperts().getExpertRequired());
+    }
+
+    @Test
+    void shouldDefaultExpertCostToZeroWhenEstimatedCostMissing() {
+        Expert expertWithNullCost = new Expert()
+            .setFirstName("John")
+            .setLastName("Doe")
+            .setEstimatedCost(null);
+
+        Respondent1DQ dq = new Respondent1DQ()
+            .setRespondent1DQExperts(new Experts()
+                                         .setExpertRequired(YES)
+                                         .setDetails(List.of(element(expertWithNullCost))));
+
+        List<uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert> experts = respondentTemplateForDQGenerator.getExpertsDetails(dq);
+
+        assertEquals("£0.00", experts.get(0).getFormattedCost());
+    }
+
+    @Test
+    void shouldReturnRequestedCourtWithNoWhenRequestedCourtIsNull() {
+        //Given
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(null);
+
+        //When
+        uk.gov.hmcts.reform.civil.model.dq.RequestedCourt result =
+            respondentTemplateForDQGenerator.getRequestedCourt(respondent1DQ, BEARER_TOKEN);
+
+        //Then
+        assertNotNull(result);
+        assertEquals(NO, result.getRequestHearingAtSpecificCourt());
+    }
+
+    @Test
+    void shouldReturnRequestedCourtWithNoWhenCaseLocationIsNull() {
+        //Given
+        uk.gov.hmcts.reform.civil.model.dq.RequestedCourt requestedCourt = new uk.gov.hmcts.reform.civil.model.dq.RequestedCourt();
+        requestedCourt.setCaseLocation(null);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
+
+        //When
+        uk.gov.hmcts.reform.civil.model.dq.RequestedCourt result =
+            respondentTemplateForDQGenerator.getRequestedCourt(respondent1DQ, BEARER_TOKEN);
+
+        //Then
+        assertNotNull(result);
+        assertEquals(NO, result.getRequestHearingAtSpecificCourt());
     }
 }

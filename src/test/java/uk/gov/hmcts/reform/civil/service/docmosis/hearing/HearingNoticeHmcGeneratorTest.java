@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
@@ -33,7 +34,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.HearingIndividual;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -76,12 +76,12 @@ class HearingNoticeHmcGeneratorTest {
     private static final String EPIMS = "venue-id";
     private static final Long VERSION_NUMBER = 1L;
 
-    private HearingGetResponse baseHearing;
+    private final HearingGetResponse baseHearing = new HearingGetResponse();
 
     private static final String FILE_NAME_APPLICATION = String.format(
         HEARING_NOTICE_HMC.getDocumentTitle(), REFERENCE_NUMBER);
 
-    private static final String fileName_application_welsh = String.format(
+    private static final String FILE_NAME_APPLICATION_WELSH = String.format(
         HEARING_NOTICE_HMC_WELSH.getDocumentTitle(), REFERENCE_NUMBER);
 
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
@@ -101,8 +101,6 @@ class HearingNoticeHmcGeneratorTest {
     private HearingFeesService hearingFeesService;
     @MockBean
     private AssignCategoryId assignCategoryId;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setupTest() {
@@ -114,18 +112,21 @@ class HearingNoticeHmcGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION_WELSH, bytes, HEARING_FORM_WELSH)))
+            .thenReturn(CASE_DOCUMENT);
 
         when(locationRefDataService
-                 .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(LocationRefData.builder()
-                                                                                             .epimmsId(EPIMS)
-                                                                                             .externalShortName("VenueName")
-                                                                                             .welshExternalShortName("WelshVenueValue")
-                                                                                             .siteName("CML-Site")
-                                                                                             .welshSiteName("CML-Site-Welsh")
-                                                                                             .courtAddress(
+                 .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(new LocationRefData()
+                                                                                             .setEpimmsId(EPIMS)
+                                                                                             .setExternalShortName("VenueName")
+                                                                                             .setWelshExternalShortName("WelshVenueValue")
+                                                                                             .setSiteName("CML-Site")
+                                                                                             .setWelshSiteName("CML-Site-Welsh")
+                                                                                             .setCourtAddress(
                                                                                                  "CourtAddress")
-                                                                                             .postcode("Postcode")
-                                                                                             .build()));
+                                                                                             .setPostcode("Postcode")
+                                                                                             ));
 
         List<HearingIndividual> hearingIndividuals = List.of(
                 HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
@@ -134,115 +135,94 @@ class HearingNoticeHmcGeneratorTest {
                 HearingIndividual.nonAttending("James", "Allen")
         );
 
-        HearingDay hearingDay = HearingDay.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0))
-            .build();
-        LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 02, 02, 0, 0, 0);
-        baseHearing = HearingGetResponse.builder()
-                .partyDetails(hearingIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
-                .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+        HearingDay hearingDay = new HearingDay()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 1, 1, 0, 0, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 1, 1, 12, 0, 0));
+        LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 2, 2, 0, 0, 0);
+        baseHearing
+                .setPartyDetails(hearingIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
+                .setHearingResponse(new HearingResponse().setHearingDaySchedule(
                                 List.of(
-                                        HearingDaySchedule.builder()
-                                                .attendees(hearingIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
-                                                .hearingVenueId(EPIMS)
-                                                .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                                                .hearingEndDateTime(hearingDay.getHearingEndDateTime())
-                                                .build()))
-                        .receivedDateTime(hearingResponseDate)
-                        .build())
-                .requestDetails(HearingRequestDetails.builder()
-                        .versionNumber(VERSION_NUMBER)
-                        .build())
-                .build();
+                                        new HearingDaySchedule()
+                                                .setAttendees(hearingIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
+                                                .setHearingVenueId(EPIMS)
+                                                .setHearingStartDateTime(hearingDay.getHearingStartDateTime())
+                                                .setHearingEndDateTime(hearingDay.getHearingEndDateTime())))
+                        .setReceivedDateTime(hearingResponseDate))
+                .setRequestDetails(new HearingRequestDetails()
+                        .setVersionNumber(VERSION_NUMBER));
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasBeenPaid(boolean isCaseProgressionEnabled) {
-
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
-        var hearing = baseHearing.toBuilder()
-                    .hearingDetails(HearingDetails.builder()
-                                        .hearingType("AAA7-TRI")
-                                        .build()
-                    )
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasBeenPaid() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(EPIMS)
-                                        .build())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+                                        )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .hearingTimeHourMinute("0800")
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
                                                             HEARING_NOTICE_HMC);
-        var expected = HearingNoticeHmc.builder()
-            .title("trial")
-            .caseNumber(caseData.getCcdCaseReference())
-            .creationDate(LocalDate.now())
-            .claimant(caseData.getApplicant1().getPartyName())
-            .defendant(caseData.getRespondent1().getPartyName())
-            .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
-            .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
-            .feeAmount(null)
-            .hearingSiteName("VenueName")
-            .caseManagementLocation("CML-Site - CourtAddress - Postcode")
-            .hearingLocation("SiteName - CourtAddress - Postcode")
-            .hearingDays("01 January 2023 at 00:00 for 12 hours")
-            .totalHearingDuration("2 days")
-            .hearingType("trial")
-            .hearingDueDate(null)
-            .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
-            .partiesAttendingInPerson("Chloe Landale")
-            .partiesAttendingByVideo("Michael Carver")
-            .partiesAttendingByTelephone("Jenny Harper")
-            .build();
+        var expected = new HearingNoticeHmc()
+            .setTitle("trial")
+            .setCaseNumber(caseData.getCcdCaseReference())
+            .setCreationDate(LocalDate.now())
+            .setClaimant(caseData.getApplicant1().getPartyName())
+            .setDefendant(caseData.getRespondent1().getPartyName())
+            .setClaimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
+            .setDefendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
+            .setFeeAmount(null)
+            .setHearingSiteName("VenueName")
+            .setCaseManagementLocation("CML-Site - CourtAddress - Postcode")
+            .setHearingLocation("SiteName - CourtAddress - Postcode")
+            .setHearingDays("01 January 2023 at 00:00 for 12 hours")
+            .setTotalHearingDuration("2 days")
+            .setHearingType("trial")
+            .setHearingDueDate(null)
+            .setHearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .setPartiesAttendingInPerson("Chloe Landale")
+            .setPartiesAttendingByVideo("Michael Carver")
+            .setPartiesAttendingByTelephone("Jenny Harper");
 
         assertEquals(expected, actual);
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldOnlyIgnoreFeeDetails_1v1_whenHearingFeeHasBeenPaidThroughHwFAndCPToggleEnabled(boolean isCaseProgressionEnabled) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-TRI")
-                                .build()
+    void shouldOnlyIgnoreFeeDetails_1v1_whenHearingFeeHasBeenPaidThroughHwFAndCPToggleEnabled() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType("AAA7-TRI")
             )
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(EPIMS)
-                                        .build())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+                                        )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .hearingTimeHourMinute("0800")
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
@@ -250,244 +230,215 @@ class HearingNoticeHmcGeneratorTest {
             .hearingHelpFeesReferenceNumber("123")
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
-            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                          .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES)
-                                          .build())
+            .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                          .setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES))
             .build();
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
                                                             HEARING_NOTICE_HMC);
-        var expected = HearingNoticeHmc.builder()
-            .title("trial")
-            .caseNumber(caseData.getCcdCaseReference())
-            .creationDate(LocalDate.now())
-            .claimant(caseData.getApplicant1().getPartyName())
-            .defendant(caseData.getRespondent1().getPartyName())
-            .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
-            .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
-            .feeAmount(isCaseProgressionEnabled ? null : "£1")
-            .hearingSiteName("VenueName")
-            .caseManagementLocation("CML-Site - CourtAddress - Postcode")
-            .hearingLocation("SiteName - CourtAddress - Postcode")
-            .hearingDays("01 January 2023 at 00:00 for 12 hours")
-            .totalHearingDuration("2 days")
-            .hearingType("trial")
-            .hearingTypePluralWelsh(null)
-            .hearingDueDate(isCaseProgressionEnabled ? null : LocalDate.of(2023, 1, 1))
-            .partiesAttendingInPerson("Chloe Landale")
-            .partiesAttendingByVideo("Michael Carver")
-            .partiesAttendingByTelephone("Jenny Harper")
-            .build();
+        var expected = new HearingNoticeHmc()
+            .setTitle("trial")
+            .setCaseNumber(caseData.getCcdCaseReference())
+            .setCreationDate(LocalDate.now())
+            .setClaimant(caseData.getApplicant1().getPartyName())
+            .setDefendant(caseData.getRespondent1().getPartyName())
+            .setClaimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
+            .setDefendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
+            .setFeeAmount(null)
+            .setHearingSiteName("VenueName")
+            .setCaseManagementLocation("CML-Site - CourtAddress - Postcode")
+            .setHearingLocation("SiteName - CourtAddress - Postcode")
+            .setHearingDays("01 January 2023 at 00:00 for 12 hours")
+            .setTotalHearingDuration("2 days")
+            .setHearingType("trial")
+            .setHearingTypePluralWelsh(null)
+            .setHearingDueDate(null)
+            .setPartiesAttendingInPerson("Chloe Landale")
+            .setPartiesAttendingByVideo("Michael Carver")
+            .setPartiesAttendingByTelephone("Jenny Harper");
 
         assertEquals(expected, actual);
     }
 
     @ParameterizedTest
     @CsvSource({"true, false", "false, false", "true, true", "false, false"})
-    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasNotBeenPaid(boolean isCaseProgressionEnabled, boolean isWelsh) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-TRI")
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasNotBeenPaid(boolean isWelsh) {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(EPIMS)
-                                        .build())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+                                        )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .hearingTimeHourMinute("0800")
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.FAILED)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.FAILED)
+                                          )
             .build();
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
                                                             isWelsh ? HEARING_NOTICE_HMC_WELSH : HEARING_NOTICE_HMC);
         var creationDate = LocalDate.now();
-        var expected = HearingNoticeHmc.builder()
-            .title(isWelsh ? "dreial" : "trial")
-            .caseNumber(caseData.getCcdCaseReference())
-            .creationDate(creationDate)
-            .creationDateWelshText(isWelsh ? DateUtils.formatDateInWelsh(creationDate, true) : null)
-            .claimant(caseData.getApplicant1().getPartyName())
-            .defendant(caseData.getRespondent1().getPartyName())
-            .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
-            .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
-            .feeAmount("£1")
-            .hearingSiteName(isWelsh ? "WelshVenueValue" : "VenueName")
-            .caseManagementLocation("CML-Site" + (isWelsh ? "-Welsh" : "") + " - CourtAddress - Postcode")
-            .hearingLocation("SiteName - CourtAddress - Postcode")
-            .hearingDays(isWelsh ? "01 Ionawr 2023 am 00:00 am 12 awr" : "01 January 2023 at 00:00 for 12 hours")
-            .totalHearingDuration(isWelsh ? "2 ddiwrnod" : "2 days")
-            .hearingType(isWelsh ? "treial" : "trial")
-            .hearingTypePluralWelsh(isWelsh ? "dreialon" : null)
-            .hearingDueDate(LocalDate.of(2023, 1, 1))
-            .hearingDueDateWelshText(isWelsh ? "01 Ionawr 2023" : null)
-            .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
-            .partiesAttendingInPerson("Chloe Landale")
-            .partiesAttendingByVideo("Michael Carver")
-            .partiesAttendingByTelephone("Jenny Harper")
-            .build();
+        var expected = new HearingNoticeHmc()
+            .setTitle(isWelsh ? "dreial" : "trial")
+            .setCaseNumber(caseData.getCcdCaseReference())
+            .setCreationDate(creationDate)
+            .setCreationDateWelshText(isWelsh ? DateUtils.formatDateInWelsh(creationDate, true) : null)
+            .setClaimant(caseData.getApplicant1().getPartyName())
+            .setDefendant(caseData.getRespondent1().getPartyName())
+            .setClaimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
+            .setDefendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
+            .setFeeAmount("£1")
+            .setHearingSiteName(isWelsh ? "WelshVenueValue" : "VenueName")
+            .setCaseManagementLocation("CML-Site" + (isWelsh ? "-Welsh" : "") + " - CourtAddress - Postcode")
+            .setHearingLocation("SiteName - CourtAddress - Postcode")
+            .setHearingDays(isWelsh ? "01 Ionawr 2023 am 00:00 am 12 awr" : "01 January 2023 at 00:00 for 12 hours")
+            .setTotalHearingDuration(isWelsh ? "2 ddiwrnod" : "2 days")
+            .setHearingType(isWelsh ? "treial" : "trial")
+            .setHearingTypePluralWelsh(isWelsh ? "dreialon" : null)
+            .setHearingDueDate(LocalDate.of(2023, 1, 1))
+            .setHearingDueDateWelshText(isWelsh ? "01 Ionawr 2023" : null)
+            .setHearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .setPartiesAttendingInPerson("Chloe Landale")
+            .setPartiesAttendingByVideo("Michael Carver")
+            .setPartiesAttendingByTelephone("Jenny Harper");
 
         assertEquals(expected, actual);
     }
 
     @ParameterizedTest
     @CsvSource({"true, false", "false, false", "true, true", "false, false"})
-    void shouldGenerateHearingNoticeHmc_1v2DS_whenHearingFeeHasBeenPaid(boolean isCaseProgressionEnabled, boolean isWelsh) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-DIS")
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+    void shouldGenerateHearingNoticeHmc_1v2DS_whenHearingFeeHasBeenPaid(boolean isWelsh) {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType("AAA7-DIS"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder().atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(EPIMS)
-                                        .build())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+                                        )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .hearingTimeHourMinute("0800")
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId", isWelsh
                                                                 ? HEARING_NOTICE_HMC_WELSH
                                                                 : HEARING_NOTICE_HMC);
-        var expected = HearingNoticeHmc.builder()
-            .title(isWelsh ? "wrandawiad gwaredu" : "disposal hearing")
-            .caseNumber(caseData.getCcdCaseReference())
-            .creationDate(LocalDate.now())
-            .creationDateWelshText(isWelsh ? DateUtils.formatDateInWelsh(LocalDate.now(), true) : null)
-            .claimant(caseData.getApplicant1().getPartyName())
-            .defendant(caseData.getRespondent1().getPartyName())
-            .defendant2(caseData.getRespondent2().getPartyName())
-            .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
-            .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
-            .defendant2Reference(caseData.getSolicitorReferences().getRespondentSolicitor2Reference())
-            .feeAmount(null)
-            .hearingSiteName(isWelsh ? "WelshVenueValue" : "VenueName")
-            .caseManagementLocation("CML-Site" + (isWelsh ? "-Welsh" : "") + " - CourtAddress - Postcode")
-            .hearingLocation("SiteName - CourtAddress - Postcode")
-            .hearingDays(isWelsh ? "01 Ionawr 2023 am 00:00 am 12 awr" : "01 January 2023 at 00:00 for 12 hours")
-            .totalHearingDuration(isWelsh ? "2 ddiwrnod" : "2 days")
-            .hearingType(isWelsh ? "gwrandawiad" : "hearing")
-            .hearingTypePluralWelsh(isWelsh ? "wrandawiadau" : null)
-            .hearingDueDate(null)
-            .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
-                .partiesAttendingInPerson("Chloe Landale")
-                .partiesAttendingByVideo("Michael Carver")
-                .partiesAttendingByTelephone("Jenny Harper")
-                .build();
+        var expected = new HearingNoticeHmc()
+            .setTitle(isWelsh ? "wrandawiad gwaredu" : "disposal hearing")
+            .setCaseNumber(caseData.getCcdCaseReference())
+            .setCreationDate(LocalDate.now())
+            .setCreationDateWelshText(isWelsh ? DateUtils.formatDateInWelsh(LocalDate.now(), true) : null)
+            .setClaimant(caseData.getApplicant1().getPartyName())
+            .setDefendant(caseData.getRespondent1().getPartyName())
+            .setDefendant2(caseData.getRespondent2().getPartyName())
+            .setClaimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
+            .setDefendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
+            .setDefendant2Reference(caseData.getSolicitorReferences().getRespondentSolicitor2Reference())
+            .setFeeAmount(null)
+            .setHearingSiteName(isWelsh ? "WelshVenueValue" : "VenueName")
+            .setCaseManagementLocation("CML-Site" + (isWelsh ? "-Welsh" : "") + " - CourtAddress - Postcode")
+            .setHearingLocation("SiteName - CourtAddress - Postcode")
+            .setHearingDays(isWelsh ? "01 Ionawr 2023 am 00:00 am 12 awr" : "01 January 2023 at 00:00 for 12 hours")
+            .setTotalHearingDuration(isWelsh ? "2 ddiwrnod" : "2 days")
+            .setHearingType(isWelsh ? "gwrandawiad" : "hearing")
+            .setHearingTypePluralWelsh(isWelsh ? "wrandawiadau" : null)
+            .setHearingDueDate(null)
+            .setHearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+                .setPartiesAttendingInPerson("Chloe Landale")
+                .setPartiesAttendingByVideo("Michael Carver")
+                .setPartiesAttendingByTelephone("Jenny Harper");
 
         assertEquals(expected, actual);
     }
 
     @ParameterizedTest
     @CsvSource({"true, false", "false, false", "true, true", "false, false"})
-    void shouldGenerateHearingNoticeHmcDisputeResolution_1v2DS_whenHearingFeeHasBeenPaid(boolean isCaseProgressionEnabled, boolean isWelsh) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-DRH")
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+    void shouldGenerateHearingNoticeHmcDisputeResolution_1v2DS_whenHearingFeeHasBeenPaid(boolean isWelsh) {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType("AAA7-DRH"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder().atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(EPIMS)
-                                        .build())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+                                        )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .hearingTimeHourMinute("0800")
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId", isWelsh
                                                                 ? HEARING_NOTICE_HMC_WELSH
                                                                 : HEARING_NOTICE_HMC);
-        var expected = HearingNoticeHmc.builder()
-            .title(isWelsh ? "wrandawiad datrys anghydfod" : "dispute resolution hearing")
-            .caseNumber(caseData.getCcdCaseReference())
-            .creationDate(LocalDate.now())
-            .creationDateWelshText(isWelsh ? DateUtils.formatDateInWelsh(LocalDate.now(), true) : null)
-            .claimant(caseData.getApplicant1().getPartyName())
-            .defendant(caseData.getRespondent1().getPartyName())
-            .defendant2(caseData.getRespondent2().getPartyName())
-            .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
-            .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
-            .defendant2Reference(caseData.getSolicitorReferences().getRespondentSolicitor2Reference())
-            .feeAmount(null)
-            .hearingSiteName(isWelsh ? "WelshVenueValue" : "VenueName")
-            .caseManagementLocation("CML-Site" + (isWelsh ? "-Welsh" : "") + " - CourtAddress - Postcode")
-            .hearingLocation("SiteName - CourtAddress - Postcode")
-            .hearingDays(isWelsh ? "01 Ionawr 2023 am 00:00 am 12 awr" : "01 January 2023 at 00:00 for 12 hours")
-            .totalHearingDuration(isWelsh ? "2 ddiwrnod" : "2 days")
-            .hearingType(isWelsh ? "gwrandawiad" : "hearing")
-            .hearingTypePluralWelsh(isWelsh ? "wrandawiadau" : null)
-            .hearingDueDate(null)
-            .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
-            .partiesAttendingInPerson("Chloe Landale")
-            .partiesAttendingByVideo("Michael Carver")
-            .partiesAttendingByTelephone("Jenny Harper")
-            .build();
+        var expected = new HearingNoticeHmc()
+            .setTitle(isWelsh ? "wrandawiad datrys anghydfod" : "dispute resolution hearing")
+            .setCaseNumber(caseData.getCcdCaseReference())
+            .setCreationDate(LocalDate.now())
+            .setCreationDateWelshText(isWelsh ? DateUtils.formatDateInWelsh(LocalDate.now(), true) : null)
+            .setClaimant(caseData.getApplicant1().getPartyName())
+            .setDefendant(caseData.getRespondent1().getPartyName())
+            .setDefendant2(caseData.getRespondent2().getPartyName())
+            .setClaimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
+            .setDefendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
+            .setDefendant2Reference(caseData.getSolicitorReferences().getRespondentSolicitor2Reference())
+            .setFeeAmount(null)
+            .setHearingSiteName(isWelsh ? "WelshVenueValue" : "VenueName")
+            .setCaseManagementLocation("CML-Site" + (isWelsh ? "-Welsh" : "") + " - CourtAddress - Postcode")
+            .setHearingLocation("SiteName - CourtAddress - Postcode")
+            .setHearingDays(isWelsh ? "01 Ionawr 2023 am 00:00 am 12 awr" : "01 January 2023 at 00:00 for 12 hours")
+            .setTotalHearingDuration(isWelsh ? "2 ddiwrnod" : "2 days")
+            .setHearingType(isWelsh ? "gwrandawiad" : "hearing")
+            .setHearingTypePluralWelsh(isWelsh ? "wrandawiadau" : null)
+            .setHearingDueDate(null)
+            .setHearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .setPartiesAttendingInPerson("Chloe Landale")
+            .setPartiesAttendingByVideo("Michael Carver")
+            .setPartiesAttendingByTelephone("Jenny Harper");
 
         assertEquals(expected, actual);
     }
@@ -499,170 +450,182 @@ class HearingNoticeHmcGeneratorTest {
         "AAA7-DRH, dispute resolution hearing, true",
         "AAA7-DRH, dispute resolution hearing, false"
     })
-    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType, String expectedTitle, boolean isCaseProgressionEnabled) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType(hearingType)
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType, String expectedTitle) {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType(hearingType))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoApplicants()
             .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(EPIMS)
-                                        .build())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+                                        )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .hearingTimeHourMinute("0800")
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
                                                             HEARING_NOTICE_HMC);
-        var expected = HearingNoticeHmc.builder()
-            .title(expectedTitle)
-            .caseNumber(caseData.getCcdCaseReference())
-            .creationDate(LocalDate.now())
-            .claimant(caseData.getApplicant1().getPartyName())
-            .claimant2(caseData.getApplicant2().getPartyName())
-            .defendant(caseData.getRespondent1().getPartyName())
-            .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
-            .claimant2Reference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
-            .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
-            .feeAmount(null)
-            .hearingSiteName("VenueName")
-            .caseManagementLocation("CML-Site - CourtAddress - Postcode")
-            .hearingLocation("SiteName - CourtAddress - Postcode")
-            .hearingDays("01 January 2023 at 00:00 for 12 hours")
-            .totalHearingDuration("2 days")
-            .hearingType("hearing")
-            .hearingDueDate(null)
-            .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
-            .partiesAttendingInPerson("Chloe Landale")
-            .partiesAttendingByVideo("Michael Carver")
-            .partiesAttendingByTelephone("Jenny Harper")
-            .build();
+        var expected = new HearingNoticeHmc()
+            .setTitle(expectedTitle)
+            .setCaseNumber(caseData.getCcdCaseReference())
+            .setCreationDate(LocalDate.now())
+            .setClaimant(caseData.getApplicant1().getPartyName())
+            .setClaimant2(caseData.getApplicant2().getPartyName())
+            .setDefendant(caseData.getRespondent1().getPartyName())
+            .setClaimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
+            .setClaimant2Reference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
+            .setDefendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
+            .setFeeAmount(null)
+            .setHearingSiteName("VenueName")
+            .setCaseManagementLocation("CML-Site - CourtAddress - Postcode")
+            .setHearingLocation("SiteName - CourtAddress - Postcode")
+            .setHearingDays("01 January 2023 at 00:00 for 12 hours")
+            .setTotalHearingDuration("2 days")
+            .setHearingType("hearing")
+            .setHearingDueDate(null)
+            .setHearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .setPartiesAttendingInPerson("Chloe Landale")
+            .setPartiesAttendingByVideo("Michael Carver")
+            .setPartiesAttendingByTelephone("Jenny Harper");
 
         assertEquals(expected, actual);
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_noSolicitorReferences(boolean isCaseProgressionEnabled) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-DRH")
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_noSolicitorReferences() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType("AAA7-DRH"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoApplicants()
             .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(EPIMS)
-                                        .build())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+                                        )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .hearingTimeHourMinute("0800")
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .solicitorReferences(null)
             .build();
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
                                                             HEARING_NOTICE_HMC);
-        var expected = HearingNoticeHmc.builder()
-                .title("dispute resolution hearing")
-            .caseNumber(caseData.getCcdCaseReference())
-            .creationDate(LocalDate.now())
-            .claimant(caseData.getApplicant1().getPartyName())
-            .claimant2(caseData.getApplicant2().getPartyName())
-            .defendant(caseData.getRespondent1().getPartyName())
-            .feeAmount(null)
-            .hearingSiteName("VenueName")
-            .caseManagementLocation("CML-Site - CourtAddress - Postcode")
-            .hearingLocation("SiteName - CourtAddress - Postcode")
-            .hearingDays("01 January 2023 at 00:00 for 12 hours")
-            .totalHearingDuration("2 days")
-            .hearingType("hearing")
-            .hearingDueDate(null)
-            .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
-            .partiesAttendingInPerson("Chloe Landale")
-            .partiesAttendingByVideo("Michael Carver")
-            .partiesAttendingByTelephone("Jenny Harper")
-            .build();
+        var expected = new HearingNoticeHmc()
+                .setTitle("dispute resolution hearing")
+            .setCaseNumber(caseData.getCcdCaseReference())
+            .setCreationDate(LocalDate.now())
+            .setClaimant(caseData.getApplicant1().getPartyName())
+            .setClaimant2(caseData.getApplicant2().getPartyName())
+            .setDefendant(caseData.getRespondent1().getPartyName())
+            .setFeeAmount(null)
+            .setHearingSiteName("VenueName")
+            .setCaseManagementLocation("CML-Site - CourtAddress - Postcode")
+            .setHearingLocation("SiteName - CourtAddress - Postcode")
+            .setHearingDays("01 January 2023 at 00:00 for 12 hours")
+            .setTotalHearingDuration("2 days")
+            .setHearingType("hearing")
+            .setHearingDueDate(null)
+            .setHearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .setPartiesAttendingInPerson("Chloe Landale")
+            .setPartiesAttendingByVideo("Michael Carver")
+            .setPartiesAttendingByTelephone("Jenny Harper");
 
         assertEquals(expected, actual);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnListOfExpectedCaseDocuments(boolean isCaseProgressionEnabled) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-TRI")
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+    @Test
+    void shouldReturnEnglishExternalShortName_whenWelshShortNameIsMissing() {
+        when(locationRefDataService.getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(new LocationRefData()
+                                                                                                   .setEpimmsId(EPIMS)
+                                                                                                   .setExternalShortName("VenueName")
+                                                                                                   .setWelshExternalShortName("")
+                                                                                                   .setSiteName("CML-Site")
+                                                                                                   .setWelshSiteName("CML-Site-Welsh")
+                                                                                                   .setCourtAddress("CourtAddress")
+                                                                                                   .setPostcode("Postcode")));
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(EPIMS)
-                                        .build())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(EPIMS))
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .hearingTimeHourMinute("0800")
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+            .build();
+
+        when(hearingFeesService.getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC_WELSH);
+
+        assertEquals("VenueName", actual.getHearingSiteName());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnListOfExpectedCaseDocuments() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+                                        )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
                                         "SiteName - CourtAddress - Postcode", "hearingId",
@@ -675,41 +638,63 @@ class HearingNoticeHmcGeneratorTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    void shouldAssignCategoryId_whenGeneratingHearingNoticeDocument() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(EPIMS))
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+            .build();
+
+        when(hearingFeesService.getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
+                                        "SiteName - CourtAddress - Postcode", "hearingId",
+                                        HEARING_NOTICE_HMC);
+
+        verify(assignCategoryId).assignCategoryIdToCaseDocument(CASE_DOCUMENT, DocCategory.HEARING_NOTICES.getValue());
+        assertEquals(List.of(CASE_DOCUMENT), actual);
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnListOfExpectedCaseDocumentsSpec(boolean isCaseProgressionEnabled) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-TRI")
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+    void shouldReturnListOfExpectedCaseDocumentsSpec() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(EPIMS)
-                                        .build())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+                                        )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .hearingTimeHourMinute("0800")
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
                                         "SiteName - CourtAddress - Postcode", "hearingId",
@@ -724,48 +709,39 @@ class HearingNoticeHmcGeneratorTest {
 
     @Test
     void shouldReturnListOfExpectedCaseDocumentsSpec_WhenIsWelshHearingNotice() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-TRI")
-                                .build())
-            .build();
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType("AAA7-TRI"));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(EPIMS)
-                                        .build())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+                                        )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .hearingTimeHourMinute("0800")
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
                                         "SiteName - CourtAddress - Postcode", "hearingId",
                                         HEARING_NOTICE_HMC_WELSH);
         var expected = List.of(CASE_DOCUMENT);
 
+        assertEquals(expected, actual);
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_application_welsh, bytes, HEARING_FORM_WELSH));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION_WELSH, bytes, HEARING_FORM_WELSH));
     }
 
 }
-
-
-

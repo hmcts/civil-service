@@ -27,15 +27,15 @@ public abstract class LegalRepresentativeOneDocumentHandler<T> extends DocumentH
         this.documentTypeBuilder = documentTypeBuilder;
     }
 
-    public CaseData copyLegalRep1ChangesToLegalRep2(CaseData caseData, CaseData caseDataBefore, CaseData.CaseDataBuilder builder) {
+    public CaseData copyLegalRep1ChangesToLegalRep2(CaseData caseData, CaseData caseDataBefore) {
         List<Element<T>> evidenceDocsToCopy =
             compareAndCopy(getDocumentList(caseDataBefore),
                 getDocumentList(caseData),
                 getCorrespondingLegalRep2DocumentList(caseData));
         List<Element<T>> evidenceDocsToAdd =
             deepCopyUploadEvidenceDocumentType(evidenceDocsToCopy, legalRepresentativeTwoDocumentCategory.getCategoryId());
-        addDocumentsToCopyToCaseData(builder, evidenceDocsToAdd);
-        return builder.build();
+        addDocumentsToCopyToCaseData(caseData, evidenceDocsToAdd);
+        return caseData;
 
     }
 
@@ -76,7 +76,7 @@ public abstract class LegalRepresentativeOneDocumentHandler<T> extends DocumentH
         return toAdd;
     }
 
-    protected abstract void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<T>> evidenceDocsToAdd);
+    protected abstract void addDocumentsToCopyToCaseData(CaseData caseData, List<Element<T>> evidenceDocsToAdd);
 
     protected abstract List<Element<T>> getCorrespondingLegalRep2DocumentList(CaseData caseData);
 

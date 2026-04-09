@@ -75,10 +75,10 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         log.info("Generating claim form for un-spec claim for caseId {}", caseId);
         LocalDate issueDate = time.now().toLocalDate();
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate);
+        caseData.setIssueDate(issueDate);
 
         CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
-            caseDataBuilder.build(),
+            caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         assignCategoryId.assignCategoryIdToCaseDocument(sealedClaim, DocCategory.CLAIMANT1_DETAILS_OF_CLAIM.getValue());
@@ -88,7 +88,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
             || YesOrNo.NO.equals(caseData.getRespondent2Represented()))) {
 
             CaseDocument lipForm = litigantInPersonFormGenerator.generate(
-                caseDataBuilder.build(),
+                caseData,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
             );
 
@@ -116,13 +116,13 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
             stitchedDocument.setDocumentName("Stitched document");
             log.info("Civil stitch service un-spec response {} for caseId {}", stitchedDocument, caseId);
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.CLAIMANT1_DETAILS_OF_CLAIM.getValue());
-            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
+            caseData.setSystemGeneratedCaseDocuments(wrapElements(stitchedDocument));
         } else {
-            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
+            caseData.setSystemGeneratedCaseDocuments(wrapElements(sealedClaim));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

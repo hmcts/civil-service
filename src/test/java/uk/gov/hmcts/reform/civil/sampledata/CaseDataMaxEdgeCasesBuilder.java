@@ -45,46 +45,39 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
     }
 
     public CaseDataMaxEdgeCasesBuilder atStateClaimDraftWithMaximumData() {
-        courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .applicantPreferredCourtLocationList(
-                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(CaseLocationCivil.builder()
-                              .region("4")
-                              .baseLocation("000000")
-                              .build())
-            .build();
-        solicitorReferences = SolicitorReferences.builder()
-            .applicantSolicitor1Reference(Strings.repeat('A', 24))
-            .respondentSolicitor1Reference(Strings.repeat('R', 24))
-            .build();
-        applicant1 = PartyBuilder.builder().companyWithMaxData().build();
+        courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("127")
+            .setApplicantPreferredCourtLocationList(
+                new DynamicList().setValue(new DynamicListElement().setLabel("sitename")))
+            .setCaseLocation(new CaseLocationCivil()
+                              .setRegion("4")
+                              .setBaseLocation("000000")
+                              );
+        solicitorReferences = new SolicitorReferences()
+            .setApplicantSolicitor1Reference(Strings.repeat('A', 24))
+            .setRespondentSolicitor1Reference(Strings.repeat('R', 24))
+            ;
+        applicant1 = new PartyBuilder().companyWithMaxData().build();
         applicant1LitigationFriendRequired = NO;
-        applicantSolicitor1CheckEmail = CorrectEmail.builder()
-            .email("hmcts.civil@gmail.com")
-            .correct(YES)
-            .build();
-        applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY A").build())
-            .build();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .build();
-        respondent1 = PartyBuilder.builder().companyWithMinimalData().build();
+        applicantSolicitor1CheckEmail = new CorrectEmail()
+            .setEmail("hmcts.civil@gmail.com")
+            .setCorrect(YES);
+        applicant1OrganisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("QWERTY A"));
+        respondent1OrganisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("QWERTY R"));
+        respondent1 = new PartyBuilder().companyWithMinimalData().build();
         respondent1Represented = NO;
         claimType = ClaimType.CLINICAL_NEGLIGENCE;
-        claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
-            .build();
-        claimFee = Fee.builder()
-            .calculatedAmountInPence(TEN)
-            .code("fee code")
-            .version("version 1")
-            .build();
+        claimValue = new ClaimValue()
+            .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
+        claimFee = new Fee()
+            .setCalculatedAmountInPence(TEN)
+            .setCode("fee code")
+            .setVersion("version 1")
+            ;
         paymentReference = "some reference";
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
-        applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
-        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.maximal().build();
+        applicantSolicitor1UserDetails = new IdamUserDetails().setEmail("applicantsolicitor@example.com");
+        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.maximal();
         submittedDate = LocalDateTime.now();
         return this;
     }
@@ -96,9 +89,9 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         ccdState = PENDING_CASE_ISSUED;
         ccdCaseReference = CASE_ID;
         submittedDate = LocalDateTime.now();
-        claimIssuedPaymentDetails = PaymentDetails.builder()
-            .customerReference(repeat("1", MAX_ALLOWED))
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails()
+            .setCustomerReference(repeat("1", MAX_ALLOWED))
+            ;
         return this;
     }
 
@@ -120,10 +113,10 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
 
     public CaseDataMaxEdgeCasesBuilder atStatePaymentSuccessfulMaximumData() {
         atStateClaimSubmittedMaximumData();
-        claimIssuedPaymentDetails = PaymentDetails.builder()
-            .status(SUCCESS)
-            .reference("RC-1604-0739-2145-4711")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails()
+            .setStatus(SUCCESS)
+            .setReference("RC-1604-0739-2145-4711")
+            ;
         paymentReference = "12345";
         paymentSuccessfulDate = LocalDateTime.now();
         return this;
@@ -135,14 +128,14 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
 
-        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
-            .email("testorg@email.com")
-            .organisationName(repeat("o", MAX_ALLOWED))
-            .fax("123123123")
-            .dx(repeat("d", AddressBuilder.MAX_ALLOWED))
-            .phoneNumber("0123456789")
-            .address(AddressBuilder.maximal().build())
-            .build();
+        respondentSolicitor1OrganisationDetails = new SolicitorOrganisationDetails()
+            .setEmail("testorg@email.com")
+            .setOrganisationName(repeat("o", MAX_ALLOWED))
+            .setFax("123123123")
+            .setDx(repeat("d", AddressBuilder.MAX_ALLOWED))
+            .setPhoneNumber("0123456789")
+            .setAddress(AddressBuilder.maximal().build())
+            ;
         return this;
     }
 
@@ -213,10 +206,10 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
 
     public CaseDataMaxEdgeCasesBuilder atStatePaymentSuccessfulWithMaximumData() {
         atStateClaimSubmittedMaximumData();
-        claimIssuedPaymentDetails = PaymentDetails.builder()
-            .status(SUCCESS)
-            .reference("RC-1604-0739-2145-4711")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails()
+            .setStatus(SUCCESS)
+            .setReference("RC-1604-0739-2145-4711")
+            ;
         paymentReference = "12345";
         paymentSuccessfulDate = LocalDateTime.now();
         return this;
@@ -226,27 +219,23 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         atStateRespondentFullDefenceMaximumData();
         applicant1ProceedWithClaim = NO;
         applicant1ResponseDate = LocalDateTime.now();
-        uiStatementOfTruth = StatementOfTruthBuilder.maximal().build();
+        uiStatementOfTruth = StatementOfTruthBuilder.maximal();
         return this;
     }
 
     public CaseDataMaxEdgeCasesBuilder atStateApplicantRespondToDefenceAndProceed() {
         atStateRespondentFullDefenceMaximumData();
         applicant1ProceedWithClaim = YES;
-        applicant1DefenceResponseDocument = ResponseDocument.builder()
-            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
-            .build();
+        applicant1DefenceResponseDocument = new ResponseDocument(DocumentBuilder.builder().documentName("claimant-response.pdf").build());
         applicant1DQ();
         applicant1ResponseDate = LocalDateTime.now();
-        uiStatementOfTruth = StatementOfTruthBuilder.maximal().build();
+        uiStatementOfTruth = StatementOfTruthBuilder.maximal();
         return this;
     }
 
     public CaseDataMaxEdgeCasesBuilder atStateRespondentFullDefenceMaximumData() {
         atStateRespondentRespondToClaimMaximumData(RespondentResponseType.FULL_DEFENCE);
-        respondent1ClaimResponseDocument = ResponseDocument.builder()
-            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
-            .build();
+        respondent1ClaimResponseDocument = new ResponseDocument(DocumentBuilder.builder().documentName("defendant-response.pdf").build());
         respondent1DQ();
         respondent1ResponseDate = LocalDateTime.now();
         return this;

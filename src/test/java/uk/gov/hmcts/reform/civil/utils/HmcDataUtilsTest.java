@@ -18,14 +18,13 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.HearingIndividual;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
-import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
-import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.OrganisationDetailsModel;
 import uk.gov.hmcts.reform.hmc.model.hearing.PartyDetailsModel;
@@ -56,7 +55,7 @@ class HmcDataUtilsTest {
 
     @Test
     void getLatestPartiesNotifiedResponse_WhenEmptyList_ReturnsNull() {
-        PartiesNotifiedResponses partiesNotified = PartiesNotifiedResponses.builder().responses(List.of()).build();
+        PartiesNotifiedResponses partiesNotified = new PartiesNotifiedResponses().setResponses(List.of());
 
         PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
 
@@ -67,16 +66,15 @@ class HmcDataUtilsTest {
     void getLatestPartiesNotifiedResponse_WhenNonEmptyList_ReturnsLatestResponse() {
         LocalDateTime now = LocalDateTime.now();
 
-        var res1 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-3").build())
-            .responseReceivedDateTime(now.minusDays(3)).build();
-        var res2 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-2").build())
-            .responseReceivedDateTime(now.minusDays(2)).build();
-        var expected = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-1").build())
-            .responseReceivedDateTime(now.minusDays(1)).build();
+        var res1 = new PartiesNotifiedResponse().setServiceData(new PartiesNotifiedServiceData().setHearingLocation("loc-3"))
+            .setResponseReceivedDateTime(now.minusDays(3)).setRequestVersion(1);
+        var res2 = new PartiesNotifiedResponse().setServiceData(new PartiesNotifiedServiceData().setHearingLocation("loc-2"))
+            .setResponseReceivedDateTime(now.minusDays(2)).setRequestVersion(2);
+        var expected = new PartiesNotifiedResponse().setServiceData(new PartiesNotifiedServiceData().setHearingLocation("loc-1"))
+            .setResponseReceivedDateTime(now.minusDays(1)).setRequestVersion(3);
 
-        PartiesNotifiedResponses partiesNotified = PartiesNotifiedResponses.builder()
-            .responses(List.of(res1, expected, res2))
-            .build();
+        PartiesNotifiedResponses partiesNotified = new PartiesNotifiedResponses()
+            .setResponses(List.of(res1, expected, res2));
 
         PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
 
@@ -84,37 +82,58 @@ class HmcDataUtilsTest {
     }
 
     @Test
-    void hearingDataChanged_WhenHearingDataChanged_ReturnsTrue() {
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(
-                HearingResponse.builder().hearingDaySchedule(
-                        List.of(
-                            HearingDaySchedule.builder()
-                                .hearingVenueId("Venue A")
-                                .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-                                .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
-                                .build(),
-                            HearingDaySchedule.builder()
-                                .hearingVenueId("Venue A")
-                                .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
-                                .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 11, 0))
-                                .build()))
-                    .build())
-            .build();
+    void getHearingResponseForRequestVersion_WhenEmptyList_ReturnsNull() {
+        PartiesNotifiedResponses partiesNotified = new PartiesNotifiedResponses().setResponses(List.of());
 
-        PartiesNotifiedResponse partiesNotified = PartiesNotifiedResponse.builder()
-            .serviceData(PartiesNotifiedServiceData.builder()
-                             .days(List.of(
-                                 HearingDay.builder()
-                                     .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-                                     .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
-                                     .build(),
-                                 HearingDay.builder()
-                                     .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-                                     .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
-                                     .build()))
-                             .hearingLocation("Venue A")
-                             .build()).build();
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingResponseForRequestVersion(partiesNotified, 1);
+
+        assertNull(result);
+    }
+
+    @Test
+    void getHearingResponseForRequestVersion_WhenNonEmptyList_ReturnsLatestResponse() {
+        LocalDateTime now = LocalDateTime.now();
+
+        var res1 = new PartiesNotifiedResponse().setServiceData(new PartiesNotifiedServiceData().setHearingLocation("loc-3"))
+            .setResponseReceivedDateTime(now.minusDays(3)).setRequestVersion(1);
+        var res2 = new PartiesNotifiedResponse().setServiceData(new PartiesNotifiedServiceData().setHearingLocation("loc-2"))
+            .setResponseReceivedDateTime(now.minusDays(2)).setRequestVersion(3);
+        var res3 = new PartiesNotifiedResponse().setServiceData(new PartiesNotifiedServiceData().setHearingLocation("loc-1"))
+            .setResponseReceivedDateTime(now.minusDays(1)).setRequestVersion(2);
+
+        PartiesNotifiedResponses partiesNotified = new PartiesNotifiedResponses()
+            .setResponses(List.of(res3, res1, res2));
+
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingResponseForRequestVersion(partiesNotified, 3);
+
+        assertEquals(result, res2);
+    }
+
+    @Test
+    void hearingDataChanged_WhenHearingDataChanged_ReturnsTrue() {
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(
+                new HearingResponse().setHearingDaySchedule(
+                        List.of(
+                            new HearingDaySchedule()
+                                .setHearingVenueId("Venue A")
+                                .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0)),
+                            new HearingDaySchedule()
+                                .setHearingVenueId("Venue A")
+                                .setHearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
+                                .setHearingEndDateTime(LocalDateTime.of(2023, 12, 24, 11, 0)))));
+
+        PartiesNotifiedResponse partiesNotified = new PartiesNotifiedResponse()
+            .setServiceData(new PartiesNotifiedServiceData()
+                             .setDays(List.of(
+                                 new HearingDay()
+                                     .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                     .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0)),
+                                 new HearingDay()
+                                     .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                     .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))))
+                             .setHearingLocation("Venue A"));
 
         boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
 
@@ -123,30 +142,24 @@ class HmcDataUtilsTest {
 
     @Test
     void hearingDataChanged_WhenHearingDataChanged_ReturnsTrueExtraDay() {
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(
-                HearingResponse.builder().hearingDaySchedule(
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(
+                new HearingResponse().setHearingDaySchedule(
                         List.of(
-                            HearingDaySchedule.builder()
-                                .hearingVenueId("Venue A")
-                                .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-                                .build(),
-                            HearingDaySchedule.builder()
-                                .hearingVenueId("Venue A")
-                                .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
-                                .build()))
-                    .build())
-            .build();
+                            new HearingDaySchedule()
+                                .setHearingVenueId("Venue A")
+                                .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0)),
+                            new HearingDaySchedule()
+                                .setHearingVenueId("Venue A")
+                                .setHearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0)))));
 
-        PartiesNotifiedResponse partiesNotified = PartiesNotifiedResponse.builder()
-            .serviceData(PartiesNotifiedServiceData.builder()
-                             .hearingDate(LocalDateTime.of(2023, 12, 23, 10, 0))
-                             .hearingLocation("Venue B")
-                             .days(List.of(HearingDay.builder()
-                                               .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-                                               .build()))
-                             .hearingLocation("Venue A")
-                             .build()).build();
+        PartiesNotifiedResponse partiesNotified = new PartiesNotifiedResponse()
+            .setServiceData(new PartiesNotifiedServiceData()
+                             .setHearingDate(LocalDateTime.of(2023, 12, 23, 10, 0))
+                             .setHearingLocation("Venue B")
+                             .setDays(List.of(new HearingDay()
+                                               .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))))
+                             .setHearingLocation("Venue A"));
 
         boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
 
@@ -155,26 +168,21 @@ class HmcDataUtilsTest {
 
     @Test
     void hearingDataChanged_WhenHearingDataNotChanged_ReturnsFalse() {
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(
-                HearingResponse.builder().hearingDaySchedule(
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(
+                new HearingResponse().setHearingDaySchedule(
                         List.of(
-                            HearingDaySchedule.builder()
-                                .hearingVenueId("Venue A")
-                                .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-                                .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
-                                .build()))
-                    .build())
-            .build();
+                            new HearingDaySchedule()
+                                .setHearingVenueId("Venue A")
+                                .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0)))));
 
-        PartiesNotifiedResponse partiesNotified = PartiesNotifiedResponse.builder()
-            .serviceData(PartiesNotifiedServiceData.builder()
-                             .days(List.of(HearingDay.builder()
-                                               .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-                                               .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
-                                               .build()))
-                             .hearingLocation("Venue A")
-                             .build()).build();
+        PartiesNotifiedResponse partiesNotified = new PartiesNotifiedResponse()
+            .setServiceData(new PartiesNotifiedServiceData()
+                             .setDays(List.of(new HearingDay()
+                                               .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                               .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))))
+                             .setHearingLocation("Venue A"));
 
         boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
 
@@ -183,7 +191,7 @@ class HmcDataUtilsTest {
 
     @Test
     void hearingDataChanged_WhenPartiesNotifiedIsNull_ReturnsTrue() {
-        HearingGetResponse hearing = hearingResponse().build();
+        HearingGetResponse hearing = new HearingGetResponse();
 
         boolean result = HmcDataUtils.hearingDataChanged(null, hearing);
 
@@ -192,58 +200,44 @@ class HmcDataUtilsTest {
 
     @Test
     void hearingDataChanged_WhenPartiesNotifiedServiceDataIsNull_ReturnsTrue() {
-        HearingGetResponse hearing = hearingResponse().build();
-        PartiesNotifiedResponse partiesNotified = PartiesNotifiedResponse.builder().build();
+        HearingGetResponse hearing = new HearingGetResponse();
+        PartiesNotifiedResponse partiesNotified = new PartiesNotifiedResponse();
 
         boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
 
         assertTrue(result);
     }
 
-    private HearingGetResponse.HearingGetResponseBuilder hearingResponse() {
-        return HearingGetResponse.builder()
-            .requestDetails(HearingRequestDetails.builder().build())
-            .hearingDetails(HearingDetails.builder().build())
-            .caseDetails(CaseDetailsHearing.builder().build())
-            .hearingResponse(HearingResponse.builder().build())
-            .partyDetails(List.of());
-    }
-
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0));
 
-        var hearingDay3 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 25, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 25, 16, 0))
-            .build();
+        var hearingDay3 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 25, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 25, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2, hearingDay3)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2, hearingDay3)));
 
         var result = HmcDataUtils.getHearingDaysText(hearing, isWelsh);
 
-        assertEquals(result, isWelsh ? "23 Rhagfyr 2023 am 10:00 am 3 awr\n" +
-            "24 Rhagfyr 2023 am 14:00 am 2 awr\n" +
-            "25 Rhagfyr 2023 am 10:00 am 6 awr"
-            : "23 December 2023 at 10:00 for 3 hours\n" +
-            "24 December 2023 at 14:00 for 2 hours\n" +
-            "25 December 2023 at 10:00 for 6 hours");
-    }
-
-    @Test
-    void getTitle() {
+        assertEquals(result, isWelsh ? """
+            23 Rhagfyr 2023 am 10:00 am 3 awr
+            24 Rhagfyr 2023 am 14:00 am 2 awr
+            25 Rhagfyr 2023 am 10:00 am 6 awr"""
+            : """
+            23 December 2023 at 10:00 for 3 hours
+            24 December 2023 at 14:00 for 2 hours
+            25 December 2023 at 10:00 for 6 hours"""
+        );
     }
 
     @Nested
@@ -251,28 +245,28 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldReturnTheExpectedFirstDay() {
-            var expected = HearingDaySchedule.builder()
-                .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
-                .build();
+            var expected = new HearingDaySchedule()
+                .setHearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0));
 
-            var hearing = HearingGetResponse.builder()
-                .hearingResponse(
-                    HearingResponse.builder()
-                        .hearingDaySchedule(List.of(
-                            HearingDaySchedule.builder()
-                                .hearingStartDateTime(
-                                    LocalDateTime.of(2023, 01, 03, 0, 0, 0))
-                                .build(),
+            var hearing = new HearingGetResponse()
+                .setHearingResponse(
+                    new HearingResponse()
+                        .setHearingDaySchedule(List.of(
+                            new HearingDaySchedule()
+                                .setHearingStartDateTime(
+                                    LocalDateTime.of(2023, 01, 03, 0, 0, 0)),
                             expected,
-                            HearingDaySchedule.builder()
-                                .hearingStartDateTime(
+                            new HearingDaySchedule()
+                                .setHearingStartDateTime(
                                     LocalDateTime.of(2023, 01, 02, 0, 0, 0))
-                                .build()
-                        ))
-                        .build())
-                .build();
+                        )));
 
-            assertEquals(HmcDataUtils.getHearingStartDay(hearing), expected);
+            var result = HmcDataUtils.getHearingStartDay(hearing);
+
+            assertEquals(
+                LocalDateTime.of(2023, 1, 1, 0, 0),
+                result.getHearingStartDateTime()
+            );
         }
 
         @Test
@@ -282,24 +276,23 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldReturnNullIfHearingResponseIsNull() {
-            var hearing = HearingGetResponse.builder().build();
+            var hearing = new HearingGetResponse();
             assertNull(HmcDataUtils.getHearingStartDay(hearing));
         }
 
         @Test
         void shouldReturnNullIfHearingResponseScheduleDaysAreNull() {
-            var hearing = HearingGetResponse.builder()
-                .hearingResponse(HearingResponse.builder().build())
-                .build();
+            var hearing = new HearingGetResponse()
+                .setHearingResponse(new HearingResponse());
             assertNull(HmcDataUtils.getHearingStartDay(hearing));
         }
 
         @Test
         void shouldReturnNullIfHearingResponseScheduleDaysAreEmpty() {
-            var hearing = HearingGetResponse.builder()
-                .hearingResponse(
-                    HearingResponse.builder().hearingDaySchedule(new ArrayList<>()).build())
-                .build();
+            var hearing = new HearingGetResponse()
+                .setHearingResponse(
+                    new HearingResponse().setHearingDaySchedule(new ArrayList<>()))
+                                ;
             assertNull(HmcDataUtils.getHearingStartDay(hearing));
         }
     }
@@ -309,35 +302,29 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldReturnExpectedHearingDays() {
-            var hearingDayOne = HearingDay.builder()
-                .hearingStartDateTime(
+            var hearingDayOne = new HearingDay()
+                .setHearingStartDateTime(
                     LocalDateTime.of(2023, 01, 03, 0, 0, 0))
-                .hearingEndDateTime(
-                    LocalDateTime.of(2023, 01, 03, 12, 0, 0))
-                .build();
+                .setHearingEndDateTime(
+                    LocalDateTime.of(2023, 01, 03, 12, 0, 0));
 
-            var hearingDayTwo = HearingDay.builder()
-                .hearingStartDateTime(
+            var hearingDayTwo = new HearingDay()
+                .setHearingStartDateTime(
                     LocalDateTime.of(2023, 01, 05, 0, 0, 0))
-                .hearingEndDateTime(
-                    LocalDateTime.of(2023, 01, 05, 12, 0, 0))
-                .build();
+                .setHearingEndDateTime(
+                    LocalDateTime.of(2023, 01, 05, 12, 0, 0));
 
-            var hearing = HearingGetResponse.builder()
-                .hearingResponse(
-                    HearingResponse.builder()
-                        .hearingDaySchedule(List.of(
-                            HearingDaySchedule.builder()
-                                .hearingStartDateTime(hearingDayOne.getHearingStartDateTime())
-                                .hearingEndDateTime(hearingDayOne.getHearingEndDateTime())
-                                .build(),
-                            HearingDaySchedule.builder()
-                                .hearingStartDateTime(hearingDayTwo.getHearingStartDateTime())
-                                .hearingEndDateTime(hearingDayTwo.getHearingEndDateTime())
-                                .build()
-                        ))
-                        .build())
-                .build();
+            var hearing = new HearingGetResponse()
+                .setHearingResponse(
+                    new HearingResponse()
+                        .setHearingDaySchedule(List.of(
+                            new HearingDaySchedule()
+                                .setHearingStartDateTime(hearingDayOne.getHearingStartDateTime())
+                                .setHearingEndDateTime(hearingDayOne.getHearingEndDateTime()),
+                            new HearingDaySchedule()
+                                .setHearingStartDateTime(hearingDayTwo.getHearingStartDateTime())
+                                .setHearingEndDateTime(hearingDayTwo.getHearingEndDateTime())
+                        )));
 
             assertEquals(HmcDataUtils.getHearingDays(hearing), List.of(hearingDayOne, hearingDayTwo));
         }
@@ -346,14 +333,12 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_1Day_FullDay_BstHearingDay(Boolean isWelsh) {
-        var hearingDay = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
-            .build();
+        var hearingDay = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(hearingDay)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(List.of(hearingDay)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -363,14 +348,12 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_1Day_FullDay(Boolean isWelsh) {
-        var hearingDay = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
-            .build();
+        var hearingDay = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(hearingDay)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(List.of(hearingDay)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -380,14 +363,12 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_1Day_Morning(Boolean isWelsh) {
-        var hearingDay = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0))
-            .build();
+        var hearingDay = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(hearingDay)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(List.of(hearingDay)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -397,14 +378,12 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_1Day_Afternoon(Boolean isWelsh) {
-        var hearingDay = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
-            .build();
+        var hearingDay = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(hearingDay)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(List.of(hearingDay)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -414,20 +393,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_2Days_MorningAndAfternoon_BST(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -445,20 +421,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_2Days_MorningAndAfternoon(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -476,20 +449,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_2Days_FullDayAndAfternoon(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -507,20 +477,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_2Days_FullDayAndMorning(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 13, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 24, 13, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -538,20 +505,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_2Days_Morning(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 13, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 24, 13, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -569,20 +533,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_2Days_Afternoon(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -600,25 +561,21 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_3Days_FullDays(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0));
 
-        var hearingDay3 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 25, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 25, 16, 0))
-            .build();
+        var hearingDay3 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 25, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 25, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2, hearingDay3)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2, hearingDay3)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -638,25 +595,21 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_3Days_FullDayMorningAndAfternoon(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 13, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 24, 13, 0));
 
-        var hearingDay3 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 25, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 25, 16, 0))
-            .build();
+        var hearingDay3 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 25, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 25, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2, hearingDay3)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2, hearingDay3)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -676,25 +629,21 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_3Days_Afternoon(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0));
 
-        var hearingDay3 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 25, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 25, 16, 0))
-            .build();
+        var hearingDay3 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 25, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 25, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2, hearingDay3)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2, hearingDay3)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -714,15 +663,13 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_1Hour30minutes(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 30))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 30))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -736,15 +683,13 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_30minutes(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 14, 30))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 14, 30));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -759,15 +704,13 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_1Hour15minutes(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 45))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 45))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -783,15 +726,13 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText_shouldReturnExpectedText_1Hour45minutes(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 15))
-            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 15))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1)));
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
@@ -807,20 +748,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_1Day_3Hours_30minutes(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 00))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 00))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 24, 13, 30))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 24, 13, 30));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -830,20 +768,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_1Day_1Hours_30minutes(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 00))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 14, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 00))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 14, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 24, 13, 30))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 24, 13, 30));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -853,15 +788,13 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_whenDurationLessThan1Hour(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 10, 30))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 10, 30));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -871,15 +804,13 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_whenDuration5Hours(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -889,15 +820,13 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_whenDuration5Hours30Minutes(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 30))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 30));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -907,15 +836,13 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_whenDuration5Hours20Minutes(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 20))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 20));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -925,15 +852,13 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_whenDuration1Day5Hours(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -943,20 +868,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_whenDuration1day30Minutes(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 24, 10, 30))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 24, 10, 30));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -966,20 +888,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_whenDuration1Day5Hours30Minutes(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 10, 24, 15, 30))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 24, 15, 30));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -989,15 +908,13 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_1Day_FullDay(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -1007,15 +924,13 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_1Day_Morning(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -1025,15 +940,13 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_1Day_Afternoon(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -1043,20 +956,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_2Days_MorningAndAfternoon(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -1066,20 +976,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_2Days_FullDayAndAfternoon(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -1089,20 +996,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_2Days_FullDayAndMorning(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 13, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 24, 13, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -1112,20 +1016,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_2Days_Morning(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 13, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 24, 13, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -1135,30 +1036,25 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_2Days_48Hours(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 13, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 24, 13, 0));
 
-        var hearingDay3 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 25, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 25, 13, 0))
-            .build();
+        var hearingDay3 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 25, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 25, 13, 0));
 
-        var hearingDay4 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 26, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 26, 13, 0))
-            .build();
+        var hearingDay4 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 26, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 26, 13, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2, hearingDay3, hearingDay4)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2, hearingDay3, hearingDay4)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -1168,20 +1064,17 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_2Days_Afternoon(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -1191,25 +1084,21 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_3Days_FullDays(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0));
 
-        var hearingDay3 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 25, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 25, 16, 0))
-            .build();
+        var hearingDay3 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 25, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 25, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2, hearingDay3)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2, hearingDay3)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -1219,25 +1108,21 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_3Days_FullDayMorningAndAfternoon(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 13, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 24, 13, 0));
 
-        var hearingDay3 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 25, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 25, 16, 0))
-            .build();
+        var hearingDay3 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 25, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 25, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2, hearingDay3)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2, hearingDay3)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -1247,25 +1132,21 @@ class HmcDataUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getTotalHearingDurationText_3Days_Afternoon(Boolean isWelsh) {
-        var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
-            .build();
+        var hearingDay1 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0));
 
-        var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
-            .build();
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0));
 
-        var hearingDay3 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 25, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 25, 16, 0))
-            .build();
+        var hearingDay3 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 5, 25, 14, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 5, 25, 16, 0));
 
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                List.of(hearingDay1, hearingDay2, hearingDay3)).build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
+                List.of(hearingDay1, hearingDay2, hearingDay3)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
@@ -1276,7 +1157,7 @@ class HmcDataUtilsTest {
     class IncludesVideoHearing {
         @Test
         void shouldReturnFalseIfCaseHearingsIsNull() {
-            HearingsResponse hearings = HearingsResponse.builder().build();
+            HearingsResponse hearings = new HearingsResponse();
 
             boolean actual = includesVideoHearing(hearings);
 
@@ -1285,7 +1166,7 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldReturnFalseIfNoCaseHearingsExist() {
-            HearingsResponse hearings = HearingsResponse.builder().caseHearings(List.of()).build();
+            HearingsResponse hearings = new HearingsResponse().setCaseHearings(List.of());
 
             boolean actual = includesVideoHearing(hearings);
 
@@ -1294,20 +1175,16 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldReturnFalseIfNoVideoHearingsExist() {
-            HearingsResponse hearings = HearingsResponse.builder().caseHearings(List.of(
-                CaseHearing.builder()
-                    .hearingDaySchedule(List.of(
-                        HearingDaySchedule.builder()
-                            .attendees(List.of(
-                                Attendees.builder()
-                                    .hearingSubChannel(INTER)
-                                    .build(),
-                                Attendees.builder()
-                                    .hearingSubChannel(null)
-                                    .build()
-                            )).build()))
-                    .build()
-            )).build();
+            HearingsResponse hearings = new HearingsResponse().setCaseHearings(List.of(
+                new CaseHearing()
+                    .setHearingDaySchedule(List.of(
+                        new HearingDaySchedule()
+                            .setAttendees(List.of(
+                                new Attendees()
+                                    .setHearingSubChannel(INTER),
+                                new Attendees()
+                                    .setHearingSubChannel(null)
+                            ))))));
 
             boolean actual = includesVideoHearing(hearings);
 
@@ -1316,20 +1193,16 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldReturnTrue_IfVideoHearingsExistOnASingleDay() {
-            HearingsResponse hearings = HearingsResponse.builder().caseHearings(List.of(
-                CaseHearing.builder()
-                    .hearingDaySchedule(List.of(
-                        HearingDaySchedule.builder()
-                            .attendees(List.of(
-                                Attendees.builder()
-                                    .hearingSubChannel(VIDCVP)
-                                    .build(),
-                                Attendees.builder()
-                                    .hearingSubChannel(null)
-                                    .build()
-                            )).build()))
-                    .build()
-            )).build();
+            HearingsResponse hearings = new HearingsResponse().setCaseHearings(List.of(
+                new CaseHearing()
+                    .setHearingDaySchedule(List.of(
+                        new HearingDaySchedule()
+                            .setAttendees(List.of(
+                                new Attendees()
+                                    .setHearingSubChannel(VIDCVP),
+                                new Attendees()
+                                    .setHearingSubChannel(null)
+                            ))))));
 
             boolean actual = includesVideoHearing(hearings);
 
@@ -1338,30 +1211,23 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldReturnTrue_IfVideoHearingsExistOneDayWithinMultipleDays() {
-            HearingsResponse hearings = HearingsResponse.builder().caseHearings(List.of(
-                CaseHearing.builder()
-                    .hearingDaySchedule(List.of(
-                        HearingDaySchedule.builder()
-                            .attendees(List.of(
-                                Attendees.builder()
-                                    .hearingSubChannel(INTER)
-                                    .build(),
-                                Attendees.builder()
-                                    .hearingSubChannel(null)
-                                    .build()
-                            )).build(),
-                        HearingDaySchedule.builder()
-                            .attendees(List.of(
-                                Attendees.builder()
-                                    .hearingSubChannel(VIDCVP)
-                                    .build(),
-                                Attendees.builder()
-                                    .hearingSubChannel(null)
-                                    .build()
-                            )).build()
-                    ))
-                    .build()
-            )).build();
+            HearingsResponse hearings = new HearingsResponse().setCaseHearings(List.of(
+                new CaseHearing()
+                    .setHearingDaySchedule(List.of(
+                        new HearingDaySchedule()
+                            .setAttendees(List.of(
+                                new Attendees()
+                                    .setHearingSubChannel(INTER),
+                                new Attendees()
+                                    .setHearingSubChannel(null)
+                            )),
+                        new HearingDaySchedule()
+                            .setAttendees(List.of(
+                                new Attendees()
+                                    .setHearingSubChannel(VIDCVP),
+                                new Attendees()
+                                    .setHearingSubChannel(null)
+                            ))))));
 
             boolean actual = includesVideoHearing(hearings);
 
@@ -1378,7 +1244,7 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldReturnLocation_whenInvoked() {
-            List<LocationRefData> locations = List.of(LocationRefData.builder().epimmsId("venue").build());
+            List<LocationRefData> locations = List.of(new LocationRefData().setEpimmsId("venue"));
             when(locationRefDataService.getHearingCourtLocations("authToken"))
                 .thenReturn(locations);
             LocationRefData locationRefData = HmcDataUtils.getLocationRefData(
@@ -1388,7 +1254,7 @@ class HmcDataUtilsTest {
                 locationRefDataService
             );
 
-            assertThat(locationRefData).isEqualTo(LocationRefData.builder().epimmsId("venue").build());
+            assertThat(locationRefData).isEqualTo(new LocationRefData().setEpimmsId("venue"));
         }
 
         @Test
@@ -1415,13 +1281,12 @@ class HmcDataUtilsTest {
             LocalDateTime requestedDateTime = TODAY.plusHours(9);
             String hearingId = "12345";
 
-            HearingsResponse hearingsResponse = HearingsResponse.builder()
-                .caseHearings(List.of(
+            HearingsResponse hearingsResponse = new HearingsResponse()
+                .setCaseHearings(List.of(
                     hearing("11111", TODAY.minusDays(1), List.of(hearingStartTime)),
                     hearing(hearingId, requestedDateTime, List.of(hearingStartTime)),
                     hearing("33333", TODAY.minusDays(3), List.of(hearingStartTime)),
-                    hearing("22222", TODAY.minusDays(2), List.of(hearingStartTime))))
-                .build();
+                    hearing("22222", TODAY.minusDays(2), List.of(hearingStartTime))));
 
             CaseHearing actual = HmcDataUtils.getLatestHearing(hearingsResponse);
             CaseHearing expected = hearing(hearingId, requestedDateTime, List.of(hearingStartTime));
@@ -1441,7 +1306,8 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedTitle(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().allocatedTrack(allocatedTrack).build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setAllocatedTrack(allocatedTrack);
 
             String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing, false);
 
@@ -1457,7 +1323,7 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedTitle_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+            CaseData caseData = CaseDataBuilder.builder().responseClaimTrack(allocatedTrack.name()).build();
 
             String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing, false);
 
@@ -1473,7 +1339,7 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedTitleWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+            CaseData caseData = CaseDataBuilder.builder().responseClaimTrack(allocatedTrack.name()).build();
 
             String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing, true);
 
@@ -1493,7 +1359,8 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedText_unspecClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().allocatedTrack(allocatedTrack).build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setAllocatedTrack(allocatedTrack);
 
             String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, false);
 
@@ -1509,7 +1376,7 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedText_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+            CaseData caseData = CaseDataBuilder.builder().responseClaimTrack(allocatedTrack.name()).build();
 
             String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, false);
 
@@ -1525,7 +1392,7 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedTextWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+            CaseData caseData = CaseDataBuilder.builder().responseClaimTrack(allocatedTrack.name()).build();
 
             String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, true);
 
@@ -1541,7 +1408,7 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedPluralTextWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+            CaseData caseData = CaseDataBuilder.builder().responseClaimTrack(allocatedTrack.name()).build();
 
             String actual = HmcDataUtils.getPluralHearingTypeTextWelsh(caseData, hearing);
 
@@ -1593,6 +1460,10 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldNotThrowNpeWhenAttendeesContainsOrgNotIndividualFromListAssistMisuse() {
+            PartyDetailsModel organisationParty = new PartyDetailsModel();
+            organisationParty.setHearingSubChannel(INTER.name());
+            organisationParty.setPartyID("PARTYID");
+            organisationParty.setOrganisationDetails(buildOrganisationDetails("ID", "Misplaced Org"));
             HearingGetResponse hearing = buildHearingWithOrganisation(
                 List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
                         HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
@@ -1600,16 +1471,19 @@ class HmcDataUtilsTest {
                         HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
                         HearingIndividual.attendingHearingInPerson("Jack", "Crawley")
                 ),
-                PartyDetailsModel.builder().hearingSubChannel(INTER.name()).partyID("PARTYID")
-                    .organisationDetails(OrganisationDetailsModel.builder()
-                                             .cftOrganisationID("ID")
-                                             .name("Misplaced Org")
-                                             .build()).build()
+                organisationParty
             );
 
             String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
 
             assertEquals("Jason Wells\nMichael Carver\nJack Crawley", actual);
+        }
+
+        private OrganisationDetailsModel buildOrganisationDetails(String id, String name) {
+            OrganisationDetailsModel organisationDetailsModel = new OrganisationDetailsModel();
+            organisationDetailsModel.setCftOrganisationID(id);
+            organisationDetailsModel.setName(name);
+            return organisationDetailsModel;
         }
 
     }
@@ -1703,19 +1577,16 @@ class HmcDataUtilsTest {
     }
 
     private HearingGetResponse buildHearing(List<HearingIndividual> testIndividuals) {
-        return HearingGetResponse.builder()
-            .partyDetails(testIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
-                HearingDaySchedule.builder()
-                    .attendees(testIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
-                    .build())).build())
-            .build();
+        return new HearingGetResponse()
+            .setPartyDetails(testIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(List.of(
+                new HearingDaySchedule()
+                    .setAttendees(testIndividuals.stream().map(HearingIndividual::buildAttendee).toList()))));
     }
 
     private HearingGetResponse buildHearing(String hearingType) {
-        return HearingGetResponse.builder()
-            .hearingDetails(HearingDetails.builder().hearingType(hearingType).build())
-            .build();
+        return new HearingGetResponse()
+            .setHearingDetails(new HearingDetails().setHearingType(hearingType));
     }
 
     private HearingGetResponse buildHearingWithOrganisation(List<HearingIndividual> testIndividuals,
@@ -1725,23 +1596,20 @@ class HmcDataUtilsTest {
 
         partyDetails.add(org);
 
-        return HearingGetResponse.builder()
-            .partyDetails(partyDetails)
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
-                HearingDaySchedule.builder()
-                    .attendees(testIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
-                    .build())).build())
-            .build();
+        return new HearingGetResponse()
+            .setPartyDetails(partyDetails)
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(List.of(
+                new HearingDaySchedule()
+                    .setAttendees(testIndividuals.stream().map(HearingIndividual::buildAttendee).toList()))));
     }
 
     private CaseHearing hearing(String hearingId, LocalDateTime hearingRequestTime, List<LocalDateTime> startTimes) {
-        return CaseHearing.builder()
-            .hearingId(Long.valueOf(hearingId))
-            .hearingRequestDateTime(hearingRequestTime)
-            .hearingDaySchedule(startTimes.stream().map(startTime -> HearingDaySchedule.builder().hearingStartDateTime(
-                startTime).build()).collect(
-                Collectors.toList()))
-            .build();
+        return new CaseHearing()
+            .setHearingId(Long.valueOf(hearingId))
+            .setHearingRequestDateTime(hearingRequestTime)
+            .setHearingDaySchedule(startTimes.stream().map(startTime -> new HearingDaySchedule().setHearingStartDateTime(
+                startTime)).collect(
+                Collectors.toList()));
     }
 
     @Nested
@@ -1750,7 +1618,7 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenApplicant1DQIsNull() {
             // Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1DQ(null)
                 .build();
 
@@ -1764,10 +1632,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenApplicant1DQLanguageIsNull() {
             // Given
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQLanguage(null)
-                .build();
-            CaseData caseData = CaseData.builder()
+            Applicant1DQ applicant1DQ = new Applicant1DQ()
+                .setApplicant1DQLanguage(null);
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1DQ(applicant1DQ)
                 .build();
 
@@ -1781,13 +1648,11 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenDocumentsIsEnglish() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.ENGLISH)
-                .build();
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQLanguage(req)
-                .build();
-            CaseData caseData = CaseData.builder()
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.ENGLISH);
+            Applicant1DQ applicant1DQ = new Applicant1DQ()
+                .setApplicant1DQLanguage(req);
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1DQ(applicant1DQ)
                 .build();
 
@@ -1801,13 +1666,11 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenDocumentsIsWelsh() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.WELSH)
-                .build();
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQLanguage(req)
-                .build();
-            CaseData caseData = CaseData.builder()
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.WELSH);
+            Applicant1DQ applicant1DQ = new Applicant1DQ()
+                .setApplicant1DQLanguage(req);
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1DQ(applicant1DQ)
                 .build();
 
@@ -1821,13 +1684,11 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenDocumentsIsBoth() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.BOTH)
-                .build();
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQLanguage(req)
-                .build();
-            CaseData caseData = CaseData.builder()
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.BOTH);
+            Applicant1DQ applicant1DQ = new Applicant1DQ()
+                .setApplicant1DQLanguage(req);
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1DQ(applicant1DQ)
                 .build();
 
@@ -1845,7 +1706,7 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenRespondent1DQIsNull() {
             // Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(null)
                 .build();
 
@@ -1859,10 +1720,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenRespondent1DQLanguageIsNull() {
             // Given
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(null)
-                .build();
-            CaseData caseData = CaseData.builder()
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQLanguage(null);
+            CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .build();
 
@@ -1876,13 +1736,11 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenDocumentsIsEnglish() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.ENGLISH)
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(req)
-                .build();
-            CaseData caseData = CaseData.builder()
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.ENGLISH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQLanguage(req);
+            CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .build();
 
@@ -1896,13 +1754,11 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenDocumentsIsWelsh() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.WELSH)
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(req)
-                .build();
-            CaseData caseData = CaseData.builder()
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.WELSH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQLanguage(req);
+            CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .build();
 
@@ -1916,13 +1772,11 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenDocumentsIsBoth() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.BOTH)
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(req)
-                .build();
-            CaseData caseData = CaseData.builder()
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.BOTH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQLanguage(req);
+            CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .build();
 
@@ -1940,7 +1794,7 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenApplicantNoRepAndClaimantBilingual() {
             // Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1Represented(YesOrNo.NO)
                 // -> isClaimantBilingual() = true
                 .claimantBilingualLanguagePreference(Language.WELSH.toString())
@@ -1957,14 +1811,12 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenApplicantNoRepAndClaimantDQDocumentsWelsh() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.BOTH)
-                .build();
-            Applicant1DQ dq = Applicant1DQ.builder()
-                .applicant1DQLanguage(req)
-                .build();
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.BOTH);
+            Applicant1DQ dq = new Applicant1DQ()
+                .setApplicant1DQLanguage(req);
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1Represented(YesOrNo.NO)
                 // -> isClaimantBilingual() = false (ej: ENGLISH)
                 .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
@@ -1983,17 +1835,14 @@ class HmcDataUtilsTest {
         void shouldReturnTrue_whenRespondentNoRepAndRespondentResponseBilingual() {
             // Given
             // -> isRespondentResponseBilingual() = true si "BOTH" o "WELSH"
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                            .respondent1ResponseLanguage("BOTH") // => true
-                                            .build())
-                .build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                            .setRespondent1ResponseLanguage("BOTH"));
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1Represented(YesOrNo.YES)
-                .respondent1Represented(YesOrNo.NO)
-                .caseDataLiP(caseDataLiP)
-                .build();
+                .respondent1Represented(YesOrNo.NO).build();
+            caseData.setCaseDataLiP(caseDataLiP);
 
             // When
             boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
@@ -2005,25 +1854,21 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenRespondentNoRepAndDefendantDQDocumentsWelsh() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.WELSH)
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(req)
-                .build();
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.WELSH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQLanguage(req);
 
             // -> isRespondentResponseBilingual() = false (ej: "ENGLISH")
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                            .respondent1ResponseLanguage("ENGLISH").build())
-                .build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                            .setRespondent1ResponseLanguage("ENGLISH"));
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1Represented(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
-                .respondent1DQ(respondent1DQ)
-                .caseDataLiP(caseDataLiP)
-                .build();
+                .respondent1DQ(respondent1DQ).build();
+            caseData.setCaseDataLiP(caseDataLiP);
 
             // When
             boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
@@ -2036,7 +1881,7 @@ class HmcDataUtilsTest {
         void shouldReturnFalse_whenApplicantYesRepAndRespondentYesRep() {
             // Given
             // Ninguno es NO => toda la expresión OR se evalúa a false
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1Represented(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.YES)
                 .build();
@@ -2051,18 +1896,16 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenApplicantNoRepButNotBilingualNotDQ_andRespondentNoRepButNotBilingualNotDQ() {
             // Given
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                            .respondent1ResponseLanguage("ENGLISH").build())
-                .build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                            .setRespondent1ResponseLanguage("ENGLISH"));
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference(Language.ENGLISH.toString()) // => false
-                .respondent1Represented(YesOrNo.NO)
-                .caseDataLiP(caseDataLiP)
-                // Sin Applicant1DQ ni Respondent1DQ que establezcan WELSH o BOTH
-                .build();
+                .respondent1Represented(YesOrNo.NO).build();
+            caseData.setCaseDataLiP(caseDataLiP);
+            // Sin Applicant1DQ ni Respondent1DQ que establezcan WELSH o BOTH
 
             // When
             boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);

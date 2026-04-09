@@ -97,7 +97,7 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            Party respondent1 = PartyBuilder.builder().soleTrader()
+            Party respondent1 = new PartyBuilder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
 
@@ -127,7 +127,7 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            Party respondent1 = PartyBuilder.builder().soleTrader()
+            Party respondent1 = new PartyBuilder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
 
@@ -136,7 +136,7 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
                 .respondent1OrgRegistered(null)
                 .specRespondent1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")))
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -157,7 +157,7 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
         void shouldNotifyRespondentSolicitor_whenInvoked() {
             when(notificationsProperties.getRespondentSolicitorCcjNotificationTemplate()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("test solicitor").build()));
+                .thenReturn(Optional.of(new Organisation().setName("test solicitor")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
@@ -183,7 +183,7 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            Party respondent1 = PartyBuilder.builder().soleTrader()
+            Party respondent1 = new PartyBuilder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
 

@@ -62,13 +62,13 @@ class DefRepresentedNewRespSolOneEmailDTOGeneratorTest {
 
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .individualTitle("Mrs")
-                             .individualFirstName("Jane")
-                             .individualLastName("Defendant")
-                             .partyName("Jane Defendant").build())
-            .changeOfRepresentation(ChangeOfRepresentation.builder().organisationToAddID(orgId).build())
+            .respondent1(new Party()
+                             .setType(Party.Type.INDIVIDUAL)
+                             .setIndividualTitle("Mrs")
+                             .setIndividualFirstName("Jane")
+                             .setIndividualLastName("Defendant")
+                             .setPartyName("Jane Defendant"))
+            .changeOfRepresentation(new ChangeOfRepresentation().setOrganisationToAddID(orgId))
             .build();
 
         Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);

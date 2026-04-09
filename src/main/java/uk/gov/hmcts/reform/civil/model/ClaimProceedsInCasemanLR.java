@@ -1,15 +1,17 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.validation.groups.CasemanTransferDateGroup;
 
-import javax.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
 @Data
-@Builder
+@NoArgsConstructor
+@Accessors(chain = true)
 public class ClaimProceedsInCasemanLR {
 
     @PastOrPresent(message = "The date entered cannot be in the future", groups = CasemanTransferDateGroup.class)

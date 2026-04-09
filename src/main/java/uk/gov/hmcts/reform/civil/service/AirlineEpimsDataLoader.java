@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,10 +27,9 @@ public class AirlineEpimsDataLoader {
 
             List<String[]> linesList = reader.readAll();
             linesList.forEach(line -> {
-                AirlineEpimsId airlineEpimsID = AirlineEpimsId.builder()
-                    .airline(line[0])
-                    .epimsID(line[1])
-                    .build();
+                AirlineEpimsId airlineEpimsID = new AirlineEpimsId()
+                    .setAirline(line[0])
+                    .setEpimsID(line[1]);
                 airlineEpimsIDList.add(airlineEpimsID);
             });
         } catch (IOException | CsvException  e) {

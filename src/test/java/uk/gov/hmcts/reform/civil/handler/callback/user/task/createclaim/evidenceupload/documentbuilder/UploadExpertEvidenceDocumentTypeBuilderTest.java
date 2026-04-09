@@ -20,24 +20,22 @@ class UploadExpertEvidenceDocumentTypeBuilderTest {
 
     @Test
     void shouldBuildElementTypeWithDocumentCopy() {
-        Document originalDocument = Document.builder()
-                .categoryID("originalCategory")
-                .documentBinaryUrl("originalBinaryUrl")
-                .documentFileName("originalFileName.pdf")
-                .documentHash("originalHash")
-                .documentUrl("originalUrl")
-                .build();
+        Document originalDocument = new Document();
+        originalDocument.setCategoryID("originalCategory")
+                .setDocumentBinaryUrl("originalBinaryUrl")
+                .setDocumentFileName("originalFileName.pdf")
+                .setDocumentHash("originalHash")
+                .setDocumentUrl("originalUrl");
 
-        UploadEvidenceExpert originalExpert = UploadEvidenceExpert.builder()
-                .expertOptionName("Expert Name")
-                .expertOptionExpertise("Expertise")
-                .expertOptionExpertises("Expertises")
-                .expertOptionOtherParty("Other Party")
-                .expertDocumentQuestion("Question")
-                .expertDocumentAnswer("Answer")
-                .expertOptionUploadDate(LocalDate.parse("2022-02-10"))
-                .expertDocument(originalDocument)
-                .build();
+        UploadEvidenceExpert originalExpert = new UploadEvidenceExpert();
+        originalExpert.setExpertOptionName("Expert Name");
+        originalExpert.setExpertOptionExpertise("Expertise");
+        originalExpert.setExpertOptionExpertises("Expertises");
+        originalExpert.setExpertOptionOtherParty("Other Party");
+        originalExpert.setExpertDocumentQuestion("Question");
+        originalExpert.setExpertDocumentAnswer("Answer");
+        originalExpert.setExpertOptionUploadDate(LocalDate.parse("2022-02-10"));
+        originalExpert.setExpertDocument(originalDocument);
 
         UploadEvidenceExpert newExpert = uploadExpertEvidenceDocumentTypeBuilder.buildElementTypeWithDocumentCopy(originalExpert, "newCategory");
 

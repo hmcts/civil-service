@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.client.FeesApiClient;
+import uk.gov.hmcts.reform.civil.config.OtherRemedyFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
@@ -12,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 import java.math.BigDecimal;
 
 @Service
+@Slf4j
 @ConditionalOnProperty(prefix = "fees.api", name = "url")
 
 public class FeesClientService {
@@ -47,6 +50,7 @@ public class FeesClientService {
     }
 
     public FeeLookupResponseDto lookupFee(String channel, String event, BigDecimal amount) {
+        log.info("Fee lookup called from client for the claim amount  {}, channel {}, event {}", amount, channel, event);
         if (featureToggleService.isFeatureEnabled("fee-keywords-enable")) {
             String keyword;
             String jurisdiction2;
@@ -61,7 +65,7 @@ public class FeesClientService {
                 jurisdiction2 = this.jurisdiction2;
             }
 
-            return feesApiClient.lookupFeeWithAmount(
+            FeeLookupResponseDto feeLookupResponseDto = feesApiClient.lookupFeeWithAmount(
                 service,
                 jurisdiction1,
                 jurisdiction2,
@@ -71,9 +75,30 @@ public class FeesClientService {
                 amount
             );
 
+            if (feeLookupResponseDto == null) {
+                throw new IllegalStateException("Fee lookup returned null response");
+            }
+
+            log.info("Fee obtained from client for the  channel {}, event {} and claim amount  {} is {}",
+                     channel, event, amount, feeLookupResponseDto.getFeeAmount());
+
+            return feeLookupResponseDto;
+
         } else {
             return feesApiClient.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);
         }
+    }
+
+    public FeeLookupResponseDto lookupOtherRemedyFees(OtherRemedyFeesConfiguration otherRemedyFeesConfiguration, BigDecimal amount) {
+        return feesApiClient.lookupFeeWithAmount(
+            otherRemedyFeesConfiguration.getService(),
+            otherRemedyFeesConfiguration.getJurisdiction1(),
+            otherRemedyFeesConfiguration.getJurisdiction2(),
+            otherRemedyFeesConfiguration.getChannel(),
+            otherRemedyFeesConfiguration.getEvent(),
+            otherRemedyFeesConfiguration.getAnyOtherRemedyKeyword(),
+            amount
+        );
     }
 
     public Fee2Dto[] findRangeGroup(String channel, String event) {

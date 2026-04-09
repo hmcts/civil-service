@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.ClaimIssue.ClaimSubmit.Required",
+  "role": "CLAIMANT",
+  "titleEn": "This claim has not been submitted",
+  "titleCy": "Nid yw'r hawliad hwn wedi cael ei gyflwyno",
+  "descriptionEn": "<p class=\"govuk-body\">Your claim is saved as a draft. <a href=\"{DRAFT_CLAIM_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Continue with claim</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae eich cais wedi ei gadw fel drafft. <a href=\"{DRAFT_CLAIM_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Parhau gyda'r hawliad</a></p>"
+}

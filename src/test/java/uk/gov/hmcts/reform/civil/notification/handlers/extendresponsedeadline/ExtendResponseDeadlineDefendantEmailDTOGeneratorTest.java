@@ -42,12 +42,11 @@ public class ExtendResponseDeadlineDefendantEmailDTOGeneratorTest {
     void shouldReturnCorrectEmailTemplateIdWhenBilingual() {
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
-                CaseDataLiP.builder()
-                    .respondent1LiPResponse(
-                        RespondentLiPResponse.builder()
-                            .respondent1ResponseLanguage(BOTH.toString())
-                            .build()
-                    ).build()
+                new CaseDataLiP()
+                    .setRespondent1LiPResponse(
+                        new RespondentLiPResponse()
+                            .setRespondent1ResponseLanguage(BOTH.toString())
+                    )
             ).build();
         String expectedTemplateId = "template-id";
 
@@ -79,8 +78,8 @@ public class ExtendResponseDeadlineDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        Party respondent = Party.builder().companyName("Respondent Name").type(Party.Type.COMPANY).build();
-        Party claimant = Party.builder().companyName("Claimant Name").type(Party.Type.COMPANY).build();
+        Party respondent = new Party().setCompanyName("Respondent Name").setType(Party.Type.COMPANY);
+        Party claimant = new Party().setCompanyName("Claimant Name").setType(Party.Type.COMPANY);
         LocalDate responseDeadline = LocalDate.of(2025, 6, 20);
         CaseData caseData = CaseData.builder()
                 .respondent1(respondent)

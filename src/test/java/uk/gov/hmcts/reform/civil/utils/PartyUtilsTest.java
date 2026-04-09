@@ -49,78 +49,79 @@ class PartyUtilsTest {
     class PartyNameBasedOnType {
         @Test
         void shouldThrowNullPointer_whenPartyTypeIsNull() {
-            Party party = Party.builder().type(null).build();
+            Party party = new Party();
+            party.setType(null);
             assertThrows(NullPointerException.class, () -> PartyUtils.getPartyNameBasedOnType(party));
         }
 
         @Test
         void shouldProvideName_whenPartyTypeIsIndividual() {
-            Party individual = Party.builder()
-                .individualTitle("Mr")
-                .individualFirstName("Jacob")
-                .individualLastName("Martin")
-                .type(Party.Type.INDIVIDUAL).build();
+            Party individual = new Party();
+            individual.setIndividualTitle("Mr");
+            individual.setIndividualFirstName("Jacob");
+            individual.setIndividualLastName("Martin");
+            individual.setType(Party.Type.INDIVIDUAL);
 
             assertEquals("Mr Jacob Martin", PartyUtils.getPartyNameBasedOnType(individual));
         }
 
         @Test
         void shouldProvideNameWithoutTitle_whenPartyTypeIsIndividual() {
-            Party individual = Party.builder()
-                .individualTitle("Mr")
-                .individualFirstName("Jacob")
-                .individualLastName("Martin")
-                .type(Party.Type.INDIVIDUAL).build();
+            Party individual = new Party();
+            individual.setIndividualTitle("Mr");
+            individual.setIndividualFirstName("Jacob");
+            individual.setIndividualLastName("Martin");
+            individual.setType(Party.Type.INDIVIDUAL);
 
             assertEquals("Jacob Martin", PartyUtils.getPartyNameBasedOnType(individual, true));
         }
 
         @Test
         void shouldProvideName_whenPartyTypeIsIndividualWithoutTitle() {
-            Party individual = Party.builder()
-                .individualFirstName("Jacob")
-                .individualLastName("Martin")
-                .type(Party.Type.INDIVIDUAL).build();
+            Party individual = new Party();
+            individual.setIndividualFirstName("Jacob");
+            individual.setIndividualLastName("Martin");
+            individual.setType(Party.Type.INDIVIDUAL);
 
             assertEquals("Jacob Martin", PartyUtils.getPartyNameBasedOnType(individual));
         }
 
         @Test
         void shouldProvideName_whenPartyTypeIsCompany() {
-            Party individual = Party.builder()
-                .companyName("XYZ Company House")
-                .type(Party.Type.COMPANY).build();
+            Party individual = new Party();
+            individual.setCompanyName("XYZ Company House");
+            individual.setType(Party.Type.COMPANY);
 
             assertEquals("XYZ Company House", PartyUtils.getPartyNameBasedOnType(individual));
         }
 
         @Test
         void shouldProvideName_whenPartyTypeIsOrganisation() {
-            Party organisation = Party.builder()
-                .organisationName("ABC Solutions")
-                .type(Party.Type.ORGANISATION).build();
+            Party organisation = new Party();
+            organisation.setOrganisationName("ABC Solutions");
+            organisation.setType(Party.Type.ORGANISATION);
 
             assertEquals("ABC Solutions", PartyUtils.getPartyNameBasedOnType(organisation));
         }
 
         @Test
         void shouldProvideName_whenPartyTypeIsSoleTrader() {
-            Party soleTrader = Party.builder()
-                .soleTraderTitle("Mr")
-                .soleTraderFirstName("Jacob")
-                .soleTraderLastName("Martin")
-                .type(Party.Type.SOLE_TRADER).build();
+            Party soleTrader = new Party();
+            soleTrader.setSoleTraderTitle("Mr");
+            soleTrader.setSoleTraderFirstName("Jacob");
+            soleTrader.setSoleTraderLastName("Martin");
+            soleTrader.setType(Party.Type.SOLE_TRADER);
 
             assertEquals("Mr Jacob Martin", PartyUtils.getPartyNameBasedOnType(soleTrader));
         }
 
         @Test
         void shouldProvideNameWithoutTitle_whenPartyTypeIsSoleTrader() {
-            Party soleTrader = Party.builder()
-                .soleTraderTitle("Mr")
-                .soleTraderFirstName("Jacob")
-                .soleTraderLastName("Martin")
-                .type(Party.Type.SOLE_TRADER).build();
+            Party soleTrader = new Party();
+            soleTrader.setSoleTraderTitle("Mr");
+            soleTrader.setSoleTraderFirstName("Jacob");
+            soleTrader.setSoleTraderLastName("Martin");
+            soleTrader.setType(Party.Type.SOLE_TRADER);
 
             assertEquals("Jacob Martin", PartyUtils.getPartyNameBasedOnType(soleTrader, true));
         }
@@ -131,77 +132,81 @@ class PartyUtilsTest {
 
         @Test
         void shouldThrowNullPointer_whenPartyTypeIsNull() {
-            Party party = Party.builder().type(null).build();
-            LitigationFriend litigationFriend = LitigationFriend.builder().build();
+            Party party = new Party();
+            party.setType(null);
+            LitigationFriend litigationFriend = new LitigationFriend();
             assertThrows(NullPointerException.class, () -> PartyUtils.getLitigiousPartyName(party, litigationFriend));
         }
 
         @Test
         void shouldProvideName_whenPartyTypeIsIndividualAndNoLitigationFriend() {
-            Party individual = Party.builder()
-                .individualTitle("Mr")
-                .individualFirstName("Jacob")
-                .individualLastName("Martin")
-                .type(Party.Type.INDIVIDUAL).build();
+            Party individual = new Party();
+            individual.setIndividualTitle("Mr");
+            individual.setIndividualFirstName("Jacob");
+            individual.setIndividualLastName("Martin");
+            individual.setType(Party.Type.INDIVIDUAL);
 
             assertEquals("Mr Jacob Martin", PartyUtils.getLitigiousPartyName(individual, null));
         }
 
         @Test
         void shouldProvideName_whenPartyTypeIsIndividualAndLitigationFriend() {
-            Party individual = Party.builder()
-                .individualTitle("Mr")
-                .individualFirstName("Jacob")
-                .individualLastName("Martin")
-                .type(Party.Type.INDIVIDUAL).build();
-            LitigationFriend litigationFriend = LitigationFriend.builder()
-                .firstName("Litigious")
-                .lastName("Friend")
-                .build();
-            assertEquals("Mr Jacob Martin L/F Litigious Friend",
-                         PartyUtils.getLitigiousPartyName(individual, litigationFriend));
+            Party individual = new Party();
+            individual.setIndividualTitle("Mr");
+            individual.setIndividualFirstName("Jacob");
+            individual.setIndividualLastName("Martin");
+            individual.setType(Party.Type.INDIVIDUAL);
+            LitigationFriend litigationFriend = new LitigationFriend();
+            litigationFriend.setFirstName("Litigious");
+            litigationFriend.setLastName("Friend");
+            assertEquals(
+                "Mr Jacob Martin L/F Litigious Friend",
+                PartyUtils.getLitigiousPartyName(individual, litigationFriend)
+            );
         }
 
         @Test
         void shouldProvideName_whenPartyTypeIsCompany() {
-            Party individual = Party.builder()
-                .companyName("XYZ Company House")
-                .type(Party.Type.COMPANY).build();
+            Party individual = new Party();
+            individual.setCompanyName("XYZ Company House");
+            individual.setType(Party.Type.COMPANY);
 
             assertEquals("XYZ Company House", PartyUtils.getLitigiousPartyName(individual, null));
         }
 
         @Test
         void shouldProvideName_whenPartyTypeIsOrganisation() {
-            Party organisation = Party.builder()
-                .organisationName("ABC Solutions")
-                .type(Party.Type.ORGANISATION).build();
+            Party organisation = new Party();
+            organisation.setOrganisationName("ABC Solutions");
+            organisation.setType(Party.Type.ORGANISATION);
 
             assertEquals("ABC Solutions", PartyUtils.getLitigiousPartyName(organisation, null));
         }
 
         @Test
         void shouldProvideName_whenPartyTypeIsSoleTrader() {
-            Party soleTrader = Party.builder()
-                .soleTraderTitle("Mr")
-                .soleTraderFirstName("Jacob")
-                .soleTraderLastName("Martin")
-                .type(Party.Type.SOLE_TRADER).build();
+            Party soleTrader = new Party();
+            soleTrader.setSoleTraderTitle("Mr");
+            soleTrader.setSoleTraderFirstName("Jacob");
+            soleTrader.setSoleTraderLastName("Martin");
+            soleTrader.setType(Party.Type.SOLE_TRADER);
 
             assertEquals("Mr Jacob Martin", PartyUtils.getLitigiousPartyName(soleTrader, null));
         }
 
         @Test
         void shouldProvideName_whenPartyTypeIsSoleTraderAndTradingAs() {
-            Party soleTrader = Party.builder()
-                .soleTraderTitle("Mr")
-                .soleTraderFirstName("Jacob")
-                .soleTraderLastName("Martin")
-                .soleTraderTradingAs("Trading Co")
-                .type(Party.Type.SOLE_TRADER).build();
+            Party soleTrader = new Party();
+            soleTrader.setSoleTraderTitle("Mr");
+            soleTrader.setSoleTraderFirstName("Jacob");
+            soleTrader.setSoleTraderLastName("Martin");
+            soleTrader.setSoleTraderTradingAs("Trading Co");
+            soleTrader.setType(Party.Type.SOLE_TRADER);
 
-            assertEquals("Mr Jacob Martin T/A Trading Co",
-                         PartyUtils.getLitigiousPartyName(soleTrader, null));
+            assertEquals(
+                "Mr Jacob Martin T/A Trading Co",
+                PartyUtils.getLitigiousPartyName(soleTrader, null)
+            );
         }
     }
 
@@ -211,7 +216,7 @@ class PartyUtilsTest {
         @ParameterizedTest
         @EnumSource(value = Party.Type.class, names = {"SOLE_TRADER", "INDIVIDUAL"})
         void shouldReturnDateOfBirth_whenPartyTypeIsIndividualOrSoleTrader(Party.Type type) {
-            Party party = PartyBuilder.builder().ofType(type).build();
+            Party party = new PartyBuilder().ofType(type).build();
 
             assertThat(PartyUtils.getDateOfBirth(party)).contains(DATE_OF_BIRTH);
         }
@@ -219,7 +224,7 @@ class PartyUtilsTest {
         @ParameterizedTest
         @EnumSource(value = Party.Type.class, mode = EnumSource.Mode.EXCLUDE, names = {"SOLE_TRADER", "INDIVIDUAL"})
         void shouldReturnEmpty_whenPartyTypeIsNotIndividualOrSoleTrader(Party.Type type) {
-            Party party = PartyBuilder.builder().ofType(type).build();
+            Party party = new PartyBuilder().ofType(type).build();
 
             assertThat(PartyUtils.getDateOfBirth(party)).isEmpty();
         }
@@ -248,10 +253,11 @@ class PartyUtilsTest {
 
         @Test
         void shouldReturnReferences_when1v2DiffSolicitorAndOnlyClaimantRefAndSol2RefAvailable() {
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .solicitorReferences(SolicitorReferences.builder().applicantSolicitor1Reference("App One").build())
-                .respondentSolicitor2Reference("Def Two")
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            SolicitorReferences solicitorReferences = new SolicitorReferences();
+            solicitorReferences.setApplicantSolicitor1Reference("App One");
+            caseData.setSolicitorReferences(solicitorReferences);
+            caseData.setRespondentSolicitor2Reference("Def Two");
 
             String partyReferences = PartyUtils.buildPartiesReferences(caseData);
 
@@ -260,57 +266,66 @@ class PartyUtilsTest {
 
         @Test
         void shouldReturnReferences_when1v2DiffSolicitorCase() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .respondentSolicitor2Reference("defendant sol 2")
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setRespondentSolicitor2Reference("defendant sol 2");
 
             String partyReferences = PartyUtils.buildPartiesReferences(caseData);
 
-            assertEquals("Claimant reference: 12345\nDefendant 1 reference: 6789\nDefendant 2 reference: "
-                             + "defendant sol 2",
-                         partyReferences);
+            assertEquals(
+                """
+                Claimant reference: 12345
+                Defendant 1 reference: 6789
+                Defendant 2 reference: defendant sol 2""",
+                partyReferences
+            );
         }
 
         @Test
         void shouldReturnRespondentReference2_when1v2DiffSolicitorCase() {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .solicitorReferences(SolicitorReferences.builder()
-                                         .respondentSolicitor2Reference("defendant sol 2").build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            SolicitorReferences solicitorReferences = new SolicitorReferences();
+            solicitorReferences.setRespondentSolicitor2Reference("defendant sol 2");
+            caseData.setSolicitorReferences(solicitorReferences);
 
             String respondentReference = PartyUtils.buildRespondentReference(caseData, true);
 
-            assertEquals("defendant sol 2",
-                         respondentReference);
+            assertEquals(
+                "defendant sol 2",
+                respondentReference
+            );
         }
 
         @Test
         void shouldReturnRespondentReference1_when1v2DiffSolicitorCase() {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .solicitorReferences(SolicitorReferences.builder()
-                                         .respondentSolicitor1Reference("defendant sol 1").build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            SolicitorReferences solicitorReferences = new SolicitorReferences();
+            solicitorReferences.setRespondentSolicitor1Reference("defendant sol 1");
+            caseData.setSolicitorReferences(solicitorReferences);
 
             String respondentReference = PartyUtils.buildRespondentReference(caseData, false);
 
-            assertEquals("defendant sol 1",
-                         respondentReference);
+            assertEquals(
+                "defendant sol 1",
+                respondentReference
+            );
         }
 
         @Test
         void shouldReturnApplicantReference1_when1v2DiffSolicitorCase() {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .solicitorReferences(SolicitorReferences.builder()
-                                         .applicantSolicitor1Reference("applicant sol").build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            SolicitorReferences solicitorReferences = new SolicitorReferences();
+            solicitorReferences.setApplicantSolicitor1Reference("applicant sol");
+            caseData.setSolicitorReferences(solicitorReferences);
 
             String respondentReference = PartyUtils.buildClaimantReferenceOnly(caseData);
 
-            assertEquals("applicant sol",
-                         respondentReference);
+            assertEquals(
+                "applicant sol",
+                respondentReference
+            );
         }
     }
 
@@ -342,18 +357,23 @@ class PartyUtilsTest {
         @Test
         void shouldReturnCorrectResponseTypeFor1v1Cases() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
-
-            assertEquals(PartyUtils.getResponseTypeForRespondent(
-                caseData,
-                caseData.getRespondent1()
-            ), FULL_DEFENCE);
+            assertEquals(
+                FULL_DEFENCE,
+                PartyUtils.getResponseTypeForRespondent(
+                    caseData,
+                    caseData.getRespondent1()
+                )
+            );
 
             CaseData partAdmissionCaseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build();
 
-            assertEquals(PartyUtils.getResponseTypeForRespondent(
-                partAdmissionCaseData,
-                partAdmissionCaseData.getRespondent1()
-            ), PART_ADMISSION);
+            assertEquals(
+                PART_ADMISSION,
+                PartyUtils.getResponseTypeForRespondent(
+                    partAdmissionCaseData,
+                    partAdmissionCaseData.getRespondent1()
+                )
+            );
         }
 
         @Test
@@ -364,15 +384,21 @@ class PartyUtilsTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .build();
 
-            assertEquals(PartyUtils.getResponseTypeForRespondent(
-                caseData,
-                caseData.getRespondent1()
-            ), FULL_DEFENCE);
+            assertEquals(
+                FULL_DEFENCE,
+                PartyUtils.getResponseTypeForRespondent(
+                    caseData,
+                    caseData.getRespondent1()
+                )
+            );
 
-            assertEquals(PartyUtils.getResponseTypeForRespondent(
-                caseData,
-                caseData.getRespondent2()
-            ), FULL_DEFENCE);
+            assertEquals(
+                FULL_DEFENCE,
+                PartyUtils.getResponseTypeForRespondent(
+                    caseData,
+                    caseData.getRespondent2()
+                )
+            );
 
             CaseData partAdmissionCaseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
@@ -381,53 +407,63 @@ class PartyUtilsTest {
                 .respondent2Responds(PART_ADMISSION)
                 .build();
 
-            assertEquals(PartyUtils.getResponseTypeForRespondent(
-                partAdmissionCaseData,
-                partAdmissionCaseData.getRespondent1()
-            ), FULL_ADMISSION);
+            assertEquals(
+                FULL_ADMISSION,
+                PartyUtils.getResponseTypeForRespondent(
+                    partAdmissionCaseData,
+                    partAdmissionCaseData.getRespondent1()
+                )
+            );
 
-            assertEquals(PartyUtils.getResponseTypeForRespondent(
-                partAdmissionCaseData,
-                partAdmissionCaseData.getRespondent2()
-            ), PART_ADMISSION);
+            assertEquals(
+                PART_ADMISSION,
+                PartyUtils.getResponseTypeForRespondent(
+                    partAdmissionCaseData,
+                    partAdmissionCaseData.getRespondent2()
+                )
+            );
         }
 
         @Test
         void shouldReturnCorrectResponseTypeFor1v1CasesSpec() {
             CaseData fullDefenceCaseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build();
 
-            assertEquals(RespondentResponseTypeSpec.FULL_DEFENCE,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             fullDefenceCaseData,
-                             fullDefenceCaseData.getRespondent1()
-                         )
+            assertEquals(
+                RespondentResponseTypeSpec.FULL_DEFENCE,
+                PartyUtils.getResponseTypeForRespondentSpec(
+                    fullDefenceCaseData,
+                    fullDefenceCaseData.getRespondent1()
+                )
             );
 
             CaseData partAdmissionCaseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
 
-            assertEquals(RespondentResponseTypeSpec.PART_ADMISSION,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             partAdmissionCaseData,
-                             partAdmissionCaseData.getRespondent1()
-                         )
+            assertEquals(
+                RespondentResponseTypeSpec.PART_ADMISSION,
+                PartyUtils.getResponseTypeForRespondentSpec(
+                    partAdmissionCaseData,
+                    partAdmissionCaseData.getRespondent1()
+                )
             );
 
             CaseData fullAdmissionCaseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
 
-            assertEquals(RespondentResponseTypeSpec.FULL_ADMISSION,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             fullAdmissionCaseData,
-                             fullAdmissionCaseData.getRespondent1()
-                         )
+            assertEquals(
+                RespondentResponseTypeSpec.FULL_ADMISSION,
+                PartyUtils.getResponseTypeForRespondentSpec(
+                    fullAdmissionCaseData,
+                    fullAdmissionCaseData.getRespondent1()
+                )
             );
 
             CaseData counterClaimCaseData = CaseDataBuilder.builder().atStateRespondentCounterClaimSpec().build();
 
-            assertEquals(RespondentResponseTypeSpec.COUNTER_CLAIM,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             counterClaimCaseData,
-                             counterClaimCaseData.getRespondent1()
-                         )
+            assertEquals(
+                RespondentResponseTypeSpec.COUNTER_CLAIM,
+                PartyUtils.getResponseTypeForRespondentSpec(
+                    counterClaimCaseData,
+                    counterClaimCaseData.getRespondent1()
+                )
             );
         }
 
@@ -439,18 +475,20 @@ class PartyUtilsTest {
                 .respondent2RespondsSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .build();
 
-            assertEquals(RespondentResponseTypeSpec.FULL_ADMISSION,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             divergentResponseCaseData,
-                             divergentResponseCaseData.getRespondent1()
-                         )
+            assertEquals(
+                RespondentResponseTypeSpec.FULL_ADMISSION,
+                PartyUtils.getResponseTypeForRespondentSpec(
+                    divergentResponseCaseData,
+                    divergentResponseCaseData.getRespondent1()
+                )
             );
 
-            assertEquals(RespondentResponseTypeSpec.PART_ADMISSION,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             divergentResponseCaseData,
-                             divergentResponseCaseData.getRespondent2()
-                         )
+            assertEquals(
+                RespondentResponseTypeSpec.PART_ADMISSION,
+                PartyUtils.getResponseTypeForRespondentSpec(
+                    divergentResponseCaseData,
+                    divergentResponseCaseData.getRespondent2()
+                )
             );
 
             CaseData counterClaimCaseData = CaseDataBuilder.builder()
@@ -459,18 +497,20 @@ class PartyUtilsTest {
                 .respondent2RespondsSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                 .build();
 
-            assertEquals(RespondentResponseTypeSpec.COUNTER_CLAIM,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             counterClaimCaseData,
-                             counterClaimCaseData.getRespondent1()
-                         )
+            assertEquals(
+                RespondentResponseTypeSpec.COUNTER_CLAIM,
+                PartyUtils.getResponseTypeForRespondentSpec(
+                    counterClaimCaseData,
+                    counterClaimCaseData.getRespondent1()
+                )
             );
 
-            assertEquals(RespondentResponseTypeSpec.COUNTER_CLAIM,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             counterClaimCaseData,
-                             counterClaimCaseData.getRespondent2()
-                         )
+            assertEquals(
+                RespondentResponseTypeSpec.COUNTER_CLAIM,
+                PartyUtils.getResponseTypeForRespondentSpec(
+                    counterClaimCaseData,
+                    counterClaimCaseData.getRespondent2()
+                )
             );
         }
     }
@@ -483,17 +523,16 @@ class PartyUtilsTest {
             LocalDateTime datetime = LocalDateTime.now();
             LocalDate date = LocalDate.now();
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1(PartyBuilder.builder().individual().build())
+                .respondent1(new PartyBuilder().individual().build())
                 .respondent1TimeExtensionDate(datetime)
                 .respondentSolicitor1AgreedDeadlineExtension(date)
                 .build();
 
-            PartyData expectedData = PartyData.builder()
-                .role(RESPONDENT_ONE)
-                .details(caseData.getRespondent1())
-                .timeExtensionDate(datetime)
-                .solicitorAgreedDeadlineExtension(date)
-                .build();
+            PartyData expectedData = new PartyData()
+                .setRole(RESPONDENT_ONE)
+                .setDetails(caseData.getRespondent1())
+                .setTimeExtensionDate(datetime)
+                .setSolicitorAgreedDeadlineExtension(date);
 
             PartyData actualData = PartyUtils.respondent1Data(caseData);
 
@@ -505,17 +544,16 @@ class PartyUtilsTest {
             LocalDateTime datetime = LocalDateTime.now();
             LocalDate date = LocalDate.now();
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .respondent2TimeExtensionDate(datetime)
                 .respondentSolicitor2AgreedDeadlineExtension(date)
                 .build();
 
-            PartyData expectedData = PartyData.builder()
-                .role(RESPONDENT_TWO)
-                .details(caseData.getRespondent2())
-                .timeExtensionDate(datetime)
-                .solicitorAgreedDeadlineExtension(date)
-                .build();
+            PartyData expectedData = new PartyData()
+                .setRole(RESPONDENT_TWO)
+                .setDetails(caseData.getRespondent2())
+                .setTimeExtensionDate(datetime)
+                .setSolicitorAgreedDeadlineExtension(date);
 
             PartyData actualData = PartyUtils.respondent2Data(caseData);
 
@@ -528,7 +566,8 @@ class PartyUtilsTest {
 
         @Test
         void shouldAddPartyId_toGivenParty() {
-            Party party = Party.builder().partyName("mock party").build();
+            Party party = new Party();
+            party.setPartyName("mock party");
 
             Party actual = PartyUtils.appendWithNewPartyId(party);
 
@@ -537,10 +576,9 @@ class PartyUtilsTest {
 
         @Test
         void shouldNotAppendPartyId_whenPartyIdExists() {
-            Party expected = Party.builder()
-                .partyID(UUID.randomUUID().toString())
-                .partyName("mock party")
-                .build();
+            Party expected = new Party();
+            expected.setPartyID(UUID.randomUUID().toString());
+            expected.setPartyName("mock party");
 
             Party actual = PartyUtils.appendWithNewPartyId(expected);
 
@@ -558,8 +596,8 @@ class PartyUtilsTest {
 
         @Test
         void shouldAddPartyId_toGivenLitigationFriend() {
-            LitigationFriend litigationFriend = LitigationFriend.builder()
-                .firstName("mock party").build();
+            LitigationFriend litigationFriend = new LitigationFriend();
+            litigationFriend.setFirstName("mock party");
 
             LitigationFriend actual = PartyUtils.appendWithNewPartyId(litigationFriend);
 
@@ -568,10 +606,9 @@ class PartyUtilsTest {
 
         @Test
         void shouldNotAppendPartyId_whenLitigationFriendPartyIdExists() {
-            LitigationFriend expected = LitigationFriend.builder()
-                .partyID(UUID.randomUUID().toString())
-                .firstName("litfriend")
-                .build();
+            LitigationFriend expected = new LitigationFriend();
+            expected.setPartyID(UUID.randomUUID().toString());
+            expected.setFirstName("litfriend");
 
             LitigationFriend actual = PartyUtils.appendWithNewPartyId(expected);
 
@@ -589,8 +626,8 @@ class PartyUtilsTest {
 
         @Test
         void shouldAddPartyId_toGivenPartyFlagStructure() {
-            PartyFlagStructure partyFlagStructure = PartyFlagStructure.builder()
-                .firstName("mock party").build();
+            PartyFlagStructure partyFlagStructure = new PartyFlagStructure();
+            partyFlagStructure.setFirstName("mock party");
 
             PartyFlagStructure actual = PartyUtils.appendWithNewPartyId(partyFlagStructure);
 
@@ -599,10 +636,9 @@ class PartyUtilsTest {
 
         @Test
         void shouldNotAppendPartyId_whenPartyFlagStructurePartyIdExists() {
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .partyID(UUID.randomUUID().toString())
-                .firstName("structure")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure();
+            expected.setPartyID(UUID.randomUUID().toString());
+            expected.setFirstName("structure");
 
             PartyFlagStructure actual = PartyUtils.appendWithNewPartyId(expected);
 
@@ -624,10 +660,9 @@ class PartyUtilsTest {
 
         @Test
         void shouldAddPartyIds_toGivenListOfPartyFlagStructures() {
-            List<Element<PartyFlagStructure>> partyFlagStructures = wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("structure").build()
-            ));
+            PartyFlagStructure partyFlagStructure = new PartyFlagStructure();
+            partyFlagStructure.setFirstName("structure");
+            List<Element<PartyFlagStructure>> partyFlagStructures = wrapElements(List.of(partyFlagStructure));
 
             var actual = PartyUtils.appendWithNewPartyIds(partyFlagStructures);
 
@@ -637,12 +672,10 @@ class PartyUtilsTest {
 
         @Test
         void shouldNotAppendParty_whenPartyIdExists() {
-            List<Element<PartyFlagStructure>> expected = wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("structure")
-                    .partyID("some id")
-                    .build()
-            ));
+            PartyFlagStructure partyFlagStructure = new PartyFlagStructure();
+            partyFlagStructure.setFirstName("structure");
+            partyFlagStructure.setPartyID("some id");
+            List<Element<PartyFlagStructure>> expected = wrapElements(List.of(partyFlagStructure));
 
             List<Element<PartyFlagStructure>> actual = PartyUtils.appendWithNewPartyIds(expected);
 
@@ -664,37 +697,61 @@ class PartyUtilsTest {
 
         @Test
         void shouldPopulatePartyIds_withinGivenCaseDataBuilder() {
-            CaseData.CaseDataBuilder builder = CaseData.builder()
-                .applicant1(Party.builder().partyName("mock party 1").build())
-                .applicant2(Party.builder().partyName("mock party 3").build())
-                .respondent1(Party.builder().partyName("mock party 4").build())
-                .respondent2(Party.builder().partyName("mock party 5").build())
-                .applicant1LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 1").build())
-                .respondent1LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 2").build())
-                .respondent2LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 3").build());
+            Party applicant1 = new Party();
+            applicant1.setPartyName("mock party 1");
+            Party applicant2 = new Party();
+            applicant2.setPartyName("mock party 3");
+            Party respondent1 = new Party();
+            respondent1.setPartyName("mock party 4");
+            Party respondent2 = new Party();
+            respondent2.setPartyName("mock party 5");
+            LitigationFriend applicant1LitigationFriend = new LitigationFriend();
+            applicant1LitigationFriend.setFirstName("mock litfriend 1");
+            LitigationFriend respondent1LitigationFriend = new LitigationFriend();
+            respondent1LitigationFriend.setFirstName("mock litfriend 2");
+            LitigationFriend respondent2LitigationFriend = new LitigationFriend();
+            respondent2LitigationFriend.setFirstName("mock litfriend 3");
 
-            PartyUtils.populateWithPartyIds(builder);
-            CaseData actual = builder.build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(applicant1)
+                .applicant2(applicant2)
+                .respondent1(respondent1)
+                .respondent2(respondent2)
+                .build();
+            caseData.setApplicant1LitigationFriend(applicant1LitigationFriend);
+            caseData.setRespondent1LitigationFriend(respondent1LitigationFriend);
+            caseData.setRespondent2LitigationFriend(respondent2LitigationFriend);
+            PartyUtils.populateWithPartyIds(caseData);
 
-            assertNotNull(actual.getApplicant1().getPartyID());
-            assertNotNull(actual.getApplicant2().getPartyID());
-            assertNotNull(actual.getRespondent1().getPartyID());
-            assertNotNull(actual.getRespondent2().getPartyID());
-            assertNotNull(actual.getApplicant1LitigationFriend().getPartyID());
-            assertNotNull(actual.getRespondent1LitigationFriend().getPartyID());
-            assertNotNull(actual.getRespondent2LitigationFriend().getPartyID());
+            assertNotNull(caseData.getApplicant1().getPartyID());
+            assertNotNull(caseData.getApplicant2().getPartyID());
+            assertNotNull(caseData.getRespondent1().getPartyID());
+            assertNotNull(caseData.getRespondent2().getPartyID());
+            assertNotNull(caseData.getApplicant1LitigationFriend().getPartyID());
+            assertNotNull(caseData.getRespondent1LitigationFriend().getPartyID());
+            assertNotNull(caseData.getRespondent2LitigationFriend().getPartyID());
         }
 
         @Test
         void shouldNotPopulateAlreadyNullPartyFields_withinCaseDataBuilder() {
-            CaseData.CaseDataBuilder builder = CaseData.builder()
-                .applicant1(Party.builder().partyName("mock party 1").build())
-                .respondent1(Party.builder().partyName("mock party 4").build())
-                .applicant1LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 1").build())
-                .respondent1LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 2").build());
+            Party applicant1 = new Party();
+            applicant1.setPartyName("mock party 1");
+            Party respondent1 = new Party();
+            respondent1.setPartyName("mock party 4");
+            LitigationFriend applicant1LitigationFriend = new LitigationFriend();
+            applicant1LitigationFriend.setFirstName("mock litfriend 1");
+            LitigationFriend respondent1LitigationFriend = new LitigationFriend();
+            respondent1LitigationFriend.setFirstName("mock litfriend 2");
 
-            PartyUtils.populateWithPartyIds(builder);
-            CaseData actual = builder.build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(applicant1)
+                .respondent1(respondent1)
+                .build();
+            caseData.setApplicant1LitigationFriend(applicant1LitigationFriend);
+            caseData.setRespondent1LitigationFriend(respondent1LitigationFriend);
+            PartyUtils.populateWithPartyIds(caseData);
+
+            CaseData actual = caseData;
 
             assertNull(actual.getApplicant2());
             assertNull(actual.getRespondent2());
@@ -707,77 +764,77 @@ class PartyUtilsTest {
 
         @Test
         void shouldDQPopulatePartyIds_withinGivenCaseDataBuilder() {
-            CaseData.CaseDataBuilder builder = CaseData.builder()
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQWitnesses(buildWitnesses("app1witness"))
-                                  .applicant1DQExperts(buildExperts("app1expert"))
-                                  .applicant1RespondToClaimExperts(buildExpertDetails("app1expertdetails"))
-                                  .build())
-                .applicant2DQ(Applicant2DQ.builder()
-                                  .applicant2DQWitnesses(buildWitnesses("app2witness"))
-                                  .applicant2DQExperts(buildExperts("app2expert"))
-                                  .applicant2RespondToClaimExperts(buildExpertDetails("app2expertdetails"))
-                                  .build())
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQWitnesses(buildWitnesses("res1witness"))
-                                   .respondent1DQExperts(buildExperts("res1expert"))
-                                   .respondToClaimExperts(buildExpertDetails("res1expertdetails"))
-                                   .build())
-                .respondent2DQ(Respondent2DQ.builder()
-                                   .respondent2DQWitnesses(buildWitnesses("res2witness"))
-                                   .respondent2DQExperts(buildExperts("res2expert"))
-                                   .respondToClaimExperts2(buildExpertDetails("res2expertdetails"))
-                                   .build());
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQWitnesses(buildWitnesses("app1witness"));
+            applicant1DQ.setApplicant1DQExperts(buildExperts("app1expert"));
+            applicant1DQ.setApplicant1RespondToClaimExperts(buildExpertDetails("app1expertdetails"));
+            Applicant2DQ applicant2DQ = new Applicant2DQ();
+            applicant2DQ.setApplicant2DQWitnesses(buildWitnesses("app2witness"));
+            applicant2DQ.setApplicant2DQExperts(buildExperts("app2expert"));
+            applicant2DQ.setApplicant2RespondToClaimExperts(buildExpertDetails("app2expertdetails"));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQWitnesses(buildWitnesses("res1witness"));
+            respondent1DQ.setRespondent1DQExperts(buildExperts("res1expert"));
+            respondent1DQ.setRespondToClaimExperts(buildExpertDetails("res1expertdetails"));
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQWitnesses(buildWitnesses("res2witness"));
+            respondent2DQ.setRespondent2DQExperts(buildExperts("res2expert"));
+            respondent2DQ.setRespondToClaimExperts2(buildExpertDetails("res2expertdetails"));
 
-            PartyUtils.populateDQPartyIds(builder);
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(applicant1DQ)
+                .applicant2DQ(applicant2DQ)
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .build();
 
-            CaseData actual = builder.build();
+            PartyUtils.populateDQPartyIds(caseData);
 
-            var app1Witness = unwrapElements(actual.getApplicant1DQ().getApplicant1DQWitnesses().getDetails()).get(0);
+            var app1Witness = unwrapElements(caseData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails()).get(0);
             assertNotNull(app1Witness.getPartyID());
             assertEquals(app1Witness.getFirstName(), "app1witness");
 
-            var app2Witness = unwrapElements(actual.getApplicant2DQ().getApplicant2DQWitnesses().getDetails()).get(0);
+            var app2Witness = unwrapElements(caseData.getApplicant2DQ().getApplicant2DQWitnesses().getDetails()).get(0);
             assertNotNull(app2Witness.getPartyID());
             assertEquals(app2Witness.getFirstName(), "app2witness");
 
-            var res1Witness = unwrapElements(actual.getRespondent1DQ().getRespondent1DQWitnesses().getDetails()).get(0);
+            var res1Witness = unwrapElements(caseData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails()).get(0);
             assertNotNull(res1Witness.getPartyID());
             assertEquals(res1Witness.getFirstName(), "res1witness");
 
-            var res2Witness = unwrapElements(actual.getRespondent2DQ().getRespondent2DQWitnesses().getDetails()).get(0);
+            var res2Witness = unwrapElements(caseData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails()).get(0);
             assertNotNull(res2Witness.getPartyID());
             assertEquals(res2Witness.getFirstName(), "res2witness");
 
-            var app1Expert = unwrapElements(actual.getApplicant1DQ().getApplicant1DQExperts().getDetails()).get(0);
+            var app1Expert = unwrapElements(caseData.getApplicant1DQ().getApplicant1DQExperts().getDetails()).get(0);
             assertNotNull(app1Expert.getPartyID());
             assertEquals(app1Expert.getFirstName(), "app1expert");
 
-            var app1ExpertDetails = actual.getApplicant1DQ().getApplicant1RespondToClaimExperts();
+            var app1ExpertDetails = caseData.getApplicant1DQ().getApplicant1RespondToClaimExperts();
             assertNotNull(app1ExpertDetails.getPartyID());
             assertEquals(app1ExpertDetails.getFirstName(), "app1expertdetails");
 
-            var app2Expert = unwrapElements(actual.getApplicant2DQ().getApplicant2DQExperts().getDetails()).get(0);
+            var app2Expert = unwrapElements(caseData.getApplicant2DQ().getApplicant2DQExperts().getDetails()).get(0);
             assertNotNull(app2Expert.getPartyID());
             assertEquals(app2Expert.getFirstName(), "app2expert");
 
-            var app2ExpertDetails = actual.getApplicant2DQ().getApplicant2RespondToClaimExperts();
+            var app2ExpertDetails = caseData.getApplicant2DQ().getApplicant2RespondToClaimExperts();
             assertNotNull(app2ExpertDetails.getPartyID());
             assertEquals(app2ExpertDetails.getFirstName(), "app2expertdetails");
 
-            var res1Expert = unwrapElements(actual.getRespondent1DQ().getRespondent1DQExperts().getDetails()).get(0);
+            var res1Expert = unwrapElements(caseData.getRespondent1DQ().getRespondent1DQExperts().getDetails()).get(0);
             assertNotNull(res1Expert.getPartyID());
             assertEquals(res1Expert.getFirstName(), "res1expert");
 
-            var res1ExpertDetails = actual.getRespondent1DQ().getRespondToClaimExperts();
+            var res1ExpertDetails = caseData.getRespondent1DQ().getRespondToClaimExperts();
             assertNotNull(res1ExpertDetails.getPartyID());
             assertEquals(res1ExpertDetails.getFirstName(), "res1expertdetails");
 
-            var res2Expert = unwrapElements(actual.getRespondent2DQ().getRespondent2DQExperts().getDetails()).get(0);
+            var res2Expert = unwrapElements(caseData.getRespondent2DQ().getRespondent2DQExperts().getDetails()).get(0);
             assertNotNull(res2Expert.getPartyID());
             assertEquals(res2Expert.getFirstName(), "res2expert");
 
-            var res2ExpertDetails = actual.getRespondent2DQ().getRespondToClaimExperts2();
+            var res2ExpertDetails = caseData.getRespondent2DQ().getRespondToClaimExperts2();
             assertNotNull(res2ExpertDetails.getPartyID());
             assertEquals(res2ExpertDetails.getFirstName(), "res2expertdetails");
         }
@@ -785,131 +842,136 @@ class PartyUtilsTest {
         @Test
         void shouldNotOverWritePartyIds_whenPartyIdsExist() {
             UUID app1WitnessElementId = UUID.randomUUID();
-            UUID app2WitnessElementId = UUID.randomUUID();
-            UUID res1WitnessElementId = UUID.randomUUID();
-            UUID res2WitnessElementId = UUID.randomUUID();
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQWitnesses(buildWitnesses("app1witness", "app1witnesspartyid", app1WitnessElementId));
+
             UUID app1ExpertElementId = UUID.randomUUID();
+            applicant1DQ.setApplicant1DQExperts(buildExperts("app1expert", "app1expertpartyid", app1ExpertElementId));
+            applicant1DQ.setApplicant1RespondToClaimExperts(buildExpertDetails("app1expertdetails", "app1expertdetailspartyid"));
+            Applicant2DQ applicant2DQ = new Applicant2DQ();
+
+            UUID app2WitnessElementId = UUID.randomUUID();
+            applicant2DQ.setApplicant2DQWitnesses(buildWitnesses("app2witness", "app2witnesspartyid", app2WitnessElementId));
+
             UUID app2ExpertElementId = UUID.randomUUID();
+            applicant2DQ.setApplicant2DQExperts(buildExperts("app2expert", "app2expertpartyid", app2ExpertElementId));
+            applicant2DQ.setApplicant2RespondToClaimExperts(buildExpertDetails("app2expertdetails", "app2expertdetailspartyid"));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+
+            UUID res1WitnessElementId = UUID.randomUUID();
+            respondent1DQ.setRespondent1DQWitnesses(buildWitnesses("res1witness", "res1witnesspartyid", res1WitnessElementId));
+
             UUID res1ExpertElementId = UUID.randomUUID();
+            respondent1DQ.setRespondent1DQExperts(buildExperts("res1expert", "res1expertpartyid", res1ExpertElementId));
+            respondent1DQ.setRespondToClaimExperts(buildExpertDetails("res1expertdetails", "res1expertdetailspartyid"));
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+
+            UUID res2WitnessElementId = UUID.randomUUID();
+            respondent2DQ.setRespondent2DQWitnesses(buildWitnesses("res2witness", "res2witnesspartyid", res2WitnessElementId));
+
             UUID res2ExpertElementId = UUID.randomUUID();
+            respondent2DQ.setRespondent2DQExperts(buildExperts("res2expert", "res2expertpartyid", res2ExpertElementId));
+            respondent2DQ.setRespondToClaimExperts2(buildExpertDetails("res2expertdetails", "res2expertdetailspartyid"));
 
-            CaseData.CaseDataBuilder builder = CaseData.builder()
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQWitnesses(buildWitnesses("app1witness", "app1witnesspartyid", app1WitnessElementId))
-                                  .applicant1DQExperts(buildExperts("app1expert", "app1expertpartyid", app1ExpertElementId))
-                                  .applicant1RespondToClaimExperts(buildExpertDetails("app1expertdetails", "app1expertdetailspartyid"))
-                                  .build())
-                .applicant2DQ(Applicant2DQ.builder()
-                                  .applicant2DQWitnesses(buildWitnesses("app2witness", "app2witnesspartyid", app2WitnessElementId))
-                                  .applicant2DQExperts(buildExperts("app2expert", "app2expertpartyid", app2ExpertElementId))
-                                  .applicant2RespondToClaimExperts(buildExpertDetails("app2expertdetails", "app2expertdetailspartyid"))
-                                  .build())
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQWitnesses(buildWitnesses("res1witness", "res1witnesspartyid", res1WitnessElementId))
-                                   .respondent1DQExperts(buildExperts("res1expert", "res1expertpartyid", res1ExpertElementId))
-                                   .respondToClaimExperts(buildExpertDetails("res1expertdetails", "res1expertdetailspartyid"))
-                                   .build())
-                .respondent2DQ(Respondent2DQ.builder()
-                                   .respondent2DQWitnesses(buildWitnesses("res2witness", "res2witnesspartyid", res2WitnessElementId))
-                                   .respondent2DQExperts(buildExperts("res2expert", "res2expertpartyid", res2ExpertElementId))
-                                   .respondToClaimExperts2(buildExpertDetails("res2expertdetails", "res2expertdetailspartyid"))
-                                   .build());
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(applicant1DQ)
+                .applicant2DQ(applicant2DQ)
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .build();
 
-            PartyUtils.populateDQPartyIds(builder);
+            PartyUtils.populateDQPartyIds(caseData);
 
-            CaseData actual = builder.build();
-
-            var app1Witness = actual.getApplicant1DQ().getApplicant1DQWitnesses().getDetails().get(0);
+            var app1Witness = caseData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails().get(0);
             assertEquals(app1Witness.getId(), app1WitnessElementId);
             assertEquals(app1Witness.getValue().getPartyID(), "app1witnesspartyid");
 
-            var app2Witness = actual.getApplicant2DQ().getApplicant2DQWitnesses().getDetails().get(0);
+            var app2Witness = caseData.getApplicant2DQ().getApplicant2DQWitnesses().getDetails().get(0);
             assertEquals(app2Witness.getId(), app2WitnessElementId);
             assertEquals(app2Witness.getValue().getPartyID(), "app2witnesspartyid");
 
-            var res1Witness = actual.getRespondent1DQ().getRespondent1DQWitnesses().getDetails().get(0);
+            var res1Witness = caseData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails().get(0);
             assertEquals(res1Witness.getId(), res1WitnessElementId);
             assertEquals(res1Witness.getValue().getPartyID(), "res1witnesspartyid");
 
-            var res2Witness = actual.getRespondent2DQ().getRespondent2DQWitnesses().getDetails().get(0);
+            var res2Witness = caseData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails().get(0);
             assertEquals(res2Witness.getId(), res2WitnessElementId);
             assertEquals(res2Witness.getValue().getPartyID(), "res2witnesspartyid");
 
-            var app1Expert = actual.getApplicant1DQ().getApplicant1DQExperts().getDetails().get(0);
+            var app1Expert = caseData.getApplicant1DQ().getApplicant1DQExperts().getDetails().get(0);
             assertEquals(app1Expert.getId(), app1ExpertElementId);
             assertEquals(app1Expert.getValue().getPartyID(), "app1expertpartyid");
 
-            var app1ExpertDetails = actual.getApplicant1DQ().getApplicant1RespondToClaimExperts();
+            var app1ExpertDetails = caseData.getApplicant1DQ().getApplicant1RespondToClaimExperts();
             assertEquals(app1ExpertDetails.getPartyID(), "app1expertdetailspartyid");
 
-            var app2Expert = actual.getApplicant2DQ().getApplicant2DQExperts().getDetails().get(0);
+            var app2Expert = caseData.getApplicant2DQ().getApplicant2DQExperts().getDetails().get(0);
             assertEquals(app2Expert.getId(), app2ExpertElementId);
             assertEquals(app2Expert.getValue().getPartyID(), "app2expertpartyid");
 
-            var app2ExpertDetails = actual.getApplicant2DQ().getApplicant2RespondToClaimExperts();
+            var app2ExpertDetails = caseData.getApplicant2DQ().getApplicant2RespondToClaimExperts();
             assertEquals(app2ExpertDetails.getPartyID(), "app2expertdetailspartyid");
 
-            var res1Expert = actual.getRespondent1DQ().getRespondent1DQExperts().getDetails().get(0);
+            var res1Expert = caseData.getRespondent1DQ().getRespondent1DQExperts().getDetails().get(0);
             assertEquals(res1Expert.getId(), res1ExpertElementId);
             assertEquals(res1Expert.getValue().getPartyID(), "res1expertpartyid");
 
-            var res1ExpertDetails = actual.getRespondent1DQ().getRespondToClaimExperts();
+            var res1ExpertDetails = caseData.getRespondent1DQ().getRespondToClaimExperts();
             assertEquals(res1ExpertDetails.getPartyID(), "res1expertdetailspartyid");
 
-            var res2Expert = actual.getRespondent2DQ().getRespondent2DQExperts().getDetails().get(0);
+            var res2Expert = caseData.getRespondent2DQ().getRespondent2DQExperts().getDetails().get(0);
             assertEquals(res2Expert.getId(), res2ExpertElementId);
             assertEquals(res2Expert.getValue().getPartyID(), "res2expertpartyid");
 
-            var res2ExpertDetails = actual.getRespondent2DQ().getRespondToClaimExperts2();
+            var res2ExpertDetails = caseData.getRespondent2DQ().getRespondToClaimExperts2();
             assertEquals(res2ExpertDetails.getPartyID(), "res2expertdetailspartyid");
         }
 
         @Test
         void shouldReturnNullWitnessExpertFields_whenCaseDataBuilderHasNullWitnessExpertFields() {
-            CaseData.CaseDataBuilder builder = CaseData.builder()
-                .applicant1DQ(Applicant1DQ.builder().build())
-                .applicant2DQ(Applicant2DQ.builder().build())
-                .respondent1DQ(Respondent1DQ.builder().build())
-                .respondent2DQ(Respondent2DQ.builder().build());
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(new Applicant1DQ())
+                .applicant2DQ(new Applicant2DQ())
+                .respondent1DQ(new Respondent1DQ())
+                .respondent2DQ(new Respondent2DQ())
+                .build();
 
-            PartyUtils.populateDQPartyIds(builder);
-            CaseData actual = builder.build();
+            PartyUtils.populateDQPartyIds(caseData);
 
-            assertNull(actual.getApplicant1DQ().getApplicant1DQWitnesses());
-            assertNull(actual.getApplicant2DQ().getApplicant2DQWitnesses());
-            assertNull(actual.getRespondent1DQ().getRespondent1DQWitnesses());
-            assertNull(actual.getRespondent2DQ().getRespondent2DQWitnesses());
-            assertNull(actual.getApplicant1DQ().getApplicant1DQExperts());
-            assertNull(actual.getApplicant1DQ().getApplicant1RespondToClaimExperts());
-            assertNull(actual.getApplicant2DQ().getApplicant2DQExperts());
-            assertNull(actual.getApplicant2DQ().getApplicant2RespondToClaimExperts());
-            assertNull(actual.getRespondent1DQ().getRespondent1DQExperts());
-            assertNull(actual.getRespondent1DQ().getRespondToClaimExperts());
-            assertNull(actual.getRespondent2DQ().getRespondent2DQExperts());
-            assertNull(actual.getRespondent2DQ().getRespondToClaimExperts2());
+            assertNull(caseData.getApplicant1DQ().getApplicant1DQWitnesses());
+            assertNull(caseData.getApplicant2DQ().getApplicant2DQWitnesses());
+            assertNull(caseData.getRespondent1DQ().getRespondent1DQWitnesses());
+            assertNull(caseData.getRespondent2DQ().getRespondent2DQWitnesses());
+            assertNull(caseData.getApplicant1DQ().getApplicant1DQExperts());
+            assertNull(caseData.getApplicant1DQ().getApplicant1RespondToClaimExperts());
+            assertNull(caseData.getApplicant2DQ().getApplicant2DQExperts());
+            assertNull(caseData.getApplicant2DQ().getApplicant2RespondToClaimExperts());
+            assertNull(caseData.getRespondent1DQ().getRespondent1DQExperts());
+            assertNull(caseData.getRespondent1DQ().getRespondToClaimExperts());
+            assertNull(caseData.getRespondent2DQ().getRespondent2DQExperts());
+            assertNull(caseData.getRespondent2DQ().getRespondToClaimExperts2());
         }
 
         @Test
         void shouldReturnNullDQFields_whenCaseDataBuilderHasNullDQFields() {
-            CaseData.CaseDataBuilder builder = CaseData.builder();
+            CaseData caseData = CaseDataBuilder.builder().build();
 
-            PartyUtils.populateDQPartyIds(builder);
-            CaseData actual = builder.build();
+            PartyUtils.populateDQPartyIds(caseData);
 
-            assertNull(actual.getApplicant1DQ());
-            assertNull(actual.getApplicant2DQ());
-            assertNull(actual.getRespondent1DQ());
-            assertNull(actual.getRespondent2DQ());
+            assertNull(caseData.getApplicant1DQ());
+            assertNull(caseData.getApplicant2DQ());
+            assertNull(caseData.getRespondent1DQ());
+            assertNull(caseData.getRespondent2DQ());
         }
 
         private Witnesses buildWitnesses(String firstName, String partyId, UUID elementId) {
-            return Witnesses.builder().details(List.of(
-                Element.<Witness>builder().id(elementId)
-                    .value(Witness.builder()
-                               .partyID(partyId)
-                               .firstName(firstName)
-                               .build())
-                    .build())).build();
+            Witness witness = new Witness();
+            witness.setPartyID(partyId);
+            witness.setFirstName(firstName);
+            Element<Witness> witnessElement = new Element<Witness>().setId(elementId).setValue(witness);
+            Witnesses witnesses = new Witnesses();
+            witnesses.setDetails(List.of(witnessElement));
+            return witnesses;
         }
 
         private Witnesses buildWitnesses(String firstName) {
@@ -917,13 +979,13 @@ class PartyUtilsTest {
         }
 
         private Experts buildExperts(String firstName, String partyId, UUID elementId) {
-            return Experts.builder().details(List.of(
-                Element.<Expert>builder().id(elementId)
-                    .value(Expert.builder()
-                               .partyID(partyId)
-                               .firstName(firstName)
-                               .build())
-                    .build())).build();
+            Expert expert = new Expert();
+            expert.setPartyID(partyId);
+            expert.setFirstName(firstName);
+            Element<Expert> expertElement = new Element<Expert>().setId(elementId).setValue(expert);
+            Experts experts = new Experts();
+            experts.setDetails(List.of(expertElement));
+            return experts;
         }
 
         private Experts buildExperts(String firstName) {
@@ -931,7 +993,10 @@ class PartyUtilsTest {
         }
 
         private ExpertDetails buildExpertDetails(String firstName, String partyId) {
-            return ExpertDetails.builder().partyID(partyId).firstName(firstName).build();
+            ExpertDetails expertDetails = new ExpertDetails();
+            expertDetails.setPartyID(partyId);
+            expertDetails.setFirstName(firstName);
+            return expertDetails;
         }
 
         private ExpertDetails buildExpertDetails(String firstName) {
@@ -944,18 +1009,37 @@ class PartyUtilsTest {
 
         @Test
         void shouldopulateIndividualsPartyIds_withinGivenCaseDataBuilder() {
-            CaseData.CaseDataBuilder builder = CaseData.builder()
-                    .applicant1LRIndividuals(wrapElements(PartyFlagStructure.builder().firstName("app1").lastName("lrindividual").build()))
-                    .respondent1LRIndividuals(wrapElements(PartyFlagStructure.builder().firstName("res1").lastName("lrindividual").build()))
-                    .respondent2LRIndividuals(wrapElements(PartyFlagStructure.builder().firstName("res2").lastName("lrindividual").build()))
-                    .applicant1OrgIndividuals(wrapElements(PartyFlagStructure.builder().firstName("app1").lastName("orgindividual").build()))
-                    .applicant2OrgIndividuals(wrapElements(PartyFlagStructure.builder().firstName("app2").lastName("orgindividual").build()))
-                    .respondent1OrgIndividuals(wrapElements(PartyFlagStructure.builder().firstName("res1").lastName("orgindividual").build()))
-                    .respondent2OrgIndividuals(wrapElements(PartyFlagStructure.builder().firstName("res2").lastName("orgindividual").build()));
+            PartyFlagStructure app1LR = new PartyFlagStructure();
+            app1LR.setFirstName("app1");
+            app1LR.setLastName("lrindividual");
+            PartyFlagStructure res1LR = new PartyFlagStructure();
+            res1LR.setFirstName("res1");
+            res1LR.setLastName("lrindividual");
+            PartyFlagStructure res2LR = new PartyFlagStructure();
+            res2LR.setFirstName("res2");
+            res2LR.setLastName("lrindividual");
+            PartyFlagStructure app1Org = new PartyFlagStructure();
+            app1Org.setFirstName("app1");
+            app1Org.setLastName("orgindividual");
+            PartyFlagStructure app2Org = new PartyFlagStructure();
+            app2Org.setFirstName("app2");
+            app2Org.setLastName("orgindividual");
+            PartyFlagStructure res1Org = new PartyFlagStructure();
+            res1Org.setFirstName("res1");
+            res1Org.setLastName("orgindividual");
+            PartyFlagStructure res2Org = new PartyFlagStructure();
+            res2Org.setFirstName("res2");
+            res2Org.setLastName("orgindividual");
 
-            PartyUtils.populatePartyIndividuals(builder);
-
-            CaseData actual = builder.build();
+            CaseData actual = CaseDataBuilder.builder().build();
+            actual.setApplicant1LRIndividuals(wrapElements(List.of(app1LR)));
+            actual.setRespondent1LRIndividuals(wrapElements(List.of(res1LR)));
+            actual.setRespondent2LRIndividuals(wrapElements(List.of(res2LR)));
+            actual.setApplicant1OrgIndividuals(wrapElements(List.of(app1Org)));
+            actual.setApplicant2OrgIndividuals(wrapElements(List.of(app2Org)));
+            actual.setRespondent1OrgIndividuals(wrapElements(List.of(res1Org)));
+            actual.setRespondent2OrgIndividuals(wrapElements(List.of(res2Org)));
+            PartyUtils.populatePartyIndividuals(actual);
 
             var app1LRIndividual = unwrapElements(actual.getApplicant1LRIndividuals()).get(0);
             assertNotNull(app1LRIndividual.getPartyID());
@@ -995,13 +1079,17 @@ class PartyUtilsTest {
 
         @Test
         void shouldopulateIndividualsPartyIds_mixedNullLRAndOrgFields() {
-            CaseData.CaseDataBuilder builder = CaseData.builder()
-                .applicant1LRIndividuals(wrapElements(PartyFlagStructure.builder().firstName("app1").lastName("lrindividual").build()))
-                .respondent1OrgIndividuals(wrapElements(PartyFlagStructure.builder().firstName("res1").lastName("orgindividual").build()));
+            PartyFlagStructure app1LR = new PartyFlagStructure();
+            app1LR.setFirstName("app1");
+            app1LR.setLastName("lrindividual");
+            PartyFlagStructure res1Org = new PartyFlagStructure();
+            res1Org.setFirstName("res1");
+            res1Org.setLastName("orgindividual");
 
-            PartyUtils.populatePartyIndividuals(builder);
-
-            CaseData actual = builder.build();
+            CaseData actual = CaseDataBuilder.builder().build();
+            actual.setApplicant1LRIndividuals(wrapElements(List.of(app1LR)));
+            actual.setRespondent1OrgIndividuals(wrapElements(List.of(res1Org)));
+            PartyUtils.populatePartyIndividuals(actual);
 
             var app1LRIndividual = unwrapElements(actual.getApplicant1LRIndividuals()).get(0);
             assertNotNull(app1LRIndividual.getPartyID());
@@ -1022,18 +1110,44 @@ class PartyUtilsTest {
 
         @Test
         void shouldNotOverwriteExistingPartyIds_withinGivenCaseDataBuilder() {
-            CaseData.CaseDataBuilder builder = CaseData.builder()
-                .applicant1LRIndividuals(wrapElements(PartyFlagStructure.builder().partyID("app1-lr-ind-id").firstName("app1").lastName("lrindividual").build()))
-                .respondent1LRIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res1-lr-ind-id").firstName("res1").lastName("lrindividual").build()))
-                .respondent2LRIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res2-lr-ind-id").firstName("res2").lastName("lrindividual").build()))
-                .applicant1OrgIndividuals(wrapElements(PartyFlagStructure.builder().partyID("app1-org-ind-id").firstName("app1").lastName("orgindividual").build()))
-                .applicant2OrgIndividuals(wrapElements(PartyFlagStructure.builder().partyID("app2-org-ind-id").firstName("app2").lastName("orgindividual").build()))
-                .respondent1OrgIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res1-org-ind-id").firstName("res1").lastName("orgindividual").build()))
-                .respondent2OrgIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res2-org-ind-id").firstName("res2").lastName("orgindividual").build()));
+            PartyFlagStructure app1LR = new PartyFlagStructure();
+            app1LR.setPartyID("app1-lr-ind-id");
+            app1LR.setFirstName("app1");
+            app1LR.setLastName("lrindividual");
+            PartyFlagStructure res1LR = new PartyFlagStructure();
+            res1LR.setPartyID("res1-lr-ind-id");
+            res1LR.setFirstName("res1");
+            res1LR.setLastName("lrindividual");
+            PartyFlagStructure res2LR = new PartyFlagStructure();
+            res2LR.setPartyID("res2-lr-ind-id");
+            res2LR.setFirstName("res2");
+            res2LR.setLastName("lrindividual");
+            PartyFlagStructure app1Org = new PartyFlagStructure();
+            app1Org.setPartyID("app1-org-ind-id");
+            app1Org.setFirstName("app1");
+            app1Org.setLastName("orgindividual");
+            PartyFlagStructure app2Org = new PartyFlagStructure();
+            app2Org.setPartyID("app2-org-ind-id");
+            app2Org.setFirstName("app2");
+            app2Org.setLastName("orgindividual");
+            PartyFlagStructure res1Org = new PartyFlagStructure();
+            res1Org.setPartyID("res1-org-ind-id");
+            res1Org.setFirstName("res1");
+            res1Org.setLastName("orgindividual");
+            PartyFlagStructure res2Org = new PartyFlagStructure();
+            res2Org.setPartyID("res2-org-ind-id");
+            res2Org.setFirstName("res2");
+            res2Org.setLastName("orgindividual");
 
-            PartyUtils.populatePartyIndividuals(builder);
-
-            CaseData actual = builder.build();
+            CaseData actual = CaseDataBuilder.builder().build();
+            actual.setApplicant1LRIndividuals(wrapElements(List.of(app1LR)));
+            actual.setRespondent1LRIndividuals(wrapElements(List.of(res1LR)));
+            actual.setRespondent2LRIndividuals(wrapElements(List.of(res2LR)));
+            actual.setApplicant1OrgIndividuals(wrapElements(List.of(app1Org)));
+            actual.setApplicant2OrgIndividuals(wrapElements(List.of(app2Org)));
+            actual.setRespondent1OrgIndividuals(wrapElements(List.of(res1Org)));
+            actual.setRespondent2OrgIndividuals(wrapElements(List.of(res2Org)));
+            PartyUtils.populatePartyIndividuals(actual);
 
             var app1LRIndividual = unwrapElements(actual.getApplicant1LRIndividuals()).get(0);
             assertEquals(app1LRIndividual.getPartyID(), "app1-lr-ind-id");
@@ -1077,17 +1191,41 @@ class PartyUtilsTest {
 
         @Test
         void shouldPopulateWitnessAndExpertsPartyIds_withinGivenCaseDataBuilder() {
-            CaseData.CaseDataBuilder builder = CaseData.builder()
-                .applicantExperts(wrapElements(PartyFlagStructure.builder().partyID("app1-expert-id").firstName("app1").lastName("expert").build()))
-                .respondent1Experts(wrapElements(PartyFlagStructure.builder().partyID("res1-expert-id").firstName("res1").lastName("expert").build()))
-                .respondent2Experts(wrapElements(PartyFlagStructure.builder().partyID("res2-expert-id").firstName("res2").lastName("expert").build()))
-                .applicantWitnesses(wrapElements(PartyFlagStructure.builder().partyID("app1-witness-id").firstName("app1").lastName("witness").build()))
-                .respondent1Witnesses(wrapElements(PartyFlagStructure.builder().partyID("res1-witness-id").firstName("res1").lastName("witness").build()))
-                .respondent2Witnesses(wrapElements(PartyFlagStructure.builder().partyID("res2-witness-id").firstName("res2").lastName("witness").build()));
+            PartyFlagStructure app1Expert = new PartyFlagStructure();
+            app1Expert.setPartyID("app1-expert-id");
+            app1Expert.setFirstName("app1");
+            app1Expert.setLastName("expert");
+            PartyFlagStructure res1Expert = new PartyFlagStructure();
+            res1Expert.setPartyID("res1-expert-id");
+            res1Expert.setFirstName("res1");
+            res1Expert.setLastName("expert");
+            PartyFlagStructure res2Expert = new PartyFlagStructure();
+            res2Expert.setPartyID("res2-expert-id");
+            res2Expert.setFirstName("res2");
+            res2Expert.setLastName("expert");
+            PartyFlagStructure app1Witness = new PartyFlagStructure();
+            app1Witness.setPartyID("app1-witness-id");
+            app1Witness.setFirstName("app1");
+            app1Witness.setLastName("witness");
+            PartyFlagStructure res1Witness = new PartyFlagStructure();
+            res1Witness.setPartyID("res1-witness-id");
+            res1Witness.setFirstName("res1");
+            res1Witness.setLastName("witness");
+            PartyFlagStructure res2Witness = new PartyFlagStructure();
+            res2Witness.setPartyID("res2-witness-id");
+            res2Witness.setFirstName("res2");
+            res2Witness.setLastName("witness");
 
-            PartyUtils.populateWitnessAndExpertsPartyIds(builder);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicantExperts(wrapElements(List.of(app1Expert)));
+            caseData.setRespondent1Experts(wrapElements(List.of(res1Expert)));
+            caseData.setRespondent2Experts(wrapElements(List.of(res2Expert)));
+            caseData.setApplicantWitnesses(wrapElements(List.of(app1Witness)));
+            caseData.setRespondent1Witnesses(wrapElements(List.of(res1Witness)));
+            caseData.setRespondent2Witnesses(wrapElements(List.of(res2Witness)));
+            PartyUtils.populateWitnessAndExpertsPartyIds(caseData);
 
-            CaseData actual = builder.build();
+            CaseData actual = caseData;
 
             assertNotNull(actual.getApplicantExperts().get(0).getValue().getPartyID());
             assertEquals("app1-expert-id", actual.getApplicantExperts().get(0).getValue().getPartyID());
@@ -1110,17 +1248,41 @@ class PartyUtilsTest {
 
         @Test
         void shouldNotOverWriteExistingWitnessAndExpertsPartyIds() {
-            CaseData.CaseDataBuilder builder = CaseData.builder()
-                .applicantExperts(wrapElements(PartyFlagStructure.builder().partyID("existingAppExpertPartyId").firstName("app1").lastName("expert").build()))
-                .respondent1Experts(wrapElements(PartyFlagStructure.builder().partyID("existingRes1ExpertPartyId").firstName("res1").lastName("expert").build()))
-                .respondent2Experts(wrapElements(PartyFlagStructure.builder().partyID("existingRes2ExpertPartyId").firstName("res2").lastName("expert").build()))
-                .applicantWitnesses(wrapElements(PartyFlagStructure.builder().partyID("existingAppWitnessPartyId").firstName("app1").lastName("witness").build()))
-                .respondent1Witnesses(wrapElements(PartyFlagStructure.builder().partyID("existingRes1WitnessPartyId").firstName("res1").lastName("witness").build()))
-                .respondent2Witnesses(wrapElements(PartyFlagStructure.builder().partyID("existingRes2WitnessPartyId").firstName("res2").lastName("witness").build()));
+            PartyFlagStructure app1Expert = new PartyFlagStructure();
+            app1Expert.setPartyID("existingAppExpertPartyId");
+            app1Expert.setFirstName("app1");
+            app1Expert.setLastName("expert");
+            PartyFlagStructure res1Expert = new PartyFlagStructure();
+            res1Expert.setPartyID("existingRes1ExpertPartyId");
+            res1Expert.setFirstName("res1");
+            res1Expert.setLastName("expert");
+            PartyFlagStructure res2Expert = new PartyFlagStructure();
+            res2Expert.setPartyID("existingRes2ExpertPartyId");
+            res2Expert.setFirstName("res2");
+            res2Expert.setLastName("expert");
+            PartyFlagStructure app1Witness = new PartyFlagStructure();
+            app1Witness.setPartyID("existingAppWitnessPartyId");
+            app1Witness.setFirstName("app1");
+            app1Witness.setLastName("witness");
+            PartyFlagStructure res1Witness = new PartyFlagStructure();
+            res1Witness.setPartyID("existingRes1WitnessPartyId");
+            res1Witness.setFirstName("res1");
+            res1Witness.setLastName("witness");
+            PartyFlagStructure res2Witness = new PartyFlagStructure();
+            res2Witness.setPartyID("existingRes2WitnessPartyId");
+            res2Witness.setFirstName("res2");
+            res2Witness.setLastName("witness");
 
-            PartyUtils.populateWitnessAndExpertsPartyIds(builder);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicantExperts(wrapElements(List.of(app1Expert)));
+            caseData.setRespondent1Experts(wrapElements(List.of(res1Expert)));
+            caseData.setRespondent2Experts(wrapElements(List.of(res2Expert)));
+            caseData.setApplicantWitnesses(wrapElements(List.of(app1Witness)));
+            caseData.setRespondent1Witnesses(wrapElements(List.of(res1Witness)));
+            caseData.setRespondent2Witnesses(wrapElements(List.of(res2Witness)));
+            PartyUtils.populateWitnessAndExpertsPartyIds(caseData);
 
-            CaseData actual = builder.build();
+            CaseData actual = caseData;
 
             assertEquals("existingAppExpertPartyId", actual.getApplicantExperts().get(0).getValue().getPartyID());
             assertEquals("existingRes1ExpertPartyId", actual.getRespondent1Experts().get(0).getValue().getPartyID());
@@ -1132,10 +1294,10 @@ class PartyUtilsTest {
 
         @Test
         void shouldReturnNull_whenCaseDataBuilderHasNullWitnessAndExperts() {
-            CaseData.CaseDataBuilder builder = CaseData.builder();
+            CaseData caseData = CaseDataBuilder.builder().build();
 
-            PartyUtils.populateWitnessAndExpertsPartyIds(builder);
-            CaseData actual = builder.build();
+            PartyUtils.populateWitnessAndExpertsPartyIds(caseData);
+            CaseData actual = caseData;
 
             assertNull(actual.getApplicantExperts());
             assertNull(actual.getRespondent1Experts());

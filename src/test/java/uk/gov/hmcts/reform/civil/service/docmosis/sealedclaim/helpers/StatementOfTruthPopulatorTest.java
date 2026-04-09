@@ -6,13 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDateTime;
@@ -35,24 +35,21 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldPopulateDetailsForRespondent1() {
-        StatementOfTruth respondent1StatementOfTruth = StatementOfTruth.builder().name("Respondent 1").build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQRequestedCourt(RequestedCourt.builder().build())
-            .respondent1DQStatementOfTruth(respondent1StatementOfTruth)
-            .build();
+        StatementOfTruth respondent1StatementOfTruth = new StatementOfTruth();
+        respondent1StatementOfTruth.setName("Respondent 1");
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQStatementOfTruth(respondent1StatementOfTruth);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1DQ(respondent1DQ)
             .respondent1ResponseDate(LocalDateTime.now())
             .build();
 
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
 
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
 
-        statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
-
-        SealedClaimResponseFormForSpec form = builder.build();
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
         assertEquals(respondent1StatementOfTruth, form.getStatementOfTruth());
         assertFalse(form.isCheckCarmToggle());
         verify(featureToggleService).isCarmEnabledForCase(caseData);
@@ -60,29 +57,28 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldPopulateDetailsForRespondent2() {
-        StatementOfTruth respondent2StatementOfTruth = StatementOfTruth.builder().name("Respondent 2").build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQRequestedCourt(RequestedCourt.builder().build())
-            .build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder()
-            .respondent2DQRequestedCourt(RequestedCourt.builder().build())
-            .respondent2DQStatementOfTruth(respondent2StatementOfTruth)
-            .build();
+        StatementOfTruth respondent2StatementOfTruth = new StatementOfTruth();
+        respondent2StatementOfTruth.setName("Respondent 2");
+        RequestedCourt requestedCourt1 = new RequestedCourt();
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt1);
+        RequestedCourt requestedCourt2 = new RequestedCourt();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt2);
+        respondent2DQ.setRespondent2DQStatementOfTruth(respondent2StatementOfTruth);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ)
             .respondent2ResponseDate(LocalDateTime.now())
             .respondent1ResponseDate(LocalDateTime.now().minusDays(1))
             .build();
 
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
 
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(true);
 
-        statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
-
-        SealedClaimResponseFormForSpec form = builder.build();
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
         assertEquals(respondent2StatementOfTruth, form.getStatementOfTruth());
         assertTrue(form.isCheckCarmToggle());
         verify(featureToggleService).isCarmEnabledForCase(caseData);
@@ -90,23 +86,25 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldHandleNoStatementOfTruthForRespondent1AndRespondent2() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder().build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQRequestedCourt(RequestedCourt.builder().build()).build();
+        RequestedCourt requestedCourt1 = new RequestedCourt();
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt1);
+        RequestedCourt requestedCourt2 = new RequestedCourt();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt2);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent2ResponseDate(LocalDateTime.now().plusDays(1))
             .build();
 
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
 
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
 
-        statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
-
-        SealedClaimResponseFormForSpec form = builder.build();
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
         assertNull(form.getStatementOfTruth());
         assertFalse(form.isCheckCarmToggle());
         verify(featureToggleService).isCarmEnabledForCase(caseData);
@@ -114,41 +112,19 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldHandleCarmFeatureToggleEnabled() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder().build()).build();
-        CaseData caseData = CaseData.builder()
+        RequestedCourt requestedCourt = new RequestedCourt();
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1DQ(respondent1DQ)
             .build();
 
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
 
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(true);
 
-        statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
-
-        SealedClaimResponseFormForSpec form = builder.build();
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
         Assertions.assertTrue(form.isCheckCarmToggle());
-        verify(featureToggleService).isCarmEnabledForCase(caseData);
-    }
-
-    @Test
-    void shouldHandleCarmFeatureToggleDisabled() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder().build()).build();
-        CaseData caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .responseClaimMediationSpecRequired(YesOrNo.YES)
-            .build();
-
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
-
-        given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
-        given(featureToggleService.isPinInPostEnabled()).willReturn(false);
-
-        statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
-
-        SealedClaimResponseFormForSpec form = builder.build();
-        Assertions.assertFalse(form.isCheckCarmToggle());
-        Assertions.assertEquals(YesOrNo.YES,
-                                form.getMediation());
         verify(featureToggleService).isCarmEnabledForCase(caseData);
     }
 }

@@ -41,9 +41,8 @@ public class ProcessCoscApplicationCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(PROCESS_COSC_APPLICATION))
-            .build();
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setBusinessProcess(BusinessProcess.ready(PROCESS_COSC_APPLICATION));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))

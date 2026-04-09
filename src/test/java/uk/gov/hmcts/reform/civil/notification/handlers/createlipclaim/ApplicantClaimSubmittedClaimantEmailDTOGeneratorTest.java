@@ -51,7 +51,7 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplateId_whenHWFReferenceNumberIsPresent() {
         CaseData caseData = CaseData.builder()
-                .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber(HELP_WITH_FEES_REFERENCE_NUMBER).build()).build())
+                .caseDataLiP(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber(HELP_WITH_FEES_REFERENCE_NUMBER)))
                 .build();
 
         when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate())
@@ -80,11 +80,9 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
     void shouldReturnBilingualTemplateId_whenClaimantIsBilingualAndHWFReferenceNumberIsPresent() {
         CaseData caseData = CaseData.builder()
                 .claimantBilingualLanguagePreference(Language.WELSH.name())
-                .caseDataLiP(CaseDataLiP.builder()
-                        .helpWithFees(HelpWithFees.builder()
-                                .helpWithFeesReferenceNumber(HELP_WITH_FEES_REFERENCE_NUMBER)
-                                .build())
-                        .build())
+                .caseDataLiP(new CaseDataLiP()
+                        .setHelpWithFees(new HelpWithFees()
+                                .setHelpWithFeesReferenceNumber(HELP_WITH_FEES_REFERENCE_NUMBER)))
                 .build();
 
         when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate())
@@ -99,11 +97,9 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
     void shouldReturnPayClaimFeeTemplateId_whenClaimantIsNotBilingualAndNoHWFReferenceNumber() {
         CaseData caseData = CaseData.builder()
                 .claimantBilingualLanguagePreference(null)
-                .caseDataLiP(CaseDataLiP.builder()
-                        .helpWithFees(HelpWithFees.builder()
-                                .helpWithFeesReferenceNumber(null)
-                                .build())
-                        .build())
+                .caseDataLiP(new CaseDataLiP()
+                        .setHelpWithFees(new HelpWithFees()
+                                .setHelpWithFeesReferenceNumber(null)))
                 .build();
 
         when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate())
@@ -119,8 +115,8 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
         Map<String, String> properties = new HashMap<>();
 
         CaseData caseData = CaseData.builder()
-                .applicant1(Party.builder().companyName("Claimant Name").type(Party.Type.COMPANY).build())
-                .respondent1(Party.builder().companyName("Defendant Name").type(Party.Type.COMPANY).build())
+                .applicant1(new Party().setCompanyName("Claimant Name").setType(Party.Type.COMPANY))
+                .respondent1(new Party().setCompanyName("Defendant Name").setType(Party.Type.COMPANY))
                 .build();
 
         when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://frontend.url");

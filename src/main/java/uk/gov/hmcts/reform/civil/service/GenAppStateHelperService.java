@@ -68,11 +68,12 @@ public class GenAppStateHelperService {
         if (Objects.isNull(caseData.getGeneralApplications())) {
             return false;
         }
-        caseData.getGeneralApplications()
-                .forEach(application ->
-                        triggerEvent(
-                                parseLong(application.getValue().getCaseLink().getCaseReference()),
-                                event));
+        caseData.getGeneralApplications().forEach(application -> {
+            GeneralApplication value = application.getValue();
+            if (value.getCaseLink() != null) {
+                triggerEvent(Long.parseLong(value.getCaseLink().getCaseReference()), event);
+            }
+        });
         return true;
     }
 
@@ -94,7 +95,7 @@ public class GenAppStateHelperService {
                 generalApplication = objectMapper.convertValue(genAppMap, GeneralApplication.class);
                 genApps.add((generalApplication));
             });
-            caseData = caseData.toBuilder().generalApplications(wrapElements(genApps)).build();
+            caseData.setGeneralApplications(wrapElements(genApps));
         }
         return caseData;
     }
@@ -108,7 +109,7 @@ public class GenAppStateHelperService {
         /*
         * Master GA collection for Judge, case worker, legal adviser etc..
         * */
-        if (!isEmpty(gaDetailsMasterCollection)) {
+        if (!isEmpty(gaDetailsMasterCollection) && !isEmpty(generalApplicationMap)) {
             gaDetailsMasterCollection.forEach(gaMasterColl -> {
                 if (applicationFilterCriteria(gaMasterColl.getValue(), generalApplicationMap, gaFlow)) {
                     gaMasterColl.getValue().setCaseState(updatedState);
@@ -118,7 +119,7 @@ public class GenAppStateHelperService {
         /*
         * Claimant GA Collection
         * */
-        if (!isEmpty(gaDetails)) {
+        if (!isEmpty(gaDetails)  && !isEmpty(generalApplicationMap)) {
             gaDetails.forEach(gaDetails1 -> {
                 if (applicationFilterCriteria(gaDetails1.getValue(), generalApplicationMap, gaFlow)) {
                     gaDetails1.getValue().setCaseState(updatedState);
@@ -131,7 +132,7 @@ public class GenAppStateHelperService {
         * */
         List<Element<GADetailsRespondentSol>> respondentSpecficGADetails = caseData.getRespondentSolGaAppDetails();
 
-        if (!isEmpty(respondentSpecficGADetails)) {
+        if (!isEmpty(respondentSpecficGADetails)  && !isEmpty(generalApplicationMap)) {
             respondentSpecficGADetails.forEach(respondentSolElement -> {
                 if (applicationFilterCriteria(respondentSolElement.getValue(), generalApplicationMap, gaFlow)) {
                     respondentSolElement.getValue().setCaseState(updatedState);
@@ -144,7 +145,7 @@ public class GenAppStateHelperService {
         * */
         List<Element<GADetailsRespondentSol>> respondentTwoGADetails = caseData.getRespondentSolTwoGaAppDetails();
 
-        if (!isEmpty(respondentTwoGADetails)) {
+        if (!isEmpty(respondentTwoGADetails)  && !isEmpty(generalApplicationMap)) {
             respondentTwoGADetails.forEach(respondentTwoSolElement -> {
                 if (applicationFilterCriteria(respondentTwoSolElement.getValue(), generalApplicationMap, gaFlow)) {
                     respondentTwoSolElement.getValue().setCaseState(updatedState);
@@ -203,10 +204,12 @@ public class GenAppStateHelperService {
         Map<Long, GeneralApplication> latestStatus = new HashMap<>();
         if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
             for (Element<GeneralApplication> element : caseData.getGeneralApplications()) {
-                Long caseReference = parseLong(element.getValue().getCaseLink().getCaseReference());
-                GeneralApplication application = caseDetailsConverter.toGeneralApplication(coreCaseDataService
-                        .getCase(caseReference));
-                latestStatus.put(caseReference, application);
+                if (element.getValue().getCaseLink() != null) {
+                    Long caseReference = parseLong(element.getValue().getCaseLink().getCaseReference());
+                    GeneralApplication application = caseDetailsConverter.toGeneralApplication(coreCaseDataService
+                            .getCase(caseReference));
+                    latestStatus.put(caseReference, application);
+                }
             }
         }
         return latestStatus;

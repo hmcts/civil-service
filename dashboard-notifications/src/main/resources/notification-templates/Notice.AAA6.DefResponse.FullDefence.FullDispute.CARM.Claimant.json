@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "Response to the claim",
+  "titleCy": "Ymateb i’r hawliad",
+  "descriptionEn": "<p class=\"govuk-body\">${respondent1PartyName} has rejected the claim. You need to respond by ${applicant1ResponseDeadlineEn}.</p><a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae ${respondent1PartyName} wedi gwrthod yr hawliad. Mae angen i chi ymateb erbyn ${applicant1ResponseDeadlineCy}.</p><a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">Gweld ac ymateb</a>",
+  "deadlineParam": "applicant1ResponseDeadline"
+}

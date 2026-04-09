@@ -102,7 +102,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "<li><a href=\"%s\" target=\"_blank\">N9B</a></li></ul><li>and any supporting documents</li></ul>"
         + "to the defendant within 4 months."
         + "%n%nFollowing this, you will need to file a Certificate of Service and supporting documents "
-        + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
+        + "to : <a href=\"mailto:contactocmc@justice.gov.uk\">contactocmc@justice.gov.uk</a>. The Certificate of Service form can be found here:"
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
     private static final String ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST =
@@ -144,7 +144,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
-            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "statement-of-truth"), this::emptyCallbackResponse)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Details)
@@ -186,12 +186,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse interestFromDefault(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimFrom())) {
-            caseData = caseData.toBuilder()
-                .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
-                .build();
-            CallbackParams callbackParamsWithUpdatedCaseData = callbackParams.toBuilder()
-                .caseData(caseData)
-                .build();
+            caseData.setInterestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE);
+            CallbackParams callbackParamsWithUpdatedCaseData = callbackParams.copy()
+                .caseData(caseData);
             return calculateInterest(callbackParamsWithUpdatedCaseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -274,13 +271,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse getIdamEmail(CallbackParams callbackParams) {
         UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder()
-            .applicantSolicitor1CheckEmail(CorrectEmail.builder().email(userDetails.getEmail()).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().build());
+        CorrectEmail correctEmail = new CorrectEmail();
+        correctEmail.setEmail(userDetails.getEmail());
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setApplicantSolicitor1CheckEmail(correctEmail);
+        caseData.setApplicantSolicitor1UserDetails(new IdamUserDetails());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -308,20 +306,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
-        // must be to do with the way XUI cache data entered through the lifecycle of an event.
-        CaseData updatedCaseData = caseData.toBuilder()
-            .uiStatementOfTruth(null)
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
-            .build();
-    }
-
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         return submitClaimTask.submitClaim(callbackParams.getCaseData(), callbackParams.getRequest().getEventId(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
@@ -330,7 +314,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     //--------v1 callback overloaded, return to single param
-    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+    SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (null != callbackParams.getRequest().getEventId()
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
@@ -349,7 +333,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     static final String PAY_FEE_MESSAGE = "# Please now pay your claim fee%n# using the link below";
 
     private String getHeader(CaseData caseData) {
-        if (areRespondentsRepresentedAndRegistered(caseData) || isPinInPostCaseMatched(caseData)) {
+        if (areRespondentsRepresentedAndRegistered(caseData) || isCaseMatched(caseData)) {
             return format(PAY_FEE_MESSAGE);
         }
         return format(
@@ -364,7 +348,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return
             ((areRespondentsRepresentedAndRegistered(caseData)
-                || isPinInPostCaseMatched(caseData))
+                || isCaseMatched(caseData))
                 ? getConfirmationSummary(caseData)
                 : format(LIP_CONFIRMATION_BODY, format(
                     CASE_DOC_LOCATION,
@@ -448,32 +432,29 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse calculateInterest(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
 
         String calculatedInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
             + caseData.getTotalClaimAmount().setScale(2)
             + " | \n | Interest amount | £ " + interest.setScale(2) + " | \n | Total amount | £ " + totalAmountWithInterest.setScale(2) + " |";
-        caseDataBuilder.calculatedInterest(calculatedInterest);
+        caseData.setCalculatedInterest(calculatedInterest);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse specCalculateInterest(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount();
 
         String calculateInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
             + caseData.getTotalClaimAmount().setScale(2)
             + " | \n | Interest amount | £ " + "0" + " | \n | Total amount | £ " + totalAmountWithInterest.setScale(2) + " |";
-        caseDataBuilder.calculatedInterest(calculateInterest);
+        caseData.setCalculatedInterest(calculateInterest);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -492,7 +473,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return
             ((areRespondentsRepresentedAndRegistered(caseData)
-                || isPinInPostCaseMatched(caseData))
+                || isCaseMatched(caseData))
                 ? getSpecConfirmationSummary(caseData)
                 : format(
                 SPEC_LIP_CONFIRMATION_BODY_PBAV3,
@@ -526,7 +507,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse validateFlightDelayDate(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         if (callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
             LocalDate today = LocalDate.now();
@@ -537,29 +518,28 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
 
     private CallbackResponse setRespondent2SameLegalRepToNo(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        CaseData caseData = callbackParams.getCaseData();
 
         // only default this to NO if respondent 1 isn't represented
         if (callbackParams.getCaseData().getSpecRespondent1Represented().equals(NO)) {
-            caseDataBuilder.respondent2SameLegalRepresentative(NO);
+            caseData.setRespondent2SameLegalRepresentative(NO);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private boolean isPinInPostCaseMatched(CaseData caseData) {
+    private boolean isCaseMatched(CaseData caseData) {
         return (caseData.getRespondent1Represented() == NO
             && caseData.getAddRespondent2() == NO
-            && caseData.getAddApplicant2() == NO
-            && toggleService.isPinInPostEnabled());
+            && caseData.getAddApplicant2() == NO);
     }
 
     private boolean areRespondentsRepresentedAndRegistered(CaseData caseData) {

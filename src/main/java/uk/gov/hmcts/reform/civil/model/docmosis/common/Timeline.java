@@ -5,20 +5,22 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 
 @Data
-@Builder
+@NoArgsConstructor
+@Accessors(chain = true)
 public class Timeline {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate timelineDate;
+    private LocalDate timelineDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String timelineDescription;
+    private String timelineDescription;
 
     @JsonCreator
     public Timeline(@JsonProperty("timelineDate") LocalDate timelineDate,

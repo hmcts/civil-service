@@ -4,32 +4,34 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.Objects;
 import java.util.stream.Stream;
 
 @Data
-@Builder
+@NoArgsConstructor
+@Accessors(chain = true)
 public class EvidenceDetails {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String evidenceType;
+    private String evidenceType;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String photoEvidence;
+    private String photoEvidence;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String contractAndAgreementsEvidence;
+    private String contractAndAgreementsEvidence;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String expertWitnessEvidence;
+    private String expertWitnessEvidence;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String lettersEmailsAndOtherCorrespondenceEvidence;
+    private String lettersEmailsAndOtherCorrespondenceEvidence;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String receiptsEvidence;
+    private String receiptsEvidence;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String statementOfTruthEvidence;
+    private String statementOfTruthEvidence;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String otherEvidence;
+    private String otherEvidence;
 
     @JsonCreator
     public EvidenceDetails(@JsonProperty("evidenceType") String evidenceType,

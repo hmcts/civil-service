@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -16,26 +17,28 @@ public class NonImmediatePaymentTypeDefaultJudgmentFormBuilder extends DefaultJu
     @Autowired
     public NonImmediatePaymentTypeDefaultJudgmentFormBuilder(InterestCalculator interestCalculator,
                                                              JudgmentAmountsCalculator judgmentAmountsCalculator,
-                                                             OrganisationService organisationService) {
-        super(interestCalculator, judgmentAmountsCalculator, organisationService);
+                                                             OrganisationService organisationService,
+                                                             DjWelshTextService djWelshTextService) {
+        super(interestCalculator, judgmentAmountsCalculator, organisationService, djWelshTextService);
     }
 
     public DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
                                                       uk.gov.hmcts.reform.civil.model.Party respondent,
+                                                      LitigationFriend litigationFriend,
                                                       String event,
                                                       boolean addReferenceOfSecondRes) {
 
-        return super.getDefaultJudgmentForm(caseData, respondent, event, addReferenceOfSecondRes)
-            .toBuilder().paymentPlan(caseData.getPaymentTypeSelection().name())
-            .payByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null :
+        return super.getDefaultJudgmentForm(caseData, respondent, litigationFriend, event, addReferenceOfSecondRes)
+            .copy()
+            .setPaymentPlan(caseData.getPaymentTypeSelection().name())
+            .setPayByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null :
                 DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
-            .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(caseData.getRepaymentFrequency(),
+            .setRepaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(caseData.getRepaymentFrequency(),
                                                                                                                 false))
-            .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(caseData.getRepaymentFrequency(),
+            .setPaymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(caseData.getRepaymentFrequency(),
                                                                                                      false))
-            .installmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
-            .repaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
-                DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE))
-            .build();
+            .setInstallmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
+            .setRepaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
+                DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE));
     }
 }

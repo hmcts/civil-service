@@ -4,12 +4,13 @@ camundaBranch=${2:-master}
 echo "export ENVIRONMENT=devuser-preview"
 echo "Loading Environment Variables"
 source ./bin/variables/load-dev-user-preview-environment-variables.sh
+. ./bin/utils/idam-get-tokens.sh
 echo "Importing Roles to the CCD pod"
 ./bin/add-roles.sh
 echo "Importing Camunda definitions"
 ./bin/pull-latest-camunda-files.sh ${camundaBranch}
 echo "Importing CCD definitions"
-./bin/pull-latest-ccd-files.sh ${ccdBranch}
+./bin/pull-latest-civil-ccd-files.sh ${ccdBranch}
 ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
 
 rm -rf $(pwd)/ccd-definition

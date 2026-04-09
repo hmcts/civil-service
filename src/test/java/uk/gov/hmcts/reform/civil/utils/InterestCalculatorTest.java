@@ -54,8 +54,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_8_PC, null, null))
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
             .totalClaimAmount(BigDecimal.valueOf(5000))
@@ -72,10 +71,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                .sameRateInterestType(SameRateInterestType
-                    .SAME_RATE_INTEREST_DIFFERENT_RATE)
-                .differentRate(BigDecimal.valueOf(10)).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE, BigDecimal.valueOf(10), null))
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
             .totalClaimAmount(BigDecimal.valueOf(5000))
@@ -92,10 +88,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                .sameRateInterestType(SameRateInterestType
-                    .SAME_RATE_INTEREST_DIFFERENT_RATE)
-                .differentRate(BigDecimal.valueOf(10)).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE, BigDecimal.valueOf(10), null))
             .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
             .interestFromSpecificDate(LocalDate.now())
@@ -114,8 +107,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_8_PC, null, null))
             .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
             .interestFromSpecificDate(LocalDate.now().minusDays(6))
@@ -149,9 +141,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestFromSpecificDate(LocalDate.now().minusDays(5))
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                .differentRate(BigDecimal.valueOf(6L))
-                .build())
+            .sameRateInterestSelection(buildSameRateSelection(null, BigDecimal.valueOf(6L), null))
             .build();
 
         BigDecimal result = interestCalculator.calculateBulkInterest(caseData);
@@ -178,8 +168,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_8_PC, null, null))
             .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
             .interestFromSpecificDate(LocalDate.now().minusDays(10))
@@ -197,8 +186,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_8_PC, null, null))
             .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
             .interestFromSpecificDate(LocalDate.now().minusDays(6))
@@ -216,9 +204,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE)
-                .differentRate(BigDecimal.valueOf(10)).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE, BigDecimal.valueOf(10), null))
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
             .interestFromSpecificDate(LocalDate.now().minusDays(6))
@@ -239,9 +225,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE)
-                .differentRate(BigDecimal.valueOf(10)).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE, BigDecimal.valueOf(10), null))
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
             .interestFromSpecificDate(LocalDate.now().minusDays(6))
@@ -257,8 +241,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_8_PC, null, null))
             .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
             .interestFromSpecificDate(LocalDate.now().minusDays(6))
@@ -275,8 +258,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_8_PC, null, null))
             .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             .interestFromSpecificDate(LocalDate.of(2023, 11, 07))
             .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
@@ -293,8 +275,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                                           .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_8_PC, null, null))
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
             .totalClaimAmount(BigDecimal.valueOf(5000))
@@ -311,8 +292,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                                           .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_8_PC, null, null))
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
             .totalClaimAmount(BigDecimal.valueOf(5000))
@@ -329,8 +309,7 @@ class InterestCalculatorTest {
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                                           .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_8_PC, null, null))
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
             .totalClaimAmount(BigDecimal.valueOf(5000))
@@ -338,5 +317,13 @@ class InterestCalculatorTest {
         caseData = caseData.toBuilder().submittedDate(dateTime).build();
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isEqualTo(BigDecimal.valueOf(0).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    private SameRateInterestSelection buildSameRateSelection(SameRateInterestType type, BigDecimal rate, String reason) {
+        SameRateInterestSelection selection = new SameRateInterestSelection();
+        selection.setSameRateInterestType(type);
+        selection.setDifferentRate(rate);
+        selection.setDifferentRateReason(reason);
+        return selection;
     }
 }

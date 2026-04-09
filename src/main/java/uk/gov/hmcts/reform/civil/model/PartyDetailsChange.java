@@ -1,15 +1,17 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
-@Builder
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
 public class PartyDetailsChange {
 
-    private final String fieldName;
-    private final String previousValue;
-    private final String updatedValue;
+    private String fieldName;
+    private String previousValue;
+    private String updatedValue;
 }

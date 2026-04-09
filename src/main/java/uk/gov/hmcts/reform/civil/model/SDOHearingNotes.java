@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.extern.jackson.Jacksonized;
+import lombok.NoArgsConstructor;
 
-@Jacksonized
-@Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SDOHearingNotes {
 
-    private final String input;
+    private String input;
 }

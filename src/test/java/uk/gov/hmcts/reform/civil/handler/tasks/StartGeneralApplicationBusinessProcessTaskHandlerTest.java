@@ -79,67 +79,49 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
     private final VariableMap variables = Variables.createVariables();
 
     private CaseData getFinishedTestCaseDataWithProcessID(CaseData caseData) {
-        GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-        GeneralApplication application = builder
-            .businessProcess(BusinessProcess.builder()
-                                 .status(FINISHED)
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .build()).build();
-        return caseData.toBuilder()
-            .generalApplications(wrapElements(application))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .build())
-            .build();
+        return caseData
+            .setGeneralApplications(wrapElements(
+                new GeneralApplication()
+                    .setBusinessProcess(new BusinessProcess()
+                                            .setStatus(FINISHED)
+                                            .setCamundaEvent("INITIATE_GENERAL_APPLICATION"))))
+            .setGeneralAppHearingDetails(new GAHearingDetails());
     }
 
     private CaseData getTestCaseData(CaseData caseData) {
-        GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-        GeneralApplication application = builder
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .build()).build();
-        return caseData.toBuilder()
-            .generalApplications(wrapElements(application))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .build())
-            .build();
+        return caseData
+            .setGeneralApplications(wrapElements(
+                new GeneralApplication()
+                    .setBusinessProcess(new BusinessProcess()
+                                            .setStatus(BusinessProcessStatus.READY)
+                                            .setCamundaEvent("INITIATE_GENERAL_APPLICATION"))))
+            .setGeneralAppHearingDetails(new GAHearingDetails());
     }
 
     private CaseData getTestCaseDataWithMultipleGA(CaseData caseData) {
-        GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-        GeneralApplication application = builder
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .build()).build();
+        GeneralApplication application1 = new GeneralApplication()
+            .setBusinessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent("INITIATE_GENERAL_APPLICATION"));
+        GeneralApplication application2 = new GeneralApplication()
+            .setBusinessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent("INITIATE_GENERAL_APPLICATION"));
 
-        GeneralApplication application2 = builder
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .build()).build();
-
-        return caseData.toBuilder()
-            .generalApplications(wrapElements(application))
-            .generalApplications(wrapElements(application2))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .build())
-            .build();
+        return caseData
+            .setGeneralApplications(wrapElements(application1, application2))
+            .setGeneralAppHearingDetails(new GAHearingDetails());
     }
 
     private CaseData getStartedTestCaseData(CaseData caseData) {
-        GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-        GeneralApplication application = builder
-            .businessProcess(BusinessProcess.builder()
-                                 .status(STARTED).processInstanceId("differentID")
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .build()).build();
-        return caseData.toBuilder()
-            .generalApplications(wrapElements(application))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .build())
-            .build();
+        return caseData
+            .setGeneralApplications(wrapElements(
+                new GeneralApplication()
+                    .setBusinessProcess(new BusinessProcess()
+                                            .setStatus(STARTED)
+                                            .setProcessInstanceId("differentID")
+                                            .setCamundaEvent("INITIATE_GENERAL_APPLICATION"))))
+            .setGeneralAppHearingDetails(new GAHearingDetails());
     }
 
     @BeforeEach
@@ -157,13 +139,16 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
     @EnumSource(value = BusinessProcessStatus.class, names = {"READY", "DISPATCHED"})
     void shouldStartBusinessProcess_whenValidBusinessProcessStatusWithOneGA(BusinessProcessStatus status) {
 
-        CaseData caseData = getTestCaseData(CaseDataBuilder.builder().build());
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        CaseData caseData = getTestCaseData(new CaseDataBuilder().build());
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS_GASPEC)).thenReturn(startEventResponse);
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder().flags(Map.of()).state(State.from("MAIN.DRAFT")).build());
+        when(stateFlowEngine.getStateFlow(any(CaseData.class)))
+            .thenReturn(new StateFlowDTO()
+                            .setFlags(Map.of())
+                            .setState(State.from("MAIN.DRAFT")));
 
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
@@ -179,13 +164,16 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
     @Test
     void shouldStartBusinessProcess_whenValidBusinessProcessStatusWithMultipleGA() {
 
-        CaseData caseData = getTestCaseDataWithMultipleGA(CaseDataBuilder.builder().build());
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        CaseData caseData = getTestCaseDataWithMultipleGA(new CaseDataBuilder().build());
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS_GASPEC)).thenReturn(startEventResponse);
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder().flags(Map.of()).state(State.from("MAIN.DRAFT")).build());
+        when(stateFlowEngine.getStateFlow(any(CaseData.class)))
+            .thenReturn(new StateFlowDTO()
+                            .setFlags(Map.of())
+                            .setState(State.from("MAIN.DRAFT")));
 
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
@@ -200,12 +188,15 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
 
     @Test
     void shouldNotUpdateBusinessProcess_whenInputStatusIsStartedAndHaveDifferentProcessInstanceId() {
-        CaseData caseData = getStartedTestCaseData(CaseDataBuilder.builder().build());
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        CaseData caseData = getStartedTestCaseData(new CaseDataBuilder().build());
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS_GASPEC)).thenReturn(startEventResponse);
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder().flags(Map.of()).state(State.from("MAIN.DRAFT")).build());
+        when(stateFlowEngine.getStateFlow(any(CaseData.class)))
+            .thenReturn(new StateFlowDTO()
+                            .setFlags(Map.of())
+                            .setState(State.from("MAIN.DRAFT")));
 
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
@@ -219,8 +210,8 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
 
     @Test
     void shouldRaiseBpmnError_whenBusinessProcessStatusIsFinished() {
-        CaseData caseData = getFinishedTestCaseDataWithProcessID(CaseDataBuilder.builder().build());
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        CaseData caseData = getFinishedTestCaseDataWithProcessID(new CaseDataBuilder().build());
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS_GASPEC)).thenReturn(startEventResponse);

@@ -53,17 +53,16 @@ class ValidateRespondentWitnessesTest {
     @Test
     void shouldValidateRespondentWitnessesWhenMultiPartyScenarioOneVOne() {
 
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQWitnesses(new Witnesses());
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1DQ(Respondent1DQ
-                               .builder().respondent1DQWitnesses(Witnesses.builder().build())
-                               .build())
+            .respondent1DQ(respondent1DQ)
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateRespondentWitnesses.execute(callbackParams);
@@ -78,17 +77,16 @@ class ValidateRespondentWitnessesTest {
 
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
             .thenReturn(true);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQWitnesses(new Witnesses());
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoDefendantSolicitors()
-            .respondent1DQ(Respondent1DQ
-                               .builder().respondent1DQWitnesses(Witnesses.builder()
-                                                                   .build()).build())
-            .build().toBuilder().ccdCaseReference(1234L)
+            .respondent1DQ(respondent1DQ)
             .build();
-        CallbackParams callbackParams = CallbackParams.builder()
+        caseData.setCcdCaseReference(1234L);
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -105,18 +103,17 @@ class ValidateRespondentWitnessesTest {
 
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
             .thenReturn(false, true);
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQWitnesses(new Witnesses());
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoDefendantSolicitors()
-            .respondent2DQ(Respondent2DQ
-                               .builder().respondent2DQWitnesses(Witnesses.builder()
-                                                                   .build()).build())
-            .build().toBuilder().ccdCaseReference(1234L)
+            .respondent2DQ(respondent2DQ)
             .build();
+        caseData.setCcdCaseReference(1234L);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -133,20 +130,18 @@ class ValidateRespondentWitnessesTest {
 
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
             .thenReturn(false, false);
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQWitnesses(new Witnesses());
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .multiPartyClaimOneDefendantSolicitor()
-            .respondent2DQ(Respondent2DQ
-                               .builder().respondent2DQWitnesses(Witnesses.builder()
-                                                                     .build())
-                               .build())
+            .respondent2DQ(respondent2DQ)
             .respondent2SameLegalRepresentative(YES)
             .respondentResponseIsSame(NO)
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -161,18 +156,17 @@ class ValidateRespondentWitnessesTest {
     @Test
     void shouldValidateRespondent1WitnessesByDefault() {
 
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQWitnesses(new Witnesses());
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoDefendantSolicitors()
-            .respondent1DQ(Respondent1DQ
-                               .builder().respondent1DQWitnesses(Witnesses.builder().build())
-                               .build())
-            .build().toBuilder().ccdCaseReference(1234L)
+            .respondent1DQ(respondent1DQ)
             .build();
+        caseData.setCcdCaseReference(1234L);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());

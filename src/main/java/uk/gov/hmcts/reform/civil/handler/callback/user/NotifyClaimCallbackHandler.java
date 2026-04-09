@@ -32,6 +32,7 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -110,11 +111,10 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         }
 
         //build options for field (Default Value & List Options), add to case data
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.defendantSolicitorNotifyClaimOptions(DynamicList.fromList(dynamicListOptions));
+        caseData.setDefendantSolicitorNotifyClaimOptions(DynamicList.fromList(dynamicListOptions));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -127,9 +127,8 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             warnings.add(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
         }
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .warnings(warnings)
             .build();
     }
@@ -141,11 +140,8 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfService);
         errors.addAll(dateValidationErrorMessages);
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder().build());
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -157,12 +153,8 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef2);
         errors.addAll(dateValidationErrorMessages);
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
-        caseDataBuilder.cosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder().build());
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -171,26 +163,21 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime claimNotificationDate = time.now();
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM))
-            .claimNotificationDate(claimNotificationDate);
+        caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM));
+        caseData.setClaimNotificationDate(claimNotificationDate);
 
         // set organisation policy after removing it in claim issue
         // workaround for hiding cases in CAA list before case notify
-        setOrganisationPolicy(caseData, caseDataBuilder);
+        setOrganisationPolicy(caseData);
         LocalDateTime claimDetailsNotificationDeadline;
         if (areAnyRespondentsLitigantInPerson(caseData)) {
             claimDetailsNotificationDeadline = getDeadline(getServiceDate(caseData));
             if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())) {
-                caseDataBuilder
-                    .cosNotifyClaimDefendant1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant1()))
-                    .build();
+                caseData.setCosNotifyClaimDefendant1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant1()));
             }
 
             if (Objects.nonNull(caseData.getCosNotifyClaimDefendant2())) {
-                caseDataBuilder
-                    .cosNotifyClaimDefendant2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant2()))
-                    .build();
+                caseData.setCosNotifyClaimDefendant2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant2()));
             }
 
         } else {
@@ -202,34 +189,35 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             claimDetailsNotificationDeadline = caseData.getClaimNotificationDeadline();
         }
 
-        caseDataBuilder
-            .claimDetailsNotificationDeadline(claimDetailsNotificationDeadline)
-            .nextDeadline(claimDetailsNotificationDeadline.toLocalDate());
+        caseData.setClaimDetailsNotificationDeadline(claimDetailsNotificationDeadline);
+        caseData.setNextDeadline(claimDetailsNotificationDeadline.toLocalDate());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void setOrganisationPolicy(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void setOrganisationPolicy(CaseData caseData) {
         if (caseData.getRespondent1OrganisationIDCopy() != null) {
-            caseDataBuilder.respondent1OrganisationPolicy(
-                caseData.getRespondent1OrganisationPolicy().toBuilder()
-                    .organisation(Organisation.builder()
-                                      .organisationID(caseData.getRespondent1OrganisationIDCopy())
-                                      .build())
-                    .build()
-            );
+            var existingPolicy = caseData.getRespondent1OrganisationPolicy();
+            var newPolicy = new uk.gov.hmcts.reform.ccd.model.OrganisationPolicy();
+            newPolicy.setOrgPolicyReference(existingPolicy.getOrgPolicyReference());
+            newPolicy.setOrgPolicyCaseAssignedRole(existingPolicy.getOrgPolicyCaseAssignedRole());
+            Organisation organisation = new Organisation();
+            organisation.setOrganisationID(caseData.getRespondent1OrganisationIDCopy());
+            newPolicy.setOrganisation(organisation);
+            caseData.setRespondent1OrganisationPolicy(newPolicy);
         }
 
         if (caseData.getRespondent2OrganisationIDCopy() != null) {
-            caseDataBuilder.respondent2OrganisationPolicy(
-                caseData.getRespondent2OrganisationPolicy().toBuilder()
-                    .organisation(Organisation.builder()
-                                      .organisationID(caseData.getRespondent2OrganisationIDCopy())
-                                      .build())
-                    .build()
-            );
+            var existingPolicy = caseData.getRespondent2OrganisationPolicy();
+            var newPolicy = new uk.gov.hmcts.reform.ccd.model.OrganisationPolicy();
+            newPolicy.setOrgPolicyReference(existingPolicy.getOrgPolicyReference());
+            newPolicy.setOrgPolicyCaseAssignedRole(existingPolicy.getOrgPolicyCaseAssignedRole());
+            Organisation organisation = new Organisation();
+            organisation.setOrganisationID(caseData.getRespondent2OrganisationIDCopy());
+            newPolicy.setOrganisation(organisation);
+            caseData.setRespondent2OrganisationPolicy(newPolicy);
         }
     }
 
@@ -244,14 +232,17 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         String body = "";
 
         if (isConfirmationForLip(caseData)) {
-            String formattedDeadline = formatLocalDate(caseData.getClaimDetailsNotificationDeadline().toLocalDate(),
-                                                       DATE);
+            String formattedDeadline = ofNullable(caseData.getClaimDetailsNotificationDeadline())
+                .map(LocalDateTime::toLocalDate)
+                .map(date -> formatLocalDate(date, DATE))
+                .orElse("N/A");
             header = String.format(CONFIRMATION_COS_HEADER, caseData.getLegacyCaseReference());
             body = format(CONFIRMATION_SUMMARY_COS, formattedDeadline) + exitSurveyContentService.applicantSurvey();
 
         } else {
-            String formattedDeadline = formatLocalDateTime(caseData
-                                                               .getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
+            String formattedDeadline = ofNullable(caseData.getClaimDetailsNotificationDeadline())
+                .map(rd -> formatLocalDateTime(rd, DATE_TIME_AT))
+                .orElse("N/A");
             header = String.format("# Notification of claim sent%n## Claim number: %s",
                                    caseData.getLegacyCaseReference());
             body = format(CONFIRMATION_SUMMARY, formattedDeadline) + exitSurveyContentService.applicantSurvey();
@@ -270,7 +261,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             return buildConfirmation(callbackParams);
         }
 
-        String formattedDeadline = formatLocalDateTime(caseData.getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
+        String formattedDeadline = ofNullable(caseData.getClaimDetailsNotificationDeadline())
+            .map(rd -> formatLocalDateTime(rd, DATE_TIME_AT))
+            .orElse("N/A");
 
         String confirmationText = (ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
             || notifyBothRespondentSolicitors(caseData))
@@ -334,8 +327,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private CertificateOfService updateStatementOfTruthForLip(CertificateOfService certificateOfService) {
         List<String> cosUISenderStatementOfTruthLabel = new ArrayList<>();
         cosUISenderStatementOfTruthLabel.add("CERTIFIED");
-        return certificateOfService.toBuilder()
-            .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
-            .build();
+        certificateOfService.setCosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel);
+        return certificateOfService;
     }
 }

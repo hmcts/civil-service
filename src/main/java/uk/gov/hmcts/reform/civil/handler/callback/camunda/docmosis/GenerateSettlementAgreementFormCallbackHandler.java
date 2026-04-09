@@ -40,7 +40,6 @@ public class GenerateSettlementAgreementFormCallbackHandler extends CallbackHand
 
     private CallbackResponse generateResponseDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder();
 
         CaseDocument claimantResponseForm = settlementAgreementFormGenerator.generate(
                 caseData,
@@ -50,18 +49,17 @@ public class GenerateSettlementAgreementFormCallbackHandler extends CallbackHand
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.add(element(claimantResponseForm));
-            updatedCaseDataBuilder
-                .bilingualHint(YesOrNo.YES)
-                .preTranslationDocuments(preTranslationDocuments);
+            caseData.setBilingualHint(YesOrNo.YES);
+            caseData.setPreTranslationDocuments(preTranslationDocuments);
         } else {
-            updatedCaseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+            caseData.setSystemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                 claimantResponseForm,
                 caseData
             ));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedCaseDataBuilder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
     }
 

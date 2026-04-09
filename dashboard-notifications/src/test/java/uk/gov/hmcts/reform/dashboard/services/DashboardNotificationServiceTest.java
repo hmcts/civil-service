@@ -11,22 +11,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
-import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getNotification;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getNotificationEntityList;
@@ -106,6 +108,25 @@ public class DashboardNotificationServiceTest {
 
             assertThat(actual).isNotEmpty().isEqualTo(expectedList);
         }
+
+        @Test
+        void should_sort_notifications_by_creation_time_descending() {
+            UUID earlierId = UUID.randomUUID();
+            UUID laterId = UUID.randomUUID();
+            DashboardNotificationsEntity earlier = new DashboardNotificationsEntity();
+            earlier.setId(earlierId);
+            earlier.setCreatedAt(OffsetDateTime.now().minusDays(1));
+            DashboardNotificationsEntity later = new DashboardNotificationsEntity();
+            later.setId(laterId);
+            later.setCreatedAt(OffsetDateTime.now());
+
+            when(dashboardNotificationsRepository.findByReferenceAndCitizenRole("case", "role"))
+                .thenReturn(List.of(earlier, later));
+
+            List<Notification> notifications = dashboardNotificationService.getNotifications("case", "role");
+
+            assertThat(notifications).extracting(Notification::getId).containsExactly(laterId, earlierId);
+        }
     }
 
     @Nested
@@ -135,6 +156,14 @@ public class DashboardNotificationServiceTest {
             dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, defendant);
             Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, defendant);
         }
+
+        @Test
+        void deleteNotificationsByNameAndReference() {
+            String templateName = "template.name";
+            String reference = "reference";
+            dashboardNotificationService.deleteByNameAndReference(templateName, reference);
+            Mockito.verify(dashboardNotificationsRepository).deleteByNameAndReference(templateName, reference);
+        }
     }
 
     @Test
@@ -144,15 +173,13 @@ public class DashboardNotificationServiceTest {
         DashboardNotificationsEntity notification2 = createDashboardNotificationsEntity();
         when(
             dashboardNotificationsRepository
-                .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
+                .findByReferenceAndCitizenRoleAndName(
                     any(), any(), any())).thenReturn(List.of(notification1, notification2));
-        NotificationTemplateEntity template = NotificationTemplateEntity.builder()
-            .id(1L)
-            .build();
-        DashboardNotificationsEntity notification = DashboardNotificationsEntity.builder()
-            .id(UUID.randomUUID())
-            .dashboardNotificationsTemplates(template)
-            .build();
+        DashboardNotificationsEntity notification = new DashboardNotificationsEntity();
+        notification.setId(UUID.randomUUID());
+        notification.setName("template.name");
+        notification.setReference("reference");
+        notification.setCitizenRole("CLAIMANT");
         dashboardNotificationService.saveOrUpdate(notification);
         verify(notificationActionRepository, times(2)).deleteByDashboardNotificationAndActionPerformed(any(DashboardNotificationsEntity.class), any());
         final ArgumentCaptor<DashboardNotificationsEntity> captor = ArgumentCaptor.forClass(DashboardNotificationsEntity.class);
@@ -161,8 +188,27 @@ public class DashboardNotificationServiceTest {
         assertThat(captor.getValue().getId()).isEqualTo(notification1.getId());
     }
 
+    @Test
+    void saveOrUpdateShouldPersistWithoutTemplateLookupWhenNameMissing() {
+        DashboardNotificationsEntity notification = new DashboardNotificationsEntity();
+        notification.setId(UUID.randomUUID());
+        notification.setReference("reference");
+        notification.setCitizenRole("CLAIMANT");
+
+        when(dashboardNotificationsRepository.save(notification)).thenReturn(notification);
+
+        DashboardNotificationsEntity saved = dashboardNotificationService.saveOrUpdate(notification);
+
+        assertThat(saved).isSameAs(notification);
+        verify(dashboardNotificationsRepository).save(notification);
+        verify(dashboardNotificationsRepository, never()).findByReferenceAndCitizenRoleAndName(any(), any(), any());
+        verifyNoInteractions(notificationActionRepository);
+    }
+
     private DashboardNotificationsEntity createDashboardNotificationsEntity() {
-        return DashboardNotificationsEntity.builder().id(UUID.randomUUID()).build();
+        DashboardNotificationsEntity notification = new DashboardNotificationsEntity();
+        notification.setId(UUID.randomUUID());
+        return notification;
     }
 
     @Nested
@@ -172,27 +218,120 @@ public class DashboardNotificationServiceTest {
         void shouldReturnOkWhenRecordingNotificationClick() {
             String authToken = "Auth-token";
 
-            when(idamApi.retrieveUserDetails(authToken))
-                .thenReturn(UserDetails.builder().forename("Claimant").surname("user").build());
-
             DashboardNotificationsEntity notification = getNotification(id);
             when(dashboardNotificationsRepository.findById(id)).thenReturn(Optional.of(notification));
+            when(dashboardNotificationsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-            NotificationActionEntity notificationAction = NotificationActionEntity.builder()
-                .reference(notification.getReference())
-                .dashboardNotification(notification)
-                .actionPerformed("Click")
-                .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
-                .createdAt(any())
-                .build();
-            notification.setNotificationAction(notificationAction);
+            UserDetails userDetails = Mockito.mock(UserDetails.class);
+            when(userDetails.getFullName()).thenReturn("Claimant user");
+            when(idamApi.retrieveUserDetails(authToken)).thenReturn(userDetails);
 
-            //when
             dashboardNotificationService.recordClick(id, authToken);
 
-            //verify
-            verify(dashboardNotificationsRepository).save(notification);
+            ArgumentCaptor<DashboardNotificationsEntity> captor = ArgumentCaptor.forClass(DashboardNotificationsEntity.class);
+            verify(dashboardNotificationsRepository).save(captor.capture());
+            NotificationActionEntity action = captor.getValue().getNotificationAction();
+            assertThat(action).isNotNull();
+            assertThat(action.getActionPerformed()).isEqualTo("Click");
+            assertThat(action.getCreatedBy()).isEqualTo("Claimant user");
+            assertThat(action.getReference()).isEqualTo(notification.getReference());
+            assertThat(action.getId()).isNull();
+        }
+
+        @Test
+        void shouldReuseExistingClickActionIdWhenRecordingSecondClick() {
+            DashboardNotificationsEntity notification = getNotification(id);
+            NotificationActionEntity existingAction = new NotificationActionEntity();
+            existingAction.setId(99L);
+            existingAction.setActionPerformed("Click");
+            existingAction.setReference(notification.getReference());
+            notification.setNotificationAction(existingAction);
+
+            when(dashboardNotificationsRepository.findById(id)).thenReturn(Optional.of(notification));
+            when(dashboardNotificationsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+            String authToken = "Auth-token";
+            UserDetails userDetails = Mockito.mock(UserDetails.class);
+            when(userDetails.getFullName()).thenReturn("Claimant user");
+            when(idamApi.retrieveUserDetails(authToken)).thenReturn(userDetails);
+
+            dashboardNotificationService.recordClick(id, authToken);
+
+            ArgumentCaptor<DashboardNotificationsEntity> captor = ArgumentCaptor.forClass(DashboardNotificationsEntity.class);
+            verify(dashboardNotificationsRepository).save(captor.capture());
+            NotificationActionEntity action = captor.getValue().getNotificationAction();
+            assertThat(action.getId()).isEqualTo(99L);
+            assertThat(action.getCreatedBy()).isEqualTo("Claimant user");
+            assertThat(action.getActionPerformed()).isEqualTo("Click");
         }
     }
 
+    @Test
+    void should_return_dashboard_notification_entities_for_case_and_role() {
+        List<DashboardNotificationsEntity> expected = getNotificationEntityList();
+
+        when(dashboardNotificationsRepository
+                 .findByReferenceAndCitizenRole("123", "Claimant"))
+            .thenReturn(expected);
+
+        List<DashboardNotificationsEntity> actual =
+            dashboardNotificationService
+                .getDashboardNotifications("123", "Claimant");
+
+        assertThat(actual).isEqualTo(expected);
+        verify(dashboardNotificationsRepository)
+            .findByReferenceAndCitizenRole("123", "Claimant");
+    }
+
+    @Test
+    void should_return_only_case_stayed_notifications_when_present() {
+        final UUID normalId = UUID.randomUUID();
+        final UUID stayedId = UUID.randomUUID();
+
+        DashboardNotificationsEntity normal = new DashboardNotificationsEntity();
+        normal.setId(normalId);
+        normal.setName("Some.Other.Template");
+        normal.setCreatedAt(OffsetDateTime.now().minusHours(1));
+
+        DashboardNotificationsEntity stayed = new DashboardNotificationsEntity();
+        stayed.setId(stayedId);
+        stayed.setName("Notice.AAA6.CP.Case.Stayed.Claimant");
+        stayed.setCreatedAt(OffsetDateTime.now());
+
+        when(dashboardNotificationsRepository.findByReferenceAndCitizenRole("case", "role"))
+            .thenReturn(List.of(normal, stayed));
+
+        List<Notification> result =
+            dashboardNotificationService.getNotifications("case", "role");
+
+        assertThat(result)
+            .extracting(Notification::getId)
+            .containsExactly(stayedId);
+    }
+
+    @Test
+    void should_return_all_notifications_when_no_case_stayed_templates_exist() {
+        final UUID id1 = UUID.randomUUID();
+        final UUID id2 = UUID.randomUUID();
+
+        DashboardNotificationsEntity n1 = new DashboardNotificationsEntity();
+        n1.setId(id1);
+        n1.setName("Template.One");
+        n1.setCreatedAt(OffsetDateTime.now());
+
+        DashboardNotificationsEntity n2 = new DashboardNotificationsEntity();
+        n2.setId(id2);
+        n2.setName("Template.Two");
+        n2.setCreatedAt(OffsetDateTime.now().minusHours(1));
+
+        when(dashboardNotificationsRepository.findByReferenceAndCitizenRole("case", "role"))
+            .thenReturn(List.of(n1, n2));
+
+        List<Notification> result =
+            dashboardNotificationService.getNotifications("case", "role");
+
+        assertThat(result)
+            .extracting(Notification::getId)
+            .containsExactly(id1, id2);
+    }
 }

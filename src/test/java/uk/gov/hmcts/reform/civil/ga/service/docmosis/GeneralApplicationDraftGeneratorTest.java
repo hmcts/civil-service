@@ -1,0 +1,643 @@
+package uk.gov.hmcts.reform.civil.ga.service.docmosis;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_FROM_SANCTIONS;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CUSTOMER_REFERENCE;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.GENERAL_APPLICATION_DRAFT;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
+import uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements;
+import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.docmosis.GADraftForm;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
+import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@SuppressWarnings("ALL")
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(
+        classes = {
+            JacksonAutoConfiguration.class,
+            CaseDetailsConverter.class,
+            GeneralApplicationDraftGenerator.class
+        })
+class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbackHandlerTest {
+
+    private static final String BEARER_TOKEN = "Bearer Token";
+    private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
+    private static final String STRING_CONSTANT = "STRING_CONSTANT";
+    private static final Long CHILD_CCD_REF = 1646003133062762L;
+    private static final Long PARENT_CCD_REF = 1645779506193000L;
+    private static final String DUMMY_EMAIL = "hmcts.civil@gmail.com";
+    private static final String DUMMY_TELEPHONE_NUM = "234345435435";
+    @MockBean private SecuredDocumentManagementService documentManagementService;
+    @MockBean private DocumentGeneratorService documentGeneratorService;
+    @MockBean ListGeneratorService listGeneratorService;
+    @MockBean private CoreCaseDataService coreCaseDataService;
+    @MockBean private GaForLipService gaForLipService;
+    @Autowired ObjectMapper objectMapper;
+
+    @Autowired GeneralApplicationDraftGenerator generalApplicationDraftGenerator;
+    List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
+    DynamicListElement location1 =
+            new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
+
+    @Test
+    void shouldNotGenerateApplicationDraftDocument() {
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(NO, YES);
+
+        when(documentGeneratorService.generateDocmosisDocument(
+                        any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
+                .thenReturn(
+                        new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+
+        when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
+        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
+        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        Map<String, String> refMap = new HashMap<>();
+        refMap.put("applicantSolicitor1Reference", "app1ref");
+        refMap.put("respondentSolicitor1Reference", "resp1ref");
+        Map<String, Object> caseDataContent = new HashMap<>();
+        caseDataContent.put("solicitorReferences", refMap);
+        CaseDetails parentCaseDetails = CaseDetails.builder().data(caseDataContent).build();
+        when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
+        generalApplicationDraftGenerator.generate(caseData, BEARER_TOKEN);
+
+        verify(documentManagementService)
+                .uploadDocument(
+                        BEARER_TOKEN,
+                        new PDF(any(), any(), DocumentType.GENERAL_APPLICATION_DRAFT));
+        verify(documentGeneratorService)
+                .generateDocmosisDocument(any(GADraftForm.class), eq(GENERAL_APPLICATION_DRAFT));
+        var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
+        assertThat(templateData.getIsCasePastDueDate()).isTrue();
+    }
+
+    @Test
+    void shouldGenerateApplicationDraftDocumentWithNoticeButRespondentNotRespondedOnTime() {
+        GeneralApplicationCaseData caseData =
+                getSampleGeneralAppCaseDataWithDeadLineReached(NO, YES);
+        caseData.setGeneralAppSubmittedDateGAspec(null);
+        when(documentGeneratorService.generateDocmosisDocument(
+                        any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
+                .thenReturn(
+                        new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+
+        when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
+        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
+        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        Map<String, String> refMap = new HashMap<>();
+        refMap.put("applicantSolicitor1Reference", "app1ref");
+        refMap.put("respondentSolicitor1Reference", "resp1ref");
+        Map<String, Object> caseDataContent = new HashMap<>();
+        caseDataContent.put("solicitorReferences", refMap);
+        caseDataContent.put("generalAppSubmittedDateGAspec", LocalDateTime.now());
+        CaseDetails parentCaseDetails = CaseDetails.builder().data(caseDataContent).build();
+        when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
+
+        generalApplicationDraftGenerator.generate(caseData, BEARER_TOKEN);
+
+        verify(documentManagementService)
+                .uploadDocument(
+                        BEARER_TOKEN,
+                        new PDF(any(), any(), DocumentType.GENERAL_APPLICATION_DRAFT));
+        verify(documentGeneratorService)
+                .generateDocmosisDocument(any(GADraftForm.class), eq(GENERAL_APPLICATION_DRAFT));
+        var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
+        assertThat(templateData.getIsCasePastDueDate()).isTrue();
+        assertNotNull(templateData.getSubmittedDate());
+        assertNotNull(templateData.getIssueDate());
+        assertEquals(String.valueOf(CHILD_CCD_REF), templateData.getApplicationId());
+    }
+
+    @Test
+    void shouldGenerateDocumentWithApplicantAndRespondent1Response_1v1_test() {
+        List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
+        GASolicitorDetailsGAspec respondent1 =
+                new GASolicitorDetailsGAspec()
+                        .setId("id")
+                        .setEmail(DUMMY_EMAIL)
+                        .setOrganisationIdentifier("org2");
+
+        respondentSols.add(element(respondent1));
+        GeneralApplicationCaseData caseData = getCase(respondentSols, NO);
+
+        when(documentGeneratorService.generateDocmosisDocument(
+                        any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
+                .thenReturn(
+                        new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+
+        when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
+        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
+        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        Map<String, String> refMap = new HashMap<>();
+        refMap.put("applicantSolicitor1Reference", "app1ref");
+        refMap.put("respondentSolicitor1Reference", "resp1ref");
+        Map<String, Object> caseDataContent = new HashMap<>();
+        caseDataContent.put("solicitorReferences", refMap);
+        CaseDetails parentCaseDetails = CaseDetails.builder().data(caseDataContent).build();
+        when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
+        var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
+        assertThatRespondentFieldsAreCorrect_DraftApp(templateData, caseData);
+    }
+
+    @Test
+    void shouldGenerateDocumentWithApplicantAndRespondent1ResponseJudgeUncloaks() {
+        List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
+        GASolicitorDetailsGAspec respondent1 =
+                new GASolicitorDetailsGAspec()
+                        .setId("id")
+                        .setEmail(DUMMY_EMAIL)
+                        .setOrganisationIdentifier("org2");
+
+        respondentSols.add(element(respondent1));
+        GeneralApplicationCaseData caseData =
+                getCase(respondentSols, NO)
+                        .copy()
+                        .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(NO))
+                        .applicationIsCloaked(NO)
+                        .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(
+                        any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
+                .thenReturn(
+                        new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+
+        when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
+        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
+        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        Map<String, String> refMap = new HashMap<>();
+        refMap.put("applicantSolicitor1Reference", "app1ref");
+        refMap.put("respondentSolicitor1Reference", "resp1ref");
+        Map<String, Object> caseDataContent = new HashMap<>();
+        caseDataContent.put("solicitorReferences", refMap);
+        CaseDetails parentCaseDetails = CaseDetails.builder().data(caseDataContent).build();
+        when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
+        var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
+        assertThat(templateData.getIsWithNotice()).isEqualTo(YES);
+    }
+
+    @Test
+    void shouldNotGenerateDocumentWithApplicantAndRespondent1ResponseWhenApplnCloaked() {
+        List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
+        GASolicitorDetailsGAspec respondent1 =
+                new GASolicitorDetailsGAspec()
+                        .setId("id")
+                        .setEmail(DUMMY_EMAIL)
+                        .setOrganisationIdentifier("org2");
+
+        respondentSols.add(element(respondent1));
+        GeneralApplicationCaseData caseData =
+                getCase(respondentSols, NO)
+                        .copy()
+                        .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(NO))
+                        .applicationIsCloaked(YES)
+                        .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(
+                        any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
+                .thenReturn(
+                        new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+
+        when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
+        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
+        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        Map<String, String> refMap = new HashMap<>();
+        refMap.put("applicantSolicitor1Reference", "app1ref");
+        refMap.put("respondentSolicitor1Reference", "resp1ref");
+        Map<String, Object> caseDataContent = new HashMap<>();
+        caseDataContent.put("solicitorReferences", refMap);
+        CaseDetails parentCaseDetails = CaseDetails.builder().data(caseDataContent).build();
+        when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
+        var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
+        assertThat(templateData.getIsWithNotice()).isEqualTo(NO);
+    }
+
+    @Test
+    void shouldGenerateDocumentWithApplicantAndRespondentsResponse_1v2_test() {
+        List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
+        GASolicitorDetailsGAspec respondent1 =
+                new GASolicitorDetailsGAspec()
+                        .setId("id")
+                        .setEmail(DUMMY_EMAIL)
+                        .setOrganisationIdentifier("org2");
+
+        GASolicitorDetailsGAspec respondent2 =
+                new GASolicitorDetailsGAspec()
+                        .setId("id")
+                        .setEmail(DUMMY_EMAIL)
+                        .setOrganisationIdentifier("org2");
+
+        respondentSols.add(element(respondent1));
+        respondentSols.add(element(respondent2));
+
+        GeneralApplicationCaseData caseData = getCase(respondentSols, YES);
+
+        when(documentGeneratorService.generateDocmosisDocument(
+                        any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
+                .thenReturn(
+                        new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+
+        when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
+        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
+        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        Map<String, String> refMap = new HashMap<>();
+        refMap.put("applicantSolicitor1Reference", "app1ref");
+        refMap.put("respondentSolicitor1Reference", "resp1ref");
+        Map<String, Object> caseDataContent = new HashMap<>();
+        caseDataContent.put("solicitorReferences", refMap);
+        CaseDetails parentCaseDetails = CaseDetails.builder().data(caseDataContent).build();
+        when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
+        var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
+        assertThatRespondentFieldsAreCorrect_DraftApp(templateData, caseData);
+    }
+
+    public List<Element<GARespondentResponse>> getRespondentResponses1nad2(
+            YesOrNo vulQuestion1,
+            YesOrNo vulQuestion2,
+            YesOrNo hasResp1PreferLocation,
+            YesOrNo hasResp2PreferLocation,
+            YesOrNo addRespondent) {
+
+        List<GAHearingSupportRequirements> respSupportReq1 = new ArrayList<>();
+        respSupportReq1.add(GAHearingSupportRequirements.OTHER_SUPPORT);
+
+        List<GAHearingSupportRequirements> respSupportReq2 = new ArrayList<>();
+        respSupportReq2.add(GAHearingSupportRequirements.LANGUAGE_INTERPRETER);
+        List<Element<GAUnavailabilityDates>> resp1UnavailabilityDates = new ArrayList<>();
+        resp1UnavailabilityDates.add(
+                element(
+                        new GAUnavailabilityDates()
+                                .setUnavailableTrialDateTo(LocalDate.now().plusDays(5))
+                                .setUnavailableTrialDateFrom(LocalDate.now())));
+        List<Element<GAUnavailabilityDates>> resp2UnavailabilityDates = new ArrayList<>();
+        resp2UnavailabilityDates.add(
+                element(
+                        new GAUnavailabilityDates()
+                                .setUnavailableTrialDateTo(LocalDate.now().plusDays(3))
+                                .setUnavailableTrialDateFrom(LocalDate.now())));
+        List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
+        respondentsResponses.add(
+                element(
+                        new GARespondentResponse()
+                                .setGaHearingDetails(
+                                        new GAHearingDetails()
+                                                .setVulnerabilityQuestionsYesOrNo(vulQuestion1)
+                                                .setVulnerabilityQuestion("dummy1")
+                                                .setHearingPreferencesPreferredType(
+                                                        GAHearingType.IN_PERSON)
+                                                .setHearingDuration(GAHearingDuration.HOUR_1)
+                                                .setSupportRequirement(respSupportReq1)
+                                                .setUnavailableTrialRequiredYesOrNo(YES)
+                                                .setGeneralAppUnavailableDates(
+                                                        resp1UnavailabilityDates)
+                                                .setHearingPreferredLocation(
+                                                        hasResp1PreferLocation == YES
+                                                                ? new DynamicList().setListItems(
+                                                                                List.of(location1)).setValue(location1)
+                                                                : null))
+                                .setGaRespondentDetails("1L")));
+        if (addRespondent == YES) {
+            respondentsResponses.add(
+                    element(
+                            new GARespondentResponse()
+                                    .setGaHearingDetails(
+                                            new GAHearingDetails()
+                                                    .setVulnerabilityQuestionsYesOrNo(vulQuestion2)
+                                                    .setVulnerabilityQuestion("dummy2")
+                                                    .setHearingPreferencesPreferredType(
+                                                            GAHearingType.IN_PERSON)
+                                                    .setHearingDuration(
+                                                            GAHearingDuration.MINUTES_30)
+                                                    .setSupportRequirement(respSupportReq2)
+                                                    .setGeneralAppUnavailableDates(
+                                                            resp2UnavailabilityDates)
+                                                    .setHearingPreferredLocation(
+                                                            hasResp2PreferLocation == YES
+                                                                    ? new DynamicList().setListItems(
+                                                                                    List.of(
+                                                                                            location1)).setValue(location1)
+                                                                    : null))
+                                    .setGaRespondentDetails("2L")));
+        }
+        return respondentsResponses;
+    }
+
+    private GeneralApplicationCaseData getCase(
+            List<Element<GASolicitorDetailsGAspec>> respondentSols, YesOrNo addRespondent) {
+        List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.SUMMARY_JUDGEMENT));
+        DynamicListElement location2 =
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
+        return new GeneralApplicationCaseData()
+                .claimant1PartyName("Test Claimant1 Name")
+                .defendant1PartyName("Test Defendant1 Name")
+                .ccdCaseReference(CHILD_CCD_REF)
+                .generalAppHearingDate(buildHearingDateGAspec(YES, LocalDate.now()))
+                .generalAppRespondentSolicitors(respondentSols)
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES))
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
+                .generalAppStatementOfTruth(new GAStatementOfTruth())
+                .generalAppHearingDetails(
+                        new GAHearingDetails()
+                                .setHearingPreferredLocation(
+                                        new DynamicList().setListItems(List.of(location2)).setValue(location1))
+                                .setVulnerabilityQuestionsYesOrNo(YES)
+                                .setVulnerabilityQuestion("dummy2")
+                                .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                                .setHearingDuration(GAHearingDuration.MINUTES_30)
+                                .setHearingDetailsEmailID(DUMMY_EMAIL)
+                                .setHearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM))
+                .hearingDetailsResp(
+                        new GAHearingDetails()
+                                .setHearingPreferredLocation(
+                                        new DynamicList().setListItems(List.of(location1)).setValue(location1))
+                                .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                                .setHearingDuration(GAHearingDuration.MINUTES_30)
+                                .setHearingDetailsEmailID(DUMMY_EMAIL)
+                                .setHearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM))
+                .respondentsResponses(
+                        getRespondentResponses1nad2(YES, YES, YES, YES, addRespondent))
+                .generalAppRespondent1Representative(
+                        new GARespondentRepresentative()
+                                .setGeneralAppRespondent1Representative(YES))
+                .generalAppType(new GAApplicationType().setTypes(types))
+                .parentClaimantIsApplicant(YES)
+                .generalAppParentCaseLink(
+                        new GeneralAppParentCaseLink().setCaseReference(PARENT_CCD_REF.toString()))
+                .generalAppSubmittedDateGAspec(LocalDateTime.now())
+                .build();
+    }
+
+    private GeneralApplicationCaseData getSampleGeneralApplicationCaseData(
+            YesOrNo isConsented, YesOrNo isTobeNotified) {
+        return GeneralApplicationCaseDataBuilder.builder()
+                .buildCaseDateBaseOnGeneralApplication(
+                        getGeneralApplication(isConsented, isTobeNotified))
+                .copy()
+                .claimant1PartyName("Test Claimant1 Name")
+                .generalAppHearingDate(buildHearingDateGAspec(YES, LocalDate.now()))
+                .defendant1PartyName("Test Defendant1 Name")
+                .ccdCaseReference(CHILD_CCD_REF)
+                .build();
+    }
+
+    private GeneralApplicationCaseData getSampleGeneralAppCaseDataWithDeadLineReached(
+            YesOrNo isConsented, YesOrNo isTobeNotified) {
+        return GeneralApplicationCaseDataBuilder.builder()
+                .buildCaseDateBaseOnGeneralApplication(
+                        getGeneralApplicationWithDeadlineReached(isConsented, isTobeNotified))
+                .copy()
+                .claimant1PartyName("Test Claimant1 Name")
+                .generalAppHearingDate(buildHearingDateGAspec(YES, LocalDate.now()))
+                .defendant1PartyName("Test Defendant1 Name")
+                .ccdCaseReference(CHILD_CCD_REF)
+                .build();
+    }
+
+    private GeneralApplication getGeneralApplication(YesOrNo isConsented, YesOrNo isTobeNotified) {
+        DynamicListElement location2 =
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
+        List<Element<GAUnavailabilityDates>> appUnavailabilityDates = new ArrayList<>();
+        appUnavailabilityDates.add(
+                element(
+                        new GAUnavailabilityDates()
+                                .setUnavailableTrialDateTo(LocalDate.now().plusDays(2))
+                                .setUnavailableTrialDateFrom(LocalDate.now())));
+        return new GeneralApplication()
+                .setGeneralAppType(new GAApplicationType().setTypes(List.of(RELIEF_FROM_SANCTIONS)))
+                .setGeneralAppRespondentAgreement(
+                        new GARespondentOrderAgreement().setHasAgreed(isConsented))
+                .setGeneralAppInformOtherParty(
+                        new GAInformOtherParty().setIsWithNotice(isTobeNotified))
+                .setGeneralAppPBADetails(
+                        new GAPbaDetails()
+                                .setFee(
+                                        new Fee()
+                                                .setCode("FE203")
+                                                .setCalculatedAmountInPence(
+                                                        BigDecimal.valueOf(27500))
+                                                .setVersion("1"))
+                                .setServiceReqReference(CUSTOMER_REFERENCE)
+                                .setPaymentSuccessfulDate(LocalDateTime.now()))
+                .setGeneralAppDetailsOfOrder(STRING_CONSTANT)
+                .setGeneralAppReasonsOfOrder(STRING_CONSTANT)
+                .setGeneralAppUrgencyRequirement(
+                        new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                .setGeneralAppStatementOfTruth(new GAStatementOfTruth())
+                .setGeneralAppHearingDetails(
+                        new GAHearingDetails()
+                                .setHearingPreferredLocation(
+                                        new DynamicList().setListItems(List.of(location2)).setValue(location2))
+                                .setVulnerabilityQuestionsYesOrNo(YES)
+                                .setVulnerabilityQuestion("dummy2")
+                                .setGeneralAppUnavailableDates(appUnavailabilityDates)
+                                .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                                .setHearingDuration(GAHearingDuration.MINUTES_30)
+                                .setHearingDetailsEmailID(DUMMY_EMAIL)
+                                .setHearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM))
+                .setGeneralAppRespondentSolicitors(
+                        wrapElements(new GASolicitorDetailsGAspec().setEmail("abc@gmail.com")))
+                .setIsMultiParty(NO)
+                .setParentClaimantIsApplicant(YES)
+                .setGeneralAppParentCaseLink(
+                        new GeneralAppParentCaseLink().setCaseReference(PARENT_CCD_REF.toString()))
+                .setGeneralAppSubmittedDateGAspec(LocalDateTime.now());
+    }
+
+    private GeneralApplication getGeneralApplicationWithDeadlineReached(
+            YesOrNo isConsented, YesOrNo isTobeNotified) {
+        List<Element<GAUnavailabilityDates>> appUnavailabilityDates = new ArrayList<>();
+        appUnavailabilityDates.add(
+                element(
+                        new GAUnavailabilityDates()
+                                .setUnavailableTrialDateTo(LocalDate.now().plusDays(2))
+                                .setUnavailableTrialDateFrom(LocalDate.now())));
+        return new GeneralApplication()
+                .setGeneralAppType(new GAApplicationType().setTypes(List.of(RELIEF_FROM_SANCTIONS)))
+                .setGeneralAppRespondentAgreement(
+                        new GARespondentOrderAgreement().setHasAgreed(isConsented))
+                .setGeneralAppInformOtherParty(
+                        new GAInformOtherParty().setIsWithNotice(isTobeNotified))
+                .setGeneralAppHearingDate(buildHearingDateGAspec(YES, LocalDate.now()))
+                .setGeneralAppPBADetails(
+                        new GAPbaDetails()
+                                .setFee(
+                                        new Fee()
+                                                .setCode("FE203")
+                                                .setCalculatedAmountInPence(
+                                                        BigDecimal.valueOf(27500))
+                                                .setVersion("1"))
+                                .setServiceReqReference(CUSTOMER_REFERENCE))
+                .setGeneralAppDetailsOfOrder(STRING_CONSTANT)
+                .setGeneralAppReasonsOfOrder(STRING_CONSTANT)
+                .setGeneralAppDateDeadline(LocalDateTime.now().minusDays(2))
+                .setGeneralAppUrgencyRequirement(
+                        new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                .setGeneralAppStatementOfTruth(new GAStatementOfTruth())
+                .setGeneralAppHearingDetails(
+                        new GAHearingDetails()
+                                .setHearingPreferredLocation(
+                                        new DynamicList().setListItems(List.of(location1)).setValue(location1))
+                                .setVulnerabilityQuestionsYesOrNo(YES)
+                                .setVulnerabilityQuestion("dummy2")
+                                .setGeneralAppUnavailableDates(appUnavailabilityDates)
+                                .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                                .setHearingDuration(GAHearingDuration.MINUTES_30)
+                                .setHearingDetailsEmailID(DUMMY_EMAIL)
+                                .setHearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM))
+                .setGeneralAppRespondentSolicitors(
+                        wrapElements(new GASolicitorDetailsGAspec().setEmail("abc@gmail.com")))
+                .setIsMultiParty(NO)
+                .setParentClaimantIsApplicant(YES)
+                .setGeneralAppSubmittedDateGAspec(LocalDateTime.now())
+                .setGeneralAppParentCaseLink(
+                        new GeneralAppParentCaseLink().setCaseReference(PARENT_CCD_REF.toString()));
+    }
+
+    @Test
+    void whenUrgentApplicationShouldGenerateDocumentWithApplicantDetails() {
+        Map<String, String> refMap = new HashMap<>();
+        refMap.put("applicantSolicitor1Reference", "app1ref");
+        refMap.put("respondentSolicitor1Reference", "resp1ref");
+        Map<String, Object> caseDataContent = new HashMap<>();
+        caseDataContent.put("solicitorReferences", refMap);
+        CaseDetails parentCaseDetails = CaseDetails.builder().data(caseDataContent).build();
+        when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
+
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(NO, YES);
+        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
+        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+
+        var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
+
+        assertThatApplicantFieldsAreCorrect_DraftApp(templateData, caseData);
+    }
+
+    private void assertThatApplicantFieldsAreCorrect_DraftApp(
+            GADraftForm templateData, GeneralApplicationCaseData caseData) {
+        Assertions.assertAll(
+                "DraftApplication data should be as expected",
+                () ->
+                        assertEquals(
+                                templateData.getClaimNumber(),
+                                caseData.getGeneralAppParentCaseLink().getCaseReference()),
+                () -> assertEquals(templateData.getClaimantName(), getClaimants(caseData)),
+                () -> assertEquals(templateData.getDefendantName(), getDefendants(caseData)));
+    }
+
+    private void assertThatRespondentFieldsAreCorrect_DraftApp(
+            GADraftForm templateData, GeneralApplicationCaseData caseData) {
+        Assertions.assertAll(
+                "DraftApplication data should be as expected",
+                () ->
+                        assertEquals(
+                                templateData.getClaimNumber(),
+                                caseData.getGeneralAppParentCaseLink().getCaseReference()),
+                () -> assertEquals(templateData.getClaimantName(), getClaimants(caseData)),
+                () -> assertEquals(templateData.getDefendantName(), getDefendants(caseData)));
+    }
+
+    @Test
+    void test_getReference() {
+        Map<String, String> refMap = new HashMap<>();
+        refMap.put("applicantSolicitor1Reference", "app1ref");
+        refMap.put("respondentSolicitor1Reference", "resp1ref");
+        Map<String, Object> caseDataContent = new HashMap<>();
+        caseDataContent.put("solicitorReferences", refMap);
+        CaseDetails caseDetails = CaseDetails.builder().data(caseDataContent).build();
+
+        assertThat(
+                        generalApplicationDraftGenerator.getReference(
+                                caseDetails, "applicantSolicitor1Reference"))
+                .isEqualTo("app1ref");
+        assertThat(generalApplicationDraftGenerator.getReference(caseDetails, "notExist")).isNull();
+    }
+
+    private GAHearingDateGAspec buildHearingDateGAspec(
+            YesOrNo hearingScheduledPreferenceYesNo, LocalDate hearingScheduledDate) {
+        GAHearingDateGAspec hearingDate = new GAHearingDateGAspec();
+        hearingDate.setHearingScheduledPreferenceYesNo(hearingScheduledPreferenceYesNo);
+        hearingDate.setHearingScheduledDate(hearingScheduledDate);
+        return hearingDate;
+    }
+
+    private String getClaimants(GeneralApplicationCaseData caseData) {
+        List<String> claimantsName = new ArrayList<>();
+        claimantsName.add(caseData.getClaimant1PartyName());
+        if (caseData.getDefendant2PartyName() != null) {
+            claimantsName.add(caseData.getClaimant2PartyName());
+        }
+        return String.join(", ", claimantsName);
+    }
+
+    private String getDefendants(GeneralApplicationCaseData caseData) {
+        List<String> defendantsName = new ArrayList<>();
+        defendantsName.add(caseData.getDefendant1PartyName());
+        if (caseData.getDefendant2PartyName() != null) {
+            defendantsName.add(caseData.getDefendant2PartyName());
+        }
+        return String.join(", ", defendantsName);
+    }
+}

@@ -1,0 +1,1136 @@
+[
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "FULL_DEFENCE",
+    "guard": "fullDefence"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "FULL_DEFENCE",
+    "guard": "fullDefenceSpec"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "FULL_ADMISSION",
+    "guard": "fullAdmission.and(not(divergentRespondGoOffline))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "PART_ADMISSION",
+    "guard": "partAdmission.and(not(divergentRespondGoOffline))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "COUNTER_CLAIM",
+    "guard": "counterClaim.and(not(divergentRespondGoOffline))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "DIVERGENT_RESPOND_GO_OFFLINE",
+    "guard": "divergentRespondGoOffline"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "DIVERGENT_RESPOND_GO_OFFLINE",
+    "guard": "divergentRespondGoOfflineSpec"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "DIVERGENT_RESPOND_GO_OFFLINE",
+    "guard": "fullAdmissionSpec"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "DIVERGENT_RESPOND_GO_OFFLINE",
+    "guard": "partAdmissionSpec"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "DIVERGENT_RESPOND_GO_OFFLINE",
+    "guard": "counterClaimSpec"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE",
+    "guard": "divergentRespondWithDQAndGoOffline"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE",
+    "guard": "divergentRespondWithDQAndGoOfflineSpec"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterClaimDetailsNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AllResponsesReceivedTransitionBuilder.java",
+    "from_state": "ALL_RESPONSES_RECEIVED",
+    "to_state": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "caseDismissedAfterDetailNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AwaitingResponsesFullAdmitReceivedTransitionBuilder.java",
+    "from_state": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "to_state": "ALL_RESPONSES_RECEIVED",
+    "guard": "allResponsesReceived"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AwaitingResponsesFullAdmitReceivedTransitionBuilder.java",
+    "from_state": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "to_state": "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED",
+    "guard": "takenOfflineAfterClaimDetailsNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AwaitingResponsesFullAdmitReceivedTransitionBuilder.java",
+    "from_state": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterClaimNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AwaitingResponsesFullAdmitReceivedTransitionBuilder.java",
+    "from_state": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "to_state": "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "pastClaimDetailsNotificationDeadline"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AwaitingResponsesFullDefenceReceivedTransitionBuilder.java",
+    "from_state": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "to_state": "ALL_RESPONSES_RECEIVED",
+    "guard": "allResponsesReceived"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AwaitingResponsesFullDefenceReceivedTransitionBuilder.java",
+    "from_state": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "to_state": "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED",
+    "guard": "takenOfflineAfterClaimDetailsNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AwaitingResponsesFullDefenceReceivedTransitionBuilder.java",
+    "from_state": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterClaimNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AwaitingResponsesFullDefenceReceivedTransitionBuilder.java",
+    "from_state": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "to_state": "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "pastClaimDetailsNotificationDeadline"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AwaitingResponsesNotFullDefenceOrFullAdmitReceivedTransitionBuilder.java",
+    "from_state": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "to_state": "ALL_RESPONSES_RECEIVED",
+    "guard": "allResponsesReceived"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AwaitingResponsesNotFullDefenceOrFullAdmitReceivedTransitionBuilder.java",
+    "from_state": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "to_state": "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED",
+    "guard": "takenOfflineAfterClaimDetailsNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AwaitingResponsesNotFullDefenceOrFullAdmitReceivedTransitionBuilder.java",
+    "from_state": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterClaimNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/AwaitingResponsesNotFullDefenceOrFullAdmitReceivedTransitionBuilder.java",
+    "from_state": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "to_state": "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "pastClaimDetailsNotificationDeadline"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTimeExtensionTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to_state": "NOTIFICATION_ACKNOWLEDGED",
+    "guard": "notificationAcknowledged"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTimeExtensionTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to_state": "ALL_RESPONSES_RECEIVED",
+    "guard": "(respondentTimeExtension).and(allResponsesReceived)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTimeExtensionTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to_state": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "guard": "(awaitingResponsesFullDefenceReceived).and(respondentTimeExtension) .and(not(caseDismissedAfterDetailNotifiedExtension))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTimeExtensionTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to_state": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "guard": "(awaitingResponsesFullAdmitReceived).and(respondentTimeExtension)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTimeExtensionTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to_state": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "guard": "(awaitingResponsesNonFullDefenceOrFullAdmitReceived).and(respondentTimeExtension)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTimeExtensionTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterClaimDetailsNotifiedExtension"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTimeExtensionTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to_state": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "caseDismissedAfterDetailNotifiedExtension"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTimeExtensionTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to_state": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard": "takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED",
+    "to_state": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "guard": "respondentTimeExtension .and(not(notificationAcknowledged)) .and(not(isInHearingReadiness))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED",
+    "to_state": "NOTIFICATION_ACKNOWLEDGED",
+    "guard": "notificationAcknowledged.and(not(isInHearingReadiness))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED",
+    "to_state": "ALL_RESPONSES_RECEIVED",
+    "guard": "allResponsesReceived.and(not(notificationAcknowledged) .and(not(respondentTimeExtension)).and(not(isInHearingReadiness)))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED",
+    "to_state": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "guard": "awaitingResponsesFullDefenceReceived .and(not(notificationAcknowledged)).and(not(respondentTimeExtension)) .and(not(caseDismissedAfterDetailNotified))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED",
+    "to_state": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "guard": "awaitingResponsesFullAdmitReceived .and(not(notificationAcknowledged)).and(not(respondentTimeExtension))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED",
+    "to_state": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "guard": "awaitingResponsesNonFullDefenceOrFullAdmitReceived .and(not(notificationAcknowledged)).and(not(respondentTimeExtension))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterClaimDetailsNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED",
+    "to_state": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "caseDismissedAfterDetailNotified.and(not(isInHearingReadiness))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED",
+    "to_state": "IN_HEARING_READINESS",
+    "guard": "isInHearingReadiness"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDetailsNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_DETAILS_NOTIFIED",
+    "to_state": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard": "takenOfflineSDONotDrawnAfterClaimDetailsNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDismissedPastClaimDetailsNotifcationDeadlineTransitionBuilder.java",
+    "from_state": "CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaff"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimDismissedPastClaimNotificationDeadlineTransitionBuilder.java",
+    "from_state": "CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaff"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedPaymentFailedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED_PAYMENT_FAILED",
+    "to_state": "FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "guard": "paymentSuccessful"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedPaymentSuccessfulTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "to_state": "PENDING_CLAIM_ISSUED",
+    "guard": "pendingClaimIssued"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedPaymentSuccessfulTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "to_state": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT",
+    "guard": "pendingClaimIssuedUnrepresentedDefendentPredicate()"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedPaymentSuccessfulTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "to_state": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "guard": "oneVsOneCase.and(respondent1NotRepresented).and(specClaim)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedPaymentSuccessfulTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "to_state": "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
+    "guard": "((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())) .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))) .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())) .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate()))) .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate())) .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())) .and(bothDefSameLegalRep.negate()) )"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedPaymentSuccessfulTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "to_state": "PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT",
+    "guard": "(respondent1NotRepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))) .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()) .and(respondent2NotRepresented))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "CLAIM_NOTIFIED",
+    "guard": "claimNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterClaimIssue"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED",
+    "guard": "takenOfflineAfterClaimNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "pastClaimNotificationDeadline"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "CONTACT_DETAILS_CHANGE",
+    "guard": "contactDetailsChange"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL",
+    "guard": "onlyInitialRespondentResponseLangIsBilingual.and(not(contactDetailsChange))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "FULL_DEFENCE",
+    "guard": "fullDefenceSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual)) .and(not(pastClaimNotificationDeadline))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "PART_ADMISSION",
+    "guard": "partAdmissionSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "FULL_ADMISSION",
+    "guard": "fullAdmissionSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "COUNTER_CLAIM",
+    "guard": "counterClaimSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "guard": "awaitingResponsesFullDefenceReceivedSpec.and(specClaim)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "guard": "awaitingResponsesFullAdmitReceivedSpec.and(specClaim)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "guard": "awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.and(specClaim)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE",
+    "guard": "divergentRespondWithDQAndGoOfflineSpec.and(specClaim)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimIssuedTransitionBuilder.java",
+    "from_state": "CLAIM_ISSUED",
+    "to_state": "DIVERGENT_RESPOND_GO_OFFLINE",
+    "guard": "divergentRespondGoOfflineSpec.and(specClaim)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_NOTIFIED",
+    "to_state": "CLAIM_DETAILS_NOTIFIED",
+    "guard": "claimDetailsNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_NOTIFIED",
+    "to_state": "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED",
+    "guard": "takenOfflineAfterClaimDetailsNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_NOTIFIED",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterClaimNotified"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimNotifiedTransitionBuilder.java",
+    "from_state": "CLAIM_NOTIFIED",
+    "to_state": "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "pastClaimDetailsNotificationDeadline"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimSubmittedTransitionBuilder.java",
+    "from_state": "CLAIM_SUBMITTED",
+    "to_state": "CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "guard": "paymentSuccessful"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimSubmittedTransitionBuilder.java",
+    "from_state": "CLAIM_SUBMITTED",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffBeforeClaimIssued"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimSubmittedTransitionBuilder.java",
+    "from_state": "CLAIM_SUBMITTED",
+    "to_state": "CLAIM_ISSUED_PAYMENT_FAILED",
+    "guard": "paymentFailed"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimSubmittedTransitionBuilder.java",
+    "from_state": "CLAIM_SUBMITTED",
+    "to_state": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "guard": "isLipCase.and(takenOfflineByStaffBeforeClaimIssued.negate())"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimSubmittedTransitionBuilder.java",
+    "from_state": "CLAIM_SUBMITTED",
+    "to_state": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "guard": "nocSubmittedForLiPApplicant"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimSubmittedTransitionBuilder.java",
+    "from_state": "CLAIM_SUBMITTED",
+    "to_state": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "guard": "not(isDefendantNoCOnlineForCase).and(isLiPvLRCase.and(not(nocSubmittedForLiPDefendant)) .and(not(nocSubmittedForLiPDefendantBeforeOffline)))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimSubmittedTransitionBuilder.java",
+    "from_state": "CLAIM_SUBMITTED",
+    "to_state": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "guard": "isDefendantNoCOnlineForCase.and(isLiPvLRCase)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ClaimSubmittedTransitionBuilder.java",
+    "from_state": "CLAIM_SUBMITTED",
+    "to_state": "SPEC_DEFENDANT_NOC",
+    "guard": "not(isDefendantNoCOnlineForCase).and( nocSubmittedForLiPDefendantBeforeOffline)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ContactDetailsChangeTransitionBuilder.java",
+    "from_state": "CONTACT_DETAILS_CHANGE",
+    "to_state": "FULL_DEFENCE",
+    "guard": "fullDefenceSpec.and(not(onlyInitialRespondentResponseLangIsBilingual))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ContactDetailsChangeTransitionBuilder.java",
+    "from_state": "CONTACT_DETAILS_CHANGE",
+    "to_state": "PART_ADMISSION",
+    "guard": "partAdmissionSpec.and(not(onlyInitialRespondentResponseLangIsBilingual))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ContactDetailsChangeTransitionBuilder.java",
+    "from_state": "CONTACT_DETAILS_CHANGE",
+    "to_state": "FULL_ADMISSION",
+    "guard": "fullAdmissionSpec.and(not(onlyInitialRespondentResponseLangIsBilingual))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ContactDetailsChangeTransitionBuilder.java",
+    "from_state": "CONTACT_DETAILS_CHANGE",
+    "to_state": "COUNTER_CLAIM",
+    "guard": "counterClaimSpec.and(not(onlyInitialRespondentResponseLangIsBilingual))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/ContactDetailsChangeTransitionBuilder.java",
+    "from_state": "CONTACT_DETAILS_CHANGE",
+    "to_state": "RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL",
+    "guard": "onlyInitialRespondentResponseLangIsBilingual"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/DraftTransitionBuilder.java",
+    "from_state": "DRAFT",
+    "to_state": "CLAIM_SUBMITTED",
+    "guard": "claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/DraftTransitionBuilder.java",
+    "from_state": "DRAFT",
+    "to_state": "CLAIM_SUBMITTED",
+    "guard": "claimSubmittedTwoRegisteredRespondentRepresentatives .or(claimSubmittedTwoRespondentRepresentativesOneUnregistered) .or(claimSubmittedBothUnregisteredSolicitors)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/DraftTransitionBuilder.java",
+    "from_state": "DRAFT",
+    "to_state": "CLAIM_SUBMITTED",
+    "guard": "claimSubmittedOneUnrepresentedDefendantOnly"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/DraftTransitionBuilder.java",
+    "from_state": "DRAFT",
+    "to_state": "CLAIM_SUBMITTED",
+    "guard": "claimSubmittedRespondent1Unrepresented .and(claimSubmittedOneUnrepresentedDefendantOnly.negate()) .and(claimSubmittedRespondent2Unrepresented.negate())"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/DraftTransitionBuilder.java",
+    "from_state": "DRAFT",
+    "to_state": "CLAIM_SUBMITTED",
+    "guard": "claimSubmittedRespondent2Unrepresented .and(claimSubmittedRespondent1Unrepresented.negate())"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/DraftTransitionBuilder.java",
+    "from_state": "DRAFT",
+    "to_state": "CLAIM_SUBMITTED",
+    "guard": "claimSubmittedRespondent1Unrepresented.and( claimSubmittedRespondent2Unrepresented)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/DraftTransitionBuilder.java",
+    "from_state": "SPEC_DRAFT",
+    "to_state": "CLAIM_SUBMITTED",
+    "guard": "claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/DraftTransitionBuilder.java",
+    "from_state": "SPEC_DRAFT",
+    "to_state": "CLAIM_SUBMITTED",
+    "guard": "claimSubmittedTwoRegisteredRespondentRepresentatives .or(claimSubmittedTwoRespondentRepresentativesOneUnregistered) .or(claimSubmittedBothUnregisteredSolicitors)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/DraftTransitionBuilder.java",
+    "from_state": "SPEC_DRAFT",
+    "to_state": "CLAIM_SUBMITTED",
+    "guard": "claimSubmittedOneUnrepresentedDefendantOnly"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/DraftTransitionBuilder.java",
+    "from_state": "SPEC_DRAFT",
+    "to_state": "CLAIM_SUBMITTED",
+    "guard": "claimSubmittedRespondent1Unrepresented .and(claimSubmittedOneUnrepresentedDefendantOnly.negate()) .and(claimSubmittedRespondent2Unrepresented.negate())"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/DraftTransitionBuilder.java",
+    "from_state": "SPEC_DRAFT",
+    "to_state": "CLAIM_SUBMITTED",
+    "guard": "claimSubmittedRespondent2Unrepresented .and(claimSubmittedRespondent1Unrepresented.negate())"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/DraftTransitionBuilder.java",
+    "from_state": "SPEC_DRAFT",
+    "to_state": "CLAIM_SUBMITTED",
+    "guard": "claimSubmittedRespondent1Unrepresented.and( claimSubmittedRespondent2Unrepresented)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionJudgmentTransitionBuilder.java",
+    "from_state": "FULL_ADMIT_JUDGMENT_ADMISSION",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaff"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionPayImmediatelyTransitionBuilder.java",
+    "from_state": "FULL_ADMIT_PAY_IMMEDIATELY",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaff.and(not(ccjRequestJudgmentByAdmission))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionPayImmediatelyTransitionBuilder.java",
+    "from_state": "FULL_ADMIT_PAY_IMMEDIATELY",
+    "to_state": "FULL_ADMIT_JUDGMENT_ADMISSION",
+    "guard": "ccjRequestJudgmentByAdmission.and(isPayImmediately)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionRejectRepaymentTransitionBuilder.java",
+    "from_state": "FULL_ADMIT_REJECT_REPAYMENT",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaff"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionTransitionBuilder.java",
+    "from_state": "FULL_ADMISSION",
+    "to_state": "FULL_ADMIT_PAY_IMMEDIATELY",
+    "guard": "fullAdmitPayImmediately"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionTransitionBuilder.java",
+    "from_state": "FULL_ADMISSION",
+    "to_state": "FULL_ADMIT_PROCEED",
+    "guard": "fullDefenceProceed"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionTransitionBuilder.java",
+    "from_state": "FULL_ADMISSION",
+    "to_state": "FULL_ADMIT_NOT_PROCEED",
+    "guard": "fullDefenceNotProceed"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionTransitionBuilder.java",
+    "from_state": "FULL_ADMISSION",
+    "to_state": "FULL_ADMIT_AGREE_REPAYMENT",
+    "guard": "acceptRepaymentPlan"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionTransitionBuilder.java",
+    "from_state": "FULL_ADMISSION",
+    "to_state": "FULL_ADMIT_REJECT_REPAYMENT",
+    "guard": "rejectRepaymentPlan"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionTransitionBuilder.java",
+    "from_state": "FULL_ADMISSION",
+    "to_state": "FULL_ADMIT_JUDGMENT_ADMISSION",
+    "guard": "ccjRequestJudgmentByAdmission.and(isPayImmediately).and(isLipCase)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionTransitionBuilder.java",
+    "from_state": "FULL_ADMISSION",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterDefendantResponse.and(not(ccjRequestJudgmentByAdmission))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionTransitionBuilder.java",
+    "from_state": "FULL_ADMISSION",
+    "to_state": "PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "applicantOutOfTimeNotBeingTakenOffline"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmissionTransitionBuilder.java",
+    "from_state": "FULL_ADMISSION",
+    "to_state": "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA",
+    "guard": "isDefendantNoCOnlineForCase.and(isPayImmediately).and(isDefendantNoCOnlineForCaseAfterJBA)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmitAgreeRepaymentTransitionBuilder.java",
+    "from_state": "FULL_ADMIT_AGREE_REPAYMENT",
+    "to_state": "SIGN_SETTLEMENT_AGREEMENT",
+    "guard": "isRespondentSignSettlementAgreement"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmitAgreeRepaymentTransitionBuilder.java",
+    "from_state": "FULL_ADMIT_AGREE_REPAYMENT",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaff"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullAdmitAgreeRepaymentTransitionBuilder.java",
+    "from_state": "FULL_ADMIT_AGREE_REPAYMENT",
+    "to_state": "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA",
+    "guard": "isDefendantNoCOnlineForCase.and(isDefendantNoCOnlineForCaseAfterJBA)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceProceedTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE_PROCEED",
+    "to_state": "IN_HEARING_READINESS",
+    "guard": "isInHearingReadiness"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceProceedTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE_PROCEED",
+    "to_state": "CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE",
+    "guard": "caseDismissedPastHearingFeeDue"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceProceedTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE_PROCEED",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "(takenOfflineByStaffAfterClaimantResponseBeforeSDO .or(takenOfflineByStaffAfterSDO) .or(takenOfflineAfterNotSuitableForSdo)) .and(not(caseDismissedPastHearingFeeDue))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceProceedTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE_PROCEED",
+    "to_state": "TAKEN_OFFLINE_AFTER_SDO",
+    "guard": "takenOfflineAfterSDO"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceProceedTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE_PROCEED",
+    "to_state": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard": "takenOfflineSDONotDrawn"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE",
+    "to_state": "IN_MEDIATION",
+    "guard": "(agreedToMediation.and(allAgreedToLrMediationSpec.negate()).and(fullDefenceNotProceed.negate()))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE",
+    "to_state": "IN_MEDIATION",
+    "guard": "isCarmApplicableCase.and(fullDefenceProceed)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE",
+    "to_state": "FULL_DEFENCE_PROCEED",
+    "guard": "fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()) .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate())"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE",
+    "to_state": "FULL_DEFENCE_PROCEED",
+    "guard": "fullDefenceProceed .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation)) .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE",
+    "to_state": "FULL_DEFENCE_PROCEED",
+    "guard": "fullDefenceProceed .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate()) .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation)) .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate() .and(not(CaseData::isLipvLROneVOne)))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE",
+    "to_state": "FULL_DEFENCE_PROCEED",
+    "guard": "(fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim).or(lipFullDefenceProceed)) .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase.or(CaseData::isLipvLROneVOne))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE",
+    "to_state": "FULL_DEFENCE_PROCEED",
+    "guard": "isClaimantSettleTheClaim.and(not(agreedToMediation))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE",
+    "to_state": "FULL_DEFENCE_NOT_PROCEED",
+    "guard": "fullDefenceNotProceed"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterDefendantResponse"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/FullDefenceTransitionBuilder.java",
+    "from_state": "FULL_DEFENCE",
+    "to_state": "PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "applicantOutOfTimeNotBeingTakenOffline"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/InMediationTransitionBuilder.java",
+    "from_state": "IN_MEDIATION",
+    "to_state": "MEDIATION_UNSUCCESSFUL_PROCEED",
+    "guard": "casemanMarksMediationUnsuccessful"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/InMediationTransitionBuilder.java",
+    "from_state": "IN_MEDIATION",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffBeforeMediationUnsuccessful"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/MediationUnsuccessfulProceedTransitionBuilder.java",
+    "from_state": "MEDIATION_UNSUCCESSFUL_PROCEED",
+    "to_state": "IN_HEARING_READINESS",
+    "guard": "isInHearingReadiness"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/MediationUnsuccessfulProceedTransitionBuilder.java",
+    "from_state": "MEDIATION_UNSUCCESSFUL_PROCEED",
+    "to_state": "CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE",
+    "guard": "caseDismissedPastHearingFeeDue.and(not(takenOfflineByStaff))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/MediationUnsuccessfulProceedTransitionBuilder.java",
+    "from_state": "MEDIATION_UNSUCCESSFUL_PROCEED",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaff"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/MediationUnsuccessfulProceedTransitionBuilder.java",
+    "from_state": "MEDIATION_UNSUCCESSFUL_PROCEED",
+    "to_state": "TAKEN_OFFLINE_AFTER_SDO",
+    "guard": "takenOfflineAfterSDO"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/MediationUnsuccessfulProceedTransitionBuilder.java",
+    "from_state": "MEDIATION_UNSUCCESSFUL_PROCEED",
+    "to_state": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard": "takenOfflineSDONotDrawn"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "ALL_RESPONSES_RECEIVED",
+    "guard": "notificationAcknowledged.and(respondentTimeExtension).and(allResponsesReceived).and( claimDismissalOutOfTime.negate()) .and(takenOfflineByStaff.negate())"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "guard": "notificationAcknowledged.and(respondentTimeExtension) .and(awaitingResponsesFullDefenceReceived) .and(not(caseDismissedAfterClaimAcknowledgedExtension)) .and(not(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "guard": "notificationAcknowledged.and(respondentTimeExtension) .and(awaitingResponsesFullAdmitReceived)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "guard": "notificationAcknowledged.and(respondentTimeExtension) .and(awaitingResponsesNonFullDefenceOrFullAdmitReceived)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "caseDismissedAfterClaimAcknowledgedExtension"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard": "takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED",
+    "to_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "guard": "notificationAcknowledged.and(respondentTimeExtension)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED",
+    "to_state": "ALL_RESPONSES_RECEIVED",
+    "guard": "notificationAcknowledged.and(not(respondentTimeExtension)).and(allResponsesReceived)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED",
+    "to_state": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "guard": "notificationAcknowledged.and(not(respondentTimeExtension)) .and(awaitingResponsesFullDefenceReceived) .and(not(caseDismissedAfterClaimAcknowledged))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED",
+    "to_state": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "guard": "notificationAcknowledged.and(not(respondentTimeExtension)) .and(awaitingResponsesFullAdmitReceived)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED",
+    "to_state": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "guard": "notificationAcknowledged.and(not(respondentTimeExtension)) .and(awaitingResponsesNonFullDefenceOrFullAdmitReceived)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterNotificationAcknowledged"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED",
+    "to_state": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "caseDismissedAfterClaimAcknowledged.and(reasonNotSuitableForSdo.negate())"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED",
+    "to_state": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard": "takenOfflineSDONotDrawnAfterNotificationAcknowledged"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionAgreeRepaymentTransitionBuilder.java",
+    "from_state": "PART_ADMIT_AGREE_REPAYMENT",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaff"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionAgreeRepaymentTransitionBuilder.java",
+    "from_state": "PART_ADMIT_AGREE_REPAYMENT",
+    "to_state": "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA",
+    "guard": "isDefendantNoCOnlineForCase.and(isDefendantNoCOnlineForCaseAfterJBA)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionAgreeSettleTransitionBuilder.java",
+    "from_state": "PART_ADMIT_AGREE_SETTLE",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaff"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionPayImmediatelyTransitionBuilder.java",
+    "from_state": "PART_ADMIT_PAY_IMMEDIATELY",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaff"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionPayImmediatelyTransitionBuilder.java",
+    "from_state": "PART_ADMIT_PAY_IMMEDIATELY",
+    "to_state": "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA",
+    "guard": "isDefendantNoCOnlineForCase.and(isDefendantNoCOnlineForCaseAfterJBA)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionRejectRepaymentTransitionBuilder.java",
+    "from_state": "PART_ADMIT_REJECT_REPAYMENT",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaff"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
+    "from_state": "PART_ADMISSION",
+    "to_state": "IN_MEDIATION",
+    "guard": "agreedToMediation.and(not(takenOfflineByStaff)) .and(not(partAdmitPayImmediately)) .and(not(acceptRepaymentPlan)) .and(not(rejectRepaymentPlan))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
+    "from_state": "PART_ADMISSION",
+    "to_state": "IN_MEDIATION",
+    "guard": "carmMediation"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
+    "from_state": "PART_ADMISSION",
+    "to_state": "PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+    "guard": "isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(isCarmApplicableCase)) .and(not(isCarmApplicableLipCase)) .and(not(takenOfflineByStaff))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
+    "from_state": "PART_ADMISSION",
+    "to_state": "PART_ADMIT_PROCEED",
+    "guard": "partAdmitProceed"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
+    "from_state": "PART_ADMISSION",
+    "to_state": "PART_ADMIT_NOT_PROCEED",
+    "guard": "fullDefenceNotProceed"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
+    "from_state": "PART_ADMISSION",
+    "to_state": "PART_ADMIT_PAY_IMMEDIATELY",
+    "guard": "partAdmitPayImmediately"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
+    "from_state": "PART_ADMISSION",
+    "to_state": "PART_ADMIT_AGREE_SETTLE",
+    "guard": "agreePartAdmitSettle"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
+    "from_state": "PART_ADMISSION",
+    "to_state": "PART_ADMIT_AGREE_REPAYMENT",
+    "guard": "acceptRepaymentPlan"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
+    "from_state": "PART_ADMISSION",
+    "to_state": "PART_ADMIT_REJECT_REPAYMENT",
+    "guard": "rejectRepaymentPlan"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
+    "from_state": "PART_ADMISSION",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterDefendantResponse"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
+    "from_state": "PART_ADMISSION",
+    "to_state": "PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "applicantOutOfTimeNotBeingTakenOffline"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmitAgreeRepaymentTransitionBuilder.java",
+    "from_state": "PART_ADMIT_AGREE_REPAYMENT",
+    "to_state": "SIGN_SETTLEMENT_AGREEMENT",
+    "guard": "isRespondentSignSettlementAgreement"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmitNotSettleNoMediationTransitionBuilder.java",
+    "from_state": "PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+    "to_state": "IN_HEARING_READINESS",
+    "guard": "isInHearingReadiness"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmitNotSettleNoMediationTransitionBuilder.java",
+    "from_state": "PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+    "to_state": "CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE",
+    "guard": "caseDismissedPastHearingFeeDue"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmitNotSettleNoMediationTransitionBuilder.java",
+    "from_state": "PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaff"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmitNotSettleNoMediationTransitionBuilder.java",
+    "from_state": "PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+    "to_state": "TAKEN_OFFLINE_AFTER_SDO",
+    "guard": "takenOfflineAfterSDO"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmitNotSettleNoMediationTransitionBuilder.java",
+    "from_state": "PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+    "to_state": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard": "takenOfflineSDONotDrawn"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PastApplicantResponseDeadlineAwaitingCamundaTransitionBuilder.java",
+    "from_state": "PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA",
+    "to_state": "TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE",
+    "guard": "applicantOutOfTimeProcessedByCamunda"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PastClaimDetailsNotificationDeadlineAwaitingCamundaTransitionBuilder.java",
+    "from_state": "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "to_state": "CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE",
+    "guard": "claimDismissedByCamunda"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PastClaimDismissedDeadlineAwaitingCamundaTransitionBuilder.java",
+    "from_state": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "to_state": "CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE",
+    "guard": "claimDismissedByCamunda"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PastClaimNotificationDeadlineAwaitingCamundaTransitionBuilder.java",
+    "from_state": "PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "to_state": "CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE",
+    "guard": "claimDismissedByCamunda"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PendingClaimIssuedTransitionBuilder.java",
+    "from_state": "PENDING_CLAIM_ISSUED",
+    "to_state": "CLAIM_ISSUED",
+    "guard": "claimIssued"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PendingClaimIssuedUnregisteredDefendantTransitionBuilder.java",
+    "from_state": "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
+    "to_state": "TAKEN_OFFLINE_UNREGISTERED_DEFENDANT",
+    "guard": "takenOfflineBySystem"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PendingClaimIssuedUnrepresentedDefendantOneVOneSpecTransitionBuilder.java",
+    "from_state": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "to_state": "CLAIM_ISSUED",
+    "guard": "claimIssued.and(pinInPostEnabledAndLiP)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PendingClaimIssuedUnrepresentedDefendantOneVOneSpecTransitionBuilder.java",
+    "from_state": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "to_state": "TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT",
+    "guard": "takenOfflineBySystem.and(not(pinInPostEnabledAndLiP))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PendingClaimIssuedUnrepresentedDefendantTransitionBuilder.java",
+    "from_state": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT",
+    "to_state": "CLAIM_ISSUED",
+    "guard": "claimIssued .and(not(specClaim)) .and(certificateOfServiceEnabled)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PendingClaimIssuedUnrepresentedDefendantTransitionBuilder.java",
+    "from_state": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT",
+    "to_state": "TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT",
+    "guard": "takenOfflineBySystem .and(specClaim)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PendingClaimIssuedUnrepresentedUnregisteredDefendantTransitionBuilder.java",
+    "from_state": "PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT",
+    "to_state": "TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT",
+    "guard": "takenOfflineBySystem"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/RespondentResponseLanguageIsBilingualTransitionBuilder.java",
+    "from_state": "RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL",
+    "to_state": "FULL_DEFENCE",
+    "guard": "fullDefenceSpec.and(isTranslatedDocumentUploaded)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/RespondentResponseLanguageIsBilingualTransitionBuilder.java",
+    "from_state": "RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL",
+    "to_state": "PART_ADMISSION",
+    "guard": "partAdmissionSpec.and(isTranslatedDocumentUploaded)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/RespondentResponseLanguageIsBilingualTransitionBuilder.java",
+    "from_state": "RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL",
+    "to_state": "FULL_ADMISSION",
+    "guard": "fullAdmissionSpec.and(isTranslatedDocumentUploaded)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/RespondentResponseLanguageIsBilingualTransitionBuilder.java",
+    "from_state": "RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL",
+    "to_state": "COUNTER_CLAIM",
+    "guard": "counterClaimSpec.and(isTranslatedDocumentUploaded)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/SignSettlementAgreementTransitionBuilder.java",
+    "from_state": "SIGN_SETTLEMENT_AGREEMENT",
+    "to_state": "FULL_ADMIT_JUDGMENT_ADMISSION",
+    "guard": "ccjRequestJudgmentByAdmission"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/SpecDefendantNocTransitionBuilder.java",
+    "from_state": "SPEC_DEFENDANT_NOC",
+    "to_state": "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC",
+    "guard": "not(isDefendantNoCOnlineForCase).and(nocSubmittedForLiPDefendant)"
+  }
+]

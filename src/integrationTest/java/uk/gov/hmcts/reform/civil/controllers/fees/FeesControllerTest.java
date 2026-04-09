@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class FeesControllerTest extends BaseIntegrationTest {
 
-    private static final String FEES_RANGES_URL = "/fees/ranges/";
+    private static final String FEES_RANGES_URL = "/fees/ranges";
     private static final String FEES_CLAIM_URL = "/fees/claim/{claimAmount}";
     private static final String FEES_CLAIM_CALCULATE_INTEREST_URL = "/fees/claim/calculate-interest";
     private static final String FEES_HEARING_URL = "/fees/hearing/{claimAmount}";
@@ -82,8 +82,8 @@ public class FeesControllerTest extends BaseIntegrationTest {
         when(gaFeesService.getFeeForGALiP(List.of(GeneralApplicationTypes.EXTEND_TIME), true, false, null)).thenReturn(
             response);
         GeneralApplicationFeeRequest feeRequest =
-            GeneralApplicationFeeRequest.builder().applicationTypes((List.of(GeneralApplicationTypes.EXTEND_TIME)))
-                .withConsent(true).withNotice(false).build();
+            new GeneralApplicationFeeRequest().setApplicationTypes((List.of(GeneralApplicationTypes.EXTEND_TIME)))
+                .setWithConsent(true).setWithNotice(false);
         mockMvc.perform(
                 MockMvcRequestBuilders.post(FEES_GA_URL)
                     .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN)
@@ -105,18 +105,12 @@ public class FeesControllerTest extends BaseIntegrationTest {
 
     private Fee2Dto[] buildFeeRangeResponse() {
         return new Fee2Dto[]{
-            Fee2Dto
-                .builder()
-                .minRange(new BigDecimal("0.1"))
-                .maxRange(new BigDecimal("300"))
-                .currentVersion(FeeVersionDto
-                                    .builder()
-                                    .flatAmount(FlatAmountDto
-                                                    .builder()
-                                                    .amount(new BigDecimal("35"))
-                                                    .build())
-                                    .build())
-                .build()
+            new Fee2Dto()
+                .setMinRange(new BigDecimal("0.1"))
+                .setMaxRange(new BigDecimal("300"))
+                .setCurrentVersion(new FeeVersionDto()
+                                       .setFlatAmount(new FlatAmountDto()
+                                                          .setAmount(new BigDecimal("35"))))
         };
     }
 

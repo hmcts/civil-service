@@ -26,13 +26,13 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     public void shouldReturnHttp200() {
-        ServiceHearingValuesModel expectedHearingValues =
-            ServiceHearingValuesModel.builder().publicCaseName("mock case name").build();
+        ServiceHearingValuesModel expectedHearingValues = new ServiceHearingValuesModel();
+        expectedHearingValues.setPublicCaseName("mock case name");
 
         when(hearingValuesService.getValues(anyLong(), anyString()))
             .thenReturn(expectedHearingValues);
 
-        HearingValuesRequest requestBody = HearingValuesRequest.builder().caseReference(1L).hearingId("hearingid").build();
+        HearingValuesRequest requestBody = new HearingValuesRequest().setCaseReference(1L).setHearingId("hearingid");
 
         doPost(BEARER_TOKEN, requestBody, HEARING_VALUES_URL)
             .andExpect(content().json(toJson(expectedHearingValues)))
@@ -45,7 +45,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
         when(hearingValuesService.getValues(anyLong(), anyString()))
             .thenThrow(CaseNotFoundException.class);
 
-        HearingValuesRequest requestBody = HearingValuesRequest.builder().caseReference(1L).hearingId("hearingid").build();
+        HearingValuesRequest requestBody = new HearingValuesRequest().setCaseReference(1L).setHearingId("hearingid");
 
         doPost(BEARER_TOKEN, requestBody, HEARING_VALUES_URL)
             .andExpect(status().isBadRequest());
@@ -57,7 +57,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
         when(hearingValuesService.getValues(anyLong(), anyString()))
             .thenThrow(MissingFieldsUpdatedException.class);
 
-        HearingValuesRequest requestBody = HearingValuesRequest.builder().caseReference(1L).hearingId("hearingid").build();
+        HearingValuesRequest requestBody = new HearingValuesRequest().setCaseReference(1L).setHearingId("hearingid");
 
         doPost(BEARER_TOKEN, requestBody, HEARING_VALUES_URL)
             .andExpect(status().isNotFound());

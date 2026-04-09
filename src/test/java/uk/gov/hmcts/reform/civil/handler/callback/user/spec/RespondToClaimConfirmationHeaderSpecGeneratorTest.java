@@ -43,18 +43,17 @@ public class RespondToClaimConfirmationHeaderSpecGeneratorTest
      * @return cases to check 2v1 different response.
      */
     private List<CaseData> get2v1DifferentResponseCase() {
-        Party applicant1 = Party.builder().build();
-        Party applicant2 = Party.builder().build();
+        Party party = new Party();
         List<CaseData> cases = new ArrayList<>();
         for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
             for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
                 if (!r1.equals(r2)) {
-                    cases.add(CaseData.builder()
-                                  .applicant1(applicant1)
-                                  .applicant2(applicant2)
-                                  .claimant1ClaimResponseTypeForSpec(r1)
-                                  .claimant2ClaimResponseTypeForSpec(r2)
-                                  .build());
+                    CaseData caseData = CaseDataBuilder.builder().build();
+                    caseData.setApplicant1(party);
+                    caseData.setApplicant2(party);
+                    caseData.setClaimant1ClaimResponseTypeForSpec(r1);
+                    caseData.setClaimant2ClaimResponseTypeForSpec(r2);
+                    cases.add(caseData);
                 }
             }
         }
@@ -62,23 +61,21 @@ public class RespondToClaimConfirmationHeaderSpecGeneratorTest
     }
 
     private List<CaseData> get1v2DivergentResponseCase() {
-        Party applicant1 = Party.builder().build();
-        Party respondent1 = Party.builder().build();
-        Party respondent2 = Party.builder().build();
+        Party party = new Party();
 
         List<CaseData> cases = new ArrayList<>();
         for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
             for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
                 if (!r1.equals(r2)) {
-                    cases.add(CaseData.builder()
-                                  .applicant1(applicant1)
-                                  .respondent1(respondent1)
-                                  .respondent2(respondent2)
-                                  .respondent2SameLegalRepresentative(YesOrNo.YES)
-                                  .respondentResponseIsSame(YesOrNo.NO)
-                                  .respondent1ClaimResponseTypeForSpec(r1)
-                                  .respondent2ClaimResponseTypeForSpec(r2)
-                                  .build());
+                    CaseData caseData = CaseDataBuilder.builder().build();
+                    caseData.setApplicant1(party);
+                    caseData.setRespondent1(party);
+                    caseData.setRespondent2(party);
+                    caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+                    caseData.setRespondentResponseIsSame(YesOrNo.NO);
+                    caseData.setRespondent1ClaimResponseTypeForSpec(r1);
+                    caseData.setRespondent2ClaimResponseTypeForSpec(r2);
+                    cases.add(caseData);
                 }
             }
         }
@@ -88,7 +85,6 @@ public class RespondToClaimConfirmationHeaderSpecGeneratorTest
     private CaseData getCounterClaim() {
         return CaseDataBuilder.builder()
             .atStateRespondentCounterClaim()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
             .build();
     }

@@ -3,18 +3,21 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 
 @Data
-@Builder
+@NoArgsConstructor
+@Accessors(chain = true)
 public class ClaimValue {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal statementOfValueInPennies;
+    private BigDecimal statementOfValueInPennies;
 
     @JsonCreator
     public ClaimValue(@JsonProperty("statementOfValueInPennies") BigDecimal statementOfValueInPennies) {

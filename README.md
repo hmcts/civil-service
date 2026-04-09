@@ -2,11 +2,69 @@
 
 Civil CCD Callback Service.
 
+
 ### Contents:
 
+- [StateFlow diagrams](#stateflow-diagrams)
 - [Building and deploying application](#building-and-deploying-the-application)
 - [Pact or contract testing](#pact-or-contract-testing)
 - [Adding Git Conventions](#adding-git-conventions)
+
+## StateFlow diagrams
+
+Visual snapshots of the automated journey logic are generated from the live StateFlow configuration. The diagrams below update automatically via the `Refresh StateFlow diagrams` GitHub Action after any change to the transition builders.
+
+#### Draft to Submission
+![Draft to Submission](docs/draft_flow.svg)
+
+#### Claim Issue & Notification
+![Claim Issue & Notification](docs/issue_flow.svg)
+
+#### Awaiting Defence & Divergence
+![Defence Waiting & Divergence](docs/response_flow.svg)
+
+#### Post-Response Outcomes & Settlement
+![Post-Response Outcomes & Settlement](docs/post_response.svg)
+
+Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 scripts/export_stateflow_transitions.py`. If you need the narrative in text form, see `docs/stateflow_transition_catalogue.md` or the structured `docs/stateflow/transition_catalogue.json`.
+
+- Per-state allowed CCD events: [flowstate_allowed_events.md](docs/flowstate_allowed_events.md)
+- Spec-only allowed CCD events: [flowstate_allowed_spec_events.md](docs/flowstate_allowed_spec_events.md)
+
+#### Predicate Business Rules
+
+Generated business rules from flowstate predicates in
+- Composed & Atomic predicate rules: [business-rules.md](docs/business-rules.md)
+
+## Email notification catalogue
+
+Every Camunda notifier, the parties it contacts, the Gov.Notify templates it uses, and the BPMN/CCD entry points are tracked in [`docs/email-notifications.md`](docs/email-notifications.md). The table is generated automatically by `scripts/generate_email_notifications_table.py`, which walks the notifier/aggregator/generator hierarchy, reads template IDs from `src/main/resources/application.yaml`, and links the referencing BPMN files from the neighbouring [`civil-camunda-bpmn-definition`](https://github.com/hmcts/civil-camunda-bpmn-definition) repository.
+
+The same data is published via GitHub Pages at https://hmcts.github.io/civil-service/email-notifications.html, so after commits land on `master` the interactive table is available to anyone with repo access.
+
+<details>
+<summary>How to regenerate `docs/email-notifications.md`</summary>
+
+```bash
+scripts/generate_email_notifications_table.py --bpmn-root ../civil-camunda-bpmn-definition
+```
+
+Need to focus on a single CCD event (or a handful)? Pass one or more `--ccd-event` filters to keep only rows whose
+CCD event column contains the provided substring, e.g.
+
+```bash
+scripts/generate_email_notifications_table.py \
+  --bpmn-root ../civil-camunda-bpmn-definition \
+  --ccd-event DEFENDANT_RESPONSE_SPEC
+```
+
+Every run also emits `docs/email-notifications.html`, which mirrors the markdown but adds a CCD event dropdown so you can
+filter interactively in a browser. Use `--html-output /path/to/file.html` to change the destination or `--html-output ""`
+to skip generating it.
+
+The `Verify email notification documentation` GitHub Action executes the same script on every push to `master` and fails if the committed markdown is out of date, so commits should always include any changes produced by the command above.
+
+</details>
 
 ## Building and deploying the application
 
@@ -274,7 +332,9 @@ For that you should have such file as this:
   },
   "operator": false,
   "agent": {
-    "flush_connections": false
+    "flush_connections": false,
+    "startup_timeout": 300,
+    "namespace": "civil"
   }
 }
 ```
@@ -286,9 +346,11 @@ Add the following label to your GitHub PR.
 civilDefinitionBranch:????
 
 where ???? is the branch name you want to point to. e.g civilDefinitionBranch:DTSCCI-1699
+
+"disableWiremock" label to disable WireMock stubs and point API endpoints to real AAT instances.
+By default, preview environments use WireMock for external services (fees-api, send-letter,
+role-assignment, etc.). Add this label when you need to test against live AAT services.
 ```
-
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details

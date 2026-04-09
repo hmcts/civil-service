@@ -39,6 +39,6 @@ public class TakeCaseOfflineHandler extends BaseExternalTaskHandler {
             }
         });
 
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 }

@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.QueryCollectionType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -15,23 +13,21 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS;
-import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENTS;
 import static java.util.Objects.nonNull;
 
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS;
-import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS;
-import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.APPLICANT_SOLICITOR_QUERIES;
-import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_ONE_QUERIES;
-import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_TWO_QUERIES;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.CLAIMANT;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.DEFENDANT;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
@@ -43,131 +39,66 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicito
 public class CaseQueriesUtil {
 
     private static final String UNSUPPORTED_ROLE_ERROR = "Unsupported case role for query management.";
+    public static final String ROLE_METADATA_DELIMITER = "::";
 
     private CaseQueriesUtil() {
         //NO-OP
     }
 
-    public static List<CaseMessage> getUserQueriesCreatedByUser(CaseData caseData, String createdBy) {
-        if (caseData.getQueries() != null) {
-            return unwrapElements(caseData.getQueries().getCaseMessages()).stream()
-                .filter(m -> m.getCreatedBy().equals(createdBy)).collect(Collectors.toList());
-        }
-        throw new IllegalArgumentException("Unsupported action for no queries on case");
-    }
-
-    //ToDo: Remove this and all its usages after public queries release.
-    public static CaseQueriesCollection getUserQueriesByRole(CaseData caseData, List<String> roles) {
-        if (isApplicantSolicitor(roles)) {
-            return caseData.getQmApplicantSolicitorQueries();
-        } else if (isRespondentSolicitorOne(roles)) {
-            return caseData.getQmRespondentSolicitor1Queries();
-        } else if (isRespondentSolicitorTwo(roles)) {
-            return caseData.getQmRespondentSolicitor2Queries();
-        } else {
-            throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
-        }
-    }
-
-    //ToDo: Remove this and all its usages after public queries release.
-    public static CaseQueriesCollection getCollectionByMessage(CaseData caseData, CaseMessage message) {
-        return Stream.of(
-                caseData.getQmApplicantSolicitorQueries(),
-                caseData.getQmRespondentSolicitor1Queries(),
-                caseData.getQmRespondentSolicitor2Queries()
-            )
-            .filter(collection -> nonNull(collection) && nonNull(collection.getCaseMessages()) && collection.getCaseMessages().stream()
-                .anyMatch(messageEl -> messageEl.getValue().getCreatedOn().equals(message.getCreatedOn())))
-            .findFirst()
-            .orElse(null);
-    }
-
-    public static CaseMessage getLatestQuery(CaseData caseData) {
-        List<CaseMessage> latestQueries = new ArrayList<>();
-        if (caseData.getQueries() != null) {
-            latestQueries.add(caseData.getQueries().latest());
-        }
-        //ToDo: Remove after public queries release
-        if (caseData.getQmApplicantSolicitorQueries() != null) {
-            latestQueries.add(caseData.getQmApplicantSolicitorQueries().latest());
-        }
-        if (caseData.getQmRespondentSolicitor1Queries() != null) {
-            latestQueries.add(caseData.getQmRespondentSolicitor1Queries().latest());
-        }
-        if (caseData.getQmRespondentSolicitor2Queries() != null) {
-            latestQueries.add(caseData.getQmRespondentSolicitor2Queries().latest());
-        }
-        return latestQueries.stream().max(Comparator.comparing(CaseMessage::getCreatedOn))
-            .orElse(null);
-    }
-
-    //ToDo: Remove this and all its usages after public queries release.
-    public static QueryCollectionType getCollectionType(CaseQueriesCollection queriesCollection, CaseData caseData) {
-
-        if (queriesCollection.isSame(caseData.getQmApplicantSolicitorQueries())) {
-            return APPLICANT_SOLICITOR_QUERIES;
-        }
-        if (queriesCollection.isSame(caseData.getQmRespondentSolicitor1Queries())) {
-            return RESPONDENT_SOLICITOR_ONE_QUERIES;
-        }
-        if (queriesCollection.isSame(caseData.getQmRespondentSolicitor2Queries())) {
-            return RESPONDENT_SOLICITOR_TWO_QUERIES;
-        }
-
-        return null;
-    }
-
-    //ToDo: Remove this and all its usages after public queries release.
-    public static DocCategory getQueryDocumentCategory(QueryCollectionType collectionType) {
-        return switch(collectionType) {
-            case APPLICANT_SOLICITOR_QUERIES -> CLAIMANT_QUERY_DOCUMENTS;
-            case RESPONDENT_SOLICITOR_ONE_QUERIES, RESPONDENT_SOLICITOR_TWO_QUERIES -> DEFENDANT_QUERY_DOCUMENTS;
-            default -> null;
-        };
-    }
-
-    public static DocCategory getQueryAttachmentsDocumentCategory(QueryCollectionType collectionType) {
-        return switch (collectionType) {
-            case APPLICANT_SOLICITOR_QUERIES -> CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS;
-            case RESPONDENT_SOLICITOR_ONE_QUERIES, RESPONDENT_SOLICITOR_TWO_QUERIES ->
-                DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS;
-            default -> null;
-        };
-    }
-
     public static List<String> getUserRoleForQuery(CaseData caseData,
                                                    CoreCaseUserService coreCaseUserService, String queryId) {
-        if (caseData.getQueries() != null) {
-            String createdBy = unwrapElements(caseData.getQueries().getCaseMessages()).stream()
-                .filter(m -> m.getId().equals(queryId)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId))
-                .getCreatedBy();
-            return coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), createdBy);
+        CaseMessage caseMessage = unwrapElements(caseData.getQueries().getCaseMessages()).stream()
+            .filter(m -> m.getId().equals(queryId)).findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId));
+
+        CreatedByRoleMetadata metadata = extractRoleMetadata(caseMessage.getCreatedBy());
+        if (metadata.persistedRole != null) {
+            return List.of(metadata.persistedRole);
         }
-        //ToDo: Remove below after public queries release
-        CaseMessage query = getQueryById(caseData, queryId);
-        String createdBy = query.getCreatedBy();
-        return coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), createdBy);
+
+        List<String> roles = coreCaseUserService.getUserCaseRoles(
+            caseData.getCcdCaseReference().toString(),
+            metadata.userId
+        );
+
+        return roles == null ? Collections.emptyList() : roles;
     }
 
-    //ToDo: Remove this and all its usages after public queries release.
-    public static void updateQueryCollectionPartyName(List<String> roles, MultiPartyScenario scenario, CaseData.CaseDataBuilder builder) {
-        CaseData caseData = builder.build();
+    public static String buildCreatedByWithRoleMetadata(String userId, List<String> roles) {
+        String identifier = stripRoleMetadata(userId);
+        Optional<String> persistedRole = resolveSupportedRole(roles);
+        return persistedRole.map(role -> identifier + ROLE_METADATA_DELIMITER + role).orElse(identifier);
+    }
+
+    // Still required as QM collections are not migrated after NOC so still necessary to update the old query collection party name.
+    public static void updateQueryCollectionPartyName(List<String> roles, MultiPartyScenario scenario, CaseData caseData) {
         String partyName = getQueryCollectionPartyName(roles, scenario);
 
         if (isApplicantSolicitor(roles)) {
-            builder.qmApplicantSolicitorQueries(updateQueryCollectionPartyName(caseData.getQmApplicantSolicitorQueries(), partyName));
+            caseData.setQmApplicantSolicitorQueries(updateQueryCollectionPartyName(
+                caseData.getQmApplicantSolicitorQueries(),
+                partyName
+            ));
         } else if (isRespondentSolicitorOne(roles)) {
-            builder.qmRespondentSolicitor1Queries(updateQueryCollectionPartyName(caseData.getQmRespondentSolicitor1Queries(), partyName));
+            caseData.setQmRespondentSolicitor1Queries(updateQueryCollectionPartyName(
+                caseData.getQmRespondentSolicitor1Queries(),
+                partyName
+            ));
         } else if (isRespondentSolicitorTwo(roles)) {
-            builder.qmRespondentSolicitor2Queries(updateQueryCollectionPartyName(caseData.getQmRespondentSolicitor2Queries(), partyName));
+            caseData.setQmRespondentSolicitor2Queries(updateQueryCollectionPartyName(
+                caseData.getQmRespondentSolicitor2Queries(),
+                partyName
+            ));
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
     }
 
     private static CaseQueriesCollection updateQueryCollectionPartyName(CaseQueriesCollection collection, String partyName) {
-        return nonNull(collection) && nonNull(partyName) ? collection.toBuilder().partyName(partyName).build() : collection;
+        if (nonNull(collection) && nonNull(partyName)) {
+            collection.setPartyName(partyName);
+        }
+        return collection;
     }
 
     public static String getQueryCollectionPartyName(List<String> roles, MultiPartyScenario scenario) {
@@ -185,23 +116,8 @@ public class CaseQueriesUtil {
     }
 
     public static CaseMessage getQueryById(CaseData caseData, String queryId) {
-        List<CaseMessage> latestQueries = new ArrayList<>();
-        if (caseData.getQueries() != null) {
-            return unwrapElements(caseData.getQueries().getCaseMessages()).stream()
-                .filter(m -> m.getId().equals(queryId)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId));
-        }
-        // ToDo: Remove below after public queries release
-        if (caseData.getQmApplicantSolicitorQueries() != null) {
-            latestQueries.addAll(unwrapElements(caseData.getQmApplicantSolicitorQueries().getCaseMessages()));
-        }
-        if (caseData.getQmRespondentSolicitor1Queries() != null) {
-            latestQueries.addAll(unwrapElements(caseData.getQmRespondentSolicitor1Queries().getCaseMessages()));
-        }
-        if (caseData.getQmRespondentSolicitor2Queries() != null) {
-            latestQueries.addAll(unwrapElements(caseData.getQmRespondentSolicitor2Queries().getCaseMessages()));
-        }
-        return latestQueries.stream().filter(m -> m.getId().equals(queryId)).findFirst()
+        return unwrapElements(caseData.getQueries().getCaseMessages()).stream()
+            .filter(m -> m.getId().equals(queryId)).findFirst()
             .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId));
     }
 
@@ -216,18 +132,21 @@ public class CaseQueriesUtil {
     }
 
     public static LatestQuery buildLatestQuery(CaseMessage latestCaseMessage) {
-        return Optional.ofNullable(latestCaseMessage)
-            .map(caseMessage -> LatestQuery.builder()
-                .queryId(caseMessage.getId())
-                .isHearingRelated(caseMessage.getIsHearingRelated())
-                .build())
-            .orElse(null);
+        if (latestCaseMessage == null) {
+            return null;
+        }
+        LatestQuery latestQuery = new LatestQuery();
+        latestQuery.setQueryId(latestCaseMessage.getId());
+        latestQuery.setIsHearingRelated(latestCaseMessage.getIsHearingRelated());
+        return latestQuery;
     }
 
     public static LatestQuery buildLatestQuery(CaseMessage latestCaseMessage, CaseData caseData, List<String> roles) {
-        return buildLatestQuery(latestCaseMessage).toBuilder()
-            .isWelsh(isWelshQuery(caseData, roles) ? YesOrNo.YES : YesOrNo.NO)
-            .build();
+        LatestQuery latestQuery = buildLatestQuery(latestCaseMessage);
+        if (latestQuery != null) {
+            latestQuery.setIsWelsh(isWelshQuery(caseData, roles) ? YesOrNo.YES : YesOrNo.NO);
+        }
+        return latestQuery;
     }
 
     public static void assignCategoryIdToAttachments(CaseMessage latestCaseMessage,
@@ -248,17 +167,13 @@ public class CaseQueriesUtil {
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, categoryId);
     }
 
-    public static void assignCategoryIdToCaseworkerAttachments(CaseData caseData,
-                                                               CaseMessage latestCaseMessage,
-                                                               AssignCategoryId assignCategoryId,
-                                                               boolean isPublicQmEnabled) {
-        if (!isPublicQmEnabled) {
-            CaseQueriesCollection workingCollection = getCollectionByMessage(caseData, latestCaseMessage);
-            DocCategory documentCategory = getQueryAttachmentsDocumentCategory(getCollectionType(workingCollection, caseData));
-            assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, documentCategory.getValue());
-        } else {
-            assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS.getValue());
-        }
+    public static void assignCategoryIdToCaseworkerAttachments(CaseMessage latestCaseMessage,
+                                                               AssignCategoryId assignCategoryId) {
+        assignCategoryIdToAttachments(
+            latestCaseMessage,
+            assignCategoryId,
+            CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS.getValue()
+        );
 
     }
 
@@ -278,21 +193,20 @@ public class CaseQueriesUtil {
             || nonNull(caseData.getQmRespondentSolicitor2Queries());
     }
 
-    public static void migrateAllQueries(CaseData.CaseDataBuilder builder) {
-        CaseData caseData = builder.build();
+    public static void migrateAllQueries(CaseData caseData) {
         if (hasOldQueries(caseData)) {
             String collectionOwner = "";
             try {
-                builder.queries(CaseQueriesCollection.builder()
-                                    .partyName("All queries")
-                                    .caseMessages(new ArrayList<>())
-                                    .build());
+                CaseQueriesCollection queriesCollection = new CaseQueriesCollection();
+                queriesCollection.setPartyName("All queries");
+                queriesCollection.setCaseMessages(new ArrayList<>());
+                caseData.setQueries(queriesCollection);
                 collectionOwner = "Claimant";
-                migrateQueries(caseData.getQmApplicantSolicitorQueries(), builder);
+                migrateQueries(caseData.getQmApplicantSolicitorQueries(), caseData);
                 collectionOwner = "Defendant 1";
-                migrateQueries(caseData.getQmRespondentSolicitor1Queries(), builder);
+                migrateQueries(caseData.getQmRespondentSolicitor1Queries(), caseData);
                 collectionOwner = "Defendant 2";
-                migrateQueries(caseData.getQmRespondentSolicitor2Queries(), builder);
+                migrateQueries(caseData.getQmRespondentSolicitor2Queries(), caseData);
             } catch (Exception e) {
                 log.error("There was a problem migrating the [{}] queries ", collectionOwner, e);
                 // Continue to throw the original error since all queries must be migrated successfully.
@@ -301,21 +215,20 @@ public class CaseQueriesUtil {
         }
     }
 
-    public static void migrateQueries(CaseQueriesCollection collectionToMigrate, CaseData.CaseDataBuilder builder) {
+    public static void migrateQueries(CaseQueriesCollection collectionToMigrate, CaseData caseData) {
         if (nonNull(collectionToMigrate) && nonNull(collectionToMigrate.getCaseMessages())) {
-            CaseData caseData = builder.build();
-            log.info("Started to migrate [{}] queries", collectionToMigrate.getPartyName(), caseData.getCcdCaseReference());
+            log.info("Started to migrate [{}] queries for caseId {}", collectionToMigrate.getPartyName(), caseData.getCcdCaseReference());
             List<Element<CaseMessage>> messages = caseData.getQueries().getCaseMessages();
             messages.addAll(collectionToMigrate.getCaseMessages());
-            builder.queries(caseData.getQueries().toBuilder().caseMessages(messages).build());
+            caseData.getQueries().setCaseMessages(messages);
         }
     }
 
-    public static void clearOldQueryCollections(CaseData.CaseDataBuilder builder) {
-        if (hasOldQueries(builder.build())) {
-            builder.qmApplicantSolicitorQueries(null);
-            builder.qmRespondentSolicitor1Queries(null);
-            builder.qmRespondentSolicitor2Queries(null);
+    public static void clearOldQueryCollections(CaseData caseData) {
+        if (hasOldQueries(caseData)) {
+            caseData.setQmApplicantSolicitorQueries(null);
+            caseData.setQmRespondentSolicitor1Queries(null);
+            caseData.setQmRespondentSolicitor2Queries(null);
         }
     }
 
@@ -328,9 +241,58 @@ public class CaseQueriesUtil {
                 ).stream().filter(Objects::nonNull)
                 .forEach(collection ->
                              log.info(
-                                 "Successfully migrated [{}] queries",
+                                 "Successfully migrated [{}] queries for caseId {}",
                                  collection.getPartyName(), caseDataBefore.getCcdCaseReference()
                              ));
+        }
+    }
+
+    private static String stripRoleMetadata(String value) {
+        if (value == null) {
+            return null;
+        }
+        int index = value.indexOf(ROLE_METADATA_DELIMITER);
+        return index >= 0 ? value.substring(0, index) : value;
+    }
+
+    private static Optional<String> resolveSupportedRole(List<String> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return Optional.empty();
+        }
+        if (isApplicantSolicitor(roles)) {
+            return Optional.of(APPLICANTSOLICITORONE.getFormattedName());
+        } else if (isRespondentSolicitorOne(roles)) {
+            return Optional.of(RESPONDENTSOLICITORONE.getFormattedName());
+        } else if (isRespondentSolicitorTwo(roles)) {
+            return Optional.of(RESPONDENTSOLICITORTWO.getFormattedName());
+        } else if (isLIPClaimant(roles)) {
+            return Optional.of(CLAIMANT.getFormattedName());
+        } else if (isLIPDefendant(roles)) {
+            return Optional.of(DEFENDANT.getFormattedName());
+        }
+        return Optional.empty();
+    }
+
+    private static CreatedByRoleMetadata extractRoleMetadata(String createdBy) {
+        if (createdBy == null) {
+            return new CreatedByRoleMetadata(null, null);
+        }
+        int index = createdBy.indexOf(ROLE_METADATA_DELIMITER);
+        if (index < 0) {
+            return new CreatedByRoleMetadata(createdBy, null);
+        }
+        String userId = createdBy.substring(0, index);
+        String role = createdBy.substring(index + ROLE_METADATA_DELIMITER.length());
+        return new CreatedByRoleMetadata(userId, role.isBlank() ? null : role);
+    }
+
+    private static final class CreatedByRoleMetadata {
+        private final String userId;
+        private final String persistedRole;
+
+        private CreatedByRoleMetadata(String userId, String persistedRole) {
+            this.userId = userId;
+            this.persistedRole = persistedRole;
         }
     }
 }

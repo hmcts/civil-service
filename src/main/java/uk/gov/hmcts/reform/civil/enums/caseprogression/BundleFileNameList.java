@@ -7,7 +7,7 @@ public enum BundleFileNameList {
     SCHEDULE_OF_LOSS_FILE_DISPLAY_NAME("%s schedule of loss %s"),
     CLAIM_FORM("Claim Form %s"),
     DEFENCE("%s Defence %s"),
-    CL_REPLY("CL's reply %s"),
+    CL_REPLY("%s reply %s"),
     DF2_DEFENCE("DF 2 Defence"),
     REPLY_TO_PART_18("%s reply to part 18 request %s"),
     DIRECTIONS_QUESTIONNAIRE("%s Directions Questionnaire %s"),

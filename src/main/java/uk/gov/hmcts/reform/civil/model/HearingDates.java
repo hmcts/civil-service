@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 
 @Data
-@Builder
+@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class HearingDates {
 
-    private final LocalDate hearingUnavailableFrom;
-    private final LocalDate hearingUnavailableUntil;
+    private LocalDate hearingUnavailableFrom;
+    private LocalDate hearingUnavailableUntil;
 }

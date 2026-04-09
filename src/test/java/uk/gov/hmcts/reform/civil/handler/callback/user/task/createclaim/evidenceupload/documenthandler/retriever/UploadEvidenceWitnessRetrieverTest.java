@@ -21,13 +21,12 @@ class UploadEvidenceWitnessRetrieverTest {
 
     @Test
     void shouldReturnDocument() {
-        Document document = Document.builder().documentFileName("OriginalName.pdf").build();
-        UploadEvidenceWitness uploadEvidenceWitness = UploadEvidenceWitness.builder()
-                .witnessOptionDocument(document)
-                .build();
-        Element<UploadEvidenceWitness> element = Element.<UploadEvidenceWitness>builder()
-                .value(uploadEvidenceWitness)
-                .build();
+        Document document = new Document();
+        document.setDocumentFileName("OriginalName.pdf");
+        UploadEvidenceWitness uploadEvidenceWitness = new UploadEvidenceWitness();
+        uploadEvidenceWitness.setWitnessOptionDocument(document);
+        Element<UploadEvidenceWitness> element = new Element<>();
+        element.setValue(uploadEvidenceWitness);
 
         Document result = uploadEvidenceWitnessRetriever.getDocument(element);
 
@@ -37,12 +36,10 @@ class UploadEvidenceWitnessRetrieverTest {
     @Test
     void shouldReturnDocumentDateTime() {
         LocalDateTime dateTime = LocalDateTime.of(2022, 2, 10, 10, 0);
-        UploadEvidenceWitness uploadEvidenceWitness = UploadEvidenceWitness.builder()
-                .createdDatetime(dateTime)
-                .build();
-        Element<UploadEvidenceWitness> element = Element.<UploadEvidenceWitness>builder()
-                .value(uploadEvidenceWitness)
-                .build();
+        UploadEvidenceWitness uploadEvidenceWitness = new UploadEvidenceWitness();
+        uploadEvidenceWitness.setCreatedDatetime(dateTime);
+        Element<UploadEvidenceWitness> element = new Element<>();
+        element.setValue(uploadEvidenceWitness);
 
         LocalDateTime result = uploadEvidenceWitnessRetriever.getDocumentDateTime(element);
 

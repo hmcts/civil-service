@@ -7,16 +7,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 class StringUtilityTest {
 
     @Test
-    void shouldRemoveAnchorFromText() {
-        String input = "<a href=\"somewhere\">Link name</A >";
+    void shouldRemoveAnchorsFromHtml() {
+        String input = "<a href=\"#\">Link</a> with <a class=\"text\">content</a>";
 
-        assertThat(StringUtility.removeAnchor(input)).isEqualTo("Link name");
+        String result = StringUtility.removeAnchor(input);
+
+        assertThat(result).isEqualTo("Link with content");
     }
 
     @Test
-    void shouldRemoveMultipleAnchorFromText() {
-        String input = "<a href=\"somewhere\">Link name</A > is a test for <a href=\"somewhere\">Multiple</A >";
+    void shouldReturnOriginalWhenTextIsBlank() {
+        assertThat(StringUtility.removeAnchor("   ")).isEqualTo("   ");
+        assertThat(StringUtility.removeAnchor(null)).isNull();
+    }
 
-        assertThat(StringUtility.removeAnchor(input)).isEqualTo("Link name is a test for Multiple");
+    @Test
+    void shouldActivateLinkForViewDocument() {
+        String input1 = "<a>View documents</a>";
+        String input2 = "<a   >  View documents </a>";
+        String input3 = "<a class=\"x\">View documents</a>";
+
+        assertThat(StringUtility.activateLink(input1))
+            .isEqualTo("<a class=\"govuk-link\" href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\">View documents</a>");
+        assertThat(StringUtility.activateLink(input2))
+            .isEqualTo("<a    class=\"govuk-link\" href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\">  View documents </a>");
+        assertThat(StringUtility.activateLink(input3))
+            .isEqualTo("<a class=\"x govuk-link\" href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\">View documents</a>");
+    }
+
+    @Test
+    void shouldNotModifyLinkWithExistingHref() {
+        String input = "<a href=\"/already\">View document</a>";
+        assertThat(StringUtility.activateLink(input)).isEqualTo(input);
     }
 }

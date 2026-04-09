@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +37,7 @@ public class TriggerGenAppLanguagePreferenceUpdateCallbackHandlerTest {
 
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplication() {
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = CaseDataBuilder.builder().build();
 
             when(helperService.triggerEvent(any(), any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder()

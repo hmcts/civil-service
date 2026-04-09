@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -56,6 +58,8 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
 
     @Mock
     private ObjectMapper objectMapper;
+    @Spy
+    private SdoCaseClassificationService sdoCaseClassificationService = new SdoCaseClassificationService();
 
     public static final String TASK_ID = "UpdateTaskListConfirmOrderReviewDefendant";
 
@@ -82,10 +86,9 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
         scenarioParams.put("orderDocument", "url");
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder().respondent1Represented(YesOrNo.NO)
-            .isFinalOrder(YesOrNo.YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setIsFinalOrder(YesOrNo.YES);
 
         when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -108,10 +111,10 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
 
     @Test
     void configureDashboardScenario_shouldNotMakeTasksInactiveOrDeleteNotifications_whenScenarioShouldNotBeRecorded() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder().respondent1Represented(YesOrNo.YES)
-            .isFinalOrder(YesOrNo.NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setIsFinalOrder(YesOrNo.NO);
+
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT.name()).build()).build();
@@ -125,10 +128,10 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
     void shouldRecordScenarioDefendantFinalOrder_whenInvoked() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
-            .respondent1Represented(YesOrNo.NO)
-            .isFinalOrder(YesOrNo.YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setIsFinalOrder(YesOrNo.YES);
+
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT.name())
                 .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
@@ -142,7 +145,7 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
             "BEARER_TOKEN",
             SCENARIO_AAA6_UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -150,12 +153,11 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
     void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
-            .respondent1Represented(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .isFinalOrder(YesOrNo.YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+        caseData.setIsFinalOrder(YesOrNo.YES);
 
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT.name())
@@ -170,7 +172,7 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
             "BEARER_TOKEN",
             SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 

@@ -27,21 +27,21 @@ public class AssembleDocumentsForDeadlineResponse {
         this.assignCategoryId = assignCategoryId;
     }
 
-    void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    void assembleResponseDocuments(CaseData caseData) {
         log.info("Assembling response documents for case ID: {}", caseData.getCcdCaseReference());
         List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
-        assembleRespondent1ResponseDocuments(caseData, updatedCaseData, defendantUploads);
-        assembleRespondent2ResponseDocuments(caseData, updatedCaseData, defendantUploads);
+        assembleRespondent1ResponseDocuments(caseData, defendantUploads);
+        assembleRespondent2ResponseDocuments(caseData, defendantUploads);
     }
 
-    private void assembleRespondent2ResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads) {
+    private void assembleRespondent2ResponseDocuments(CaseData caseData, List<Element<CaseDocument>> defendantUploads) {
         ResponseDocument respondent2ClaimResponseDocument = caseData.getRespondent2ClaimResponseDocument();
         if (respondent2ClaimResponseDocument != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2ClaimResponseDocument.getFile();
             if (respondent2ClaimDocument != null) {
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                     respondent2ClaimDocument, "Defendant 2",
-                    updatedCaseData.build().getRespondent2ResponseDate(),
+                    caseData.getRespondent2ResponseDate(),
                     DocumentType.DEFENDANT_DEFENCE
                 );
                 assignCategoryId.assignCategoryIdToDocument(
@@ -58,7 +58,7 @@ public class AssembleDocumentsForDeadlineResponse {
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                     respondent2DQDraftDirections,
                     "Defendant 2",
-                    updatedCaseData.build().getRespondent2ResponseDate(),
+                    caseData.getRespondent2ResponseDate(),
                     DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 );
                 assignCategoryId.assignCategoryIdToDocument(
@@ -70,18 +70,18 @@ public class AssembleDocumentsForDeadlineResponse {
         }
 
         if (!defendantUploads.isEmpty()) {
-            updatedCaseData.defendantResponseDocuments(defendantUploads);
+            caseData.setDefendantResponseDocuments(defendantUploads);
         }
     }
 
-    private void assembleRespondent1ResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads) {
+    private void assembleRespondent1ResponseDocuments(CaseData caseData, List<Element<CaseDocument>> defendantUploads) {
         ResponseDocument respondent1ClaimResponseDocument = caseData.getRespondent1ClaimResponseDocument();
         if (respondent1ClaimResponseDocument != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1ClaimResponseDocument.getFile();
             if (respondent1ClaimDocument != null) {
                 Element<CaseDocument> documentElement =
                     buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
-                                          updatedCaseData.build().getRespondent1ResponseDate(),
+                                          caseData.getRespondent1ResponseDate(),
                                           DocumentType.DEFENDANT_DEFENCE
                     );
                 assignCategoryId.assignCategoryIdToDocument(
@@ -99,7 +99,7 @@ public class AssembleDocumentsForDeadlineResponse {
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                     respondent1DQDraftDirections,
                     "Defendant",
-                    updatedCaseData.build().getRespondent1ResponseDate(),
+                    caseData.getRespondent1ResponseDate(),
                     DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 );
                 assignCategoryId.assignCategoryIdToDocument(

@@ -30,11 +30,9 @@ public class UploadHearingDocumentsDefendantScenarioTest extends DashboardBaseIn
 
         String caseId = "1234518843299";
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        DynamicListElement selectedCourt = new DynamicListElement().setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
@@ -45,7 +43,7 @@ public class UploadHearingDocumentsDefendantScenarioTest extends DashboardBaseIn
             .responseClaimMediationSpecRequired(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(1000))
             .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .build();
 
         handler.handle(callbackParams(caseData));

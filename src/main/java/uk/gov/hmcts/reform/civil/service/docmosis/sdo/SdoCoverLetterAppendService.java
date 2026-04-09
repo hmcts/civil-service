@@ -85,11 +85,9 @@ public class SdoCoverLetterAppendService {
     }
 
     private SdoCoverLetter getTemplateData(Party recipient, String caseReference) {
-        return SdoCoverLetter
-                .builder()
-                .party(recipient)
-                .claimReferenceNumber(caseReference)
-                .build();
+        return new SdoCoverLetter()
+                .setParty(recipient)
+                .setClaimReferenceNumber(caseReference);
     }
 
     private CaseDocument getMailableStitchedDocument(List<DocumentMetaData> documentMetaDataList,

@@ -59,26 +59,23 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
 
     private static final String SETTLE_CLAIM_PAID_IN_FULL_LETTER_STRING = "settle-claim-paid-in-full-letter";
     public static final String TASK_ID = "SendSettleClaimPaidInFullLetterLipDef";
-    private static final String TEST = "test";
-    private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST, TEST);
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
+
     private static final CaseDocument STITCHED_DOC =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(SETTLE_CLAIM_PAID_IN_FULL_LETTER)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("Stitched document")
+            .setDocumentSize(0L)
+            .setDocumentType(SETTLE_CLAIM_PAID_IN_FULL_LETTER)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
 
     private static final CaseDocument SETTLE_CLAIM = CaseDocumentBuilder.builder()
-        .documentName(null)
+        .documentName("settle_claim_paid_in_full_letter.pdf")
         .documentType(SETTLE_CLAIM_PAID_IN_FULL_LETTER)
         .build();
 
@@ -108,8 +105,8 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
             any(), any(), anyString(), anyString()
         )).willReturn(bytes);
 
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
+        Party applicant = new PartyBuilder().soleTrader().build();
+        Party defendant = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1L)
             .respondent1Represented(YesOrNo.NO)
@@ -128,7 +125,8 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
                 caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(),
                 SETTLE_CLAIM_PAID_IN_FULL_LETTER_STRING,
-                List.of(caseData.getRespondent1().getPartyName())
+                List.of(caseData.getRespondent1().getPartyName()),
+                List.of(SETTLE_CLAIM.getDocumentLink().getDocumentFileName())
             );
     }
 
@@ -170,17 +168,17 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
             any(), any(), anyString(), anyString()
         )).willReturn(bytes);
 
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
+        Party applicant = new PartyBuilder().soleTrader().build();
+        Party defendant = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(123L)
             .respondent1Represented(YesOrNo.NO)
             .applicant1(applicant)
             .respondent1(defendant)
             .legacyCaseReference("100DC001")
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder()
-                                                                             .court(Language.WELSH)
-                                                                             .build()).build())
+            .respondent1DQ(new Respondent1DQ()
+                               .setRespondent1DQLanguage(new WelshLanguageRequirements()
+                                                             .setCourt(Language.WELSH)))
             .build();
 
         //When
@@ -193,7 +191,8 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
                 caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(),
                 SETTLE_CLAIM_PAID_IN_FULL_LETTER_STRING,
-                List.of(caseData.getRespondent1().getPartyName())
+                List.of(caseData.getRespondent1().getPartyName()),
+                List.of(SETTLE_CLAIM.getDocumentLink().getDocumentFileName(), SETTLE_CLAIM.getDocumentLink().getDocumentFileName())
             );
     }
 }

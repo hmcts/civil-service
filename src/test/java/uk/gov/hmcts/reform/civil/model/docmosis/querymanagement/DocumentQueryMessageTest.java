@@ -23,25 +23,23 @@ class DocumentQueryMessageTest {
 
     @Test
     void shouldMapFromInitialQuery() {
-        CaseMessage initialQuery = CaseMessage.builder()
-            .id(PARENT_QUERY_ID)
-            .isHearingRelated(YES)
-            .hearingDate(HEARING_DATE)
-            .subject("initial query")
-            .createdOn(DATE_QUERY_RAISED)
-            .createdBy(SOLICITOR_ID.toString())
-            .name("Solicitor")
-            .build();
+        CaseMessage initialQuery = new CaseMessage();
+        initialQuery.setId(PARENT_QUERY_ID);
+        initialQuery.setIsHearingRelated(YES);
+        initialQuery.setHearingDate(HEARING_DATE);
+        initialQuery.setSubject("initial query");
+        initialQuery.setCreatedOn(DATE_QUERY_RAISED);
+        initialQuery.setCreatedBy(SOLICITOR_ID.toString());
+        initialQuery.setName("Solicitor");
 
-        DocumentQueryMessage expected = DocumentQueryMessage.builder()
-            .messageType("Query")
-            .id(PARENT_QUERY_ID)
-            .name("Solicitor")
-            .subject("initial query")
-            .createdOn("15-05-2025 13:00")
-            .isHearingRelated(YES)
-            .hearingDate("15-03-2025")
-            .build();
+        DocumentQueryMessage expected = new DocumentQueryMessage()
+            .setMessageType("Query")
+            .setId(PARENT_QUERY_ID)
+            .setName("Solicitor")
+            .setSubject("initial query")
+            .setCreatedOn("15-05-2025 13:00")
+            .setIsHearingRelated(YES)
+            .setHearingDate("15-03-2025");
 
         DocumentQueryMessage actual = DocumentQueryMessage.from(initialQuery, false);
         assertEquals(expected, actual);
@@ -49,22 +47,20 @@ class DocumentQueryMessageTest {
 
     @Test
     void shouldMapFromQueryResponse() {
-        CaseMessage queryResponse = CaseMessage.builder()
-            .id(QUERY_ID)
-            .parentId(PARENT_QUERY_ID)
-            .isHearingRelated(YES)
-            .hearingDate(HEARING_DATE)
-            .createdOn(DATE_QUERY_RAISED.plusDays(1))
-            .createdBy(CASEWORKER_ID.toString())
-            .name("Hearing admin")
-            .build();
+        CaseMessage queryResponse = new CaseMessage();
+        queryResponse.setId(QUERY_ID);
+        queryResponse.setParentId(PARENT_QUERY_ID);
+        queryResponse.setIsHearingRelated(YES);
+        queryResponse.setHearingDate(HEARING_DATE);
+        queryResponse.setCreatedOn(DATE_QUERY_RAISED.plusDays(1));
+        queryResponse.setCreatedBy(CASEWORKER_ID.toString());
+        queryResponse.setName("Hearing admin");
 
-        DocumentQueryMessage expected = DocumentQueryMessage.builder()
-            .messageType("Caseworker response")
-            .id(QUERY_ID)
-            .name("Caseworker")
-            .createdOn("16-05-2025 13:00")
-            .build();
+        DocumentQueryMessage expected = new DocumentQueryMessage()
+            .setMessageType("Caseworker response")
+            .setId(QUERY_ID)
+            .setName("Caseworker")
+            .setCreatedOn("16-05-2025 13:00");
 
         DocumentQueryMessage actual = DocumentQueryMessage.from(queryResponse, true);
         assertEquals(expected, actual);
@@ -72,22 +68,20 @@ class DocumentQueryMessageTest {
 
     @Test
     void shouldMapFromFollowUpQuery() {
-        CaseMessage queryFollowUp = CaseMessage.builder()
-            .id(QUERY_ID)
-            .parentId(PARENT_QUERY_ID)
-            .isHearingRelated(YES)
-            .hearingDate(HEARING_DATE)
-            .createdOn(DATE_QUERY_RAISED.plusDays(2))
-            .createdBy(SOLICITOR_ID.toString())
-            .name("Solicitor")
-            .build();
+        CaseMessage queryFollowUp = new CaseMessage();
+        queryFollowUp.setId(QUERY_ID);
+        queryFollowUp.setParentId(PARENT_QUERY_ID);
+        queryFollowUp.setIsHearingRelated(YES);
+        queryFollowUp.setHearingDate(HEARING_DATE);
+        queryFollowUp.setCreatedOn(DATE_QUERY_RAISED.plusDays(2));
+        queryFollowUp.setCreatedBy(SOLICITOR_ID.toString());
+        queryFollowUp.setName("Solicitor");
 
-        DocumentQueryMessage expected = DocumentQueryMessage.builder()
-            .messageType("Follow up")
-            .id(QUERY_ID)
-            .name("Solicitor")
-            .createdOn("17-05-2025 13:00")
-            .build();
+        DocumentQueryMessage expected = new DocumentQueryMessage()
+            .setMessageType("Follow up")
+            .setId(QUERY_ID)
+            .setName("Solicitor")
+            .setCreatedOn("17-05-2025 13:00");
 
         DocumentQueryMessage actual = DocumentQueryMessage.from(queryFollowUp, false);
 

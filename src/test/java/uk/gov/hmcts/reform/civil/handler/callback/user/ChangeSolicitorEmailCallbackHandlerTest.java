@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -119,13 +120,12 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .build().toBuilder()
-                .specRespondentCorrespondenceAddressRequired(YesOrNo.YES)
-                .specRespondentCorrespondenceAddressdetails(Address.builder()
-                                                                .postCode("mail post code")
-                                                                .addressLine1("mail line 1")
-                                                                .build())
                 .build();
+            caseData.setSpecRespondentCorrespondenceAddressRequired(YesOrNo.YES);
+            Address specAddress = new Address();
+            specAddress.setPostCode("mail post code");
+            specAddress.setAddressLine1("mail line 1");
+            caseData.setSpecRespondentCorrespondenceAddressdetails(specAddress);
             params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response =
@@ -187,7 +187,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build()
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicant1solicitor@gmail.com")
                 ).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -223,13 +223,12 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .respondentSolicitor1EmailAddress("respondent1solicitor@gmail.com")
-                .build().toBuilder()
-                .respondent2(Party.builder()
-                                 .companyName("c3")
-                                 .type(Party.Type.COMPANY)
-                                 .build())
-                .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .build();
+            Party respondent2 = new Party();
+            respondent2.setCompanyName("c3");
+            respondent2.setType(Party.Type.COMPANY);
+            caseData.setRespondent2(respondent2);
+            caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response =
@@ -284,13 +283,12 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
                 .toBuilder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .applicantSolicitor1ServiceAddressRequired(YesOrNo.YES)
-                .applicantSolicitor1ServiceAddress(Address.builder()
-                                                       .addressLine1("mail line 1")
-                                                       .postCode("mail post code")
-                                                       .build()
-                )
                 .build();
+            caseData.setApplicantSolicitor1ServiceAddressRequired(YesOrNo.YES);
+            Address applicantServiceAddress = new Address();
+            applicantServiceAddress.setAddressLine1("mail line 1");
+            applicantServiceAddress.setPostCode("mail post code");
+            caseData.setApplicantSolicitor1ServiceAddress(applicantServiceAddress);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response =
@@ -315,13 +313,12 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
                 .toBuilder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .respondentSolicitor1ServiceAddressRequired(YesOrNo.YES)
-                .respondentSolicitor1ServiceAddress(Address.builder()
-                                                       .addressLine1("mail line 1")
-                                                       .postCode("mail post code")
-                                                       .build()
-                )
                 .build();
+            caseData.setRespondentSolicitor1ServiceAddressRequired(YesOrNo.YES);
+            Address respondent1ServiceAddress = new Address();
+            respondent1ServiceAddress.setAddressLine1("mail line 1");
+            respondent1ServiceAddress.setPostCode("mail post code");
+            caseData.setRespondentSolicitor1ServiceAddress(respondent1ServiceAddress);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response =
@@ -346,13 +343,12 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
                 .toBuilder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .respondentSolicitor2ServiceAddressRequired(YesOrNo.YES)
-                .respondentSolicitor2ServiceAddress(Address.builder()
-                                                       .addressLine1("mail line 1")
-                                                       .postCode("mail post code")
-                                                       .build()
-                )
                 .build();
+            caseData.setRespondentSolicitor2ServiceAddressRequired(YesOrNo.YES);
+            Address respondent2ServiceAddress = new Address();
+            respondent2ServiceAddress.setAddressLine1("mail line 1");
+            respondent2ServiceAddress.setPostCode("mail post code");
+            caseData.setRespondentSolicitor2ServiceAddress(respondent2ServiceAddress);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response =
@@ -379,11 +375,11 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondentSolicitor2ServiceAddressRequired(YesOrNo.NO)
                 .respondentSolicitor2ServiceAddress(null)
-                .specRespondent2CorrespondenceAddressdetails(Address.builder()
-                                                                 .addressLine1("mail line 1")
-                                                                 .postCode("mail post code")
-                                                                 .build())
                 .build();
+            Address specRespondent2Address = new Address();
+            specRespondent2Address.setAddressLine1("mail line 1");
+            specRespondent2Address.setPostCode("mail post code");
+            caseData.setSpecRespondent2CorrespondenceAddressdetails(specRespondent2Address);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response =
@@ -405,21 +401,19 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseRoles.add("[RESPONDENTSOLICITORONE]");
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
-                .toBuilder()
-                .respondent2(Party.builder()
-                                 .type(Party.Type.COMPANY)
-                                 .companyName("c3")
-                                 .build())
-                .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
-                .respondentSolicitor1ServiceAddress(null)
-                .specRespondentCorrespondenceAddressdetails(Address.builder()
-                                                                 .addressLine1("mail line 1")
-                                                                 .postCode("mail post code")
-                                                                 .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            Party respondent2 = new Party();
+            respondent2.setType(Party.Type.COMPANY);
+            respondent2.setCompanyName("c3");
+            caseData.setRespondent2(respondent2);
+            caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+            caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+            caseData.setRespondentSolicitor1ServiceAddressRequired(YesOrNo.NO);
+            caseData.setRespondentSolicitor1ServiceAddress(null);
+            Address specAddress = new Address();
+            specAddress.setAddressLine1("mail line 1");
+            specAddress.setPostCode("mail post code");
+            caseData.setSpecRespondentCorrespondenceAddressdetails(specAddress);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response =
@@ -442,11 +436,12 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            OrganisationPolicy applicantPolicy =
+                copyOrganisationPolicy(caseData.getApplicant1OrganisationPolicy())
+                    .setOrgPolicyReference("new reference");
             caseData = caseData.toBuilder()
                 .isApplicant1(YesOrNo.YES)
-                .applicant1OrganisationPolicy(caseData.getApplicant1OrganisationPolicy().toBuilder()
-                                                  .orgPolicyReference("new reference")
-                                                  .build())
+                .applicant1OrganisationPolicy(applicantPolicy)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -467,11 +462,12 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            OrganisationPolicy respondent1Policy =
+                copyOrganisationPolicy(caseData.getRespondent1OrganisationPolicy())
+                    .setOrgPolicyReference("new reference");
             caseData = caseData.toBuilder()
                 .isRespondent1(YesOrNo.YES)
-                .respondent1OrganisationPolicy(caseData.getRespondent1OrganisationPolicy().toBuilder()
-                                                  .orgPolicyReference("new reference")
-                                                  .build())
+                .respondent1OrganisationPolicy(respondent1Policy)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -492,11 +488,12 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            OrganisationPolicy respondent2Policy =
+                copyOrganisationPolicy(caseData.getRespondent2OrganisationPolicy())
+                    .setOrgPolicyReference("new reference");
             caseData = caseData.toBuilder()
                 .isRespondent2(YesOrNo.YES)
-                .respondent2OrganisationPolicy(caseData.getRespondent2OrganisationPolicy().toBuilder()
-                                                  .orgPolicyReference("new reference")
-                                                  .build())
+                .respondent2OrganisationPolicy(respondent2Policy)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -524,7 +521,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
         void validateApplicant1SolicitorEmail_shouldInvokeEmailValidationServiceAndReturnOutput() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicantSolicitor1UserDetails(
-                    IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build()).build();
+                    new IdamUserDetails().setEmail("applicant1solicitor@gmail.com")).build();
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-applicant1-solicitor-email");
 
             when(validateEmailService.validate(anyString())).thenReturn(mockErrors);
@@ -655,5 +652,18 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals("<br />",
                          response.getConfirmationBody(), "confirmationBody");
         }
+    }
+
+    private OrganisationPolicy copyOrganisationPolicy(OrganisationPolicy sourcePolicy) {
+        OrganisationPolicy copy = new OrganisationPolicy();
+        if (sourcePolicy == null) {
+            return copy;
+        }
+
+        return copy
+            .setOrganisation(sourcePolicy.getOrganisation())
+            .setOrgPolicyReference(sourcePolicy.getOrgPolicyReference())
+            .setOrgPolicyCaseAssignedRole(sourcePolicy.getOrgPolicyCaseAssignedRole())
+            .setPreviousOrganisations(sourcePolicy.getPreviousOrganisations());
     }
 }

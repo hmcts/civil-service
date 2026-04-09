@@ -80,26 +80,26 @@ class CaseDismissClaimantNotificationHandlerTest {
 
     private CaseDataBuilder commonCaseData() {
         return CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
-                             .type(Party.Type.INDIVIDUAL).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build());
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
+            .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
+                            .setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson")
+                             .setType(Party.Type.INDIVIDUAL))
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@example.com"));
     }
 
     private CaseData getCaseData(boolean isClaimantLiP, boolean isClaimantBilingual) {
-        RespondentLiPResponse respondentLip = RespondentLiPResponse.builder()
-            .respondent1ResponseLanguage(isClaimantBilingual ? Language.BOTH.toString()
-                                             : Language.ENGLISH.toString()).build();
+        RespondentLiPResponse respondentLip = new RespondentLiPResponse()
+            .setRespondent1ResponseLanguage(isClaimantBilingual ? Language.BOTH.toString()
+                                             : Language.ENGLISH.toString());
         return commonCaseData()
             .applicant1Represented(isClaimantLiP ? YesOrNo.NO : YesOrNo.YES)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@example.com"))
             .claimantBilingualLanguagePreference(isClaimantBilingual ? Language.BOTH.toString()
                                                      : Language.ENGLISH.toString())
             .build().toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(respondentLip).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(respondentLip))
             .build();
     }
 
@@ -120,11 +120,10 @@ class CaseDismissClaimantNotificationHandlerTest {
             .builder()
             .eventId(CaseEvent.NOTIFY_CLAIMANT_DISMISS_CASE.name())
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .caseData(caseData)
-            .type(ABOUT_TO_SUBMIT)
-            .build();
+            .type(ABOUT_TO_SUBMIT);
 
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isRespondentLiP && isRespondentBilingual) {

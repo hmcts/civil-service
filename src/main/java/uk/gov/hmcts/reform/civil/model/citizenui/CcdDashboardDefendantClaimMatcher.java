@@ -103,10 +103,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isEligibleForCCJ() {
-        if (isCasedDiscontinued()) {
+        if (isCasedDiscontinued() || isPaperResponse()) {
             return false;
         }
-        return (caseData.getRespondent1ResponseDeadline() != null
+        return (CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())
+            && caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() == null
             && caseData.getDefaultJudgmentDocuments().isEmpty());
@@ -274,8 +275,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean hasClaimEnded() {
         return (nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
             && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO)
-            && caseData.isRespondentResponseFullDefence())
-            || caseData.getApplicant1ResponseDeadlinePassed();
+            && caseData.isRespondentResponseFullDefence());
     }
 
     @Override
@@ -301,25 +301,23 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isSDOOrderInReview() {
-        return featureToggleService.isCaseProgressionEnabled()
-            && isSDOMadeByLegalAdviser()
-            && nonNull(caseData.getOrderRequestedForReviewDefendant())
-            && caseData.getOrderRequestedForReviewDefendant().equals(YES)
-            && !isDecisionForReconsiderationMade()
-            && !isSDODoneAfterDecisionForReconsiderationMade()
-            && !isGeneralOrderAfterDecisionForReconsiderationMade();
+        return isSDOMadeByLegalAdviser()
+                && nonNull(caseData.getOrderRequestedForReviewDefendant())
+                && caseData.getOrderRequestedForReviewDefendant().equals(YES)
+                && !isDecisionForReconsiderationMade()
+                && !isSDODoneAfterDecisionForReconsiderationMade()
+                && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
     public boolean isSDOOrderInReviewOtherParty() {
-        return featureToggleService.isCaseProgressionEnabled()
-            && isSDOMadeByLegalAdviser()
-            && nonNull(caseData.getOrderRequestedForReviewClaimant())
-            && caseData.getOrderRequestedForReviewClaimant().equals(YES)
-            && !isSDOOrderInReview()
-            && !isDecisionForReconsiderationMade()
-            && !isSDODoneAfterDecisionForReconsiderationMade()
-            && !isGeneralOrderAfterDecisionForReconsiderationMade();
+        return isSDOMadeByLegalAdviser()
+                && nonNull(caseData.getOrderRequestedForReviewClaimant())
+                && caseData.getOrderRequestedForReviewClaimant().equals(YES)
+                && !isSDOOrderInReview()
+                && !isDecisionForReconsiderationMade()
+                && !isSDODoneAfterDecisionForReconsiderationMade()
+                && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
@@ -332,7 +330,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isClaimantDefaultJudgement() {
-        return caseData.getRespondent1ResponseDeadline() != null
+        return (
+            caseData.isCcjRequestJudgmentByAdmission()
+            && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState()))
+            || caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
     }
@@ -395,11 +396,14 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean pausedForTranslationAfterResponse() {
-        if (!featureToggleService.isLipVLipEnabled()) {
-            return false;
+        if (!featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimUnderTranslationAfterDefResponse() && caseData.isRespondentResponseBilingual())
+            || (caseData.isClaimUnderTranslationAfterClaimantResponse() && caseData.isClaimantBilingual())) {
+            return true;
+        } else {
+            return featureToggleService.isWelshEnabledForMainCase()
+                && (caseData.isClaimUnderTranslationAfterDefResponse() || caseData.isClaimUnderTranslationAfterClaimantResponse())
+                && (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual());
         }
-        return (caseData.getRespondent1ClaimResponseTypeForSpec() != null && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-            || (caseData.getApplicant1ResponseDate() != null && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION);
     }
 
     @Override

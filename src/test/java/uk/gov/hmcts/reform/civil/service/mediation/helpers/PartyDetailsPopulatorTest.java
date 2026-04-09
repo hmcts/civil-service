@@ -19,17 +19,16 @@ public class PartyDetailsPopulatorTest {
 
     @Test
     void shouldPopulateLitigantWithCorrectInfo_whenAllFieldsProvided() {
-        PartyFlags flags = PartyFlags.builder().roleOnCase("Defendant").build();
-        Party party = Party.builder()
-            .partyID("P1")
-            .type(Type.INDIVIDUAL)
-            .individualFirstName("John")
-            .individualLastName("Doe")
-            .flags(flags)
-            .build();
+        PartyFlags flags = (PartyFlags) new PartyFlags().setRoleOnCase("Defendant");
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
-        MediationLitigant litigant = partyDetailsPopulator.populator(builder, party).build();
+        Party party = new Party();
+        party.setPartyID("P1");
+        party.setType(Type.INDIVIDUAL);
+        party.setIndividualFirstName("John");
+        party.setIndividualLastName("Doe");
+        party.setFlags(flags);
+
+        MediationLitigant litigant = partyDetailsPopulator.populator(new MediationLitigant(), party);
 
         assertThat(litigant.getPartyID()).isEqualTo("P1");
         assertThat(litigant.getPartyRole()).isEqualTo("Defendant");
@@ -40,16 +39,13 @@ public class PartyDetailsPopulatorTest {
 
     @Test
     void shouldHandleNullFlags_whenFlagsAreNotProvided() {
-        Party party = Party.builder()
-            .partyID("P2")
-            .type(Type.COMPANY)
-            .individualFirstName("John")
-            .individualLastName("Doe")
-            .flags(null)
-            .build();
+        Party party = new Party()
+            .setPartyID("P2")
+            .setType(Type.COMPANY)
+            .setIndividualFirstName("John")
+            .setIndividualLastName("Doe");
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
-        MediationLitigant litigant = partyDetailsPopulator.populator(builder, party).build();
+        MediationLitigant litigant = partyDetailsPopulator.populator(new MediationLitigant(), party);
 
         assertThat(litigant.getPartyID()).isEqualTo("P2");
         assertThat(litigant.getPartyRole()).isNull();

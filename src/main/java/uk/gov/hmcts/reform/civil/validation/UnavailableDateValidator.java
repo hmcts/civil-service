@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.IsPresentOrEqualToOrLessT
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.Validator;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class UnavailableDateValidator implements
     ConstraintValidator<IsPresentOrEqualToOrLessThanOneYearInTheFuture, UnavailableDate> {
 
+    private static final String DETAILS_OF_UNAVAILABLE_DATE_REQUIRED = "Details of unavailable date required";
     private final Validator validator;
 
     @Override
@@ -37,7 +38,7 @@ public class UnavailableDateValidator implements
     public List<String> validate(Hearing hearing) {
         List<String> errors = new ArrayList<>();
         if (hearing.getUnavailableDatesRequired() == YES && isNullOrEmpty(hearing)) {
-            errors.add("Details of unavailable date required");
+            errors.add(DETAILS_OF_UNAVAILABLE_DATE_REQUIRED);
         }
 
         if (hearing.getUnavailableDatesRequired() == YES && !isNullOrEmpty(hearing)) {
@@ -55,7 +56,7 @@ public class UnavailableDateValidator implements
                 List<Element<UnavailableDate>> unavailableDate = hearingLRspec.getUnavailableDates();
                 errors = dateValidation(unavailableDate);
             } else {
-                errors.add("Details of unavailable date required");
+                errors.add(DETAILS_OF_UNAVAILABLE_DATE_REQUIRED);
             }
         }
         return errors;
@@ -65,7 +66,7 @@ public class UnavailableDateValidator implements
         List<String> errors = new ArrayList<>();
         if (smallClaimHearing.getUnavailableDatesRequired() == YES
             && isSmallClaimHearingNullOrEmpty(smallClaimHearing)) {
-            errors.add("Details of unavailable date required");
+            errors.add(DETAILS_OF_UNAVAILABLE_DATE_REQUIRED);
         }
         if (smallClaimHearing.getUnavailableDatesRequired() == YES
             && !isSmallClaimHearingNullOrEmpty(smallClaimHearing)) {
@@ -80,7 +81,7 @@ public class UnavailableDateValidator implements
     public List<String> validateAdditionalUnavailableDates(List<Element<UnavailableDate>> dates) {
         List<Element<UnavailableDate>> unavailableDates = ofNullable(dates).orElse(emptyList());
         if (unavailableDates.isEmpty()) {
-            return List.of("Details of unavailable date required");
+            return List.of(DETAILS_OF_UNAVAILABLE_DATE_REQUIRED);
         }
 
         return dateValidation(unavailableDates);
@@ -118,12 +119,12 @@ public class UnavailableDateValidator implements
             UnavailableDate unavailableDateElement = element.getValue();
             if (UnavailableDateType.SINGLE_DATE == unavailableDateElement.getUnavailableDateType()
                 && unavailableDateElement.getDate() == null) {
-                errors.add("Details of unavailable date required");
+                errors.add(DETAILS_OF_UNAVAILABLE_DATE_REQUIRED);
             }
             if (UnavailableDateType.DATE_RANGE == unavailableDateElement.getUnavailableDateType()) {
                 if (unavailableDateElement.getFromDate() == null
                     || unavailableDateElement.getToDate() == null) {
-                    errors.add("Details of unavailable date required");
+                    errors.add(DETAILS_OF_UNAVAILABLE_DATE_REQUIRED);
                 }
             }
             if (checkOneYearValidation(unavailableDateElement.getDate())

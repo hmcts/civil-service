@@ -75,18 +75,16 @@ class BundleDocumentsRetrievalTest {
             "14 Apr 2024 00:00:00"
         );
 
-        UploadEvidenceExpert uploadEvidenceExpert = UploadEvidenceExpert.builder()
-            .expertOptionName("Expert1")
-            .expertDocument(documentTest)
-            .build();
+        UploadEvidenceExpert uploadEvidenceExpert = new UploadEvidenceExpert()
+            .setExpertOptionName("Expert1")
+            .setExpertDocument(documentTest);
 
         List<Element<UploadEvidenceExpert>> listOfDocs = new ArrayList<>();
-        listOfDocs.add(Element.<UploadEvidenceExpert>builder().value(uploadEvidenceExpert).build());
+        listOfDocs.add(new Element<UploadEvidenceExpert>().setValue(uploadEvidenceExpert));
 
         List<BundlingRequestDocument> expectedConvertedDocs = List.of(
-            BundlingRequestDocument.builder()
-                .documentFileName("Name")
-                .build()
+            new BundlingRequestDocument()
+                .setDocumentFileName("Name")
         );
 
         try (MockedStatic<BundleFileNameHelper> bundleFileNameHelper = mockStatic(BundleFileNameHelper.class)) {
@@ -116,26 +114,24 @@ class BundleDocumentsRetrievalTest {
             "14 Apr 2024 00:00:00"
         );
 
-        UploadEvidenceExpert uploadEvidenceExpert = UploadEvidenceExpert.builder()
-            .expertOptionName("Expert1")
-            .expertOptionOtherParty("James Gordon")
-            .expertDocument(documentTest)
-            .build();
+        UploadEvidenceExpert uploadEvidenceExpert = new UploadEvidenceExpert()
+            .setExpertOptionName("Expert1")
+            .setExpertOptionOtherParty("James Gordon")
+            .setExpertDocument(documentTest);
 
         List<Element<UploadEvidenceExpert>> listOfDocs = new ArrayList<>();
-        listOfDocs.add(Element.<UploadEvidenceExpert>builder().value(uploadEvidenceExpert).build());
+        listOfDocs.add(new Element<UploadEvidenceExpert>().setValue(uploadEvidenceExpert));
 
         Map<String, List<Element<UploadEvidenceExpert>>> expectedGroupedDocuments = new HashMap<>();
         expectedGroupedDocuments.put("Expert1", listOfDocs);
 
         List<BundlingRequestDocument> expectedBundlingRequestDocs = List.of(
-            BundlingRequestDocument.builder()
-                .documentFileName("Name")
-                .build()
+            new BundlingRequestDocument()
+                .setDocumentFileName("Name")
         );
 
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().individualFirstName("James").individualLastName("Gordon").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualFirstName("James").setIndividualLastName("Gordon").setType(Party.Type.INDIVIDUAL))
             .documentExpertReport(new ArrayList<>())
             .documentQuestionsRes2(listOfDocs)
             .build();
@@ -163,21 +159,19 @@ class BundleDocumentsRetrievalTest {
 
         Document documentTest1 = new Document("testUrl1", "binUrl1", "Name1", "hash1", null, "14 Apr 2024 00:00:00");
 
-        UploadEvidenceExpert uploadEvidenceExpert1 = UploadEvidenceExpert.builder()
-            .expertOptionName("Expert1")
-            .expertDocument(documentTest1)
-            .build();
+        UploadEvidenceExpert uploadEvidenceExpert1 = new UploadEvidenceExpert()
+            .setExpertOptionName("Expert1")
+            .setExpertDocument(documentTest1);
 
         List<Element<UploadEvidenceExpert>> listOfDocs = new ArrayList<>();
-        listOfDocs.add(Element.<UploadEvidenceExpert>builder().value(uploadEvidenceExpert1).build());
+        listOfDocs.add(new Element<UploadEvidenceExpert>().setValue(uploadEvidenceExpert1));
 
         Map<String, List<Element<UploadEvidenceExpert>>> expectedGroupedDocuments = new HashMap<>();
         expectedGroupedDocuments.put("Expert1", listOfDocs);
 
         List<BundlingRequestDocument> expectedBundlingRequestDocs = List.of(
-            BundlingRequestDocument.builder()
-                .documentFileName("Name1")
-                .build()
+            new BundlingRequestDocument()
+                .setDocumentFileName("Name1")
         );
 
         PartyType partyType = PartyType.CLAIMANT1;

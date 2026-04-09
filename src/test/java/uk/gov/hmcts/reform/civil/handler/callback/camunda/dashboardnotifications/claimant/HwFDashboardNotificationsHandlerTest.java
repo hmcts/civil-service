@@ -78,13 +78,11 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
                 .buildClaimIssuedPaymentCaseData();
-            caseData = caseData.toBuilder()
-                .hwfFeeType(FeeType.CLAIMISSUED)
-                .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                           .hwfCaseEvent(hwfEvent)
-                                           .build())
-                .applicant1Represented(YesOrNo.NO)
-                .build();
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
+            HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
+            helpWithFeesDetails.setHwfCaseEvent(hwfEvent);
+            caseData.setClaimIssuedHwfDetails(helpWithFeesDetails);
+            caseData.setApplicant1Represented(YesOrNo.NO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("typeOfFee", "claim");
@@ -106,7 +104,7 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 dashboardScenario.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -116,15 +114,11 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
                 .buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails();
-            caseData = caseData.toBuilder()
-                .hwfFeeType(FeeType.HEARING)
-                .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                           .hwfCaseEvent(hwfEvent)
-                                           .build())
-                .applicant1Represented(YesOrNo.NO)
-                .build();
-
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+            caseData.setHwfFeeType(FeeType.HEARING);
+            HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
+            helpWithFeesDetails.setHwfCaseEvent(hwfEvent);
+            caseData.setHearingHwfDetails(helpWithFeesDetails);
+            caseData.setApplicant1Represented(YesOrNo.NO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("hearingFeeRemissionAmount", "£1000");
@@ -145,7 +139,7 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 dashboardScenario.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -155,14 +149,11 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
                 .buildClaimIssuedPaymentCaseData();
-
-            caseData = caseData.toBuilder()
-                .hwfFeeType(null)
-                .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                       .hwfCaseEvent(hwfEvent)
-                                       .build())
-                .applicant1Represented(YesOrNo.NO)
-                .build();
+            caseData.setHwfFeeType(null);
+            HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
+            helpWithFeesDetails.setHwfCaseEvent(hwfEvent);
+            caseData.setHearingHwfDetails(helpWithFeesDetails);
+            caseData.setApplicant1Represented(YesOrNo.NO);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
@@ -181,12 +172,9 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
                 .buildClaimIssuedPaymentCaseData();
-
-            caseData = caseData.toBuilder()
-                .hwfFeeType(FeeType.HEARING)
-                .hearingHwfDetails(null)
-                .applicant1Represented(YesOrNo.NO)
-                .build();
+            caseData.setHwfFeeType(FeeType.HEARING);
+            caseData.setHearingHwfDetails(null);
+            caseData.setApplicant1Represented(YesOrNo.NO);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
@@ -205,14 +193,11 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
                 .buildClaimIssuedPaymentCaseData();
-
-            caseData = caseData.toBuilder()
-                .hwfFeeType(FeeType.HEARING)
-                .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                .hwfCaseEvent(hwfEvent)
-                                .build())
-                .applicant1Represented(YesOrNo.YES)
-                .build();
+            caseData.setHwfFeeType(FeeType.HEARING);
+            HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
+            helpWithFeesDetails.setHwfCaseEvent(hwfEvent);
+            caseData.setHearingHwfDetails(helpWithFeesDetails);
+            caseData.setApplicant1Represented(YesOrNo.YES);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()

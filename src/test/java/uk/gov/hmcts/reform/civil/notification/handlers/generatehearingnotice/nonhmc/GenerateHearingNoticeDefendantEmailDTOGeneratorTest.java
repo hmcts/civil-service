@@ -66,11 +66,9 @@ class GenerateHearingNoticeDefendantEmailDTOGeneratorTest {
     @Test
     void getEmailTemplateId_returnsWelsh_whenBilingual() {
         CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(CaseDataLiP.builder()
-                        .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                .respondent1ResponseLanguage(Language.BOTH.toString())
-                                .build())
-                        .build())
+                .caseDataLip(new CaseDataLiP()
+                        .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();
         when(notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh())
                 .thenReturn(WELSH_TEMPLATE);
@@ -93,9 +91,9 @@ class GenerateHearingNoticeDefendantEmailDTOGeneratorTest {
                 .legacyCaseReference(CASE_REF)
                 .hearingDate(HEARING_DATE_VAL)
                 .hearingTimeHourMinute(TIME_ARG)
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
-                .respondent1(Party.builder().individualFirstName("Defendant")
-                            .individualLastName("Org").type(Party.Type.INDIVIDUAL).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
+                .respondent1(new Party().setIndividualFirstName("Defendant")
+                            .setIndividualLastName("Org").setType(Party.Type.INDIVIDUAL))
                 .build();
 
         try (MockedStatic<NotificationUtils> utils = mockStatic(NotificationUtils.class)) {

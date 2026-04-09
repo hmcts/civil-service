@@ -9,10 +9,10 @@ import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.OrderCallbackHandler;
-import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_WITHOUT_UPLOAD_FILES_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS;
@@ -40,8 +42,9 @@ import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsucc
 @Service
 public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
+    private static final String CLAIMANT = "CLAIMANT";
     private final ObjectMapper objectMapper;
-    protected final WorkingDayIndicator workingDayIndicator;
+    protected final WorkingDayIndicator localWorkingDayIndicator;
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
@@ -49,18 +52,21 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
     public static final String GA = "Applications";
+    private final SdoCaseClassificationService sdoCaseClassificationService;
 
     public OrderMadeClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                 DashboardNotificationsParamsMapper mapper,
                                                 FeatureToggleService featureToggleService, ObjectMapper objectMapper,
                                                 WorkingDayIndicator workingDayIndicator,
                                                 DashboardNotificationService dashboardNotificationService,
-                                                TaskListService taskListService) {
+                                                TaskListService taskListService,
+                                                SdoCaseClassificationService sdoCaseClassificationService) {
         super(dashboardScenariosService, mapper, featureToggleService, workingDayIndicator);
         this.objectMapper = objectMapper;
-        this.workingDayIndicator = workingDayIndicator;
+        this.localWorkingDayIndicator = workingDayIndicator;
         this.dashboardNotificationService = dashboardNotificationService;
         this.taskListService = taskListService;
+        this.sdoCaseClassificationService = sdoCaseClassificationService;
     }
 
     @Override
@@ -77,34 +83,49 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (isNull(caseData.getRequestForReconsiderationDeadline())
             && isSDOEvent(callbackParams)
             && isEligibleForReconsideration(caseData)) {
-            caseDataBuilder.requestForReconsiderationDeadline(getDateWithoutBankHolidays());
+            caseData.setRequestForReconsiderationDeadline(getDateWithoutBankHolidays());
         }
-        HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.mapCaseDataToParams(caseDataBuilder.build(), caseEvent);
+        HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.mapCaseDataToParams(caseData, caseEvent);
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String scenario = getScenario(caseData, callbackParams);
+
+        List<String> addNocNotificationScenarios = List.of(
+            SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario()
+        );
+
+        if (caseData.isLipvLROneVOne() && addNocNotificationScenarios.contains(scenario)) {
+            dashboardScenariosService.recordScenarios(
+                authToken,
+                SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                new ScenarioRequestParams(paramsMap)
+            );
+        }
+
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 scenario,
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(paramsMap).build()
+                new ScenarioRequestParams(paramsMap)
             );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper)).build();
+            .data(caseData.toMap(objectMapper)).build();
     }
 
     @Override
     protected String getScenario(CaseData caseData, CallbackParams callbackParams) {
         if (isSDOEvent(callbackParams)
-            && isEligibleForReconsideration(caseData)) {
+            && isEligibleForReconsideration(caseData)
+            && Objects.isNull(caseData.getIsReferToJudgeClaim())) {
             deleteNotificationAndInactiveTasks(caseData);
             return SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario();
         }
@@ -166,26 +187,28 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     }
 
     private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
-        return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
+        return sdoCaseClassificationService.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
     }
 
     private void deleteNotificationAndInactiveTasks(CaseData caseData) {
 
         dashboardNotificationService.deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
-            "CLAIMANT"
+            CLAIMANT
         );
-        if ((getFeatureToggleService().isGaForLipsEnabledAndLocationWhiteListed(caseData
-                                                                                    .getCaseManagementLocation().getBaseLocation()))) {
+        if (getFeatureToggleService().isLocationWhiteListed(caseData
+                                                                                   .getCaseManagementLocation()
+                                                                                   .getBaseLocation())
+            || getFeatureToggleService().isCuiGaNroEnabled()) {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
                 caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
+                CLAIMANT,
                 GA
             );
         } else {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
-                "CLAIMANT"
+                CLAIMANT
             );
         }
     }

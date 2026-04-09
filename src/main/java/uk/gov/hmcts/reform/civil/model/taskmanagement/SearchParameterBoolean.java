@@ -1,0 +1,18 @@
+package uk.gov.hmcts.reform.civil.model.taskmanagement;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@EqualsAndHashCode
+@ToString
+public class SearchParameterBoolean implements SearchParameter<Boolean> {
+
+    private SearchParameterKey key;
+    private SearchOperator operator;
+
+    @JsonProperty("value")
+    private Boolean values;
+}

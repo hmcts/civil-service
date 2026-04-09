@@ -71,24 +71,11 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         @BeforeEach
         void setup() {
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isGeneralApplicationsEnabled()).thenReturn(true);
         }
 
         @Test
         void shouldNotCallRecordScenario_whenLipVLipIsDisabled() {
             when(toggleService.isLipVLipEnabled()).thenReturn(false);
-
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-                .build();
-
-            handler.handle(callbackParams);
-            verifyNoInteractions(dashboardScenariosService);
-        }
-
-        @Test
-        void shouldNotCallRecordScenario_whenGeneralApplicationIsDisabled() {
-            when(toggleService.isGeneralApplicationsEnabled()).thenReturn(false);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
@@ -178,9 +165,8 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         @Test
         void shouldEmptyResponse_whenEventIsLrClaimant() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
-                    .build());
+                new GeneralApplication()
+                    .setCaseLink(new CaseLink("12345678")));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
@@ -201,9 +187,8 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         @Test
         void shouldEmptyResponse_whenEventIsLrDefendant() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
-                    .build());
+                new GeneralApplication()
+                    .setCaseLink(new CaseLink("12345678")));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
@@ -224,9 +209,8 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         @Test
         void shouldEmptyResponse_whenGeneralApplicationsForClaimantNull() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
-                    .build());
+                new GeneralApplication()
+                    .setCaseLink(new CaseLink("12345678")));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
@@ -246,16 +230,15 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                new ScenarioRequestParams(new HashMap<>())
             );
         }
 
         @Test
         void shouldEmptyResponse_whenGeneralApplicationsForClaimantEmpty() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
-                    .build());
+                new GeneralApplication()
+                    .setCaseLink(new CaseLink("12345678")));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
@@ -275,22 +258,20 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                new ScenarioRequestParams(new HashMap<>())
             );
         }
 
         @Test
         void shouldReturnResponse_whenGeneralApplicationsForClaimantExist() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
-                    .build());
+                new GeneralApplication()
+                    .setCaseLink(new CaseLink("12345678")));
 
             List<Element<GeneralApplicationsDetails>> gaApplicationsClaimant = wrapElements(
-                GeneralApplicationsDetails.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
-                    .caseState("Awaiting Respondent Response")
-                    .build());
+                new GeneralApplicationsDetails()
+                    .setCaseLink(new CaseLink("12345678"))
+                    .setCaseState("Awaiting Respondent Response"));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
@@ -312,16 +293,15 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                new ScenarioRequestParams(new HashMap<>())
             );
         }
 
         @Test
         void shouldEmptyResponse_whenGeneralApplicationsForDefendantNull() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
-                    .build());
+                new GeneralApplication()
+                    .setCaseLink(new CaseLink("12345678")));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
@@ -341,16 +321,15 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                new ScenarioRequestParams(new HashMap<>())
             );
         }
 
         @Test
         void shouldEmptyResponse_whenGeneralApplicationsForDefendantEmpty() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
-                    .build());
+                new GeneralApplication()
+                    .setCaseLink(new CaseLink("12345678")));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
@@ -370,22 +349,20 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                new ScenarioRequestParams(new HashMap<>())
             );
         }
 
         @Test
         void shouldReturnResponse_whenGeneralApplicationsForDefendantExist() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
-                    .build());
+                new GeneralApplication()
+                    .setCaseLink(new CaseLink("12345678")));
 
             List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails = wrapElements(
-                GADetailsRespondentSol.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
-                    .caseState("Awaiting Respondent Response")
-                    .build());
+                new GADetailsRespondentSol()
+                    .setCaseLink(new CaseLink("12345678"))
+                    .setCaseState("Awaiting Respondent Response"));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
@@ -407,7 +384,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                new ScenarioRequestParams(new HashMap<>())
             );
         }
     }

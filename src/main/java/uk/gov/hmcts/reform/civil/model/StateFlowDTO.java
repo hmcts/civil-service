@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.Optional;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Accessors(chain = true)
 public class StateFlowDTO {
 
     private State state;

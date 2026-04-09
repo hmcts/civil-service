@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -7,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public abstract class EmailDTOGenerator implements NotificationData {
 
     @Autowired
@@ -17,13 +19,16 @@ public abstract class EmailDTOGenerator implements NotificationData {
     public EmailDTO buildEmailDTO(CaseData caseData, String taskId) {
         Map<String, String> properties = addProperties(caseData);
         addCustomProperties(properties, caseData);
-        return EmailDTO.builder()
-            .targetEmail(getEmailAddress(caseData))
-            .emailTemplate(getEmailTemplateId(caseData, taskId))
-            .parameters(properties)
-            .reference(String.format(getReferenceTemplate(),
-                caseData.getLegacyCaseReference()))
-            .build();
+        String emailReference = String.format(getReferenceTemplate(),
+                                         caseData.getLegacyCaseReference());
+        log.info("buildEmailDTO for taskId: {} and email: {} and reference: {}",
+                 taskId, getEmailAddress(caseData), emailReference);
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setTargetEmail(getEmailAddress(caseData));
+        emailDTO.setEmailTemplate(getEmailTemplateId(caseData, taskId));
+        emailDTO.setParameters(properties);
+        emailDTO.setReference(emailReference);
+        return emailDTO;
     }
 
     public Map<String, String> addProperties(CaseData caseData) {

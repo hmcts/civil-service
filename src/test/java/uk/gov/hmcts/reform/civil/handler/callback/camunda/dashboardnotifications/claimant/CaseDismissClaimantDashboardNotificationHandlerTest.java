@@ -53,11 +53,11 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
     @Test
     void shouldRecordScenario_whenInvoked() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
-            .ccdCaseReference(1234L)
-            .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(1234L);
+        caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
@@ -83,7 +83,7 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
             "BEARER_TOKEN",
             SCENARIO_AAA6_DISMISS_CASE_CLAIMANT.getScenario(),
             caseId,
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -94,10 +94,9 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
-            .includesApplicantCitizenQueryFollowUp(queryDate)
-            .build().toBuilder()
-            .ccdCaseReference(1234L)
-            .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+            .includesApplicantCitizenQueryFollowUp(queryDate).build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
@@ -115,13 +114,13 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
             "BEARER_TOKEN",
             SCENARIO_AAA6_DISMISS_CASE_CLAIMANT.getScenario(),
             caseId,
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT.getScenario(),
             caseId,
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 }

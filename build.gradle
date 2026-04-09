@@ -5,38 +5,40 @@ plugins {
   id 'checkstyle'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.7'
-  id 'org.springframework.boot' version '2.7.18'
-  id 'org.owasp.dependencycheck' version '12.1.3'
-  id 'com.github.ben-manes.versions' version '0.52.0'
-  id 'org.sonarqube' version '6.2.0.5505'
+  id 'org.springframework.boot' version '3.3.7'
+  id 'org.owasp.dependencycheck' version '12.2.0'
+  id 'com.github.ben-manes.versions' version '0.53.0'
+  id 'org.sonarqube' version '6.3.1.5724'
   id 'au.com.dius.pact' version '4.6.17'
-  id "io.freefair.lombok" version "8.14"
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.1810'
+  id "io.freefair.lombok" version "8.14.4"
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.2017'
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
+  id "org.gradle.test-retry" version "1.6.2"
 }
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 def versions = [
-  junit             : '5.11.4',
-  junitPlatform     : '1.11.4',
+  junit             : '5.14.3',
+  junitPlatform     : '1.14.3',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.38',
-  springSecurity    : '5.8.16',
   camunda           : '7.20.0',
-  jackson           : '2.19.2',
-  testcontainers    : '1.21.3',
-  pdfbox            : '3.0.5',
-  tika              : '2.9.4'
+  testcontainers    : '1.21.4',
+  pdfbox            : '3.0.6',
+  tika              : '3.2.3'
 ]
 
 allprojects {
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
+
   java {
     toolchain {
-      languageVersion = JavaLanguageVersion.of(17)
+      languageVersion = JavaLanguageVersion.of(21)
     }
   }
 
@@ -52,10 +54,19 @@ allprojects {
     maxWarnings = 0
     toolVersion = '10.26.1'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
+    ignoreFailures = System.getenv('CHECKSTYLE_SKIP') == 'true'
+  }
+
+// Only create HTML Checkstyle reports
+  tasks.withType(Checkstyle).configureEach {
+    reports {
+      xml.required = false
+      html.required = true
+    }
   }
 
   jacoco {
-    toolVersion = '0.8.8' // jacocoMavenPluginVersion
+    toolVersion = '0.8.14' // jacocoMavenPluginVersion
     reportsDirectory = file("$buildDir/reports/jacoco")
   }
 
@@ -93,52 +104,24 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
-      dependencySet(group: 'com.google.guava', version: '33.4.8-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.5.0-jre') {
         entry 'guava'
       }
 
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.25'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.25'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.25'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.25'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.25'
-
-      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
-
-      //Solves CVE-2023-34034
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.2'
-
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
+      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.3.2'
 
       // To prevent other libraries using conflicting versions
       dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.17'
 
-      // solves CVE-2022-25857
-      dependencySet(
-        group: 'org.yaml',
-        version: '2.4'
-      ) {
-        entry 'snakeyaml'
-      }
-
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.43') {
-        entry 'tomcat-embed-core'
-        entry 'tomcat-embed-el'
-        entry 'tomcat-embed-websocket'
-      }
-
-      //Solves CVE-2023-6481
-      dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
-        entry 'logback-core'
-        entry 'logback-classic'
+      dependencySet(group: 'org.apache.httpcomponents.core5', version: '5.4.1') {
+        entry 'httpcore5'
+        entry 'httpcore5-h2'
       }
 
     }
     imports {
-      mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.22.0"
+      mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2023.0.6'
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.24.1"
     }
   }
 
@@ -176,15 +159,7 @@ sourceSets {
 }
 
 tasks.withType(JavaCompile) {
-  options.compilerArgs << "-Xlint:unchecked" << "-Werror"
-}
-
-tasks.withType(Test) {
-  useJUnitPlatform()
-  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
-  testLogging {
-    exceptionFormat = 'full'
-  }
+  options.compilerArgs << "-Xlint:unchecked" << "-Xlint:-removal" << "-Werror"
 }
 
 test {
@@ -201,9 +176,16 @@ task integration(type: Test) {
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
-  failFast = true
+  failFast = System.getenv('GITHUB_ACTIONS') == 'true' ? false : true
   testLogging.showStandardStreams = false
 
+  if (System.getenv('GITHUB_ACTIONS') == 'true') {
+    retry {
+      maxRetries = 3
+      maxFailures = 10
+      failOnPassedAfterRetry = false
+    }
+  }
 }
 
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
@@ -218,7 +200,7 @@ task awaitApplicationReadiness(type: Exec, description: 'Awaits until applicatio
 }
 
 task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:smoke'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:civil-service-smoke'
 }
 
 task runApiTests(type: Exec, description: 'Runs Prod features in functional tests.') {
@@ -262,16 +244,28 @@ sonarqube {
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/PaymentRequestUpdateCallbackService.java, **/advice/**, **/dashboard/cache/**"
-    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
-    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**, **/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java" +
+    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java, **/notification/handlers/respondtoquery/**/*EmailDTOGenerator.java, **/notification/handlers/respondtoquery/RespondToQueryHelper.java, **/handler/migration/FixDashboardParamsTextTask.java"
+    property "sonar.exclusions", "**/model/**, **/hmc/model/**, **/model/hearingvalues/**, **/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java" +
       ", **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java, **/utils/**, **/filters/**, **/handler/callback/camunda/dashboardnotifications/defendant/MoreTimeRequestedDashboardNotificationDefendantHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantMediationSuccessfulDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimSettledDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/HearingScheduledClaimantNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/defendant/SettleClaimPaidInFullDefendantDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/defendant/DefendantNotifyDiscontinuanceDashboardNotificationHandler.java" +
-      ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java, **/handler/callback/user/RespondQueryCallbackHandler.java, **/service/servicebus/CcdCaseEventsExecutor.java, **/tasklisteners/MigrateCasesTaskListener.java, **/migration/MigrationTask.java, **/migration/CustomRequestScopeAttr.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantFullAdmitPayImmediatelyCCJNotificationHandler.java"
+      ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java,**/handler/migration/MigrateCaseQueriesTask.java, **/handler/callback/user/RespondQueryCallbackHandler.java, **/service/servicebus/CcdCaseEventsExecutor.java, **/tasklisteners/MigrateCasesTaskListener.java, **/migration/MigrationTask.java, **/migration/CustomRequestScopeAttr.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
+    property "sonar.gradle.skipCompile", System.getenv("SONAR_SKIP_COMPILE") ?: "false"
+    property "sonar.branch.cache.enabled", "true"
+    property "sonar.working.directory", "${buildDir}/sonar"
+  }
+}
+
+configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
+  sonarqube {
+    properties {
+      property "sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    }
   }
 }
 
 jacocoTestReport {
+  dependsOn "bootStartScripts"
   executionData(test, integration)
   executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
   subprojects.each {
@@ -282,10 +276,27 @@ jacocoTestReport {
     csv.required.set(false)
     xml.outputLocation.set(file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml"))
   }
+  dependsOn tasks.named('bootStartScripts')
+  dependsOn tasks.named('startScripts')
 }
 
 jacocoTestReport.dependsOn {
   subprojects*.test
+}
+
+jacocoTestReport.dependsOn subprojects.collect { project ->
+  project.tasks.findByName('jacocoTestReport')
+}.findAll { it != null }
+
+jacocoTestReport.dependsOn tasks.matching {
+  it.name.startsWith('compile')
+          || it.name.startsWith('process')
+          || it.name.equals('startScripts')
+          || it.name.equals('bootStartScripts')
+}
+
+tasks.named('test') {
+  finalizedBy jacocoTestReport
 }
 
 ext.libraries = [
@@ -298,36 +309,41 @@ ext.libraries = [
   ]
 ]
 
-configurations.all {
-  resolutionStrategy.eachDependency { details ->
-    if (details.requested.group == 'org.projectlombok') {
-      details.useVersion versions.lombok
-    }
-    if (details.requested.group == 'io.netty') {
-      if (details.requested.name in [
-        'netty-buffer', 'netty-codec', 'netty-codec-dns',
-        'netty-codec-http', 'netty-codec-http2', 'netty-codec-socks',
-        'netty-common', 'netty-handler', 'netty-handler-proxy',
-        'netty-resolver', 'netty-resolver-dns', 'netty-resolver-dns-classes-macos',
-        'netty-resolver-dns-native-macos',
-        'netty-transport', 'netty-transport-classes-epoll',
-        'netty-transport-classes-kqueue', 'netty-transport-native-epoll',
-        'netty-transport-native-kqueue', 'netty-transport-native-unix-common'
-      ]) {
-        details.useVersion('4.1.118.Final')
-        details.because('CVE-2025-25193')
+allprojects {
+  configurations.all {
+    resolutionStrategy.eachDependency { details ->
+      if (details.requested.group == 'org.projectlombok') {
+        details.useVersion versions.lombok
+      }
+      if (details.requested.group == 'io.netty') {
+        if (details.requested.name in [
+          'netty-buffer', 'netty-codec', 'netty-codec-dns',
+          'netty-codec-http', 'netty-codec-http2', 'netty-codec-socks',
+          'netty-common', 'netty-handler', 'netty-handler-proxy',
+          'netty-resolver', 'netty-resolver-dns', 'netty-resolver-dns-classes-macos',
+          'netty-resolver-dns-native-macos',
+          'netty-transport', 'netty-transport-classes-epoll',
+          'netty-transport-classes-kqueue', 'netty-transport-native-epoll',
+          'netty-transport-native-kqueue', 'netty-transport-native-unix-common'
+        ]) {
+          details.useVersion('4.1.129.Final')
+          details.because('CVE-2025-25193, CVE-2025-67735')
+        }
+      }
+      if (details.requested.group == 'org.apache.logging.log4j') {
+        details.useVersion('2.25.3')
+        details.because('CVE-2025-68161 vendor recommended version')
       }
     }
+    exclude group: 'org.springframework.security', module: 'spring-security-rsa'
+    exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
   }
-  exclude group: 'org.springframework.security', module: 'spring-security-rsa'
-  exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
 }
 
 dependencies {
   def withoutJunit4 = {
     exclude group: 'junit', module: 'junit'
   }
-  implementation 'com.github.hmcts:civil-commons:1.1.12'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
@@ -343,31 +359,32 @@ dependencies {
 
   // CVE-2025-48734 force update of commons-beanutils.
   implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
-  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
-  implementation group: 'javax.persistence', name: 'javax.persistence-api'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.10'
+  implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.49.5'
-  implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.51.0'
+  implementation group: 'org.jdbi', name: 'jdbi3-spring', version: '3.51.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
 
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
+  implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '10.22.0'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
   implementation group: 'org.apache.tika', name: 'tika-core', version: versions.tika
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.6'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.9.3'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: '6.1.9'
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.7'
 
-  implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.1.1'
+  implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
+  implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.2.0'
   implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
-  implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23.1'
+  implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.1.1'
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version:'7.4'
-  implementation('com.github.hmcts:fees-java-client:0.0.6') {
+  implementation('com.github.hmcts:fees-java-client:0.1.0') {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
   }
   implementation('com.github.hmcts:payments-java-client:1.6.7') {
@@ -382,29 +399,32 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
-  implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.2'
+  implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.3'
 
-  implementation group: 'org.springframework.security', name: 'spring-security-web', version: versions.springSecurity
-  implementation group: 'org.springframework.security', name: 'spring-security-config', version: versions.springSecurity
-  implementation group: 'org.springframework.security', name: 'spring-security-core', version: versions.springSecurity
-  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: versions.springSecurity
-  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
-  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
-  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.48'
-  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
-  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.2'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.1'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.25.1'
-  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.107'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.43'
+  implementation group: 'org.springframework.security', name: 'spring-security-web'
+  implementation group: 'org.springframework.security', name: 'spring-security-config'
+  implementation group: 'org.springframework.security', name: 'spring-security-core'
+  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
+  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
+  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
+  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.8'
+  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.13.0'
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.3'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.3'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.25.3'
+  constraints {
+    implementation('org.apache.logging.log4j:log4j-core:2.25.3') {
+      because 'CVE-2025-68161 (upgrade to vendor recommended version)'
+    }
+  }
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.15.0'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.8'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.9'
 
-  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
-  implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version: versions.jacksonDatabind
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin'
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
+  implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: versions.camunda
   implementation group: 'org.camunda.community.rest', name: 'camunda-platform-7-rest-client-spring-boot-starter', version: versions.camunda
@@ -413,54 +433,63 @@ dependencies {
   implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
 
   // JAX-B dependencies for JDK 9+
+  implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.5'
+  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.6'
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-  implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
-  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
+  runtimeOnly group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.9'
+  runtimeOnly group: 'com.sun.activation', name: 'javax.activation', version: '1.2.0'
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.55.5'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.12'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.57.1'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.17'
 
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
 
-  implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
+  implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '3.1.1'
+
+  implementation 'org.apache.poi:poi:5.5.1'
+  implementation 'org.apache.poi:poi-ooxml:5.5.1'
+  implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6'
 
   testImplementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
   testImplementation group: 'org.apache.pdfbox', name: 'preflight', version: versions.pdfbox, withoutJunit4
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.6'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.6'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.18.7'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.18.7'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   testImplementation libraries.junit5
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher:${versions.junitPlatform}"
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
-  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
+  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.7'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
   //pact contract testing
-  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
+  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.17'
+  contractTestImplementation 'au.com.dius.pact.provider:junit5:4.6.17'
+  contractTestImplementation 'au.com.dius.pact.provider:junit5spring:4.6.17'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.4')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.4')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.14.3')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.14.3')
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.4')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.4')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.14.3')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.14.3')
 
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
-  testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
+  testImplementation group: 'com.h2database', name: 'h2', version: '2.4.240'
   // dashboard specific changes ends
 
 
@@ -468,7 +497,7 @@ dependencies {
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
   // https://mvnrepository.com/artifact/com.opencsv/opencsv
-  implementation group: 'com.opencsv', name: 'opencsv', version: '5.11.2', {
+  implementation group: 'com.opencsv', name: 'opencsv', version: '5.12.0', {
     exclude group: 'commons-collections', module: 'commons-collections'
   }
 }
@@ -551,10 +580,14 @@ project.ext {
 }
 
 pact {
+  broker {
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+  }
   publish {
     pactDirectory = 'pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
     tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+    consumerBranch = System.getenv("PACT_BRANCH_NAME") ?: 'Dev'
     version = project.pactVersion
   }
 }
@@ -564,6 +597,7 @@ tasks.register('contract', Test) {
   description = 'Runs the consumer Pact tests'
   setTestClassesDirs(sourceSets.contractTest.output.classesDirs)
   setClasspath(sourceSets.contractTest.runtimeClasspath)
+  useJUnitPlatform()
   systemProperty 'pact.rootDir', "pacts"
 }
 
@@ -573,6 +607,67 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
   finalizedBy(pactPublish)
+}
+
+tasks.register('providerContractTests', Test) {
+  description = 'Runs ONLY the provider Pact verification tests.'
+  group = 'Verification'
+
+  useJUnitPlatform()
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  include '**/provider/**'
+}
+
+tasks.register('runProviderPactVerification') {
+  description = 'Entry point for Jenkins to run provider contract tests.'
+  group = 'Verification'
+
+  dependsOn tasks.named('providerContractTests')
+}
+
+tasks.withType(Test).configureEach { t ->
+  doFirst {
+    logger.lifecycle("Available Processors for ${t.name}: ${Runtime.runtime.availableProcessors()}")
+  }
+  useJUnitPlatform()
+
+  maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
+  jvmArgs '-Xshare:off'
+  // Use Parallel GC for faster, short-lived test forks
+  jvmArgs '-XX:+UseParallelGC'
+
+  // Keep within typical Jenkins container limits
+  minHeapSize = "256m"
+  maxHeapSize = "1536m"
+  jvmArgs "-XX:MaxMetaspaceSize=512m"
+  jvmArgs '-XX:ReservedCodeCacheSize=512m'
+  // Temurin 21.0.7 occasionally crashes in C2 (BoolNode::Ideal SIGSEGV); stay on C1 until upstream fix.
+  jvmArgs "-XX:TieredStopAtLevel=1"
+
+  testLogging {
+    exceptionFormat = 'full'
+    showCauses = true
+    showExceptions = true
+    showStackTraces = true
+    showStandardStreams = false
+    events "failed", "skipped"
+  }
+
+  if (project.hasProperty('pact.verifier.publishResults')) {
+    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+  }
+  if (project.hasProperty('pact.provider.version')) {
+    systemProperty 'pact.provider.version', project.property('pact.provider.version')
+  } else {
+    systemProperty 'pact.provider.version', project.pactVersion
+  }
+
+  if (project.hasProperty('pact.provider.branch')) {
+    systemProperty 'pact.provider.branch', project.property('pact.provider.branch')
+  } else {
+    systemProperty 'pact.provider.branch', System.getenv("PACT_BRANCH_NAME") ?: "Dev"
+  }
 }
 
 def getCheckedOutGitCommitHash() {
@@ -616,4 +711,3 @@ publishing {
     }
   }
 }
-

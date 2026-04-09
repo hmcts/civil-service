@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -31,25 +33,26 @@ public class UpdateDataRespondentDeadlineResponse {
 
     private final LocationReferenceDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
+    private final ObjectMapper objectMapper;
 
     public UpdateDataRespondentDeadlineResponse(LocationReferenceDataService locationRefDataService,
-                                                CourtLocationUtils courtLocationUtils) {
+                                                CourtLocationUtils courtLocationUtils,
+                                                ObjectMapper objectMapper) {
 
         this.locationRefDataService = locationRefDataService;
         this.courtLocationUtils = courtLocationUtils;
+        this.objectMapper = objectMapper;
     }
 
     void updateBothRespondentsResponseSameLegalRep(CallbackParams callbackParams,
                                                    CaseData caseData,
-                                                   CaseData.CaseDataBuilder<?, ?> updatedData,
                                                    LocalDateTime responseDate,
                                                    LocalDateTime applicant1Deadline) {
         if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
-            responseHasSameUpdateValues(callbackParams, updatedData, caseData, responseDate, applicant1Deadline);
+            responseHasSameUpdateValues(callbackParams, caseData, responseDate, applicant1Deadline);
         } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
             responseDoesNotHaveSameUpdateValues(
                 callbackParams,
-                updatedData,
                 responseDate,
                 applicant1Deadline,
                 caseData
@@ -58,62 +61,56 @@ public class UpdateDataRespondentDeadlineResponse {
     }
 
     void updateResponseDataForSecondRespondent(CallbackParams callbackParams,
-                                               CaseData.CaseDataBuilder<?, ?> updatedData,
-                                               LocalDateTime responseDate,
                                                CaseData caseData,
                                                LocalDateTime applicant1Deadline) {
-        updatedData.respondent2ResponseDate(responseDate)
-            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
-        updateRespondent2StatementOfTruth(callbackParams, updatedData, caseData);
-        setApplicantDeadLineIfRespondent1DateExist(caseData, updatedData, applicant1Deadline);
+        caseData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
+        updateRespondent2StatementOfTruth(callbackParams, caseData);
+        setApplicantDeadLineIfRespondent1DateExist(caseData, applicant1Deadline);
     }
 
     void updateResponseDataForBothRespondent(CallbackParams callbackParams,
-                                             CaseData.CaseDataBuilder<?, ?> updatedData,
                                              LocalDateTime responseDate,
                                              CaseData caseData,
                                              LocalDateTime applicant1Deadline) {
-        updatedData.respondent1ResponseDate(responseDate)
-            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
+        caseData.setRespondent1ResponseDate(responseDate);
+        caseData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
 
-        setApplicantDeadlineIfRequired(caseData, updatedData, applicant1Deadline);
-        updateRespondent2AdressesAndSetDeadline(caseData, updatedData);
-        updateRespondent2Date(caseData, updatedData, responseDate);
-        updateRespondent1StatementOfTruth(callbackParams, caseData, updatedData);
+        setApplicantDeadlineIfRequired(caseData, applicant1Deadline);
+        updateRespondent2AdressesAndSetDeadline(caseData);
+        updateRespondent2Date(caseData, responseDate);
+        updateRespondent1StatementOfTruth(callbackParams, caseData);
     }
 
-    private void updateRespondent2StatementOfTruth(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
+    private void updateRespondent2StatementOfTruth(CallbackParams callbackParams, CaseData caseData) {
 
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()
-            .respondent2DQStatementOfTruth(statementOfTruth);
+        Respondent2DQ dq = caseData.getRespondent2DQ();
+        dq.setRespondent2DQStatementOfTruth(statementOfTruth);
         handleCourtLocationForRespondent2DQ(caseData, dq, callbackParams);
-        updatedData.respondent2DQ(dq.build());
+        caseData.setRespondent2DQ(dq);
 
-        updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+        caseData.setUiStatementOfTruth(new StatementOfTruth());
     }
 
     private Optional<CaseLocationCivil> buildWithMatching(LocationRefData courtLocation) {
         return Optional.ofNullable(courtLocation).map(LocationHelper::buildCaseLocation);
     }
 
-    private void setApplicantDeadLineIfRespondent1DateExist(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, LocalDateTime applicant1Deadline) {
+    private void setApplicantDeadLineIfRespondent1DateExist(CaseData caseData, LocalDateTime applicant1Deadline) {
         if (caseData.getRespondent1ResponseDate() != null) {
-            updatedData
-                .nextDeadline(applicant1Deadline.toLocalDate())
-                .applicant1ResponseDeadline(applicant1Deadline);
+            caseData.setNextDeadline(applicant1Deadline.toLocalDate());
+            caseData.setApplicant1ResponseDeadline(applicant1Deadline);
         } else {
-            updatedData.nextDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());
+            caseData.setNextDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());
         }
     }
 
-    private void setApplicantDeadlineIfRequired(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, LocalDateTime applicant1Deadline) {
+    private void setApplicantDeadlineIfRequired(CaseData caseData, LocalDateTime applicant1Deadline) {
         if (isRespondent2NotPresent(caseData)
             || isApplicant2Present(caseData)
             || caseData.getRespondent2ResponseDate() != null) {
-            updatedData
-                .applicant1ResponseDeadline(applicant1Deadline)
-                .nextDeadline(applicant1Deadline.toLocalDate());
+            caseData.setApplicant1ResponseDeadline(applicant1Deadline);
+            caseData.setNextDeadline(applicant1Deadline.toLocalDate());
         }
     }
 
@@ -121,44 +118,45 @@ public class UpdateDataRespondentDeadlineResponse {
         return caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES;
     }
 
-    private void updateRespondent2AdressesAndSetDeadline(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void updateRespondent2AdressesAndSetDeadline(CaseData caseData) {
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .build();
+            var updatedRespondent2 = caseData.getRespondent2();
+            updatedRespondent2.setPrimaryAddress(caseData.getRespondent2Copy().getPrimaryAddress());
 
-            updatedData
-                .respondent2(updatedRespondent2)
-                .respondent2Copy(null)
-                .respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
+            caseData.setRespondent2(updatedRespondent2);
+            caseData.setRespondent2Copy(null);
+
+            Party respondent2Clone = objectMapper.convertValue(updatedRespondent2, Party.class);
+            respondent2Clone.setFlags(null);
+            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2Clone);
 
             if (caseData.getRespondent2ResponseDate() == null) {
-                updatedData.nextDeadline(caseData.getRespondent2ResponseDeadline().toLocalDate());
+                caseData.setNextDeadline(caseData.getRespondent2ResponseDeadline().toLocalDate());
             }
         }
     }
 
-    private void updateRespondent2Date(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, LocalDateTime responseDate) {
+    private void updateRespondent2Date(CaseData caseData, LocalDateTime responseDate) {
         if (isRespondent2SameLegalRep(caseData)) {
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
-                updatedData.respondent2ClaimResponseType(caseData.getRespondent1ClaimResponseType());
+                caseData.setRespondent2ClaimResponseType(caseData.getRespondent1ClaimResponseType());
             }
 
-            updatedData.respondent2ResponseDate(responseDate);
+            caseData.setRespondent2ResponseDate(responseDate);
         }
     }
 
-    private void updateRespondent1StatementOfTruth(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void updateRespondent1StatementOfTruth(CallbackParams callbackParams, CaseData caseData) {
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
-            .respondent1DQStatementOfTruth(statementOfTruth);
+        Respondent1DQ dq = caseData.getRespondent1DQ();
+        dq.setRespondent1DQStatementOfTruth(statementOfTruth);
         handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
-        updatedData.respondent1DQ(dq.build());
-        updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+        caseData.setRespondent1DQ(dq);
+        caseData.setUiStatementOfTruth(new StatementOfTruth());
     }
 
-    private void handleCourtLocationForRespondent1DQ(CaseData caseData, Respondent1DQ.Respondent1DQBuilder dq,
+    private void handleCourtLocationForRespondent1DQ(CaseData caseData, Respondent1DQ dq,
                                                      CallbackParams callbackParams) {
 
         if (Optional.ofNullable(caseData.getRespondent1DQ())
@@ -169,25 +167,27 @@ public class UpdateDataRespondentDeadlineResponse {
                 .getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtLocations();
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 getLocationData(callbackParams), courtLocations);
-            RequestedCourt.RequestedCourtBuilder dqBuilder = caseData.getRespondent1DQ()
-                .getRespondent1DQRequestedCourt().toBuilder()
-                .responseCourtLocations(null)
-                .responseCourtCode(Optional.ofNullable(courtLocation)
+            RequestedCourt requestedCourt = caseData.getRespondent1DQ()
+                .getRespondent1DQRequestedCourt();
+            requestedCourt.setResponseCourtLocations(null);
+            requestedCourt.setResponseCourtCode(Optional.ofNullable(courtLocation)
                                        .map(LocationRefData::getCourtLocationCode)
                                        .orElse(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                                                    .getResponseCourtCode()));
-            buildWithMatching(courtLocation).ifPresent(dqBuilder::caseLocation);
-            dq.respondent1DQRequestedCourt(dqBuilder.build());
+            buildWithMatching(courtLocation).ifPresent(requestedCourt::setCaseLocation);
+            dq.setRespondent1DQRequestedCourt(requestedCourt);
         } else if (Optional.ofNullable(caseData.getRespondent1DQ())
             .map(Respondent1DQ::getRespondent1DQRequestedCourt)
             .map(RequestedCourt::getResponseCourtLocations).isPresent()) {
-            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ()
-                                               .getRespondent1DQRequestedCourt()
-                                               .toBuilder().responseCourtLocations(null).build());
+            caseData.getRespondent1DQ()
+                .getRespondent1DQRequestedCourt()
+                .setResponseCourtLocations(null);
+            dq.setRespondent1DQRequestedCourt(caseData.getRespondent1DQ()
+                                               .getRespondent1DQRequestedCourt());
         }
     }
 
-    private void handleCourtLocationForRespondent2DQ(CaseData caseData, Respondent2DQ.Respondent2DQBuilder dq,
+    private void handleCourtLocationForRespondent2DQ(CaseData caseData, Respondent2DQ dq,
                                                      CallbackParams callbackParams) {
 
         if (Optional.ofNullable(caseData.getRespondent2DQ())
@@ -198,20 +198,22 @@ public class UpdateDataRespondentDeadlineResponse {
                 .getRespondent2DQ().getRespondent2DQRequestedCourt().getResponseCourtLocations();
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 getLocationData(callbackParams), courtLocations);
-            RequestedCourt.RequestedCourtBuilder dqBuilder = caseData.getRespondent2DQ().getRequestedCourt().toBuilder()
-                .responseCourtLocations(null)
-                .responseCourtCode(Optional.ofNullable(courtLocation)
+            RequestedCourt requestedCourt = caseData.getRespondent2DQ().getRequestedCourt();
+            requestedCourt.setResponseCourtLocations(null);
+            requestedCourt.setResponseCourtCode(Optional.ofNullable(courtLocation)
                                        .map(LocationRefData::getCourtLocationCode)
                                        .orElse(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
                                                    .getResponseCourtCode()));
-            buildWithMatching(courtLocation).ifPresent(dqBuilder::caseLocation);
-            dq.respondent2DQRequestedCourt(dqBuilder.build());
+            buildWithMatching(courtLocation).ifPresent(requestedCourt::setCaseLocation);
+            dq.setRespondent2DQRequestedCourt(requestedCourt);
         } else if (Optional.ofNullable(caseData.getRespondent2DQ())
             .map(Respondent2DQ::getRespondent2DQRequestedCourt)
             .map(RequestedCourt::getResponseCourtLocations).isPresent()) {
-            dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ()
-                                               .getRespondent2DQRequestedCourt()
-                                               .toBuilder().responseCourtLocations(null).build());
+            caseData.getRespondent2DQ()
+                .getRespondent2DQRequestedCourt()
+                .setResponseCourtLocations(null);
+            dq.setRespondent2DQRequestedCourt(caseData.getRespondent2DQ()
+                                               .getRespondent2DQRequestedCourt());
         }
 
     }
@@ -227,64 +229,60 @@ public class UpdateDataRespondentDeadlineResponse {
     }
 
     private void responseHasSameUpdateValues(CallbackParams callbackParams,
-                                             CaseData.CaseDataBuilder<?, ?> updatedData,
                                              CaseData caseData,
                                              LocalDateTime responseDate,
                                              LocalDateTime applicant1Deadline) {
-        updatedData.respondent2ClaimResponseType(caseData.getRespondent1ClaimResponseType());
-        updatedData
-            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
-            .respondent1ResponseDate(responseDate)
-            .respondent2ResponseDate(responseDate)
-            .nextDeadline(applicant1Deadline.toLocalDate())
-            .applicant1ResponseDeadline(applicant1Deadline);
+        caseData.setRespondent2ClaimResponseType(caseData.getRespondent1ClaimResponseType());
+        caseData
+            .setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
+        caseData.setRespondent1ResponseDate(responseDate);
+        caseData.setRespondent2ResponseDate(responseDate);
+        caseData.setNextDeadline(applicant1Deadline.toLocalDate());
+        caseData.setApplicant1ResponseDeadline(applicant1Deadline);
 
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
-            .respondent1DQStatementOfTruth(statementOfTruth);
+        Respondent1DQ dq = caseData.getRespondent1DQ();
+        dq.setRespondent1DQStatementOfTruth(statementOfTruth);
 
         handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
 
-        updatedData.respondent1DQ(dq.build());
-
-        updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+        caseData.setRespondent1DQ(dq);
+        caseData.setUiStatementOfTruth(new StatementOfTruth());
     }
 
     private void responseDoesNotHaveSameUpdateValues(CallbackParams callbackParams,
-                                                     CaseData.CaseDataBuilder<?, ?> updatedData,
                                                      LocalDateTime responseDate,
                                                      LocalDateTime applicant1Deadline,
                                                      CaseData caseData) {
-        updatedData
-            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
-            .respondent1ResponseDate(responseDate)
-            .respondent2ResponseDate(responseDate)
-            .nextDeadline(applicant1Deadline.toLocalDate())
-            .applicant1ResponseDeadline(applicant1Deadline);
+        caseData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
+        caseData.setRespondent1ResponseDate(responseDate);
+        caseData.setRespondent2ResponseDate(responseDate);
+        caseData.setNextDeadline(applicant1Deadline.toLocalDate());
+        caseData.setApplicant1ResponseDeadline(applicant1Deadline);
 
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())) {
-            Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
-                .respondent1DQStatementOfTruth(statementOfTruth);
+            Respondent1DQ dq = caseData.getRespondent1DQ();
+            dq.setRespondent1DQStatementOfTruth(statementOfTruth);
             handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
-            updatedData.respondent1DQ(dq.build());
+            caseData.setRespondent1DQ(dq);
 
         } else {
-            updatedData.respondent1DQ(null);
+            caseData.setRespondent1DQ(null);
         }
 
         if (FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())) {
 
-            Respondent2DQ.Respondent2DQBuilder dq2 = caseData.getRespondent2DQ().toBuilder()
-                .respondent2DQStatementOfTruth(statementOfTruth);
+            Respondent2DQ dq2 = caseData.getRespondent2DQ();
+            dq2.setRespondent2DQStatementOfTruth(statementOfTruth);
             handleCourtLocationForRespondent2DQ(caseData, dq2, callbackParams);
-            updatedData.respondent2DQ(dq2.build());
+            caseData.setRespondent2DQ(dq2);
 
         } else {
-            updatedData.respondent2DQ(null);
+            caseData.setRespondent2DQ(null);
         }
 
-        updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+        caseData.setUiStatementOfTruth(new StatementOfTruth());
     }
 
     private List<LocationRefData> getLocationData(CallbackParams callbackParams) {

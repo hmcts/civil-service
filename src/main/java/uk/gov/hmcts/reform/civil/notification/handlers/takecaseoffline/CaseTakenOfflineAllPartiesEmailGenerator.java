@@ -9,10 +9,17 @@ import java.util.List;
 public class CaseTakenOfflineAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
 
     public CaseTakenOfflineAllPartiesEmailGenerator(
-            CaseTakenOfflineAppSolOneEmailDTOGenerator appSolOneGenerator,
-            CaseTakenOfflineRespSolOneEmailDTOGenerator respSolOneGenerator,
-            CaseTakenOfflineRespSolTwoEmailDTOGenerator respSolTwoGenerator
+        CaseTakenOfflineAppSolOneEmailDTOGenerator appSolOneGenerator,
+        CaseTakenOfflineRespSolOneEmailDTOGenerator respSolOneGenerator,
+        CaseTakenOfflineRespSolTwoEmailDTOGenerator respSolTwoGenerator,
+        CaseTakenOfflineAppLipSolOneEmailDTOGenerator appLipSolOneGenerator,
+        CaseTakenOfflineRespLipSolOneEmailDTOGenerator respLipSolOneGenerator
     ) {
-        super(List.of(appSolOneGenerator, respSolOneGenerator, respSolTwoGenerator));
+        super(List.of(appSolOneGenerator,
+                      respSolOneGenerator,
+                      respSolTwoGenerator,
+                      appLipSolOneGenerator,
+                      respLipSolOneGenerator
+        ));
     }
 }

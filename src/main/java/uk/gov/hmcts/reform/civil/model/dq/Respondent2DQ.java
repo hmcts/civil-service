@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.civil.model.dq;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -17,9 +17,9 @@ import java.util.List;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class Respondent2DQ implements DQ {
 
     private FileDirectionsQuestionnaire respondent2DQFileDirectionsQuestionnaire;
@@ -215,5 +215,41 @@ public class Respondent2DQ implements DQ {
     @JsonProperty("respondent2DQRemoteHearing")
     public RemoteHearing getRemoteHearing() {
         return respondent2DQRemoteHearing;
+    }
+
+    public Respondent2DQ copy() {
+        return new Respondent2DQ()
+            .setRespondent2DQFileDirectionsQuestionnaire(respondent2DQFileDirectionsQuestionnaire)
+            .setRespondent2DQFixedRecoverableCosts(respondent2DQFixedRecoverableCosts)
+            .setRespondent2DQFixedRecoverableCostsIntermediate(respondent2DQFixedRecoverableCostsIntermediate)
+            .setRespondent2DQDisclosureOfElectronicDocuments(respondent2DQDisclosureOfElectronicDocuments)
+            .setSpecRespondent2DQDisclosureOfElectronicDocuments(specRespondent2DQDisclosureOfElectronicDocuments)
+            .setRespondent2DQDisclosureOfNonElectronicDocuments(respondent2DQDisclosureOfNonElectronicDocuments)
+            .setSpecRespondent2DQDisclosureOfNonElectronicDocuments(specRespondent2DQDisclosureOfNonElectronicDocuments)
+            .setRespondent2DQDisclosureReport(respondent2DQDisclosureReport)
+            .setRespondent2DQExperts(respondent2DQExperts)
+            .setRespondToClaimExperts2(respondToClaimExperts2)
+            .setRespondent2DQWitnesses(respondent2DQWitnesses)
+            .setRespondent2DQHearing(respondent2DQHearing)
+            .setRespondent2DQHearingSmallClaim(respondent2DQHearingSmallClaim)
+            .setRespondent2DQDraftDirections(respondent2DQDraftDirections)
+            .setRespondent2DQRequestedCourt(respondent2DQRequestedCourt)
+            .setRespondent2DQRemoteHearing(respondent2DQRemoteHearing)
+            .setRespondent2DQRemoteHearingLRspec(respondent2DQRemoteHearingLRspec)
+            .setRespondent2DQHearingSupport(respondent2DQHearingSupport)
+            .setRespondent2DQCarerAllowanceCredit(respondent2DQCarerAllowanceCredit)
+            .setRespondent2DQFurtherInformation(respondent2DQFurtherInformation)
+            .setRespondent2DQLanguage(respondent2DQLanguage)
+            .setRespondent2DQLanguageLRspec(respondent2DQLanguageLRspec)
+            .setRespondent2DQStatementOfTruth(respondent2DQStatementOfTruth)
+            .setRespondent2DQVulnerabilityQuestions(respondent2DQVulnerabilityQuestions)
+            .setRespondent2DQRecurringIncome(respondent2DQRecurringIncome)
+            .setRespondent2DQRecurringExpenses(respondent2DQRecurringExpenses)
+            .setRespondent2BankAccountList(respondent2BankAccountList)
+            .setRespondent2DQHomeDetails(respondent2DQHomeDetails)
+            .setRespondent2DQFutureApplications(respondent2DQFutureApplications)
+            .setRespondent2DQHearingFastClaim(respondent2DQHearingFastClaim)
+            .setRespondToCourtLocation2(respondToCourtLocation2)
+            .setDeterWithoutHearingRespondent2(deterWithoutHearingRespondent2);
     }
 }

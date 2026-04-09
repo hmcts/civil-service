@@ -28,7 +28,7 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
 
     private final MediationCsvServiceFactory mediationCsvServiceFactory;
 
-    private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
+    private final MediationCSVEmailConfiguration localMediationCSVEmailConfiguration;
 
     private static final String FILENAME = "ocmc_mediation_data.csv";
 
@@ -47,7 +47,7 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
             mediationCSVEmailConfiguration
         );
         this.mediationCsvServiceFactory = mediationCsvServiceFactory;
-        this.mediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
+        this.localMediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
     }
 
     @Override
@@ -85,17 +85,16 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private Optional<EmailData> prepareEmail(String generateCsvData) {
         InputStreamSource inputSource = new ByteArrayResource(generateCsvData.getBytes(StandardCharsets.UTF_8));
 
-        return Optional.of(EmailData.builder()
-                               .to(mediationCSVEmailConfiguration.getRecipient())
-                               .subject(SUBJECT)
-                               .attachments(List.of(new EmailAttachment(inputSource, "text/csv", FILENAME)))
-                               .build());
+        return Optional.of(new EmailData()
+                               .setTo(mediationCSVEmailConfiguration.getRecipient())
+                               .setSubject(SUBJECT)
+                               .setAttachments(List.of(new EmailAttachment(inputSource, "text/csv", FILENAME))));
     }
 
     private String generateCsvContent(CaseData caseData) {

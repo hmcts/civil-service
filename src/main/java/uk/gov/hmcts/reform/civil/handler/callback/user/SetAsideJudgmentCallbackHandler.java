@@ -75,9 +75,8 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
             errors.add(ERROR_MESSAGE_DEFENCE_DATE);
         }
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -94,12 +93,11 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
         caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
         setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT))
-            .joSetAsideCreatedDate(LocalDateTime.now());
+        caseData.setBusinessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT));
+        caseData.setJoSetAsideCreatedDate(LocalDateTime.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

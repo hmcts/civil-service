@@ -4,15 +4,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidenceupload.documenthandler.BaseDocumentHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.applicantonesolcitor.ApplicantOneWitnessSummaryDocumentHandler;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidenceupload.documenthandler.BaseDocumentHandlerTest.DomainConstants.APPLICANT;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicantOneWitnessSummaryDocumentHandlerTest extends BaseDocumentHandlerTest {
+
+    @Mock
+    private DocumentTypeBuilder<UploadEvidenceWitness> documentTypeBuilder;
 
     @InjectMocks
     private ApplicantOneWitnessSummaryDocumentHandler handler;
@@ -24,9 +30,9 @@ class ApplicantOneWitnessSummaryDocumentHandlerTest extends BaseDocumentHandlerT
 
     @Test
     void shouldCopyWitnessSummaryDocumentsToLegalRep2() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getDocumentWitnessSummaryApp2().size());
+        assertEquals(2, caseData.getDocumentWitnessSummaryApp2().size());
     }
 
     @Test

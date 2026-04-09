@@ -47,32 +47,31 @@ public class ClaimStoreService {
             return claimStoreApi.isDefendantLinked(caseReference);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return DefendantLinkStatus.builder().linked(false).build();
+            return new DefendantLinkStatus().setLinked(false);
         }
     }
 
     private List<DashboardClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims) {
         return cmcClaims.stream().map(cmcClaim ->
-                                          DashboardClaimInfo.builder()
-                                              .createdDate(createAtToCreateDate(cmcClaim))
-                                              .claimId(cmcClaim.getExternalId())
-                                              .claimNumber(cmcClaim.getReferenceNumber())
-                                              .claimantName(cmcClaim.getClaimantName())
-                                              .defendantName(cmcClaim.getDefendantName())
-                                              .responseDeadline(cmcClaim.getResponseDeadline())
-                                              .responseDeadlineTime(Optional.ofNullable(cmcClaim.getResponseDeadline()).map(
+                                          new DashboardClaimInfo()
+                                              .setCreatedDate(createAtToCreateDate(cmcClaim))
+                                              .setClaimId(cmcClaim.getExternalId())
+                                              .setClaimNumber(cmcClaim.getReferenceNumber())
+                                              .setClaimantName(cmcClaim.getClaimantName())
+                                              .setDefendantName(cmcClaim.getDefendantName())
+                                              .setResponseDeadline(cmcClaim.getResponseDeadline())
+                                              .setResponseDeadlineTime(Optional.ofNullable(cmcClaim.getResponseDeadline()).map(
                                                                         LocalDate::atStartOfDay).orElse(null)
                                                   )
-                                              .claimAmount(cmcClaim.getTotalAmountTillToday())
-                                              .paymentDate(cmcClaim.getBySpecifiedDate())
-                                              .ccjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())
-                                              .ocmc(true)
-                                              .admittedAmount(cmcClaim.getAdmittedAmount())
-                                              .respondToAdmittedClaimOwingAmountPounds(Optional.ofNullable(cmcClaim.getResponse())
+                                              .setClaimAmount(cmcClaim.getTotalAmountTillToday())
+                                              .setPaymentDate(cmcClaim.getBySpecifiedDate())
+                                              .setCcjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())
+                                              .setOcmc(true)
+                                              .setAdmittedAmount(cmcClaim.getAdmittedAmount())
+                                              .setRespondToAdmittedClaimOwingAmountPounds(Optional.ofNullable(cmcClaim.getResponse())
                                                                                            .map(Response::getAmount)
                                                                                            .orElse(null))
-                                              .status(dashboardClaimStatusFactory.getDashboardClaimStatus(cmcClaim))
-                                              .build()
+                                              .setStatus(dashboardClaimStatusFactory.getDashboardClaimStatus(cmcClaim))
         ).toList();
     }
 

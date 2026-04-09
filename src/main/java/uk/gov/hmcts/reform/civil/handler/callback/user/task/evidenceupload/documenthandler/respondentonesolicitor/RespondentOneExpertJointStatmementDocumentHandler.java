@@ -32,8 +32,8 @@ public class RespondentOneExpertJointStatmementDocumentHandler extends
     }
 
     @Override
-    protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceExpert>> evidenceDocsToAdd) {
-        builder.documentJointStatementRes2(evidenceDocsToAdd);
+    protected void addDocumentsToCopyToCaseData(CaseData caseData, List<Element<UploadEvidenceExpert>> evidenceDocsToAdd) {
+        caseData.setDocumentJointStatementRes2(evidenceDocsToAdd);
 
     }
 

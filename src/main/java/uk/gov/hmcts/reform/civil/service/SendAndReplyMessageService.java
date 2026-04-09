@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
@@ -94,15 +95,14 @@ public class SendAndReplyMessageService {
 
         messageList.add(element(
             createBaseMessageWithSenderDetails(userAuth)
-                .toBuilder()
-                .updatedTime(time.now())
-                .sentTime(time.now())
-                .recipientRoleType(ROLE_SELECTION_TO_POOL.get(messageMetaData.getRecipientRoleType()))
-                .isUrgent(messageMetaData.getIsUrgent())
-                .subjectType(messageMetaData.getSubjectType())
-                .subject(messageMetaData.getSubject())
-                .messageContent(messageContent)
-                .build())
+                .setUpdatedTime(time.now())
+                .setSentTime(time.now())
+                .setRecipientRoleType(ROLE_SELECTION_TO_POOL.get(messageMetaData.getRecipientRoleType()))
+                .setIsUrgent(messageMetaData.getIsUrgent())
+                .setSubjectType(messageMetaData.getSubjectType())
+                .setSubject(messageMetaData.getSubject())
+                .setMessageContent(messageContent)
+                .setMessageId(UUID.randomUUID().toString()))
         );
         return messageList;
     }
@@ -113,10 +113,9 @@ public class SendAndReplyMessageService {
         String senderName = String.format("%s, %s", details.getFullName(), role.getRoleLabel());
         Map<String, RolePool> supportRoleMap = buildSupportedRolesMap();
 
-        return Message.builder()
-            .senderName(senderName)
-            .senderRoleType(supportRoleMap.get(role.getRoleName()))
-            .build();
+        return new Message()
+            .setSenderName(senderName)
+            .setSenderRoleType(supportRoleMap.get(role.getRoleName()));
     }
 
     public List<Element<Message>> addReplyToMessage(List<Element<Message>> messages, String messageId, MessageReply messageReply,
@@ -147,7 +146,7 @@ public class SendAndReplyMessageService {
         RoleAssignmentResponse roleAssignment = roleAssignments.getRoleAssignmentResponse().stream()
             .filter(userRole -> supportedRolesList.contains(userRole.getRoleName()))
             .min(Comparator.comparingInt(userRole -> supportedRolesList.indexOf(userRole.getRoleName())))
-            .orElse(RoleAssignmentResponse.builder().roleLabel("").roleCategory("").build());
+            .orElse(new RoleAssignmentResponse().setRoleLabel("").setRoleCategory(""));
         return roleAssignment;
     }
 
@@ -159,7 +158,7 @@ public class SendAndReplyMessageService {
     }
 
     private List<Message> retrieveFullMessageHistory(Element<Message> message) {
-        Message baseMessage = message.getValue().toBuilder().sentTime(message.getValue().getUpdatedTime()).build();
+        Message baseMessage = message.getValue().copyNoHistory().setSentTime(message.getValue().getUpdatedTime());
         return Stream.concat(Stream.of(baseMessage), message.getValue().getHistory().stream()
                 .map(historyItem -> message.getValue().buildFullReplyMessageForTable(historyItem.getValue())))
                 .sorted(Comparator.comparing(Message::getSentTime).reversed())
@@ -179,9 +178,9 @@ public class SendAndReplyMessageService {
     }
 
     public DynamicList createMessageSelectionList(List<Element<Message>> messages) {
-        return DynamicList.builder()
-            .listItems(messages.stream().map(this::createMessageListItems).toList())
-            .build();
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setListItems(messages.stream().map(this::createMessageListItems).toList());
+        return dynamicList;
     }
 
     private DynamicListElement createMessageListItems(Element<Message> message) {
@@ -199,15 +198,14 @@ public class SendAndReplyMessageService {
     }
 
     public MessageReply buildReplyOutOfMessage(Message message) {
-        return MessageReply.builder()
-            .sentTime(message.getUpdatedTime())
-            .isUrgent(message.getIsUrgent())
-            .senderName(message.getSenderName())
-            .senderRoleType(message.getSenderRoleType())
-            .messageContent(message.getMessageContent())
-            .recipientRoleType(message.getRecipientRoleType())
-            .subject(message.getSubject())
-            .subjectType(message.getSubjectType())
-            .build();
+        return new MessageReply()
+            .setSentTime(message.getUpdatedTime())
+            .setIsUrgent(message.getIsUrgent())
+            .setSenderName(message.getSenderName())
+            .setSenderRoleType(message.getSenderRoleType())
+            .setMessageContent(message.getMessageContent())
+            .setRecipientRoleType(message.getRecipientRoleType())
+            .setSubject(message.getSubject())
+            .setSubjectType(message.getSubjectType());
     }
 }

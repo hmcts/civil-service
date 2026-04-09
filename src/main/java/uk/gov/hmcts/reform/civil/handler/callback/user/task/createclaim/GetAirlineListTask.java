@@ -30,13 +30,11 @@ public class GetAirlineListTask {
     }
 
     public CallbackResponse getAirlineList(CaseData caseData) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
         DynamicList airlineDropdownList = createAirlineDropdownList();
         FlightDelayDetails flightDelayDetails = buildFlightDelayDetails(airlineDropdownList);
-        caseDataBuilder.flightDelayDetails(flightDelayDetails);
+        caseData.setFlightDelayDetails(flightDelayDetails);
 
-        return buildCallbackResponse(caseDataBuilder);
+        return buildCallbackResponse(caseData);
     }
 
     private DynamicList createAirlineDropdownList() {
@@ -54,16 +52,16 @@ public class GetAirlineListTask {
     }
 
     private FlightDelayDetails buildFlightDelayDetails(DynamicList airlineDropdownList) {
-        return FlightDelayDetails.builder()
-            .airlineList(DynamicList.builder()
-                             .listItems(airlineDropdownList.getListItems())
-                             .build())
-            .build();
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setListItems(airlineDropdownList.getListItems());
+        FlightDelayDetails flightDelayDetails = new FlightDelayDetails();
+        flightDelayDetails.setAirlineList(dynamicList);
+        return flightDelayDetails;
     }
 
-    private CallbackResponse buildCallbackResponse(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private CallbackResponse buildCallbackResponse(CaseData caseData) {
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

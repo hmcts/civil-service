@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.BLANK
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.BLANK_TEMPLATE_BEFORE_HEARING_DOCX;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FIX_DATE_CCMC_DOCX;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FIX_DATE_CMC_DOCX;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameWithLitigiousFriend;
 
 @Service
 public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFinalOrderForm> {
@@ -107,45 +108,42 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
 
     public JudgeFinalOrderForm getBlankAfterHearing(CaseData caseData, String authorisation) {
         return getBaseTemplateData(caseData, authorisation)
-            .orderAfterHearingDate(getOrderAfterHearingDateText(caseData))
-            .build();
+            .setOrderAfterHearingDate(getOrderAfterHearingDateText(caseData));
     }
 
     public JudgeFinalOrderForm getBlankBeforeHearing(CaseData caseData, String authorisation) {
         return getBaseTemplateData(caseData, authorisation)
-            .claimTrack(caseData.getFinalOrderAllocateToTrack())
-            .trackAndComplexityBandText(getTrackAndComplexityText(caseData))
-            .build();
+            .setClaimTrack(caseData.getFinalOrderAllocateToTrack())
+            .setTrackAndComplexityBandText(getTrackAndComplexityText(caseData));
     }
 
     public JudgeFinalOrderForm getFixDateCcmc(CaseData caseData, String authorisation) {
-        return getBaseTemplateData(caseData, authorisation).build();
+        return getBaseTemplateData(caseData, authorisation);
     }
 
     public JudgeFinalOrderForm getFixDateCmc(CaseData caseData, String authorisation) {
         return getBaseTemplateData(caseData, authorisation)
-            .claimTrack(caseData.getFinalOrderAllocateToTrack())
-            .trackAndComplexityBandText(getTrackAndComplexityText(caseData))
-            .build();
+            .setClaimTrack(caseData.getFinalOrderAllocateToTrack())
+            .setTrackAndComplexityBandText(getTrackAndComplexityText(caseData));
     }
 
-    private JudgeFinalOrderForm.JudgeFinalOrderFormBuilder getBaseTemplateData(CaseData caseData,
-                                                                               String authorisation) {
+    private JudgeFinalOrderForm getBaseTemplateData(CaseData caseData,
+                                                    String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
         LocationRefData caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
-        return JudgeFinalOrderForm.builder()
-            .judgeNameTitle(userDetails.getFullName())
-            .courtName(caseManagementLocationDetails.getExternalShortName())
-            .caseNumber(nonNull(caseData.getCcdCaseReference()) ? caseData.getCcdCaseReference().toString() : null)
-            .claimant1Name(caseData.getApplicant1().getPartyName())
-            .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
-            .defendant1Name(caseData.getRespondent1().getPartyName())
-            .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
-            .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
-            .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
-            .dateNowPlus7(LocalDate.now().plusDays(7).format(formatter));
+        return new JudgeFinalOrderForm()
+            .setJudgeNameTitle(userDetails.getFullName())
+            .setCourtName(caseManagementLocationDetails.getExternalShortName())
+            .setCaseNumber(nonNull(caseData.getCcdCaseReference()) ? caseData.getCcdCaseReference().toString() : null)
+            .setClaimant1Name(getPartyNameWithLitigiousFriend(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend()))
+            .setClaimant2Name(getPartyNameWithLitigiousFriend(caseData.getApplicant2(), caseData.getApplicant2LitigationFriend()))
+            .setDefendant1Name(getPartyNameWithLitigiousFriend(caseData.getRespondent1(), caseData.getRespondent1LitigationFriend()))
+            .setDefendant2Name(getPartyNameWithLitigiousFriend(caseData.getRespondent2(), caseData.getRespondent2LitigationFriend()))
+            .setClaimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
+            .setDefendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
+            .setDateNowPlus7(LocalDate.now().plusDays(7).format(formatter));
     }
 
     public String getTrackAndComplexityText(CaseData caseData) {

@@ -21,20 +21,18 @@ class UploadEvidenceWitnessDocumentTypeBuilderTest {
 
     @Test
     void shouldBuildElementTypeWithDocumentCopy() {
-        Document originalDocument = Document.builder()
-                .categoryID("originalCategory")
-                .documentBinaryUrl("originalBinaryUrl")
-                .documentFileName("originalFileName.pdf")
-                .documentHash("originalHash")
-                .documentUrl("originalUrl")
-                .build();
+        Document originalDocument = new Document();
+        originalDocument.setCategoryID("originalCategory")
+                .setDocumentBinaryUrl("originalBinaryUrl")
+                .setDocumentFileName("originalFileName.pdf")
+                .setDocumentHash("originalHash")
+                .setDocumentUrl("originalUrl");
 
-        UploadEvidenceWitness originalWitness = UploadEvidenceWitness.builder()
-                .witnessOptionName("Witness Name")
-                .witnessOptionUploadDate(LocalDate.parse("2022-02-10"))
-                .createdDatetime(LocalDateTime.of(2022, 2, 10, 10, 0))
-                .witnessOptionDocument(originalDocument)
-                .build();
+        UploadEvidenceWitness originalWitness = new UploadEvidenceWitness();
+        originalWitness.setWitnessOptionName("Witness Name");
+        originalWitness.setWitnessOptionUploadDate(LocalDate.parse("2022-02-10"));
+        originalWitness.setCreatedDatetime(LocalDateTime.of(2022, 2, 10, 10, 0));
+        originalWitness.setWitnessOptionDocument(originalDocument);
 
         UploadEvidenceWitness newWitness = uploadEvidenceWitnessDocumentTypeBuilder.buildElementTypeWithDocumentCopy(originalWitness, "newCategory");
 

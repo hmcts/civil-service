@@ -24,4 +24,7 @@ public class Solicitor {
     private String reference;
     @JsonProperty("isPayee")
     private boolean isPayee;
+
+    public Solicitor() {
+    }
 }

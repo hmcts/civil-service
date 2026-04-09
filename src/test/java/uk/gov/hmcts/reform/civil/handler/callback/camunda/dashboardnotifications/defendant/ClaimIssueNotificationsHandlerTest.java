@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -29,8 +30,10 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MESSAGES_TO_THE_COURT;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
@@ -71,13 +74,12 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
 
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(dateTime)
-            .respondent1Represented(YesOrNo.NO)
-            .totalClaimAmount(new BigDecimal(1000))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(dateTime);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setTotalClaimAmount(new BigDecimal(1000));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -88,7 +90,7 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -99,13 +101,12 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
 
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(dateTime)
-            .respondent1Represented(YesOrNo.NO)
-            .totalClaimAmount(new BigDecimal(10001))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(dateTime);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setTotalClaimAmount(new BigDecimal(10001));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -116,13 +117,13 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -130,16 +131,15 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
     void createDashboardNotifications_queryManagement() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
+        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(dateTime)
-            .respondent1Represented(YesOrNo.NO)
-            .totalClaimAmount(new BigDecimal(10001))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(dateTime);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setTotalClaimAmount(new BigDecimal(10001));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -150,14 +150,27 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            new ScenarioRequestParams(params)
+        );
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            new ScenarioRequestParams(params)
+        );
+
     }
 
     @Test
@@ -165,13 +178,12 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(dateTime)
-            .respondent1Represented(YesOrNo.YES)
-            .totalClaimAmount(new BigDecimal(10001))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(dateTime);
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setTotalClaimAmount(new BigDecimal(10001));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)

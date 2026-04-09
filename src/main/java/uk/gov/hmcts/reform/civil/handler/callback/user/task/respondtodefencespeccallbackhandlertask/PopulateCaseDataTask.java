@@ -9,26 +9,24 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
-import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -36,10 +34,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DATE_FORMATTER;
 
 @Component
 @RequiredArgsConstructor
@@ -50,60 +48,73 @@ public class PopulateCaseDataTask implements CaseTask {
     private final ObjectMapper objectMapper;
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
-    private static final String DATE_PATTERN = "dd MMMM yyyy";
+
     private final PaymentDateService paymentDateService;
     private final ResponseOneVOneShowTagService responseOneVOneShowTagService;
-    private final DeadlineExtensionCalculatorService deadlineCalculatorService;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
-
         log.info("Populating Case Data for Case : {}", caseData.getCcdCaseReference());
 
         if (isDefendantFullAdmitPayImmediately(caseData)) {
-            LocalDate whenBePaid = paymentDateService.getPaymentDateAdmittedClaim(caseData);
-            updatedCaseData.showResponseOneVOneFlag(responseOneVOneShowTagService.setUpOneVOneFlow(caseData));
-            updatedCaseData.whenToBePaidText(formatLocalDate(whenBePaid, DATE));
+            String whenBePaid = paymentDateService.getFormattedPaymentDate(caseData);
+            caseData.setShowResponseOneVOneFlag(responseOneVOneShowTagService.setUpOneVOneFlow(caseData));
+            caseData.setWhenToBePaidText(whenBePaid);
         }
 
-        updatedCaseData.respondent1Copy(caseData.getRespondent1())
-            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM);
+        if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
+            LocalDate whenBePaid = paymentDateService.calculatePaymentDeadline();
+            caseData.setWhenToBePaidText(whenBePaid.format(DATE_FORMATTER));
+            RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+            respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenBePaid);
+            caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+        }
+
+        caseData.setRespondent1Copy(caseData.getRespondent1());
+        caseData.setClaimantResponseScenarioFlag(getMultiPartyScenario(caseData));
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            updatedCaseData.showCarmFields(YES);
+            caseData.setShowCarmFields(YES);
         } else {
-            updatedCaseData.showCarmFields(NO);
+            caseData.setShowCarmFields(NO);
         }
 
         List<LocationRefData> locations = fetchLocationData(callbackParams);
-        updatedCaseData.applicant1DQ(
-            Applicant1DQ.builder().applicant1DQRequestedCourt(
-                RequestedCourt.builder().responseCourtLocations(
-                    courtLocationUtils.getLocationsFromList(locations)).build()
-            ).build());
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setResponseCourtLocations(
+            courtLocationUtils.getLocationsFromList(locations));
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQRequestedCourt(requestedCourt);
+        caseData.setApplicant1DQ(applicant1DQ);
 
-        if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
-            updatedCaseData.showResponseOneVOneFlag(responseOneVOneShowTagService.setUpOneVOneFlow(caseData));
-            updatedCaseData.respondent1PaymentDateToStringSpec(setUpPayDateToString(caseData));
+        if (V_2.equals(callbackParams.getVersion())) {
+            caseData.setShowResponseOneVOneFlag(responseOneVOneShowTagService.setUpOneVOneFlow(caseData));
+            caseData.setRespondent1PaymentDateToStringSpec(paymentDateService.getFormattedPaymentDate(caseData));
 
             Optional<BigDecimal> howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
                 .map(RespondToClaim::getHowMuchWasPaid);
 
-            howMuchWasPaid.ifPresent(howMuchWasPaidValue -> updatedCaseData.partAdmitPaidValuePounds(
+            howMuchWasPaid.ifPresent(howMuchWasPaidValue -> caseData.setPartAdmitPaidValuePounds(
                 MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
 
-            updatedCaseData.responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
+            caseData.setResponseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
                                                                                 null, null, featureToggleService, caseData
             ).name());
         }
-        populatePreviewDocuments(caseData, updatedCaseData);
+        populatePreviewDocuments(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
+    }
+
+    private boolean isDefendantPartAdmitPayImmediatelyAccepted(CaseData caseData) {
+        return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
+            && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            && (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            && YES.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec());
     }
 
     private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
@@ -117,49 +128,31 @@ public class PopulateCaseDataTask implements CaseTask {
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
-    private String setUpPayDateToString(CaseData caseData) {
-        if (caseData.getRespondToClaimAdmitPartLRspec() != null
-            && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
-            return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
-                .format(DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH));
+    private void populatePreviewDocuments(CaseData caseData) {
+        if (caseData.getSystemGeneratedCaseDocuments() == null) {
+            caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         }
-        if (caseData.getRespondToAdmittedClaim() != null
-            && caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid() != null) {
-            return caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid()
-                .format(DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH));
-        }
-        if (caseData.getRespondent1ResponseDate() != null) {
-            return deadlineCalculatorService.calculateExtendedDeadline(
-                    caseData.getRespondent1ResponseDate().toLocalDate(),
-                    RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY)
-                .format(DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH));
-        }
-        return null;
-    }
-
-    private void populatePreviewDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        
         if (caseData.getRespondent2DocumentURL() == null) {
             caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
                 if (document.getValue().getDocumentName().contains("defendant_directions_questionnaire_form")) {
-                    updatedCaseData.respondent1GeneratedResponseDocument(document.getValue());
+                    caseData.setRespondent1GeneratedResponseDocument(document.getValue());
                 }
             });
         } else {
             caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
                 if (document.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getRespondent1DocumentURL())) {
-                    updatedCaseData.respondent1GeneratedResponseDocument(document.getValue());
+                    caseData.setRespondent1GeneratedResponseDocument(document.getValue());
                 }
                 if (document.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getRespondent2DocumentURL())) {
-                    updatedCaseData.respondent2GeneratedResponseDocument(document.getValue());
+                    caseData.setRespondent2GeneratedResponseDocument(document.getValue());
                 }
             });
         }
-        if (featureToggleService.isPinInPostEnabled()) {
-            caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
-                if (document.getValue().getDocumentName().contains("response_sealed_form.pdf")) {
-                    updatedCaseData.respondent1ClaimResponseDocumentSpec(document.getValue());
-                }
-            });
-        }
+        caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
+            if (document.getValue().getDocumentName().contains("response_sealed_form.pdf")) {
+                caseData.setRespondent1ClaimResponseDocumentSpec(document.getValue());
+            }
+        });
     }
 }

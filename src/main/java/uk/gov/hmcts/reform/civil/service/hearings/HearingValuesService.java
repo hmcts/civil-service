@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
-import uk.gov.hmcts.reform.civil.exceptions.IncludesLitigantInPersonException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
@@ -83,48 +81,26 @@ public class HearingValuesService {
     private final FeatureToggleService featuretoggleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String authToken) throws Exception {
+        log.info("Getting hearing values for case id: {}", caseId);
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
 
+        log.info("Checking LR v LR for case id: {}", caseId);
         isLrVLr(caseData);
+        log.info("Completed LR v LR check for case id: {}", caseId);
 
-        String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
-        String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);
+        ServiceHearingValuesModel hearingValuesModel = buildHearingValues(caseData, authToken, caseId);
+        log.info("Returning hearing values for case id: {}", caseId);
+        return hearingValuesModel;
+    }
 
-        return ServiceHearingValuesModel.builder()
-            .hmctsServiceID(hmctsServiceID)
-            .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
-            .publicCaseName(getPublicCaseName(caseData))
-            .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag(caseData))
-            .caseCategories(getCaseCategories(caseData, caseCategoriesService, authToken))
-            .caseDeepLink(getCaseDeepLink(caseId, baseUrl))
-            .caseRestrictedFlag(getCaseRestrictedFlag())
-            .externalCaseReference(getExternalCaseReference())
-            .caseManagementLocationCode(getCaseManagementLocationCode(caseData))
-            .caseSLAStartDate(getCaseSLAStartDate(caseData))
-            .autoListFlag(getAutoListFlag())
-            .hearingType(getHearingType())
-            .hearingWindow(getHearingWindow())
-            .duration(getDuration())
-            .hearingPriorityType(getHearingPriorityType())
-            .numberOfPhysicalAttendees(getNumberOfPhysicalAttendees())
-            .hearingInWelshFlag(getHearingInWelshFlag(caseData))
-            .hearingLocations(getHearingLocations(caseData))
-            .facilitiesRequired(getFacilitiesRequired(caseData))
-            .listingComments(getListingComments(caseData))
-            .hearingRequester(getHearingRequester())
-            .privateHearingRequiredFlag(getPrivateHearingRequiredFlag())
-            .caseInterpreterRequiredFlag(hasCaseInterpreterRequiredFlag(caseData))
-            .panelRequirements(getPanelRequirements())
-            .leadJudgeContractType(getLeadJudgeContractType())
-            .judiciary(getJudiciary())
-            .hearingIsLinkedFlag(getHearingIsLinkedFlag())
-            .parties(buildPartyObjectForHearingPayload(caseData, organisationService))
-            .screenFlow(getScreenFlow())
-            .vocabulary(getVocabulary())
-            .hearingChannels(getHearingChannels(authToken, hmctsServiceID, caseData, categoryService))
-            .caseFlags(getCaseFlags(caseData))
-            .build();
+    public ServiceHearingValuesModel getValues(CaseData caseData, String authToken) {
+        Long caseReference = caseData.getCcdCaseReference();
+        log.info("Building hearing values for supplied case data. case reference: {}", caseReference);
+        isLrVLr(caseData);
+        ServiceHearingValuesModel hearingValuesModel = buildHearingValues(caseData, authToken, caseReference);
+        log.info("Returning hearing values for supplied case data. case reference: {}", caseReference);
+        return hearingValuesModel;
     }
 
     private CaseData retrieveCaseData(long caseId) {
@@ -142,31 +118,28 @@ public class HearingValuesService {
         }
     }
 
-    private void isLrVLr(CaseData caseData) throws IncludesLitigantInPersonException {
+    private void isLrVLr(CaseData caseData) {
         if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
-            if (featuretoggleService.isHmcForLipEnabled()) {
+            if (!featuretoggleService.isWelshEnabledForMainCase()) {
                 isEarlyAdopter(caseData);
-            } else {
-                throw new IncludesLitigantInPersonException();
             }
         }
     }
 
     private void populateMissingFields(Long caseId, CaseData caseData) throws Exception {
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        boolean partyIdsUpdated = populateMissingPartyIds(builder, caseData);
-        boolean unavailableDatesUpdated = populateMissingUnavailableDatesFields(builder);
-        boolean caseFlagsUpdated = initialiseMissingCaseFlags(builder);
+        boolean partyIdsUpdated = populateMissingPartyIds(caseData);
+        boolean unavailableDatesUpdated = populateMissingUnavailableDatesFields(caseData);
+        boolean caseFlagsUpdated = initialiseMissingCaseFlags(caseData);
 
         if (partyIdsUpdated || unavailableDatesUpdated || caseFlagsUpdated) {
             try {
+                log.info("Updating missing fields for {} ", caseId);
                 caseDataService.triggerEvent(
-                    caseId, UPDATE_MISSING_FIELDS, builder.build().toMap(mapper));
+                    caseId, UPDATE_MISSING_FIELDS, caseData.toMap(mapper));
             } catch (FeignException e) {
-                log.error("Updating missing fields failed: {}", e);
+                log.error("Updating missing fields failed: {}", e.getMessage(), e);
                 throw e;
             }
-            throw new MissingFieldsUpdatedException();
         }
     }
 
@@ -176,21 +149,18 @@ public class HearingValuesService {
      * that gets populated during claim creation. If no partyIds exist it's safe to assume there
      * are missing partyIds to populate.
      *
-     * @param builder case data builder
      * @param caseData given case data.
-     * @throws MissingFieldsUpdatedException If party ids have been updated, to force the consumer to request
-     *                                  the hearing values endpoint again.
      * @throws FeignException If an error is returned from case data service when triggering the event.
      */
-    private boolean populateMissingPartyIds(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
+    private boolean populateMissingPartyIds(CaseData caseData) {
         if (caseData.getApplicant1().getPartyID() == null) {
             // Even if party ids creation is released and cases are
             // in an inconsistent state where app/res fields have no party ids
             // and litfriends, witnesses and experts do it's still safe to call populateWithPartyFlags
             // as it was created to not overwrite partyId fields if they exist.
-            populateWithPartyIds(builder);
-            populateDQPartyIds(builder);
-            populateWitnessAndExpertsPartyIds(builder);
+            populateWithPartyIds(caseData);
+            populateDQPartyIds(caseData);
+            populateWitnessAndExpertsPartyIds(caseData);
             return true;
         }
         return false;
@@ -201,19 +171,16 @@ public class HearingValuesService {
      * First the unavailable dates fields are checked if date added exists before
      * overwriting with the event and date added fields
      *
-     * @throws MissingFieldsUpdatedException If unavailable dates have been updated, to force the consumer to request
-     *                                  the hearing values endpoint again.
      * @throws FeignException If an error is returned from case data service when triggering the event.
      */
-    private boolean populateMissingUnavailableDatesFields(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
+    private boolean populateMissingUnavailableDatesFields(CaseData caseData) {
         if (shouldUpdateApplicant1UnavailableDates(caseData)
             || shouldUpdateApplicant2UnavailableDates(caseData)
             || shouldUpdateRespondent1UnavailableDates(caseData)
             || shouldUpdateRespondent2UnavailableDates(caseData)) {
-            updateMissingUnavailableDatesForApplicants(caseData, builder);
-            rollUpUnavailabilityDatesForRespondent(builder);
-            copyDatesIntoListingTabFields(builder.build(), builder);
+            updateMissingUnavailableDatesForApplicants(caseData);
+            rollUpUnavailabilityDatesForRespondent(caseData);
+            copyDatesIntoListingTabFields(caseData);
             return true;
         }
         return false;
@@ -224,16 +191,53 @@ public class HearingValuesService {
      * First the applicant is checked for the flags field as it's the first one
      * to get initialised on claim creation
      *
-     * @throws MissingFieldsUpdatedException If case flags have been re-initialised, to force the consumer to request
-     *                                  the hearing values endpoint again.
      * @throws FeignException If an error is returned from case data service when triggering the event.
      */
-    private boolean initialiseMissingCaseFlags(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
+    private boolean initialiseMissingCaseFlags(CaseData caseData) {
         if (caseData.getApplicant1().getFlags() == null) {
-            caseFlagInitialiser.initialiseMissingCaseFlags(builder);
+            caseFlagInitialiser.initialiseMissingCaseFlags(caseData);
             return true;
         }
         return false;
+    }
+
+    private ServiceHearingValuesModel buildHearingValues(CaseData caseData, String authToken, Long caseIdForDeepLink) {
+        String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
+        String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);
+
+        ServiceHearingValuesModel serviceHearingValuesModel = new ServiceHearingValuesModel();
+        serviceHearingValuesModel.setHmctsServiceID(hmctsServiceID);
+        serviceHearingValuesModel.setHmctsInternalCaseName(getHmctsInternalCaseName(caseData));
+        serviceHearingValuesModel.setPublicCaseName(getPublicCaseName(caseData));
+        serviceHearingValuesModel.setCaseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag(caseData));
+        serviceHearingValuesModel.setCaseCategories(getCaseCategories(caseData, caseCategoriesService, authToken));
+        serviceHearingValuesModel.setCaseDeepLink(caseIdForDeepLink != null ? getCaseDeepLink(caseIdForDeepLink, baseUrl) : null);
+        serviceHearingValuesModel.setCaseRestrictedFlag(getCaseRestrictedFlag());
+        serviceHearingValuesModel.setExternalCaseReference(getExternalCaseReference());
+        serviceHearingValuesModel.setCaseManagementLocationCode(getCaseManagementLocationCode(caseData));
+        serviceHearingValuesModel.setCaseSLAStartDate(getCaseSLAStartDate(caseData));
+        serviceHearingValuesModel.setAutoListFlag(getAutoListFlag());
+        serviceHearingValuesModel.setHearingType(getHearingType());
+        serviceHearingValuesModel.setHearingWindow(getHearingWindow());
+        serviceHearingValuesModel.setDuration(getDuration());
+        serviceHearingValuesModel.setHearingPriorityType(getHearingPriorityType());
+        serviceHearingValuesModel.setNumberOfPhysicalAttendees(getNumberOfPhysicalAttendees());
+        serviceHearingValuesModel.setHearingInWelshFlag(getHearingInWelshFlag(caseData));
+        serviceHearingValuesModel.setHearingLocations(getHearingLocations(caseData));
+        serviceHearingValuesModel.setFacilitiesRequired(getFacilitiesRequired(caseData));
+        serviceHearingValuesModel.setListingComments(getListingComments(caseData));
+        serviceHearingValuesModel.setHearingRequester(getHearingRequester());
+        serviceHearingValuesModel.setPrivateHearingRequiredFlag(getPrivateHearingRequiredFlag());
+        serviceHearingValuesModel.setCaseInterpreterRequiredFlag(hasCaseInterpreterRequiredFlag(caseData));
+        serviceHearingValuesModel.setPanelRequirements(getPanelRequirements());
+        serviceHearingValuesModel.setLeadJudgeContractType(getLeadJudgeContractType());
+        serviceHearingValuesModel.setJudiciary(getJudiciary());
+        serviceHearingValuesModel.setHearingIsLinkedFlag(getHearingIsLinkedFlag());
+        serviceHearingValuesModel.setParties(buildPartyObjectForHearingPayload(caseData, organisationService));
+        serviceHearingValuesModel.setScreenFlow(getScreenFlow());
+        serviceHearingValuesModel.setVocabulary(getVocabulary());
+        serviceHearingValuesModel.setHearingChannels(getHearingChannels(authToken, hmctsServiceID, caseData, categoryService));
+        serviceHearingValuesModel.setCaseFlags(getCaseFlags(caseData));
+        return serviceHearingValuesModel;
     }
 }

@@ -33,8 +33,9 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
     private final DocumentGeneratorService documentGeneratorService;
     private final FeatureToggleService featureToggleService;
 
-    public CaseDocument generateDocs(CaseData caseData, String partyName, Address address, String partyType, String authorisation) {
-        NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, partyName, address);
+    public CaseDocument generateDocs(CaseData caseData, String partyName, Address address, String partyType, String authorisation, boolean isRespondentLiP) {
+        boolean isQMEnabled = featureToggleService.isPublicQueryManagementEnabled(caseData);
+        NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, partyName, address, isQMEnabled, isRespondentLiP);
         DocmosisTemplates docmosisTemplate = isBilingual(caseData) ? NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF : NOTICE_OF_DISCONTINUANCE_PDF;
         DocmosisDocument docmosisDocument =
                 documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
@@ -57,46 +58,47 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
         return String.format(docmosisTemplate.getDocumentTitle(), partyTypeAndCaseRef);
     }
 
-    private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData, String partyName, Address address) {
-        var noticeOfDiscontinueBuilder = NoticeOfDiscontinuanceForm.builder()
-                .caseNumber(caseData.getLegacyCaseReference())
-                .claimReferenceNumber(caseData.getLegacyCaseReference())
-                .letterIssueDate(LocalDate.now())
-                .dateOfEvent(LocalDate.now())
-                .coverLetterName(partyName)
-                .addressLine1(address.getAddressLine1())
-                .addressLine2(address.getAddressLine2())
-                .addressLine3(address.getAddressLine3())
-                .postCode(address.getPostCode())
-                .claimant1Name(caseData.getApplicant1().getPartyName())
-                .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
-                .defendant1Name(caseData.getRespondent1().getPartyName())
-                .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
-                .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
-                .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
-                .claimantNumWelsh(nonNull(caseData.getApplicant2()) ? "Hawlydd 1" : "Hawlydd")
-                .defendantNumWelsh(nonNull(caseData.getRespondent2()) ? "Diffynnydd 1" : "Diffynnydd")
-                .claimantWhoIsDiscontinue(getClaimantWhoIsDiscontinue(caseData))
-                .claimantsConsentToDiscontinuance(nonNull(caseData.getClaimantsConsentToDiscontinuance())
-                        ? getConsentToDiscontinue(caseData) : null)
-                .courtPermission(nonNull(caseData.getCourtPermissionNeeded())
-                        ? caseData.getCourtPermissionNeeded().getDisplayedValue() : null)
-                .permissionGranted(nonNull(caseData.getIsPermissionGranted())
-                        ? caseData.getIsPermissionGranted().getDisplayedValue() : null)
-                .judgeName(isCourtPermissionGranted(caseData)
-                        ? caseData.getPermissionGrantedComplex().getPermissionGrantedJudge() : null)
-                .judgementDate(isCourtPermissionGranted(caseData)
-                        ? caseData.getPermissionGrantedComplex().getPermissionGrantedDate() : null)
-                .judgementDateWelsh(isCourtPermissionGranted(caseData)
-                        ? formatDateInWelsh(caseData.getPermissionGrantedComplex().getPermissionGrantedDate(), false) : null)
-                .typeOfDiscontinuance(caseData.getTypeOfDiscontinuance().toString())
-                .typeOfDiscontinuanceTxt(caseData.getTypeOfDiscontinuance().getType())
-                .partOfDiscontinuanceTxt(caseData.getPartDiscontinuanceDetails())
-                .discontinuingAgainstOneDefendant(getDiscontinueAgainstOneDefendant(caseData))
-                .discontinuingAgainstBothDefendants(nonNull(caseData.getIsDiscontinuingAgainstBothDefendants())
-                        ? caseData.getIsDiscontinuingAgainstBothDefendants().getDisplayedValue() : null)
-                .welshDate(formatDateInWelsh(LocalDate.now(), false));
-        return noticeOfDiscontinueBuilder.build();
+    private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData, String partyName, Address address, boolean isQMEnabled, boolean isRespondentLiP) {
+        return new NoticeOfDiscontinuanceForm()
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setLetterIssueDate(LocalDate.now())
+            .setDateOfEvent(LocalDate.now())
+            .setCoverLetterName(partyName)
+            .setAddressLine1(address.getAddressLine1())
+            .setAddressLine2(address.getAddressLine2())
+            .setAddressLine3(address.getAddressLine3())
+            .setPostCode(address.getPostCode())
+            .setClaimant1Name(caseData.getApplicant1().getPartyName())
+            .setClaimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
+            .setDefendant1Name(caseData.getRespondent1().getPartyName())
+            .setDefendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
+            .setClaimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
+            .setDefendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
+            .setClaimantNumWelsh(nonNull(caseData.getApplicant2()) ? "Hawlydd 1" : "Hawlydd")
+            .setDefendantNumWelsh(nonNull(caseData.getRespondent2()) ? "Diffynnydd 1" : "Diffynnydd")
+            .setClaimantWhoIsDiscontinue(getClaimantWhoIsDiscontinue(caseData))
+            .setClaimantsConsentToDiscontinuance(nonNull(caseData.getClaimantsConsentToDiscontinuance())
+                                                     ? getConsentToDiscontinue(caseData) : null)
+            .setCourtPermission(nonNull(caseData.getCourtPermissionNeeded())
+                                    ? caseData.getCourtPermissionNeeded().getDisplayedValue() : null)
+            .setPermissionGranted(nonNull(caseData.getIsPermissionGranted())
+                                      ? caseData.getIsPermissionGranted().getDisplayedValue() : null)
+            .setJudgeName(isCourtPermissionGranted(caseData)
+                              ? caseData.getPermissionGrantedComplex().getPermissionGrantedJudge() : null)
+            .setJudgementDate(isCourtPermissionGranted(caseData)
+                                  ? caseData.getPermissionGrantedComplex().getPermissionGrantedDate() : null)
+            .setJudgementDateWelsh(isCourtPermissionGranted(caseData)
+                                       ? formatDateInWelsh(caseData.getPermissionGrantedComplex().getPermissionGrantedDate(), false) : null)
+            .setTypeOfDiscontinuance(caseData.getTypeOfDiscontinuance().toString())
+            .setTypeOfDiscontinuanceTxt(caseData.getTypeOfDiscontinuance().getType())
+            .setPartOfDiscontinuanceTxt(caseData.getPartDiscontinuanceDetails())
+            .setDiscontinuingAgainstOneDefendant(getDiscontinueAgainstOneDefendant(caseData))
+            .setDiscontinuingAgainstBothDefendants(nonNull(caseData.getIsDiscontinuingAgainstBothDefendants())
+                                                       ? caseData.getIsDiscontinuingAgainstBothDefendants().getDisplayedValue() : null)
+            .setWelshDate(formatDateInWelsh(LocalDate.now(), false))
+            .setQMEnabled(isQMEnabled)
+            .setRespondent1LiP(isRespondentLiP);
     }
 
     private String getClaimantWhoIsDiscontinue(CaseData caseData) {
@@ -126,4 +128,5 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
     private boolean isBilingual(CaseData caseData) {
         return isWelshHearingSelected(caseData) || caseData.isRespondentResponseBilingual();
     }
+
 }

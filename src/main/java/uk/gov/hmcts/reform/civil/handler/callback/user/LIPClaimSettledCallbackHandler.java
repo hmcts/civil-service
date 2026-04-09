@@ -62,10 +62,9 @@ public class LIPClaimSettledCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            .previousCCDState(callbackParams.getCaseData().getCcdState())
-            .businessProcess(BusinessProcess.ready(LIP_CLAIM_SETTLED))
-            .build();
+        CaseData caseDataUpdated = callbackParams.getCaseData();
+        caseDataUpdated.setPreviousCCDState(caseDataUpdated.getCcdState());
+        caseDataUpdated.setBusinessProcess(BusinessProcess.ready(LIP_CLAIM_SETTLED));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
             .build();

@@ -1,0 +1,1831 @@
+[
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "FULL_DEFENCE",
+    "guard_raw": "fullDefence",
+    "guard_text": "Latest defence is a full defence (unspecified).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "FULL_DEFENCE",
+    "guard_raw": "fullDefenceSpec",
+    "guard_text": "Latest defence is a full defence in SPEC.",
+    "tags": [
+      "spec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "FULL_ADMISSION",
+    "guard_raw": "fullAdmission.and(not(divergentRespondGoOffline))",
+    "guard_text": "(Latest defence is a full admission (unspecified).) AND (NOT (Defendant responses diverge so the case must go offline.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "PART_ADMISSION",
+    "guard_raw": "partAdmission.and(not(divergentRespondGoOffline))",
+    "guard_text": "(Latest defence is a part admission (unspecified).) AND (NOT (Defendant responses diverge so the case must go offline.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "COUNTER_CLAIM",
+    "guard_raw": "counterClaim.and(not(divergentRespondGoOffline))",
+    "guard_text": "(Latest defence is a counter claim (unspecified journey).) AND (NOT (Defendant responses diverge so the case must go offline.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "DIVERGENT_RESPOND_GO_OFFLINE",
+    "guard_raw": "divergentRespondGoOffline",
+    "guard_text": "Defendant responses diverge so the case must go offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "DIVERGENT_RESPOND_GO_OFFLINE",
+    "guard_raw": "divergentRespondGoOfflineSpec",
+    "guard_text": "SPEC defendant/claimant responses diverge so the case must go offline.",
+    "tags": [
+      "offline/timeout",
+      "spec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "DIVERGENT_RESPOND_GO_OFFLINE",
+    "guard_raw": "fullAdmissionSpec",
+    "guard_text": "Latest defence is a full admission in SPEC.",
+    "tags": [
+      "spec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "DIVERGENT_RESPOND_GO_OFFLINE",
+    "guard_raw": "partAdmissionSpec",
+    "guard_text": "Latest defence is a part admission in SPEC.",
+    "tags": [
+      "spec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "DIVERGENT_RESPOND_GO_OFFLINE",
+    "guard_raw": "counterClaimSpec",
+    "guard_text": "Latest defence is a counter claim for SPEC.",
+    "tags": [
+      "spec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE",
+    "guard_raw": "divergentRespondWithDQAndGoOffline",
+    "guard_text": "Responses diverge and discrete directions questionnaires must be produced before going offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE",
+    "guard_raw": "divergentRespondWithDQAndGoOfflineSpec",
+    "guard_text": "SPEC divergent responses requiring DQs before going offline.",
+    "tags": [
+      "offline/timeout",
+      "spec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterClaimDetailsNotified",
+    "guard_text": "Staff took the case offline after claim details were notified (and before any responses/time extensions).",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "ALL_RESPONSES_RECEIVED",
+    "to": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "caseDismissedAfterDetailNotified",
+    "guard_text": "Claim details notification deadline expired with no response or staff action.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "to": "ALL_RESPONSES_RECEIVED",
+    "guard_raw": "allResponsesReceived",
+    "guard_text": "Every required defendant response has been received",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "to": "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED",
+    "guard_raw": "takenOfflineAfterClaimDetailsNotified",
+    "guard_text": "Claim was taken offline because not all defendants were notified of claim details online.",
+    "tags": [
+      "multi-party",
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterClaimNotified",
+    "guard_text": "Staff took the case offline after notification but before claim details were served.",
+    "tags": [
+      "multi-party",
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "to": "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "pastClaimDetailsNotificationDeadline",
+    "guard_text": "Claim details notification deadline has expired.",
+    "tags": [
+      "multi-party",
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "to": "ALL_RESPONSES_RECEIVED",
+    "guard_raw": "allResponsesReceived",
+    "guard_text": "Every required defendant response has been received",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "to": "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED",
+    "guard_raw": "takenOfflineAfterClaimDetailsNotified",
+    "guard_text": "Claim was taken offline because not all defendants were notified of claim details online.",
+    "tags": [
+      "multi-party",
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterClaimNotified",
+    "guard_text": "Staff took the case offline after notification but before claim details were served.",
+    "tags": [
+      "multi-party",
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "to": "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "pastClaimDetailsNotificationDeadline",
+    "guard_text": "Claim details notification deadline has expired.",
+    "tags": [
+      "multi-party",
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "to": "ALL_RESPONSES_RECEIVED",
+    "guard_raw": "allResponsesReceived",
+    "guard_text": "Every required defendant response has been received",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "to": "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED",
+    "guard_raw": "takenOfflineAfterClaimDetailsNotified",
+    "guard_text": "Claim was taken offline because not all defendants were notified of claim details online.",
+    "tags": [
+      "multi-party",
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterClaimNotified",
+    "guard_text": "Staff took the case offline after notification but before claim details were served.",
+    "tags": [
+      "multi-party",
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "to": "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "pastClaimDetailsNotificationDeadline",
+    "guard_text": "Claim details notification deadline has expired.",
+    "tags": [
+      "multi-party",
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to": "NOTIFICATION_ACKNOWLEDGED",
+    "guard_raw": "notificationAcknowledged",
+    "guard_text": "At least one defendant has acknowledged service (per scenario rules).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to": "ALL_RESPONSES_RECEIVED",
+    "guard_raw": "(respondentTimeExtension).and(allResponsesReceived)",
+    "guard_text": "(A defendant has obtained a time extension to respond.) AND (Every required defendant response has been received)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "guard_raw": "(awaitingResponsesFullDefenceReceived).and(respondentTimeExtension) .and(not(caseDismissedAfterDetailNotifiedExtension))",
+    "guard_text": "((In a 1v2 two-solicitor case only one defendant has provided a full defence and the other is yet to respond.) AND (A defendant has obtained a time extension to respond.)) AND (NOT (Claim details notification deadline expired while an extension applied and no responses or staff action occurred.))",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "guard_raw": "(awaitingResponsesFullAdmitReceived).and(respondentTimeExtension)",
+    "guard_text": "(In a 1v2 two-solicitor case only one defendant has responded with a full admission and the second is outstanding.) AND (A defendant has obtained a time extension to respond.)",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "guard_raw": "(awaitingResponsesNonFullDefenceOrFullAdmitReceived).and(respondentTimeExtension)",
+    "guard_text": "(In a 1v2 two-solicitor case a single defendant has responded with something other than full defence/admission while the co-defendant is outstanding.) AND (A defendant has obtained a time extension to respond.)",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterClaimDetailsNotifiedExtension",
+    "guard_text": "Staff took the case offline after claim details were notified while an extension was active.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "caseDismissedAfterDetailNotifiedExtension",
+    "guard_text": "Claim details notification deadline expired while an extension applied and no responses or staff action occurred.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "to": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard_raw": "takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension",
+    "guard_text": "Case marked not suitable for SDO and taken offline during a claim-details extension.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED",
+    "to": "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
+    "guard_raw": "respondentTimeExtension .and(not(notificationAcknowledged)) .and(not(isInHearingReadiness))",
+    "guard_text": "((A defendant has obtained a time extension to respond.) AND (NOT (At least one defendant has acknowledged service (per scenario rules).))) AND (NOT (Hearing has been listed and the case is in hearing readiness (no dismissals/taken offline).))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED",
+    "to": "NOTIFICATION_ACKNOWLEDGED",
+    "guard_raw": "notificationAcknowledged.and(not(isInHearingReadiness))",
+    "guard_text": "(At least one defendant has acknowledged service (per scenario rules).) AND (NOT (Hearing has been listed and the case is in hearing readiness (no dismissals/taken offline).))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED",
+    "to": "ALL_RESPONSES_RECEIVED",
+    "guard_raw": "allResponsesReceived.and(not(notificationAcknowledged) .and(not(respondentTimeExtension)).and(not(isInHearingReadiness)))",
+    "guard_text": "(Every required defendant response has been received) AND (((NOT (At least one defendant has acknowledged service (per scenario rules).)) AND (NOT (A defendant has obtained a time extension to respond.))) AND (NOT (Hearing has been listed and the case is in hearing readiness (no dismissals/taken offline).)))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED",
+    "to": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "guard_raw": "awaitingResponsesFullDefenceReceived .and(not(notificationAcknowledged)).and(not(respondentTimeExtension)) .and(not(caseDismissedAfterDetailNotified))",
+    "guard_text": "(((In a 1v2 two-solicitor case only one defendant has provided a full defence and the other is yet to respond.) AND (NOT (At least one defendant has acknowledged service (per scenario rules).))) AND (NOT (A defendant has obtained a time extension to respond.))) AND (NOT (Claim details notification deadline expired with no response or staff action.))",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED",
+    "to": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "guard_raw": "awaitingResponsesFullAdmitReceived .and(not(notificationAcknowledged)).and(not(respondentTimeExtension))",
+    "guard_text": "((In a 1v2 two-solicitor case only one defendant has responded with a full admission and the second is outstanding.) AND (NOT (At least one defendant has acknowledged service (per scenario rules).))) AND (NOT (A defendant has obtained a time extension to respond.))",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED",
+    "to": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "guard_raw": "awaitingResponsesNonFullDefenceOrFullAdmitReceived .and(not(notificationAcknowledged)).and(not(respondentTimeExtension))",
+    "guard_text": "((In a 1v2 two-solicitor case a single defendant has responded with something other than full defence/admission while the co-defendant is outstanding.) AND (NOT (At least one defendant has acknowledged service (per scenario rules).))) AND (NOT (A defendant has obtained a time extension to respond.))",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterClaimDetailsNotified",
+    "guard_text": "Staff took the case offline after claim details were notified (and before any responses/time extensions).",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED",
+    "to": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "caseDismissedAfterDetailNotified.and(not(isInHearingReadiness))",
+    "guard_text": "(Claim details notification deadline expired with no response or staff action.) AND (NOT (Hearing has been listed and the case is in hearing readiness (no dismissals/taken offline).))",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED",
+    "to": "IN_HEARING_READINESS",
+    "guard_raw": "isInHearingReadiness",
+    "guard_text": "Hearing has been listed and the case is in hearing readiness (no dismissals/taken offline).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DETAILS_NOTIFIED",
+    "to": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard_raw": "takenOfflineSDONotDrawnAfterClaimDetailsNotified",
+    "guard_text": "Case marked not suitable for SDO and taken offline after claim details notification.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaff",
+    "guard_text": "HMCTS staff have manually taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaff",
+    "guard_text": "HMCTS staff have manually taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED_PAYMENT_FAILED",
+    "to": "FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "guard_raw": "paymentSuccessful",
+    "guard_text": "Card payment succeeded for the claim issue fee.",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "to": "PENDING_CLAIM_ISSUED",
+    "guard_raw": "pendingClaimIssued",
+    "guard_text": "Case ready to move from payment success to pending issue (represented defendants with registered orgs).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "to": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT",
+    "guard_raw": "pendingClaimIssuedUnrepresentedDefendentPredicate()",
+    "guard_text": "At least one defendant is unrepresented (with scenario-specific rules) so the LiP pending issue state applies.",
+    "tags": [
+      "lip",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "to": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "guard_raw": "oneVsOneCase.and(respondent1NotRepresented).and(specClaim)",
+    "guard_text": "((Case is a single claimant v single defendant matter.) AND (First defendant is unrepresented.)) AND (Case is in the SPEC (damages) service.)",
+    "tags": [
+      "lip",
+      "spec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "to": "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
+    "guard_raw": "((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())) .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))) .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())) .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate()))) .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate())) .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())) .and(bothDefSameLegalRep.negate()) )",
+    "guard_text": "((((First defendant is represented but their organisation is not registered.) AND (NOT (First defendant is unrepresented.))) AND ((Second defendant is represented but their organisation is not registered.) AND (NOT (Second defendant is unrepresented.)))) OR (((First defendant is represented but their organisation is not registered.) AND (NOT (First defendant is unrepresented.))) AND ((NOT (Second defendant is represented but their organisation is not registered.)) AND (NOT (Second defendant is unrepresented.))))) OR ((((NOT (First defendant is represented but their organisation is not registered.)) AND (NOT (First defendant is unrepresented.))) AND ((Second defendant is represented but their organisation is not registered.) AND (NOT (Second defendant is unrepresented.)))) AND (NOT (Both defendants share the same legal representative.)))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "to": "PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT",
+    "guard_raw": "(respondent1NotRepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))) .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()) .and(respondent2NotRepresented))",
+    "guard_text": "((First defendant is unrepresented.) AND ((Second defendant is represented but their organisation is not registered.) AND (NOT (Second defendant is unrepresented.)))) OR (((First defendant is represented but their organisation is not registered.) AND (NOT (First defendant is unrepresented.))) AND (Second defendant is unrepresented.))",
+    "tags": [
+      "lip",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "CLAIM_NOTIFIED",
+    "guard_raw": "claimNotified",
+    "guard_text": "Claim notification has been sent (acknowledgement deadline exists).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterClaimIssue",
+    "guard_text": "Staff took the case offline between claim submission and issue.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED",
+    "guard_raw": "takenOfflineAfterClaimNotified",
+    "guard_text": "Claim was taken offline after notification but before claim details were served.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "pastClaimNotificationDeadline",
+    "guard_text": "Claim notification deadline has expired.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "CONTACT_DETAILS_CHANGE",
+    "guard_raw": "contactDetailsChange",
+    "guard_text": "Contact details change event has been triggered on the case.",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL",
+    "guard_raw": "onlyInitialRespondentResponseLangIsBilingual.and(not(contactDetailsChange))",
+    "guard_text": "(Respondent marked their response as bilingual but has not requested ongoing bilingual processing.) AND (NOT (Contact details change event has been triggered on the case.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "FULL_DEFENCE",
+    "guard_raw": "fullDefenceSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual)) .and(not(pastClaimNotificationDeadline))",
+    "guard_text": "(((Latest defence is a full defence in SPEC.) AND (NOT (Contact details change event has been triggered on the case.))) AND (NOT (Respondent marked their response as bilingual but has not requested ongoing bilingual processing.))) AND (NOT (Claim notification deadline has expired.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "PART_ADMISSION",
+    "guard_raw": "partAdmissionSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual))",
+    "guard_text": "((Latest defence is a part admission in SPEC.) AND (NOT (Contact details change event has been triggered on the case.))) AND (NOT (Respondent marked their response as bilingual but has not requested ongoing bilingual processing.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "FULL_ADMISSION",
+    "guard_raw": "fullAdmissionSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual))",
+    "guard_text": "((Latest defence is a full admission in SPEC.) AND (NOT (Contact details change event has been triggered on the case.))) AND (NOT (Respondent marked their response as bilingual but has not requested ongoing bilingual processing.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "COUNTER_CLAIM",
+    "guard_raw": "counterClaimSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual))",
+    "guard_text": "((Latest defence is a counter claim for SPEC.) AND (NOT (Contact details change event has been triggered on the case.))) AND (NOT (Respondent marked their response as bilingual but has not requested ongoing bilingual processing.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "guard_raw": "awaitingResponsesFullDefenceReceivedSpec.and(specClaim)",
+    "guard_text": "(SPEC analogue: one defendant has filed a full defence and the paired response is pending.) AND (Case is in the SPEC (damages) service.)",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "guard_raw": "awaitingResponsesFullAdmitReceivedSpec.and(specClaim)",
+    "guard_text": "(SPEC analogue: only one defendant has submitted a full admission and the matching response from the other side is pending.) AND (Case is in the SPEC (damages) service.)",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "guard_raw": "awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.and(specClaim)",
+    "guard_text": "(SPEC analogue: a non full-defence/admission response was received while the paired response is still outstanding.) AND (Case is in the SPEC (damages) service.)",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE",
+    "guard_raw": "divergentRespondWithDQAndGoOfflineSpec.and(specClaim)",
+    "guard_text": "(SPEC divergent responses requiring DQs before going offline.) AND (Case is in the SPEC (damages) service.)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_ISSUED",
+    "to": "DIVERGENT_RESPOND_GO_OFFLINE",
+    "guard_raw": "divergentRespondGoOfflineSpec.and(specClaim)",
+    "guard_text": "(SPEC defendant/claimant responses diverge so the case must go offline.) AND (Case is in the SPEC (damages) service.)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_NOTIFIED",
+    "to": "CLAIM_DETAILS_NOTIFIED",
+    "guard_raw": "claimDetailsNotified",
+    "guard_text": "Claim details have been successfully notified.",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_NOTIFIED",
+    "to": "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED",
+    "guard_raw": "takenOfflineAfterClaimDetailsNotified",
+    "guard_text": "Claim was taken offline because not all defendants were notified of claim details online.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_NOTIFIED",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterClaimNotified",
+    "guard_text": "Staff took the case offline after notification but before claim details were served.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_NOTIFIED",
+    "to": "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "pastClaimDetailsNotificationDeadline",
+    "guard_text": "Claim details notification deadline has expired.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_SUBMITTED",
+    "to": "CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+    "guard_raw": "paymentSuccessful",
+    "guard_text": "Card payment succeeded for the claim issue fee.",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_SUBMITTED",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffBeforeClaimIssued",
+    "guard_text": "Staff took the case offline before the claim was issued.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_SUBMITTED",
+    "to": "CLAIM_ISSUED_PAYMENT_FAILED",
+    "guard_raw": "paymentFailed",
+    "guard_text": "Card payment failed for the claim issue fee.",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CLAIM_SUBMITTED",
+    "to": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "guard_raw": "isLipCase.and(takenOfflineByStaffBeforeClaimIssued.negate())",
+    "guard_text": "(Case is LiP v LiP in a 1v1 scenario.) AND (NOT (Staff took the case offline before the claim was issued.))",
+    "tags": [
+      "lip",
+      "spec"
+    ]
+  },
+  {
+    "from": "CLAIM_SUBMITTED",
+    "to": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "guard_raw": "nocSubmittedForLiPApplicant",
+    "guard_text": "Notice of Change submitted for a LiP claimant.",
+    "tags": [
+      "lip",
+      "spec"
+    ]
+  },
+  {
+    "from": "CLAIM_SUBMITTED",
+    "to": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "guard_raw": "not(isDefendantNoCOnlineForCase).and(isLiPvLRCase.and(not(nocSubmittedForLiPDefendant)) .and(not(nocSubmittedForLiPDefendantBeforeOffline)))",
+    "guard_text": "(NOT (Defendant Notice of Change online feature flag is active for this case.)) AND (((Case is LiP v represented (one party self-represented and the other legally represented) in a 1v1.) AND (NOT (Notice of Change submitted for a LiP defendant.))) AND (NOT (LiP defendant submitted a Notice of Change before the case went offline.)))",
+    "tags": [
+      "lip",
+      "spec"
+    ]
+  },
+  {
+    "from": "CLAIM_SUBMITTED",
+    "to": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "guard_raw": "isDefendantNoCOnlineForCase.and(isLiPvLRCase)",
+    "guard_text": "(Defendant Notice of Change online feature flag is active for this case.) AND (Case is LiP v represented (one party self-represented and the other legally represented) in a 1v1.)",
+    "tags": [
+      "lip",
+      "spec"
+    ]
+  },
+  {
+    "from": "CLAIM_SUBMITTED",
+    "to": "SPEC_DEFENDANT_NOC",
+    "guard_raw": "not(isDefendantNoCOnlineForCase).and( nocSubmittedForLiPDefendantBeforeOffline)",
+    "guard_text": "(NOT (Defendant Notice of Change online feature flag is active for this case.)) AND (LiP defendant submitted a Notice of Change before the case went offline.)",
+    "tags": [
+      "spec"
+    ]
+  },
+  {
+    "from": "CONTACT_DETAILS_CHANGE",
+    "to": "FULL_DEFENCE",
+    "guard_raw": "fullDefenceSpec.and(not(onlyInitialRespondentResponseLangIsBilingual))",
+    "guard_text": "(Latest defence is a full defence in SPEC.) AND (NOT (Respondent marked their response as bilingual but has not requested ongoing bilingual processing.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CONTACT_DETAILS_CHANGE",
+    "to": "PART_ADMISSION",
+    "guard_raw": "partAdmissionSpec.and(not(onlyInitialRespondentResponseLangIsBilingual))",
+    "guard_text": "(Latest defence is a part admission in SPEC.) AND (NOT (Respondent marked their response as bilingual but has not requested ongoing bilingual processing.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CONTACT_DETAILS_CHANGE",
+    "to": "FULL_ADMISSION",
+    "guard_raw": "fullAdmissionSpec.and(not(onlyInitialRespondentResponseLangIsBilingual))",
+    "guard_text": "(Latest defence is a full admission in SPEC.) AND (NOT (Respondent marked their response as bilingual but has not requested ongoing bilingual processing.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CONTACT_DETAILS_CHANGE",
+    "to": "COUNTER_CLAIM",
+    "guard_raw": "counterClaimSpec.and(not(onlyInitialRespondentResponseLangIsBilingual))",
+    "guard_text": "(Latest defence is a counter claim for SPEC.) AND (NOT (Respondent marked their response as bilingual but has not requested ongoing bilingual processing.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "CONTACT_DETAILS_CHANGE",
+    "to": "RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL",
+    "guard_raw": "onlyInitialRespondentResponseLangIsBilingual",
+    "guard_text": "Respondent marked their response as bilingual but has not requested ongoing bilingual processing.",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "DRAFT",
+    "to": "CLAIM_SUBMITTED",
+    "guard_raw": "claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered)",
+    "guard_text": "(Single defendant representative covers all parties.) OR (1v1 claim where the respondent representative is not registered.)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "DRAFT",
+    "to": "CLAIM_SUBMITTED",
+    "guard_raw": "claimSubmittedTwoRegisteredRespondentRepresentatives .or(claimSubmittedTwoRespondentRepresentativesOneUnregistered) .or(claimSubmittedBothUnregisteredSolicitors)",
+    "guard_text": "((Two defendants, both represented by registered organisations.) OR (Two defendants with separate representatives, one organisation unregistered.)) OR (Both defendant solicitors are unregistered organisations.)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "DRAFT",
+    "to": "CLAIM_SUBMITTED",
+    "guard_raw": "claimSubmittedOneUnrepresentedDefendantOnly",
+    "guard_text": "Only defendant is unrepresented.",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "DRAFT",
+    "to": "CLAIM_SUBMITTED",
+    "guard_raw": "claimSubmittedRespondent1Unrepresented .and(claimSubmittedOneUnrepresentedDefendantOnly.negate()) .and(claimSubmittedRespondent2Unrepresented.negate())",
+    "guard_text": "((Defendant 1 is unrepresented.) AND (NOT (Only defendant is unrepresented.))) AND (NOT (Defendant 2 is unrepresented.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "DRAFT",
+    "to": "CLAIM_SUBMITTED",
+    "guard_raw": "claimSubmittedRespondent2Unrepresented .and(claimSubmittedRespondent1Unrepresented.negate())",
+    "guard_text": "(Defendant 2 is unrepresented.) AND (NOT (Defendant 1 is unrepresented.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "DRAFT",
+    "to": "CLAIM_SUBMITTED",
+    "guard_raw": "claimSubmittedRespondent1Unrepresented.and( claimSubmittedRespondent2Unrepresented)",
+    "guard_text": "(Defendant 1 is unrepresented.) AND (Defendant 2 is unrepresented.)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "SPEC_DRAFT",
+    "to": "CLAIM_SUBMITTED",
+    "guard_raw": "claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered)",
+    "guard_text": "(Single defendant representative covers all parties.) OR (1v1 claim where the respondent representative is not registered.)",
+    "tags": [
+      "spec"
+    ]
+  },
+  {
+    "from": "SPEC_DRAFT",
+    "to": "CLAIM_SUBMITTED",
+    "guard_raw": "claimSubmittedTwoRegisteredRespondentRepresentatives .or(claimSubmittedTwoRespondentRepresentativesOneUnregistered) .or(claimSubmittedBothUnregisteredSolicitors)",
+    "guard_text": "((Two defendants, both represented by registered organisations.) OR (Two defendants with separate representatives, one organisation unregistered.)) OR (Both defendant solicitors are unregistered organisations.)",
+    "tags": [
+      "spec"
+    ]
+  },
+  {
+    "from": "SPEC_DRAFT",
+    "to": "CLAIM_SUBMITTED",
+    "guard_raw": "claimSubmittedOneUnrepresentedDefendantOnly",
+    "guard_text": "Only defendant is unrepresented.",
+    "tags": [
+      "spec"
+    ]
+  },
+  {
+    "from": "SPEC_DRAFT",
+    "to": "CLAIM_SUBMITTED",
+    "guard_raw": "claimSubmittedRespondent1Unrepresented .and(claimSubmittedOneUnrepresentedDefendantOnly.negate()) .and(claimSubmittedRespondent2Unrepresented.negate())",
+    "guard_text": "((Defendant 1 is unrepresented.) AND (NOT (Only defendant is unrepresented.))) AND (NOT (Defendant 2 is unrepresented.))",
+    "tags": [
+      "spec"
+    ]
+  },
+  {
+    "from": "SPEC_DRAFT",
+    "to": "CLAIM_SUBMITTED",
+    "guard_raw": "claimSubmittedRespondent2Unrepresented .and(claimSubmittedRespondent1Unrepresented.negate())",
+    "guard_text": "(Defendant 2 is unrepresented.) AND (NOT (Defendant 1 is unrepresented.))",
+    "tags": [
+      "spec"
+    ]
+  },
+  {
+    "from": "SPEC_DRAFT",
+    "to": "CLAIM_SUBMITTED",
+    "guard_raw": "claimSubmittedRespondent1Unrepresented.and( claimSubmittedRespondent2Unrepresented)",
+    "guard_text": "(Defendant 1 is unrepresented.) AND (Defendant 2 is unrepresented.)",
+    "tags": [
+      "spec"
+    ]
+  },
+  {
+    "from": "FULL_ADMIT_JUDGMENT_ADMISSION",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaff",
+    "guard_text": "HMCTS staff have manually taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMIT_PAY_IMMEDIATELY",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaff.and(not(ccjRequestJudgmentByAdmission))",
+    "guard_text": "(HMCTS staff have manually taken the case offline.) AND (NOT (Applicant has requested a CCJ by admission.))",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMIT_PAY_IMMEDIATELY",
+    "to": "FULL_ADMIT_JUDGMENT_ADMISSION",
+    "guard_raw": "ccjRequestJudgmentByAdmission.and(isPayImmediately)",
+    "guard_text": "(Applicant has requested a CCJ by admission.) AND (Defendant has proposed to pay the admitted amount immediately.)",
+    "tags": [
+      "settlement/Judgment",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMIT_REJECT_REPAYMENT",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaff",
+    "guard_text": "HMCTS staff have manually taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMISSION",
+    "to": "FULL_ADMIT_PAY_IMMEDIATELY",
+    "guard_raw": "fullAdmitPayImmediately",
+    "guard_text": "SPEC 1v1 full admission where the defendant proposes to pay immediately and claimant has not decided whether to proceed.",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMISSION",
+    "to": "FULL_ADMIT_PROCEED",
+    "guard_raw": "fullDefenceProceed",
+    "guard_text": "Claimant elects to proceed against the defendant(s).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMISSION",
+    "to": "FULL_ADMIT_NOT_PROCEED",
+    "guard_raw": "fullDefenceNotProceed",
+    "guard_text": "Claimant indicates they do not wish to proceed against the defendant(s).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMISSION",
+    "to": "FULL_ADMIT_AGREE_REPAYMENT",
+    "guard_raw": "acceptRepaymentPlan",
+    "guard_text": "Applicant accepts the defendant's repayment plan (for LiP 1v1 the case must remain online).",
+    "tags": [
+      "settlement/Judgment",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMISSION",
+    "to": "FULL_ADMIT_REJECT_REPAYMENT",
+    "guard_raw": "rejectRepaymentPlan",
+    "guard_text": "Applicant rejected the defendant\u2019s repayment plan (and case remains online for LiP 1v1).",
+    "tags": [
+      "settlement/Judgment",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMISSION",
+    "to": "FULL_ADMIT_JUDGMENT_ADMISSION",
+    "guard_raw": "ccjRequestJudgmentByAdmission.and(isPayImmediately).and(isLipCase)",
+    "guard_text": "((Applicant has requested a CCJ by admission.) AND (Defendant has proposed to pay the admitted amount immediately.)) AND (Case is LiP v LiP in a 1v1 scenario.)",
+    "tags": [
+      "settlement/Judgment",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMISSION",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterDefendantResponse.and(not(ccjRequestJudgmentByAdmission))",
+    "guard_text": "(Staff took the case offline after a defendant response and before claimant action.) AND (NOT (Applicant has requested a CCJ by admission.))",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMISSION",
+    "to": "PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "applicantOutOfTimeNotBeingTakenOffline",
+    "guard_text": "Claimant response deadline has passed with no response and staff have not taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMISSION",
+    "to": "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA",
+    "guard_raw": "isDefendantNoCOnlineForCase.and(isPayImmediately).and(isDefendantNoCOnlineForCaseAfterJBA)",
+    "guard_text": "((Defendant Notice of Change online feature flag is active for this case.) AND (Defendant has proposed to pay the admitted amount immediately.)) AND (Case is LiP with an active judgment by admission and a post-judgment Notice of Change has occurred.)",
+    "tags": [
+      "offline/timeout",
+      "spec"
+    ]
+  },
+  {
+    "from": "FULL_ADMIT_AGREE_REPAYMENT",
+    "to": "SIGN_SETTLEMENT_AGREEMENT",
+    "guard_raw": "isRespondentSignSettlementAgreement",
+    "guard_text": "Defendant has signed the digital settlement agreement.",
+    "tags": [
+      "settlement/Judgment",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMIT_AGREE_REPAYMENT",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaff",
+    "guard_text": "HMCTS staff have manually taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_ADMIT_AGREE_REPAYMENT",
+    "to": "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA",
+    "guard_raw": "isDefendantNoCOnlineForCase.and(isDefendantNoCOnlineForCaseAfterJBA)",
+    "guard_text": "(Defendant Notice of Change online feature flag is active for this case.) AND (Case is LiP with an active judgment by admission and a post-judgment Notice of Change has occurred.)",
+    "tags": [
+      "offline/timeout",
+      "spec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE_PROCEED",
+    "to": "IN_HEARING_READINESS",
+    "guard_raw": "isInHearingReadiness",
+    "guard_text": "Hearing has been listed and the case is in hearing readiness (no dismissals/taken offline).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE_PROCEED",
+    "to": "CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE",
+    "guard_raw": "caseDismissedPastHearingFeeDue",
+    "guard_text": "Hearing fee due date has passed without payment.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE_PROCEED",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "(takenOfflineByStaffAfterClaimantResponseBeforeSDO .or(takenOfflineByStaffAfterSDO) .or(takenOfflineAfterNotSuitableForSdo)) .and(not(caseDismissedPastHearingFeeDue))",
+    "guard_text": "(((Staff took the case offline after claimant response but before an SDO was drawn.) OR (Staff took the case offline after an SDO was drawn.)) OR (Claim flagged as not suitable for SDO and taken offline.)) AND (NOT (Hearing fee due date has passed without payment.))",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE_PROCEED",
+    "to": "TAKEN_OFFLINE_AFTER_SDO",
+    "guard_raw": "takenOfflineAfterSDO",
+    "guard_text": "Claim was taken offline after directions (SDO) were drawn.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE_PROCEED",
+    "to": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard_raw": "takenOfflineSDONotDrawn",
+    "guard_text": "Case was taken offline because it was marked not suitable for an SDO.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE",
+    "to": "IN_MEDIATION",
+    "guard_raw": "(agreedToMediation.and(allAgreedToLrMediationSpec.negate()).and(fullDefenceNotProceed.negate()))",
+    "guard_text": "((Claimant opted into free mediation.) AND (NOT (In a SPEC small claim all represented parties have agreed to legal representative mediation (and no party has opted out).))) AND (NOT (Claimant indicates they do not wish to proceed against the defendant(s).))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE",
+    "to": "IN_MEDIATION",
+    "guard_raw": "isCarmApplicableCase.and(fullDefenceProceed)",
+    "guard_text": "(Case meets CARM pilot criteria for represented parties in SPEC small claims.) AND (Claimant elects to proceed against the defendant(s).)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE",
+    "to": "FULL_DEFENCE_PROCEED",
+    "guard_raw": "fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()) .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate())",
+    "guard_text": "(((((Claimant elects to proceed against the defendant(s).) AND (In a SPEC small claim all represented parties have agreed to legal representative mediation (and no party has opted out).)) AND (NOT (Claimant opted into free mediation.))) AND (NOT (Claimant has declined free mediation.))) AND (NOT (Case meets CARM pilot criteria for LiP participation in SPEC small claims.))) AND (NOT (Case meets CARM pilot criteria for represented parties in SPEC small claims.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE",
+    "to": "FULL_DEFENCE_PROCEED",
+    "guard_raw": "fullDefenceProceed .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation)) .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim)",
+    "guard_text": "(((Claimant elects to proceed against the defendant(s).) AND (((NOT (In a SPEC small claim all represented parties have agreed to legal representative mediation (and no party has opted out).)) AND (NOT (Claimant opted into free mediation.))) OR (Claimant has declined free mediation.))) AND (NOT (Claimant response deadline has passed with no response and staff have not taken the case offline.))) AND (Allocated track is multi-track for an UNSPEC claim.)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE",
+    "to": "FULL_DEFENCE_PROCEED",
+    "guard_raw": "fullDefenceProceed .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate()) .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation)) .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate() .and(not(CaseData::isLipvLROneVOne)))",
+    "guard_text": "((((((Claimant elects to proceed against the defendant(s).) AND (NOT (Case meets CARM pilot criteria for LiP participation in SPEC small claims.))) AND (NOT (Case meets CARM pilot criteria for represented parties in SPEC small claims.))) AND (((NOT (In a SPEC small claim all represented parties have agreed to legal representative mediation (and no party has opted out).)) AND (NOT (Claimant opted into free mediation.))) OR (Claimant has declined free mediation.))) AND (NOT (Claimant response deadline has passed with no response and staff have not taken the case offline.))) AND (NOT (Allocated track is multi-track for an UNSPEC claim.))) AND ((NOT (Case is LiP v LiP in a 1v1 scenario.)) AND (NOT (Case is LiP v represented (1v1).)))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE",
+    "to": "FULL_DEFENCE_PROCEED",
+    "guard_raw": "(fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim).or(lipFullDefenceProceed)) .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase.or(CaseData::isLipvLROneVOne))",
+    "guard_text": "((((((Claimant elects to proceed against the defendant(s).) OR (Claimant indicates they will not settle after a full defence.)) OR (Claimant states the defendant has not paid the amount ordered on a full defence outcome.)) OR (LiP claimant has opted to proceed following a full defence response.)) AND (NOT (Claimant opted into free mediation.))) AND (NOT (Case meets CARM pilot criteria for LiP participation in SPEC small claims.))) AND ((Case is LiP v LiP in a 1v1 scenario.) OR (Case is LiP v represented (1v1).))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE",
+    "to": "FULL_DEFENCE_PROCEED",
+    "guard_raw": "isClaimantSettleTheClaim.and(not(agreedToMediation))",
+    "guard_text": "(Claimant indicates the claim has been settled.) AND (NOT (Claimant opted into free mediation.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE",
+    "to": "FULL_DEFENCE_NOT_PROCEED",
+    "guard_raw": "fullDefenceNotProceed",
+    "guard_text": "Claimant indicates they do not wish to proceed against the defendant(s).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterDefendantResponse",
+    "guard_text": "Staff took the case offline after a defendant response and before claimant action.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "FULL_DEFENCE",
+    "to": "PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "applicantOutOfTimeNotBeingTakenOffline",
+    "guard_text": "Claimant response deadline has passed with no response and staff have not taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "IN_MEDIATION",
+    "to": "MEDIATION_UNSUCCESSFUL_PROCEED",
+    "guard_raw": "casemanMarksMediationUnsuccessful",
+    "guard_text": "Mediation service recorded the session as unsuccessful.",
+    "tags": [
+      "mediation",
+      "unspec"
+    ]
+  },
+  {
+    "from": "IN_MEDIATION",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffBeforeMediationUnsuccessful",
+    "guard_text": "Staff took the case offline before mediation recorded an outcome.",
+    "tags": [
+      "mediation",
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "MEDIATION_UNSUCCESSFUL_PROCEED",
+    "to": "IN_HEARING_READINESS",
+    "guard_raw": "isInHearingReadiness",
+    "guard_text": "Hearing has been listed and the case is in hearing readiness (no dismissals/taken offline).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "MEDIATION_UNSUCCESSFUL_PROCEED",
+    "to": "CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE",
+    "guard_raw": "caseDismissedPastHearingFeeDue.and(not(takenOfflineByStaff))",
+    "guard_text": "(Hearing fee due date has passed without payment.) AND (NOT (HMCTS staff have manually taken the case offline.))",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "MEDIATION_UNSUCCESSFUL_PROCEED",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaff",
+    "guard_text": "HMCTS staff have manually taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "MEDIATION_UNSUCCESSFUL_PROCEED",
+    "to": "TAKEN_OFFLINE_AFTER_SDO",
+    "guard_raw": "takenOfflineAfterSDO",
+    "guard_text": "Claim was taken offline after directions (SDO) were drawn.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "MEDIATION_UNSUCCESSFUL_PROCEED",
+    "to": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard_raw": "takenOfflineSDONotDrawn",
+    "guard_text": "Case was taken offline because it was marked not suitable for an SDO.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "ALL_RESPONSES_RECEIVED",
+    "guard_raw": "notificationAcknowledged.and(respondentTimeExtension).and(allResponsesReceived).and( claimDismissalOutOfTime.negate()) .and(takenOfflineByStaff.negate())",
+    "guard_text": "((((At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)) AND (Every required defendant response has been received)) AND (NOT (claimDismissalOutOfTime))) AND (NOT (HMCTS staff have manually taken the case offline.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "guard_raw": "notificationAcknowledged.and(respondentTimeExtension) .and(awaitingResponsesFullDefenceReceived) .and(not(caseDismissedAfterClaimAcknowledgedExtension)) .and(not(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension))",
+    "guard_text": "((((At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)) AND (In a 1v2 two-solicitor case only one defendant has provided a full defence and the other is yet to respond.)) AND (NOT (Claim was acknowledged, an extension applied, and the dismissal deadline passed without response or staff action.))) AND (NOT (Staff took the case offline after acknowledgement while a time extension was in play.))",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "guard_raw": "notificationAcknowledged.and(respondentTimeExtension) .and(awaitingResponsesFullAdmitReceived)",
+    "guard_text": "((At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)) AND (In a 1v2 two-solicitor case only one defendant has responded with a full admission and the second is outstanding.)",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "guard_raw": "notificationAcknowledged.and(respondentTimeExtension) .and(awaitingResponsesNonFullDefenceOrFullAdmitReceived)",
+    "guard_text": "((At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)) AND (In a 1v2 two-solicitor case a single defendant has responded with something other than full defence/admission while the co-defendant is outstanding.)",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension",
+    "guard_text": "Staff took the case offline after acknowledgement while a time extension was in play.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "caseDismissedAfterClaimAcknowledgedExtension",
+    "guard_text": "Claim was acknowledged, an extension applied, and the dismissal deadline passed without response or staff action.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard_raw": "takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension",
+    "guard_text": "Case marked not suitable for SDO and taken offline after acknowledgement while an extension applied.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED",
+    "to": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "guard_raw": "notificationAcknowledged.and(respondentTimeExtension)",
+    "guard_text": "(At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED",
+    "to": "ALL_RESPONSES_RECEIVED",
+    "guard_raw": "notificationAcknowledged.and(not(respondentTimeExtension)).and(allResponsesReceived)",
+    "guard_text": "((At least one defendant has acknowledged service (per scenario rules).) AND (NOT (A defendant has obtained a time extension to respond.))) AND (Every required defendant response has been received)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED",
+    "to": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "guard_raw": "notificationAcknowledged.and(not(respondentTimeExtension)) .and(awaitingResponsesFullDefenceReceived) .and(not(caseDismissedAfterClaimAcknowledged))",
+    "guard_text": "(((At least one defendant has acknowledged service (per scenario rules).) AND (NOT (A defendant has obtained a time extension to respond.))) AND (In a 1v2 two-solicitor case only one defendant has provided a full defence and the other is yet to respond.)) AND (NOT (Claim was acknowledged but the response deadline has expired without a response and staff have not intervened.))",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED",
+    "to": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "guard_raw": "notificationAcknowledged.and(not(respondentTimeExtension)) .and(awaitingResponsesFullAdmitReceived)",
+    "guard_text": "((At least one defendant has acknowledged service (per scenario rules).) AND (NOT (A defendant has obtained a time extension to respond.))) AND (In a 1v2 two-solicitor case only one defendant has responded with a full admission and the second is outstanding.)",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED",
+    "to": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "guard_raw": "notificationAcknowledged.and(not(respondentTimeExtension)) .and(awaitingResponsesNonFullDefenceOrFullAdmitReceived)",
+    "guard_text": "((At least one defendant has acknowledged service (per scenario rules).) AND (NOT (A defendant has obtained a time extension to respond.))) AND (In a 1v2 two-solicitor case a single defendant has responded with something other than full defence/admission while the co-defendant is outstanding.)",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterNotificationAcknowledged",
+    "guard_text": "Staff took the case offline after service acknowledgement and before defence/extension.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED",
+    "to": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "caseDismissedAfterClaimAcknowledged.and(reasonNotSuitableForSdo.negate())",
+    "guard_text": "(Claim was acknowledged but the response deadline has expired without a response and staff have not intervened.) AND (NOT (Claimant flagged that the case is not suitable for an SDO.))",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED",
+    "to": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard_raw": "takenOfflineSDONotDrawnAfterNotificationAcknowledged",
+    "guard_text": "Case marked not suitable for SDO and taken offline after service acknowledgement.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMIT_AGREE_REPAYMENT",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaff",
+    "guard_text": "HMCTS staff have manually taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMIT_AGREE_REPAYMENT",
+    "to": "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA",
+    "guard_raw": "isDefendantNoCOnlineForCase.and(isDefendantNoCOnlineForCaseAfterJBA)",
+    "guard_text": "(Defendant Notice of Change online feature flag is active for this case.) AND (Case is LiP with an active judgment by admission and a post-judgment Notice of Change has occurred.)",
+    "tags": [
+      "offline/timeout",
+      "spec"
+    ]
+  },
+  {
+    "from": "PART_ADMIT_AGREE_SETTLE",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaff",
+    "guard_text": "HMCTS staff have manually taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMIT_PAY_IMMEDIATELY",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaff",
+    "guard_text": "HMCTS staff have manually taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMIT_PAY_IMMEDIATELY",
+    "to": "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA",
+    "guard_raw": "isDefendantNoCOnlineForCase.and(isDefendantNoCOnlineForCaseAfterJBA)",
+    "guard_text": "(Defendant Notice of Change online feature flag is active for this case.) AND (Case is LiP with an active judgment by admission and a post-judgment Notice of Change has occurred.)",
+    "tags": [
+      "offline/timeout",
+      "spec"
+    ]
+  },
+  {
+    "from": "PART_ADMIT_REJECT_REPAYMENT",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaff",
+    "guard_text": "HMCTS staff have manually taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMISSION",
+    "to": "IN_MEDIATION",
+    "guard_raw": "agreedToMediation.and(not(takenOfflineByStaff)) .and(not(partAdmitPayImmediately)) .and(not(acceptRepaymentPlan)) .and(not(rejectRepaymentPlan))",
+    "guard_text": "((((Claimant opted into free mediation.) AND (NOT (HMCTS staff have manually taken the case offline.))) AND (NOT (Defendant offered to pay the part-admitted amount immediately and claimant accepted.))) AND (NOT (Applicant accepts the defendant's repayment plan (for LiP 1v1 the case must remain online).))) AND (NOT (Applicant rejected the defendant\u2019s repayment plan (and case remains online for LiP 1v1).))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMISSION",
+    "to": "IN_MEDIATION",
+    "guard_raw": "carmMediation",
+    "guard_text": "carmMediation",
+    "tags": [
+      "mediation",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMISSION",
+    "to": "PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+    "guard_raw": "isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(isCarmApplicableCase)) .and(not(isCarmApplicableLipCase)) .and(not(takenOfflineByStaff))",
+    "guard_text": "((((Claimant indicates they will not settle after a part admission.) AND (NOT (Claimant opted into free mediation.))) AND (NOT (Case meets CARM pilot criteria for represented parties in SPEC small claims.))) AND (NOT (Case meets CARM pilot criteria for LiP participation in SPEC small claims.))) AND (NOT (HMCTS staff have manually taken the case offline.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMISSION",
+    "to": "PART_ADMIT_PROCEED",
+    "guard_raw": "partAdmitProceed",
+    "guard_text": "partAdmitProceed",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMISSION",
+    "to": "PART_ADMIT_NOT_PROCEED",
+    "guard_raw": "fullDefenceNotProceed",
+    "guard_text": "Claimant indicates they do not wish to proceed against the defendant(s).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMISSION",
+    "to": "PART_ADMIT_PAY_IMMEDIATELY",
+    "guard_raw": "partAdmitPayImmediately",
+    "guard_text": "Defendant offered to pay the part-admitted amount immediately and claimant accepted.",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMISSION",
+    "to": "PART_ADMIT_AGREE_SETTLE",
+    "guard_raw": "agreePartAdmitSettle",
+    "guard_text": "Claimant confirms the part-admission offer settles the dispute.",
+    "tags": [
+      "settlement/Judgment",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMISSION",
+    "to": "PART_ADMIT_AGREE_REPAYMENT",
+    "guard_raw": "acceptRepaymentPlan",
+    "guard_text": "Applicant accepts the defendant's repayment plan (for LiP 1v1 the case must remain online).",
+    "tags": [
+      "settlement/Judgment",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMISSION",
+    "to": "PART_ADMIT_REJECT_REPAYMENT",
+    "guard_raw": "rejectRepaymentPlan",
+    "guard_text": "Applicant rejected the defendant\u2019s repayment plan (and case remains online for LiP 1v1).",
+    "tags": [
+      "settlement/Judgment",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMISSION",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterDefendantResponse",
+    "guard_text": "Staff took the case offline after a defendant response and before claimant action.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMISSION",
+    "to": "PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "applicantOutOfTimeNotBeingTakenOffline",
+    "guard_text": "Claimant response deadline has passed with no response and staff have not taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMIT_AGREE_REPAYMENT",
+    "to": "SIGN_SETTLEMENT_AGREEMENT",
+    "guard_raw": "isRespondentSignSettlementAgreement",
+    "guard_text": "Defendant has signed the digital settlement agreement.",
+    "tags": [
+      "settlement/Judgment",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+    "to": "IN_HEARING_READINESS",
+    "guard_raw": "isInHearingReadiness",
+    "guard_text": "Hearing has been listed and the case is in hearing readiness (no dismissals/taken offline).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+    "to": "CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE",
+    "guard_raw": "caseDismissedPastHearingFeeDue",
+    "guard_text": "Hearing fee due date has passed without payment.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaff",
+    "guard_text": "HMCTS staff have manually taken the case offline.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+    "to": "TAKEN_OFFLINE_AFTER_SDO",
+    "guard_raw": "takenOfflineAfterSDO",
+    "guard_text": "Claim was taken offline after directions (SDO) were drawn.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+    "to": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard_raw": "takenOfflineSDONotDrawn",
+    "guard_text": "Case was taken offline because it was marked not suitable for an SDO.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA",
+    "to": "TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE",
+    "guard_raw": "applicantOutOfTimeProcessedByCamunda",
+    "guard_text": "Automation has already processed the out-of-time applicant response.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "to": "CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE",
+    "guard_raw": "claimDismissedByCamunda",
+    "guard_text": "Camunda automation has already dismissed the claim.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "to": "CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE",
+    "guard_raw": "claimDismissedByCamunda",
+    "guard_text": "Camunda automation has already dismissed the claim.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
+    "to": "CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE",
+    "guard_raw": "claimDismissedByCamunda",
+    "guard_text": "Camunda automation has already dismissed the claim.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PENDING_CLAIM_ISSUED",
+    "to": "CLAIM_ISSUED",
+    "guard_raw": "claimIssued",
+    "guard_text": "Claim has been issued (a notification deadline exists).",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
+    "to": "TAKEN_OFFLINE_UNREGISTERED_DEFENDANT",
+    "guard_raw": "takenOfflineBySystem",
+    "guard_text": "System automatically took the case offline (for example because of representation changes).",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "to": "CLAIM_ISSUED",
+    "guard_raw": "claimIssued.and(pinInPostEnabledAndLiP)",
+    "guard_text": "(Claim has been issued (a notification deadline exists).) AND (PIN-in-Post feature is enabled and the defendant is a LiP.)",
+    "tags": [
+      "lip",
+      "spec"
+    ]
+  },
+  {
+    "from": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
+    "to": "TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT",
+    "guard_raw": "takenOfflineBySystem.and(not(pinInPostEnabledAndLiP))",
+    "guard_text": "(System automatically took the case offline (for example because of representation changes).) AND (NOT (PIN-in-Post feature is enabled and the defendant is a LiP.))",
+    "tags": [
+      "lip",
+      "offline/timeout",
+      "spec"
+    ]
+  },
+  {
+    "from": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT",
+    "to": "CLAIM_ISSUED",
+    "guard_raw": "claimIssued .and(not(specClaim)) .and(certificateOfServiceEnabled)",
+    "guard_text": "((Claim has been issued (a notification deadline exists).) AND (NOT (Case is in the SPEC (damages) service.))) AND (Certificate of Service workflow is enabled for this case.)",
+    "tags": [
+      "lip",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT",
+    "to": "TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT",
+    "guard_raw": "takenOfflineBySystem .and(specClaim)",
+    "guard_text": "(System automatically took the case offline (for example because of representation changes).) AND (Case is in the SPEC (damages) service.)",
+    "tags": [
+      "lip",
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT",
+    "to": "TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT",
+    "guard_raw": "takenOfflineBySystem",
+    "guard_text": "System automatically took the case offline (for example because of representation changes).",
+    "tags": [
+      "lip",
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL",
+    "to": "FULL_DEFENCE",
+    "guard_raw": "fullDefenceSpec.and(isTranslatedDocumentUploaded)",
+    "guard_text": "(Latest defence is a full defence in SPEC.) AND (Translated response documents have been uploaded.)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL",
+    "to": "PART_ADMISSION",
+    "guard_raw": "partAdmissionSpec.and(isTranslatedDocumentUploaded)",
+    "guard_text": "(Latest defence is a part admission in SPEC.) AND (Translated response documents have been uploaded.)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL",
+    "to": "FULL_ADMISSION",
+    "guard_raw": "fullAdmissionSpec.and(isTranslatedDocumentUploaded)",
+    "guard_text": "(Latest defence is a full admission in SPEC.) AND (Translated response documents have been uploaded.)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL",
+    "to": "COUNTER_CLAIM",
+    "guard_raw": "counterClaimSpec.and(isTranslatedDocumentUploaded)",
+    "guard_text": "(Latest defence is a counter claim for SPEC.) AND (Translated response documents have been uploaded.)",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "SIGN_SETTLEMENT_AGREEMENT",
+    "to": "FULL_ADMIT_JUDGMENT_ADMISSION",
+    "guard_raw": "ccjRequestJudgmentByAdmission",
+    "guard_text": "Applicant has requested a CCJ by admission.",
+    "tags": [
+      "settlement/Judgment",
+      "unspec"
+    ]
+  },
+  {
+    "from": "SPEC_DEFENDANT_NOC",
+    "to": "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC",
+    "guard_raw": "not(isDefendantNoCOnlineForCase).and(nocSubmittedForLiPDefendant)",
+    "guard_text": "(NOT (Defendant Notice of Change online feature flag is active for this case.)) AND (Notice of Change submitted for a LiP defendant.)",
+    "tags": [
+      "offline/timeout",
+      "spec"
+    ]
+  }
+]

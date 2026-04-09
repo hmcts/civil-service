@@ -4,31 +4,31 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 import java.time.LocalDate;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@Accessors(chain = true)
 public class SettleClaimMarkedPaidInFullDefendantLiPLetter implements MappableObject {
 
-    private final String claimReferenceNumber;
+    private String claimReferenceNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate letterIssueDate;
+    private LocalDate letterIssueDate;
     private String letterIssueDateWelsh;
-    private final String defendantLipName;
-    private final String addressLine1;
-    private final String addressLine2;
-    private final String addressLine3;
-    private final String postCode;
+    private String defendantLipName;
+    private String addressLine1;
+    private String addressLine2;
+    private String addressLine3;
+    private String postCode;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate dateOfEvent;
+    private LocalDate dateOfEvent;
     private String dateOfEventWelsh;
 }

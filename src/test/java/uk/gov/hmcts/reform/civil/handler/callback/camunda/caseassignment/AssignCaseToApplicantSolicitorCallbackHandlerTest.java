@@ -111,19 +111,24 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
         void setup() {
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                    .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                                                    .email("applicant@someorg.com")
-                                                    .build())
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                  .organisation(Organisation.builder().organisationID("OrgId1").build())
-                                                  .build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .organisation(Organisation.builder()
-                                                                     .organisationID("OrgId2").build())
-                                                   .build())
                 .build();
+            IdamUserDetails applicantSolicitor1UserDetails = new IdamUserDetails();
+            applicantSolicitor1UserDetails.setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9");
+            applicantSolicitor1UserDetails.setEmail("applicant@someorg.com");
+            caseData.setApplicantSolicitor1UserDetails(applicantSolicitor1UserDetails);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setStatus(BusinessProcessStatus.READY);
+            caseData.setBusinessProcess(businessProcess);
+            OrganisationPolicy applicant1OrganisationPolicy = new OrganisationPolicy();
+            Organisation organisation1 = new Organisation();
+            organisation1.setOrganisationID("OrgId1");
+            applicant1OrganisationPolicy.setOrganisation(organisation1);
+            caseData.setApplicant1OrganisationPolicy(applicant1OrganisationPolicy);
+            OrganisationPolicy respondent1OrganisationPolicy = new OrganisationPolicy();
+            Organisation organisation2 = new Organisation();
+            organisation2.setOrganisationID("OrgId2");
+            respondent1OrganisationPolicy.setOrganisation(organisation2);
+            caseData.setRespondent1OrganisationPolicy(respondent1OrganisationPolicy);
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
@@ -154,17 +159,21 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                    .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                                                    .email("applicant@someorg.com")
-                                                    .build())
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                  .organisation(Organisation.builder().organisationID("OrgId1").build())
-                                                  .build())
                 .respondent1OrgRegistered(NO)
                 .respondent1Represented(NO)
                 .build();
+            IdamUserDetails applicantSolicitor1UserDetails = new IdamUserDetails();
+            applicantSolicitor1UserDetails.setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9");
+            applicantSolicitor1UserDetails.setEmail("applicant@someorg.com");
+            caseData.setApplicantSolicitor1UserDetails(applicantSolicitor1UserDetails);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setStatus(BusinessProcessStatus.READY);
+            caseData.setBusinessProcess(businessProcess);
+            OrganisationPolicy applicant1OrganisationPolicy = new OrganisationPolicy();
+            Organisation organisation1 = new Organisation();
+            organisation1.setOrganisationID("OrgId1");
+            applicant1OrganisationPolicy.setOrganisation(organisation1);
+            caseData.setApplicant1OrganisationPolicy(applicant1OrganisationPolicy);
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
@@ -185,20 +194,25 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator1v2SS() {
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                    .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                                                    .email("applicant@someorg.com")
-                                                    .build())
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                  .organisation(Organisation.builder().organisationID("OrgId1").build())
-                                                  .build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .organisation(Organisation.builder()
-                                                                     .organisationID("OrgId2").build())
-                                                   .build())
                 .multiPartyClaimOneDefendantSolicitor()
                 .build();
+            IdamUserDetails applicantSolicitor1UserDetails = new IdamUserDetails();
+            applicantSolicitor1UserDetails.setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9");
+            applicantSolicitor1UserDetails.setEmail("applicant@someorg.com");
+            caseData.setApplicantSolicitor1UserDetails(applicantSolicitor1UserDetails);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setStatus(BusinessProcessStatus.READY);
+            caseData.setBusinessProcess(businessProcess);
+            OrganisationPolicy applicant1OrganisationPolicy = new OrganisationPolicy();
+            Organisation organisation1 = new Organisation();
+            organisation1.setOrganisationID("OrgId1");
+            applicant1OrganisationPolicy.setOrganisation(organisation1);
+            caseData.setApplicant1OrganisationPolicy(applicant1OrganisationPolicy);
+            OrganisationPolicy respondent1OrganisationPolicy = new OrganisationPolicy();
+            Organisation organisation2 = new Organisation();
+            organisation2.setOrganisationID("OrgId2");
+            respondent1OrganisationPolicy.setOrganisation(organisation2);
+            caseData.setRespondent1OrganisationPolicy(respondent1OrganisationPolicy);
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
@@ -216,25 +230,31 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator1v2DS() {
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                    .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                                                    .email("applicant@someorg.com")
-                                                    .build())
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                  .organisation(Organisation.builder().organisationID("OrgId1").build())
-                                                  .build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .organisation(Organisation.builder()
-                                                                     .organisationID("OrgId2").build())
-                                                   .build())
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .organisation(Organisation.builder()
-                                                                     .organisationID("OrgId3").build())
-                                                   .build())
                 .multiPartyClaimTwoDefendantSolicitors()
                 .respondent2Represented(YES)
                 .build();
+            IdamUserDetails applicantSolicitor1UserDetails = new IdamUserDetails();
+            applicantSolicitor1UserDetails.setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9");
+            applicantSolicitor1UserDetails.setEmail("applicant@someorg.com");
+            caseData.setApplicantSolicitor1UserDetails(applicantSolicitor1UserDetails);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setStatus(BusinessProcessStatus.READY);
+            caseData.setBusinessProcess(businessProcess);
+            OrganisationPolicy applicant1OrganisationPolicy = new OrganisationPolicy();
+            Organisation organisation1 = new Organisation();
+            organisation1.setOrganisationID("OrgId1");
+            applicant1OrganisationPolicy.setOrganisation(organisation1);
+            caseData.setApplicant1OrganisationPolicy(applicant1OrganisationPolicy);
+            OrganisationPolicy respondent1OrganisationPolicy = new OrganisationPolicy();
+            Organisation organisation2 = new Organisation();
+            organisation2.setOrganisationID("OrgId2");
+            respondent1OrganisationPolicy.setOrganisation(organisation2);
+            caseData.setRespondent1OrganisationPolicy(respondent1OrganisationPolicy);
+            OrganisationPolicy respondent2OrganisationPolicy = new OrganisationPolicy();
+            Organisation organisation3 = new Organisation();
+            organisation3.setOrganisationID("OrgId3");
+            respondent2OrganisationPolicy.setOrganisation(organisation3);
+            caseData.setRespondent2OrganisationPolicy(respondent2OrganisationPolicy);
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
@@ -252,22 +272,27 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
         void shouldAssignCaseToApplicantSolicitorOneAndRemoveCreator1v2DSUnregisteredRespondent2() {
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                    .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                                                    .email("applicant@someorg.com")
-                                                    .build())
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                  .organisation(Organisation.builder().organisationID("OrgId1").build())
-                                                  .build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .organisation(Organisation.builder()
-                                                                     .organisationID("OrgId2").build())
-                                                   .build())
                 .multiPartyClaimTwoDefendantSolicitors()
                 .respondent2Represented(NO)
                 .respondent2OrgRegistered(NO)
                 .build();
+            IdamUserDetails applicantSolicitor1UserDetails = new IdamUserDetails();
+            applicantSolicitor1UserDetails.setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9");
+            applicantSolicitor1UserDetails.setEmail("applicant@someorg.com");
+            caseData.setApplicantSolicitor1UserDetails(applicantSolicitor1UserDetails);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setStatus(BusinessProcessStatus.READY);
+            caseData.setBusinessProcess(businessProcess);
+            OrganisationPolicy applicant1OrganisationPolicy = new OrganisationPolicy();
+            Organisation organisation1 = new Organisation();
+            organisation1.setOrganisationID("OrgId1");
+            applicant1OrganisationPolicy.setOrganisation(organisation1);
+            caseData.setApplicant1OrganisationPolicy(applicant1OrganisationPolicy);
+            OrganisationPolicy respondent1OrganisationPolicy = new OrganisationPolicy();
+            Organisation organisation2 = new Organisation();
+            organisation2.setOrganisationID("OrgId2");
+            respondent1OrganisationPolicy.setOrganisation(organisation2);
+            caseData.setRespondent1OrganisationPolicy(respondent1OrganisationPolicy);
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });

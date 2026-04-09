@@ -73,117 +73,192 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         updateCamundaVars(caseData);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        buildDocuments(callbackParams, caseDataBuilder);
+        buildDocuments(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
     }
 
-    private void buildDocuments(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void buildDocuments(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        RecipientDetails applicant = getApplicantRecipient(caseData);
+        RecipientDetails respondent1 = getRespondent1Recipient(caseData);
+        boolean generateRespondent2Form = shouldGenerateRespondent2Form(caseData);
 
-        Optional<Organisation> applicantLegalOrganisation = getLegalOrganization(caseData.getApplicant1OrganisationPolicy()
-                                                                                     .getOrganisation().getOrganisationID());
-        String appSolOrgName = getLegalName(applicantLegalOrganisation,
-                                            caseData.getApplicantSolicitor1ClaimStatementOfTruth() != null
-                                                ? caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName()
-                                                : null);
-        Address applicant1SolicitorAddress = getLegalAddress(applicantLegalOrganisation,
-                                                             caseData.getApplicantSolicitor1ServiceAddress(),
-                                                             caseData.getSpecApplicantCorrespondenceAddressdetails(),
-                                                             caseData.getCaseAccessCategory());
+        CaseDocument applicant1DiscontinueDoc = generateForm(
+            applicant.name(),
+            applicant.address(),
+            "claimant",
+            callbackParams,
+            applicant.isLip()
+        );
+        CaseDocument respondent1DiscontinueDoc = generateForm(
+            respondent1.name(),
+            respondent1.address(),
+            generateRespondent2Form ? "defendant1" : "defendant",
+            callbackParams,
+            respondent1.isLip()
+        );
+        CaseDocument respondent2DiscontinueDoc = generateRespondent2Form
+            ? generateRespondent2Document(caseData, callbackParams)
+            : null;
 
-        String respondent1Name;
-        Address respondent1Address;
-        if (!caseData.isRespondent1LiP()) {
-            Optional<Organisation> respondentLegalOrganisation = getLegalOrganization(caseData.getRespondent1OrganisationPolicy()
-                                                                                         .getOrganisation().getOrganisationID());
-            respondent1Name = getLegalName(respondentLegalOrganisation, caseData.getRespondent1DQ() != null
-                && caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth() != null
-                ? caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getName()
-                : null);
-            respondent1Address = getLegalAddress(respondentLegalOrganisation,
-                                                 caseData.getRespondentSolicitor1ServiceAddress(),
-                                                 caseData.getSpecRespondentCorrespondenceAddressdetails(),
-                                                 caseData.getCaseAccessCategory());
-        } else {
-            respondent1Name = caseData.getRespondent1().getPartyName();
-            respondent1Address = caseData.getRespondent1().getPrimaryAddress();
+        routeDocuments(callbackParams, applicant1DiscontinueDoc, respondent1DiscontinueDoc, respondent2DiscontinueDoc);
+    }
+
+    private RecipientDetails getApplicantRecipient(CaseData caseData) {
+        Optional<Organisation> applicantLegalOrganisation = getLegalOrganization(
+            caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()
+        );
+        String applicantName = getLegalName(
+            applicantLegalOrganisation,
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth() != null
+                ? caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName()
+                : null
+        );
+        Address applicantAddress = getLegalAddress(
+            applicantLegalOrganisation,
+            caseData.getApplicantSolicitor1ServiceAddress(),
+            caseData.getSpecApplicantCorrespondenceAddressdetails(),
+            caseData.getCaseAccessCategory()
+        );
+        return new RecipientDetails(applicantName, applicantAddress, false);
+    }
+
+    private RecipientDetails getRespondent1Recipient(CaseData caseData) {
+        return caseData.isRespondent1LiP()
+            ? getLipRecipient(caseData.getRespondent1())
+            : getRepresentedRecipient(
+            caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID(),
+            getRespondent1StatementOfTruthName(caseData),
+            caseData.getRespondentSolicitor1ServiceAddress(),
+            caseData.getSpecRespondentCorrespondenceAddressdetails(),
+            caseData.getCaseAccessCategory()
+        );
+    }
+
+    private CaseDocument generateRespondent2Document(CaseData caseData, CallbackParams callbackParams) {
+        RecipientDetails respondent2 = getRespondent2Recipient(caseData);
+        return generateForm(respondent2.name(), respondent2.address(), "defendant2", callbackParams, respondent2.isLip());
+    }
+
+    private RecipientDetails getRespondent2Recipient(CaseData caseData) {
+        return caseData.isRespondent2LiP()
+            ? getLipRecipient(caseData.getRespondent2())
+            : getRepresentedRecipient(
+            caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID(),
+            getRespondent2StatementOfTruthName(caseData),
+            caseData.getRespondentSolicitor2ServiceAddress(),
+            caseData.getSpecRespondent2CorrespondenceAddressdetails(),
+            caseData.getCaseAccessCategory()
+        );
+    }
+
+    private String getRespondent1StatementOfTruthName(CaseData caseData) {
+        if (caseData.getRespondent1DQ() == null || caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth() == null) {
+            return null;
         }
+        return caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getName();
+    }
 
-        CaseDocument applicant1DiscontinueDoc = generateForm(appSolOrgName,
-                                                             applicant1SolicitorAddress,
-                                                             "claimant",
-                                                             callbackParams);
-        boolean generateRespondent2Form = (YES.equals(caseData.getAddRespondent2())
-            && !YES.equals(caseData.getRespondent2SameLegalRepresentative()));
-        CaseDocument respondent1DiscontinueDoc = generateForm(respondent1Name, respondent1Address,
-                                                              generateRespondent2Form ? "defendant1" : "defendant", callbackParams);
-        CaseDocument respondent2DiscontinueDoc = null;
-
-        if (generateRespondent2Form) {
-            String respondent2Name;
-            Address respondent2Address;
-            if (!caseData.isRespondent2LiP()) {
-                Optional<Organisation> respondentLegalOrganisation = getLegalOrganization(caseData.getRespondent2OrganisationPolicy()
-                                                                                              .getOrganisation().getOrganisationID());
-                respondent2Name = getLegalName(respondentLegalOrganisation, caseData.getRespondent2DQ() != null
-                    && caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth() != null
-                    ? caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth().getName()
-                    : null);
-                respondent2Address = getLegalAddress(respondentLegalOrganisation,
-                                                     caseData.getRespondentSolicitor2ServiceAddress(),
-                                                     caseData.getSpecRespondent2CorrespondenceAddressdetails(),
-                                                     caseData.getCaseAccessCategory());
-            } else {
-                respondent2Name = caseData.getRespondent2().getPartyName();
-                respondent2Address = caseData.getRespondent2().getPrimaryAddress();
-            }
-            respondent2DiscontinueDoc = generateForm(respondent2Name, respondent2Address, "defendant2", callbackParams);
+    private String getRespondent2StatementOfTruthName(CaseData caseData) {
+        if (caseData.getRespondent2DQ() == null || caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth() == null) {
+            return null;
         }
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && caseData.isRespondent1LiP()
-            && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-            && caseData.isRespondentResponseBilingual()
-            && SettleDiscontinueYesOrNoList.NO.equals(caseData.getCourtPermissionNeeded())) {
-            respondent1DiscontinueDoc.setDocumentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT);
-            List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
-                .getPreTranslationDocuments();
-            assignDiscontinuanceCategoryId(applicant1DiscontinueDoc);
-            assignDiscontinuanceCategoryId(respondent1DiscontinueDoc);
-            translatedDocuments.add(element(respondent1DiscontinueDoc));
-            caseDataBuilder.bilingualHint(YesOrNo.YES);
-            caseDataBuilder.preTranslationDocuments(translatedDocuments);
-            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE);
-            caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(applicant1DiscontinueDoc);
+        return caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth().getName();
+    }
+
+    private RecipientDetails getRepresentedRecipient(String organisationId,
+                                                     String statementOfTruthName,
+                                                     Address serviceAddress,
+                                                     Address correspondenceAddress,
+                                                     CaseCategory caseCategory) {
+        Optional<Organisation> respondentLegalOrganisation = getLegalOrganization(organisationId);
+        return new RecipientDetails(
+            getLegalName(respondentLegalOrganisation, statementOfTruthName),
+            getLegalAddress(respondentLegalOrganisation, serviceAddress, correspondenceAddress, caseCategory),
+            false
+        );
+    }
+
+    private RecipientDetails getLipRecipient(uk.gov.hmcts.reform.civil.model.Party party) {
+        return new RecipientDetails(party.getPartyName(), party.getPrimaryAddress(), true);
+    }
+
+    private boolean shouldGenerateRespondent2Form(CaseData caseData) {
+        return YES.equals(caseData.getAddRespondent2())
+            && !YES.equals(caseData.getRespondent2SameLegalRepresentative());
+    }
+
+    private void routeDocuments(CallbackParams callbackParams,
+                                CaseDocument applicant1DiscontinueDoc,
+                                CaseDocument respondent1DiscontinueDoc,
+                                CaseDocument respondent2DiscontinueDoc) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (shouldStoreForWelshTranslation(caseData)) {
+            storeForWelshTranslation(callbackParams, applicant1DiscontinueDoc, respondent1DiscontinueDoc);
         } else if (caseData.isJudgeOrderVerificationRequired()) {
-            caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(applicant1DiscontinueDoc);
-            caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(respondent1DiscontinueDoc);
-            assignDiscontinuanceCategoryId(caseDataBuilder.build().getApplicant1NoticeOfDiscontinueCWViewDoc());
-            assignDiscontinuanceCategoryId(caseDataBuilder.build().getRespondent1NoticeOfDiscontinueCWViewDoc());
-
-            if (respondent2DiscontinueDoc != null) {
-                caseDataBuilder.respondent2NoticeOfDiscontinueCWViewDoc(respondent2DiscontinueDoc);
-                assignDiscontinuanceCategoryId(caseDataBuilder.build().getRespondent2NoticeOfDiscontinueCWViewDoc());
-            }
+            storeForCourtWorkerView(caseData, applicant1DiscontinueDoc, respondent1DiscontinueDoc, respondent2DiscontinueDoc);
         } else {
-            caseDataBuilder.applicant1NoticeOfDiscontinueAllPartyViewDoc(applicant1DiscontinueDoc);
-            caseDataBuilder.respondent1NoticeOfDiscontinueAllPartyViewDoc(respondent1DiscontinueDoc);
-            assignDiscontinuanceCategoryId(caseDataBuilder.build().getApplicant1NoticeOfDiscontinueAllPartyViewDoc());
-            assignDiscontinuanceCategoryId(caseDataBuilder.build().getRespondent1NoticeOfDiscontinueAllPartyViewDoc());
-
-            if (respondent2DiscontinueDoc != null) {
-                caseDataBuilder.respondent2NoticeOfDiscontinueAllPartyViewDoc(respondent2DiscontinueDoc);
-                assignDiscontinuanceCategoryId(caseDataBuilder.build().getRespondent2NoticeOfDiscontinueAllPartyViewDoc());
-            }
+            storeForAllPartiesView(caseData, applicant1DiscontinueDoc, respondent1DiscontinueDoc, respondent2DiscontinueDoc);
         }
     }
 
-    private CaseDocument generateForm(String partyName, Address address, String partyType, CallbackParams callbackParams) {
+    private boolean shouldStoreForWelshTranslation(CaseData caseData) {
+        return featureToggleService.isWelshEnabledForMainCase()
+            && caseData.isRespondent1LiP()
+            && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+            && caseData.isRespondentResponseBilingual()
+            && SettleDiscontinueYesOrNoList.NO.equals(caseData.getCourtPermissionNeeded());
+    }
+
+    private void storeForWelshTranslation(CallbackParams callbackParams,
+                                          CaseDocument applicant1DiscontinueDoc,
+                                          CaseDocument respondent1DiscontinueDoc) {
+        respondent1DiscontinueDoc.setDocumentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT);
+        List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData().getPreTranslationDocuments();
+        assignDiscontinuanceCategoryId(applicant1DiscontinueDoc);
+        assignDiscontinuanceCategoryId(respondent1DiscontinueDoc);
+        translatedDocuments.add(element(respondent1DiscontinueDoc));
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setBilingualHint(YesOrNo.YES);
+        caseData.setPreTranslationDocuments(translatedDocuments);
+        caseData.setPreTranslationDocumentType(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE);
+        caseData.setApplicant1NoticeOfDiscontinueCWViewDoc(applicant1DiscontinueDoc);
+    }
+
+    private void storeForCourtWorkerView(CaseData caseData,
+                                         CaseDocument applicant1DiscontinueDoc,
+                                         CaseDocument respondent1DiscontinueDoc,
+                                         CaseDocument respondent2DiscontinueDoc) {
+        caseData.setApplicant1NoticeOfDiscontinueCWViewDoc(applicant1DiscontinueDoc);
+        caseData.setRespondent1NoticeOfDiscontinueCWViewDoc(respondent1DiscontinueDoc);
+        assignDiscontinuanceCategoryId(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc());
+        assignDiscontinuanceCategoryId(caseData.getRespondent1NoticeOfDiscontinueCWViewDoc());
+        if (respondent2DiscontinueDoc != null) {
+            caseData.setRespondent2NoticeOfDiscontinueCWViewDoc(respondent2DiscontinueDoc);
+            assignDiscontinuanceCategoryId(caseData.getRespondent2NoticeOfDiscontinueCWViewDoc());
+        }
+    }
+
+    private void storeForAllPartiesView(CaseData caseData,
+                                        CaseDocument applicant1DiscontinueDoc,
+                                        CaseDocument respondent1DiscontinueDoc,
+                                        CaseDocument respondent2DiscontinueDoc) {
+        caseData.setApplicant1NoticeOfDiscontinueAllPartyViewDoc(applicant1DiscontinueDoc);
+        caseData.setRespondent1NoticeOfDiscontinueAllPartyViewDoc(respondent1DiscontinueDoc);
+        assignDiscontinuanceCategoryId(caseData.getApplicant1NoticeOfDiscontinueAllPartyViewDoc());
+        assignDiscontinuanceCategoryId(caseData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc());
+        if (respondent2DiscontinueDoc != null) {
+            caseData.setRespondent2NoticeOfDiscontinueAllPartyViewDoc(respondent2DiscontinueDoc);
+            assignDiscontinuanceCategoryId(caseData.getRespondent2NoticeOfDiscontinueAllPartyViewDoc());
+        }
+    }
+
+    private CaseDocument generateForm(String partyName, Address address, String partyType, CallbackParams callbackParams, boolean isRespondentLiP) {
         return formGenerator.generateDocs(
-            callbackParams.getCaseData(), partyName, address, partyType, callbackParams.getParams().get(BEARER_TOKEN).toString());
+            callbackParams.getCaseData(), partyName, address, partyType, callbackParams.getParams().get(BEARER_TOKEN).toString(), isRespondentLiP);
     }
 
     private void assignDiscontinuanceCategoryId(CaseDocument caseDocument) {
@@ -221,11 +296,11 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     protected Address getLegalAddress(Optional<Organisation> organisation,
                                      Address serviceAddress,
                                      Address correspondenceAddress, CaseCategory caseCategory) {
-        Address legalAddress = Address.builder().build();
+        Address legalAddress = new Address();
         if (organisation.isPresent()
             && nonNull(organisation.get().getContactInformation())
             && !organisation.get().getContactInformation().isEmpty()) {
-            legalAddress = Address.fromContactInformation(organisation.get().getContactInformation().get(0));
+            legalAddress = Address.fromContactInformation(organisation.get().getContactInformation().getFirst());
         }
 
         if (nonNull(serviceAddress) && nonNull(serviceAddress.getAddressLine1())) {
@@ -237,5 +312,8 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
             legalAddress = correspondenceAddress;
         }
         return legalAddress;
+    }
+
+    private record RecipientDetails(String name, Address address, boolean isLip) {
     }
 }

@@ -1,17 +1,19 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,7 +24,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.Optional;
@@ -44,18 +45,19 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
     private LocationHelper helper;
 
     @Mock
-    private Time time;
-
-    @InjectMocks
-    private CreateReferToJudgeCallbackHandler handler;
-
-    @Mock
     private LocationReferenceDataService locationService;
 
-    @Mock
+    private CreateReferToJudgeCallbackHandler handler;
     private ObjectMapper objectMapper;
 
     public static final String REFERENCE_NUMBER = "000DC001";
+
+    @BeforeEach
+    void setUp() {
+        objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
+        handler = new CreateReferToJudgeCallbackHandler(locationService, helper, objectMapper);
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -81,50 +83,60 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(response).isNotNull();
+            assertThat(updatedData.getIsReferToJudgeClaim()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
         void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio1() {
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setResponseCourtCode("123");
+            given(helper.getClaimantRequestedCourt(any()))
+                .willReturn(Optional.of(requestedCourt));
+
+            given(helper.getMatching(any(), any()))
+                .willReturn(Optional.of(new LocationRefData().setCourtLocationCode("123")));
+
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmittedSmallClaim()
                 .setClaimTypeToUnspecClaim()
-                .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
+                .respondent1(new PartyBuilder().individual().build().setPartyID("res-1-party-id"))
                 .build();
-
-            given(helper.getClaimantRequestedCourt(any()))
-                .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
-
-            given(helper.getMatching(any(), any()))
-                .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(response).isNotNull();
+            assertThat(updatedData.getIsReferToJudgeClaim()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
         void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio2() {
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setResponseCourtCode("123");
+            given(helper.getClaimantRequestedCourt(any()))
+                .willReturn(Optional.of(requestedCourt));
+
+            given(helper.getMatching(any(), any()))
+                .willReturn(Optional.of(new LocationRefData().setCourtLocationCode("123")));
+
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmittedSmallClaim()
                 .setClaimTypeToUnspecClaim()
-                .respondent2(PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build())
+                .respondent2(new PartyBuilder().individual().build().setPartyID("res-2-party-id"))
                 .build();
-
-            given(helper.leadDefendantIs1(any()))
-                .willReturn(false);
-
-            given(helper.getClaimantRequestedCourt(any()))
-                .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
-
-            given(helper.getMatching(any(), any()))
-                .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(response).isNotNull();
+            assertThat(updatedData.getIsReferToJudgeClaim()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
@@ -132,28 +144,48 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmitted()
                 .setClaimTypeToSpecClaim()
-                .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
+                .respondent1(new PartyBuilder().individual().build().setPartyID("res-1-party-id"))
                 .build();
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(response).isNotNull();
+            assertThat(updatedData.getIsReferToJudgeClaim()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
         void thereIsAMatchingLocation() {
-            CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
+            CaseData updatedData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
 
-            LocationHelper.updateWithLocation(updatedData, LocationRefData.builder()
-                .courtLocationCode("123").regionId("regionId").region("region name").epimmsId("epimms").build());
+            LocationHelper.updateWithLocation(updatedData, new LocationRefData()
+                .setCourtLocationCode("123").setRegionId("regionId").setRegion("region name").setEpimmsId("epimms"));
 
-            Assertions.assertThat(updatedData.build().getCaseManagementLocation())
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setRegion("regionId");
+            caseLocationCivil.setBaseLocation("epimms");
+            Assertions.assertThat(updatedData.getCaseManagementLocation())
                 .isNotNull()
-                .isEqualTo(CaseLocationCivil.builder()
-                               .region("regionId")
-                               .baseLocation("epimms")
-                               .build());
+                .isEqualTo(caseLocationCivil);
+        }
+
+        @Test
+        void shouldReturnExpectedAboutToSubmitResponseForLiP() {
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .atStateClaimSubmitted()
+                .setClaimTypeToSpecClaim()
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+
+            CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(response).isNotNull();
+            assertThat(updatedData.getIsReferToJudgeClaim()).isEqualTo(YesOrNo.YES);
         }
     }
 

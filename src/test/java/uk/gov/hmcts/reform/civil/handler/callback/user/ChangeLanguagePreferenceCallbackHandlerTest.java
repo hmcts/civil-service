@@ -50,12 +50,11 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldClearData_WhenAboutToStart() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        caseData = caseData.toBuilder()
-            .changeLanguagePreference(ChangeLanguagePreference.builder()
-                                          .userType(CLAIMANT)
-                                          .preferredLanguage(ENGLISH).build())
-            .applicant1Represented(NO)
-            .build();
+        ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
+        changeLanguagePreference.setUserType(CLAIMANT);
+        changeLanguagePreference.setPreferredLanguage(ENGLISH);
+        caseData.setChangeLanguagePreference(changeLanguagePreference);
+        caseData.setApplicant1Represented(NO);
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -81,8 +80,9 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldThrowException_WhenNoUserType() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
-            caseData = caseData.toBuilder().changeLanguagePreference(ChangeLanguagePreference.builder()
-                                                                         .preferredLanguage(WELSH).build()).build();
+            ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
+            changeLanguagePreference.setPreferredLanguage(WELSH);
+            caseData.setChangeLanguagePreference(changeLanguagePreference);
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-lang-pref");
 
             assertThatExceptionOfType(IllegalArgumentException.class)
@@ -93,9 +93,10 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldReturnError_WhenClaimantIsNotLip() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
-            caseData = caseData.toBuilder().changeLanguagePreference(ChangeLanguagePreference.builder()
-                                                                         .userType(CLAIMANT)
-                                                                         .preferredLanguage(WELSH).build()).build();
+            ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
+            changeLanguagePreference.setUserType(CLAIMANT);
+            changeLanguagePreference.setPreferredLanguage(WELSH);
+            caseData.setChangeLanguagePreference(changeLanguagePreference);
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-lang-pref");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -108,9 +109,10 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldReturnError_WhenDefendantIsNotLip() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
-            caseData = caseData.toBuilder().changeLanguagePreference(ChangeLanguagePreference.builder()
-                                                                         .userType(DEFENDANT)
-                                                                         .preferredLanguage(WELSH).build()).build();
+            ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
+            changeLanguagePreference.setUserType(DEFENDANT);
+            changeLanguagePreference.setPreferredLanguage(WELSH);
+            caseData.setChangeLanguagePreference(changeLanguagePreference);
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-lang-pref");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -123,12 +125,11 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldReturnError_WhenDefendantHasNotResponded() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            caseData = caseData.toBuilder()
-                .changeLanguagePreference(ChangeLanguagePreference.builder()
-                                              .userType(DEFENDANT)
-                                              .preferredLanguage(WELSH).build())
-                .respondent1Represented(NO)
-                .build();
+            ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
+            changeLanguagePreference.setUserType(DEFENDANT);
+            changeLanguagePreference.setPreferredLanguage(WELSH);
+            caseData.setChangeLanguagePreference(changeLanguagePreference);
+            caseData.setRespondent1Represented(NO);
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-lang-pref");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -155,8 +156,9 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldThrowException_WhenNoLanguagePreference() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
-            caseData = caseData.toBuilder().changeLanguagePreference(ChangeLanguagePreference.builder()
-                                                                         .userType(CLAIMANT).build()).build();
+            ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
+            changeLanguagePreference.setUserType(CLAIMANT);
+            caseData.setChangeLanguagePreference(changeLanguagePreference);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             assertThatExceptionOfType(IllegalArgumentException.class)
@@ -167,8 +169,9 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldThrowException_WhenNoUserType() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
-            caseData = caseData.toBuilder().changeLanguagePreference(ChangeLanguagePreference.builder()
-                                                                         .preferredLanguage(WELSH).build()).build();
+            ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
+            changeLanguagePreference.setPreferredLanguage(WELSH);
+            caseData.setChangeLanguagePreference(changeLanguagePreference);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             assertThatExceptionOfType(IllegalArgumentException.class)
@@ -179,12 +182,11 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldChangeClaimantLanguagePreferenceToEnglish() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            caseData = caseData.toBuilder()
-                .changeLanguagePreference(ChangeLanguagePreference.builder()
-                                              .userType(CLAIMANT)
-                                              .preferredLanguage(ENGLISH).build())
-                .applicant1Represented(NO)
-                .build();
+            ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
+            changeLanguagePreference.setUserType(CLAIMANT);
+            changeLanguagePreference.setPreferredLanguage(ENGLISH);
+            caseData.setChangeLanguagePreference(changeLanguagePreference);
+            caseData.setApplicant1Represented(NO);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -198,12 +200,11 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldChangeClaimantLanguagePreferenceToWelsh() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            caseData = caseData.toBuilder()
-                .changeLanguagePreference(ChangeLanguagePreference.builder()
-                                              .userType(CLAIMANT)
-                                              .preferredLanguage(WELSH).build())
-                .applicant1Represented(NO)
-                .build();
+            ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
+            changeLanguagePreference.setUserType(CLAIMANT);
+            changeLanguagePreference.setPreferredLanguage(WELSH);
+            caseData.setChangeLanguagePreference(changeLanguagePreference);
+            caseData.setApplicant1Represented(NO);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -218,16 +219,16 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldChangeDefendantLanguagePreference() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
-            caseData = caseData.toBuilder()
-                .changeLanguagePreference(ChangeLanguagePreference.builder()
-                                              .userType(DEFENDANT)
-                                              .preferredLanguage(ENGLISH_AND_WELSH).build())
-                .respondent1Represented(NO)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage("ENGLISH").build())
-                                 .build())
-                .build();
+            ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
+            changeLanguagePreference.setUserType(DEFENDANT);
+            changeLanguagePreference.setPreferredLanguage(ENGLISH_AND_WELSH);
+            caseData.setChangeLanguagePreference(changeLanguagePreference);
+            caseData.setRespondent1Represented(NO);
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("ENGLISH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+            caseData.setCaseDataLiP(caseDataLiP);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler

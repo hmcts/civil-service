@@ -120,16 +120,12 @@ public class JudgementByAdmissionIssuedClaimantScenarioTest extends  DashboardBa
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("John Doe")
-                                                 .build())
-                                      .build())
-            .respondent1(PartyBuilder.builder().organisation().build())
-            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                .state(JudgmentState.ISSUED)
-                                .type(JudgmentType.JUDGMENT_BY_ADMISSION)
-                                .build())
+            .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("John Doe")))
+            .respondent1(new PartyBuilder().organisation().build())
+            .activeJudgment(new JudgmentDetails()
+                                .setIssueDate(LocalDate.now())
+                                .setState(JudgmentState.ISSUED)
+                                .setType(JudgmentType.JUDGMENT_BY_ADMISSION))
             .build();
     }
 }

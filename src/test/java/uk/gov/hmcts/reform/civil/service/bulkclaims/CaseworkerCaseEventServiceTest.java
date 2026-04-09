@@ -61,13 +61,11 @@ public class CaseworkerCaseEventServiceTest {
 
     @Test
     void shouldSubmitCaseworkerEventForNewClaimSuccessfully() {
-        CaseDetails caseDetails = caseworkerCaseEventService.submitEventForNewClaimCaseWorker(CaseworkerEventSubmissionParams
-                                                                   .builder()
-                                                                   .updates(Maps.newHashMap())
-                                                                   .event(CaseEvent.CREATE_CLAIM_SPEC)
-                                                                   .userId(USER_ID)
-                                                                   .authorisation(AUTHORISATION)
-                                                                   .build());
+        CaseDetails caseDetails = caseworkerCaseEventService.submitEventForNewClaimCaseWorker(new CaseworkerEventSubmissionParams()
+                                                                   .setUpdates(Maps.newHashMap())
+                                                                   .setEvent(CaseEvent.CREATE_CLAIM_SPEC)
+                                                                   .setUserId(USER_ID)
+                                                                   .setAuthorisation(AUTHORISATION));
         assertThat(caseDetails).isEqualTo(CASE_DETAILS);
         verify(coreCaseDataApi).startForCaseworker(
             AUTHORISATION,

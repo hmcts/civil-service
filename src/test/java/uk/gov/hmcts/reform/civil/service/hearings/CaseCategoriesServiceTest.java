@@ -63,53 +63,49 @@ public class CaseCategoriesServiceTest {
 
     @Test
     void shouldReturnCaseType_whenCategorySearchResultPresent() {
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(
+            new Category()
+                .setCategoryKey("caseType")
+                .setKey("AAA7-FAST_CLAIM")
+        ));
         when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any()))
-            .thenReturn(Optional.of(CategorySearchResult.builder()
-                                        .categories(List.of(
-                                            Category.builder()
-                                                .categoryKey("caseType")
-                                                .key("AAA7-FAST_CLAIM")
-                                                .build()
-                                        ))
-                                        .build()));
+            .thenReturn(Optional.of(categorySearchResult));
+        CaseCategoryModel expected = new CaseCategoryModel();
+        expected.setCategoryParent(null);
+        expected.setCategoryType(CategoryType.CASE_TYPE);
+        expected.setCategoryValue("AAA7-FAST_CLAIM");
+
         CaseCategoryModel actual = caseCategoriesService.getCaseCategoriesFor(
             CategoryType.CASE_TYPE,
             caseData,
             AUTH
         );
 
-        CaseCategoryModel expected = CaseCategoryModel.builder()
-            .categoryParent(null)
-            .categoryType(CategoryType.CASE_TYPE)
-            .categoryValue("AAA7-FAST_CLAIM")
-            .build();
-
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void shouldReturnCaseSubType_whenCategorySearchResultPresent() {
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(
+            new Category()
+                .setCategoryKey("caseSubType")
+                .setKey("AAA7-FAST_CLAIM")
+                .setParentKey("AAA7-FAST_CLAIM")
+        ));
         when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any()))
-            .thenReturn(Optional.of(CategorySearchResult.builder()
-                                        .categories(List.of(
-                                            Category.builder()
-                                                .categoryKey("caseSubType")
-                                                .key("AAA7-FAST_CLAIM")
-                                                .parentKey("AAA7-FAST_CLAIM")
-                                                .build()
-                                        ))
-                                        .build()));
+            .thenReturn(Optional.of(categorySearchResult));
+        CaseCategoryModel expected = new CaseCategoryModel();
+        expected.setCategoryParent("AAA7-FAST_CLAIM");
+        expected.setCategoryType(CategoryType.CASE_SUBTYPE);
+        expected.setCategoryValue("AAA7-FAST_CLAIM");
+
         CaseCategoryModel actual = caseCategoriesService.getCaseCategoriesFor(
             CategoryType.CASE_SUBTYPE,
             caseData,
             AUTH
         );
-
-        CaseCategoryModel expected = CaseCategoryModel.builder()
-            .categoryParent("AAA7-FAST_CLAIM")
-            .categoryType(CategoryType.CASE_SUBTYPE)
-            .categoryValue("AAA7-FAST_CLAIM")
-            .build();
 
         assertThat(actual).isEqualTo(expected);
     }

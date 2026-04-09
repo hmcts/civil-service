@@ -56,15 +56,15 @@ class SealedClaimFormGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName = format(N1.getDocumentTitle(), REFERENCE_NUMBER);
-    private static final String fileNameDiffSol = format(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String FILE_NAME = format(N1.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String FILE_NAME_DIFF_SOL = format(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName)
+        .documentName(FILE_NAME)
         .documentType(SEALED_CLAIM)
         .build();
 
-    private final Representative representative1 = Representative.builder().organisationName("test org").build();
-    private final Representative representative2 = Representative.builder().organisationName("test org2").build();
+    private final Representative representative1 = new Representative().setOrganisationName("test org");
+    private final Representative representative2 = new Representative().setOrganisationName("test org2");
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;
@@ -92,14 +92,14 @@ class SealedClaimFormGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1)))
             .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
         verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1));
     }
 
@@ -112,7 +112,7 @@ class SealedClaimFormGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1)))
             .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
@@ -120,7 +120,7 @@ class SealedClaimFormGeneratorTest {
 
         verify(representativeService).getRespondent1Representative(caseData);
         verify(representativeService).getRespondent2Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1));
     }
 
@@ -133,13 +133,13 @@ class SealedClaimFormGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL)))
             .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDiffSol, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DIFF_SOL, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
         verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(
             any(SealedClaimForm.class),
             eq(N1_MULTIPARTY_SAME_SOL)
@@ -155,33 +155,120 @@ class SealedClaimFormGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL)))
             .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDiffSol, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DIFF_SOL, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
         verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(
             any(SealedClaimForm.class),
             eq(N1_MULTIPARTY_SAME_SOL)
         );
     }
 
+    @Nested
+    class OtherRemedy {
+        @Test
+        void shouldGenerateSealedClaimForm_when1V1DataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().setClaimTypeToOtherRemedy().build();
+
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1)))
+                .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
+                .thenReturn(CASE_DOCUMENT);
+
+            CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
+            verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1));
+        }
+
+        @Test
+        void shouldGenerateSealedClaimForm_when1V2DifferentSolicitorDataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoDefendantSolicitors().setClaimTypeToHousingDisrepair().build();
+
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1)))
+                .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
+                .thenReturn(CASE_DOCUMENT);
+
+            CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(representativeService).getRespondent2Representative(caseData);
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
+            verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1));
+        }
+
+        @Test
+        void shouldGenerateSealedClaimForm_when2V1DataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoApplicants().setClaimTypeToOtherRemedy().build();
+
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL)))
+                .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DIFF_SOL, bytes, SEALED_CLAIM)))
+                .thenReturn(CASE_DOCUMENT);
+            CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(SealedClaimForm.class),
+                eq(N1_MULTIPARTY_SAME_SOL)
+            );
+        }
+
+        @Test
+        void shouldGenerateSealedClaimForm_when1V2SameSolicitorDataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor().setClaimTypeToHousingDisrepair().build();
+
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL)))
+                .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DIFF_SOL, bytes, SEALED_CLAIM)))
+                .thenReturn(CASE_DOCUMENT);
+
+            CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(SealedClaimForm.class),
+                eq(N1_MULTIPARTY_SAME_SOL)
+            );
+        }
+    }
+
     private Representative getRepresentative() {
-        return Representative.builder()
-            .organisationName("MiguelSpooner")
-            .dxAddress("DX 751Newport")
-            .organisationName("DBE Law")
-            .emailAddress("jim.smith@slatergordon.com")
-            .serviceAddress(Address.builder()
-                                .addressLine1("AdmiralHouse")
-                                .addressLine2("Queensway")
-                                .postTown("Newport")
-                                .postCode("NP204AG")
-                                .build())
-            .build();
+        Address serviceAddress = new Address();
+        serviceAddress.setAddressLine1("AdmiralHouse");
+        serviceAddress.setAddressLine2("Queensway");
+        serviceAddress.setPostTown("Newport");
+        serviceAddress.setPostCode("NP204AG");
+
+        return new Representative()
+            .setOrganisationName("MiguelSpooner")
+            .setDxAddress("DX 751Newport")
+            .setOrganisationName("DBE Law")
+            .setEmailAddress("jim.smith@slatergordon.com")
+            .setServiceAddress(serviceAddress);
     }
 
     @Nested
@@ -190,10 +277,9 @@ class SealedClaimFormGeneratorTest {
         @Test
         void whenCaseIsAtClaimDetailsNotified_shouldGetSealedClaimFormDataFor1V1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .applicant1LitigationFriend(LitigationFriend.builder()
-                                                .firstName("applicant")
-                                                .lastName("LF")
-                                                .build())
+                .applicant1LitigationFriend(new LitigationFriend().setFirstName("applicant")
+                                                .setLastName("LF")
+                                                )
                 .build();
 
             var templateData = sealedClaimFormGenerator.getTemplateData(caseData, BEARER_TOKEN);
@@ -208,10 +294,9 @@ class SealedClaimFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors().build().toBuilder()
-                .applicant1LitigationFriend(LitigationFriend.builder()
-                                                .firstName("applicant")
-                                                .lastName("LF")
-                                                .build())
+                .applicant1LitigationFriend(new LitigationFriend().setFirstName("applicant")
+                                                .setLastName("LF")
+                                                )
                 .build();
 
             final var templateData = sealedClaimFormGenerator.getTemplateData(caseData, BEARER_TOKEN);
@@ -227,14 +312,12 @@ class SealedClaimFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoApplicants().build().toBuilder()
-                .applicant1LitigationFriend(LitigationFriend.builder()
-                                                .firstName("applicant")
-                                                .lastName("LF")
-                                                .build())
-                .applicant2LitigationFriend(LitigationFriend.builder()
-                                                .firstName("applicant2")
-                                                .lastName("LF")
-                                                .build())
+                .applicant1LitigationFriend(new LitigationFriend().setFirstName("applicant")
+                                                .setLastName("LF")
+                                                )
+                .applicant2LitigationFriend(new LitigationFriend().setFirstName("applicant2")
+                                                .setLastName("LF")
+                                                )
                 .build();
 
             var templateData = sealedClaimFormGenerator.getTemplateData(caseData, BEARER_TOKEN);
@@ -249,10 +332,9 @@ class SealedClaimFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor().build().toBuilder()
-                .applicant1LitigationFriend(LitigationFriend.builder()
-                                                .firstName("applicant")
-                                                .lastName("LF")
-                                                .build())
+                .applicant1LitigationFriend(new LitigationFriend().setFirstName("applicant")
+                                                .setLastName("LF")
+                                                )
                 .build();
 
             var templateData = sealedClaimFormGenerator.getTemplateData(caseData, BEARER_TOKEN);
@@ -404,33 +486,30 @@ class SealedClaimFormGeneratorTest {
 
         private List<Party> getRespondent(CaseData caseData) {
             var respondent = caseData.getRespondent1();
-            return List.of(Party.builder()
-                               .type(respondent.getType().getDisplayValue())
-                               .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent))
-                               .name(respondent.getPartyName())
-                               .primaryAddress(respondent.getPrimaryAddress())
-                               .representative(representative1)
-                               .build());
+            return List.of(new Party()
+                               .setType(respondent.getType().getDisplayValue())
+                               .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent))
+                               .setName(respondent.getPartyName())
+                               .setPrimaryAddress(respondent.getPrimaryAddress())
+                               .setRepresentative(representative1));
         }
 
         private List<Party> getRespondentsSameSolicitor(CaseData caseData) {
             var respondent1 = caseData.getRespondent1();
             var respondent2 = caseData.getRespondent2();
             return List.of(
-                Party.builder()
-                    .type(respondent1.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent1))
-                    .name(respondent1.getPartyName())
-                    .primaryAddress(respondent1.getPrimaryAddress())
-                    .representative(representative1)
-                    .build(),
-                Party.builder()
-                    .type(respondent2.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
-                    .name(respondent2.getPartyName())
-                    .primaryAddress(respondent2.getPrimaryAddress())
-                    .representative(representative1)
-                    .build()
+                new Party()
+                    .setType(respondent1.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent1))
+                    .setName(respondent1.getPartyName())
+                    .setPrimaryAddress(respondent1.getPrimaryAddress())
+                    .setRepresentative(representative1),
+                new Party()
+                    .setType(respondent2.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
+                    .setName(respondent2.getPartyName())
+                    .setPrimaryAddress(respondent2.getPrimaryAddress())
+                    .setRepresentative(representative1)
             );
         }
 
@@ -438,55 +517,50 @@ class SealedClaimFormGeneratorTest {
             var respondent1 = caseData.getRespondent1();
             var respondent2 = caseData.getRespondent2();
             return List.of(
-                Party.builder()
-                    .type(respondent1.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent1))
-                    .name(respondent1.getPartyName())
-                    .primaryAddress(respondent1.getPrimaryAddress())
-                    .representative(representative1)
-                    .build(),
-                Party.builder()
-                    .type(respondent2.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
-                    .name(respondent2.getPartyName())
-                    .primaryAddress(respondent2.getPrimaryAddress())
-                    .representative(representative2)
-                    .build()
+                new Party()
+                    .setType(respondent1.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent1))
+                    .setName(respondent1.getPartyName())
+                    .setPrimaryAddress(respondent1.getPrimaryAddress())
+                    .setRepresentative(representative1),
+                new Party()
+                    .setType(respondent2.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
+                    .setName(respondent2.getPartyName())
+                    .setPrimaryAddress(respondent2.getPrimaryAddress())
+                    .setRepresentative(representative2)
             );
         }
 
         private List<Party> getApplicant(CaseData caseData) {
             var applicant = caseData.getApplicant1();
-            return List.of(Party.builder()
-                               .type(applicant.getType().getDisplayValue())
-                               .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
-                               .name(applicant.getPartyName())
-                               .primaryAddress(applicant.getPrimaryAddress())
-                               .litigationFriendName("applicant LF")
-                               .representative(getRepresentative())
-                               .build());
+            return List.of(new Party()
+                               .setType(applicant.getType().getDisplayValue())
+                               .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
+                               .setName(applicant.getPartyName())
+                               .setPrimaryAddress(applicant.getPrimaryAddress())
+                               .setLitigationFriendName("applicant LF")
+                               .setRepresentative(getRepresentative()));
         }
 
         private List<Party> getApplicants(CaseData caseData) {
             var applicant = caseData.getApplicant1();
             var applicant2 = caseData.getApplicant2();
             return List.of(
-                Party.builder()
-                    .type(applicant.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
-                    .name(applicant.getPartyName())
-                    .primaryAddress(applicant.getPrimaryAddress())
-                    .litigationFriendName("applicant LF")
-                    .representative(getRepresentative())
-                    .build(),
-                Party.builder()
-                    .type(applicant2.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant2))
-                    .name(applicant2.getPartyName())
-                    .primaryAddress(applicant2.getPrimaryAddress())
-                    .litigationFriendName("applicant2 LF")
-                    .representative(getRepresentative())
-                    .build()
+                new Party()
+                    .setType(applicant.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
+                    .setName(applicant.getPartyName())
+                    .setPrimaryAddress(applicant.getPrimaryAddress())
+                    .setLitigationFriendName("applicant LF")
+                    .setRepresentative(getRepresentative()),
+                new Party()
+                    .setType(applicant2.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant2))
+                    .setName(applicant2.getPartyName())
+                    .setPrimaryAddress(applicant2.getPrimaryAddress())
+                    .setLitigationFriendName("applicant2 LF")
+                    .setRepresentative(getRepresentative())
             );
         }
     }

@@ -43,10 +43,10 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String REFERENCE_NUMBER = "000MC014";
-    private static final String fileName_application = String.format(
+    private static final String FILE_NAME_APPLICATION = String.format(
             CLAIMANT_LIP_MANUAL_DETERMINATION_PDF.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-            .documentName(fileName_application)
+            .documentName(FILE_NAME_APPLICATION)
             .documentType(LIP_MANUAL_DETERMINATION)
             .build();
     @MockBean
@@ -63,7 +63,7 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(CLAIMANT_LIP_MANUAL_DETERMINATION_PDF)))
                 .thenReturn(new DocmosisDocument(CLAIMANT_LIP_MANUAL_DETERMINATION_PDF.getDocumentTitle(), bytes));
         when(documentManagementService
-                .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, LIP_MANUAL_DETERMINATION)))
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, LIP_MANUAL_DETERMINATION)))
                 .thenReturn(CASE_DOCUMENT);
     }
 
@@ -80,7 +80,7 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
         assertThat(caseDocument).isNotNull();
 
         verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, LIP_MANUAL_DETERMINATION));
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, LIP_MANUAL_DETERMINATION));
     }
 
     @Test
@@ -89,7 +89,7 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .issueDate(LocalDate.now())
                 .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
-                .applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder().paymentSetDate(LocalDate.now()).build())
+                .applicant1RequestedPaymentDateForDefendantSpec(new PaymentBySetDate().setPaymentSetDate(LocalDate.now()))
                 .build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -97,7 +97,7 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
         assertThat(caseDocument).isNotNull();
 
         verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, LIP_MANUAL_DETERMINATION));
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, LIP_MANUAL_DETERMINATION));
     }
 
     @Test
@@ -117,6 +117,6 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
         assertThat(caseDocument).isNotNull();
 
         verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, LIP_MANUAL_DETERMINATION));
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, LIP_MANUAL_DETERMINATION));
     }
 }

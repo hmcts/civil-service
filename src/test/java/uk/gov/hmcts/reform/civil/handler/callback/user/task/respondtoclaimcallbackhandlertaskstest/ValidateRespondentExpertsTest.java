@@ -53,17 +53,18 @@ class ValidateRespondentExpertsTest {
     @Test
     void shouldValidateRespondentExpertsWhenMultiPartyScenarioOneVOne() {
 
+        Experts experts = new Experts();
+        experts.setExpertRequired(NO);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQExperts(experts);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1DQ(Respondent1DQ
-                               .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
-                               .build())
+            .respondent1DQ(respondent1DQ)
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateRespondentExperts.execute(callbackParams);
@@ -78,18 +79,18 @@ class ValidateRespondentExpertsTest {
 
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
             .thenReturn(true);
+        Experts experts = new Experts();
+        experts.setExpertRequired(NO);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQExperts(experts);
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoDefendantSolicitors()
-            .respondent1DQ(Respondent1DQ
-                               .builder().respondent1DQExperts(Experts.builder()
-                                                                   .expertRequired(NO)
-                                                                   .build()).build())
-            .build().toBuilder().ccdCaseReference(1234L)
+            .respondent1DQ(respondent1DQ)
             .build();
-        CallbackParams callbackParams = CallbackParams.builder()
+        caseData.setCcdCaseReference(1234L);
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -107,19 +108,19 @@ class ValidateRespondentExpertsTest {
 
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
             .thenReturn(false, true);
+        Experts experts = new Experts();
+        experts.setExpertRequired(NO);
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQExperts(experts);
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoDefendantSolicitors()
-            .respondent2DQ(Respondent2DQ
-                               .builder().respondent2DQExperts(Experts.builder()
-                                                                   .expertRequired(NO)
-                                                                   .build()).build())
-            .build().toBuilder().ccdCaseReference(1234L)
+            .respondent2DQ(respondent2DQ)
             .build();
+        caseData.setCcdCaseReference(1234L);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -137,19 +138,20 @@ class ValidateRespondentExpertsTest {
 
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
             .thenReturn(false, false);
+        Experts experts = new Experts();
+        experts.setExpertRequired(NO);
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQExperts(experts);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .multiPartyClaimOneDefendantSolicitor()
-            .respondent2DQ(Respondent2DQ
-                               .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
-                               .build())
+            .respondent2DQ(respondent2DQ)
             .respondent2SameLegalRepresentative(YES)
             .respondentResponseIsSame(NO)
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -165,18 +167,19 @@ class ValidateRespondentExpertsTest {
     @Test
     void shouldValidateRespondent1ExpertsByDefault() {
 
+        Experts experts = new Experts();
+        experts.setExpertRequired(YES);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQExperts(experts);
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoDefendantSolicitors()
-            .respondent1DQ(Respondent1DQ
-                               .builder().respondent1DQExperts(Experts.builder().expertRequired(YES).build())
-                               .build())
-            .build().toBuilder().ccdCaseReference(1234L)
+            .respondent1DQ(respondent1DQ)
             .build();
+        caseData.setCcdCaseReference(1234L);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());

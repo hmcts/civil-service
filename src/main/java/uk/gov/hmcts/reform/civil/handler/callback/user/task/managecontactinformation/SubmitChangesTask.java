@@ -15,8 +15,12 @@ import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -33,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORM
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_GA_CASE_DATA;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentTabDetails.updateDataForClaimDetailsTab;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
@@ -62,8 +67,6 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapU
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQWitnesses;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populatePartyIndividuals;
-import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForLitigationFriendParties;
-import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 
 @Component
 @Slf4j
@@ -91,58 +94,52 @@ public class SubmitChangesTask {
     }
 
     public CallbackResponse submitChanges(CaseData caseData, CaseDetails caseDetailsBefore, String authToken) {
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
         log.info("Submit changes for case ID {}", caseData.getCcdCaseReference());
-        CaseData oldCaseData = caseDetailsConverter.toCaseData(caseDetailsBefore);
-
-        // persist party flags (ccd issue)
-        persistFlagsForParties(oldCaseData, caseData, builder);
-        persistFlagsForLitigationFriendParties(oldCaseData, caseData, builder);
 
         String partyChosenId = caseData.getUpdateDetailsForm().getPartyChosenId();
 
-        updateExperts(partyChosenId, caseData, builder);
-        updateWitnesses(partyChosenId, caseData, builder);
-        updateLRIndividuals(partyChosenId, caseData, builder);
-        updateOrgIndividuals(partyChosenId, caseData, builder);
+        updateExperts(partyChosenId, caseData);
+        updateWitnesses(partyChosenId, caseData);
+        updateLRIndividuals(partyChosenId, caseData);
+        updateOrgIndividuals(partyChosenId, caseData);
         updateGaCaseName(caseData);
 
         if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
             // update case name for hmc if applicant/respondent/litigation friend was updated
-            builder.caseNameHmctsInternal(CaseNameUtils.buildCaseName(caseData));
-            builder.caseNamePublic(buildCaseName(caseData));
+            caseData.setCaseNameHmctsInternal(CaseNameUtils.buildCaseName(caseData));
+            caseData.setCaseNamePublic(buildCaseName(caseData));
         }
 
         // last step before clearing update details form
-        caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, builder);
+        caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, caseData);
 
         // clear updateDetailsForm
-        builder.updateDetailsForm(UpdateDetailsForm.builder().manageContactDetailsEventUsed(YES).build());
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setManageContactDetailsEventUsed(YES);
+        caseData.setUpdateDetailsForm(updateDetailsForm);
 
         // update claim details tab
-        updateClaimDetailsTab(caseData, builder);
+        updateDataForClaimDetailsTab(caseData, objectMapper, false);
 
         CaseData current = caseDetailsConverter.toCaseData(caseDetailsBefore);
-        ContactDetailsUpdatedEvent changesEvent = partyDetailsChangedUtil.buildChangesEvent(current, builder.build());
+        ContactDetailsUpdatedEvent changesEvent = partyDetailsChangedUtil.buildChangesEvent(current, caseData);
         //Populate individuals with partyID if they do not exist
-        populatePartyIndividuals(builder);
+        populatePartyIndividuals(caseData);
 
         if (changesEvent == null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(builder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
         }
 
         YesOrNo submittedByCaseworker = isAdmin(authToken) ? YES : NO;
 
+        caseData.setBusinessProcess(BusinessProcess.ready(MANAGE_CONTACT_INFORMATION));
+        changesEvent.setSubmittedByCaseworker(submittedByCaseworker);
+        caseData.setContactDetailsUpdatedEvent(changesEvent);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder
-                      .businessProcess(BusinessProcess.ready(MANAGE_CONTACT_INFORMATION))
-                      .contactDetailsUpdatedEvent(
-                          changesEvent.toBuilder()
-                              .submittedByCaseworker(submittedByCaseworker)
-                              .build())
-                      .build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -162,141 +159,141 @@ public class SubmitChangesTask {
 
     // wip can't be tested yet because need to get ids from new ticket: CIV-10382
     // have to delete experts (yes/no etc) if the experts are removed, same as witnesses
-    private void updateExperts(String partyId, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private void updateExperts(String partyId, CaseData caseData) {
         List<Element<UpdatePartyDetailsForm>> formData = caseData.getUpdateDetailsForm().getUpdateExpertsDetailsForm();
         List<Element<Expert>> mappedExperts;
 
         if (partyId.equals(CLAIMANT_ONE_EXPERTS_ID)) {
             mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
                 caseData.getApplicant1DQ().getApplicant1DQExperts(), formData);
-            builder.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
-                                     .applicant1DQExperts(
-                                         buildExperts(caseData.getApplicant1DQ().getApplicant1DQExperts(), mappedExperts))
-                                     .build());
+            Applicant1DQ applicant1DQ = caseData.getApplicant1DQ();
+            applicant1DQ.setApplicant1DQExperts(
+                buildExperts(applicant1DQ.getApplicant1DQExperts(), mappedExperts));
+            caseData.setApplicant1DQ(applicant1DQ);
             List<Element<PartyFlagStructure>> updatedApplicantExperts = updatePartyDQExperts(
                 unwrapElements(caseData.getApplicantExperts()),
                 unwrapElements(mappedExperts)
             );
-            builder.applicantExperts(updatedApplicantExperts);
+            caseData.setApplicantExperts(updatedApplicantExperts);
 
             // copy in applicant 2 for single response
             if (shouldCopyToApplicant2(caseData)) {
-                builder.applicant2DQ(caseData.getApplicant2DQ().toBuilder()
-                                         .applicant2DQExperts(
-                                             buildExperts(caseData.getApplicant1DQ().getApplicant1DQExperts(), mappedExperts))
-                                         .build());
+                Applicant2DQ applicant2DQ = caseData.getApplicant2DQ();
+                applicant2DQ.setApplicant2DQExperts(
+                    buildExperts(applicant1DQ.getApplicant1DQExperts(), mappedExperts));
+                caseData.setApplicant2DQ(applicant2DQ);
             }
 
         } else if (partyId.equals(DEFENDANT_ONE_EXPERTS_ID)) {
             mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
                 caseData.getRespondent1DQ().getRespondent1DQExperts(), formData);
-            builder.respondent1DQ(caseData.getRespondent1DQ().toBuilder()
-                                      .respondent1DQExperts(
-                                          buildExperts(caseData.getRespondent1DQ().getRespondent1DQExperts(), mappedExperts))
-                                      .build());
+            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
+            respondent1DQ.setRespondent1DQExperts(
+                buildExperts(respondent1DQ.getRespondent1DQExperts(), mappedExperts));
+            caseData.setRespondent1DQ(respondent1DQ);
             List<Element<PartyFlagStructure>> updatedRespondent1Experts = updatePartyDQExperts(
                 unwrapElements(caseData.getRespondent1Experts()),
                 unwrapElements(mappedExperts)
             );
-            builder.respondent1Experts(updatedRespondent1Experts);
+            caseData.setRespondent1Experts(updatedRespondent1Experts);
 
             // copy in respondent2 for 1v2SS single response
             if (shouldCopyToRespondent2(caseData)) {
-                builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
-                                          .respondent2DQExperts(
-                                              buildExperts(caseData.getRespondent1DQ().getRespondent1DQExperts(), mappedExperts))
-                                          .build());
-                builder.respondent2Experts(updatedRespondent1Experts);
+                Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+                respondent2DQ.setRespondent2DQExperts(
+                    buildExperts(respondent1DQ.getRespondent1DQExperts(), mappedExperts));
+                caseData.setRespondent2DQ(respondent2DQ);
+                caseData.setRespondent2Experts(updatedRespondent1Experts);
             }
         } else if (partyId.equals(DEFENDANT_TWO_EXPERTS_ID)) {
             mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
                 caseData.getRespondent2DQ().getRespondent2DQExperts(), formData);
-            builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
-                                      .respondent2DQExperts(
-                                          buildExperts(caseData.getRespondent2DQ().getRespondent2DQExperts(), mappedExperts))
-                                      .build());
+            Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+            respondent2DQ.setRespondent2DQExperts(
+                buildExperts(respondent2DQ.getRespondent2DQExperts(), mappedExperts));
+            caseData.setRespondent2DQ(respondent2DQ);
             List<Element<PartyFlagStructure>> updatedRespondent2Experts = updatePartyDQExperts(
                 unwrapElements(caseData.getRespondent2Experts()),
                 unwrapElements(mappedExperts)
             );
-            builder.respondent2Experts(updatedRespondent2Experts);
+            caseData.setRespondent2Experts(updatedRespondent2Experts);
         }
     }
 
-    private void updateWitnesses(String partyId, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private void updateWitnesses(String partyId, CaseData caseData) {
         List<Element<UpdatePartyDetailsForm>> formData = caseData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm();
         List<Element<Witness>> mappedWitnesses;
 
         if (partyId.equals(CLAIMANT_ONE_WITNESSES_ID)) {
             mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
                 caseData.getApplicant1DQ().getApplicant1DQWitnesses(), formData);
-            builder.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
-                                     .applicant1DQWitnesses(
-                                         buildWitnesses(caseData.getApplicant1DQ().getApplicant1DQWitnesses(), mappedWitnesses))
-                                     .build());
+            Applicant1DQ applicant1DQ = caseData.getApplicant1DQ();
+            applicant1DQ.setApplicant1DQWitnesses(
+                buildWitnesses(applicant1DQ.getApplicant1DQWitnesses(), mappedWitnesses));
+            caseData.setApplicant1DQ(applicant1DQ);
             List<Element<PartyFlagStructure>> updatedApplicantWitnesses = updatePartyDQWitnesses(
                 unwrapElements(caseData.getApplicantWitnesses()),
                 unwrapElements(mappedWitnesses)
             );
-            builder.applicantWitnesses(updatedApplicantWitnesses);
+            caseData.setApplicantWitnesses(updatedApplicantWitnesses);
 
             // copy in applicant 2 for single response
             if (shouldCopyToApplicant2(caseData)) {
-                builder.applicant2DQ(caseData.getApplicant2DQ().toBuilder()
-                                         .applicant2DQWitnesses(
-                                             buildWitnesses(caseData.getApplicant1DQ().getApplicant1DQWitnesses(), mappedWitnesses))
-                                         .build());
+                Applicant2DQ applicant2DQ = caseData.getApplicant2DQ();
+                applicant2DQ.setApplicant2DQWitnesses(
+                    buildWitnesses(applicant1DQ.getApplicant1DQWitnesses(), mappedWitnesses));
+                caseData.setApplicant2DQ(applicant2DQ);
             }
         } else if (partyId.equals(DEFENDANT_ONE_WITNESSES_ID)) {
             mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
                 caseData.getRespondent1DQ().getRespondent1DQWitnesses(), formData);
-            builder.respondent1DQ(caseData.getRespondent1DQ().toBuilder()
-                                      .respondent1DQWitnesses(
-                                          buildWitnesses(caseData.getRespondent1DQ().getRespondent1DQWitnesses(), mappedWitnesses))
-                                      .build());
+            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
+            respondent1DQ.setRespondent1DQWitnesses(
+                buildWitnesses(respondent1DQ.getRespondent1DQWitnesses(), mappedWitnesses));
+            caseData.setRespondent1DQ(respondent1DQ);
             List<Element<PartyFlagStructure>> updatedRespondent1Witnesses = updatePartyDQWitnesses(
                 unwrapElements(caseData.getRespondent1Witnesses()),
                 unwrapElements(mappedWitnesses)
             );
-            builder.respondent1Witnesses(updatedRespondent1Witnesses);
+            caseData.setRespondent1Witnesses(updatedRespondent1Witnesses);
 
             // copy in respondent2 for 1v2SS single response
             if (shouldCopyToRespondent2(caseData)) {
-                builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
-                                          .respondent2DQWitnesses(
-                                              buildWitnesses(caseData.getRespondent1DQ().getRespondent1DQWitnesses(), mappedWitnesses))
-                                          .build());
-                builder.respondent2Witnesses(updatedRespondent1Witnesses);
+                Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+                respondent2DQ.setRespondent2DQWitnesses(
+                    buildWitnesses(respondent1DQ.getRespondent1DQWitnesses(), mappedWitnesses));
+                caseData.setRespondent2DQ(respondent2DQ);
+                caseData.setRespondent2Witnesses(updatedRespondent1Witnesses);
             }
         } else if (partyId.equals(DEFENDANT_TWO_WITNESSES_ID)) {
             mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
                 caseData.getRespondent2DQ().getRespondent2DQWitnesses(), formData);
-            builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
-                                      .respondent2DQWitnesses(
-                                          buildWitnesses(caseData.getRespondent2DQ().getRespondent2DQWitnesses(), mappedWitnesses))
-                                      .build());
+            Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+            respondent2DQ.setRespondent2DQWitnesses(
+                buildWitnesses(respondent2DQ.getRespondent2DQWitnesses(), mappedWitnesses));
+            caseData.setRespondent2DQ(respondent2DQ);
             List<Element<PartyFlagStructure>> updatedRespondent2Witnesses = updatePartyDQWitnesses(
                 unwrapElements(caseData.getRespondent2Witnesses()),
                 unwrapElements(mappedWitnesses)
             );
-            builder.respondent2Witnesses(updatedRespondent2Witnesses);
+            caseData.setRespondent2Witnesses(updatedRespondent2Witnesses);
         }
     }
 
-    private void updateLRIndividuals(String partyId, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private void updateLRIndividuals(String partyId, CaseData caseData) {
         switch (partyId) {
             case CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID: {
-                builder.applicant1LRIndividuals(mapFormDataToIndividualsData(caseData.getApplicant1LRIndividuals(),
+                caseData.setApplicant1LRIndividuals(mapFormDataToIndividualsData(caseData.getApplicant1LRIndividuals(),
                                                                              caseData.getUpdateDetailsForm().getUpdateLRIndividualsForm()));
                 return;
             }
             case DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID: {
-                builder.respondent1LRIndividuals(mapFormDataToIndividualsData(caseData.getRespondent1LRIndividuals(),
+                caseData.setRespondent1LRIndividuals(mapFormDataToIndividualsData(caseData.getRespondent1LRIndividuals(),
                                                                               caseData.getUpdateDetailsForm().getUpdateLRIndividualsForm()));
                 return;
             }
             case DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID: {
-                builder.respondent2LRIndividuals(mapFormDataToIndividualsData(caseData.getRespondent2LRIndividuals(),
+                caseData.setRespondent2LRIndividuals(mapFormDataToIndividualsData(caseData.getRespondent2LRIndividuals(),
                                                                               caseData.getUpdateDetailsForm().getUpdateLRIndividualsForm()));
                 return;
             }
@@ -304,25 +301,25 @@ public class SubmitChangesTask {
         }
     }
 
-    private void updateOrgIndividuals(String partyId, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private void updateOrgIndividuals(String partyId, CaseData caseData) {
         switch (partyId) {
             case CLAIMANT_ONE_ORG_INDIVIDUALS_ID: {
-                builder.applicant1OrgIndividuals(mapFormDataToIndividualsData(caseData.getApplicant1OrgIndividuals(),
+                caseData.setApplicant1OrgIndividuals(mapFormDataToIndividualsData(caseData.getApplicant1OrgIndividuals(),
                                                                               caseData.getUpdateDetailsForm().getUpdateOrgIndividualsForm()));
                 return;
             }
             case CLAIMANT_TWO_ORG_INDIVIDUALS_ID: {
-                builder.applicant2OrgIndividuals(mapFormDataToIndividualsData(caseData.getApplicant2OrgIndividuals(),
+                caseData.setApplicant2OrgIndividuals(mapFormDataToIndividualsData(caseData.getApplicant2OrgIndividuals(),
                                                                               caseData.getUpdateDetailsForm().getUpdateOrgIndividualsForm()));
                 return;
             }
             case DEFENDANT_ONE_ORG_INDIVIDUALS_ID: {
-                builder.respondent1OrgIndividuals(mapFormDataToIndividualsData(caseData.getRespondent1OrgIndividuals(),
+                caseData.setRespondent1OrgIndividuals(mapFormDataToIndividualsData(caseData.getRespondent1OrgIndividuals(),
                                                                                caseData.getUpdateDetailsForm().getUpdateOrgIndividualsForm()));
                 return;
             }
             case DEFENDANT_TWO_ORG_INDIVIDUALS_ID: {
-                builder.respondent2OrgIndividuals(mapFormDataToIndividualsData(caseData.getRespondent2OrgIndividuals(),
+                caseData.setRespondent2OrgIndividuals(mapFormDataToIndividualsData(caseData.getRespondent2OrgIndividuals(),
                                                                                caseData.getUpdateDetailsForm().getUpdateOrgIndividualsForm()));
                 return;
             }
@@ -344,20 +341,13 @@ public class SubmitChangesTask {
             || DEFENDANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen);
     }
 
-    private void updateClaimDetailsTab(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        builder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            builder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
-        }
-    }
-
     private Experts buildExperts(Experts experts, List<Element<Expert>> mappedExperts) {
-        return ofNullable(experts)
-            .orElse(Experts.builder().build())
-            .toBuilder()
-            .expertRequired(mappedExperts.size() >= 1 ? YES : NO)
-            .details(mappedExperts).build();
+        Experts result = ofNullable(experts).orElse(new Experts());
+
+        result.setExpertRequired(mappedExperts != null && !mappedExperts.isEmpty() ? YES : NO);
+        result.setDetails(mappedExperts);
+
+        return result;
     }
 
     private boolean shouldCopyToApplicant2(CaseData caseData) {
@@ -368,11 +358,13 @@ public class SubmitChangesTask {
     }
 
     private Witnesses buildWitnesses(Witnesses witnesses, List<Element<Witness>> mappedWitnesses) {
-        return ofNullable(witnesses)
-            .orElse(Witnesses.builder().build())
-            .toBuilder()
-            .witnessesToAppear(mappedWitnesses.size() >= 1 ? YES : NO)
-            .details(mappedWitnesses).build();
+        Witnesses result = ofNullable(witnesses)
+            .orElse(new Witnesses());
+
+        result.setWitnessesToAppear(mappedWitnesses != null && mappedWitnesses.size() >= 1 ? YES : NO);
+        result.setDetails(mappedWitnesses);
+
+        return result;
     }
 
     private boolean shouldCopyToRespondent2(CaseData caseData) {

@@ -40,9 +40,9 @@ class RoboticsAddressMapperTest {
 
         @Test
         void shouldMapToRoboticsAddressWithDefaultForAddressLine2_whenAddressLine2IsNull() {
-            Address address = Address.builder()
-                .addressLine1("address line 1")
-                .postCode("SW1 1AA").build();
+            Address address = new Address();
+            address.setAddressLine1("address line 1");
+            address.setPostCode("SW1 1AA");
 
             RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
 
@@ -60,36 +60,34 @@ class RoboticsAddressMapperTest {
 
         @Test
         void shouldRollOverToAddressLine2_whenAddressLine1IsMoreThan35CharactersWithCommas() {
-            Address address = Address.builder()
-                .addressLine1("address line 1, address line 1, address line 2")
-                .postCode("SW1 1AA").build();
+            Address address = new Address();
+            address.setAddressLine1("address line 1, address line 1, address line 2");
+            address.setPostCode("SW1 1AA");
 
             RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
 
             assertThat(roboticsAddress)
-                .isEqualTo(RoboticsAddress.builder()
-                               .addressLine1("address line 1, address line 1")
-                               .addressLine2("address line 2")
-                               .postCode("SW1 1AA")
-                               .build());
+                .isEqualTo(new RoboticsAddress()
+                               .setAddressLine1("address line 1, address line 1")
+                               .setAddressLine2("address line 2")
+                               .setPostCode("SW1 1AA"));
         }
 
         @Test
         void shouldRollOverToAddressLine3_whenAddressLine2IsMoreThan35CharactersWithCommas() {
-            Address address = Address.builder()
-                .addressLine1("address line 1, address line 1")
-                .addressLine2("address line 2, address line 2, address line 3")
-                .postCode("SW1 1AA").build();
+            Address address = new Address();
+            address.setAddressLine1("address line 1, address line 1");
+            address.setAddressLine2("address line 2, address line 2, address line 3");
+            address.setPostCode("SW1 1AA");
 
             RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
 
             assertThat(roboticsAddress)
-                .isEqualTo(RoboticsAddress.builder()
-                               .addressLine1("address line 1, address line 1")
-                               .addressLine2("address line 2, address line 2")
-                               .addressLine3("address line 3")
-                               .postCode("SW1 1AA")
-                               .build());
+                .isEqualTo(new RoboticsAddress()
+                               .setAddressLine1("address line 1, address line 1")
+                               .setAddressLine2("address line 2, address line 2")
+                               .setAddressLine3("address line 3")
+                               .setPostCode("SW1 1AA"));
         }
     }
 
@@ -116,12 +114,11 @@ class RoboticsAddressMapperTest {
 
         @Test
         void shouldMapToRoboticsAddresses_whenContactInformationIsProvided() {
-            List<ContactInformation> contactInformationList = List.of(ContactInformation.builder()
-                                                                          .addressLine1("line 1")
-                                                                          .addressLine2("line 2")
-                                                                          .postCode("AB1 2XY")
-                                                                          .county("My county")
-                                                                          .build());
+            List<ContactInformation> contactInformationList = List.of(new ContactInformation()
+                                                                          .setAddressLine1("line 1")
+                                                                          .setAddressLine2("line 2")
+                                                                          .setPostCode("AB1 2XY")
+                                                                          .setCounty("My county"));
 
             RoboticsAddresses roboticsAddresses = mapper.toRoboticsAddresses(contactInformationList);
 

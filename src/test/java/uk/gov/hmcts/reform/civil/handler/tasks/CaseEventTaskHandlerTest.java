@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDate;
@@ -58,7 +59,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -99,6 +100,8 @@ class CaseEventTaskHandlerTest {
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+    @Spy
+    private RoboticsEventTextFormatter textFormatter = new RoboticsEventTextFormatter();
     @Captor
     ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
     @InjectMocks
@@ -111,7 +114,7 @@ class CaseEventTaskHandlerTest {
         void init() {
             Map<String, Object> variables = Map.of(
                 "caseId", CASE_ID,
-                "caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
+                "caseEvent", NOTIFY_EVENT.name()
             );
 
             when(mockTask.getAllVariables()).thenReturn(variables);
@@ -124,28 +127,27 @@ class CaseEventTaskHandlerTest {
         @Test
         void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
             CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder()
-                                     .status(BusinessProcessStatus.READY)
-                                     .processInstanceId("processInstanceId")
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.READY)
+                                     .setProcessInstanceId("processInstanceId"))
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
             variables.putValue(FLOW_FLAGS, Map.of());
 
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
-            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
 
             when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
             when(stateFlowEngine.getStateFlow(any(CaseData.class)))
-                .thenReturn(StateFlowDTO.builder().state(State.from("MAIN.DRAFT")).flags(Map.of()).build());
+                .thenReturn(new StateFlowDTO().setState(State.from("MAIN.DRAFT")).setFlags(Map.of()));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
-            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_EVENT);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
         }
@@ -158,7 +160,7 @@ class CaseEventTaskHandlerTest {
         void init() {
             Map<String, Object> variables = Map.of(
                 "caseId", CASE_ID,
-                "caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
+                "caseEvent", NOTIFY_EVENT.name()
             );
 
             when(mockTask.getAllVariables()).thenReturn(variables);
@@ -169,7 +171,7 @@ class CaseEventTaskHandlerTest {
             String errorMessage = "there was an error";
 
             when(mockTask.getRetries()).thenReturn(null);
-            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
                 .thenAnswer(invocation -> {
                     throw new Exception(errorMessage);
                 });
@@ -194,7 +196,7 @@ class CaseEventTaskHandlerTest {
             String exampleUrl = "example url";
 
             when(mockTask.getRetries()).thenReturn(null);
-            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
                 .thenAnswer(invocation -> {
                     throw FeignException.errorStatus(errorMessage, Response.builder()
                         .request(
@@ -259,7 +261,7 @@ class CaseEventTaskHandlerTest {
 
             CaseData caseData = getCaseData(state);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -268,7 +270,7 @@ class CaseEventTaskHandlerTest {
             when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
             when(stateFlowEngine.getStateFlow(any(CaseData.class)))
-                .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName())).flags(flags).build());
+                .thenReturn(new StateFlowDTO().setState(State.from(state.fullName())).setFlags(flags));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -319,7 +321,7 @@ class CaseEventTaskHandlerTest {
             CaseData caseData = getCaseData(TAKEN_OFFLINE_BY_STAFF);
             caseData.getClaimProceedsInCaseman().setReason(reason);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -327,9 +329,9 @@ class CaseEventTaskHandlerTest {
             when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
             when(stateFlowEngine.getStateFlow(caseData))
-                .thenReturn(StateFlowDTO.builder().state(State.from(TAKEN_OFFLINE_BY_STAFF.fullName()))
-                                .flags(getFlowFlags(TAKEN_OFFLINE_BY_STAFF))
-                                .build());
+                .thenReturn(new StateFlowDTO()
+                    .setState(State.from(TAKEN_OFFLINE_BY_STAFF.fullName()))
+                    .setFlags(getFlowFlags(TAKEN_OFFLINE_BY_STAFF)));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -363,7 +365,7 @@ class CaseEventTaskHandlerTest {
 
             CaseData caseData = getCaseData(state);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -373,9 +375,9 @@ class CaseEventTaskHandlerTest {
                 .thenReturn(caseData);
 
             when(stateFlowEngine.getStateFlow(caseData))
-                .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                .flags(getFlowFlags(state))
-                                .build());
+                .thenReturn(new StateFlowDTO()
+                    .setState(State.from(state.fullName()))
+                    .setFlags(getFlowFlags(state)));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -406,7 +408,7 @@ class CaseEventTaskHandlerTest {
 
             CaseData caseData = getCaseData(state);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -416,9 +418,9 @@ class CaseEventTaskHandlerTest {
                 .thenReturn(caseData);
 
             when(stateFlowEngine.getStateFlow(caseData))
-                .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                .flags(getFlowFlags(state))
-                                .build());
+                .thenReturn(new StateFlowDTO()
+                    .setState(State.from(state.fullName()))
+                    .setFlags(getFlowFlags(state)));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -449,7 +451,7 @@ class CaseEventTaskHandlerTest {
 
             CaseData caseData = getCaseData(state);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -459,9 +461,9 @@ class CaseEventTaskHandlerTest {
                 .thenReturn(caseData);
 
             when(stateFlowEngine.getStateFlow(caseData))
-                .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                .flags(getFlowFlags(state))
-                                .build());
+                .thenReturn(new StateFlowDTO()
+                    .setState(State.from(state.fullName()))
+                    .setFlags(getFlowFlags(state)));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -476,10 +478,9 @@ class CaseEventTaskHandlerTest {
         @Nested
         class FullDefenceProceed {
             FlowState.Main state = FULL_DEFENCE_PROCEED;
-            BusinessProcess businessProcess = BusinessProcess.builder()
-                .status(BusinessProcessStatus.READY)
-                .processInstanceId("processInstanceId")
-                .build();
+            BusinessProcess businessProcess = new BusinessProcess()
+                .setStatus(BusinessProcessStatus.READY)
+                .setProcessInstanceId("processInstanceId");
 
             @BeforeEach
             void initForFullDefence() {
@@ -502,7 +503,7 @@ class CaseEventTaskHandlerTest {
                 void shouldHaveExpectedDescription() {
                     CaseData caseData = getCaseData(state);
                     caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
-                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+                    CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
                     when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                         .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -512,9 +513,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -530,7 +531,7 @@ class CaseEventTaskHandlerTest {
             class OneVTwo {
                 @Test
                 void shouldHaveExpectedDescription_WhenClaimantProceedsAgainstBothDefendants() {
-                    CaseData caseData = CaseDataBuilder.builder()
+                    CaseData caseData = new CaseDataBuilder()
                         .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
                         .businessProcess(businessProcess)
@@ -545,9 +546,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -561,7 +562,7 @@ class CaseEventTaskHandlerTest {
 
                 @Test
                 void shouldHaveExpectedDescription_WhenClaimantProceedsAgainstFirstDefendantOnly() {
-                    CaseData caseData = CaseDataBuilder.builder()
+                    CaseData caseData = new CaseDataBuilder()
                         .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
                         .businessProcess(businessProcess)
@@ -576,9 +577,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -592,7 +593,7 @@ class CaseEventTaskHandlerTest {
 
                 @Test
                 void shouldHaveExpectedDescription_WhenClaimantProceedsAgainstSecondDefendantOnly() {
-                    CaseData caseData = CaseDataBuilder.builder()
+                    CaseData caseData = new CaseDataBuilder()
                         .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
                         .businessProcess(businessProcess)
@@ -607,9 +608,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -626,7 +627,7 @@ class CaseEventTaskHandlerTest {
             class TwoVOne {
                 @Test
                 void shouldHaveExpectedDescription_WhenBothClaimaintsProceed() {
-                    CaseData caseData = CaseDataBuilder.builder()
+                    CaseData caseData = new CaseDataBuilder()
                         .multiPartyClaimTwoApplicants()
                         .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                         .businessProcess(businessProcess)
@@ -641,9 +642,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -657,12 +658,12 @@ class CaseEventTaskHandlerTest {
 
                 @Test
                 void shouldHaveExpectedDescription_WhenOnlyFirstClaimantProceeds() {
-                    CaseData caseData = CaseDataBuilder.builder()
+                    CaseData caseData = new CaseDataBuilder()
                         .multiPartyClaimTwoApplicants()
                         .atStateApplicant1RespondToDefenceAndProceed_2v1()
                         .businessProcess(businessProcess)
                         .build();
-                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+                    CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
                     when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                         .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -672,9 +673,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -688,7 +689,7 @@ class CaseEventTaskHandlerTest {
 
                 @Test
                 void shouldHaveExpectedDescription_WhenOnlySecondClaimantProceeds() {
-                    CaseData caseData = CaseDataBuilder.builder()
+                    CaseData caseData = new CaseDataBuilder()
                         .multiPartyClaimTwoApplicants()
                         .atStateApplicant2RespondToDefenceAndProceed_2v1()
                         .businessProcess(businessProcess)
@@ -703,9 +704,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -727,31 +728,25 @@ class CaseEventTaskHandlerTest {
                 || state.equals(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)) {
                 return Map.ofEntries(Map.entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                              Map.entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                             Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                              Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                             Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                              Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                              Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                              Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                              Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                              Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
                              Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-                             Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
                              Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
                 || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)) {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                                     Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
                                      Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
             } else if (state.equals(FULL_ADMISSION)
@@ -759,39 +754,31 @@ class CaseEventTaskHandlerTest {
                 || state.equals(COUNTER_CLAIM)
                 || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                                     Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
                                      Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
             } else if (state.equals(CLAIM_DETAILS_NOTIFIED)
                 || state.equals(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)) {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                                     Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
                                      Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
 
             } else if (state.equals(FULL_DEFENCE_PROCEED)) {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                                     Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.MINTI_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
@@ -799,25 +786,21 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
                                      Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
                                      Map.entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false),
                                      Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
             }
             Map<String, Boolean> expectedFlags = new HashMap<>();
-            expectedFlags.put(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false);
-            expectedFlags.put(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.BULK_CLAIM_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false);
             expectedFlags.put(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false);
-            expectedFlags.put(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false);
             return expectedFlags;
         }
 
         private CaseData getCaseData(FlowState.Main state) {
-            BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
+            BusinessProcess businessProcess = new BusinessProcess().setStatus(BusinessProcessStatus.READY);
             CaseDataBuilder caseDataBuilder = new CaseDataBuilder().businessProcess(businessProcess);
             switch (state) {
                 case FULL_ADMISSION:
@@ -845,12 +828,12 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant()
                         .respondent1OrgRegistered(NO)
                         .respondent1OrganisationPolicy(
-                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]").build())
+                            new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]"))
                         .addRespondent2(YES)
                         .respondent2Represented(YES)
                         .respondent2OrgRegistered(NO)
                         .respondent2OrganisationPolicy(
-                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]").build());
+                            new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]"));
                     break;
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     caseDataBuilder.atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant();
@@ -945,7 +928,7 @@ class CaseEventTaskHandlerTest {
         @Test
         void shouldNotCallHandleFailureMethod_whenCaseIdNotFound() {
             //given: ExternalTask variables without caseId
-            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_EVENT);
             when(mockTask.getAllVariables())
                 .thenReturn(allVariables);
 

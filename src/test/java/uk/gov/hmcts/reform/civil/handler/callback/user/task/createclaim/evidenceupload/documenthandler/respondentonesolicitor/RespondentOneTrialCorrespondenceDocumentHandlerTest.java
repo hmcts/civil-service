@@ -24,9 +24,9 @@ class RespondentOneTrialCorrespondenceDocumentHandlerTest extends BaseDocumentHa
 
     @Test
     void shouldCopyTrialCorrespondenceDocumentsToLegalRep2() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getDocumentEvidenceForTrialRes2().size());
+        assertEquals(2, caseData.getDocumentEvidenceForTrialRes2().size());
     }
 
     @Test

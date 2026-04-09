@@ -1,22 +1,24 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.math.BigDecimal;
 
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@Accessors(chain = true)
 public class Respondent1SelfEmploymentLRspec {
 
-    private final String jobTitle;
+    private String jobTitle;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal annualTurnover;
-    private final YesOrNo isBehindOnTaxPayment;
+    private BigDecimal annualTurnover;
+    private YesOrNo isBehindOnTaxPayment;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal amountOwed;
-    private final String reason;
+    private BigDecimal amountOwed;
+    private String reason;
 
 }

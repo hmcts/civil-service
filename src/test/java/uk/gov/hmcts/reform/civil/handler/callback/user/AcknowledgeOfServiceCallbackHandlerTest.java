@@ -1,18 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,12 +23,19 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.List;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,6 +74,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     void prepare() {
+        objectMapper.registerModule(new JavaTimeModule());
         ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
     }
@@ -89,15 +91,34 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void populateRespondentCopy1_checkIfDeadlineNotPassed() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
+                .respondent2(new PartyBuilder().soleTrader().build().setPartyID("res-1-party-id"))
                 .build();
+
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("Defendant 1");
+            caseData.getRespondent1().setFlags(respondent1Flags);
+            Flags respondent2Flags = new Flags();
+            respondent1Flags.setPartyName("respondent2name");
+            respondent1Flags.setRoleOnCase("Defendant 2");
+            caseData.getRespondent2().setFlags(respondent2Flags);
+
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
             CallbackRequest request = CallbackRequest.builder()
                 .eventId("ACKNOWLEDGEMENT_OF_SERVICE")
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
-            CallbackResponse response = handler.handle(params);
-            assertThat(((AboutToStartOrSubmitCallbackResponse) response).getErrors()).isEmpty();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+            assertThat(updatedCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
+            Party respondent2DetailsForClaimDetailsTab = updatedCaseData.getRespondent2DetailsForClaimDetailsTab();
+            assertThat(respondent2DetailsForClaimDetailsTab).isNotNull();
+            assertThat(respondent2DetailsForClaimDetailsTab.getFlags()).isNull();
+            assertThat(updatedCaseData.getRespondent1Copy()).isNotNull();
+            assertThat(updatedCaseData.getRespondent2Copy()).isNotNull();
         }
 
         @Test
@@ -109,12 +130,23 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackRequest request = CallbackRequest.builder()
                 .eventId("ACKNOWLEDGEMENT_OF_SERVICE")
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             List<String> errors = Collections.singletonList("Deadline to file Acknowledgement of Service has passed, option is not available.");
 
             CallbackResponse response = handler.handle(params);
             Assertions.assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
+        }
+
+        @Test
+        void populateRespondentCopy1_shouldNotThrowNPE_whenDeadlineIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
+
+            Assertions.assertDoesNotThrow(() -> handler.handle(params));
         }
 
     }
@@ -124,17 +156,16 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void midSpecCorrespondenceAddress_checkAddressIfWasIncorrect() {
             String postCode = "postCode";
-            CaseData caseData = CaseData.builder()
-                .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO)
-                .specAoSApplicantCorrespondenceAddressdetails(Address.builder()
-                                                                  .postCode(postCode)
-                                                                  .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setSpecAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO);
+            Address address = new Address();
+            address.setPostCode(postCode);
+            caseData.setSpecAoSApplicantCorrespondenceAddressdetails(address);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
             CallbackRequest request = CallbackRequest.builder()
                 .eventId("ACKNOWLEDGEMENT_OF_SERVICE")
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             List<String> errors = Collections.singletonList("error 1");
             Mockito.when(postcodeValidator.validate(postCode)).thenReturn(errors);
@@ -152,7 +183,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackRequest request = CallbackRequest.builder()
                 .eventId("NOT_ACKNOWLEDGEMENT_OF_SERVICE")
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             CallbackResponse response = handler.handle(params);
             assertThat(((AboutToStartOrSubmitCallbackResponse) response).getErrors()).isNull();
@@ -168,7 +199,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "confirm-details");
             CallbackRequest request = CallbackRequest.builder()
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             List<String> errors = Collections.singletonList("Error 1");
             Mockito.when(dateOfBirthValidator.validate(caseData.getRespondent1())).thenReturn(errors);
@@ -183,15 +214,15 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .atSpecAoSRespondentCorrespondenceAddressRequired(YesOrNo.NO)
-                .atSpecAoSRespondentCorrespondenceAddressDetails(Address.builder()
-                                                                   .postCode(postCode)
-                                                                   .build())
                 .build();
+            Address respondentAddress = new Address();
+            respondentAddress.setPostCode(postCode);
+            caseData.setSpecAoSRespondentCorrespondenceAddressdetails(respondentAddress);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "confirm-details");
             CallbackRequest request = CallbackRequest.builder()
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             List<String> errors = Collections.singletonList("Error 1");
             Mockito.when(dateOfBirthValidator.validate(caseData.getRespondent1())).thenReturn(errors);
@@ -210,20 +241,35 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void aboutToSubmit_NewResponseDeadline() {
+            Address address = new Address();
+            address.setAddressLine1("Triple street");
+            address.setPostCode("Postcode");
+            Party respondent1Copy = new Party();
+            respondent1Copy.setPartyName("Party 2");
+            respondent1Copy.setPrimaryAddress(address);
+            Party respondent2Copy = new Party();
+            respondent2Copy.setPartyName("Party 2");
+            respondent2Copy.setPrimaryAddress(address);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .respondent1Copy(Party.builder().partyName("Party 2").primaryAddress(
-                                                                        Address
-                                                                            .builder()
-                                                                            .addressLine1("Triple street")
-                                                                            .postCode("Postcode")
-                                                                            .build())
-                                     .build())
                 .build();
+            caseData.setRespondent2(new PartyBuilder().soleTrader().build().setPartyID("res-1-party-id"));
+            caseData.setRespondent1Copy(respondent1Copy);
+            caseData.setRespondent2Copy(respondent2Copy);
+
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("Defendant 1");
+            caseData.getRespondent1().setFlags(respondent1Flags);
+            Flags respondent2Flags = new Flags();
+            respondent1Flags.setPartyName("respondent2name");
+            respondent1Flags.setRoleOnCase("Defendant 2");
+            caseData.getRespondent2().setFlags(respondent2Flags);
+
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             CallbackRequest request = CallbackRequest.builder()
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             Mockito.when(deadlinesCalculator.plus14DaysAt4pmDeadline(caseData.getRespondent1ResponseDeadline()))
                                             .thenReturn(caseData.getRespondent1ResponseDeadline()
@@ -234,36 +280,42 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             String newDeadline = LocalDateTime.now().plusDays(28).withHour(16).withMinute(0).withSecond(1).truncatedTo(ChronoUnit.SECONDS).toString();
 
-            CallbackResponse response = handler.handle(params);
-            assertThat(((AboutToStartOrSubmitCallbackResponse) response)
-                           .getData().get("respondent1ResponseDeadline"))
-                .hasToString(newDeadline);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedCaseData.getRespondent1ResponseDeadline()).hasToString(newDeadline);
+            assertThat(updatedCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+            assertThat(updatedCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
+            Party respondent2DetailsForClaimDetailsTab = updatedCaseData.getRespondent2DetailsForClaimDetailsTab();
+            assertThat(respondent2DetailsForClaimDetailsTab).isNotNull();
+            assertThat(respondent2DetailsForClaimDetailsTab.getFlags()).isNull();
         }
 
         @Test
         void aboutToSubmit_NewResponseDeadline1v2() {
+            Address address1 = new Address();
+            address1.setAddressLine1("Triple street");
+            address1.setPostCode("Postcode");
+            Party respondent1Copy = new Party();
+            respondent1Copy.setPartyName("Party 2");
+            respondent1Copy.setPrimaryAddress(address1);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .respondent1Copy(Party.builder().partyName("Party 2").primaryAddress(
-                        Address
-                            .builder()
-                            .addressLine1("Triple street")
-                            .postCode("Postcode")
-                            .build())
-                                     .build())
-                .respondent2Copy(Party.builder().partyName("Respondent 2").primaryAddress(
-                        Address
-                            .builder()
-                            .addressLine1("Triple street")
-                            .postCode("Postcode")
-                            .build())
-                                     .build())
                 .build();
+            caseData.setRespondent1Copy(respondent1Copy);
+
+            Address address2 = new Address();
+            address2.setAddressLine1("Triple street");
+            address2.setPostCode("Postcode");
+            Party respondent2Copy = new Party();
+            respondent2Copy.setPartyName("Respondent 2");
+            respondent2Copy.setPrimaryAddress(address2);
+            caseData.setRespondent2Copy(respondent2Copy);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             CallbackRequest request = CallbackRequest.builder()
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             Mockito.when(deadlinesCalculator.plus14DaysAt4pmDeadline(caseData.getRespondent1ResponseDeadline()))
                 .thenReturn(caseData.getRespondent1ResponseDeadline()
@@ -278,6 +330,17 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(((AboutToStartOrSubmitCallbackResponse) response)
                            .getData().get("respondent1ResponseDeadline"))
                 .hasToString(newDeadline);
+        }
+
+        @Test
+        void shouldNotThrowNPE_whenRespondent1ResponseDeadlineIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+            Assertions.assertDoesNotThrow(() -> handler.handle(params));
         }
     }
 
@@ -311,6 +374,39 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build());
         }
 
+        @Test
+        void shouldReturnExpectedResponse_whenInvokedWithNullDeadline() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .legacyCaseReference("000MC001")
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String body = format(
+                CONFIRMATION_SUMMARY,
+                "N/A",
+                format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+            ) + exitSurveyContentService.respondentSurvey();
+
+            // Then
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format(
+                        "# You have acknowledged the claim%n## Claim number: %s",
+                        REFERENCE_NUMBER
+                    ))
+                    .confirmationBody(body)
+                    .build());
+        }
+    }
+
+    private CallbackParams paramsWithRequest(CallbackParams params, CallbackRequest request) {
+        return params.copy()
+            .request(request);
     }
 
 }

@@ -7,7 +7,6 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,7 +40,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 
@@ -67,24 +66,20 @@ class PaymentTaskHandlerTest {
     @InjectMocks
     private PaymentTaskHandler paymentTaskHandler;
 
-    @BeforeEach
-    void init() {
-
-    }
-
     @Nested
     class SuccessHandler {
 
         @Test
         void shouldTriggerMakePbaPaymentCCDEvent_whenHandlerIsExecuted() {
-            CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            CaseData caseData = new CaseDataBuilder()
+                .atStateClaimSubmitted()
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.CLAIM_SUBMITTED");
             variables.putValue(FLOW_FLAGS, getVariableMap());
 
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(mockExternalTask.getTopicName()).thenReturn("test");
             when(mockExternalTask.getActivityId()).thenReturn("activityId");
@@ -150,7 +145,7 @@ class PaymentTaskHandlerTest {
         @Test
         void shouldNotCallHandleFailureMethod_whenCaseIdNotFound() {
             //given: ExternalTask variables without caseId
-            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_EVENT);
             when(mockExternalTask.getAllVariables())
                 .thenReturn(allVariables);
 
@@ -169,25 +164,21 @@ class PaymentTaskHandlerTest {
     }
 
     private StateFlowDTO getStateFlowDTO() {
-        return StateFlowDTO.builder()
-            .state(State.from("MAIN.CLAIM_SUBMITTED"))
-            .flags(getVariableMap())
-            .build();
+        return new StateFlowDTO()
+            .setState(State.from("MAIN.CLAIM_SUBMITTED"))
+            .setFlags(getVariableMap());
     }
 
     private Map<String, Boolean> getVariableMap() {
         return Map.ofEntries(
             Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-            Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
             Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-            Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
             Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
             Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
             Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
             Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-            Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
         );
     }

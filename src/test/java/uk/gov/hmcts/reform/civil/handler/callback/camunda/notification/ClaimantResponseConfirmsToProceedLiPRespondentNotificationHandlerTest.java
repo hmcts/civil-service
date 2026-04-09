@@ -185,16 +185,15 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn(
                 RESPONDENT_MEDIATION_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1SettleClaim(NO)
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setApplicant1SettleClaim(NO))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
@@ -216,9 +215,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction()).thenReturn(
                 RESPONDENT_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -248,17 +247,16 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedInMediation()).thenReturn(
                 RESPONDENT_MEDIATION_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1SettleClaim(NO)
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setApplicant1SettleClaim(NO))
                 .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
                 .responseClaimTrack("SMALL_CLAIM")
                 .applicant1Represented(NO)
@@ -284,17 +282,16 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedInMediation()).thenReturn(
                 RESPONDENT_MEDIATION_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1SettleClaim(NO)
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setApplicant1SettleClaim(NO))
                 .responseClaimTrack("SMALL_CLAIM")
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
@@ -320,18 +317,17 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn(
                 RESPONDENT_LR_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1SettleClaim(NO)
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setApplicant1SettleClaim(NO))
                 .build();
             caseData = caseData.toBuilder()
                 .respondent1Represented(NO)
@@ -339,7 +335,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 .respondent1Represented(YES)
                 .defenceRouteRequired(HAS_PAID_THE_AMOUNT_CLAIMED)
                 .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
-                .caseDataLiP(CaseDataLiP.builder().applicant1SettleClaim(YES).build())
+                .caseDataLiP(new CaseDataLiP().setApplicant1SettleClaim(YES))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
@@ -361,9 +357,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn(
                 RESPONDENT_LR_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
 
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
@@ -371,9 +367,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1SettleClaim(YES)
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setApplicant1SettleClaim(YES))
                 .build();
             caseData = caseData.toBuilder()
                 .respondent1Represented(NO)
@@ -401,9 +396,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn(
                 RESPONDENT_LR_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
 
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
@@ -411,9 +406,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1SettleClaim(YES)
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setApplicant1SettleClaim(YES))
                 .build();
             caseData = caseData.toBuilder()
                 .applicant1ProceedWithClaim(NO)
@@ -441,9 +435,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(
                 RESPONDENT_LR_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("org name")
+                                                                                             ));
 
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
@@ -480,10 +474,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .build().toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                             .build()).build())
+                .caseDataLiP(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())

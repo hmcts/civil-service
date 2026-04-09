@@ -49,9 +49,8 @@ class ConfirmListingCompletedCallbackHandlerTest extends BaseCallbackHandlerTest
         "MULTI_CLAIM, 5"
     })
     void shouldPopulateHearingListingTypeUnspec_whenInvoked(String claimType, String  expectedSize) {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .allocatedTrack(AllocatedTrack.valueOf(claimType))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setAllocatedTrack(AllocatedTrack.valueOf(claimType));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -65,10 +64,9 @@ class ConfirmListingCompletedCallbackHandlerTest extends BaseCallbackHandlerTest
         "MULTI_CLAIM, 5"
     })
     void shouldPopulateHearingListingTypeSpec_whenInvoked(String claimType, String  expectedSize) {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .responseClaimTrack(claimType)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setResponseClaimTrack(claimType);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -78,7 +76,7 @@ class ConfirmListingCompletedCallbackHandlerTest extends BaseCallbackHandlerTest
 
     @Test
     void shouldReturnErrorMessageWhenNotConfirmed_WhenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         CallbackParams params = callbackParamsOf(caseData, MID, "validate-confirmed");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -91,9 +89,8 @@ class ConfirmListingCompletedCallbackHandlerTest extends BaseCallbackHandlerTest
         List<ConfirmListingTickBox> confirmList = new ArrayList<>();
         confirmList.add(CONFIRM_LISTING);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .confirmListingTickBox(confirmList)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setConfirmListingTickBox(confirmList);
         CallbackParams params = callbackParamsOf(caseData, MID, "validate-confirmed");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -106,9 +103,8 @@ class ConfirmListingCompletedCallbackHandlerTest extends BaseCallbackHandlerTest
         List<ConfirmListingTickBox> confirmList = new ArrayList<>();
         confirmList.add(CONFIRM_LISTING);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .confirmListingTickBox(confirmList)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setConfirmListingTickBox(confirmList);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

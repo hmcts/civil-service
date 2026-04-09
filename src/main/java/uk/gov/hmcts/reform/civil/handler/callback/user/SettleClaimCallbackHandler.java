@@ -50,63 +50,50 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        caseDataBuilder.previousCCDState(callbackParams.getCaseData().getCcdState());
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setPreviousCCDState(callbackParams.getCaseData().getCcdState());
 
-        deleteMainCaseDashboardNotifications(caseDataBuilder);
+        deleteMainCaseDashboardNotifications(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .state(CASE_SETTLED.name())
             .build();
     }
 
     private CallbackResponse inactivateTaskListAndBuildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean isLrQmEnabled = featureToggleService.isQueryManagementLRsEnabled();
 
-        if (caseData.isApplicantLiP()) {
-            if (!isLrQmEnabled) {
-                taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                       CLAIMANT,
-                                                                                                       APPLICATION_VIEW
-                );
-            } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
-                taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                       CLAIMANT,
-                                                                                                       APPLICATION_VIEW
-                );
-            }
-
+        if (caseData.isApplicantLiP() && !featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+                caseData.getCcdCaseReference().toString(),
+                CLAIMANT,
+                APPLICATION_VIEW
+            );
         }
-        if (caseData.isRespondent1LiP()) {
-            if (!isLrQmEnabled) {
-                taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                       DEFENDANT,
-                                                                                                       APPLICATION_VIEW
-                );
-            } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
-                taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                       DEFENDANT,
-                                                                                                       APPLICATION_VIEW
-                );
-            }
 
+        if (caseData.isRespondent1LiP() && !featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+                caseData.getCcdCaseReference().toString(),
+                DEFENDANT,
+                APPLICATION_VIEW
+            );
         }
+
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Claim marked as settled")
             .confirmationBody("<br />")
             .build();
     }
 
-    private void deleteMainCaseDashboardNotifications(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        if (caseDataBuilder.build().isApplicantLiP()) {
+    private void deleteMainCaseDashboardNotifications(CaseData caseData) {
+        if (caseData.isApplicantLiP()) {
             dashboardNotificationService.deleteByReferenceAndCitizenRole(
-                caseDataBuilder.build().getCcdCaseReference().toString(), CLAIMANT);
+                caseData.getCcdCaseReference().toString(), CLAIMANT);
         }
-        if (caseDataBuilder.build().isRespondent1LiP()) {
+        if (caseData.isRespondent1LiP()) {
             dashboardNotificationService.deleteByReferenceAndCitizenRole(
-                caseDataBuilder.build().getCcdCaseReference().toString(), DEFENDANT);
+                caseData.getCcdCaseReference().toString(), DEFENDANT);
         }
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.EvidenceUploadNotificationEvent;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.search.EvidenceUploadNotificationSearchService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -62,7 +63,7 @@ class EvidenceUploadCheckHandlerTest {
         // Given: one case found from search service
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
-        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
 
         given(searchService.getCases()).willReturn(caseDetails);
 
@@ -140,8 +141,8 @@ class EvidenceUploadCheckHandlerTest {
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
         Set<CaseDetails> caseDetails = Set.of(
-            CaseDetails.builder().id(caseId).data(data).build(),
-            CaseDetails.builder().id(otherId).data(data).build());
+            new CaseDetailsBuilder().id(caseId).data(data).build(),
+            new CaseDetailsBuilder().id(otherId).data(data).build());
 
         given(searchService.getCases()).willReturn(caseDetails);
 

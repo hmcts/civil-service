@@ -42,18 +42,17 @@ public class CreateCaseFlagsHandler extends CallbackHandler {
     private CallbackResponse createUrgentFlag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
         List<Element<FlagDetail>> urgentFlags = null;
         if (caseData.getCaseFlags() != null) {
             urgentFlags = caseData.getCaseFlags().getDetails().stream()
                 .filter(details -> (details.getValue().getFlagCode().equals("CF0007")
                     && details.getValue().getStatus().equals("Active"))).toList();
-            updatedData.urgentFlag(urgentFlags.isEmpty() ? YesOrNo.NO : YesOrNo.YES);
+            caseData.setUrgentFlag(urgentFlags.isEmpty() ? YesOrNo.NO : YesOrNo.YES);
         } else {
-            updatedData.urgentFlag(YesOrNo.NO);
+            caseData.setUrgentFlag(YesOrNo.NO);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
 
     }

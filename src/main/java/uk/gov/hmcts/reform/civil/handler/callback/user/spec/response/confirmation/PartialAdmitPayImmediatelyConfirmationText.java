@@ -36,15 +36,11 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         LocalDate whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
             .orElse(null);
-        if (whenBePaid == null) {
-            throw new IllegalStateException("Unable to format the payment date.");
-        }
 
-        String formattedWhenBePaid = formatLocalDate(whenBePaid, DATE);
         boolean isPartAdmitLRAdmissionBulk = checkLrAdmissionBulk(caseData, featureToggleService);
         BigDecimal claimOwingAmount = getClaimOwingAmount(caseData, isPartAdmitLRAdmissionBulk);
         String applicantName = caseData.getApplicant1().getPartyName();
-        Boolean isLipVLr  = caseData.isLipvLROneVOne();
+        Boolean isLipVLr = caseData.isLipvLROneVOne();
 
         if (isPartAdmitLRAdmissionBulk) {
             return Optional.of(getPartAdmitLrAdmissionBulkConfirmationText(caseData, claimOwingAmount));
@@ -56,11 +52,18 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             .append(isLipVLr ? " We'll contact you when they respond." : "")
             .append("<h2 class=\"govuk-heading-m\">What you need to do:</h2>")
             .append("<ul>")
-            .append("<li><p class=\"govuk-!-margin-0\">pay ").append(applicantName).append(" By ")
-            .append(formattedWhenBePaid).append("</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">pay ").append(applicantName);
+
+        if (whenBePaid != null) {
+            sb.append(" By ").append(formatLocalDate(whenBePaid, DATE));
+        }
+
+        sb.append("</p></li>")
             .append("<li><p class=\"govuk-!-margin-0\">keep proof of any payments you make</p></li>")
-            .append("<li><p class=\"govuk-!-margin-0\">make sure ").append(applicantName).append(" tells the court that you've paid").append("</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">make sure ").append(applicantName)
+            .append(" tells the court that you've paid").append("</p></li>")
             .append("</ul>");
+
         if (caseData.getRespondent2() == null && caseData.getApplicant2() == null
             && !RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
             sb.append("<h3 class=\"govuk-heading-m\">If you do not pay: </h3>")
@@ -112,22 +115,21 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
         boolean isRespondent1PartAdmission = RespondentResponseTypeSpec.PART_ADMISSION.equals(
-            caseData.getRespondentClaimResponseTypeForSpecGeneric()
-        );
+                caseData.getRespondentClaimResponseTypeForSpecGeneric());
 
-        boolean isRespondent2PartAdmission = RespondentResponseTypeSpec.PART_ADMISSION.equals(
-            caseData.getRespondent2ClaimResponseTypeForSpec()
-        );
+        boolean isRespondent2PartAdmission =
+                RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec());
 
         boolean isPartAdmission = isRespondent1PartAdmission;
 
         if ((ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario) && YesOrNo.YES.equals(caseData.getIsRespondent2()))) {
             isPartAdmission = isRespondent2PartAdmission;
-        } else if ((ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario) && caseData.getRespondentResponseIsSame().equals(NO))) {
+        } else if ((ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
+                && caseData.getRespondentResponseIsSame().equals(NO))) {
             isPartAdmission = false;
         }
 
-        return featureToggleService.isLrAdmissionBulkEnabled() && isPartAdmission;
+        return isPartAdmission;
     }
 
     private BigDecimal getClaimOwingAmount(CaseData caseData, boolean isPartLRAdmission) {

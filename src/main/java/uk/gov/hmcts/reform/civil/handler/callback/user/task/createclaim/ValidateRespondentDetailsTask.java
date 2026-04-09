@@ -48,7 +48,7 @@ public class ValidateRespondentDetailsTask {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty()
-                      ? caseData.toBuilder().build().toMap(objectMapper) : null)
+                      ? caseData.toMap(objectMapper) : null)
             .build();
     }
 }

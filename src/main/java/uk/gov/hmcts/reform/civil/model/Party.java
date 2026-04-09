@@ -1,17 +1,18 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.validation.groups.DateOfBirthGroup;
 
-import javax.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -23,10 +24,11 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Data
-@Builder(toBuilder = true)
+@Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Party {
 
     private String partyID;
@@ -116,5 +118,31 @@ public class Party {
     @JsonIgnore
     public LocalDate getDateOfBirth() {
         return Optional.ofNullable(individualDateOfBirth).orElse(soleTraderDateOfBirth);
+    }
+
+    public Party copy() {
+        return new Party()
+            .setPartyID(partyID)
+            .setType(type)
+            .setIndividualTitle(individualTitle)
+            .setIndividualFirstName(individualFirstName)
+            .setIndividualLastName(individualLastName)
+            .setIndividualDateOfBirth(individualDateOfBirth)
+            .setCompanyName(companyName)
+            .setOrganisationName(organisationName)
+            .setSoleTraderTitle(soleTraderTitle)
+            .setSoleTraderFirstName(soleTraderFirstName)
+            .setSoleTraderLastName(soleTraderLastName)
+            .setSoleTraderTradingAs(soleTraderTradingAs)
+            .setSoleTraderDateOfBirth(soleTraderDateOfBirth)
+            .setPrimaryAddress(primaryAddress)
+            .setPartyName(partyName)
+            .setBulkClaimPartyName(bulkClaimPartyName)
+            .setPartyTypeDisplayValue(partyTypeDisplayValue)
+            .setPartyEmail(partyEmail)
+            .setPartyPhone(partyPhone)
+            .setLegalRepHeading(legalRepHeading)
+            .setUnavailableDates(unavailableDates)
+            .setFlags(flags);
     }
 }

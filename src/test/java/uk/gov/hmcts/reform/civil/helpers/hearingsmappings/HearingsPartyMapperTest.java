@@ -65,17 +65,17 @@ public class HearingsPartyMapperTest {
     @BeforeEach
     void setUp() {
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_TWO_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_TWO_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_TWO_LR_ORG_NAME)
+                                        ));
     }
 
     private String getLocalDateInString(LocalDate date) {
@@ -83,24 +83,20 @@ public class HearingsPartyMapperTest {
     }
 
     private UnavailabilityRangeModel buildUnavailabilityDateRange(LocalDate from, LocalDate to) {
-        return  UnavailabilityRangeModel.builder()
-            .unavailabilityType(ALL_DAY)
-            .unavailableFromDate(getLocalDateInString(from))
-            .unavailableToDate(getLocalDateInString(to))
-            .build();
+        UnavailabilityRangeModel unavailabilityRangeModel = new UnavailabilityRangeModel();
+        unavailabilityRangeModel.setUnavailabilityType(ALL_DAY);
+        unavailabilityRangeModel.setUnavailableFromDate(getLocalDateInString(from));
+        unavailabilityRangeModel.setUnavailableToDate(getLocalDateInString(to));
+        return unavailabilityRangeModel;
     }
 
     private CaseData rollUpUnavailableDateRespondent(CaseData caseData) {
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
-        caseData = builder.build();
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(caseData);
         return caseData;
     }
 
     private CaseData rollUpUnavailableDateApplicant(CaseData caseData) {
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
-        caseData = builder.build();
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(caseData);
         return caseData;
     }
 
@@ -314,16 +310,14 @@ public class HearingsPartyMapperTest {
             .addRespondent1OrgIndividual("Respondent One", "Hearing Attendee")
             .build()
             .toBuilder()
-            .applicant1(Party.builder()
-                            .partyID(APPLICANT_PARTY_ID)
-                            .companyName(APPLICANT_COMPANY_NAME)
-                            .type(COMPANY)
-                            .build())
-            .respondent1(Party.builder()
-                             .partyID(RESPONDENT_ONE_PARTY_ID)
-                             .organisationName(RESPONDENT_ONE_ORG_NAME)
-                             .type(ORGANISATION)
-                             .build())
+            .applicant1(new Party()
+                            .setPartyID(APPLICANT_PARTY_ID)
+                            .setCompanyName(APPLICANT_COMPANY_NAME)
+                            .setType(COMPANY))
+            .respondent1(new Party()
+                             .setPartyID(RESPONDENT_ONE_PARTY_ID)
+                             .setOrganisationName(RESPONDENT_ONE_ORG_NAME)
+                             .setType(ORGANISATION))
             .build();
 
         caseData = rollUpUnavailableDateRespondent(caseData);
@@ -521,11 +515,10 @@ public class HearingsPartyMapperTest {
             .addRespondent1LitigationFriend()
             .addApplicant2ExpertsAndWitnesses()
             .addRespondent1ExpertsAndWitnesses()
-            .applicant2(Party.builder()
-                            .partyID(APPLICANT_TWO_PARTY_ID)
-                            .companyName(APPLICANT_TWO_COMPANY_NAME)
-                            .type(COMPANY)
-                            .build())
+            .applicant2(new Party()
+                            .setPartyID(APPLICANT_TWO_PARTY_ID)
+                            .setCompanyName(APPLICANT_TWO_COMPANY_NAME)
+                            .setType(COMPANY))
             .addApplicant2OrgIndividual("Applicant Two", "Hearing Attendee")
             .build();
 
@@ -682,11 +675,10 @@ public class HearingsPartyMapperTest {
             .addRespondent1ExpertsAndWitnesses()
             .addRespondent2ExpertsAndWitnesses()
             .addRespondent2OrgIndividual("Respondent Two", "Hearing Attendee")
-            .respondent2(Party.builder()
-                             .partyID(RESPONDENT_TWO_PARTY_ID)
-                             .organisationName(RESPONDENT_TWO_ORG_NAME)
-                             .type(ORGANISATION)
-                             .build())
+            .respondent2(new Party()
+                             .setPartyID(RESPONDENT_TWO_PARTY_ID)
+                             .setOrganisationName(RESPONDENT_TWO_ORG_NAME)
+                             .setType(ORGANISATION))
             .build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
@@ -990,8 +982,7 @@ public class HearingsPartyMapperTest {
             .addApplicant1ExpertsAndWitnesses()
             .addRespondent1ExpertsAndWitnesses()
             .build().toBuilder()
-            .applicant1OrganisationPolicy(uk.gov.hmcts.reform.ccd.model.OrganisationPolicy.builder()
-                                              .orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build()).build();
+            .applicant1OrganisationPolicy(new uk.gov.hmcts.reform.ccd.model.OrganisationPolicy().setOrgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]")).build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
             "app-1-party-id",
@@ -1102,53 +1093,51 @@ public class HearingsPartyMapperTest {
                                                                   String email, String phone) {
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
         List<String> hearingChannelPhone = phone == null ? emptyList() : List.of(phone);
-        IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
-            .firstName(firstName)
-            .lastName(lastName)
-            .interpreterLanguage(null)
-            .reasonableAdjustments(emptyList())
-            .vulnerableFlag(false)
-            .vulnerabilityDetails(null)
-            .hearingChannelEmail(hearingChannelEmail)
-            .hearingChannelPhone(hearingChannelPhone)
-            .relatedParties(emptyList())
-            .custodyStatus(null)
-            .build();
+        IndividualDetailsModel individualDetails = new IndividualDetailsModel();
+        individualDetails.setFirstName(firstName);
+        individualDetails.setLastName(lastName);
+        individualDetails.setInterpreterLanguage(null);
+        individualDetails.setReasonableAdjustments(emptyList());
+        individualDetails.setVulnerableFlag(false);
+        individualDetails.setVulnerabilityDetails(null);
+        individualDetails.setHearingChannelEmail(hearingChannelEmail);
+        individualDetails.setHearingChannelPhone(hearingChannelPhone);
+        individualDetails.setRelatedParties(emptyList());
+        individualDetails.setCustodyStatus(null);
 
-        return PartyDetailsModel.builder()
-            .partyID(partyId)
-            .partyType(IND)
-            .partyName(partyName)
-            .partyRole(partyRole)
-            .individualDetails(individualDetails)
-            .organisationDetails(null)
-            .unavailabilityDOW(null)
-            .unavailabilityRanges(null)
-            .hearingSubChannel(null)
-            .build();
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(partyId);
+        partyDetails.setPartyType(IND);
+        partyDetails.setPartyName(partyName);
+        partyDetails.setPartyRole(partyRole);
+        partyDetails.setIndividualDetails(individualDetails);
+        partyDetails.setOrganisationDetails(null);
+        partyDetails.setUnavailabilityDOW(null);
+        partyDetails.setUnavailabilityRanges(null);
+        partyDetails.setHearingSubChannel(null);
+        return partyDetails;
     }
 
     private PartyDetailsModel buildExpectedOrganisationPartyObject(String partyId,
                                                                    String name,
                                                                    String partyRole,
                                                                    String cftOrganisationID) {
-        OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
-            .name(name)
-            .organisationType(ORG.getLabel())
-            .cftOrganisationID(cftOrganisationID)
-            .build();
+        OrganisationDetailsModel organisationDetails = new OrganisationDetailsModel();
+        organisationDetails.setName(name);
+        organisationDetails.setOrganisationType(ORG.getLabel());
+        organisationDetails.setCftOrganisationID(cftOrganisationID);
 
-        return PartyDetailsModel.builder()
-            .partyID(partyId)
-            .partyType(ORG)
-            .partyName(name)
-            .partyRole(partyRole)
-            .individualDetails(null)
-            .organisationDetails(organisationDetails)
-            .unavailabilityDOW(null)
-            .unavailabilityRanges(null)
-            .hearingSubChannel(null)
-            .build();
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(partyId);
+        partyDetails.setPartyType(ORG);
+        partyDetails.setPartyName(name);
+        partyDetails.setPartyRole(partyRole);
+        partyDetails.setIndividualDetails(null);
+        partyDetails.setOrganisationDetails(organisationDetails);
+        partyDetails.setUnavailabilityDOW(null);
+        partyDetails.setUnavailabilityRanges(null);
+        partyDetails.setHearingSubChannel(null);
+        return partyDetails;
     }
 
     private PartyDetailsModel buildExpectedOrganisationPartyObject(String name,

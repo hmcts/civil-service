@@ -237,10 +237,9 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_WhenAboutSmallClaimUnspec() {
             //given: unspecified small claim
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .hearingDate(LocalDate.now().plusWeeks(4).plusDays(6))
-                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setHearingDate(LocalDate.now().plusWeeks(4).plusDays(6));
+            caseData.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()));
@@ -256,10 +255,9 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_WhenAboutSmallClaimSpec() {
             //given: specified small claim
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .hearingDate(LocalDate.now().plusWeeks(4).plusDays(6))
-                .responseClaimTrack("SMALL_CLAIM")
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setHearingDate(LocalDate.now().plusWeeks(4).plusDays(6));
+            caseData.setResponseClaimTrack("SMALL_CLAIM");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()));
@@ -284,8 +282,8 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerApplicantNotifyOthers_WhenAboutToSubmitIsInvoked_ApplicantSolicitor() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .trialReadyApplicant(YesOrNo.YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setTrialReadyApplicant(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
@@ -300,8 +298,8 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerApplicantNotifyOthers_WhenAboutToSubmitIsInvoked_Claimant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .trialReadyApplicant(YesOrNo.YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setTrialReadyApplicant(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.CLAIMANT.getFormattedName()));
@@ -316,8 +314,8 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerRespondent1NotifyOthers_WhenAboutToSubmitIsInvoked_Respondent1Solicitor() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .trialReadyRespondent1(YesOrNo.YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setTrialReadyRespondent1(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()));
@@ -332,8 +330,8 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerRespondent1NotifyOthers_WhenAboutToSubmitIsInvoked_Defendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .trialReadyRespondent1(YesOrNo.YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setTrialReadyRespondent1(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.DEFENDANT.getFormattedName()));
@@ -348,8 +346,8 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerRespondent2NotifyOthers_WhenAboutToSubmitIsInvoked_Respondent2Solicitor() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .trialReadyRespondent2(YesOrNo.YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setTrialReadyRespondent2(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()));
@@ -364,8 +362,8 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerApplicantDocument_WhenAboutToSubmitIsInvoked_ApplicantSolicitor() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .trialReadyApplicant(YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setTrialReadyApplicant(YesOrNo.NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
@@ -380,8 +378,8 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerApplicantDocument_WhenAboutToSubmitIsInvoked_Claimant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .trialReadyApplicant(YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setTrialReadyApplicant(YesOrNo.NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.CLAIMANT.getFormattedName()));
@@ -396,8 +394,8 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerRespondent1Document_WhenAboutToSubmitIsInvoked_Respondent1Solicitor() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .trialReadyRespondent1(YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setTrialReadyRespondent1(YesOrNo.NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()));
@@ -412,8 +410,8 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerRespondent1Document_WhenAboutToSubmitIsInvoked_Defendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .trialReadyRespondent1(YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setTrialReadyRespondent1(YesOrNo.NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.DEFENDANT.getFormattedName()));
@@ -428,8 +426,8 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerRespondent2Document_WhenAboutToSubmitIsInvoked_Respondent2Solicitor() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .trialReadyRespondent2(YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setTrialReadyRespondent2(YesOrNo.NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()));

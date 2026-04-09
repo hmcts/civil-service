@@ -48,7 +48,7 @@ class SetAsideJudgmentsOnlineMapperTest {
 
     @BeforeEach
     void setUp() {
-        when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
+        when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
     }
 
     @Test
@@ -135,7 +135,7 @@ class SetAsideJudgmentsOnlineMapperTest {
         caseData.setActiveJudgment(defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         caseData.getActiveJudgment().setRtlState(rtlState);
         //When
-        SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper();
+        SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper(time);
         caseData.setActiveJudgment(setAsideJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         //Then
         if (rtlState.equals("S")) {

@@ -62,10 +62,9 @@ public class HmcDataUtils {
 
     public static List<HearingDay> getHearingDays(HearingGetResponse hearing) {
         return getScheduledDays(hearing).stream()
-            .map(day -> HearingDay.builder()
-                .hearingStartDateTime(convertFromUTC(day.getHearingStartDateTime()))
-                .hearingEndDateTime(convertFromUTC(day.getHearingEndDateTime()))
-                .build()).toList();
+            .map(day -> new HearingDay()
+                .setHearingStartDateTime(convertFromUTC(day.getHearingStartDateTime()))
+                .setHearingEndDateTime(convertFromUTC(day.getHearingEndDateTime()))).toList();
     }
 
     private static List<HearingDaySchedule> getScheduledDays(HearingGetResponse hearing) {
@@ -77,6 +76,17 @@ public class HmcDataUtils {
     public static PartiesNotifiedResponse getLatestHearingNoticeDetails(PartiesNotifiedResponses partiesNotified) {
         return Optional.ofNullable(partiesNotified.getResponses()).orElse(List.of())
             .stream().max(Comparator.comparing(PartiesNotifiedResponse::getResponseReceivedDateTime))
+            .orElse(null);
+    }
+
+    public static PartiesNotifiedResponse getLatestHearingResponseForRequestVersion(
+        PartiesNotifiedResponses partiesNotified, int requestVersion) {
+
+        return Optional.ofNullable(partiesNotified.getResponses())
+            .orElse(List.of())
+            .stream()
+            .filter(r -> r.getRequestVersion() == requestVersion)
+            .max(Comparator.comparing(PartiesNotifiedResponse::getResponseReceivedDateTime))
             .orElse(null);
     }
 
@@ -100,10 +110,9 @@ public class HmcDataUtils {
                 return true;
             } else {
                 for (HearingDaySchedule hearingDay : schedule) {
-                    HearingDay datesFromHearingDay = HearingDay.builder()
-                        .hearingStartDateTime(convertFromUTC(hearingDay.getHearingStartDateTime()))
-                        .hearingEndDateTime(convertFromUTC(hearingDay.getHearingEndDateTime()))
-                        .build();
+                    HearingDay datesFromHearingDay = new HearingDay()
+                        .setHearingStartDateTime(convertFromUTC(hearingDay.getHearingStartDateTime()))
+                        .setHearingEndDateTime(convertFromUTC(hearingDay.getHearingEndDateTime()));
                     if (!serviceData.getHearingLocation().equals(hearingDay.getHearingVenueId())
                         || !serviceData.getDays().contains(datesFromHearingDay)) {
                         return true;
@@ -422,7 +431,7 @@ public class HmcDataUtils {
         return hearing.getHearingDaySchedule().stream()
             .filter(day -> day.getHearingStartDateTime().isAfter(currentDateTime.withHour(0).withMinute(0).withSecond(0)))
             .min(Comparator.comparing(HearingDaySchedule::getHearingStartDateTime))
-            .orElse(HearingDaySchedule.builder().build())
+            .orElse(new HearingDaySchedule())
             .getHearingStartDateTime();
     }
 

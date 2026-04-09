@@ -73,22 +73,21 @@ class LipDefendantCaseAssignmentServiceTest {
         given(userService.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL).build());
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         Party respondent1 = caseData.getRespondent1()
-            .toBuilder().partyEmail(EMAIL).build();
-        IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
-            .id(USER_ID)
-            .email(EMAIL)
-            .build();
+            .setPartyEmail(EMAIL);
+        IdamUserDetails defendantUserDetails = new IdamUserDetails()
+            .setId(USER_ID)
+            .setEmail(EMAIL)
+            ;
         Map<String, Object> data = Map.of("defendantUserDetails", defendantUserDetails,
                                           "respondent1", respondent1);
 
         when(caseDetailsConverter.toCaseData((CaseDetails) any())).thenReturn(caseData);
-        EventSubmissionParams params = EventSubmissionParams.builder()
-            .caseId(CASE_ID)
-            .userId(USER_ID)
-            .authorisation(AUTHORIZATION)
-            .event(ASSIGN_LIP_DEFENDANT)
-            .updates(data)
-            .build();
+        EventSubmissionParams params = new EventSubmissionParams()
+            .setCaseId(CASE_ID)
+            .setUserId(USER_ID)
+            .setAuthorisation(AUTHORIZATION)
+            .setEvent(ASSIGN_LIP_DEFENDANT)
+            .setUpdates(data);
         //When
         lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(
             AUTHORIZATION,
@@ -100,15 +99,14 @@ class LipDefendantCaseAssignmentServiceTest {
         );
         //Then
         verify(userService).getUserDetails(AUTHORIZATION);
-        verify(caseEventService).submitEventForClaim(refEq(params));
+        verify(caseEventService).submitEventForClaim(refEq(params), Boolean.TRUE.equals(refEq(true)));
     }
 
     @Test
     void shouldRemovePinPostDetails_whenLipVLipFlagIsEnabled() {
         //Given
-        DefendantPinToPostLRspec pinInPostData = DefendantPinToPostLRspec.builder()
-            .expiryDate(LocalDate.now().plusDays(180))
-            .build();
+        DefendantPinToPostLRspec pinInPostData = new DefendantPinToPostLRspec();
+        pinInPostData.setExpiryDate(LocalDate.now().plusDays(180));
         Map<String, Object> data = new HashMap<>();
         data.put("respondent1PinToPostLRspec", pinInPostData);
         given(featureToggleService.isLipVLipEnabled()).willReturn(true);
@@ -117,35 +115,30 @@ class LipDefendantCaseAssignmentServiceTest {
         given(defendantPinToPostLRspecService.removePinInPostData(any())).willReturn(data);
 
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-            .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                               .accessCode("TEST1234")
-                                               .expiryDate(LocalDate.now().plusDays(180))
-                                               .build())
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-            .respondent1(Party.builder()
-                             .flags(Flags.builder()
-                                        .partyName("Mr test")
-                                        .roleOnCase("Defendant 1")
-                                        .details(List.of()).build())
-                             .type(Party.Type.INDIVIDUAL)
-                             .build())
+            .addRespondent1PinToPostLRspec(buildPin("TEST1234", LocalDate.now().plusDays(180)))
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
+            .respondent1(new Party()
+                             .setFlags(new Flags()
+                                        .setPartyName("Mr test")
+                                        .setRoleOnCase("Defendant 1")
+                                        .setDetails(List.of()))
+                             .setType(Party.Type.INDIVIDUAL))
             .build();
-        IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
-            .id(USER_ID)
-            .email(EMAIL)
-            .build();
+        IdamUserDetails defendantUserDetails = new IdamUserDetails()
+            .setId(USER_ID)
+            .setEmail(EMAIL)
+            ;
         data.put("defendantUserDetails", defendantUserDetails);
-        data.put("respondent1", caseData.getRespondent1().toBuilder().partyEmail(EMAIL).build());
+        data.put("respondent1", caseData.getRespondent1().setPartyEmail(EMAIL));
         ReflectionTestUtils.setField(lipDefendantCaseAssignmentService, "caseFlagsLoggingEnabled", true);
         Optional<CaseDetails> caseDetails = Optional.of(CaseDetailsBuilder.builder().data(caseData).build());
         when(caseDetailsConverter.toCaseData(caseDetails.get())).thenReturn(caseData);
-        EventSubmissionParams params = EventSubmissionParams.builder()
-            .caseId(CASE_ID)
-            .userId(USER_ID)
-            .authorisation(AUTHORIZATION)
-            .event(ASSIGN_LIP_DEFENDANT)
-            .updates(data)
-            .build();
+        EventSubmissionParams params = new EventSubmissionParams()
+            .setCaseId(CASE_ID)
+            .setUserId(USER_ID)
+            .setAuthorisation(AUTHORIZATION)
+            .setEvent(ASSIGN_LIP_DEFENDANT)
+            .setUpdates(data);
         //When
         lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(
             AUTHORIZATION,
@@ -155,6 +148,13 @@ class LipDefendantCaseAssignmentServiceTest {
         );
         //Then
         verify(userService).getUserDetails(AUTHORIZATION);
-        verify(caseEventService).submitEventForClaim(refEq(params));
+        verify(caseEventService).submitEventForClaim(refEq(params), Boolean.TRUE.equals(refEq(true)));
+    }
+
+    private DefendantPinToPostLRspec buildPin(String accessCode, LocalDate expiryDate) {
+        DefendantPinToPostLRspec pin = new DefendantPinToPostLRspec();
+        pin.setAccessCode(accessCode);
+        pin.setExpiryDate(expiryDate);
+        return pin;
     }
 }

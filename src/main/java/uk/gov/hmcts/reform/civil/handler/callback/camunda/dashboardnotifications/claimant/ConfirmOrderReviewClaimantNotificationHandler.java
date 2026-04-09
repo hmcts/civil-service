@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.ConfirmOrderReviewNotificationHandler;
-import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
@@ -26,16 +26,19 @@ public class ConfirmOrderReviewClaimantNotificationHandler extends ConfirmOrderR
     private static final List<CaseEvent> CASE_EVENTS = List.of(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT);
     private static final String TASK_ID = "UpdateTaskListConfirmOrderReviewClaimant";
     private static final String USER_ROLE = "CLAIMANT";
+    private final SdoCaseClassificationService sdoCaseClassificationService;
 
     public ConfirmOrderReviewClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                          DashboardNotificationsParamsMapper mapper,
                                                          FeatureToggleService featureToggleService,
                                                          ObjectMapper objectMapper,
                                                          DashboardNotificationService dashboardNotificationService,
-                                                         TaskListService taskListService) {
+                                                         TaskListService taskListService,
+                                                         SdoCaseClassificationService sdoCaseClassificationService) {
         super(dashboardScenariosService, mapper, featureToggleService,
               objectMapper, USER_ROLE, TASK_ID, CASE_EVENTS,
               dashboardNotificationService, taskListService);
+        this.sdoCaseClassificationService = sdoCaseClassificationService;
     }
 
     @Override
@@ -53,6 +56,6 @@ public class ConfirmOrderReviewClaimantNotificationHandler extends ConfirmOrderR
     }
 
     private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
-        return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
+        return sdoCaseClassificationService.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
     }
 }

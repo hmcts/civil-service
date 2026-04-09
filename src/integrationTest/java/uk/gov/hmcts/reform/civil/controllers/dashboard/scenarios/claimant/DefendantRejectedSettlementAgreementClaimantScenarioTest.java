@@ -23,11 +23,11 @@ public class DefendantRejectedSettlementAgreementClaimantScenarioTest extends Da
 
         String caseId = "123467891213";
         CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO).build())
+            .caseDataLiP(new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO))
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .respondent1(Party.builder().individualFirstName("Dave").individualLastName("Indent").type(Party.Type.INDIVIDUAL).build())
-            .applicant1(Party.builder().individualFirstName("Dave").individualLastName("Indent").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(new Party().setIndividualFirstName("Dave").setIndividualLastName("Indent").setType(Party.Type.INDIVIDUAL))
+            .applicant1(new Party().setIndividualFirstName("Dave").setIndividualLastName("Indent").setType(Party.Type.INDIVIDUAL))
             .build();
 
         handler.handle(callbackParams(caseData));

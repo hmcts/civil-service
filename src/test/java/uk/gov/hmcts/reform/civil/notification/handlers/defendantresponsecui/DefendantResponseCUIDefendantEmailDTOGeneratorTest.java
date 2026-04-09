@@ -53,12 +53,11 @@ public class DefendantResponseCUIDefendantEmailDTOGeneratorTest {
     void shouldReturnCorrectEmailTemplateWhenBilingual() {
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
-                CaseDataLiP.builder()
-                    .respondent1LiPResponse(
-                        RespondentLiPResponse.builder()
-                            .respondent1ResponseLanguage(BOTH.toString())
-                            .build()
-                    ).build()
+                new CaseDataLiP()
+                    .setRespondent1LiPResponse(
+                        new RespondentLiPResponse()
+                            .setRespondent1ResponseLanguage(BOTH.toString())
+                    )
             ).build();
 
         String expectedTemplateId = "template-id";
@@ -78,7 +77,7 @@ public class DefendantResponseCUIDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectCustomProperties() {
-        Party party = Party.builder().build();
+        Party party = new Party();
         String legacyCaseReference = "legacy case reference";
         CaseData caseData = CaseData.builder()
             .legacyCaseReference(legacyCaseReference)

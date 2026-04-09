@@ -1,18 +1,22 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 import java.time.LocalDateTime;
 
 @Data
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class ManageDocument {
 
-    private final Document documentLink;
-    private final String documentName;
-    private final ManageDocumentType documentType;
-    private final String documentTypeOther;
-    private final LocalDateTime createdDatetime = LocalDateTime.now();
+    private Document documentLink;
+    private String documentName;
+    private ManageDocumentType documentType;
+    private String documentTypeOther;
+    private LocalDateTime createdDatetime = LocalDateTime.now();
 }

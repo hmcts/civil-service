@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
-public class SdoLegalAdviserClaimantScenarioTest extends CaseProgressionDashboardBaseIntegrationTest {
+public class SdoLegalAdviserClaimantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private OrderMadeClaimantNotificationHandler handler;
@@ -39,11 +39,9 @@ public class SdoLegalAdviserClaimantScenarioTest extends CaseProgressionDashboar
     void should_create_order_made_claimant_scenario() throws Exception {
 
         String caseId = "72014112265";
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        DynamicListElement selectedCourt = new DynamicListElement().setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
@@ -53,10 +51,9 @@ public class SdoLegalAdviserClaimantScenarioTest extends CaseProgressionDashboar
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
-                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
-            .build();
+                new CaseDocument().setDocumentLink(new Document().setDocumentBinaryUrl("url"))))).build();
 
         handler.handle(callbackParamsTestSDO(caseData));
 

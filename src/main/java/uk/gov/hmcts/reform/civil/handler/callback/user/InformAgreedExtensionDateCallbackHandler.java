@@ -12,9 +12,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -127,47 +129,70 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
                 .build();
         }
 
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().isRespondent1(isRespondent1);
+        caseData.setIsRespondent1(isRespondent1);
         if (caseData.getCaseAccessCategory() == CaseCategory.UNSPEC_CLAIM) {
-            setMaxAllowedDate(callbackParams, caseData, builder);
+            setMaxAllowedExtensionDate(callbackParams, caseData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    /**
-     * Sets the agreed deadline extension to be the maximum allowed.
-     *
-     * @param callbackParams callback parameters
-     * @param caseData       original case data
-     * @param builder        builder for new case data
-     */
-    private void setMaxAllowedDate(CallbackParams callbackParams,
-                                   CaseData caseData,
-                                   CaseData.CaseDataBuilder<?, ?> builder) {
+    private void setMaxAllowedExtensionDate(CallbackParams callbackParams, CaseData caseData) {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        if (coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            RESPONDENTSOLICITORONE
-        )) {
-            builder.respondentSolicitor1AgreedDeadlineExtension(validator.getMaxDate(
-                caseData.getClaimDetailsNotificationDate(),
+        Long ccdCaseReference = caseData.getCcdCaseReference();
+
+        if (isUserHasCaseRole(caseData, userInfo, CaseRole.RESPONDENTSOLICITORONE)) {
+            LocalDate notificationDate = getDeemedServedDate(caseData, RESPONDENTSOLICITORONE);
+            log.info("Setting max allowed extension date base on notification date {} and respondent1 for caseID {}",
+                     notificationDate, ccdCaseReference
+            );
+            if (caseData.getPreStayState() != null) {
+                notificationDate = LocalDate.from(caseData.getRespondent1ResponseDeadline());
+            }
+            caseData.setRespondentSolicitor1AgreedDeadlineExtension(validator.getMaxDate(
+                notificationDate,
                 caseData.getRespondent1AcknowledgeNotificationDate()
             ));
         }
-        if (coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            RESPONDENTSOLICITORTWO
-        )) {
-            builder.respondentSolicitor2AgreedDeadlineExtension(validator.getMaxDate(
-                caseData.getClaimDetailsNotificationDate(),
+        if (isUserHasCaseRole(caseData, userInfo, CaseRole.RESPONDENTSOLICITORTWO)) {
+            LocalDate notificationDate = getDeemedServedDate(caseData, RESPONDENTSOLICITORTWO);
+            log.info("Setting max allowed extension date base on notification date {} and respondent2 for caseID {}",
+                     notificationDate, ccdCaseReference
+            );
+            if (caseData.getPreStayState() != null) {
+                notificationDate = LocalDate.from(caseData.getRespondent2ResponseDeadline());
+            }
+            caseData.setRespondentSolicitor2AgreedDeadlineExtension(validator.getMaxDate(
+                notificationDate,
                 caseData.getRespondent2AcknowledgeNotificationDate()
             ));
         }
+    }
+
+    private LocalDate getDeemedServedDate(CaseData caseData, CaseRole caseRole) {
+        if (RESPONDENTSOLICITORONE.equals(caseRole)) {
+            CertificateOfService cosNotifyClaimDefendant1 = caseData.getCosNotifyClaimDetails1();
+            if (cosNotifyClaimDefendant1 != null && cosNotifyClaimDefendant1.getCosDateDeemedServedForDefendant() != null) {
+                return cosNotifyClaimDefendant1.getCosDateDeemedServedForDefendant();
+            }
+        }
+        if (RESPONDENTSOLICITORTWO.equals(caseRole)) {
+            CertificateOfService cosNotifyClaimDefendant2 = caseData.getCosNotifyClaimDetails2();
+            if (cosNotifyClaimDefendant2 != null && cosNotifyClaimDefendant2.getCosDateDeemedServedForDefendant() != null) {
+                return cosNotifyClaimDefendant2.getCosDateDeemedServedForDefendant();
+            }
+        }
+        return caseData.getClaimDetailsNotificationDate().toLocalDate();
+    }
+
+    private boolean isUserHasCaseRole(CaseData caseData, UserInfo userInfo, CaseRole caseRole) {
+        return coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid(),
+            caseRole
+        );
     }
 
     private CallbackResponse validateExtensionDate(CallbackParams callbackParams) {
@@ -209,38 +234,35 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         LocalDateTime newDeadline = deadlinesCalculator.calculateFirstWorkingDay(agreedExtension)
             .atTime(END_OF_BUSINESS_DAY);
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().isRespondent1(null);
+        caseData.setIsRespondent1(null);
 
         if (caseData.getRespondent2SameLegalRepresentative() != null
             && caseData.getRespondent2SameLegalRepresentative() == YES) {
 
-            caseDataBuilder
-                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
-                .respondent1TimeExtensionDate(time.now())
-                .respondent1ResponseDeadline(newDeadline)
-                .respondent2TimeExtensionDate(time.now())
-                .respondent2ResponseDeadline(newDeadline)
-                .respondentSolicitor2AgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension())
-                .nextDeadline(newDeadline.toLocalDate());
+            caseData.setBusinessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE));
+            caseData.setRespondent1TimeExtensionDate(time.now());
+            caseData.setRespondent1ResponseDeadline(newDeadline);
+            caseData.setRespondent2TimeExtensionDate(time.now());
+            caseData.setRespondent2ResponseDeadline(newDeadline);
+            caseData.setRespondentSolicitor2AgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension());
+            caseData.setNextDeadline(newDeadline.toLocalDate());
         } else if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
-            caseDataBuilder
-                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
-                .respondent2TimeExtensionDate(time.now())
-                .respondent2ResponseDeadline(newDeadline)
-                .nextDeadline(deadlinesCalculator.nextDeadline(
-                    Arrays.asList(newDeadline, caseData.getRespondent1ResponseDeadline())).toLocalDate());
+            caseData.setBusinessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE));
+            caseData.setRespondent2TimeExtensionDate(time.now());
+            caseData.setRespondent2ResponseDeadline(newDeadline);
+            caseData.setNextDeadline(deadlinesCalculator.nextDeadline(
+                Arrays.asList(newDeadline, caseData.getRespondent1ResponseDeadline())).toLocalDate());
         } else {
-            caseDataBuilder
-                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
-                .respondent1TimeExtensionDate(time.now())
-                .respondent1ResponseDeadline(newDeadline)
-                // null safe - so will work on 1v1 and multiparty scenarios
-                .nextDeadline(deadlinesCalculator.nextDeadline(
-                    Arrays.asList(newDeadline, caseData.getRespondent2ResponseDeadline())).toLocalDate());
+            caseData.setBusinessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE));
+            caseData.setRespondent1TimeExtensionDate(time.now());
+            caseData.setRespondent1ResponseDeadline(newDeadline);
+            // null safe - so will work on 1v1 and multiparty scenarios
+            caseData.setNextDeadline(deadlinesCalculator.nextDeadline(
+                Arrays.asList(newDeadline, caseData.getRespondent2ResponseDeadline())).toLocalDate());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

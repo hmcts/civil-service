@@ -46,7 +46,7 @@ public class ContactInformationUpdatedTaskHandler extends BaseExternalTaskHandle
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
 
             coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, externalTask));
-            return ExternalTaskData.builder().build();
+            return new ExternalTaskData();
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
@@ -65,9 +65,7 @@ public class ContactInformationUpdatedTaskHandler extends BaseExternalTaskHandle
                        .description(event.getDescription())
                        .summary(event.getSummary())
                        .build())
-            .data(caseData.toBuilder()
-                      .businessProcess(businessProcess)
-                      .build().toMap(mapper))
+            .data(caseData.setBusinessProcess(businessProcess).toMap(mapper))
             .build();
     }
 

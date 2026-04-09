@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import net.minidev.json.annotate.JsonIgnore;
 
 @Data
-@Builder
-
+@Accessors(chain = true)
 public class Evidence {
 
-    private final EvidenceDetails value;
+    private EvidenceDetails value;
     @JsonIgnore
-    private final String id;
+    private String id;
 }

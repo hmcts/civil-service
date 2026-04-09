@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
@@ -14,38 +17,38 @@ import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
 
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class Representative {
 
-    private final String contactName;
-    private final String organisationName;
-    private final String phoneNumber;
-    private final String dxAddress;
-    private final String emailAddress;
-    private final Address serviceAddress;
-    private final String legalRepHeading;
+    private String contactName;
+    private String organisationName;
+    private String phoneNumber;
+    private String dxAddress;
+    private String emailAddress;
+    private Address serviceAddress;
+    private String legalRepHeading;
 
     public static Representative fromSolicitorOrganisationDetails(
         SolicitorOrganisationDetails solicitorOrganisationDetails) {
-        return Representative.builder()
-            .dxAddress(solicitorOrganisationDetails.getDx())
-            .organisationName(solicitorOrganisationDetails.getOrganisationName())
-            .phoneNumber(solicitorOrganisationDetails.getPhoneNumber())
-            .emailAddress(solicitorOrganisationDetails.getEmail())
-            .serviceAddress(solicitorOrganisationDetails.getAddress())
-            .build();
+        return new Representative()
+            .setDxAddress(solicitorOrganisationDetails.getDx())
+            .setOrganisationName(solicitorOrganisationDetails.getOrganisationName())
+            .setPhoneNumber(solicitorOrganisationDetails.getPhoneNumber())
+            .setEmailAddress(solicitorOrganisationDetails.getEmail())
+            .setServiceAddress(solicitorOrganisationDetails.getAddress());
     }
 
     public static Representative fromOrganisation(Organisation organisation) {
         var contactInformation = organisation.getContactInformation().get(0);
-        return Representative.builder()
-            .organisationName(organisation.getName())
-            .dxAddress(ofNullable(contactInformation.getDxAddress())
-                           .filter(not(List::isEmpty))
-                           .map(dxAddressList -> dxAddressList.get(0))
-                           .map(DxAddress::getDxNumber)
-                           .orElse(""))
-            .serviceAddress(fromContactInformation(contactInformation))
-            .build();
+        return new Representative()
+            .setOrganisationName(organisation.getName())
+            .setDxAddress(ofNullable(contactInformation.getDxAddress())
+                              .filter(not(List::isEmpty))
+                              .map(dxAddressList -> dxAddressList.get(0))
+                              .map(DxAddress::getDxNumber)
+                              .orElse(""))
+            .setServiceAddress(fromContactInformation(contactInformation));
     }
 }

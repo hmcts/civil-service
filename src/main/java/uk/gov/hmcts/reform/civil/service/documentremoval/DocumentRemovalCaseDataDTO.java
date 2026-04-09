@@ -1,16 +1,21 @@
 package uk.gov.hmcts.reform.civil.service.documentremoval;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeep;
 
 import java.util.List;
 
 @Data
-@Builder
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class DocumentRemovalCaseDataDTO {
 
-    private final CaseData caseData;
+    private CaseData caseData;
     private List<DocumentToKeep> documentsMarkedForDelete;
 }

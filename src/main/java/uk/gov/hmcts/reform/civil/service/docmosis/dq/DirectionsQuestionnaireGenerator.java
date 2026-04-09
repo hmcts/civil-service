@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -31,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RE
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS_FAST_TRACK_INT;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWithAuth<DirectionsQuestionnaireForm> {
@@ -42,6 +42,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     private final RespondentTemplateForDQGenerator respondentTemplateForDQGenerator;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
+        log.info("Starting generation of directions questionnaire for caseId {}", caseData.getCcdCaseReference());
+
         DocmosisTemplates templateId;
         DocmosisDocument docmosisDocument;
         DirectionsQuestionnaireForm templateData;
@@ -50,77 +52,65 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         templateData = getTemplateData(caseData, authorisation);
         docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
 
-        return documentManagementService.uploadDocument(
-            authorisation,
-            new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
-                    DocumentType.DIRECTIONS_QUESTIONNAIRE
-            )
-        );
+        CaseDocument uploadedDocument = documentManagementService.uploadDocument(
+                authorisation,
+                new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
+                        DocumentType.DIRECTIONS_QUESTIONNAIRE
+                ));
+
+        log.info("Completed upload of directions questionnaire for caseId {}", caseData.getCcdCaseReference());
+        return uploadedDocument;
     }
 
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
-        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
-        DocmosisTemplates templateId;
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (isClaimantResponse(caseData)) {
-                templateId = isFastTrackOrMinti
-                    ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
-            } else {
-                templateId = featureToggleService.isFastTrackUpliftsEnabled()
-                    ? DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT : DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
-            }
-        } else {
-            templateId = getDocmosisTemplate(caseData);
-        }
+        DocmosisTemplates templateId = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            ? getSpecTemplate(caseData)
+            : getUnspecTemplate(caseData);
+        log.info("{} {}", caseData.getCcdCaseReference(), templateId);
         return templateId;
     }
 
-    private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
-        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
-        DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
-                    templateId = isFastTrackOrMinti
-                        ? DQ_RESPONSE_1V2_DS_FAST_TRACK_INT : DQ_RESPONSE_1V2_DS;
-                }
-                break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
-                if (!isClaimantResponse(caseData)
-                    || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = isFastTrackOrMinti
-                        ? DocmosisTemplates.DQ_RESPONSE_1V2_SS_FAST_TRACK_INT : DocmosisTemplates.DQ_RESPONSE_1V2_SS;
-                }
-                break;
-            case TWO_V_ONE:
-                if (!isClaimantResponse(caseData)
-                    || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = isFastTrackOrMinti
-                        ? DocmosisTemplates.DQ_RESPONSE_2V1_FAST_TRACK_INT : DocmosisTemplates.DQ_RESPONSE_2V1;
-                }
-                break;
-            default:
+    private DocmosisTemplates getSpecTemplate(CaseData caseData) {
+        if (!isClaimantResponse(caseData)) {
+            return DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT;
         }
-        return templateId;
+        return isMintiEnabled(caseData)
+            ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT
+            : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
+    }
+
+    private DocmosisTemplates getUnspecTemplate(CaseData caseData) {
+        boolean isMinti = isMintiEnabled(caseData);
+        boolean isClaimantResponse = isClaimantResponse(caseData);
+        boolean claimantMultipartyProceed = isClaimantMultipartyProceed(caseData);
+
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP -> shouldUseClaimantProceedTemplate(isClaimantResponse, claimantMultipartyProceed)
+                    ? getOneVTwoTwoLegalRepTemplate(isMinti)
+                    : getDefaultTemplate(isMinti);
+            case ONE_V_TWO_ONE_LEGAL_REP -> shouldUseRespondentOrClaimantProceedTemplate(isClaimantResponse, claimantMultipartyProceed)
+                    ? getOneVTwoOneLegalRepTemplate(isMinti)
+                    : getDefaultTemplate(isMinti);
+            case TWO_V_ONE -> shouldUseRespondentOrClaimantProceedTemplate(isClaimantResponse, claimantMultipartyProceed)
+                    ? getTwoVOneTemplate(isMinti)
+                    : getDefaultTemplate(isMinti);
+            default -> getDefaultTemplate(isMinti);
+        };
     }
 
     public CaseDocument generateDQFor1v2SingleSolDiffResponse(CaseData caseData,
                                                               String authorisation,
                                                               String respondent) {
-        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
-        DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
-        DirectionsQuestionnaireForm templateData;
+        log.info("Starting 1v2 single-solicitor different-response DQ for caseId {} respondent {}", caseData.getCcdCaseReference(), respondent);
 
-        if (respondent.equals("ONE")) {
-            templateData = respondentTemplateForDQGenerator.getRespondent1TemplateData(caseData, "ONE", authorisation);
-        } else if (respondent.equals("TWO")) {
-            templateData = respondentTemplateForDQGenerator.getRespondent2TemplateData(caseData, "TWO", authorisation);
-        } else {
-            throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
-        }
+        DocmosisTemplates templateId = getSingleSolicitorDifferentResponseTemplate(caseData);
+        DirectionsQuestionnaireForm templateData = getRespondentTemplateData(caseData, authorisation, respondent);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData, templateId);
+
+        log.info("Completed upload of 1v2 single-solicitor DQ for caseId {} respondent {}", caseData.getCcdCaseReference(), respondent);
+
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
@@ -133,20 +123,19 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     public Optional<CaseDocument> generateDQFor1v2DiffSol(CaseData caseData,
                                                           String authorisation,
                                                           String respondent) {
-        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
-        DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+        DocmosisTemplates templateId = getSingleSolicitorDifferentResponseTemplate(caseData);
 
+        log.info("Starting 1v2 different-solicitor DQ check for caseId {} respondent {}", caseData.getCcdCaseReference(), respondent);
         String fileName = getFileName(caseData, templateId);
         LocalDateTime responseDate = getResponseDate(caseData, respondent);
 
         // Check if the DQ is already generated for this response date and file name
         if (isDQAlreadyGenerated(caseData, responseDate, fileName)) {
-            // DQ is already generated, return empty optional
+            log.info("DQ already exists for caseId {} respondent {} responseDate {}", caseData.getCcdCaseReference(), respondent, responseDate);
             return Optional.empty();
         }
 
-        DirectionsQuestionnaireForm templateData =
-            getDirectionsQuestionnaireForm(caseData, authorisation, respondent);
+        DirectionsQuestionnaireForm templateData = getRespondentTemplateData(caseData, authorisation, respondent);
 
         // Generate docmosis document and upload it
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
@@ -158,20 +147,19 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             )
         );
 
-        // set the create date time equal to the response date time, so we can check it afterwards
-        return Optional.of(document.toBuilder().createdDatetime(responseDate).build());
+        log.info("Uploaded new 1v2 different-solicitor DQ for caseId {} respondent {} responseDate {}", caseData.getCcdCaseReference(), respondent, responseDate);
+        document.setCreatedDatetime(responseDate);
+        return Optional.of(document);
     }
 
-    private DirectionsQuestionnaireForm getDirectionsQuestionnaireForm(CaseData caseData, String authorisation, String respondent) {
-        // Generate DQ based on respondent and template data
-        DirectionsQuestionnaireForm templateData;
-        if (respondent.equals("ONE")) {
-            templateData = respondentTemplateForDQGenerator.getRespondent1TemplateData(caseData, "ONE", authorisation);
-        } else {
-            // TWO
-            templateData = respondentTemplateForDQGenerator.getRespondent2TemplateData(caseData, "TWO", authorisation);
+    private DirectionsQuestionnaireForm getRespondentTemplateData(CaseData caseData, String authorisation, String respondent) {
+        if ("ONE".equals(respondent)) {
+            return respondentTemplateForDQGenerator.getRespondent1TemplateData(caseData, "ONE", authorisation);
         }
-        return templateData;
+        if ("TWO".equals(respondent)) {
+            return respondentTemplateForDQGenerator.getRespondent2TemplateData(caseData, "TWO", authorisation);
+        }
+        throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
     }
 
     @NotNull
@@ -200,6 +188,38 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     static final String DEFENDANT = "defendant";
 
+    private boolean isMintiEnabled(CaseData caseData) {
+        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+    }
+
+    private DocmosisTemplates getDefaultTemplate(boolean isMinti) {
+        return isMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+    }
+
+    private DocmosisTemplates getOneVTwoTwoLegalRepTemplate(boolean isMinti) {
+        return isMinti ? DQ_RESPONSE_1V2_DS_FAST_TRACK_INT : DQ_RESPONSE_1V2_DS;
+    }
+
+    private DocmosisTemplates getOneVTwoOneLegalRepTemplate(boolean isMinti) {
+        return isMinti ? DocmosisTemplates.DQ_RESPONSE_1V2_SS_FAST_TRACK_INT : DocmosisTemplates.DQ_RESPONSE_1V2_SS;
+    }
+
+    private DocmosisTemplates getTwoVOneTemplate(boolean isMinti) {
+        return isMinti ? DocmosisTemplates.DQ_RESPONSE_2V1_FAST_TRACK_INT : DocmosisTemplates.DQ_RESPONSE_2V1;
+    }
+
+    private boolean shouldUseClaimantProceedTemplate(boolean isClaimantResponse, boolean claimantMultipartyProceed) {
+        return isClaimantResponse && claimantMultipartyProceed;
+    }
+
+    private boolean shouldUseRespondentOrClaimantProceedTemplate(boolean isClaimantResponse, boolean claimantMultipartyProceed) {
+        return !isClaimantResponse || claimantMultipartyProceed;
+    }
+
+    private DocmosisTemplates getSingleSolicitorDifferentResponseTemplate(CaseData caseData) {
+        return getDefaultTemplate(isMintiEnabled(caseData));
+    }
+
     private String getFileName(CaseData caseData, DocmosisTemplates templateId) {
         boolean isRespondent = dqGeneratorFormBuilder.isRespondentState(caseData);
         String userPrefix = isRespondent ? DEFENDANT : "claimant";
@@ -208,21 +228,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(
+        return dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(
             caseData,
             authorisation
         );
-
-        return builder.build();
     }
 
     public static boolean isClaimantResponse(CaseData caseData) {
-        var businessProcess = ofNullable(caseData.getBusinessProcess())
-            .map(BusinessProcess::getCamundaEvent)
-            .orElse(null);
-        return "CLAIMANT_RESPONSE".equals(businessProcess)
-                || "CLAIMANT_RESPONSE_SPEC".equals(businessProcess)
-            || "CLAIMANT_RESPONSE_CUI".equals(businessProcess);
+        return DQGeneratorFormBuilder.isClaimantResponse(caseData);
     }
 
     private boolean isClaimantMultipartyProceed(CaseData caseData) {

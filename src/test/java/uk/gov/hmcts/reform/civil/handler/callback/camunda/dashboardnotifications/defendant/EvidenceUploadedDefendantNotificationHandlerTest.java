@@ -67,10 +67,12 @@ class EvidenceUploadedDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldRecordScenario_whenInvoked_whenClaimantUploadsDocument() {
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build())
+                .caseDataLip(caseDataLiP)
                 .respondent1Represented(YesOrNo.NO).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -86,17 +88,20 @@ class EvidenceUploadedDefendantNotificationHandlerTest extends BaseCallbackHandl
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordScenario_whenInvoked_whenDefendantUploadsDocument() {
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build())
-                .respondent1Represented(YesOrNo.NO).build().toBuilder().caseDocumentUploadDateRes(LocalDateTime.now()).build();
+                .caseDataLip(caseDataLiP)
+                .respondent1Represented(YesOrNo.NO).build();
+            caseData.setCaseDocumentUploadDateRes(LocalDateTime.now());
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -111,7 +116,7 @@ class EvidenceUploadedDefendantNotificationHandlerTest extends BaseCallbackHandl
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

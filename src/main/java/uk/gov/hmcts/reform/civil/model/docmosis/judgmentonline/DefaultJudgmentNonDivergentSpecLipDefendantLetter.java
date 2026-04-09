@@ -4,36 +4,36 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 import java.time.LocalDate;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@Accessors(chain = true)
 public class DefaultJudgmentNonDivergentSpecLipDefendantLetter implements MappableObject {
 
-    private final Party defendant;
-    private final String claimantName;
-    private final String claimReferenceNumber;
+    private Party defendant;
+    private String claimantName;
+    private String claimReferenceNumber;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate letterIssueDate;
+    private LocalDate letterIssueDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate caseSubmittedDate;
+    private LocalDate caseSubmittedDate;
 
-    private final String respondToClaimUrl;
-    private final String pin;
-    private final String varyJudgmentFee;
-    private final String judgmentSetAsideFee;
-    private final String certifOfSatisfactionFee;
+    private String respondToClaimUrl;
+    private String pin;
+    private String varyJudgmentFee;
+    private String judgmentSetAsideFee;
+    private String certifOfSatisfactionFee;
 
 }

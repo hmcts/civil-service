@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.sdo;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
@@ -14,7 +13,9 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.PPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
+import uk.gov.hmcts.reform.civil.model.sdo.HousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
@@ -29,71 +30,77 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import java.time.LocalDate;
 import java.util.List;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-@ToString
+@Accessors(chain = true)
+@SuppressWarnings({"java:S1104", "java:S107", "common-java:DuplicatedBlocks", "java:S6539"})
 public class SdoDocumentFormSmall implements MappableObject {
 
-    private final LocalDate currentDate;
+    private String judgeName;
+    private String caseNumber;
+    private LocalDate currentDate;
+    private ClaimsTrack claimsTrack;
+    private YesOrNo drawDirectionsOrderRequired;
+    private JudgementSum drawDirectionsOrder;
+    private Party applicant1;
+    private Party applicant2;
+    private boolean hasApplicant2;
+    private Party respondent1;
+    private Party respondent2;
+    private boolean hasRespondent2;
+    private String applicant1PartyName;
+    private String applicant2PartyName;
+    private String respondent1PartyName;
+    private String respondent2PartyName;
 
-    private final String judgeName;
+    private List<SmallTrack> smallClaims;
 
-    private final String caseNumber;
+    private boolean hasCreditHire;
+    private boolean hasHousingDisrepair;
+    private boolean hasRoadTrafficAccident;
+    private boolean hasPaymentProtectionInsurance;
+    private boolean writtenByJudge;
 
-    private final Party applicant1;
-    private final Party respondent1;
-    private final boolean hasApplicant2;
-    private final Party applicant2;
-    private final boolean hasRespondent2;
-    private final Party respondent2;
+    private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
+    private SmallClaimsHearing smallClaimsHearing;
+    private String smallClaimsHearingTime;
+    private SmallClaimsMethod smallClaimsMethod;
+    private DynamicList smallClaimsMethodInPerson;
+    private String smallClaimsMethodTelephoneHearing;
+    private String smallClaimsMethodVideoConferenceHearing;
+    private SmallClaimsDocuments smallClaimsDocuments;
+    private SmallClaimsFlightDelay smallClaimsFlightDelay;
+    private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private LocationRefData hearingLocation;
+    private LocationRefData caseManagementLocation;
+    private SmallClaimsCreditHire smallClaimsCreditHire;
+    private HousingDisrepair smallClaimsHousingDisrepair;
+    private SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
+    private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
+    private PPI smallClaimsPPI;
 
-    private final YesOrNo drawDirectionsOrderRequired;
-    private final JudgementSum drawDirectionsOrder;
-    private final ClaimsTrack claimsTrack;
+    private String welshLanguageDescription;
+    private boolean hasNewDirections;
+    private List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
 
-    private final List<SmallTrack> smallClaims;
-
-    private final boolean hasCreditHire;
-    private final boolean hasRoadTrafficAccident;
-    private final boolean writtenByJudge;
-
-    private final SmallClaimsJudgesRecital smallClaimsJudgesRecital;
-    private final SmallClaimsHearing smallClaimsHearing;
-    private final String smallClaimsHearingTime;
-    private final SmallClaimsMethod smallClaimsMethod;
-    private final DynamicList smallClaimsMethodInPerson;
-    private final String smallClaimsMethodTelephoneHearing;
-    private final String smallClaimsMethodVideoConferenceHearing;
-    private final SmallClaimsDocuments smallClaimsDocuments;
-    private final SmallClaimsFlightDelay smallClaimsFlightDelay;
-    private final SmallClaimsWitnessStatement smallClaimsWitnessStatement;
-    private final LocationRefData hearingLocation;
-    private final LocationRefData caseManagementLocation;
-    private final SmallClaimsCreditHire smallClaimsCreditHire;
-    private final SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
-    private final SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
-
-    private final String welshLanguageDescription;
-    private final boolean hasNewDirections;
-    private final List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
-
-    private final SmallClaimsNotes smallClaimsNotes;
-    private final boolean smallClaimsHearingToggle;
+    private SmallClaimsNotes smallClaimsNotes;
+    private boolean smallClaimsHearingToggle;
     /**
      * SNI-5142 made mandatory.
      */
-    private final boolean smallClaimsMethodToggle;
-    private final boolean smallClaimsDocumentsToggle;
-    private final boolean smallClaimsWitnessStatementToggle;
-    private final boolean smallClaimsNumberOfWitnessesToggle;
-    private final boolean smallClaimsFlightDelayToggle;
-    private final boolean smallClaimsMediationSectionToggle;
-    private final boolean carmEnabled;
-    private final String smallClaimMediationSectionInput;
-    private final boolean smallClaimsWelshLanguageToggle;
-    private final String caseAccessCategory;
+    private boolean smallClaimsMethodToggle;
+    private boolean smallClaimsDocumentsToggle;
+    private boolean smallClaimsWitnessStatementToggle;
+    private boolean smallClaimsNumberOfWitnessesToggle;
+    private boolean smallClaimsFlightDelayToggle;
+    private boolean smallClaimsMediationSectionToggle;
+    private boolean carmEnabled;
+    private String smallClaimMediationSectionInput;
+    private boolean smallClaimsWelshLanguageToggle;
+    private String caseAccessCategory;
+    private boolean showPenalNotice;
+    private String penalNoticeText;
 
     @SuppressWarnings("unused")
     public boolean getSmallClaimsMethodToggle() {

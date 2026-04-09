@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -15,10 +16,17 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.callback.TaskCompletionSubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
+import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContext;
+import uk.gov.hmcts.reform.civil.model.taskmanagement.Task;
+import uk.gov.hmcts.reform.civil.model.taskmanagement.UserTask;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendAndReplyMessageService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.taskmanagement.WaTaskManagementService;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.Comparator;
 import java.util.List;
@@ -33,10 +41,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_AND_REPLY;
 import static uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption.REPLY;
+import static uk.gov.hmcts.reform.civil.service.taskmanagement.TaskCompletionPredicate.taskToCompleteFilter;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @SuppressWarnings("unchecked")
 public class SendAndReplyCallbackHandler extends CallbackHandler {
 
@@ -52,7 +62,11 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
 
+    private final UserService userService;
+
     private final FeatureToggleService featureToggleService;
+
+    private final WaTaskManagementService taskManagementService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -72,10 +86,9 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         }
 
         Element<Message> messageToReplyTo = getMessageToReplyTo(caseData);
+        caseData.setMessageHistory(messageService.renderMessageTableList(messageToReplyTo));
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder()
-                      .messageHistory(messageService.renderMessageTableList(messageToReplyTo))
-                      .build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -86,19 +99,19 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
 
     private CallbackResponse handleAboutToStart(CallbackParams params) {
         CaseData caseData = params.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         if (nonNull(caseData.getMessages()) && !caseData.getMessages().isEmpty()) {
-            builder.messagesToReplyTo(messageService.createMessageSelectionList(caseData.getMessages()));
+            caseData.setMessagesToReplyTo(messageService.createMessageSelectionList(caseData.getMessages()));
         }
 
         if (featureToggleService.isWelshEnabledForMainCase()
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
-            builder.bilingualHint(YesOrNo.YES);
+            caseData.setBilingualHint(YesOrNo.YES);
         }
 
+        caseData.setSendAndReplyOption(null);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.sendAndReplyOption(null).build().toMap(objectMapper)).build();
+            .data(caseData.toMap(objectMapper)).build();
     }
 
     private Element<Message> getMessageToReplyTo(CaseData caseData) {
@@ -108,7 +121,6 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
 
     private CallbackResponse handleAboutToSubmit(CallbackParams params) {
         CaseData caseData = params.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         String userAuth = params.getParams().get(BEARER_TOKEN).toString();
 
         List<Element<Message>> messagesNew;
@@ -121,9 +133,9 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 userAuth
             );
 
-            builder.messages(messagesNew)
-                .sendMessageMetadata(null)
-                .sendMessageContent(null);
+            caseData.setMessages(messagesNew);
+            caseData.setSendMessageMetadata(null);
+            caseData.setSendMessageContent(null);
         } else {
             messagesNew = messageService.addReplyToMessage(
                 caseData.getMessages(),
@@ -131,18 +143,19 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 caseData.getMessageReplyMetadata(),
                 userAuth, caseData
             );
-            builder.messages(messagesNew)
-                .messagesToReplyTo(null)
-                .messageReplyMetadata(null)
-                .messageHistory(null);
+
+            caseData.setMessages(messagesNew);
+            caseData.setMessagesToReplyTo(null);
+            caseData.setMessageReplyMetadata(null);
+            caseData.setMessageHistory(null);
         }
 
         Element<Message> lastMessageElement = messagesNew.stream()
                 .max(Comparator.comparing(message -> message.getValue().getUpdatedTime()))
-                .orElse(element(Message.builder().build()));
+                .orElse(element(new Message()));
         Message lastMessage = lastMessageElement.getValue();
 
-        builder.lastMessage(lastMessage);
+        caseData.setLastMessage(lastMessage);
 
         AllocatedTrack allocatedTrack;
         if (Objects.nonNull(caseData.getAssignedTrackType())) {
@@ -156,20 +169,21 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 caseData
             );
         }
-        builder.lastMessageAllocatedTrack(AllocatedTrack.toStringValueForMessage(allocatedTrack));
+        caseData.setLastMessageAllocatedTrack(AllocatedTrack.toStringValueForMessage(allocatedTrack));
 
         boolean isRecipientCircuitJudge = RolePool.JUDICIAL_CIRCUIT.equals(lastMessage.getRecipientRoleType());
         boolean isRecipientDistrictJudge = RolePool.JUDICIAL_DISTRICT.equals(lastMessage.getRecipientRoleType());
         boolean isJudge = RolePool.JUDICIAL.equals(lastMessage.getRecipientRoleType());
 
         if (isRecipientCircuitJudge || isRecipientDistrictJudge) {
-            builder.lastMessageJudgeLabel(isRecipientCircuitJudge ? "CJ" : "DJ");
+            caseData.setLastMessageJudgeLabel(isRecipientCircuitJudge ? "CJ" : "DJ");
         } else if (isJudge) {
-            builder.lastMessageJudgeLabel("Judge");
+            caseData.setLastMessageJudgeLabel("Judge");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper)).build();
+            .data(caseData.toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse handleSubmitted(CallbackParams params) {
@@ -179,10 +193,45 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 .confirmationBody(SEND_MESSAGE_BODY_CONFIRMATION)
                 .build();
         } else {
+            CaseData caseData = params.getCaseData();
+            String userAuth = params.getParams().get(BEARER_TOKEN).toString();
+            ClientContext clientContext = buildTaskCompletionContext(userAuth, caseData);
+
+            if (nonNull(clientContext)) {
+                return new TaskCompletionSubmittedCallbackResponse()
+                    .setConfirmationHeader(REPLY_MESSAGE_CONFIRMATION_HEADER)
+                    .setConfirmationBody(REPLY_MESSAGE_BODY_CONFIRMATION)
+                    .setClientContext(clientContext);
+            }
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader(REPLY_MESSAGE_CONFIRMATION_HEADER)
                 .confirmationBody(REPLY_MESSAGE_BODY_CONFIRMATION)
                 .build();
         }
+    }
+
+    private ClientContext buildTaskCompletionContext(String userAuth, CaseData caseData) {
+        Task taskToComplete = taskManagementService.getTaskToComplete(
+            caseData.getCcdCaseReference().toString(),
+            userAuth,
+            taskToCompleteFilter(caseData)
+        );
+
+        if (nonNull(taskToComplete)) {
+            if (taskToComplete.getTaskState().equals("unassigned")) {
+                UserDetails userDetails = userService.getUserDetails(userAuth);
+                taskManagementService.claimTask(userAuth, taskToComplete.getId());
+                taskToComplete.setAssignee(userDetails.getId());
+            }
+
+            UserTask userTask = new UserTask();
+            userTask.setTaskData(taskToComplete);
+            userTask.setCompleteTask(true);
+            ClientContext clientContext = new ClientContext();
+            clientContext.setUserTask(userTask);
+            return clientContext;
+        }
+
+        return null;
     }
 }

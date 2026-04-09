@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.hearing.HearingNoticeHmc;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
@@ -52,7 +51,6 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
     private final LocationReferenceDataService locationRefDataService;
     private final HearingFeesService hearingFeesService;
     private final AssignCategoryId assignCategoryId;
-    private final FeatureToggleService featureToggleService;
 
     public List<CaseDocument> generate(CaseData caseData, HearingGetResponse hearing, String authorisation, String hearingLocation, String hearingId, DocmosisTemplates template) {
 
@@ -74,65 +72,101 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
 
     public HearingNoticeHmc getHearingNoticeTemplateData(CaseData caseData, HearingGetResponse hearing, String bearerToken,
                                                          String hearingLocation, String hearingId, DocmosisTemplates template) {
-        var paymentFailed = (caseData.getHearingFeePaymentDetails() == null
-            || caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.FAILED))
-            && (!featureToggleService.isCaseProgressionEnabled() || !caseData.hearingFeePaymentDoneWithHWF());
-        var hearingType = hearing.getHearingDetails().getHearingType();
-        var feeAmount = paymentFailed && hearingFeeRequired(hearingType)
-            ? HearingUtils.formatHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack())) : null;
-        var hearingDueDate = paymentFailed && hearingFeeRequired(hearingType) ? HearingFeeUtils
-            .calculateHearingDueDate(LocalDate.now(), HmcDataUtils.getHearingStartDay(hearing)
-                .getHearingStartDateTime().toLocalDate()) : null;
-        var isWelsh = HEARING_NOTICE_HMC_WELSH.equals(template);
-        var creationDate = LocalDate.now();
+        String hearingType = hearing.getHearingDetails().getHearingType();
+        boolean paymentFailed = isPaymentFailed(caseData);
+        boolean isWelsh = isWelshTemplate(template);
+        LocalDate creationDate = LocalDate.now();
+        LocalDate hearingDueDate = getHearingDueDate(hearing, hearingType, paymentFailed);
+        LocationRefData caseManagementLocation = getCaseManagementLocation(caseData, hearingId, bearerToken);
+        String caseManagementLocationText = getCaseManagementLocationText(caseManagementLocation, isWelsh);
 
-        LocationRefData caseManagementLocation =
-            getLocationRefData(hearingId, caseData.getCaseManagementLocation().getBaseLocation(), bearerToken, locationRefDataService);
-
-        String caseManagementLocationText = "";
-        if (nonNull(caseManagementLocation) && isWelsh) {
-            caseManagementLocationText = LocationReferenceDataService.getDisplayEntryWelsh(caseManagementLocation);
-        } else if (nonNull(caseManagementLocation)) {
-            caseManagementLocationText = LocationReferenceDataService.getDisplayEntry(caseManagementLocation);
-        }
-
-        return HearingNoticeHmc.builder()
-            .title(getHearingTypeTitleText(caseData, hearing, isWelsh ? true : false))
-            .hearingSiteName(nonNull(caseManagementLocation) ? getExternalShortName(template, caseManagementLocation) : null)
-            .caseManagementLocation(caseManagementLocationText)
-            .hearingLocation(hearingLocation)
-            .caseNumber(caseData.getCcdCaseReference())
-            .creationDate(creationDate)
-            .creationDateWelshText(isWelsh ? formatDateInWelsh(creationDate, true) : null)
-            .hearingType(getHearingTypeContentText(caseData, hearing, isWelsh))
-            .hearingTypePluralWelsh(isWelsh ? getPluralHearingTypeTextWelsh(caseData, hearing) : null)
-            .claimant(caseData.getApplicant1().getPartyName())
-            .claimantReference(nonNull(caseData.getSolicitorReferences())
+        return new HearingNoticeHmc()
+            .setTitle(getHearingTypeTitleText(caseData, hearing, isWelsh))
+            .setHearingSiteName(getHearingSiteName(template, caseManagementLocation))
+            .setCaseManagementLocation(caseManagementLocationText)
+            .setHearingLocation(hearingLocation)
+            .setCaseNumber(caseData.getCcdCaseReference())
+            .setCreationDate(creationDate)
+            .setCreationDateWelshText(isWelsh ? formatDateInWelsh(creationDate, true) : null)
+            .setHearingType(getHearingTypeContentText(caseData, hearing, isWelsh))
+            .setHearingTypePluralWelsh(isWelsh ? getPluralHearingTypeTextWelsh(caseData, hearing) : null)
+            .setClaimant(caseData.getApplicant1().getPartyName())
+            .setClaimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
-            .claimant2(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
-            .claimant2Reference(nonNull(caseData.getApplicant2())
+            .setClaimant2(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
+            .setClaimant2Reference(nonNull(caseData.getApplicant2())
                     && nonNull(caseData.getSolicitorReferences()) ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
-            .defendant(caseData.getRespondent1().getPartyName())
-            .defendantReference(nonNull(caseData.getSolicitorReferences())
+            .setDefendant(caseData.getRespondent1().getPartyName())
+            .setDefendantReference(nonNull(caseData.getSolicitorReferences())
                                     ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
-            .defendant2(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
-            .defendant2Reference(caseData.getRespondentSolicitor2Reference())
-            .hearingDays(getHearingDaysText(hearing, isWelsh))
-            .totalHearingDuration(getTotalHearingDurationText(hearing, isWelsh))
-            .feeAmount(feeAmount)
-            .hearingDueDate(hearingDueDate)
-            .hearingDueDateWelshText(isWelsh && nonNull(hearingDueDate)
+            .setDefendant2(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
+            .setDefendant2Reference(caseData.getRespondentSolicitor2Reference())
+            .setHearingDays(getHearingDaysText(hearing, isWelsh))
+            .setTotalHearingDuration(getTotalHearingDurationText(hearing, isWelsh))
+            .setFeeAmount(getFeeAmount(caseData, hearingType, paymentFailed))
+            .setHearingDueDate(hearingDueDate)
+            .setHearingDueDateWelshText(isWelsh && nonNull(hearingDueDate)
                                          ? formatDateInWelsh(hearingDueDate, true)
                                          : null)
-            .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
-            .partiesAttendingInPerson(getInPersonAttendeeNames(hearing))
-            .partiesAttendingByTelephone(getPhoneAttendeeNames(hearing))
-            .partiesAttendingByVideo(getVideoAttendeesNames(hearing))
-            .build();
+            .setHearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .setPartiesAttendingInPerson(getInPersonAttendeeNames(hearing))
+            .setPartiesAttendingByTelephone(getPhoneAttendeeNames(hearing))
+            .setPartiesAttendingByVideo(getVideoAttendeesNames(hearing));
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates template) {
         return String.format(template.getDocumentTitle(), caseData.getLegacyCaseReference());
+    }
+
+    private boolean isPaymentFailed(CaseData caseData) {
+        return (caseData.getHearingFeePaymentDetails() == null
+            || caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.FAILED))
+            && !caseData.hearingFeePaymentDoneWithHWF();
+    }
+
+    private boolean isWelshTemplate(DocmosisTemplates template) {
+        return HEARING_NOTICE_HMC_WELSH.equals(template);
+    }
+
+    private String getFeeAmount(CaseData caseData, String hearingType, boolean paymentFailed) {
+        if (!paymentFailed || !hearingFeeRequired(hearingType)) {
+            return null;
+        }
+        return HearingUtils.formatHearingFee(
+            HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack())
+        );
+    }
+
+    private LocalDate getHearingDueDate(HearingGetResponse hearing, String hearingType, boolean paymentFailed) {
+        if (!paymentFailed || !hearingFeeRequired(hearingType)) {
+            return null;
+        }
+        return HearingFeeUtils.calculateHearingDueDate(
+            LocalDate.now(),
+            HmcDataUtils.getHearingStartDay(hearing).getHearingStartDateTime().toLocalDate()
+        );
+    }
+
+    private LocationRefData getCaseManagementLocation(CaseData caseData, String hearingId, String bearerToken) {
+        return getLocationRefData(
+            hearingId,
+            caseData.getCaseManagementLocation().getBaseLocation(),
+            bearerToken,
+            locationRefDataService
+        );
+    }
+
+    private String getCaseManagementLocationText(LocationRefData caseManagementLocation, boolean isWelsh) {
+        if (caseManagementLocation == null) {
+            return "";
+        }
+        return isWelsh
+            ? LocationReferenceDataService.getDisplayEntryWelsh(caseManagementLocation)
+            : LocationReferenceDataService.getDisplayEntry(caseManagementLocation);
+    }
+
+    private String getHearingSiteName(DocmosisTemplates template, LocationRefData caseManagementLocation) {
+        return caseManagementLocation == null ? null : getExternalShortName(template, caseManagementLocation);
     }
 
     private String getExternalShortName(DocmosisTemplates template, LocationRefData caseManagementLocation) {
@@ -147,4 +181,3 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         return null;
     }
 }
-

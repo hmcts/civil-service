@@ -1,12 +1,16 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class LengthOfUnemploymentComplexTypeLRspec {
 
-    private final String numberOfYearsInUnemployment;
-    private final String numberOfMonthsInUnemployment;
+    private String numberOfYearsInUnemployment;
+    private String numberOfMonthsInUnemployment;
 }

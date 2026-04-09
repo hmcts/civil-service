@@ -126,7 +126,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         when(authTokenGenerator.generate()).thenReturn(BEARER_TOKEN);
         when(userService.getUserInfo(anyString())).thenReturn(userInfo);
         when(userService.getAccessToken(anyString(), anyString())).thenReturn(BEARER_TOKEN);
-        when(representativeService.getApplicantRepresentative(any())).thenReturn(Representative.builder().build());
+        when(representativeService.getApplicantRepresentative(any())).thenReturn(new Representative());
 
         document = mapper.readValue(
             readString("document-management/download.success.json"),

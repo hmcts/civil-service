@@ -30,7 +30,6 @@ public class ValidateWitnessesTask {
     }
 
     public CallbackResponse validateWitnesses(CaseData caseData, String authToken) {
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
         log.info("Validate Witnesses for case ID {}", caseData.getCcdCaseReference());
         List<String> errors = new ArrayList<>();
 
@@ -48,7 +47,7 @@ public class ValidateWitnessesTask {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }

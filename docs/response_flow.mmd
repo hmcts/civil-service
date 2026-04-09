@@ -1,0 +1,68 @@
+stateDiagram-v2
+  %% Defence Waiting & Divergence
+  state "CLAIM_DETAILS_NOTIFIED (from Issue flow)" as RESPONSE_FLOW_IN_0
+  state "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION (from Issue flow)" as RESPONSE_FLOW_IN_1
+  state "FULL_DEFENCE (continues in Post-response flow)" as RESPONSE_FLOW_OUT_0
+  state "FULL_ADMISSION (continues in Post-response flow)" as RESPONSE_FLOW_OUT_1
+  state "PART_ADMISSION (continues in Post-response flow)" as RESPONSE_FLOW_OUT_2
+  state "COUNTER_CLAIM (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_3
+  state "TAKEN_OFFLINE_BY_STAFF (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_4
+  state "TAKEN_OFFLINE_SDO_NOT_DRAWN (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_5
+  state "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA (continues in Post-response flow)" as RESPONSE_FLOW_OUT_6
+  ALL_RESPONSES_RECEIVED --> RESPONSE_FLOW_OUT_0 : Latest defence is a full defence unspecified.
+  ALL_RESPONSES_RECEIVED --> RESPONSE_FLOW_OUT_0 : Latest defence is a full defence in SPEC.
+  ALL_RESPONSES_RECEIVED --> RESPONSE_FLOW_OUT_1 : Latest defence is a full admission unspecified
+  ALL_RESPONSES_RECEIVED --> RESPONSE_FLOW_OUT_2 : Latest defence is a part admission unspecified
+  ALL_RESPONSES_RECEIVED --> RESPONSE_FLOW_OUT_3 : Latest defence is a counter claim unspecified journey
+  ALL_RESPONSES_RECEIVED --> DIVERGENT_RESPOND_GO_OFFLINE : Defendant responses diverge so the case must go offline.
+  ALL_RESPONSES_RECEIVED --> DIVERGENT_RESPOND_GO_OFFLINE : SPEC defendant/claimant responses diverge so the case must go offline.
+  ALL_RESPONSES_RECEIVED --> DIVERGENT_RESPOND_GO_OFFLINE : Latest defence is a full admission in SPEC.
+  ALL_RESPONSES_RECEIVED --> DIVERGENT_RESPOND_GO_OFFLINE : Latest defence is a part admission in SPEC.
+  ALL_RESPONSES_RECEIVED --> DIVERGENT_RESPOND_GO_OFFLINE : Latest defence is a counter claim for SPEC.
+  ALL_RESPONSES_RECEIVED --> DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE : Responses diverge and discrete directions questionnaires must be pr…
+  ALL_RESPONSES_RECEIVED --> DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE : SPEC divergent responses requiring DQs before going offline.
+  ALL_RESPONSES_RECEIVED --> RESPONSE_FLOW_OUT_4 : Staff took the case offline after claim details were notified and b…
+  ALL_RESPONSES_RECEIVED --> RESPONSE_FLOW_OUT_6 : Claim details notification deadline expired with no response or sta…
+  AWAITING_RESPONSES_FULL_ADMIT_RECEIVED --> ALL_RESPONSES_RECEIVED : Every required defendant response has been received
+  AWAITING_RESPONSES_FULL_ADMIT_RECEIVED --> RESPONSE_FLOW_OUT_4 : Staff took the case offline after notification but before claim det…
+  AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED --> ALL_RESPONSES_RECEIVED : Every required defendant response has been received
+  AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED --> RESPONSE_FLOW_OUT_4 : Staff took the case offline after notification but before claim det…
+  AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED --> ALL_RESPONSES_RECEIVED : Every required defendant response has been received
+  AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED --> RESPONSE_FLOW_OUT_4 : Staff took the case offline after notification but before claim det…
+  RESPONSE_FLOW_IN_1 --> NOTIFICATION_ACKNOWLEDGED : At least one defendant has acknowledged service per scenario rules.
+  RESPONSE_FLOW_IN_1 --> ALL_RESPONSES_RECEIVED : A defendant has obtained a time extension to respond
+  RESPONSE_FLOW_IN_1 --> AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED : In a 1v2 two-solicitor case only one defendant has provided a full …
+  RESPONSE_FLOW_IN_1 --> AWAITING_RESPONSES_FULL_ADMIT_RECEIVED : In a 1v2 two-solicitor case only one defendant has responded with a…
+  RESPONSE_FLOW_IN_1 --> AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED : In a 1v2 two-solicitor case a single defendant has responded with s…
+  RESPONSE_FLOW_IN_1 --> RESPONSE_FLOW_OUT_4 : Staff took the case offline after claim details were notified while…
+  RESPONSE_FLOW_IN_1 --> RESPONSE_FLOW_OUT_6 : Claim details notification deadline expired while an extension appl…
+  RESPONSE_FLOW_IN_1 --> RESPONSE_FLOW_OUT_5 : Case marked not suitable for SDO and taken offline during a claim-d…
+  RESPONSE_FLOW_IN_0 --> NOTIFICATION_ACKNOWLEDGED : At least one defendant has acknowledged service per scenario rules
+  RESPONSE_FLOW_IN_0 --> ALL_RESPONSES_RECEIVED : Every required defendant response has been received / not At least …
+  RESPONSE_FLOW_IN_0 --> AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED : In a 1v2 two-solicitor case only one defendant has provided a full …
+  RESPONSE_FLOW_IN_0 --> AWAITING_RESPONSES_FULL_ADMIT_RECEIVED : In a 1v2 two-solicitor case only one defendant has responded with a…
+  RESPONSE_FLOW_IN_0 --> AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED : In a 1v2 two-solicitor case a single defendant has responded with s…
+  RESPONSE_FLOW_IN_0 --> RESPONSE_FLOW_OUT_4 : Staff took the case offline after claim details were notified and b…
+  RESPONSE_FLOW_IN_0 --> RESPONSE_FLOW_OUT_6 : Claim details notification deadline expired with no response or sta…
+  RESPONSE_FLOW_IN_0 --> RESPONSE_FLOW_OUT_5 : Case marked not suitable for SDO and taken offline after claim deta…
+  NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION --> ALL_RESPONSES_RECEIVED : At least one defendant has acknowledged service per scenario rules
+  NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION --> AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED : At least one defendant has acknowledged service per scenario rules
+  NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION --> AWAITING_RESPONSES_FULL_ADMIT_RECEIVED : At least one defendant has acknowledged service per scenario rules
+  NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION --> AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED : At least one defendant has acknowledged service per scenario rules
+  NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION --> RESPONSE_FLOW_OUT_4 : Staff took the case offline after acknowledgement while a time exte…
+  NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION --> RESPONSE_FLOW_OUT_6 : Claim was acknowledged, an extension applied, and the dismissal dea…
+  NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION --> RESPONSE_FLOW_OUT_5 : Case marked not suitable for SDO and taken offline after acknowledg…
+  NOTIFICATION_ACKNOWLEDGED --> NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION : At least one defendant has acknowledged service per scenario rules
+  NOTIFICATION_ACKNOWLEDGED --> ALL_RESPONSES_RECEIVED : At least one defendant has acknowledged service per scenario rules
+  NOTIFICATION_ACKNOWLEDGED --> AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED : At least one defendant has acknowledged service per scenario rules
+  NOTIFICATION_ACKNOWLEDGED --> AWAITING_RESPONSES_FULL_ADMIT_RECEIVED : At least one defendant has acknowledged service per scenario rules
+  NOTIFICATION_ACKNOWLEDGED --> AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED : At least one defendant has acknowledged service per scenario rules
+  NOTIFICATION_ACKNOWLEDGED --> RESPONSE_FLOW_OUT_4 : Staff took the case offline after service acknowledgement and befor…
+  NOTIFICATION_ACKNOWLEDGED --> RESPONSE_FLOW_OUT_6 : Claim was acknowledged but the response deadline has expired withou…
+  NOTIFICATION_ACKNOWLEDGED --> RESPONSE_FLOW_OUT_5 : Case marked not suitable for SDO and taken offline after service ac…
+  RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL --> RESPONSE_FLOW_OUT_0 : Latest defence is a full defence in SPEC
+  RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL --> RESPONSE_FLOW_OUT_2 : Latest defence is a part admission in SPEC
+  RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL --> RESPONSE_FLOW_OUT_1 : Latest defence is a full admission in SPEC
+  RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL --> RESPONSE_FLOW_OUT_3 : Latest defence is a counter claim for SPEC
+  note right of DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE : 🔚 Terminal state
+  note right of DIVERGENT_RESPOND_GO_OFFLINE : 🔚 Terminal state

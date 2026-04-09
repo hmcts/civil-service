@@ -6,6 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
@@ -23,6 +26,8 @@ import uk.gov.hmcts.reform.payments.request.PBAServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
@@ -107,6 +112,26 @@ public class PaymentsService {
         }
     }
 
+    public void validateRequestGa(GeneralApplicationCaseData caseData) {
+        String error = null;
+        GeneralApplicationPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails();
+        if (generalAppPBADetails == null) {
+            error = "PBA details not received.";
+        } else if (generalAppPBADetails.getFee() == null
+            || generalAppPBADetails.getFee().getCalculatedAmountInPence() == null
+            || isBlank(generalAppPBADetails.getFee().getVersion())
+            || isBlank(generalAppPBADetails.getFee().getCode())) {
+            error = "Fees are not set correctly.";
+        }
+        if (caseData.getGeneralAppApplnSolicitor() == null
+            || (caseData.getIsGaApplicantLip() != YesOrNo.YES && isBlank(caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier()))) {
+            error = "Applicant's organization details not received.";
+        }
+        if (!isBlank(error)) {
+            throw new InvalidPaymentRequestException(error);
+        }
+    }
+
     private PBAServiceRequestDTO buildPbaPaymentRequestBulkClaim(CaseData caseData) {
         SRPbaDetails serviceRequestPBADetails = null;
         FeeDto srFee = null;
@@ -156,6 +181,12 @@ public class PaymentsService {
         return paymentsClient.createServiceRequest(authToken, paymentRequest);
     }
 
+    public PaymentServiceResponse createServiceRequestGa(GeneralApplicationCaseData caseData, String authToken) {
+        CreateServiceRequestDTO paymentRequest = buildServiceRequest(caseData);
+        log.info("Calling payment service request for general application case {} and callbackUrl {} ", caseData.getCcdCaseReference(), paymentRequest.getCallBackUrl());
+        return paymentsClient.createServiceRequest(authToken, paymentRequest);
+    }
+
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
         String siteId = null;
 
@@ -165,33 +196,37 @@ public class PaymentsService {
             siteId = paymentsConfiguration.getSpecSiteId();
         }
         String callbackURLUsed = null;
-        FeeDto feeResponse = null;
+        List<FeeDto> feeResponses = new ArrayList<>();
 
         if (caseData.getHearingDueDate() == null) {
             callbackURLUsed = callBackUrlClaimIssued;
-            feeResponse = caseData.getClaimFee().toFeeDto();
+            feeResponses.add(caseData.getClaimFee().toFeeDto());
+            if (YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
+                feeResponses.add(caseData.getOtherRemedyFee().toFeeDto());
+            }
         } else {
             callbackURLUsed = callBackUrl;
             if (caseData.getHearingFee() != null) {
-                feeResponse = caseData.getHearingFee().toFeeDto();
+                feeResponses.add(caseData.getHearingFee().toFeeDto());
             } else {
-                feeResponse = HearingFeeUtils.calculateAndApplyFee(
-                    hearingFeesService, caseData, caseData.getAssignedTrack()).toFeeDto();
+                feeResponses.add(HearingFeeUtils.calculateAndApplyFee(
+                    hearingFeesService, caseData, caseData.getAssignedTrack()).toFeeDto());
             }
         }
         log.info("Payment callbackURLUsed: {}, siteId{} and  for caseId {} ", callbackURLUsed, siteId, caseData.getCcdCaseReference());
 
         if (callbackURLUsed != null) {
+            FeeDto[] feeArray = feeResponses.stream().map(feeResponse -> FeeDto.builder()
+                                          .calculatedAmount(feeResponse.getCalculatedAmount())
+                                          .code(feeResponse.getCode())
+                                          .version(feeResponse.getVersion())
+                                          .volume(1).build()).toList().toArray(FeeDto[]::new);
             return CreateServiceRequestDTO.builder()
                 .caseReference(caseData.getLegacyCaseReference())
                 .ccdCaseNumber(caseData.getCcdCaseReference().toString())
                 .hmctsOrgId(siteId)
                 .callBackUrl(callbackURLUsed)
-                .fees(new FeeDto[] {(FeeDto.builder()
-                    .calculatedAmount(feeResponse.getCalculatedAmount())
-                    .code(feeResponse.getCode())
-                    .version(feeResponse.getVersion())
-                    .volume(1).build())})
+                .fees(feeArray)
                 .casePaymentRequest(CasePaymentRequestDto.builder()
                     .action(PAYMENT_ACTION)
                     .responsibleParty(caseData.getApplicant1().getPartyName()).build())
@@ -200,6 +235,27 @@ public class PaymentsService {
         } else {
             throw new RuntimeException("Invalid Case State" + caseData.getCcdCaseReference());
         }
+    }
+
+    private CreateServiceRequestDTO buildServiceRequest(GeneralApplicationCaseData caseData) {
+        GeneralApplicationPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails();
+        FeeDto feeResponse = generalAppPBADetails.getFee().toFeeDto();
+        String siteId = caseData.getGeneralAppSuperClaimType().equals(SPEC_CLAIM.name())
+            ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId();
+
+        return CreateServiceRequestDTO.builder()
+            .callBackUrl(callBackUrl)
+            .casePaymentRequest(CasePaymentRequestDto.builder()
+                                    .action(PAYMENT_ACTION)
+                                    .responsibleParty(caseData.getApplicantPartyName()).build())
+            .caseReference(caseData.getCcdCaseReference().toString())
+            .ccdCaseNumber(caseData.getCcdCaseReference().toString())
+            .fees(new FeeDto[] { (FeeDto.builder()
+                .calculatedAmount(feeResponse.getCalculatedAmount())
+                .code(feeResponse.getCode())
+                .version(feeResponse.getVersion())
+                .volume(1).build())})
+            .hmctsOrgId(siteId).build();
     }
 }
 

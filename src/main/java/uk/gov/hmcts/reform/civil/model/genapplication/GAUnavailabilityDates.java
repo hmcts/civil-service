@@ -2,19 +2,21 @@ package uk.gov.hmcts.reform.civil.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@Accessors(chain = true)
 public class GAUnavailabilityDates {
 
-    private final LocalDate unavailableTrialDateFrom;
-    private final LocalDate unavailableTrialDateTo;
+    private LocalDate unavailableTrialDateFrom;
+    private LocalDate unavailableTrialDateTo;
 
     @JsonCreator
     GAUnavailabilityDates(@JsonProperty("unavailableTrialDateFrom") LocalDate unavailableTrialDateFrom,

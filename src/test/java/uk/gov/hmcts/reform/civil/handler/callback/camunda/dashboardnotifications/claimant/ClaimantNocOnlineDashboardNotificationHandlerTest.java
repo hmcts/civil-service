@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -46,7 +47,7 @@ class ClaimantNocOnlineDashboardNotificationHandlerTest extends BaseCallbackHand
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        caseData = CaseData.builder().ccdCaseReference(1234567890123456L).build();
+        caseData = CaseDataBuilder.builder().ccdCaseReference(1234567890123456L).build();
 
         callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder()

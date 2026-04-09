@@ -41,9 +41,8 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldPopulateIntermediateList_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setAllocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -53,10 +52,9 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldPopulateMultiList_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .responseClaimTrack("MULTI_CLAIM")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setResponseClaimTrack("MULTI_CLAIM");
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -66,9 +64,8 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldClearData_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setAllocatedTrack(AllocatedTrack.MULTI_CLAIM);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -77,8 +74,7 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldCreateConfirmationScreen_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
 
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
         SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);

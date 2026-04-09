@@ -186,13 +186,12 @@ public class CaseFlagsHearingsUtilsTest {
 
         @BeforeEach
         void setup() {
-            FlagDetail details = FlagDetail.builder()
-                .name("Detained individual")
-                .flagComment("comment")
-                .flagCode("PF0019")
-                .hearingRelevant(YES)
-                .status("Active")
-                .build();
+            FlagDetail details = new FlagDetail()
+                .setName("Detained individual")
+                .setFlagComment("comment")
+                .setFlagCode("PF0019")
+                .setHearingRelevant(YES)
+                .setStatus("Active");
 
             flags = wrapElements(details);
         }
@@ -256,10 +255,9 @@ public class CaseFlagsHearingsUtilsTest {
             List<FlagDetail> actual = CaseFlagsHearingsUtils.getAllActiveCaseLevelFlags(caseData);
 
             assertThat(actual.size()).isEqualTo(1);
-            assertThat(actual).containsOnly(FlagDetail.builder()
-                                                .flagCode("123")
-                                                .status("Active")
-                                                .build());
+            assertThat(actual).containsOnly(new FlagDetail()
+                                                .setFlagCode("123")
+                                                .setStatus("Active"));
         }
 
         @Test
@@ -333,140 +331,129 @@ public class CaseFlagsHearingsUtilsTest {
     }
 
     private PartyFlags getFlagsForParty(String name, String role, List<Element<FlagDetail>> details, String partyId) {
-        return PartyFlags.builder()
-            .partyId(partyId)
-            .partyName(name)
-            .roleOnCase(role)
-            .details(details)
-            .build();
+        PartyFlags partyFlags = new PartyFlags();
+        partyFlags.setPartyId(partyId)
+            .setPartyName(name)
+            .setRoleOnCase(role)
+            .setDetails(details);
+        return partyFlags;
     }
 
     private List<Element<FlagDetail>> getAllFlagDetails() {
-        FlagDetail details1 = FlagDetail.builder()
-            .name("Vulnerable user")
-            .flagComment("comment")
-            .flagCode("AB001")
-            .hearingRelevant(YES)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-            .build();
+        FlagDetail details1 = new FlagDetail()
+            .setName("Vulnerable user")
+            .setFlagComment("comment")
+            .setFlagCode("AB001")
+            .setHearingRelevant(YES)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
 
-        FlagDetail details2 = FlagDetail.builder()
-            .name("Flight risk")
-            .flagComment("comment")
-            .flagCode("SM001")
-            .hearingRelevant(YES)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-            .build();
+        FlagDetail details2 = new FlagDetail()
+            .setName("Flight risk")
+            .setFlagComment("comment")
+            .setFlagCode("SM001")
+            .setHearingRelevant(YES)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
 
-        FlagDetail details3 = FlagDetail.builder()
-            .name("Audio/Video evidence")
-            .flagComment("comment")
-            .flagCode("RA001")
-            .hearingRelevant(NO)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-            .build();
+        FlagDetail details3 = new FlagDetail()
+            .setName("Audio/Video evidence")
+            .setFlagComment("comment")
+            .setFlagCode("RA001")
+            .setHearingRelevant(NO)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
 
-        FlagDetail details4 = FlagDetail.builder()
-            .name("Other")
-            .flagComment("comment")
-            .flagCode("AB001")
-            .hearingRelevant(YES)
-            .status("Inactive")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-            .build();
+        FlagDetail details4 = new FlagDetail()
+            .setName("Other")
+            .setFlagComment("comment")
+            .setFlagCode("AB001")
+            .setHearingRelevant(YES)
+            .setStatus("Inactive")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
 
         return wrapElements(details1, details2, details3, details4);
     }
 
     private List<Element<FlagDetail>> getAllActiveFlagDetails() {
-        FlagDetail details1 = FlagDetail.builder()
-            .name("Vulnerable user")
-            .flagComment("comment")
-            .flagCode("AB001")
-            .hearingRelevant(YES)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-            .build();
+        FlagDetail details1 = new FlagDetail()
+            .setName("Vulnerable user")
+            .setFlagComment("comment")
+            .setFlagCode("AB001")
+            .setHearingRelevant(YES)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
 
-        FlagDetail details2 = FlagDetail.builder()
-            .name("Flight risk")
-            .flagComment("comment")
-            .flagCode("SM001")
-            .hearingRelevant(YES)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-            .build();
+        FlagDetail details2 = new FlagDetail()
+            .setName("Flight risk")
+            .setFlagComment("comment")
+            .setFlagCode("SM001")
+            .setHearingRelevant(YES)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
 
-        FlagDetail details3 = FlagDetail.builder()
-            .name("Audio/Video evidence")
-            .flagComment("comment")
-            .flagCode("RA001")
-            .hearingRelevant(NO)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-            .build();
+        FlagDetail details3 = new FlagDetail()
+            .setName("Audio/Video evidence")
+            .setFlagComment("comment")
+            .setFlagCode("RA001")
+            .setHearingRelevant(NO)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
 
         return wrapElements(details1, details2, details3);
     }
 
     private List<Element<FlagDetail>> getAllActiveHearingRelevantFlagDetails() {
-        FlagDetail details1 = FlagDetail.builder()
-            .name("Vulnerable user")
-            .flagComment("comment")
-            .flagCode("AB001")
-            .hearingRelevant(YES)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-            .build();
+        FlagDetail details1 = new FlagDetail()
+            .setName("Vulnerable user")
+            .setFlagComment("comment")
+            .setFlagCode("AB001")
+            .setHearingRelevant(YES)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
 
-        FlagDetail details2 = FlagDetail.builder()
-            .name("Flight risk")
-            .flagComment("comment")
-            .flagCode("SM001")
-            .hearingRelevant(YES)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-            .build();
+        FlagDetail details2 = new FlagDetail()
+            .setName("Flight risk")
+            .setFlagComment("comment")
+            .setFlagCode("SM001")
+            .setHearingRelevant(YES)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
 
         return wrapElements(details1, details2);
     }
 
     private List<Element<FlagDetail>> getAllActiveSMCodeFlagDetails() {
-        FlagDetail details2 = FlagDetail.builder()
-            .name("Flight risk")
-            .flagComment("comment")
-            .flagCode("SM001")
-            .hearingRelevant(YES)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-            .build();
+        FlagDetail details2 = new FlagDetail()
+            .setName("Flight risk")
+            .setFlagComment("comment")
+            .setFlagCode("SM001")
+            .setHearingRelevant(YES)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
 
         return wrapElements(details2);
     }
 
     private List<Element<FlagDetail>> getAllActiveRACodeFlagDetails() {
-        FlagDetail details3 = FlagDetail.builder()
-            .name("Audio/Video evidence")
-            .flagComment("comment")
-            .flagCode("RA001")
-            .hearingRelevant(NO)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-            .build();
+        FlagDetail details3 = new FlagDetail()
+            .setName("Audio/Video evidence")
+            .setFlagComment("comment")
+            .setFlagCode("RA001")
+            .setHearingRelevant(NO)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
 
         return wrapElements(details3);
     }

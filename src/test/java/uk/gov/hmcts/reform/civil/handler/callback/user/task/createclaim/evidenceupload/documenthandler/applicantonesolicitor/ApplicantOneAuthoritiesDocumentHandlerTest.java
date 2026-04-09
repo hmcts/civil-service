@@ -22,9 +22,9 @@ class ApplicantOneAuthoritiesDocumentHandlerTest extends BaseDocumentHandlerTest
 
     @Test
     void shouldCopyLegalRep1ChangesToLegalRep2() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getDocumentAuthoritiesApp2().size());
+        assertEquals(2, caseData.getDocumentAuthoritiesApp2().size());
     }
 
     @Test

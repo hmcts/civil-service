@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
+import uk.gov.hmcts.reform.civil.config.OtherRemedyFeesConfiguration;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
@@ -21,9 +22,19 @@ public class FeesService {
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
     private final FeesClientService feesClient;
     private final FeesConfiguration feesConfiguration;
+    private final OtherRemedyFeesConfiguration otherRemedyFeesConfiguration;
 
     public Fee getFeeDataByClaimValue(ClaimValue claimValue) {
         FeeLookupResponseDto feeLookupResponseDto = lookupFee(claimValue);
+
+        return buildFeeDto(feeLookupResponseDto);
+    }
+
+    public Fee getFeeDataForOtherRemedy(ClaimValue claimValue) {
+        if (otherRemedyFeesConfiguration == null) {
+            throw new IllegalStateException("Other remedy fees configuration is not set");
+        }
+        FeeLookupResponseDto feeLookupResponseDto = lookupOtherRemedyFees(otherRemedyFeesConfiguration, claimValue);
 
         return buildFeeDto(feeLookupResponseDto);
     }
@@ -36,6 +47,13 @@ public class FeesService {
         );
     }
 
+    private FeeLookupResponseDto lookupOtherRemedyFees(OtherRemedyFeesConfiguration otherRemedyFeesConfiguration, ClaimValue claimValue) {
+        return feesClient.lookupOtherRemedyFees(
+            otherRemedyFeesConfiguration,
+            claimValue.toPounds()
+        );
+    }
+
     // WARNING! the following function buildFeeDto is being used by both damages and specified claims,
     // any changes to the below code may break the code, please check with respective teams before making changes
     private Fee buildFeeDto(FeeLookupResponseDto feeLookupResponseDto) {
@@ -43,11 +61,11 @@ public class FeesService {
             .multiply(PENCE_PER_POUND)
             .setScale(0, RoundingMode.UNNECESSARY);
 
-        return Fee.builder()
-            .calculatedAmountInPence(calculatedAmount)
-            .code(feeLookupResponseDto.getCode())
-            .version(feeLookupResponseDto.getVersion().toString())
-            .build();
+        Fee fee = new Fee();
+        fee.setCalculatedAmountInPence(calculatedAmount);
+        fee.setCode(feeLookupResponseDto.getCode());
+        fee.setVersion(feeLookupResponseDto.getVersion().toString());
+        return fee;
     }
 
     //calculate fee for specified claim total amount

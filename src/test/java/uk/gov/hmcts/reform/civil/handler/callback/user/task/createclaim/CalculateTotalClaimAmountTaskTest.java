@@ -8,10 +8,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.CalculateTotalClaimAmountTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
@@ -37,18 +37,23 @@ class CalculateTotalClaimAmountTaskTest {
 
     @Test
     void shouldCalculateTotalClaimAmountSuccessfully() {
+        ClaimAmountBreakup claimAmountBreakup1 = new ClaimAmountBreakup();
+        ClaimAmountBreakupDetails claimAmountBreakupDetails = new ClaimAmountBreakupDetails();
+        claimAmountBreakupDetails.setClaimAmount(new BigDecimal(1000));
+        claimAmountBreakupDetails.setClaimReason("Claim 1");
+        claimAmountBreakup1.setValue(claimAmountBreakupDetails);
         List<ClaimAmountBreakup> claimAmountBreakup = new ArrayList<>();
-        claimAmountBreakup.add(ClaimAmountBreakup.builder()
-                                   .value(ClaimAmountBreakupDetails.builder()
-                                              .claimAmount(new BigDecimal(1000)).claimReason("Claim 1").build()).build());
+        claimAmountBreakup.add(claimAmountBreakup1);
+        ClaimAmountBreakup claimAmountBreakup2 = new ClaimAmountBreakup();
+        ClaimAmountBreakupDetails claimAmountBreakupDetails1 = new ClaimAmountBreakupDetails();
+        claimAmountBreakupDetails1.setClaimAmount(new BigDecimal(2000));
+        claimAmountBreakupDetails1.setClaimReason("Claim 2");
+        claimAmountBreakup2.setValue(claimAmountBreakupDetails1);
 
-        claimAmountBreakup.add(ClaimAmountBreakup.builder()
-                                   .value(ClaimAmountBreakupDetails.builder()
-                                              .claimAmount(new BigDecimal(2000)).claimReason("Claim 2").build()).build());
+        claimAmountBreakup.add(claimAmountBreakup2);
 
-        CaseData caseData = CaseData.builder()
-            .claimAmountBreakup(claimAmountBreakup)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimAmountBreakup(claimAmountBreakup);
 
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 

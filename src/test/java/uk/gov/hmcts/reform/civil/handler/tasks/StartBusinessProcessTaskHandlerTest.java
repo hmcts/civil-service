@@ -90,7 +90,7 @@ class StartBusinessProcessTaskHandlerTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, names = {"READY", "DISPATCHED"})
     void shouldStartBusinessProcess_whenValidBusinessProcessStatus(BusinessProcessStatus status) {
-        BusinessProcess businessProcess = BusinessProcess.builder().status(status).build();
+        BusinessProcess businessProcess = new BusinessProcess().setStatus(status);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().businessProcess(businessProcess).build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
@@ -98,10 +98,9 @@ class StartBusinessProcessTaskHandlerTest {
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
         when(mockTask.getTopicName()).thenReturn("test");
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder()
-                                                                               .state(State.from("MAIN.DRAFT"))
-                                                                               .flags(Map.of())
-                                                                               .build());
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(new StateFlowDTO()
+            .setState(State.from("MAIN.DRAFT"))
+            .setFlags(Map.of()));
 
         handler.execute(mockTask, externalTaskService);
 
@@ -121,26 +120,27 @@ class StartBusinessProcessTaskHandlerTest {
         //when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
         when(mockTask.getTopicName()).thenReturn("test");
         //when(mockTask.getActivityId()).thenReturn("activityId");
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder()
-                                                                               .state(State.from("MAIN.DRAFT"))
-                                                                               .flags(Map.of())
-                                                                               .build());
 
         handler.execute(mockTask, externalTaskService);
 
         verify(coreCaseDataService).startUpdate(CASE_ID, START_BUSINESS_PROCESS);
-        verify(externalTaskService).complete(mockTask, variables);
+        verify(externalTaskService, never()).complete(any(), any());
         verify(coreCaseDataService, never()).submitUpdate(anyString(), any(CaseDataContent.class));
+        verify(externalTaskService).handleBpmnError(mockTask, ERROR_CODE);
     }
 
     @Test
-    void shouldRaiseBpmnError_whenBusinessProcessStatusIsStarted_AndHaveSameProcessInstanceId() {
+    void shouldCompleteWithoutUpdate_whenBusinessProcessStatusIsStartedAndProcessInstanceMatches() {
         BusinessProcess businessProcess = getBusinessProcess(STARTED, PROCESS_INSTANCE_ID);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().businessProcess(businessProcess).build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
+        when(mockTask.getTopicName()).thenReturn("test");
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(new StateFlowDTO()
+            .setState(State.from("MAIN.DRAFT"))
+            .setFlags(Map.of()));
 
         handler.execute(mockTask, externalTaskService);
 
@@ -153,7 +153,8 @@ class StartBusinessProcessTaskHandlerTest {
             anyInt(),
             anyLong()
         );
-        verify(externalTaskService).handleBpmnError(mockTask, ERROR_CODE);
+        verify(externalTaskService, never()).handleBpmnError(mockTask, ERROR_CODE);
+        verify(externalTaskService).complete(mockTask, variables);
     }
 
     @Test
@@ -191,9 +192,8 @@ class StartBusinessProcessTaskHandlerTest {
     }
 
     private BusinessProcess getBusinessProcess(BusinessProcessStatus started, String processInstanceId) {
-        return BusinessProcess.builder()
-            .status(started)
-            .processInstanceId(processInstanceId)
-            .build();
+        return new BusinessProcess()
+            .setStatus(started)
+            .setProcessInstanceId(processInstanceId);
     }
 }

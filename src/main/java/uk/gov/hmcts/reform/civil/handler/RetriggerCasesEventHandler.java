@@ -29,6 +29,7 @@ import static java.lang.Long.parseLong;
 @Component
 public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
 
+    private static final String FINAL_ORDER_DOCUMENT_COLLECTION = "finalOrderDocumentCollection";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
@@ -66,7 +67,7 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
                 log.error("ERROR Retrigger CaseId: {}. Case data: {},  {}", caseId, caseData, e.getMessage(), e);
             }
         }
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private Map<String, Object> getCaseData(ExternalTask externalTask) {
@@ -104,15 +105,15 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
             .constructCollectionType(List.class,
                                      mapper.getTypeFactory().constructParametricType(Element.class, CaseDocument.class));
 
-        List<Element<CaseDocument>> finalOrderDocumentCollection = data.get("finalOrderDocumentCollection") != null
-            ? mapper.convertValue(data.get("finalOrderDocumentCollection"), listType)
+        List<Element<CaseDocument>> finalOrderDocumentCollection = data.get(FINAL_ORDER_DOCUMENT_COLLECTION) != null
+            ? mapper.convertValue(data.get(FINAL_ORDER_DOCUMENT_COLLECTION), listType)
             : new ArrayList<>();
 
-        finalOrderDocumentCollection.add(Element.<CaseDocument>builder().id(UUID.randomUUID()).value(document).build());
+        finalOrderDocumentCollection.add(new Element<CaseDocument>().setId(UUID.randomUUID()).setValue(document));
 
         Map<String, Object> updatedData = new HashMap<>();
 
-        updatedData.put("finalOrderDocumentCollection", finalOrderDocumentCollection);
+        updatedData.put(FINAL_ORDER_DOCUMENT_COLLECTION, finalOrderDocumentCollection);
 
         String eventSummary = "Re-trigger of " + caseEvent.name();
         String eventDescription = "Process ID: %s".formatted(processInstanceId);

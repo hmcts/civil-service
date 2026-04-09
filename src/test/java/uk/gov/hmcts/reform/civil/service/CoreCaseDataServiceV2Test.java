@@ -84,7 +84,7 @@ class CoreCaseDataServiceV2Test {
         private static final String CASE_ID = "1";
         private static final String USER_ID = "User1";
         private final CaseData caseData = new CaseDataBuilder().atStateClaimDraftMock()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
         private final CaseDetails caseDetails = CaseDetailsBuilder.builder()
             .data(caseData)
@@ -93,13 +93,13 @@ class CoreCaseDataServiceV2Test {
         @BeforeEach
         void setUp() {
             List<LocationRefData> mockLocation = new ArrayList<>();
-            LocationRefData locationRefData = LocationRefData.builder()
-                .region("1")
-                .epimmsId("12345")
-                .courtAddress("Central London")
-                .postcode("LJ09 EMM")
-                .siteName("London SX12 2345")
-                .build();
+            LocationRefData locationRefData = new LocationRefData()
+                .setRegion("1")
+                .setEpimmsId("12345")
+                .setCourtAddress("Central London")
+                .setPostcode("LJ09 EMM")
+                .setSiteName("London SX12 2345")
+                ;
             mockLocation.add(locationRefData);
             when(locationReferenceDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(mockLocation);
             when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
@@ -109,6 +109,8 @@ class CoreCaseDataServiceV2Test {
             when(coreCaseDataApi.startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID, JURISDICTION,
                                                          CASE_TYPE, CASE_ID, EVENT_ID
             )).thenReturn(buildStartEventResponse());
+
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
             when(coreCaseDataApi.submitEventForCaseWorker(
                      eq(USER_AUTH_TOKEN),
@@ -125,16 +127,12 @@ class CoreCaseDataServiceV2Test {
 
         @Test
         void triggerUpdateLocationEpimdsIdEvent_WhenApplicant1DQRequestedCourtCalled() {
-            service.triggerUpdateLocationEpimdsIdEvent(Long.valueOf(CASE_ID),
-                                                       CaseEvent.valueOf(EVENT_ID),
-                                                       "12345",
-                                                       "2",
-                                                        "yes",
-                                                       "yes",
-                                                       "yes",
-                                                       "yes",
-                                                       "Summary",
-                                                       "Desc"
+            service.triggerUpdateCaseMgmtLocation(Long.valueOf(CASE_ID),
+                                                  CaseEvent.valueOf(EVENT_ID),
+                                                  "12345",
+                                                  "court closed as a cml",
+                                                  "Summary",
+                                                  "Desc"
             );
 
             verify(coreCaseDataApi).startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID,

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 
@@ -33,14 +34,12 @@ class UpdateCaseProgressHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldReturnCallbackResponseWithHearingReadinessCaseStateOnAboutToSubmitTrialHearing() {
         when(camundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingType("AAA7-TRI")
-                            .build());
-        CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("PROCESS_ID")
-                                 .build())
-            .build();
+            .thenReturn(new HearingNoticeVariables()
+                            .setHearingType("AAA7-TRI"));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("PROCESS_ID");
+        caseData.setBusinessProcess(businessProcess);
 
         var params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
@@ -58,14 +57,12 @@ class UpdateCaseProgressHandlerTest extends BaseCallbackHandlerTest {
     })
     void shouldReturnCallbackResponseWithHearingReadinessCaseStateOnAboutToSubmit(String hearingType) {
         when(camundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingType(hearingType)
-                            .build());
-        CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("PROCESS_ID")
-                                 .build())
-            .build();
+            .thenReturn(new HearingNoticeVariables()
+                            .setHearingType(hearingType));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("PROCESS_ID");
+        caseData.setBusinessProcess(businessProcess);
 
         var params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
@@ -79,14 +76,12 @@ class UpdateCaseProgressHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldReturnCallbackResponseWithHearingReadinessCaseStateOnAboutToSubmitDisputeResolutionHearing() {
         when(camundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                        .hearingType("AAA7-DRH")
-                        .build());
-        CaseData caseData = CaseData.builder()
-                .businessProcess(BusinessProcess.builder()
-                        .processInstanceId("PROCESS_ID")
-                        .build())
-                .build();
+                .thenReturn(new HearingNoticeVariables()
+                        .setHearingType("AAA7-DRH"));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("PROCESS_ID");
+        caseData.setBusinessProcess(businessProcess);
 
         var params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 

@@ -38,22 +38,21 @@ class DefRepresentedDefendantLipEmailDTOGeneratorTest {
         baseCaseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
             .legacyCaseReference("LEGACY123456")
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .individualTitle("Mrs")
-                             .individualFirstName("Jane")
-                             .individualLastName("Defendant")
-                             .partyName("Jane Defendant").build())
+            .respondent1(new Party()
+                             .setType(Party.Type.INDIVIDUAL)
+                             .setIndividualTitle("Mrs")
+                             .setIndividualFirstName("Jane")
+                             .setIndividualLastName("Defendant")
+                             .setPartyName("Jane Defendant"))
             .build();
     }
 
     @Test
     void shouldReturnBilingualTemplateIdIfRespondentResponseIsBilingual() {
         CaseData bilingualCaseData = baseCaseData.toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage(Language.WELSH.toString()).build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1ResponseLanguage(Language.WELSH.toString())))
             .build();
 
         when(notificationsProperties.getNotifyDefendantLipBilingualAfterDefendantNOC())
@@ -67,10 +66,9 @@ class DefRepresentedDefendantLipEmailDTOGeneratorTest {
     @Test
     void shouldReturnDefaultTemplateIdIfRespondentResponseIsNotBilingual() {
         CaseData monoCaseData = baseCaseData.toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage(Language.ENGLISH.toString()).build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1ResponseLanguage(Language.ENGLISH.toString())))
             .build();
 
         when(notificationsProperties.getNotifyDefendantLipForNoLongerAccessTemplate())

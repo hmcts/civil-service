@@ -51,10 +51,9 @@ class JudgmentVariedDeterminationOfMeansDefendantEmailDTOGeneratorTest {
     void shouldReturnLipTemplateIdWhenClaimantIsBilingual() {
         CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
         caseData = caseData.toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
-                        .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                .respondent1ResponseLanguage(Language.BOTH.toString()).build())
-                        .build())
+                .caseDataLiP(new CaseDataLiP()
+                        .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();
 
         when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(BILINGUAL_TEMPLATE_ID);
@@ -67,7 +66,7 @@ class JudgmentVariedDeterminationOfMeansDefendantEmailDTOGeneratorTest {
     @Test
     void shouldReturnRespondent1EmailAddress() {
         CaseData caseData = CaseData.builder()
-                .respondent1(Party.builder().partyEmail(RESPONDENT_EMAIL).build())
+                .respondent1(new Party().setPartyEmail(RESPONDENT_EMAIL))
                 .build();
 
         assertThat(generator.getEmailAddress(caseData)).isEqualTo(RESPONDENT_EMAIL);
@@ -77,9 +76,9 @@ class JudgmentVariedDeterminationOfMeansDefendantEmailDTOGeneratorTest {
     void shouldPickCorrectTemplateAndCustomProperties() {
         CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
         caseData = caseData.toBuilder()
-                .applicant1(Party.builder().partyEmail(APPLICANT_EMAIL).companyName(APPLICANT_NAME).type(Party.Type.COMPANY).build())
+                .applicant1(new Party().setPartyEmail(APPLICANT_EMAIL).setCompanyName(APPLICANT_NAME).setType(Party.Type.COMPANY))
                 .respondent1Represented(YesOrNo.NO)
-                .respondent1(Party.builder().partyEmail(RESPONDENT_EMAIL).companyName(RESPONDENT_NAME).type(Party.Type.COMPANY).build())
+                .respondent1(new Party().setPartyEmail(RESPONDENT_EMAIL).setCompanyName(RESPONDENT_NAME).setType(Party.Type.COMPANY))
                 .legacyCaseReference(LEGACY_REF)
                 .build();
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);

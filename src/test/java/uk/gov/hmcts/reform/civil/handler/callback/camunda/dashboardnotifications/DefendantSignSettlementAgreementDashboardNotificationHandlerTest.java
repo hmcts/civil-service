@@ -71,8 +71,8 @@ class DefendantSignSettlementAgreementDashboardNotificationHandlerTest extends B
 
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
-                ).build()
+                new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
+                )
             )
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -88,7 +88,7 @@ class DefendantSignSettlementAgreementDashboardNotificationHandlerTest extends B
             "BEARER_TOKEN",
             SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -102,8 +102,8 @@ class DefendantSignSettlementAgreementDashboardNotificationHandlerTest extends B
 
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES
-                ).build()
+                new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.YES
+                )
             )
             .legacyCaseReference("reference")
             .ccdCaseReference(12345L)
@@ -119,7 +119,7 @@ class DefendantSignSettlementAgreementDashboardNotificationHandlerTest extends B
             "BEARER_TOKEN",
             SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_ACCEPTED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }

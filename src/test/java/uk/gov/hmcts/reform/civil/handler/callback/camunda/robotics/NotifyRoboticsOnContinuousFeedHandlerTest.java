@@ -30,8 +30,14 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -51,12 +57,18 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
     NotifyRoboticsOnContinuousFeedHandler.class,
     RoboticsNotifier.class,
     JsonSchemaValidationService.class,
-    RoboticsDataMapper.class,
+    RoboticsDataMapperForUnspec.class,
     RoboticsDataMapperForSpec.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
     EventHistorySequencer.class,
     EventHistoryMapper.class,
+    RoboticsEventTextFormatter.class,
+    RoboticsTimelineHelper.class,
+    RoboticsRespondentResponseSupport.class,
+    RoboticsCaseDataSupport.class,
+    RoboticsPartyLookup.class,
+    RoboticsSequenceGenerator.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     SimpleStateFlowEngine.class,
@@ -114,7 +126,7 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
                 .build();
-            caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             // When

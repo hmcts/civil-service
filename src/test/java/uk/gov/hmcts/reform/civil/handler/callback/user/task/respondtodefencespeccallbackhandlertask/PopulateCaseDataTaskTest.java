@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
@@ -71,30 +72,27 @@ class PopulateCaseDataTaskTest {
         objectMapper.registerModule(new JavaTimeModule());
         task = new PopulateCaseDataTask(locationRefDataService, objectMapper,
                                         courtLocationUtils, featureToggleService,
-                                        paymentDateService, responseOneVOneShowTagService, deadlineCalculatorService);
+                                        paymentDateService, responseOneVOneShowTagService);
     }
 
     @Test
     void shouldUpdateCaseData() {
 
-        CaseData caseData = CaseData.builder()
+        Party party = new Party();
+        party.setType(Party.Type.COMPANY);
+        party.setCompanyName("company name");
+        CaseData caseData = CaseDataBuilder.builder()
             .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .respondent1(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company name")
-                             .build())
-            .respondent2DocumentURL("test-respondent2Doc-url")
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+            .respondent1(party).build();
+        caseData.setRespondent2DocumentURL("test-respondent2Doc-url");
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
 
         when(featureToggleService.isCarmEnabledForCase(any(CaseData.class))).thenReturn(true);
-        when(paymentDateService.getPaymentDateAdmittedClaim(any())).thenReturn(LocalDate.EPOCH);
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        when(paymentDateService.getFormattedPaymentDate(any())).thenReturn(LocalDate.EPOCH.toString());
 
-        CallbackParams params = callbackParams(caseData).toBuilder()
-            .version(CallbackVersion.V_2)
-            .build();
+        CallbackParams params = callbackParams(caseData).copy()
+            .version(CallbackVersion.V_2);
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(params);
@@ -102,29 +100,25 @@ class PopulateCaseDataTaskTest {
         assertNotNull(response);
         assertEquals(YES, getCaseData(response).getShowCarmFields());
         assertEquals(CaseCategory.SPEC_CLAIM, getCaseData(response).getCaseAccessCategory());
-        verify(featureToggleService, times(2)).isPinInPostEnabled();
         verify(featureToggleService, times(1)).isCarmEnabledForCase(any(CaseData.class));
 
     }
 
     @Test
     void shouldUpdatedCaseDataPartiallyWhenFeatureTogglesAreFalse() {
-        CaseData caseData = CaseData.builder()
+        Party party = new Party();
+        party.setType(Party.Type.COMPANY);
+        party.setCompanyName("company name");
+        CaseData caseData = CaseDataBuilder.builder()
             .applicant1DQ(null)
             .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
-            .respondent1(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company name")
-                             .build())
-            .respondent2DocumentURL("test-respondent2Doc-url")
-            .build();
+            .respondent1(party).build();
+        caseData.setRespondent2DocumentURL("test-respondent2Doc-url");
 
         when(featureToggleService.isCarmEnabledForCase(any(CaseData.class))).thenReturn(false);
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(false);
 
-        CallbackParams params = callbackParams(caseData).toBuilder()
-            .version(CallbackVersion.V_1)
-            .build();
+        CallbackParams params = callbackParams(caseData).copy()
+            .version(CallbackVersion.V_1);
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(params);
@@ -132,8 +126,6 @@ class PopulateCaseDataTaskTest {
         assertNotNull(response);
         assertEquals(NO, getCaseData(response).getShowCarmFields());
         assertEquals(CaseCategory.SPEC_CLAIM, getCaseData(response).getCaseAccessCategory());
-        verify(featureToggleService, times(1)).isPinInPostEnabled();
-
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
@@ -142,9 +134,8 @@ class PopulateCaseDataTaskTest {
 
     private CallbackParams callbackParams(CaseData caseData) {
 
-        return CallbackParams.builder()
+        return new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN));
     }
 }

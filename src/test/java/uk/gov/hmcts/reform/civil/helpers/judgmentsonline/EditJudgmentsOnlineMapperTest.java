@@ -58,10 +58,10 @@ public class EditJudgmentsOnlineMapperTest {
         interestCalculator = new InterestCalculator();
         judgementService = new JudgementService(featureToggleService, interestCalculator);
         addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
-        editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
-        recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
-        judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
-        defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+        editJudgmentOnlineMapper = new EditJudgmentOnlineMapper(time);
+        recordJudgmentMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
+        judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(time, addressMapper, judgementService, interestCalculator);
+        defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(time, interestCalculator, addressMapper);
     }
 
     @Test
@@ -227,28 +227,23 @@ public class EditJudgmentsOnlineMapperTest {
     @Test
     void testIfJudgmentByAdmission_scenario3() {
 
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-            .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
-            .ccjPaymentPaidSomeOption(YesOrNo.YES)
-            .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
-            .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
-            .build();
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
+            .setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
+            .setCcjPaymentPaidSomeOption(YesOrNo.YES)
+            .setCcjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
+            .setCcjJudgmentTotalStillOwed(BigDecimal.valueOf(150));
 
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)
             .applicant1Represented(YES)
-            .defendantDetailsSpec(DynamicList.builder()
-                .value(DynamicListElement.builder()
-                    .label("John Doe")
-                    .build())
-                .build())
+            .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("John Doe")))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                .setWhenWillThisAmountBePaid(LocalDate.now().plusDays(5)))
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .ccjPaymentDetails(ccjPaymentDetails)
-            .respondent1(PartyBuilder.builder().organisation().build())
+            .respondent1(new PartyBuilder().organisation().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionMapper.addUpdateActiveJudgment(caseData);
 

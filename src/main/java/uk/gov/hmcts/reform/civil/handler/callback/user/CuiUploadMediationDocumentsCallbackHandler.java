@@ -39,10 +39,9 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
 
     private CallbackResponse submitData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         uploadMediationService.uploadMediationDocumentsTaskList(callbackParams);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

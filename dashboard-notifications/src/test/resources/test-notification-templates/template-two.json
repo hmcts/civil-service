@@ -1,0 +1,10 @@
+{
+  "name": "Notice.AAA6.Another.Template",
+  "role": "DEFENDANT",
+  "titleEn": "Another",
+  "titleCy": "Arall",
+  "descriptionEn": "<p>Second</p>",
+  "descriptionCy": "<p>Ail</p>",
+  "timeToLive": null,
+  "deadlineParam": null
+}

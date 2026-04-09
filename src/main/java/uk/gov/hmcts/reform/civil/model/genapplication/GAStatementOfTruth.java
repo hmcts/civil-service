@@ -2,17 +2,19 @@ package uk.gov.hmcts.reform.civil.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@Accessors(chain = true)
 public class GAStatementOfTruth {
 
-    private final String name;
-    private final String role;
+    private String name;
+    private String role;
 
     @JsonCreator
     GAStatementOfTruth(@JsonProperty("name") String name,

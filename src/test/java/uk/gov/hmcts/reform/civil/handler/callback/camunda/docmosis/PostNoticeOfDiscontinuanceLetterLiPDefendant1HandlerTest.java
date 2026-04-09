@@ -52,10 +52,10 @@ public class PostNoticeOfDiscontinuanceLetterLiPDefendant1HandlerTest extends Ba
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
-                .respondent1NoticeOfDiscontinueAllPartyViewDoc(caseDocument).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+        caseData.setRespondent1NoticeOfDiscontinueAllPartyViewDoc(caseDocument);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_DISCONTINUANCE_LETTER_LIP_DEFENDANT1.name());

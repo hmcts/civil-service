@@ -31,7 +31,7 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
 
     private final MediationJsonService mediationJsonService;
 
-    private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
+    private final MediationCSVEmailConfiguration localMediationCSVEmailConfiguration;
 
     private static final String FILENAME = "ocmc_mediation_data.json";
 
@@ -50,7 +50,7 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
             mediationCSVEmailConfiguration
         );
         this.mediationJsonService = mediationJsonService;
-        this.mediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
+        this.localMediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
     }
 
     @Override
@@ -90,15 +90,14 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private Optional<EmailData> prepareEmail(MediationDTO mediationDTO) {
-        return Optional.of(EmailData.builder()
-                               .to(mediationCSVEmailConfiguration.getJsonRecipient())
-                               .subject(SUBJECT)
-                               .attachments(of(json(mediationDTO.getJsonRawData(), FILENAME)))
-                               .build());
+        return Optional.of(new EmailData()
+                               .setTo(mediationCSVEmailConfiguration.getJsonRecipient())
+                               .setSubject(SUBJECT)
+                               .setAttachments(of(json(mediationDTO.getJsonRawData(), FILENAME))));
     }
 
     private MediationCase generateJsonForCase(CaseData caseData) {
@@ -106,11 +105,7 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
     }
 
     private MediationDTO convertToMediationDTO(List<MediationCase> list) throws JsonProcessingException {
-        MediationCases cases = MediationCases.builder()
-            .cases(list)
-            .build();
-        return MediationDTO.builder()
-            .jsonRawData(cases.toJsonString().getBytes())
-            .build();
+        MediationCases cases = new MediationCases(list);
+        return new MediationDTO(cases.toJsonString().getBytes());
     }
 }

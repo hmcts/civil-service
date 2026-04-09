@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_
     NonImmediatePaymentTypeDefaultJudgmentFormBuilder.class,
     JudgmentAmountsCalculator.class,
     DefaultJudgmentFormBuilder.class,
+    DjWelshTextService.class,
     JacksonAutoConfiguration.class
 })
 class DefaultJudgmentFormGeneratorTest {
@@ -55,9 +56,9 @@ class DefaultJudgmentFormGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName = String.format(N121_SPEC.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String FILE_NAME = String.format(N121_SPEC.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName)
+        .documentName(FILE_NAME)
         .documentType(DEFAULT_JUDGMENT)
         .build();
     @MockBean
@@ -84,7 +85,7 @@ class DefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
@@ -93,14 +94,14 @@ class DefaultJudgmentFormGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .build();
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments).hasSize(1);
         verify(organisationService).findOrganisationById(any());
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT));
 
     }
 
@@ -110,7 +111,7 @@ class DefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
@@ -118,19 +119,19 @@ class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .hwfFeeType(FeeType.CLAIMISSUED)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().outstandingFeeInPounds(BigDecimal.valueOf(1)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
+            .claimIssuedHwfDetails(new HelpWithFeesDetails().setOutstandingFeeInPounds(BigDecimal.valueOf(1)))
             .atStateNotificationAcknowledged()
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .totalClaimAmount(new BigDecimal(2000))
-            .caseDataLip(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFee(YesOrNo.YES).build()).build())
+            .caseDataLip(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES)))
             .build();
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments).hasSize(1);
         verify(organisationService).findOrganisationById(any());
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT));
     }
 
     @Test
@@ -139,7 +140,7 @@ class DefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
@@ -147,19 +148,19 @@ class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .hwfFeeType(FeeType.CLAIMISSUED)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().outstandingFeeInPounds(BigDecimal.ZERO).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
+            .claimIssuedHwfDetails(new HelpWithFeesDetails().setOutstandingFeeInPounds(BigDecimal.ZERO))
             .atStateNotificationAcknowledged()
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .totalClaimAmount(new BigDecimal(2000))
-            .caseDataLip(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFee(YesOrNo.YES).build()).build())
+            .caseDataLip(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES)))
             .build();
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments).hasSize(1);
         verify(organisationService).findOrganisationById(any());
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT));
 
     }
 
@@ -169,7 +170,7 @@ class DefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
@@ -177,17 +178,17 @@ class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .totalClaimAmount(new BigDecimal(2000))
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-            .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFee(YesOrNo.NO).build()).build())
+            .caseDataLiP(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.NO)))
             .build();
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments).hasSize(1);
         verify(organisationService).findOrganisationById(any());
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT));
 
     }
 
@@ -197,7 +198,7 @@ class DefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
@@ -205,20 +206,20 @@ class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .totalClaimAmount(new BigDecimal(2000))
-            .fixedCosts(FixedCosts.builder()
-                .claimFixedCosts(YesOrNo.YES)
-                .fixedCostAmount("10000")
-                .build())
+            .fixedCosts(new FixedCosts()
+                .setClaimFixedCosts(YesOrNo.YES)
+                .setFixedCostAmount("10000")
+                )
             .claimFixedCostsOnEntryDJ(YesOrNo.NO)
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-            .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFee(YesOrNo.NO).build()).build())
+            .caseDataLiP(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.NO)))
             .build();
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments.size()).isEqualTo(1);
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT));
     }
 
     @Test
@@ -227,7 +228,7 @@ class DefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
@@ -235,20 +236,20 @@ class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .totalClaimAmount(new BigDecimal(2000))
-            .fixedCosts(FixedCosts.builder()
-                .claimFixedCosts(YesOrNo.YES)
-                .fixedCostAmount("10000")
-                .build())
+            .fixedCosts(new FixedCosts()
+                .setClaimFixedCosts(YesOrNo.YES)
+                .setFixedCostAmount("10000")
+                )
             .claimFixedCostsOnEntryDJ(YesOrNo.YES)
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-            .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFee(YesOrNo.NO).build()).build())
+            .caseDataLiP(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.NO)))
             .build();
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments.size()).isEqualTo(1);
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT));
     }
 
     @Test
@@ -257,7 +258,7 @@ class DefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
@@ -266,7 +267,7 @@ class DefaultJudgmentFormGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors()
             .totalClaimAmount(new BigDecimal(2000))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .build();
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
@@ -280,7 +281,7 @@ class DefaultJudgmentFormGeneratorTest {
             .thenReturn(new DocmosisDocument(N121_SPEC_NON_IMMEDIATE.getDocumentTitle(), bytes));
 
         when(documentManagementService
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT)))
             .thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
@@ -289,7 +290,7 @@ class DefaultJudgmentFormGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors()
             .totalClaimAmount(new BigDecimal(2000))
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .build();
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 

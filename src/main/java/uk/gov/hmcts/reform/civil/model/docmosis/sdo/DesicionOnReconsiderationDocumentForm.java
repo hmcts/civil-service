@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.sdo;
 
-import lombok.Getter;
-import lombok.Builder;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
@@ -13,25 +12,24 @@ import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 
 import java.time.LocalDate;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-@ToString
+@Accessors(chain = true)
 public class DesicionOnReconsiderationDocumentForm implements MappableObject {
 
-    private final String caseNumber;
+    private String caseNumber;
 
-    private final LocalDate currentDate;
+    private LocalDate currentDate;
 
-    private final Party applicant1;
-    private final Party respondent1;
-    private final boolean hasRespondent2;
-    private final Party respondent2;
-    private final boolean hasApplicant2;
-    private final Party applicant2;
-    private final String judgeName;
-    private final boolean writtenByJudge;
+    private Party applicant1;
+    private Party respondent1;
+    private boolean hasRespondent2;
+    private Party respondent2;
+    private boolean hasApplicant2;
+    private Party applicant2;
+    private String judgeName;
+    private boolean writtenByJudge;
     private ReasonForReconsideration reasonForReconsideration;
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;

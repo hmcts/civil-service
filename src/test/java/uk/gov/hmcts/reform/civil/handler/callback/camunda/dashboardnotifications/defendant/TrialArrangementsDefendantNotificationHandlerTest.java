@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -50,6 +52,8 @@ class TrialArrangementsDefendantNotificationHandlerTest extends BaseCallbackHand
 
     @Mock
     private FeatureToggleService featureToggleService;
+    @Spy
+    private SdoCaseClassificationService sdoCaseClassificationService = new SdoCaseClassificationService();
 
     public static final String TASK_ID = "GenerateDashboardDefendantNotificationTrialArrangements";
 
@@ -76,7 +80,6 @@ class TrialArrangementsDefendantNotificationHandlerTest extends BaseCallbackHand
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -89,7 +92,7 @@ class TrialArrangementsDefendantNotificationHandlerTest extends BaseCallbackHand
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         } else {
             verifyNoInteractions(dashboardScenariosService);
@@ -97,28 +100,24 @@ class TrialArrangementsDefendantNotificationHandlerTest extends BaseCallbackHand
     }
 
     private static Stream<Arguments> provideCaseData() {
+        CaseData caseData1 = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData1.setRespondent1Represented(YesOrNo.NO);
+        caseData1.setDrawDirectionsOrderRequired(YES);
+        caseData1.setDrawDirectionsOrderSmallClaims(NO);
+        caseData1.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData1.setOrderType(OrderType.DECIDE_DAMAGES);
+
+        CaseData caseData2 = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData2.setRespondent1Represented(YesOrNo.NO);
+        caseData2.setDrawDirectionsOrderRequired(YES);
+        caseData2.setDrawDirectionsOrderSmallClaims(NO);
+        caseData2.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData2.setOrderType(OrderType.DECIDE_DAMAGES);
+        caseData2.setTrialReadyRespondent1(YES);
+
         return Stream.of(
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimIssued().build()
-                    .toBuilder().respondent1Represented(YesOrNo.NO)
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .claimsTrack(ClaimsTrack.fastTrack)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .build(),
-                true
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimIssued().build()
-                    .toBuilder().respondent1Represented(YesOrNo.NO)
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .claimsTrack(ClaimsTrack.fastTrack)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .trialReadyRespondent1(YES)
-                    .build(),
-                false
-            )
+            Arguments.of(caseData1, true),
+            Arguments.of(caseData2, false)
         );
     }
 

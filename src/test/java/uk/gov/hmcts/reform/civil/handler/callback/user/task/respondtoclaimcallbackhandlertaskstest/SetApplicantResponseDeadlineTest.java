@@ -18,11 +18,12 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallba
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.SetApplicantResponseDeadline;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.UpdateDataRespondentDeadlineResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -70,9 +71,6 @@ class SetApplicantResponseDeadlineTest {
 
     @Mock
     private  FrcDocumentsUtils frcDocumentsUtils;
-
-    @Mock
-    private  FeatureToggleService toggleService;
 
     @Mock
     private  CaseFlagsInitialiser caseFlagsInitialiser;
@@ -123,33 +121,50 @@ class SetApplicantResponseDeadlineTest {
         when(time.now()).thenReturn(responseDate);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimOneDefendantSolicitor()
+            .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+            .respondentResponseIsSame(YES)
+            .respondent2SameLegalRepresentative(YES)
+            .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent2Copy(new PartyBuilder().individual().build())
+            .build();
+
+        Flags respondent1Flags = new Flags();
+        respondent1Flags.setPartyName("respondent1name");
+        respondent1Flags.setRoleOnCase("Defendant 1");
+        caseData.getRespondent1().setFlags(respondent1Flags);
+        Flags respondent2Flags = new Flags();
+        respondent1Flags.setPartyName("respondent2name");
+        respondent1Flags.setRoleOnCase("Defendant 2");
+        caseData.getRespondent2().setFlags(respondent2Flags);
+
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
             .eventId(CREATE_CLAIM.name())
             .caseDetailsBefore(CaseDetails.builder().data(Map.of("state", "created")).build())
             .build();
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimOneDefendantSolicitor()
-            .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-            .respondentResponseIsSame(YES)
-            .respondent2SameLegalRepresentative(YES)
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
-            .build();
-
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
             .params(Map.of(BEARER_TOKEN, "BearerToken"))
-            .request(callbackRequest)
-            .build();
+            .request(callbackRequest);
 
         callbackParams.getRequest().getCaseDetailsBefore().setState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) setApplicantResponseDeadline.execute(callbackParams);
 
+        CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
         assertEquals("AWAITING_APPLICANT_INTENTION", response.getState());
+        assertThat(updatedCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+        Party respondent1DetailsForClaimDetailsTab = updatedCaseData.getRespondent1DetailsForClaimDetailsTab();
+        assertThat(respondent1DetailsForClaimDetailsTab).isNotNull();
+        assertThat(respondent1DetailsForClaimDetailsTab.getFlags()).isNull();
+        assertThat(updatedCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
+        Party respondent2DetailsForClaimDetailsTab = updatedCaseData.getRespondent2DetailsForClaimDetailsTab();
+        assertThat(respondent2DetailsForClaimDetailsTab).isNotNull();
+        assertThat(respondent2DetailsForClaimDetailsTab.getFlags()).isNull();
 
         verify(frcDocumentsUtils).assembleDefendantsFRCDocuments(caseData);
     }
@@ -179,15 +194,14 @@ class SetApplicantResponseDeadlineTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondentResponseIsSame(NO)
             .respondent2SameLegalRepresentative(NO)
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent2Copy(new PartyBuilder().individual().build())
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
             .params(Map.of(BEARER_TOKEN, "BearerToken"))
-            .request(callbackRequest)
-            .build();
+            .request(callbackRequest);
 
         callbackParams.getRequest().getCaseDetailsBefore().setState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
@@ -209,33 +223,50 @@ class SetApplicantResponseDeadlineTest {
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-        CallbackRequest callbackRequest = CallbackRequest
-            .builder()
-            .eventId(CREATE_CLAIM.name())
-            .caseDetailsBefore(CaseDetails.builder().data(Map.of("state", "created")).build())
-            .build();
 
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoDefendantSolicitors()
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondentResponseIsSame(NO)
             .respondent2SameLegalRepresentative(NO)
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent2Copy(new PartyBuilder().individual().build())
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        Flags respondent1Flags = new Flags();
+        respondent1Flags.setPartyName("respondent1name");
+        respondent1Flags.setRoleOnCase("Defendant 1");
+        caseData.getRespondent1().setFlags(respondent1Flags);
+        Flags respondent2Flags = new Flags();
+        respondent1Flags.setPartyName("respondent2name");
+        respondent1Flags.setRoleOnCase("Defendant 2");
+        caseData.getRespondent2().setFlags(respondent2Flags);
+
+        CallbackRequest callbackRequest = CallbackRequest
+            .builder()
+            .eventId(CREATE_CLAIM.name())
+            .caseDetailsBefore(CaseDetails.builder().data(Map.of("state", "created")).build())
+            .build();
+
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
             .params(Map.of(BEARER_TOKEN, "BearerToken"))
-            .request(callbackRequest)
-            .build();
+            .request(callbackRequest);
 
         callbackParams.getRequest().getCaseDetailsBefore().setState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) setApplicantResponseDeadline.execute(callbackParams);
-
+        CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
         assertEquals("AWAITING_APPLICANT_INTENTION", response.getState());
+        assertThat(updatedCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+        Party respondent1DetailsForClaimDetailsTab = updatedCaseData.getRespondent1DetailsForClaimDetailsTab();
+        assertThat(respondent1DetailsForClaimDetailsTab).isNotNull();
+        assertThat(respondent1DetailsForClaimDetailsTab.getFlags()).isNull();
+        assertThat(updatedCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
+        Party respondent2DetailsForClaimDetailsTab = updatedCaseData.getRespondent2DetailsForClaimDetailsTab();
+        assertThat(respondent2DetailsForClaimDetailsTab).isNotNull();
+        assertThat(respondent2DetailsForClaimDetailsTab.getFlags()).isNull();
 
         verify(frcDocumentsUtils).assembleDefendantsFRCDocuments(caseData);
     }
@@ -247,8 +278,8 @@ class SetApplicantResponseDeadlineTest {
 
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadline(any(LocalDateTime.class))).thenReturn(deadline);
-        when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(24, LocalDate.now()))
-            .thenReturn(LocalDateTime.now().plusMonths(24));
+        when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(36, LocalDate.now()))
+            .thenReturn(LocalDateTime.now().plusMonths(36));
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
@@ -264,15 +295,14 @@ class SetApplicantResponseDeadlineTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondentResponseIsSame(NO)
             .respondent2SameLegalRepresentative(NO)
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent2Copy(new PartyBuilder().individual().build())
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
             .params(Map.of(BEARER_TOKEN, "BearerToken"))
-            .request(callbackRequest)
-            .build();
+            .request(callbackRequest);
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) setApplicantResponseDeadline.execute(callbackParams);
@@ -280,7 +310,7 @@ class SetApplicantResponseDeadlineTest {
         Object deadlineValue = response.getData().get("claimDismissedDeadline");
 
         LocalDateTime actual = LocalDateTime.parse(deadlineValue.toString());
-        LocalDateTime expected = LocalDateTime.now().plusMonths(24);
+        LocalDateTime expected = LocalDateTime.now().plusMonths(36);
 
         assertThat(actual.toLocalDate()).isEqualTo(expected.toLocalDate());
     }

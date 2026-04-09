@@ -30,7 +30,7 @@ class CitizenClaimIssueFeePaymentCallbackHandlerTest extends BaseCallbackHandler
     @Test
     void citizenClaimIssuePayment() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        caseData = caseData.toBuilder().claimIssuedPaymentDetails(buildPaymentDetails()).build();
+        caseData.setClaimIssuedPaymentDetails(buildPaymentDetails());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -44,10 +44,10 @@ class CitizenClaimIssueFeePaymentCallbackHandlerTest extends BaseCallbackHandler
     }
 
     private PaymentDetails buildPaymentDetails() {
-        return PaymentDetails.builder()
-            .status(PaymentStatus.SUCCESS)
-            .reference("R1234-1234-1234-1234")
-            .build();
+        return new PaymentDetails()
+            .setStatus(PaymentStatus.SUCCESS)
+            .setReference("R1234-1234-1234-1234")
+            ;
 
     }
 }

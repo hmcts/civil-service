@@ -35,11 +35,10 @@ class ValidateFeeCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldReturnErrors_whenInitialFeeSsDifferentAfterReCalculation() {
         when(feesService.getFeeDataByClaimValue(any(ClaimValue.class)))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(BigDecimal.valueOf(25))
-                            .version("3")
-                            .code("CODE2")
-                            .build());
+            .thenReturn(new Fee()
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(25))
+                            .setVersion("3")
+                            .setCode("CODE2"));
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -52,11 +51,10 @@ class ValidateFeeCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotReturnErrors_whenInitialFeeIsSameAfterReCalculation() {
         when(feesService.getFeeDataByClaimValue(any(ClaimValue.class)))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(BigDecimal.valueOf(100))
-                            .version("1")
-                            .code("CODE")
-                            .build());
+            .thenReturn(new Fee()
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(100))
+                            .setVersion("1")
+                            .setCode("CODE"));
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

@@ -4,16 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
-@SuperBuilder(toBuilder = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@Accessors(chain = true)
 public class DocumentsToBeConsidered {
 
-    private YesOrNo hasDocumentsToBeConsidered;
-    private String details;
+    public YesOrNo hasDocumentsToBeConsidered;
+    public String details;
 }

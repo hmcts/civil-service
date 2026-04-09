@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
@@ -9,12 +10,14 @@ import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -26,10 +29,12 @@ import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
@@ -55,79 +60,105 @@ public class RespondentTemplateForDQGenerator {
 
     public DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData, String defendantIdentifier, String authorisation) {
         DQ dq = caseData.getRespondent2DQ();
+        List<Party> respondents = respondentsForDQGenerator.getRespondents(caseData, defendantIdentifier);
 
-        return  DirectionsQuestionnaireForm.builder()
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
-            .submittedOn(caseData.getRespondent2SameLegalRepresentative().equals(YES)
+        return new DirectionsQuestionnaireForm()
+            .setCaseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .setReferenceNumber(caseData.getLegacyCaseReference())
+            .setSolicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
+            .setSubmittedOn(caseData.getRespondent2SameLegalRepresentative().equals(YES)
                              ? caseData.getRespondent1ResponseDate().toLocalDate()
                              : caseData.getRespondent2ResponseDate().toLocalDate())
-            .applicant(setApplicantsForDQGenerator.getApplicant1DQParty(caseData))
-            .respondents(respondentsForDQGenerator.getRespondents(caseData, defendantIdentifier))
-            .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
-            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(caseData))
+            .setApplicant(setApplicantsForDQGenerator.getApplicant1DQParty(caseData))
+            .setRespondents(respondents)
+            .setRepresentativeOrganisationName(getOrgNameFromParties(respondents))
+            .setFileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
+            .setFixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(caseData))
                                                                          ? dq.getFixedRecoverableCostsIntermediate()
                                                                          : dq.getFixedRecoverableCosts()))
-            .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            .setDisclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
-            .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            .setDisclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
-            .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
-            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq))
-            .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) != null && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
+            .setDisclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
+            .setDeterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq))
+            .setDeterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) != null && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
                                            ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
-            .experts(SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
+            .setExperts(SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
-            .witnesses(getWitnesses(dq))
-            .hearing(getHearing(dq))
-            .hearingSupport(getHearingSupport(dq))
-            .support(dq.getHearingSupport())
-            .furtherInformation(dq.getFurtherInformation())
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
-            .statementOfTruth(dq.getStatementOfTruth())
-            .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
-            .allocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            .setWitnesses(getWitnesses(dq))
+            .setHearing(getHearing(dq))
+            .setHearingSupport(getHearingSupport(dq))
+            .setSupport(dq.getHearingSupport())
+            .setFurtherInformation(dq.getFurtherInformation())
+            .setWelshLanguageRequirements(getWelshLanguageRequirements(dq))
+            .setStatementOfTruth(dq.getStatementOfTruth())
+            .setStatementOfTruthText(getStatementOfTruthText())
+            .setVulnerabilityQuestions(dq.getVulnerabilityQuestions())
+            .setAllocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                 ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack())
-            .requestedCourt(getRequestedCourt(dq, authorisation))
-            .build();
+            .setRequestedCourt(getRequestedCourt(dq, authorisation));
     }
 
     public DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData, String defendantIdentifier, String authorisation) {
         DQ dq = caseData.getRespondent1DQ();
 
-        return DirectionsQuestionnaireForm.builder()
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
-            .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
-            .applicant(setApplicantsForDQGenerator.getApplicant1DQParty(caseData))
-            .respondents(respondentsForDQGenerator.getRespondents(caseData, defendantIdentifier))
-            .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
-            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(caseData))
+        List<Party> respondents = respondentsForDQGenerator.getRespondents(caseData, defendantIdentifier);
+
+        return new DirectionsQuestionnaireForm()
+            .setCaseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .setReferenceNumber(caseData.getLegacyCaseReference())
+            .setSolicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
+            .setSubmittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
+            .setApplicant(setApplicantsForDQGenerator.getApplicant1DQParty(caseData))
+            .setRepresentativeOrganisationName(getOrgNameFromParties(respondents))
+            .setFileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
+            .setFixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(caseData))
                                                                          ? dq.getFixedRecoverableCostsIntermediate()
                                                                          : dq.getFixedRecoverableCosts()))
-            .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            .setDisclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
-            .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            .setDisclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
-            .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
-            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq))
-            .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) != null && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
+            .setDisclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
+            .setDeterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq))
+            .setDeterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) != null && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
                                            ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
-            .experts(SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
+            .setExperts(SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
-            .witnesses(getWitnesses(dq))
-            .hearing(getHearing(dq))
-            .hearingSupport(getHearingSupport(dq))
-            .support(dq.getHearingSupport())
-            .furtherInformation(dq.getFurtherInformation())
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
-            .statementOfTruth(dq.getStatementOfTruth())
-            .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
-            .allocatedTrack(getClaimTrack(caseData))
-            .requestedCourt(getRequestedCourt(dq, authorisation))
-            .build();
+            .setWitnesses(getWitnesses(dq))
+            .setHearing(getHearing(dq))
+            .setHearingSupport(getHearingSupport(dq))
+            .setSupport(dq.getHearingSupport())
+            .setFurtherInformation(dq.getFurtherInformation())
+            .setWelshLanguageRequirements(getWelshLanguageRequirements(dq))
+            .setStatementOfTruth(dq.getStatementOfTruth())
+            .setStatementOfTruthText(getStatementOfTruthText())
+            .setVulnerabilityQuestions(dq.getVulnerabilityQuestions())
+            .setAllocatedTrack(getClaimTrack(caseData))
+            .setRequestedCourt(getRequestedCourt(dq, authorisation));
+    }
+
+    private String getStatementOfTruthText() {
+        String statementOfTruth = "The defendant believes that the facts stated in the response are true.";
+        statementOfTruth += String.format(
+            "\n\n\nI am duly authorised by the defendant to sign this statement.\n\n"
+                + "The defendant understands that the proceedings for contempt of court "
+                + "may be brought against anyone who makes, or causes to be made, "
+                + "a false statement in a document verified by a statement of truth "
+                + "without an honest belief in its truth."
+        );
+        return statementOfTruth;
+    }
+
+    private String getOrgNameFromParties(List<Party> parties) {
+        return Optional.ofNullable(parties)
+            .filter(p -> !p.isEmpty())
+            .map(p -> p.get(0))
+            .map(Party::getRepresentative)
+            .map(Representative::getOrganisationName)
+            .filter(StringUtils::isNotBlank)
+            .orElse("");
     }
 
     private static YesOrNo getDeterWithoutHearing(CaseData caseData, DQ dq) {
@@ -145,19 +176,18 @@ public class RespondentTemplateForDQGenerator {
     public Experts getExperts(DQ dq) {
         var experts = dq.getExperts();
         if (experts == null) {
-            return Experts.builder().expertRequired(NO)
-                .details(Collections.emptyList())
-                .build();
+            return new Experts()
+                .setExpertRequired(NO)
+                .setDetails(Collections.emptyList());
         }
-        return Experts.builder()
-            .expertRequired(experts.getExpertRequired())
-            .expertReportsSent(
+        return new Experts()
+            .setExpertRequired(experts.getExpertRequired())
+            .setExpertReportsSent(
                 ofNullable(experts.getExpertReportsSent())
                     .map(ExpertReportsSent::getDisplayedValue)
                     .orElse(""))
-            .jointExpertSuitable(experts.getJointExpertSuitable())
-            .details(getExpertsDetails(dq))
-            .build();
+            .setJointExpertSuitable(experts.getJointExpertSuitable())
+            .setDetails(getExpertsDetails(dq));
     }
 
     public List<Expert> getExpertsDetails(DQ dq) {
@@ -166,33 +196,31 @@ public class RespondentTemplateForDQGenerator {
         }
         return unwrapElements(dq.getExperts().getDetails())
             .stream()
-            .map(expert -> Expert.builder()
-                .firstName(expert.getFirstName())
-                .lastName(expert.getLastName())
-                .phoneNumber(expert.getPhoneNumber())
-                .emailAddress(expert.getEmailAddress())
-                .fieldOfExpertise(expert.getFieldOfExpertise())
-                .whyRequired(expert.getWhyRequired())
-                .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
-                                   .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
-                .build())
+            .map(expert -> new Expert()
+                .setFirstName(expert.getFirstName())
+                .setLastName(expert.getLastName())
+                .setPhoneNumber(expert.getPhoneNumber())
+                .setEmailAddress(expert.getEmailAddress())
+                .setFieldOfExpertise(expert.getFieldOfExpertise())
+                .setWhyRequired(expert.getWhyRequired())
+                .setFormattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
+                                   .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost() == null ? new BigDecimal(0) : expert.getEstimatedCost()))))
             .collect(toList());
     }
 
     public Witnesses getWitnesses(DQ dq) {
         var witnesses = dq.getWitnesses();
         if (witnesses == null) {
-            return Witnesses.builder().witnessesToAppear(NO)
-                .details(Collections.emptyList())
-                .build();
+            return new Witnesses()
+                .setWitnessesToAppear(NO)
+                .setDetails(Collections.emptyList());
         }
         List<Witness> witnessesList = ofNullable(witnesses.getDetails())
             .map(ElementUtils::unwrapElements)
             .orElseGet(Collections::emptyList);
-        return Witnesses.builder()
-            .witnessesToAppear(witnesses.getWitnessesToAppear())
-            .details(witnessesList)
-            .build();
+        return new Witnesses()
+            .setWitnessesToAppear(witnesses.getWitnessesToAppear())
+            .setDetails(witnessesList);
     }
 
     private String getClaimTrack(CaseData caseData) {
@@ -218,19 +246,20 @@ public class RespondentTemplateForDQGenerator {
                 .getCourtLocationsByEpimmsIdAndCourtType(authorisation,
                                                          rc.getCaseLocation().getBaseLocation()
                 ));
-            RequestedCourt.RequestedCourtBuilder builder = RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(YES)
-                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setRequestHearingAtSpecificCourt(YES);
+            requestedCourt.setReasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
             courtLocations.stream()
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .findFirst().ifPresent(court -> builder
-                    .responseCourtCode(court.getCourtLocationCode())
-                    .responseCourtName(court.getCourtName()));
-            return builder.build();
+                .findFirst().ifPresent(court -> {
+                    requestedCourt.setResponseCourtCode(court.getCourtLocationCode());
+                    requestedCourt.setResponseCourtName(court.getCourtName());
+                });
+            return requestedCourt;
         } else {
-            return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(NO)
-                .build();
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setRequestHearingAtSpecificCourt(NO);
+            return requestedCourt;
         }
     }
 
@@ -252,11 +281,10 @@ public class RespondentTemplateForDQGenerator {
     private Hearing getHearing(DQ dq) {
         var hearing = dq.getHearing();
         if (hearing != null) {
-            return Hearing.builder()
-                .hearingLength(getHearingLength(dq))
-                .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
-                .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
-                .build();
+            return new Hearing()
+                .setHearingLength(getHearingLength(dq))
+                .setUnavailableDatesRequired(hearing.getUnavailableDatesRequired())
+                .setUnavailableDates(unwrapElements(hearing.getUnavailableDates()));
         } else {
             return null;
         }
@@ -273,25 +301,23 @@ public class RespondentTemplateForDQGenerator {
         }
         Expert expertDetails;
         if (experts != null) {
-            expertDetails = Expert.builder()
-                .firstName(experts.getFirstName())
-                .lastName(experts.getLastName())
-                .phoneNumber(experts.getPhoneNumber())
-                .emailAddress(experts.getEmailAddress())
-                .formattedCost(MonetaryConversions.penniesToPounds(experts.getEstimatedCost()).toString())
-                .fieldOfExpertise(experts.getFieldofExpertise())
-                .whyRequired(experts.getWhyRequired())
-                .build();
+            expertDetails = new Expert()
+                .setFirstName(experts.getFirstName())
+                .setLastName(experts.getLastName())
+                .setPhoneNumber(experts.getPhoneNumber())
+                .setEmailAddress(experts.getEmailAddress())
+                .setFormattedCost(MonetaryConversions.penniesToPounds(experts.getEstimatedCost()).toString())
+                .setFieldOfExpertise(experts.getFieldofExpertise())
+                .setWhyRequired(experts.getWhyRequired());
         } else {
-            expertDetails = Expert.builder().build();
+            expertDetails = new Expert();
         }
 
-        return Experts.builder()
-            .expertRequired(caseData.isRespondent1NotRepresented() ? YesOrNo.NO : expertRequired)
-            .expertReportsSent(null)
-            .jointExpertSuitable(null)
-            .details(caseData.isRespondent1NotRepresented() && dq.getExperts() != null ? getExpertsDetails(dq) : List.of(expertDetails))
-            .build();
+        return new Experts()
+            .setExpertRequired(caseData.isRespondent1NotRepresented() ? YesOrNo.NO : expertRequired)
+            .setExpertReportsSent(null)
+            .setJointExpertSuitable(null)
+            .setDetails(caseData.isRespondent1NotRepresented() && dq.getExperts() != null ? getExpertsDetails(dq) : List.of(expertDetails));
     }
 
     public static boolean isClaimantResponse(CaseData caseData) {
@@ -332,19 +358,17 @@ public class RespondentTemplateForDQGenerator {
     public WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
         var welshLanguageRequirements = dq.getWelshLanguageRequirements();
         if (welshLanguageRequirements == null) {
-            return WelshLanguageRequirements.builder()
-                .evidence("")
-                .court("")
-                .documents("")
-                .build();
+            return new WelshLanguageRequirements()
+                .setEvidence("")
+                .setCourt("")
+                .setDocuments("");
         }
-        return WelshLanguageRequirements.builder()
-            .evidence(ofNullable(
+        return new WelshLanguageRequirements()
+            .setEvidence(ofNullable(
                 welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
-            .court(ofNullable(
+            .setCourt(ofNullable(
                 welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
-            .documents(ofNullable(
-                welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
-            .build();
+            .setDocuments(ofNullable(
+                welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""));
     }
 }

@@ -59,7 +59,7 @@ class DQResponseDocumentUtilsTest {
 
         @Test
         void shouldReturnEmptyListWhenDQHasNoDocuments() {
-            Applicant1DQ dq = Applicant1DQ.builder().build();
+            Applicant1DQ dq = new Applicant1DQ();
             CaseData caseData = CaseData.builder()
                 .applicant1DQ(dq)
                 .applicant1ResponseDate(LocalDateTime.now())
@@ -75,9 +75,8 @@ class DQResponseDocumentUtilsTest {
         void shouldReturnListWithDocumentsWhenDQHasDraftDirections() {
             Document document = DocumentBuilder.builder().build();
 
-            Applicant1DQ dq = Applicant1DQ.builder()
-                .applicant1DQDraftDirections(document)
-                .build();
+            Applicant1DQ dq = new Applicant1DQ()
+                .setApplicant1DQDraftDirections(document);
 
             CaseData caseData = CaseData.builder()
                 .applicant1DQ(dq)
@@ -100,7 +99,7 @@ class DQResponseDocumentUtilsTest {
 
         @Test
         void shouldNotAssignCategoryIdWhenNoDocumentsAdded() {
-            Applicant1DQ dq = Applicant1DQ.builder().build();
+            Applicant1DQ dq = new Applicant1DQ();
             CaseData caseData = CaseData.builder()
                 .applicant1DQ(dq)
                 .applicant1ResponseDate(LocalDateTime.now())
@@ -133,9 +132,8 @@ class DQResponseDocumentUtilsTest {
         void shouldReturnListWithDocumentsWhenRespondent1DQHasDraftDirections() {
             Document document = DocumentBuilder.builder().build();
 
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQDraftDirections(document)
-                .build();
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQDraftDirections(document);
 
             CaseData caseData = CaseData.builder()
                 .respondent1DQ(respondent1DQ)
@@ -160,9 +158,8 @@ class DQResponseDocumentUtilsTest {
         void shouldReturnListWithDocumentsWhenRespondent2DQHasDraftDirections() {
             Document document = DocumentBuilder.builder().build();
 
-            Respondent2DQ respondent2DQ = Respondent2DQ.builder()
-                .respondent2DQDraftDirections(document)
-                .build();
+            Respondent2DQ respondent2DQ = new Respondent2DQ()
+                .setRespondent2DQDraftDirections(document);
 
             CaseData caseData = CaseData.builder()
                 .respondent2DQ(respondent2DQ)
@@ -188,13 +185,11 @@ class DQResponseDocumentUtilsTest {
             Document document1 = DocumentBuilder.builder().build();
             Document document2 = DocumentBuilder.builder().build();
 
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQDraftDirections(document1)
-                .build();
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQDraftDirections(document1);
 
-            Respondent2DQ respondent2DQ = Respondent2DQ.builder()
-                .respondent2DQDraftDirections(document2)
-                .build();
+            Respondent2DQ respondent2DQ = new Respondent2DQ()
+                .setRespondent2DQDraftDirections(document2);
 
             CaseData caseData = CaseData.builder()
                 .respondent1DQ(respondent1DQ)

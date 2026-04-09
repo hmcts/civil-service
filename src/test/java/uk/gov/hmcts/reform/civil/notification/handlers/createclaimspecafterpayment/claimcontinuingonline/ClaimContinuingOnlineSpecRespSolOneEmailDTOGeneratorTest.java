@@ -60,7 +60,7 @@ public class ClaimContinuingOnlineSpecRespSolOneEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+                .thenReturn(Optional.of(new Organisation().setName(ORG_NAME)));
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         Map<String, String> initial = new HashMap<>();

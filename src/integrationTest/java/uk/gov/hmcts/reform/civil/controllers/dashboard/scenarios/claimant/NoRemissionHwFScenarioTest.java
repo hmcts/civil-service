@@ -33,8 +33,8 @@ public class NoRemissionHwFScenarioTest extends DashboardBaseIntegrationTest {
             .toBuilder()
             .applicant1Represented(YesOrNo.NO)
             .hwfFeeType(FeeType.CLAIMISSUED)
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).build())
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(NO_REMISSION_HWF).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)))
+            .claimIssuedHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(NO_REMISSION_HWF))
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
 

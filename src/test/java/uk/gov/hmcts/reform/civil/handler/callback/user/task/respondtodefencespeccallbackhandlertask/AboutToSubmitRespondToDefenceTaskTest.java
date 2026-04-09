@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnli
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -108,6 +110,9 @@ class AboutToSubmitRespondToDefenceTaskTest {
     @Mock
     private RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
+    @Mock
+    private PaymentDateService paymentDateService;
+
     private final LocalDateTime localDateTime = now();
 
     private ObjectMapper objectMapper;
@@ -123,18 +128,22 @@ class AboutToSubmitRespondToDefenceTaskTest {
                                                      caseDetailsConverter, frcDocumentsUtils,
                                                      dqResponseDocumentUtils, determineNextState,
                                                      Optional.of(updateWaCourtLocationsService),
-                                                     requestedCourtForClaimDetailsTab
+                                                     requestedCourtForClaimDetailsTab,
+                                                     paymentDateService
         );
 
-        Address address = Address.builder()
-            .postCode("E11 5BB")
-            .build();
+        Address address = new Address();
+        address.setPostCode("E11 5BB");
+        Party party = new Party();
+        party.setPartyName("name");
+        party.setType(INDIVIDUAL);
+        party.setPrimaryAddress(address);
 
         CaseData oldCaseData = CaseDataBuilder.builder()
-            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-            .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-            .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .applicant1(party)
+            .applicant2(party)
+            .respondent1(party)
+            .respondent2(party)
             .build();
 
         when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
@@ -145,23 +154,19 @@ class AboutToSubmitRespondToDefenceTaskTest {
     @Test
     void shouldSetClaimantResponseDocs() {
         Document document = DocumentBuilder.builder().build();
-        CaseData fullDefenceData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
-        CaseData caseData = fullDefenceData.toBuilder()
-            .applicant1DQ(fullDefenceData.getApplicant1DQ().toBuilder()
-                              .applicant1DQDraftDirections(document)
-                              .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
+        caseData.getApplicant1DQ().setApplicant1DQDraftDirections(document);
 
-        List<Element<CaseDocument>> expectedResponseDocuments = List.of(
-            Element.<CaseDocument>builder()
-                .id(UUID.randomUUID())
-                .value(CaseDocument.builder()
-                           .documentLink(document)
-                           .documentName("doc-name")
-                           .createdBy("Claimant")
-                           .createdDatetime(LocalDateTime.now())
-                           .build())
-                .build());
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentLink(document);
+        caseDocument.setDocumentName("doc-name");
+        caseDocument.setCreatedBy("Claimant");
+        caseDocument.setCreatedDatetime(LocalDateTime.now());
+        Element<CaseDocument> element = new Element<>();
+        element.setId(UUID.randomUUID());
+        element.setValue(caseDocument);
+
+        List<Element<CaseDocument>> expectedResponseDocuments = List.of(element);
 
         when(dqResponseDocumentUtils.buildClaimantResponseDocuments(any(CaseData.class))).thenReturn(expectedResponseDocuments);
 
@@ -174,14 +179,9 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Test
     void shouldAddEventAndDateToApplicantExperts() {
-        CaseData fullDefenceData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
-        CaseData caseData = fullDefenceData.toBuilder()
-            .applicant1DQ(fullDefenceData.getApplicant1DQ().toBuilder()
-                              .applicant1RespondToClaimExperts(
-                              ExpertDetails.builder().build())
-                              .build())
-            .applicant1ResponseDate(LocalDateTime.now())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
+        caseData.getApplicant1DQ().setApplicant1RespondToClaimExperts(new ExpertDetails());
+        caseData.setApplicant1ResponseDate(LocalDateTime.now());
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
@@ -191,18 +191,16 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Test
     void shouldAddEventAndDateToApplicantWitnesses() {
-        Witnesses witnesses = Witnesses.builder()
-            .witnessesToAppear(YES)
-            .details(wrapElements(Witness.builder().name("John Smith").reasonForWitness("reason").build()))
-            .build();
+        Witnesses witnesses = new Witnesses();
+        witnesses.setWitnessesToAppear(YES);
+        Witness witness = new Witness();
+        witness.setName("John Smith");
+        witness.setReasonForWitness("reason");
+        witnesses.setDetails(wrapElements(witness));
 
-        CaseData fullDefenceData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
-        CaseData caseData = fullDefenceData.toBuilder()
-            .applicant1DQ(fullDefenceData.getApplicant1DQ().toBuilder()
-                              .applicant1DQWitnesses(witnesses)
-                              .build())
-            .applicant1ResponseDate(LocalDateTime.now())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
+        caseData.getApplicant1DQ().setApplicant1DQWitnesses(witnesses);
+        caseData.setApplicant1ResponseDate(LocalDateTime.now());
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
@@ -217,6 +215,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1DQWithExperts()
             .applicant1DQWithWitnesses()
             .atState(FULL_DEFENCE_PROCEED)
+            .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
@@ -235,6 +234,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1DQWithExperts()
             .applicant1DQWithWitnesses()
             .atState(FULL_DEFENCE_PROCEED)
+            .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
@@ -253,13 +253,15 @@ class AboutToSubmitRespondToDefenceTaskTest {
                                                      caseDetailsConverter, frcDocumentsUtils,
                                                      dqResponseDocumentUtils, determineNextState,
                                                      Optional.empty(),
-                                                     requestedCourtForClaimDetailsTab
+                                                     requestedCourtForClaimDetailsTab,
+                                                     paymentDateService
         );
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1DQWithExperts()
             .applicant1DQWithWitnesses()
             .atState(FULL_DEFENCE_PROCEED)
+            .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
@@ -272,15 +274,18 @@ class AboutToSubmitRespondToDefenceTaskTest {
     void shouldSetRespondOptionWhenImmediatePaymentPlanSelected_ApplicantConfirmsNotToProceed1v1() {
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+        CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+        caseLocationCivil.setBaseLocation("0123");
+        caseLocationCivil.setRegion("0321");
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondent1Represented(NO)
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .specRespondent1Represented(NO)
             .applicant1Represented(YES)
-            .applicant1(PartyBuilder.builder().individual().build())
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .applicant1(new PartyBuilder().individual().build())
+            .caseManagementLocation(caseLocationCivil)
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
@@ -293,7 +298,11 @@ class AboutToSubmitRespondToDefenceTaskTest {
     @Test
     void shouldSetRespondOptionWhenImmediatePartPaymentPlanSelected_ApplicantConfirmsNotToProceed1v1() {
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(paymentDateService.calculatePaymentDeadline()).thenReturn(LocalDate.now().plusDays(5));
 
+        CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+        caseLocationCivil.setBaseLocation("0123");
+        caseLocationCivil.setRegion("0321");
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
@@ -301,11 +310,12 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1DQWithExperts()
             .applicant1DQWithWitnesses()
             .respondent1Represented(NO)
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .specRespondent1Represented(NO)
             .applicant1Represented(YES)
-            .applicant1(PartyBuilder.builder().individual().build())
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .applicant1(new PartyBuilder().individual().build())
+            .caseManagementLocation(caseLocationCivil)
+            .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
@@ -322,6 +332,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1DQWithWitnesses()
             .atState(FULL_DEFENCE_PROCEED)
             .nextDeadline(LocalDate.now())
+            .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
@@ -329,6 +340,71 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
         assertNotNull(response);
         assertThat(getCaseData(response)).extracting("nextDeadline").isNull();
+    }
+
+    @Test
+    void shouldSetPaymentDeadlineWhenDefendantProposesImmediatePartPaymentPlanAndClaimantAcceptsIt() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(paymentDateService.calculatePaymentDeadline()).thenReturn(LocalDate.now().plusDays(5));
+
+        CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+        caseLocationCivil.setBaseLocation("0123");
+        caseLocationCivil.setRegion("0321");
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .applicant1AcceptAdmitAmountPaidSpec(YES)
+            .applicant1DQWithExperts()
+            .applicant1DQWithWitnesses()
+            .respondent1Represented(NO)
+            .respondent1(new PartyBuilder().individual().build())
+            .specRespondent1Represented(NO)
+            .applicant1Represented(YES)
+            .applicant1(new PartyBuilder().individual().build())
+            .caseManagementLocation(caseLocationCivil)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+            .applicant1ResponseDate(LocalDateTime.now())
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
+
+        assertNotNull(response);
+        CaseData caseData1 = getCaseData(response);
+        assertThat(caseData1.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()).isNotNull();
+    }
+
+    @Test
+    void shouldSetApplicant1DefenceResponseDocumentCategory() {
+        // Given
+        Document document = new Document()
+            .setDocumentUrl("http://dm-store/documents/123")
+            .setDocumentBinaryUrl("http://dm-store/documents/123/binary")
+            .setDocumentFileName("defence-response.pdf");
+
+        ResponseDocument responseDocument = new ResponseDocument(document);
+
+        CaseData caseData = CaseData.builder()
+            .applicant1DefenceResponseDocumentSpec(responseDocument)
+            .build();
+
+        caseData.setApplicant1DefenceResponseDocumentSpec(responseDocument);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
+
+        // Then
+        assertNotNull(response);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseDocumentData =
+            (Map<String, Object>) response.getData().get("applicant1DefenceResponseDocumentSpec");
+        assertThat(responseDocumentData).isNotNull();
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> file = (Map<String, Object>) responseDocumentData.get("file");
+        assertThat(file.get("categoryID")).isEqualTo("directionsQuestionnaire");
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
@@ -339,13 +415,11 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
-        return CallbackParams.builder()
+        return new CallbackParams()
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .caseDetailsBefore(caseDetails)
                          .build())
-            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN));
     }
 }
-

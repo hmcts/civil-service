@@ -21,9 +21,9 @@ public abstract class RespondentTwoSolicitorDocumentHandler<T> extends DocumentH
     }
 
     @Override
-    protected void applyDocumentUpdateToCollection(CaseData.CaseDataBuilder<?, ?> caseDetailsBuilder,
+    protected void applyDocumentUpdateToCollection(CaseData caseData,
                                                    List<Element<UploadEvidenceDocumentType>> finalAdditionalBundleDoc) {
-        caseDetailsBuilder.respondentDocsUploadedAfterBundle(finalAdditionalBundleDoc);
+        caseData.setRespondentDocsUploadedAfterBundle(finalAdditionalBundleDoc);
 
     }
 }

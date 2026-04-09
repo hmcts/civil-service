@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.HearingScheduledDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class HearingScheduledDefendantScenarioTest extends CaseProgressionDashboardBaseIntegrationTest {
+public class HearingScheduledDefendantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private HearingScheduledDefendantNotificationHandler handler;
@@ -33,12 +33,12 @@ public class HearingScheduledDefendantScenarioTest extends CaseProgressionDashbo
     void should_create_hearing_scheduled_scenario() throws Exception {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
+        locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "8123456783";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
             .legacyCaseReference("reference")
@@ -49,9 +49,8 @@ public class HearingScheduledDefendantScenarioTest extends CaseProgressionDashbo
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT")
-                                                                .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT").build());
 
         // When
         handler.handle(callbackParams);

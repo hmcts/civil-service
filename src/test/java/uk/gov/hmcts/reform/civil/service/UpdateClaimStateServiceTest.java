@@ -64,10 +64,9 @@ class UpdateClaimStateServiceTest {
                 .applicant1ProceedWithClaim(YES)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .build().toBuilder()
-                .applicant1Represented(NO)
-                .responseClaimTrack(MULTI_CLAIM.name())
                 .build();
+        caseData.setApplicant1Represented(NO);
+        caseData.setResponseClaimTrack(MULTI_CLAIM.name());
         String actualState = service.setUpCaseState(caseData);
 
         assertEquals(CaseState.AWAITING_APPLICANT_INTENTION.name(), actualState);
@@ -83,11 +82,10 @@ class UpdateClaimStateServiceTest {
                 .applicant1ProceedWithClaim(YES)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .build().toBuilder()
-                .respondent1Represented(NO)
-                .specRespondent1Represented(NO)
-                .responseClaimTrack(MULTI_CLAIM.name())
                 .build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setSpecRespondent1Represented(NO);
+        caseData.setResponseClaimTrack(MULTI_CLAIM.name());
         String actualState = service.setUpCaseState(caseData);
 
         assertEquals(CaseState.AWAITING_APPLICANT_INTENTION.name(), actualState);
@@ -103,10 +101,9 @@ class UpdateClaimStateServiceTest {
                 .applicant1ProceedWithClaim(YES)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .build().toBuilder()
-                .applicant1Represented(NO)
-                .responseClaimTrack(INTERMEDIATE_CLAIM.name())
                 .build();
+        caseData.setApplicant1Represented(NO);
+        caseData.setResponseClaimTrack(INTERMEDIATE_CLAIM.name());
         String actualState = service.setUpCaseState(caseData);
 
         assertEquals(CaseState.AWAITING_APPLICANT_INTENTION.name(), actualState);
@@ -122,11 +119,10 @@ class UpdateClaimStateServiceTest {
                 .applicant1ProceedWithClaim(YES)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .build().toBuilder()
-                .specRespondent1Represented(NO)
-                .respondent1Represented(NO)
-                .responseClaimTrack(INTERMEDIATE_CLAIM.name())
                 .build();
+        caseData.setSpecRespondent1Represented(NO);
+        caseData.setRespondent1Represented(NO);
+        caseData.setResponseClaimTrack(INTERMEDIATE_CLAIM.name());
         String actualState = service.setUpCaseState(caseData);
 
         assertEquals(CaseState.AWAITING_APPLICANT_INTENTION.name(), actualState);
@@ -135,18 +131,17 @@ class UpdateClaimStateServiceTest {
     @Test
     void shouldUpdateCaseStateToInMediation_WhenSmallClaimCarmEnabled1v1() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-            .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                         .hasAgreedFreeMediation(MediationDecision.No).build())
-            .build();
+        ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
+        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
         CaseData caseData =
             CaseDataBuilder.builder().caseDataLip(caseDataLiP)
                 .applicant1ProceedWithClaim(YES)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                 .atStateClaimIssued()
-                .build().toBuilder()
-                .responseClaimTrack(SMALL_CLAIM.name())
                 .build();
+        caseData.setResponseClaimTrack(SMALL_CLAIM.name());
         String actualState = service.setUpCaseState(caseData);
 
         assertEquals(CaseState.IN_MEDIATION.name(), actualState);
@@ -155,18 +150,17 @@ class UpdateClaimStateServiceTest {
     @Test
     void shouldUpdateCaseStateToJudicialReferral_WhenSmallClaimCarmNotEnabled() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-            .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                         .hasAgreedFreeMediation(MediationDecision.No).build())
-            .build();
+        ClaimantMediationLip claimantMediationLip2 = new ClaimantMediationLip();
+        claimantMediationLip2.setHasAgreedFreeMediation(MediationDecision.No);
+        CaseDataLiP caseDataLiP2 = new CaseDataLiP();
+        caseDataLiP2.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip2);
         CaseData caseData =
-            CaseDataBuilder.builder().caseDataLip(caseDataLiP)
+            CaseDataBuilder.builder().caseDataLip(caseDataLiP2)
                 .applicant1ProceedWithClaim(YES)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                 .atStateClaimIssued()
-                .build().toBuilder()
-                .responseClaimTrack(SMALL_CLAIM.name())
                 .build();
+        caseData.setResponseClaimTrack(SMALL_CLAIM.name());
 
         String actualState = service.setUpCaseState(caseData);
 
@@ -177,12 +171,12 @@ class UpdateClaimStateServiceTest {
     void shouldUpdateCaseStateToJudicialReferral_WhenPartAdmitNoSettle_NoMediation() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-            .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                         .hasAgreedFreeMediation(MediationDecision.No).build())
-            .build();
+        ClaimantMediationLip claimantMediationLip3 = new ClaimantMediationLip();
+        claimantMediationLip3.setHasAgreedFreeMediation(MediationDecision.No);
+        CaseDataLiP caseDataLiP3 = new CaseDataLiP();
+        caseDataLiP3.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip3);
         CaseData caseData = CaseDataBuilder.builder()
-            .caseDataLip(caseDataLiP)
+            .caseDataLip(caseDataLiP3)
             .applicant1AcceptAdmitAmountPaidSpec(NO)
             .atStateClaimIssued().build();
 
@@ -198,12 +192,12 @@ class UpdateClaimStateServiceTest {
     void shouldUpdateCaseStateToJudicialReferral_WhenNotReceivedPayment_NoMediation_ForPartAdmit() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-            .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                         .hasAgreedFreeMediation(MediationDecision.No).build())
-            .build();
+        ClaimantMediationLip claimantMediationLip4 = new ClaimantMediationLip();
+        claimantMediationLip4.setHasAgreedFreeMediation(MediationDecision.No);
+        CaseDataLiP caseDataLiP4 = new CaseDataLiP();
+        caseDataLiP4.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip4);
         CaseData caseData = CaseDataBuilder.builder()
-            .caseDataLip(caseDataLiP)
+            .caseDataLip(caseDataLiP4)
             .applicant1PartAdmitConfirmAmountPaidSpec(NO)
             .atStateClaimIssued().build();
 
@@ -219,12 +213,12 @@ class UpdateClaimStateServiceTest {
     void shouldUpdateCaseStateToJudicialReferral_WhenFullDefence_NotPaid_NoMediation() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-            .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                         .hasAgreedFreeMediation(MediationDecision.No).build())
-            .build();
+        ClaimantMediationLip claimantMediationLip5 = new ClaimantMediationLip();
+        claimantMediationLip5.setHasAgreedFreeMediation(MediationDecision.No);
+        CaseDataLiP caseDataLiP5 = new CaseDataLiP();
+        caseDataLiP5.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip5);
         CaseData caseData =
-            CaseDataBuilder.builder().caseDataLip(caseDataLiP).applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+            CaseDataBuilder.builder().caseDataLip(caseDataLiP5).applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                 .atStateClaimIssued()
                 .build();
 
@@ -256,12 +250,12 @@ class UpdateClaimStateServiceTest {
     void shouldUpdateCaseStateToJudicialReferral_WhenFullDefence() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-            .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                         .hasAgreedFreeMediation(MediationDecision.No).build())
-            .build();
+        ClaimantMediationLip claimantMediationLip6 = new ClaimantMediationLip();
+        claimantMediationLip6.setHasAgreedFreeMediation(MediationDecision.No);
+        CaseDataLiP caseDataLiP6 = new CaseDataLiP();
+        caseDataLiP6.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip6);
         CaseData caseData =
-            CaseDataBuilder.builder().caseDataLip(caseDataLiP).applicant1ProceedWithClaim(YES)
+            CaseDataBuilder.builder().caseDataLip(caseDataLiP6).applicant1ProceedWithClaim(YES)
                 .atStateClaimIssued()
                 .build();
         //When
@@ -289,14 +283,16 @@ class UpdateClaimStateServiceTest {
     void shouldChangeCaseState_whenApplicantRejectClaimSettlementAndAgreeToMediation() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
+        ClaimantMediationLip claimantMediationLip7 = new ClaimantMediationLip();
+        claimantMediationLip7.setHasAgreedFreeMediation(MediationDecision.Yes);
+        CaseDataLiP caseDataLiP7 = new CaseDataLiP();
+        caseDataLiP7.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip7);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-            .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                    MediationDecision.Yes).build())
-                             .build())
-            .build().toBuilder()
-            .responseClaimMediationSpecRequired(YES).build();
+            .caseDataLip(caseDataLiP7)
+            .build();
+        caseData.setResponseClaimMediationSpecRequired(YES);
 
         //When
         var response = service.setUpCaseState(caseData);
@@ -307,15 +303,17 @@ class UpdateClaimStateServiceTest {
     @Test
     void shouldNotChangeCaseState_whenHaveFullAdmissionFromRespondent() {
         //Given
+        ClaimantMediationLip claimantMediationLip8 = new ClaimantMediationLip();
+        claimantMediationLip8.setHasAgreedFreeMediation(MediationDecision.Yes);
+        CaseDataLiP caseDataLiP8 = new CaseDataLiP();
+        caseDataLiP8.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip8);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-            .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                    MediationDecision.Yes).build())
-                             .build())
-            .build().toBuilder()
-            .responseClaimMediationSpecRequired(YES).build();
+            .caseDataLip(caseDataLiP8)
+            .build();
+        caseData.setResponseClaimMediationSpecRequired(YES);
         //When
         var response = service.setUpCaseState(caseData);
         //Then
@@ -331,8 +329,8 @@ class UpdateClaimStateServiceTest {
             .atStateClaimIssued()
             .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YES)
-            .build().toBuilder()
-            .responseClaimMediationSpecRequired(YES).build();
+            .build();
+        caseData.setResponseClaimMediationSpecRequired(YES);
 
         //When
         var response = service.setUpCaseState(caseData);
@@ -344,16 +342,22 @@ class UpdateClaimStateServiceTest {
     void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsCompany_toAllFinalOrdersIssued() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
+        ClaimantMediationLip claimantMediationLip9 = new ClaimantMediationLip();
+        claimantMediationLip9.setHasAgreedFreeMediation(MediationDecision.No);
+        CaseDataLiP caseDataLiP9 = new CaseDataLiP();
+        caseDataLiP9.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip9);
+        Party applicant1 = new Party();
+        applicant1.setType(Party.Type.COMPANY);
+        applicant1.setCompanyName("CLAIMANT_ORG_NAME");
+        Party respondent1 = new Party();
+        respondent1.setType(COMPANY);
+        respondent1.setCompanyName("Test Inc");
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
-            .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                MediationDecision.No).build()).build())
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
-            .respondent1(Party.builder()
-                             .type(COMPANY)
-                             .companyName("Test Inc")
-                             .build())
+            .caseDataLip(caseDataLiP9)
             .build();
+        caseData.setApplicant1(applicant1);
+        caseData.setRespondent1(respondent1);
 
         //When
         var response = service.setUpCaseState(caseData);
@@ -366,18 +370,19 @@ class UpdateClaimStateServiceTest {
     void shouldChangeCaseState_whenApplicantAcceptedPartAdmitImmediatePayment() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
-        CaseData caseData = CaseDataBuilder.builder()
-            .build().toBuilder()
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .applicant1AcceptAdmitAmountPaidSpec(YES)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
-            .respondent1(Party.builder()
-                             .type(COMPANY)
-                             .companyName("Test Inc")
-                             .build())
-            .build();
+        Party applicant1b = new Party();
+        applicant1b.setType(Party.Type.COMPANY);
+        applicant1b.setCompanyName("CLAIMANT_ORG_NAME");
+        Party respondent1b = new Party();
+        respondent1b.setType(COMPANY);
+        respondent1b.setCompanyName("Test Inc");
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        caseData.setApplicant1AcceptAdmitAmountPaidSpec(YES);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setApplicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY);
+        caseData.setApplicant1(applicant1b);
+        caseData.setRespondent1(respondent1b);
 
         //When
         var response = service.setUpCaseState(caseData);
@@ -390,18 +395,21 @@ class UpdateClaimStateServiceTest {
     void shouldChangeCaseState_whenApplicantRejectedRepaymentPlanAndRequestCCJ_CourtAcceptsClaimantDecision_ForPartAmit() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
-        CaseData caseData = CaseDataBuilder.builder()
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-            .caseDataLip(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                        .build()).build())
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .partyName("CLAIMANT_NAME")
-                             .build())
-            .build();
+        Party applicant1c = new Party();
+        applicant1c.setType(Party.Type.INDIVIDUAL);
+        applicant1c.setPartyName("CLAIMANT_NAME");
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
+        claimantLiPResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
+        CaseDataLiP caseDataLiPc = new CaseDataLiP();
+        caseDataLiPc.setApplicant1LiPResponse(claimantLiPResponse);
+        Party respondent1c = new Party();
+        respondent1c.setType(Party.Type.INDIVIDUAL);
+        respondent1c.setPartyName("CLAIMANT_NAME");
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1(applicant1c);
+        caseData.setCaseDataLiP(caseDataLiPc);
+        caseData.setRespondent1(respondent1c);
 
         //When
         var response = service.setUpCaseState(caseData);
@@ -414,19 +422,20 @@ class UpdateClaimStateServiceTest {
     void shouldChangeCaseState_whenApplicantRejectedRepaymentPlanAndRequestCCJ_RejectedManualDetermination_ForPartAmit_PayBySetDate() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
-        CaseData caseData = CaseDataBuilder.builder()
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-            .caseDataLip(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantResponseOnCourtDecision(
-                                                            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE
-                                                        )
-                                                        .build()).build())
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .partyName("CLAIMANT_NAME")
-                             .build())
-            .build();
+        Party applicant1d = new Party();
+        applicant1d.setType(Party.Type.INDIVIDUAL);
+        applicant1d.setPartyName("CLAIMANT_NAME");
+        ClaimantLiPResponse claimantLiPResponse2 = new ClaimantLiPResponse();
+        claimantLiPResponse2.setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE);
+        CaseDataLiP caseDataLiPd = new CaseDataLiP();
+        caseDataLiPd.setApplicant1LiPResponse(claimantLiPResponse2);
+        Party respondent1d = new Party();
+        respondent1d.setType(Party.Type.INDIVIDUAL);
+        respondent1d.setPartyName("CLAIMANT_NAME");
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1(applicant1d);
+        caseData.setCaseDataLiP(caseDataLiPd);
+        caseData.setRespondent1(respondent1d);
 
         //When
         var response = service.setUpCaseState(caseData);
@@ -439,20 +448,21 @@ class UpdateClaimStateServiceTest {
     void shouldChangeCaseState_whenApplicantRejectedRepaymentPlanAndRequestCCJ_AcceptManualDetermination_ForPartAmit_ForPayByInstalments() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
-        CaseData caseData = CaseDataBuilder.builder()
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-            .caseDataLip(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantResponseOnCourtDecision(
-                                                            ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_PLAN
-                                                        )
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                        .build()).build())
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .partyName("CLAIMANT_NAME")
-                             .build())
-            .build();
+        Party applicant1e = new Party();
+        applicant1e.setType(Party.Type.INDIVIDUAL);
+        applicant1e.setPartyName("CLAIMANT_NAME");
+        ClaimantLiPResponse claimantLiPResponse3 = new ClaimantLiPResponse();
+        claimantLiPResponse3.setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_PLAN);
+        claimantLiPResponse3.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
+        CaseDataLiP caseDataLiPe = new CaseDataLiP();
+        caseDataLiPe.setApplicant1LiPResponse(claimantLiPResponse3);
+        Party respondent1e = new Party();
+        respondent1e.setType(Party.Type.INDIVIDUAL);
+        respondent1e.setPartyName("CLAIMANT_NAME");
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1(applicant1e);
+        caseData.setCaseDataLiP(caseDataLiPe);
+        caseData.setRespondent1(respondent1e);
 
         //When
         var response = service.setUpCaseState(caseData);
@@ -465,20 +475,21 @@ class UpdateClaimStateServiceTest {
     void shouldChangeCaseState_whenApplicantRejectedRepaymentPlanAndRequestCCJ_AcceptManualDetermination_ForPartAmit_ForPayBySetDate() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
-        CaseData caseData = CaseDataBuilder.builder()
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-            .caseDataLip(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantResponseOnCourtDecision(
-                                                            ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE
-                                                        )
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                        .build()).build())
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .partyName("CLAIMANT_NAME")
-                             .build())
-            .build();
+        Party applicant1f = new Party();
+        applicant1f.setType(Party.Type.INDIVIDUAL);
+        applicant1f.setPartyName("CLAIMANT_NAME");
+        ClaimantLiPResponse claimantLiPResponse4 = new ClaimantLiPResponse();
+        claimantLiPResponse4.setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE);
+        claimantLiPResponse4.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
+        CaseDataLiP caseDataLiPf = new CaseDataLiP();
+        caseDataLiPf.setApplicant1LiPResponse(claimantLiPResponse4);
+        Party respondent1f = new Party();
+        respondent1f.setType(Party.Type.INDIVIDUAL);
+        respondent1f.setPartyName("CLAIMANT_NAME");
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1(applicant1f);
+        caseData.setCaseDataLiP(caseDataLiPf);
+        caseData.setRespondent1(respondent1f);
 
         //When
         var response = service.setUpCaseState(caseData);
@@ -491,20 +502,26 @@ class UpdateClaimStateServiceTest {
     void shouldUpdateCaseStateToAllFinalOrderIssued_whenApplicantAcceptOrRejectedRepaymentPlanAndRequestCCJ_JudgementOnlineLiveEnabled() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        Party applicant1g = new Party();
+        applicant1g.setType(Party.Type.INDIVIDUAL);
+        applicant1g.setPartyName("CLAIMANT_NAME");
+        Party respondent1g = new Party();
+        respondent1g.setType(Party.Type.INDIVIDUAL);
+        respondent1g.setPartyName("DEFENDANT_NAME");
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YES);
+        ccjPaymentDetails.setCcjJudgmentFixedCostAmount(BigDecimal.valueOf(10));
+        ccjPaymentDetails.setCcjJudgmentTotalStillOwed(BigDecimal.valueOf(150));
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1ResponseDate(LocalDateTime.now())
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("DEFENDANT_NAME").build())
             .respondent1Represented(NO)
             .specRespondent1Represented(NO)
             .applicant1Represented(NO)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                                   .ccjPaymentPaidSomeOption(YES)
-                                   .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
-                                   .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
-                                   .build())
             .build();
+        caseData.setApplicant1(applicant1g);
+        caseData.setRespondent1(respondent1g);
+        caseData.setCcjPaymentDetails(ccjPaymentDetails);
         String actualState = service.setUpCaseState(caseData);
 
         assertEquals(CaseState.All_FINAL_ORDERS_ISSUED.name(), actualState);

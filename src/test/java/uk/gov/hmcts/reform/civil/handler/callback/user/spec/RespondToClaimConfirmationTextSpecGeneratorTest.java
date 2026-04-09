@@ -34,13 +34,12 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
     .CaseDataToTextGeneratorIntentionConfig<RespondToClaimConfirmationTextSpecGenerator> {
 
     private CaseData getFullAdmitAlreadyPaidCase() {
-        return CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .specDefenceFullAdmittedRequired(YesOrNo.YES)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+            .totalClaimAmount(BigDecimal.valueOf(1000)).build();
+        caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.YES);
+        return caseData;
     }
 
     private CaseData getPartialAdmitSetDate() {
@@ -51,22 +50,18 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
         BigDecimal admitted = BigDecimal.valueOf(1000);
         LocalDate whenWillPay = LocalDate.now().plusMonths(1);
 
-        return CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToAdmittedClaimOwingAmountPounds(admitted)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
-            )
             .totalClaimAmount(admitted.multiply(BigDecimal.valueOf(2)))
             .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
-            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
-            .build();
-
+            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES).build();
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+        respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+        return caseData;
     }
 
     private CaseData getPartialAdmitPayImmediately() {
@@ -76,64 +71,58 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
     private CaseData getPartialAdmitPayImmediately(boolean isLipVLR) {
         BigDecimal admitted = BigDecimal.valueOf(1000);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        return CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToAdmittedClaimOwingAmountPounds(admitted)
             .totalClaimAmount(BigDecimal.valueOf(1000))
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
-            )
             .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
             .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+        respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+        return caseData;
     }
 
     private CaseData getFullAdmitPayImmediately() {
         BigDecimal admitted = BigDecimal.valueOf(1000);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        return CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .applicant1Represented(YesOrNo.NO)
             .totalClaimAmount(BigDecimal.valueOf(1000))
-            .respondToAdmittedClaimOwingAmountPounds(admitted)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
-            )
-            .build();
+            .respondToAdmittedClaimOwingAmountPounds(admitted).build();
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+        respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+        return caseData;
     }
 
     private CaseData getFullAdmitRepayPlan() {
-        return CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .specDefenceFullAdmittedRequired(YesOrNo.NO)
             .applicant1Represented(YesOrNo.YES)
             .defenceAdmitPartPaymentTimeRouteRequired(
-                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-            .build();
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN).build();
+        caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
+        return caseData;
     }
 
     private CaseData getFullAdmitRepayPlanLiPvLr() {
-        return CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .specDefenceFullAdmittedRequired(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .build();
+        caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
+        return caseData;
     }
 
     private CaseData getPartialAdmitRepayPlan() {
@@ -141,79 +130,76 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
     }
 
     private CaseData getPartialAdmitRepayPlan(boolean isLipVLR) {
-        return CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .specDefenceFullAdmittedRequired(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
             .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
+        caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
+        return caseData;
     }
 
     private CaseData getFullAdmitAlreadyPaid() {
-        return CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .specDefenceFullAdmittedRequired(YesOrNo.YES)
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .build();
+        caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.YES);
+        return caseData;
+
     }
 
     private CaseData getFullAdmitPayBySetDate() {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        return CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .specDefenceFullAdmittedRequired(YesOrNo.NO)
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .applicant1Represented(YesOrNo.YES)
             .defenceAdmitPartPaymentTimeRouteRequired(
-                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
-            )
-            .build();
+                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE).build();
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+        respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+        caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
+        return caseData;
     }
 
     private CaseData getFullAdmitPayBySetDateLipVLr() {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        return CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .specDefenceFullAdmittedRequired(YesOrNo.NO)
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .applicant1Represented(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(
-                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
-            )
-            .build();
+                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE).build();
+        caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+        respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+        return caseData;
     }
 
     private CaseData getPartialAdmitPayFull(boolean isLipVLR) {
         BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
         BigDecimal howMuchWasPaid = new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount));
-        return CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .specDefenceAdmittedRequired(YesOrNo.YES)
-            .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
             .totalClaimAmount(totalClaimAmount)
             .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
             .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setHowMuchWasPaid(howMuchWasPaid);
+        caseData.setRespondToAdmittedClaim(respondToClaim);
+        caseData.setSpecDefenceAdmittedRequired(YesOrNo.YES);
+        return caseData;
     }
 
     private CaseData getPartialAdmitPayFull() {
@@ -227,22 +213,23 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
     private CaseData getPartialAdmitPayLess(boolean isLipVLR) {
         BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
         BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
-        return CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .specDefenceAdmittedRequired(YesOrNo.YES)
-            .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
             .totalClaimAmount(totalClaimAmount)
             .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
             .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
+        caseData.setSpecDefenceAdmittedRequired(YesOrNo.YES);
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setHowMuchWasPaid(howMuchWasPaid);
+        caseData.setRespondToAdmittedClaim(respondToClaim);
+        return caseData;
     }
 
     private CaseData getCounterClaim() {
         return CaseDataBuilder.builder()
             .atStateRespondentCounterClaim()
-            .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
             .build();
     }
@@ -253,18 +240,18 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
     }
 
     private List<CaseData> get2v1DifferentResponseCase() {
-        Party applicant1 = Party.builder().build();
-        Party applicant2 = Party.builder().build();
+        Party applicant1 = new Party();
+        Party applicant2 = new Party();
         List<CaseData> cases = new ArrayList<>();
         for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
             for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
                 if (!r1.equals(r2)) {
-                    cases.add(CaseData.builder()
-                                  .applicant1(applicant1)
-                                  .applicant2(applicant2)
-                                  .claimant1ClaimResponseTypeForSpec(r1)
-                                  .claimant2ClaimResponseTypeForSpec(r2)
-                                  .build());
+                    CaseData caseData = CaseDataBuilder.builder().build();
+                    caseData.setApplicant1(applicant1);
+                    caseData.setApplicant2(applicant2);
+                    caseData.setClaimant1ClaimResponseTypeForSpec(r1);
+                    caseData.setClaimant2ClaimResponseTypeForSpec(r2);
+                    cases.add(caseData);
                 }
             }
         }
@@ -272,23 +259,23 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
     }
 
     private List<CaseData> get1v2DivergentResponseCase() {
-        Party applicant1 = Party.builder().build();
-        Party respondent1 = Party.builder().build();
-        Party respondent2 = Party.builder().build();
+        Party applicant1 = new Party();
+        Party respondent1 = new Party();
+        Party respondent2 = new Party();
 
         List<CaseData> cases = new ArrayList<>();
         for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
             for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
                 if (!r1.equals(r2)) {
-                    cases.add(CaseData.builder()
-                                  .applicant1(applicant1)
-                                  .respondent1(respondent1)
-                                  .respondent2(respondent2)
-                                  .respondent2SameLegalRepresentative(YesOrNo.YES)
-                                  .respondentResponseIsSame(YesOrNo.NO)
-                                  .respondent1ClaimResponseTypeForSpec(r1)
-                                  .respondent2ClaimResponseTypeForSpec(r2)
-                                  .build());
+                    CaseData caseData = CaseDataBuilder.builder().build();
+                    caseData.setApplicant1(applicant1);
+                    caseData.setRespondent1(respondent1);
+                    caseData.setRespondent2(respondent2);
+                    caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+                    caseData.setRespondentResponseIsSame(YesOrNo.NO);
+                    caseData.setRespondent1ClaimResponseTypeForSpec(r1);
+                    caseData.setRespondent2ClaimResponseTypeForSpec(r2);
+                    cases.add(caseData);
                 }
             }
         }

@@ -15,7 +15,10 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.ContactInformationUpda
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -41,28 +44,31 @@ class ContactInformationUpdatedCallbackHandlerTest extends BaseCallbackHandlerTe
     @ValueSource(booleans = {true, false})
     void shouldClearContactDetailsUpdatedEventFieldFromCaseData_andSetExpectedCamundaVars(boolean submittedByCaseworker) {
         String processId = "process-id";
-        CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
-            .contactDetailsUpdatedEvent(
-                ContactDetailsUpdatedEvent.builder()
-                    .summary("Summary")
-                    .description("Description")
-                    .submittedByCaseworker(submittedByCaseworker ? YES : NO)
-                    .build()
-            ).build();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId(processId);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setBusinessProcess(businessProcess);
+        ContactDetailsUpdatedEvent contactDetailsUpdatedEvent = new ContactDetailsUpdatedEvent();
+        contactDetailsUpdatedEvent.setSummary("Summary");
+        contactDetailsUpdatedEvent.setDescription("Description");
+        contactDetailsUpdatedEvent.setSubmittedByCaseworker(submittedByCaseworker ? YES : NO);
+        caseData.setContactDetailsUpdatedEvent(contactDetailsUpdatedEvent);
 
         CallbackParams params = callbackParamsOf(caseData, CONTACT_INFORMATION_UPDATED, ABOUT_TO_SUBMIT);
 
         AboutToStartOrSubmitCallbackResponse result = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+        assertNotNull(result);
+        assertNotNull(result.getData());
         verify(runTimeService).setVariable(processId, "submittedByCaseworker", submittedByCaseworker);
         assertNull(result.getData().get("contactDetailsUpdatedEvent"));
     }
 
     @Test
     void shouldReturnExpectedCamundaActivityId() {
-        CaseData caseData = CaseData.builder().build();
-        handler.camundaActivityId(callbackParamsOf(caseData, CONTACT_INFORMATION_UPDATED, ABOUT_TO_SUBMIT));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        String activityId = handler.camundaActivityId(callbackParamsOf(caseData, CONTACT_INFORMATION_UPDATED, ABOUT_TO_SUBMIT));
+        assertEquals("ContactInformationUpdated", activityId);
     }
 
 }

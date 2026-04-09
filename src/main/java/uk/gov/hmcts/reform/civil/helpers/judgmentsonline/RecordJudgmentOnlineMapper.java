@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -9,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.math.BigDecimal;
@@ -16,10 +16,14 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class RecordJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
     private final RoboticsAddressMapper addressMapper;
+
+    public RecordJudgmentOnlineMapper(Time time, RoboticsAddressMapper addressMapper) {
+        super(time);
+        this.addressMapper = addressMapper;
+    }
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
@@ -27,23 +31,22 @@ public class RecordJudgmentOnlineMapper extends JudgmentOnlineMapper {
         BigDecimal costs = JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered());
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, addressMapper);
-        JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
-            .createdTimestamp(LocalDateTime.now())
-            .state(getJudgmentState(caseData))
-            .rtlState(getRtlState(caseData.getJoIsRegisteredWithRTL()))
-            .type(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
-            .instalmentDetails(caseData.getJoInstalmentDetails())
-            .paymentPlan(caseData.getJoPaymentPlan())
-            .isRegisterWithRTL(caseData.getJoIsRegisteredWithRTL())
-            .issueDate(caseData.getJoOrderMadeDate())
-            .orderedAmount(orderAmount.toString())
-            .costs(costs.toString())
-            .totalAmount(orderAmount.add(costs).toString())
-            .build();
+        activeJudgment
+            .setCreatedTimestamp(LocalDateTime.now())
+            .setState(getJudgmentState(caseData))
+            .setRtlState(getRtlState(caseData.getJoIsRegisteredWithRTL()))
+            .setType(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
+            .setInstalmentDetails(caseData.getJoInstalmentDetails())
+            .setPaymentPlan(caseData.getJoPaymentPlan())
+            .setIsRegisterWithRTL(caseData.getJoIsRegisteredWithRTL())
+            .setIssueDate(caseData.getJoOrderMadeDate())
+            .setOrderedAmount(orderAmount.toString())
+            .setCosts(costs.toString())
+            .setTotalAmount(orderAmount.add(costs).toString());
 
-        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
 
-        return activeJudgmentDetails;
+        return activeJudgment;
     }
 
     protected JudgmentState getJudgmentState(CaseData caseData) {

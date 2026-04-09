@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "Response to the claim",
+  "titleCy": "Ymateb i’r hawliad",
+  "descriptionEn": "<p class=\"govuk-body\">${respondent1PartyName} has rejected the claim and suggested mediation. You can reject or agree to mediation. You need to respond by ${applicant1ResponseDeadlineEn}.</p><p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and respond</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae ${respondent1PartyName} wedi gwrthod yr hawliad ac wedi awgrymu cyfryngu. Gallwch wrthod neu gytuno i gyfryngu. Mae angen i chi ymateb erbyn ${applicant1ResponseDeadlineCy}.</p><p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ac ymateb</a></p>",
+  "deadlineParam": "applicant1ResponseDeadline"
+}

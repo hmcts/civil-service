@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import camundajar.impl.scala.collection.mutable.StringBuilder;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -83,29 +82,38 @@ public class JudgmentsOnlineHelper {
             || caseData.isLRvLipOneVOne();
     }
 
-    public static BigDecimal getCostOfJudgmentForDJ(CaseData data) {
+    public static BigDecimal getClaimFeeOfJudgmentForDJ(CaseData data) {
 
         if (data.getOutstandingFeeInPounds() != null) {
             return data.getOutstandingFeeInPounds();
         }
 
         String repaymentSummary = data.getRepaymentSummaryObject();
-        BigDecimal fixedCost = null;
         BigDecimal claimCost = null;
         if (null != repaymentSummary) {
-            fixedCost = repaymentSummary.contains("Fixed")
-                ? new BigDecimal(repaymentSummary.substring(
-                repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
-                repaymentSummary.indexOf("\n### Claim fee amount ")
-            )) : null;
             claimCost = new BigDecimal(repaymentSummary.substring(
                 repaymentSummary.indexOf("Claim fee amount \n £") + 20,
                 repaymentSummary.indexOf("\n ## Subtotal")
             ));
         }
 
-        return fixedCost != null && claimCost != null ? fixedCost.add(claimCost)
-            : claimCost != null ? claimCost : ZERO;
+        return claimCost != null ? claimCost : ZERO;
+
+    }
+
+    public static BigDecimal getFixedCostsOfJudgmentForDJ(CaseData data) {
+
+        String repaymentSummary = data.getRepaymentSummaryObject();
+        BigDecimal fixedCost = null;
+        if (null != repaymentSummary) {
+            fixedCost = repaymentSummary.contains("Fixed")
+                ? new BigDecimal(repaymentSummary.substring(
+                repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
+                repaymentSummary.indexOf("\n### Claim fee amount ")
+            )) : null;
+        }
+
+        return fixedCost != null ? fixedCost : ZERO;
 
     }
 
@@ -266,23 +274,24 @@ public class JudgmentsOnlineHelper {
 
     public static JudgmentAddress getJudgmentAddress(Address address, RoboticsAddressMapper addressMapper) {
 
-        Address newAddress = Address.builder()
-            .addressLine1(removeWelshCharacters(address.getAddressLine1()))
-            .addressLine2(removeWelshCharacters(address.getAddressLine2()))
-            .addressLine3(removeWelshCharacters(address.getAddressLine3()))
-            .postCode(removeWelshCharacters(address.getPostCode()))
-            .postTown(removeWelshCharacters(address.getPostTown()))
-            .county(removeWelshCharacters(address.getCounty()))
-            .country(removeWelshCharacters(address.getCountry())).build();
+        Address newAddress = new Address();
+        newAddress.setAddressLine1(removeWelshCharacters(address.getAddressLine1()));
+        newAddress.setAddressLine2(removeWelshCharacters(address.getAddressLine2()));
+        newAddress.setAddressLine3(removeWelshCharacters(address.getAddressLine3()));
+        newAddress.setPostCode(removeWelshCharacters(address.getPostCode()));
+        newAddress.setPostTown(removeWelshCharacters(address.getPostTown()));
+        newAddress.setCounty(removeWelshCharacters(address.getCounty()));
+        newAddress.setCountry(removeWelshCharacters(address.getCountry()));
 
         RoboticsAddress roboticsAddress = addressMapper.toRoboticsAddress(newAddress);
-        return JudgmentAddress.builder()
-            .defendantAddressLine1(trimDownTo35(roboticsAddress.getAddressLine1()))
-            .defendantAddressLine2(trimDownTo35(roboticsAddress.getAddressLine2()))
-            .defendantAddressLine3(trimDownTo35(roboticsAddress.getAddressLine3()))
-            .defendantAddressLine4(trimDownTo35(roboticsAddress.getAddressLine4()))
-            .defendantAddressLine5(trimDownTo35(roboticsAddress.getAddressLine5()))
-            .defendantPostCode(roboticsAddress.getPostCode()).build();
+        JudgmentAddress judgmentAddress = new JudgmentAddress();
+        judgmentAddress.setDefendantAddressLine1(trimDownTo35(roboticsAddress.getAddressLine1()));
+        judgmentAddress.setDefendantAddressLine2(trimDownTo35(roboticsAddress.getAddressLine2()));
+        judgmentAddress.setDefendantAddressLine3(trimDownTo35(roboticsAddress.getAddressLine3()));
+        judgmentAddress.setDefendantAddressLine4(trimDownTo35(roboticsAddress.getAddressLine4()));
+        judgmentAddress.setDefendantAddressLine5(trimDownTo35(roboticsAddress.getAddressLine5()));
+        judgmentAddress.setDefendantPostCode(roboticsAddress.getPostCode());
+        return judgmentAddress;
     }
 
     public static String removeWelshCharacters(String input) {
@@ -295,12 +304,12 @@ public class JudgmentsOnlineHelper {
 
     public static  String formatAddress(JudgmentAddress address) {
         String formattedLine = new StringBuilder()
-            .addAll(formatAddressLine(address.getDefendantAddressLine1()))
-            .addAll(formatAddressLine(address.getDefendantAddressLine2()))
-            .addAll(formatAddressLine(address.getDefendantAddressLine3()))
-            .addAll(formatAddressLine(address.getDefendantAddressLine4()))
-            .addAll(formatAddressLine(address.getDefendantAddressLine5()))
-            .result().trim();
+            .append(formatAddressLine(address.getDefendantAddressLine1()))
+            .append(formatAddressLine(address.getDefendantAddressLine2()))
+            .append(formatAddressLine(address.getDefendantAddressLine3()))
+            .append(formatAddressLine(address.getDefendantAddressLine4()))
+            .append(formatAddressLine(address.getDefendantAddressLine5()))
+            .toString().trim();
         return formattedLine.length() > 0 ? formattedLine.substring(0, formattedLine.length() - 1) : "";
     }
 

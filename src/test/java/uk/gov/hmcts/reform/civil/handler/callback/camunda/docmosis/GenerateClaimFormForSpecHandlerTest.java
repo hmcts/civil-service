@@ -90,33 +90,34 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
+    public static final CaseDocument CLAIM_FORM;
+    public static final CaseDocument STITCHED_DOC;
 
-    private static final CaseDocument CLAIM_FORM =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName(String.format(N1.getDocumentTitle(), "000MC001"))
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
-    private static final CaseDocument STITCHED_DOC =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+    static {
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document = new CaseDocument();
+        document.setCreatedBy("John");
+        document.setDocumentName(String.format(N1.getDocumentTitle(), "000MC001"));
+        document.setDocumentSize(0L);
+        document.setDocumentType(SEALED_CLAIM);
+        document.setCreatedDatetime(LocalDateTime.now());
+        document.setDocumentLink(documentLink);
+        CLAIM_FORM = document;
+
+        CaseDocument document2 = new CaseDocument();
+        document2.setCreatedBy("John");
+        document2.setDocumentName("Stitched document");
+        document2.setDocumentSize(0L);
+        document2.setDocumentType(SEALED_CLAIM);
+        document2.setCreatedDatetime(LocalDateTime.now());
+        document2.setDocumentLink(documentLink);
+        STITCHED_DOC = document2;
+    }
+
     private final LocalDate issueDate = now();
     List<DocumentMetaData> documents = new ArrayList<>();
     List<DocumentMetaData> specClaimTimelineDocuments = new ArrayList<>();
@@ -144,9 +145,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
                                                                 "Supported docs",
                                                                 LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued().build().toBuilder()
-                .specRespondent1Represented(YES)
-                .build();
+                .atStatePendingClaimIssued().build();
+            caseData.setSpecRespondent1Represented(YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             // When
@@ -183,8 +183,7 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
                                                                 LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitorsSpec()
-                .atStatePendingClaimIssued().build().toBuilder()
-                .build();
+                .atStatePendingClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -219,18 +218,17 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
                                                                 "Supported docs",
                                                                 LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued().build().toBuilder()
-                .specRespondent1Represented(YES)
-                .specClaimTemplateDocumentFiles(new Document("fake-url",
+                .atStatePendingClaimIssued().build();
+            caseData.setSpecRespondent1Represented(YES);
+            caseData.setSpecClaimTemplateDocumentFiles(new Document("fake-url",
                                                              "binary-url",
                                                              "file-name",
-                                                             null, null, null))
+                                                             null, null, null));
 
-                .specClaimDetailsDocumentFiles(new Document("fake-url",
+            caseData.setSpecClaimDetailsDocumentFiles(new Document("fake-url",
                                                             "binary-url",
                                                             "file-name",
-                                                            null, null, null))
-                .build();
+                                                            null, null, null));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -263,9 +261,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
                                                             "Supported docs",
                                                             LocalDate.now().toString()));
         CaseData caseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .specRespondent1Represented(YES)
-            .build();
+            .atStatePendingClaimIssued().build();
+        caseData.setSpecRespondent1Represented(YES);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -300,10 +297,9 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null, UPLOAD_TIMESTAMP);
         CaseData caseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .specClaimDetailsDocumentFiles(testDocument)
-            .specRespondent1Represented(YES)
-            .build();
+            .atStatePendingClaimIssued().build();
+        caseData.setSpecClaimDetailsDocumentFiles(testDocument);
+        caseData.setSpecRespondent1Represented(YES);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -339,10 +335,9 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null, UPLOAD_TIMESTAMP);
         CaseData caseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .specClaimTemplateDocumentFiles(testDocument)
-            .specRespondent1Represented(YES)
-            .build();
+            .atStatePendingClaimIssued().build();
+        caseData.setSpecClaimTemplateDocumentFiles(testDocument);
+        caseData.setSpecRespondent1Represented(YES);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -378,11 +373,10 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null, UPLOAD_TIMESTAMP);
         CaseData caseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .specClaimDetailsDocumentFiles(testDocument)
-            .specClaimTemplateDocumentFiles(testDocument)
-            .specRespondent1Represented(YES)
-            .build();
+            .atStatePendingClaimIssued().build();
+        caseData.setSpecClaimDetailsDocumentFiles(testDocument);
+        caseData.setSpecClaimTemplateDocumentFiles(testDocument);
+        caseData.setSpecRespondent1Represented(YES);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -421,11 +415,10 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null, UPLOAD_TIMESTAMP);
         CaseData caseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .specClaimDetailsDocumentFiles(testDocument)
-            .specClaimTemplateDocumentFiles(testDocument)
-            .specRespondent1Represented(YES)
-            .build();
+            .atStatePendingClaimIssued().build();
+        caseData.setSpecClaimDetailsDocumentFiles(testDocument);
+        caseData.setSpecClaimTemplateDocumentFiles(testDocument);
+        caseData.setSpecRespondent1Represented(YES);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -459,9 +452,9 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
                                                                 "Supported docs",
                                                                 LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssuedUnrepresentedDefendant().build().toBuilder()
-                .specRespondent1Represented(NO)
-                .build();
+                .atStatePendingClaimIssuedUnrepresentedDefendant().build();
+            caseData.setSpecRespondent1Represented(NO)
+;
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -492,10 +485,9 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
                                                                 "Supported docs",
                                                                 LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimSubmitted1v2AndOnlySecondRespondentIsRepresented().build().toBuilder()
-                .specRespondent1Represented(NO)
-                .specRespondent2Represented(YES)
-                .build();
+                .atStateClaimSubmitted1v2AndOnlySecondRespondentIsRepresented().build();
+            caseData.setSpecRespondent1Represented(NO);
+            caseData.setSpecRespondent2Represented(YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -526,10 +518,9 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
                                                                 "Supported docs",
                                                                 LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented().build().toBuilder()
-                .specRespondent1Represented(YES)
-                .specRespondent2Represented(NO)
-                .build();
+                .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented().build();
+            caseData.setSpecRespondent1Represented(YES);
+            caseData.setSpecRespondent2Represented(NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -560,10 +551,9 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
                                                                 "Supported docs",
                                                                 LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimSubmittedNoRespondentRepresented().build().toBuilder()
-                .specRespondent1Represented(NO)
-                .specRespondent2Represented(NO)
-                .build();
+                .atStateClaimSubmittedNoRespondentRepresented().build();
+            caseData.setSpecRespondent1Represented(NO);
+            caseData.setSpecRespondent2Represented(NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -592,12 +582,9 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             given(toggleService.isLipVLipEnabled()).willReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssuedUnrepresentedDefendant().build().toBuilder()
-                .specRespondent1Represented(NO)
-                .build()
-                .toBuilder()
-                .applicant1Represented(NO)
-                .build();
+                .atStatePendingClaimIssuedUnrepresentedDefendant().build();
+            caseData.setSpecRespondent1Represented(NO);
+            caseData.setApplicant1Represented(NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

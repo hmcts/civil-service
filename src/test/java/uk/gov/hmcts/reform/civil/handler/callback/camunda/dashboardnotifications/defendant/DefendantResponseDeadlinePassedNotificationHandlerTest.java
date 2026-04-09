@@ -65,9 +65,9 @@ class DefendantResponseDeadlinePassedNotificationHandlerTest extends BaseCallbac
         @Test
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build()).build();
+                .caseDataLip(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.YES)
+                                 .setApplicant1ClaimSettledDate(
+                                     LocalDate.now())).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -82,7 +82,7 @@ class DefendantResponseDeadlinePassedNotificationHandlerTest extends BaseCallbac
                 "BEARER_TOKEN",
                 "Scenario.AAA6.DefResponse.ResponseTimeElapsed.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

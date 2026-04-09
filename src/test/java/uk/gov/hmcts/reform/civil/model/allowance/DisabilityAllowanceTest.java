@@ -12,22 +12,18 @@ import static uk.gov.hmcts.reform.civil.model.allowance.DisabilityAllowance.getD
 class DisabilityAllowanceTest {
 
     static Stream<Arguments> shouldReturnCalculatedDisabilityAllowance() {
-        DisabilityParam severelyDisabledAndCarer = DisabilityParam.builder()
-            .carer(true)
-            .severelyDisabled(true)
-            .build();
-        DisabilityParam severelyDisabledCouple = DisabilityParam.builder()
-            .severelyDisabled(true)
-            .hasPartner(true)
-            .build();
-        DisabilityParam disabledCouple = DisabilityParam.builder()
-            .disabled(true)
-            .hasPartner(true)
-            .build();
-        DisabilityParam hasDependantDisabledAndIsCarer = DisabilityParam.builder()
-            .dependant(true)
-            .carer(true)
-            .build();
+        DisabilityParam severelyDisabledAndCarer = new DisabilityParam(
+            false, false, true, false, true
+        );
+        DisabilityParam severelyDisabledCouple = new DisabilityParam(
+            false, true, true, false, false
+        );
+        DisabilityParam disabledCouple = new DisabilityParam(
+            true, true, false, false, false
+        );
+        DisabilityParam hasDependantDisabledAndIsCarer = new DisabilityParam(
+            false, false, false, true, true
+        );
         return Stream.of(
             Arguments.of(severelyDisabledAndCarer, 417.94),
             Arguments.of(severelyDisabledCouple, 536.03),

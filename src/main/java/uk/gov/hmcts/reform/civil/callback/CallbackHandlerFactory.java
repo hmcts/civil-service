@@ -24,18 +24,32 @@ public class CallbackHandlerFactory {
 
     private final HashMap<String, CallbackHandler> eventHandlers = new HashMap<>();
     private final CaseDetailsConverter caseDetailsConverter;
+    private final CaseTypeHandlerKeyFactory caseTypeHandlerKeyFactory;
 
     @Autowired
-    public CallbackHandlerFactory(CaseDetailsConverter caseDetailsConverter, CallbackHandler... beans) {
+    public CallbackHandlerFactory(CaseDetailsConverter caseDetailsConverter,
+                                  CaseTypeHandlerKeyFactory caseTypeHandlerKeyFactory,
+                                  CallbackHandler... callbackHandlers) {
         this.caseDetailsConverter = caseDetailsConverter;
-        Arrays.asList(beans).forEach(bean -> bean.register(eventHandlers));
+        this.caseTypeHandlerKeyFactory = caseTypeHandlerKeyFactory;
+        Arrays.asList(callbackHandlers).forEach(
+            callbackHandler ->
+                callbackHandler.handledEvents().forEach(
+                    handleEvent -> registerHandlerForEvent(callbackHandler, handleEvent)
+                ));
+    }
+
+    private void registerHandlerForEvent(CallbackHandler callbackHandler, CaseEvent handledEvent) {
+        caseTypeHandlerKeyFactory.createRegistrationKeys(callbackHandler, handledEvent)
+            .forEach(handlerKey -> eventHandlers.put(handlerKey, callbackHandler));
     }
 
     @EventAllowed
     @NoOngoingBusinessProcess
     @EventEmitter
     public CallbackResponse dispatch(CallbackParams callbackParams) {
-        String eventId = callbackParams.getRequest().getEventId();
+        final String eventId = caseTypeHandlerKeyFactory.createDispatchKey(callbackParams);
+
         return ofNullable(eventHandlers.get(eventId))
             .map(h -> processEvent(h, callbackParams, eventId))
             .orElseThrow(() -> new CallbackException("Could not handle callback for event " + eventId));

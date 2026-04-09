@@ -26,10 +26,9 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     public void canEnterOnce() {
         CaseData caseData = CaseData.builder().build();
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
-            .type(CallbackType.ABOUT_TO_START)
-            .build();
+            .type(CallbackType.ABOUT_TO_START);
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
         Assertions.assertFalse(response.getErrors() != null && !response.getErrors().isEmpty());
@@ -37,16 +36,15 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
     @Test
     public void cantEnterTwice() {
-        CaseData caseData = CaseData.builder()
-            .breathing(BreathingSpaceInfo.builder()
-                           .enter(BreathingSpaceEnterInfo.builder().build())
-                           .build())
-            .build();
+        BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
+        BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
+        breathingInfo.setEnter(enterInfo);
+        CaseData caseData = CaseData.builder().build();
+        caseData.setBreathing(breathingInfo);
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
-            .type(CallbackType.ABOUT_TO_START)
-            .build();
+            .type(CallbackType.ABOUT_TO_START);
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
         Assertions.assertFalse(response.getErrors().isEmpty());
@@ -54,19 +52,17 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
     @Test
     public void whenStartDateIsNotPast_thenReturnError() {
-        CaseData caseData = CaseData.builder()
-            .breathing(BreathingSpaceInfo.builder()
-                           .enter(BreathingSpaceEnterInfo.builder()
-                                      .start(LocalDate.now().plusDays(1))
-                                      .build())
-                           .build())
-            .build();
+        BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
+        enterInfo.setStart(LocalDate.now().plusDays(1));
+        BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
+        breathingInfo.setEnter(enterInfo);
+        CaseData caseData = CaseData.builder().build();
+        caseData.setBreathing(breathingInfo);
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
             .type(CallbackType.MID)
-            .pageId("enter-info")
-            .build();
+            .pageId("enter-info");
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
         Assertions.assertFalse(response.getErrors().isEmpty());
@@ -74,19 +70,17 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
     @Test
     public void whenStartDateIsPast_thenReturnNoError() {
-        CaseData caseData = CaseData.builder()
-            .breathing(BreathingSpaceInfo.builder()
-                           .enter(BreathingSpaceEnterInfo.builder()
-                                      .start(LocalDate.now())
-                                      .build())
-                           .build())
-            .build();
+        BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
+        enterInfo.setStart(LocalDate.now());
+        BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
+        breathingInfo.setEnter(enterInfo);
+        CaseData caseData = CaseData.builder().build();
+        caseData.setBreathing(breathingInfo);
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
             .type(CallbackType.MID)
-            .pageId("enter-info")
-            .build();
+            .pageId("enter-info");
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
         Assertions.assertTrue(response.getErrors().isEmpty());
@@ -94,19 +88,17 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
     @Test
     public void whenEndDateIsNotFuture_thenReturnError() {
-        CaseData caseData = CaseData.builder()
-            .breathing(BreathingSpaceInfo.builder()
-                           .enter(BreathingSpaceEnterInfo.builder()
-                                      .expectedEnd(LocalDate.now())
-                                      .build())
-                           .build())
-            .build();
+        BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
+        enterInfo.setExpectedEnd(LocalDate.now());
+        BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
+        breathingInfo.setEnter(enterInfo);
+        CaseData caseData = CaseData.builder().build();
+        caseData.setBreathing(breathingInfo);
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
             .type(CallbackType.MID)
-            .pageId("enter-info")
-            .build();
+            .pageId("enter-info");
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
         Assertions.assertFalse(response.getErrors().isEmpty());
@@ -114,19 +106,17 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
     @Test
     public void whenEndDateIsFuture_thenReturnNoError() {
-        CaseData caseData = CaseData.builder()
-            .breathing(BreathingSpaceInfo.builder()
-                           .enter(BreathingSpaceEnterInfo.builder()
-                                      .expectedEnd(LocalDate.now().plusDays(1))
-                                      .build())
-                           .build())
-            .build();
+        BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
+        enterInfo.setExpectedEnd(LocalDate.now().plusDays(1));
+        BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
+        breathingInfo.setEnter(enterInfo);
+        CaseData caseData = CaseData.builder().build();
+        caseData.setBreathing(breathingInfo);
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
             .type(CallbackType.MID)
-            .pageId("enter-info")
-            .build();
+            .pageId("enter-info");
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
         Assertions.assertTrue(response.getErrors().isEmpty());
@@ -135,14 +125,12 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void whenSubmitted_thenIncludeHeader() {
         String claimNumber = "claim number";
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference(claimNumber)
-            .build();
+        CaseData caseData = CaseData.builder().build();
+        caseData.setLegacyCaseReference(claimNumber);
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
-            .type(CallbackType.SUBMITTED)
-            .build();
+            .type(CallbackType.SUBMITTED);
         SubmittedCallbackResponse response =
             (SubmittedCallbackResponse) callbackHandler.handle(params);
         Assertions.assertTrue(response.getConfirmationHeader().contains(claimNumber));
@@ -152,10 +140,9 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     void testAboutToSubmitCallback() {
         CaseData caseData = CaseData.builder().build();
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
-            .type(CallbackType.ABOUT_TO_SUBMIT)
-            .build();
+            .type(CallbackType.ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
         Assertions.assertTrue(response.getData().containsKey("businessProcess"));

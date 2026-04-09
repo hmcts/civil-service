@@ -7,20 +7,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 public class PaymentDateServiceTest {
 
     @Mock
-    private DeadlinesCalculator calculator;
+    private DeadlineExtensionCalculatorService deadlineCalculatorService;
 
     @InjectMocks
     private PaymentDateService paymentDateService;
@@ -29,56 +34,51 @@ public class PaymentDateServiceTest {
     void shouldGetWhenWillThisAmountBePaid_whenWhenWillThisAmountBePaidArePresent() {
         //Given
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        CaseData caseData = CaseData.builder()
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
-            )
-            .build();
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+        respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
         //When
-        LocalDate payDate = paymentDateService.getPaymentDateAdmittedClaim(caseData);
+        Optional<LocalDate> payDate = paymentDateService.getPaymentDate(caseData);
         //Then
-        assertThat(payDate).isEqualTo(whenWillPay);
+        assertThat(payDate.orElse(null)).isEqualTo(whenWillPay);
     }
 
     @Test
     void shouldGetWhenWasThisAmountPaid_whenWhenWasThisAmountPaidArePresent() {
         //Given
         LocalDate whenWasPaid = LocalDate.now().plusDays(-5);
-        CaseData caseData = CaseData.builder()
-            .respondToAdmittedClaim(RespondToClaim.builder()
-                                        .whenWasThisAmountPaid(whenWasPaid).build()
-            )
-            .build();
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setWhenWasThisAmountPaid(whenWasPaid);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondToAdmittedClaim(respondToClaim);
         //When
-        LocalDate result = paymentDateService.getPaymentDateAdmittedClaim(caseData);
+        Optional<LocalDate> result = paymentDateService.getPaymentDate(caseData);
         //Then
-        assertThat(result).isEqualTo(whenWasPaid);
+        assertThat(result.orElse(null)).isEqualTo(whenWasPaid);
     }
 
     @Test
     void shouldReturnRespondent1ResponseDatePlus5Days_whenRespondent1ResponseDateArePresent() {
         //Given
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        when(calculator.calculateRespondentPaymentDateAdmittedClaim(any())).thenReturn(whenWillPay);
-        CaseData caseData = CaseData.builder()
-            .respondent1ResponseDate(LocalDateTime.now())
-            .build();
+        when(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDate.class), anyInt())).thenReturn(whenWillPay);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1ResponseDate(LocalDateTime.now());
         //When
-        LocalDate result = paymentDateService.getPaymentDateAdmittedClaim(caseData);
+        Optional<LocalDate> result = paymentDateService.getPaymentDate(caseData);
         //Then
-        assertThat(result).isEqualTo(whenWillPay);
+        assertThat(result.orElse(null)).isEqualTo(whenWillPay);
     }
 
     @Test
     void shouldReturnNull_whenAnythingIsSettled() {
         //Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         //When
-        LocalDate result = paymentDateService.getPaymentDateAdmittedClaim(caseData);
+        Optional<LocalDate> result = paymentDateService.getPaymentDate(caseData);
         //Then
-        assertThat(result).isNull();
+        assertThat(result.orElse(null)).isNull();
     }
 
 }

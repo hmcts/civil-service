@@ -37,14 +37,12 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL)
-                    .individualFirstName("Claimant")
-                    .individualLastName("John")
-                    .build())
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                               .builder()
-                                               .whenWillThisAmountBePaid(responseDeadline)
-                                               .build())
+            .applicant1(new Party().setType(Party.Type.INDIVIDUAL)
+                    .setIndividualFirstName("Claimant")
+                    .setIndividualLastName("John"))
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(responseDeadline)
+                                               )
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
             .build();
@@ -59,17 +57,13 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have offered to pay £1000 by " +
-                        DateUtils.formatDate(responseDeadline) + " plus the claim fee and any fixed costs claimed. " +
-                        "The payment must be received in Claimant John's account by then, if not they can request a county court judgment.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
+                    "<p class=\"govuk-body\">You've said you owe £1000 plus the claim fee and any fixed costs claimed and offered to pay " +
+                        "Claimant John immediately. We will contact you when the claimant responds.</p>"
                 ),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 erbyn " +
-                        DateUtils.formatDateInWelsh(responseDeadline, false) + " ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog" +
-                        " a hawlir. Rhaid i’r taliad fod yng nghyfrif Claimant John erbyn y dyddiad hwnnw. Os nad yw, yna gallant wneud cais" +
-                        " am ddyfarniad llys sirol.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
+                    "<p class=\"govuk-body\">Rydych chi wedi dweud bod £1000 yn ddyledus gennych, a ffi’r hawliad ac unrhyw gostau sefydlog " +
+                        "a hawlir ac rydych wedi cynnig i dalu " +
+                        "Claimant John ar unwaith. Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb.</p>"
                 )
 
             );
@@ -95,14 +89,12 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL)
-                    .individualFirstName("Claimant")
-                    .individualLastName("John")
-                    .build())
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                               .builder()
-                                               .whenWillThisAmountBePaid(admitPaymentDeadline)
-                                               .build())
+            .applicant1(new Party().setType(Party.Type.INDIVIDUAL)
+                    .setIndividualFirstName("Claimant")
+                    .setIndividualLastName("John"))
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(admitPaymentDeadline)
+                                               )
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .totalClaimAmount(new BigDecimal(1000))
             .build();

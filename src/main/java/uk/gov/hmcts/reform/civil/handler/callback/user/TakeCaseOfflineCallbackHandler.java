@@ -46,11 +46,10 @@ public class TakeCaseOfflineCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse setTakenOfflineDate(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(TAKE_CASE_OFFLINE))
-            .previousCCDState(getPreviousCaseSate(callbackParams))
-            .takenOfflineDate(time.now())
-            .build();
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setBusinessProcess(BusinessProcess.ready(TAKE_CASE_OFFLINE));
+        caseData.setPreviousCCDState(getPreviousCaseSate(callbackParams));
+        caseData.setTakenOfflineDate(time.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))

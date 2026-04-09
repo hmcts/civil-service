@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.client.LocationReferenceDataApiClient;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.refdata.CourtVenueService;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,26 +24,21 @@ public class LocationReferenceDataService {
 
     public static final String CIVIL_NATIONAL_BUSINESS_CENTRE = "Civil National Business Centre";
     public static final String COUNTY_COURT_MONEY_CLAIMS_CENTRE = "County Court Money Claims Centre";
-    private final LocationReferenceDataApiClient locationReferenceDataApiClient;
+    private final CourtVenueService courtVenueService;
     private final AuthTokenGenerator authTokenGenerator;
-    private static final String CIVIL_COURT_TYPE_ID = "10";
-    private static final String IS_HEARING_LOCATION = "Y";
-    private static final String IS_CASE_MANAGEMENT_LOCATION = "Y";
-    private static final String LOCATION_TYPE = "Court";
-    private static final String COURT_STATUS = "Open";
     private static final String LOCATION_REFERENCE_DATA_LOOKUP_FAILED = "Location Reference Data Lookup Failed - {}";
 
     public LocationRefData getCnbcLocation(String authToken) {
         try {
             List<LocationRefData> cnbcLocations =
-                locationReferenceDataApiClient.getCourtVenueByName(
+                courtVenueService.getCourtVenueByName(
                     authTokenGenerator.generate(),
                     authToken,
                     CIVIL_NATIONAL_BUSINESS_CENTRE
                 );
             if (cnbcLocations == null || cnbcLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CNBC location");
-                return LocationRefData.builder().build();
+                return new LocationRefData();
             } else {
                 if (cnbcLocations.size() > 1) {
                     log.warn("Location Reference Data Lookup returned more than one CNBC location");
@@ -53,20 +48,20 @@ public class LocationReferenceDataService {
         } catch (Exception e) {
             log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
         }
-        return LocationRefData.builder().build();
+        return new LocationRefData();
     }
 
     public LocationRefData getCcmccLocation(String authToken) {
         try {
             List<LocationRefData> ccmccLocations =
-                locationReferenceDataApiClient.getCourtVenueByName(
+                courtVenueService.getCourtVenueByName(
                     authTokenGenerator.generate(),
                     authToken,
                     COUNTY_COURT_MONEY_CLAIMS_CENTRE
                 );
             if (ccmccLocations == null || ccmccLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CCMCC location");
-                return LocationRefData.builder().build();
+                return new LocationRefData();
             } else {
                 if (ccmccLocations.size() > 1) {
                     log.warn("Location Reference Data Lookup returned more than one CCMCC location");
@@ -76,21 +71,12 @@ public class LocationReferenceDataService {
         } catch (Exception e) {
             log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
         }
-        return LocationRefData.builder().build();
+        return new LocationRefData();
     }
 
     public List<LocationRefData> getCourtLocationsForDefaultJudgments(String authToken) {
         try {
-            return
-                locationReferenceDataApiClient.getCourtVenue(
-                    authTokenGenerator.generate(),
-                    authToken,
-                    IS_HEARING_LOCATION,
-                    IS_CASE_MANAGEMENT_LOCATION,
-                    CIVIL_COURT_TYPE_ID,
-                    LOCATION_TYPE
-                );
-
+            return courtVenueService.getCMLAndHLCourts(authTokenGenerator.generate(), authToken);
         } catch (Exception e) {
             log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
         }
@@ -99,15 +85,7 @@ public class LocationReferenceDataService {
 
     public List<LocationRefData> getCourtLocationsForGeneralApplication(String authToken) {
         try {
-            List<LocationRefData> responseEntity =
-                locationReferenceDataApiClient.getCourtVenue(
-                    authTokenGenerator.generate(),
-                    authToken,
-                    IS_HEARING_LOCATION,
-                    IS_CASE_MANAGEMENT_LOCATION,
-                    CIVIL_COURT_TYPE_ID,
-                    LOCATION_TYPE
-                );
+            List<LocationRefData> responseEntity = courtVenueService.getCMLAndHLCourts(authTokenGenerator.generate(), authToken);
             return onlyEnglandAndWalesLocations(responseEntity)
                 .stream().sorted(Comparator.comparing(LocationRefData::getSiteName)).toList();
         } catch (Exception e) {
@@ -122,10 +100,19 @@ public class LocationReferenceDataService {
 
     public List<LocationRefData> getCourtLocationsByEpimmsIdAndCourtType(String authToken, String epimmsId) {
         try {
-            return locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
+            return courtVenueService.getCourtByEpimmsId(authTokenGenerator.generate(), authToken, epimmsId);
+        } catch (Exception e) {
+            log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
+        }
+        return new ArrayList<>();
+    }
+
+    public List<LocationRefData> getCourtLocationsByEpimmsIdWithCML(String authToken, String epimmsId) {
+        try {
+            return courtVenueService.getCMLCourtByEpimmsId(
                 authTokenGenerator.generate(),
-                authToken, epimmsId, CIVIL_COURT_TYPE_ID
-                );
+                authToken, epimmsId
+            );
         } catch (Exception e) {
             log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
         }
@@ -141,10 +128,7 @@ public class LocationReferenceDataService {
      */
     public List<LocationRefData> getHearingCourtLocations(String authToken) {
         try {
-            return locationReferenceDataApiClient.getHearingVenue(
-                authTokenGenerator.generate(),
-                authToken, IS_HEARING_LOCATION, CIVIL_COURT_TYPE_ID, LOCATION_TYPE
-                );
+            return courtVenueService.getHearingLocationCourts(authTokenGenerator.generate(), authToken);
         } catch (Exception e) {
             log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
         }
@@ -199,14 +183,9 @@ public class LocationReferenceDataService {
 
     public LocationRefData getCourtLocation(String authToken, String threeDigitCode) {
         try {
-            List<LocationRefData> responseEntity =
-                locationReferenceDataApiClient.getCourtVenueByLocationCode(
-                    authTokenGenerator.generate(),
-                    authToken, IS_CASE_MANAGEMENT_LOCATION, CIVIL_COURT_TYPE_ID, threeDigitCode, COURT_STATUS
-                );
-            List<LocationRefData> locations = responseEntity;
+            List<LocationRefData> locations = courtVenueService.getCourtVenueByLocationCode(authTokenGenerator.generate(), authToken, threeDigitCode);
             if (locations == null || locations.isEmpty()) {
-                return LocationRefData.builder().build();
+                return new LocationRefData();
             } else {
                 return filterCourtLocation(locations, threeDigitCode);
 

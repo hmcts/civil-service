@@ -80,7 +80,7 @@ class CaseFlagUtilsTest {
     void setUp() {
         organisationService = mock(OrganisationService.class);
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Civil - Organisation").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Civil - Organisation")));
     }
 
     @Nested
@@ -88,7 +88,7 @@ class CaseFlagUtilsTest {
 
         @Test
         void shouldCreateFlags() {
-            Flags expected = Flags.builder().partyName("partyName").roleOnCase("roleOnCase").details(List.of()).build();
+            Flags expected = new Flags().setPartyName("partyName").setRoleOnCase("roleOnCase").setDetails(List.of());
             Flags actual = CaseFlagUtils.createFlags("partyName", "roleOnCase");
             assertEquals(expected, actual);
         }
@@ -99,9 +99,9 @@ class CaseFlagUtilsTest {
 
         @Test
         void shouldUpdatePartyWithFlagsMeta() {
-            Party party = PartyBuilder.builder().individual().build();
-            Flags flags = Flags.builder().partyName("Mr. John Rambo").roleOnCase("applicant").details(List.of()).build();
-            Party expected = party.toBuilder().flags(flags).build();
+            Party party = new PartyBuilder().individual().build();
+            Flags flags = new Flags().setPartyName("Mr. John Rambo").setRoleOnCase("applicant").setDetails(List.of());
+            Party expected = party.setFlags(flags);
 
             Party actual = CaseFlagUtils.updateParty("applicant", party);
 
@@ -110,10 +110,8 @@ class CaseFlagUtilsTest {
 
         @Test
         void shouldNotUpdatePartyFlagsIfFlagsExist() {
-            Party existingParty = PartyBuilder.builder().individual().build()
-                .toBuilder()
-                .flags(Flags.builder().partyName("Mr. John Rambo").roleOnCase("applicant").details(List.of()).build())
-                .build();
+            Party existingParty = new PartyBuilder().individual().build()
+                .setFlags(new Flags().setPartyName("Mr. John Rambo").setRoleOnCase("applicant").setDetails(List.of()));
 
             Party actual = CaseFlagUtils.updateParty("updatedField", existingParty);
 
@@ -132,9 +130,9 @@ class CaseFlagUtilsTest {
 
         @Test
         void shouldUpdateLitigationFriendWithFlagsMeta() {
-            LitigationFriend litFriend = LitigationFriend.builder().firstName("John").lastName("Rambo").build();
-            Flags flags = Flags.builder().partyName("John Rambo").roleOnCase("applicant").details(List.of()).build();
-            LitigationFriend expected = litFriend.toBuilder().flags(flags).build();
+            LitigationFriend litFriend = new LitigationFriend().setFirstName("John").setLastName("Rambo");
+            Flags flags = new Flags().setPartyName("John Rambo").setRoleOnCase("applicant").setDetails(List.of());
+            LitigationFriend expected = litFriend.copy().setFlags(flags);
 
             LitigationFriend actual = CaseFlagUtils.updateLitFriend("applicant", litFriend);
 
@@ -143,10 +141,9 @@ class CaseFlagUtilsTest {
 
         @Test
         void shouldNotUpdateLitigationFriendFlagsIfFlagsExist() {
-            LitigationFriend existingLitFriend = LitigationFriend.builder().firstName("John").lastName("Rambo").build()
-                .toBuilder()
-                .flags(Flags.builder().partyName("John Rambo").roleOnCase("applicant").details(List.of()).build())
-                .build();
+            LitigationFriend existingLitFriend = new LitigationFriend().setFirstName("John").setLastName("Rambo")
+                .copy()
+                .setFlags(new Flags().setPartyName("John Rambo").setRoleOnCase("applicant").setDetails(List.of()));
 
             LitigationFriend actual = CaseFlagUtils.updateLitFriend("updatedField", existingLitFriend);
 
@@ -168,46 +165,35 @@ class CaseFlagUtilsTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .build();
 
-            Expert expert1 = Expert.builder().partyID("partyId1").firstName("First").lastName("Name").build();
-            Expert expert2 = Expert.builder().partyID("partyId2").firstName("Second").lastName("expert").build();
-            Expert expert3 = Expert.builder().partyID("partyId3").firstName("Third").lastName("experto").build();
+            Expert expert1 = new Expert().setPartyID("partyId1").setFirstName("First").setLastName("Name");
+            Expert expert2 = new Expert().setPartyID("partyId2").setFirstName("Second").setLastName("expert");
+            Expert expert3 = new Expert().setPartyID("partyId3").setFirstName("Third").setLastName("experto");
 
             CaseData updatedCaseData = caseData.toBuilder()
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQExperts(Experts
-                                                             .builder()
-                                                             .details(wrapElements(expert1, expert2))
-                                                             .build())
-                                   .build())
-                .respondent2DQ(Respondent2DQ.builder()
-                                   .respondent2DQExperts(Experts.builder()
-                                                             .details(wrapElements(expert3))
-                                                             .build())
-                                   .build())
+                .respondent1DQ(new Respondent1DQ()
+                                   .setRespondent1DQExperts(new Experts()
+                                                                .setDetails(wrapElements(expert1, expert2))))
+                .respondent2DQ(new Respondent2DQ()
+                                   .setRespondent2DQExperts(new Experts()
+                                                                .setDetails(wrapElements(expert3))))
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilderToUpdateWithFlags = updatedCaseData.toBuilder();
+            addRespondentDQPartiesFlagStructure(updatedCaseData);
 
-            addRespondentDQPartiesFlagStructure(
-                caseDataBuilderToUpdateWithFlags,
-                updatedCaseData
-            );
+            List<Element<PartyFlagStructure>> respondent1ExpertsWithFlags = updatedCaseData.getRespondent1Experts();
+            List<Element<PartyFlagStructure>> respondent2ExpertsWithFlags = updatedCaseData.getRespondent2Experts();
 
-            CaseData caseDataWithFlags = caseDataBuilderToUpdateWithFlags.build();
-            List<Element<PartyFlagStructure>> respondent1ExpertsWithFlags = caseDataWithFlags.getRespondent1Experts();
-            List<Element<PartyFlagStructure>> respondent2ExpertsWithFlags = caseDataWithFlags.getRespondent2Experts();
+            Flags expectedExpert1Flags = new Flags().setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
+                .setPartyName("First Name")
+                .setDetails(List.of());
 
-            Flags expectedExpert1Flags = Flags.builder().roleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
-                .partyName("First Name")
-                .details(List.of()).build();
+            Flags expectedExpert2Flags = new Flags().setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
+                .setPartyName("Second expert")
+                .setDetails(List.of());
 
-            Flags expectedExpert2Flags = Flags.builder().roleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
-                .partyName("Second expert")
-                .details(List.of()).build();
-
-            Flags expectedExpert3Flags = Flags.builder().roleOnCase(RESPONDENT_SOLICITOR_TWO_EXPERT)
-                .partyName("Third experto")
-                .details(List.of()).build();
+            Flags expectedExpert3Flags = new Flags().setRoleOnCase(RESPONDENT_SOLICITOR_TWO_EXPERT)
+                .setPartyName("Third experto")
+                .setDetails(List.of());
 
             assertThat(respondent1ExpertsWithFlags).isNotNull();
             assertThat(respondent1ExpertsWithFlags).hasSize(2);
@@ -238,47 +224,35 @@ class CaseFlagUtilsTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .build();
 
-            Witness witness1 = Witness.builder().partyID("partyId1").firstName("First").lastName("Name").build();
-            Witness witness2 = Witness.builder().partyID("partyId2").firstName("Second").lastName("witness").build();
-            Witness witness3 = Witness.builder().partyID("partyId3").firstName("Third").lastName("witnessy").build();
+            Witness witness1 = new Witness().setPartyID("partyId1").setFirstName("First").setLastName("Name");
+            Witness witness2 = new Witness().setPartyID("partyId2").setFirstName("Second").setLastName("witness");
+            Witness witness3 = new Witness().setPartyID("partyId3").setFirstName("Third").setLastName("witnessy");
 
             CaseData updatedCaseData = caseData.toBuilder()
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQWitnesses(Witnesses
-                                                               .builder()
-                                                               .details(wrapElements(witness1, witness2))
-                                                               .build())
-                                   .build())
-                .respondent2DQ(Respondent2DQ.builder()
-                                   .respondent2DQWitnesses(Witnesses
-                                                               .builder()
-                                                               .details(wrapElements(witness3))
-                                                               .build())
-                                   .build())
+                .respondent1DQ(new Respondent1DQ()
+                                   .setRespondent1DQWitnesses(new Witnesses()
+                                                                  .setDetails(wrapElements(witness1, witness2))))
+                .respondent2DQ(new Respondent2DQ()
+                                   .setRespondent2DQWitnesses(new Witnesses()
+                                                                  .setDetails(wrapElements(witness3))))
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilderToUpdateWithFlags = updatedCaseData.toBuilder();
+            addRespondentDQPartiesFlagStructure(updatedCaseData);
 
-            addRespondentDQPartiesFlagStructure(
-                caseDataBuilderToUpdateWithFlags,
-                updatedCaseData
-            );
+            List<Element<PartyFlagStructure>> respondent1WitnessWithFlags = updatedCaseData.getRespondent1Witnesses();
+            List<Element<PartyFlagStructure>> respondent2WitnessWithFlags = updatedCaseData.getRespondent2Witnesses();
 
-            CaseData caseDataWithFlags = caseDataBuilderToUpdateWithFlags.build();
-            List<Element<PartyFlagStructure>> respondent1WitnessWithFlags = caseDataWithFlags.getRespondent1Witnesses();
-            List<Element<PartyFlagStructure>> respondent2WitnessWithFlags = caseDataWithFlags.getRespondent2Witnesses();
+            Flags expectedWitness1Flags = new Flags().setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
+                .setPartyName("First Name")
+                .setDetails(List.of());
 
-            Flags expectedWitness1Flags = Flags.builder().roleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
-                .partyName("First Name")
-                .details(List.of()).build();
+            Flags expectedWitness2Flags = new Flags().setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
+                .setPartyName("Second witness")
+                .setDetails(List.of());
 
-            Flags expectedWitness2Flags = Flags.builder().roleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
-                .partyName("Second witness")
-                .details(List.of()).build();
-
-            Flags expectedWitness3Flags = Flags.builder().roleOnCase(RESPONDENT_SOLICITOR_TWO_WITNESS)
-                .partyName("Third witnessy")
-                .details(List.of()).build();
+            Flags expectedWitness3Flags = new Flags().setRoleOnCase(RESPONDENT_SOLICITOR_TWO_WITNESS)
+                .setPartyName("Third witnessy")
+                .setDetails(List.of());
 
             assertThat(respondent1WitnessWithFlags).isNotNull();
             assertThat(respondent1WitnessWithFlags).hasSize(2);
@@ -309,46 +283,34 @@ class CaseFlagUtilsTest {
                 .multiPartyClaimTwoApplicants()
                 .build();
 
-            Witness witness1 = Witness.builder().partyID("partyId1").firstName("First").lastName("Name").build();
-            Witness witness2 = Witness.builder().partyID("partyId2").firstName("Second").lastName("witness").build();
-            Witness witness3 = Witness.builder().partyID("partyId3").firstName("Third").lastName("witnessy").build();
+            Witness witness1 = new Witness().setPartyID("partyId1").setFirstName("First").setLastName("Name");
+            Witness witness2 = new Witness().setPartyID("partyId2").setFirstName("Second").setLastName("witness");
+            Witness witness3 = new Witness().setPartyID("partyId3").setFirstName("Third").setLastName("witnessy");
 
             CaseData updatedCaseData = caseData.toBuilder()
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQWitnesses(Witnesses
-                                                             .builder()
-                                                             .details(wrapElements(witness1, witness2))
-                                                             .build())
-                                  .build())
-                .applicant2DQ(Applicant2DQ.builder()
-                                  .applicant2DQWitnesses(Witnesses
-                                                             .builder()
-                                                             .details(wrapElements(witness3))
-                                                             .build())
-                                  .build())
+                .applicant1DQ(new Applicant1DQ()
+                                  .setApplicant1DQWitnesses(new Witnesses()
+                                                                .setDetails(wrapElements(witness1, witness2))))
+                .applicant2DQ(new Applicant2DQ()
+                                  .setApplicant2DQWitnesses(new Witnesses()
+                                                                .setDetails(wrapElements(witness3))))
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilderToUpdateWithFlags = updatedCaseData.toBuilder();
+            addApplicantExpertAndWitnessFlagsStructure(updatedCaseData);
 
-            addApplicantExpertAndWitnessFlagsStructure(
-                caseDataBuilderToUpdateWithFlags,
-                updatedCaseData
-            );
+            List<Element<PartyFlagStructure>> applicantWitnesses = updatedCaseData.getApplicantWitnesses();
 
-            CaseData caseDataWithFlags = caseDataBuilderToUpdateWithFlags.build();
-            List<Element<PartyFlagStructure>> applicantWitnesses = caseDataWithFlags.getApplicantWitnesses();
+            Flags expectedWitness1Flags = new Flags().setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
+                .setPartyName("First Name")
+                .setDetails(List.of());
 
-            Flags expectedWitness1Flags = Flags.builder().roleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                .partyName("First Name")
-                .details(List.of()).build();
+            Flags expectedWitness2Flags = new Flags().setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
+                .setPartyName("Second witness")
+                .setDetails(List.of());
 
-            Flags expectedWitness2Flags = Flags.builder().roleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                .partyName("Second witness")
-                .details(List.of()).build();
-
-            Flags expectedWitness3Flags = Flags.builder().roleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                .partyName("Third witnessy")
-                .details(List.of()).build();
+            Flags expectedWitness3Flags = new Flags().setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
+                .setPartyName("Third witnessy")
+                .setDetails(List.of());
 
             assertThat(applicantWitnesses).isNotNull();
             assertThat(applicantWitnesses).hasSize(3);
@@ -376,45 +338,34 @@ class CaseFlagUtilsTest {
                 .multiPartyClaimTwoApplicants()
                 .build();
 
-            Expert expert1 = Expert.builder().partyID("partyId1").firstName("First").lastName("Name").build();
-            Expert expert2 = Expert.builder().partyID("partyId2").firstName("Second").lastName("expert").build();
-            Expert expert3 = Expert.builder().partyID("partyId3").firstName("Third").lastName("expert").build();
+            Expert expert1 = new Expert().setPartyID("partyId1").setFirstName("First").setLastName("Name");
+            Expert expert2 = new Expert().setPartyID("partyId2").setFirstName("Second").setLastName("expert");
+            Expert expert3 = new Expert().setPartyID("partyId3").setFirstName("Third").setLastName("expert");
 
             CaseData updatedCaseData = caseData.toBuilder()
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQExperts(Experts
-                                                           .builder()
-                                                           .details(wrapElements(expert1, expert2))
-                                                           .build())
-                                  .build())
-                .applicant2DQ(Applicant2DQ.builder()
-                                  .applicant2DQExperts(Experts
-                                                           .builder()
-                                                           .details(wrapElements(expert3))
-                                                           .build())
-                                  .build())
+                .applicant1DQ(new Applicant1DQ()
+                                  .setApplicant1DQExperts(new Experts()
+                                                              .setDetails(wrapElements(expert1, expert2))))
+                .applicant2DQ(new Applicant2DQ()
+                                  .setApplicant2DQExperts(new Experts()
+                                                              .setDetails(wrapElements(expert3))))
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilderToUpdateWithFlags = updatedCaseData.toBuilder();
+            addApplicantExpertAndWitnessFlagsStructure(updatedCaseData);
 
-            addApplicantExpertAndWitnessFlagsStructure(
-                caseDataBuilderToUpdateWithFlags,
-                updatedCaseData);
+            List<Element<PartyFlagStructure>> applicantExperts = updatedCaseData.getApplicantExperts();
 
-            CaseData caseDataWithFlags = caseDataBuilderToUpdateWithFlags.build();
-            List<Element<PartyFlagStructure>> applicantExperts = caseDataWithFlags.getApplicantExperts();
+            Flags expectedExpert1Flags = new Flags().setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
+                .setPartyName("First Name")
+                .setDetails(List.of());
 
-            Flags expectedExpert1Flags = Flags.builder().roleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                .partyName("First Name")
-                .details(List.of()).build();
+            Flags expectedExpert2Flags = new Flags().setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
+                .setPartyName("Second expert")
+                .setDetails(List.of());
 
-            Flags expectedExpert2Flags = Flags.builder().roleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                .partyName("Second expert")
-                .details(List.of()).build();
-
-            Flags expectedExpert3Flags = Flags.builder().roleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                .partyName("Third expert")
-                .details(List.of()).build();
+            Flags expectedExpert3Flags = new Flags().setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
+                .setPartyName("Third expert")
+                .setDetails(List.of());
 
             assertThat(applicantExperts).isNotNull();
             assertThat(applicantExperts).hasSize(3);
@@ -441,10 +392,14 @@ class CaseFlagUtilsTest {
             List<FlagDetail> expectedApplicant1WitnessFlags = flagDetails();
             List<FlagDetail> expectedApplicant1ExpertFlags = flagDetails();
             List<FlagDetail> expectedApplicant1LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedApplicant1OrgIndividualFlags = flagDetails();
+            List<FlagDetail> expectedApplicant1LRIndividualFlags = flagDetails();
             List<FlagDetail> expectedRespondent1Flags = flagDetails();
             List<FlagDetail> expectedRespondent1WitnessFlags = flagDetails();
             List<FlagDetail> expectedRespondent1ExpertFlags = flagDetails();
             List<FlagDetail> expectedRespondent1LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1OrgIndividualFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1LRIndividualFlags = flagDetails();
 
             List<FlagDetail> expected = new ArrayList<>();
             expected.addAll(expectedApplicant1Flags);
@@ -455,6 +410,10 @@ class CaseFlagUtilsTest {
             expected.addAll(expectedRespondent1WitnessFlags);
             expected.addAll(expectedRespondent1ExpertFlags);
             expected.addAll(expectedRespondent1LitigationFriendFlags);
+            expected.addAll(expectedApplicant1OrgIndividualFlags);
+            expected.addAll(expectedRespondent1OrgIndividualFlags);
+            expected.addAll(expectedApplicant1LRIndividualFlags);
+            expected.addAll(expectedRespondent1LRIndividualFlags);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -466,10 +425,14 @@ class CaseFlagUtilsTest {
                 .withApplicant1WitnessFlags()
                 .withApplicant1ExpertFlags()
                 .withApplicant1LitigationFriendFlags()
+                .withApplicant1OrgIndividualFlags()
+                .withApplicant1LRIndividualFlags()
                 .withRespondent1Flags()
                 .withRespondent1ExpertFlags()
                 .withRespondent1WitnessFlags()
                 .withRespondent1LitigationFriendFlags()
+                .withRespondent1OrgIndividualFlags()
+                .withRespondent1LRIndividualFlags()
                 .build();
 
             assertThat(getAllCaseFlags(caseData)).isEqualTo(expected);
@@ -481,20 +444,30 @@ class CaseFlagUtilsTest {
             List<FlagDetail> expectedApplicant2WitnessFlags = flagDetails();
             List<FlagDetail> expectedApplicant2ExpertFlags = flagDetails();
             List<FlagDetail> expectedApplicant2LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedApplicant2OrgIndividualFlags = flagDetails();
             List<FlagDetail> expectedRespondent1Flags = flagDetails();
             List<FlagDetail> expectedRespondent1WitnessFlags = flagDetails();
             List<FlagDetail> expectedRespondent1ExpertFlags = flagDetails();
             List<FlagDetail> expectedRespondent1LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1OrgIndividualFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1LRIndividualFlags = flagDetails();
+            List<FlagDetail> expectedApplicant1OrgIndividualFlags = flagDetails();
+            List<FlagDetail> expectedApplicant1LRIndividualFlags = flagDetails();
 
             List<FlagDetail> expected = new ArrayList<>();
             expected.addAll(expectedApplicant2Flags); // add other parties
             expected.addAll(expectedApplicant2WitnessFlags);
             expected.addAll(expectedApplicant2ExpertFlags);
             expected.addAll(expectedApplicant2LitigationFriendFlags);
+            expected.addAll(expectedApplicant1OrgIndividualFlags);
+            expected.addAll(expectedApplicant2OrgIndividualFlags);
             expected.addAll(expectedRespondent1Flags);
             expected.addAll(expectedRespondent1WitnessFlags);
             expected.addAll(expectedRespondent1ExpertFlags);
             expected.addAll(expectedRespondent1LitigationFriendFlags);
+            expected.addAll(expectedRespondent1OrgIndividualFlags);
+            expected.addAll(expectedApplicant1LRIndividualFlags);
+            expected.addAll(expectedRespondent1LRIndividualFlags);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicant2RespondToDefenceAndProceed_2v1()
@@ -507,10 +480,15 @@ class CaseFlagUtilsTest {
                 .withApplicant2WitnessFlags()
                 .withApplicant2ExpertFlags()
                 .withApplicant2LitigationFriendFlags()
+                .withApplicant1OrgIndividualFlags()
+                .withApplicant2OrgIndividualFlags()
+                .withApplicant1LRIndividualFlags()
                 .withRespondent1Flags()
                 .withRespondent1ExpertFlags()
                 .withRespondent1WitnessFlags()
                 .withRespondent1LitigationFriendFlags()
+                .withRespondent1OrgIndividualFlags()
+                .withRespondent1LRIndividualFlags()
                 .build();
 
             assertThat(getAllCaseFlags(caseData)).isEqualTo(expected);
@@ -522,10 +500,14 @@ class CaseFlagUtilsTest {
             List<FlagDetail> expectedRespondent1WitnessFlags = flagDetails();
             List<FlagDetail> expectedRespondent1ExpertFlags = flagDetails();
             List<FlagDetail> expectedRespondent1LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1OrgIndividualFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1LRIndividualFlags = flagDetails();
             List<FlagDetail> expectedRespondent2Flags = flagDetails();
             List<FlagDetail> expectedRespondent2ExpertFlags = flagDetails();
             List<FlagDetail> expectedRespondent2WitnessFlags = flagDetails();
             List<FlagDetail> expectedRespondent2LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedRespondent2OrgIndividualFlags = flagDetails();
+            List<FlagDetail> expectedRespondent2LRIndividualFlags = flagDetails();
 
             List<FlagDetail> expected = new ArrayList<>();
 
@@ -533,10 +515,14 @@ class CaseFlagUtilsTest {
             expected.addAll(expectedRespondent1WitnessFlags);
             expected.addAll(expectedRespondent1ExpertFlags);
             expected.addAll(expectedRespondent1LitigationFriendFlags);
+            expected.addAll(expectedRespondent1OrgIndividualFlags);
             expected.addAll(expectedRespondent2Flags);
             expected.addAll(expectedRespondent2ExpertFlags);
             expected.addAll(expectedRespondent2WitnessFlags);
             expected.addAll(expectedRespondent2LitigationFriendFlags);
+            expected.addAll(expectedRespondent2OrgIndividualFlags);
+            expected.addAll(expectedRespondent1LRIndividualFlags);
+            expected.addAll(expectedRespondent2LRIndividualFlags);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceSpec_1v2_BothPartiesFullDefenceResponses()
@@ -549,10 +535,14 @@ class CaseFlagUtilsTest {
                 .withRespondent1ExpertFlags()
                 .withRespondent1WitnessFlags()
                 .withRespondent1LitigationFriendFlags()
+                .withRespondent1OrgIndividualFlags()
+                .withRespondent1LRIndividualFlags()
                 .withRespondent2Flags()
                 .withRespondent2ExpertFlags()
                 .withRespondent2WitnessFlags()
                 .withRespondent2LitigationFriendFlags()
+                .withRespondent2OrgIndividualFlags()
+                .withRespondent2LRIndividualFlags()
                 .build();
 
             assertThat(getAllCaseFlags(caseData)).isEqualTo(expected);
@@ -595,114 +585,104 @@ class CaseFlagUtilsTest {
         }
 
         private List<FlagDetail> flagDetails() {
-            FlagDetail details1 = FlagDetail.builder()
-                .name("Vulnerable user")
-                .flagComment("comment")
-                .flagCode("AB001")
-                .hearingRelevant(YES)
-                .status("Active")
-                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-                .build();
+            FlagDetail details1 = new FlagDetail()
+                .setName("Vulnerable user")
+                .setFlagComment("comment")
+                .setFlagCode("AB001")
+                .setHearingRelevant(YES)
+                .setStatus("Active")
+                .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+                .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
-            FlagDetail details2 = FlagDetail.builder()
-                .name("Flight risk")
-                .flagComment("comment")
-                .flagCode("SM001")
-                .hearingRelevant(YES)
-                .status("Active")
-                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-                .build();
+            FlagDetail details2 = new FlagDetail()
+                .setName("Flight risk")
+                .setFlagComment("comment")
+                .setFlagCode("SM001")
+                .setHearingRelevant(YES)
+                .setStatus("Active")
+                .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+                .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
-            FlagDetail details3 = FlagDetail.builder()
-                .name("Audio/Video evidence")
-                .flagComment("comment")
-                .flagCode("RA001")
-                .hearingRelevant(NO)
-                .status("Active")
-                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-                .build();
+            FlagDetail details3 = new FlagDetail()
+                .setName("Audio/Video evidence")
+                .setFlagComment("comment")
+                .setFlagCode("RA001")
+                .setHearingRelevant(NO)
+                .setStatus("Active")
+                .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+                .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
-            FlagDetail details4 = FlagDetail.builder()
-                .name("Other")
-                .flagComment("comment")
-                .flagCode("AB001")
-                .hearingRelevant(YES)
-                .status("Inactive")
-                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-                .build();
+            FlagDetail details4 = new FlagDetail()
+                .setName("Other")
+                .setFlagComment("comment")
+                .setFlagCode("AB001")
+                .setHearingRelevant(YES)
+                .setStatus("Inactive")
+                .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+                .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
             return List.of(details1, details2, details3, details4);
         }
 
         private List<FlagDetail> activeFlagDetails() {
-            FlagDetail details1 = FlagDetail.builder()
-                .name("Vulnerable user")
-                .flagComment("comment")
-                .flagCode("AB001")
-                .hearingRelevant(YES)
-                .status("Active")
-                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-                .build();
+            FlagDetail details1 = new FlagDetail()
+                .setName("Vulnerable user")
+                .setFlagComment("comment")
+                .setFlagCode("AB001")
+                .setHearingRelevant(YES)
+                .setStatus("Active")
+                .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+                .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
-            FlagDetail details2 = FlagDetail.builder()
-                .name("Flight risk")
-                .flagComment("comment")
-                .flagCode("SM001")
-                .hearingRelevant(YES)
-                .status("Active")
-                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-                .build();
+            FlagDetail details2 = new FlagDetail()
+                .setName("Flight risk")
+                .setFlagComment("comment")
+                .setFlagCode("SM001")
+                .setHearingRelevant(YES)
+                .setStatus("Active")
+                .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+                .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
-            FlagDetail details3 = FlagDetail.builder()
-                .name("Audio/Video evidence")
-                .flagComment("comment")
-                .flagCode("RA001")
-                .hearingRelevant(NO)
-                .status("Active")
-                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-                .build();
+            FlagDetail details3 = new FlagDetail()
+                .setName("Audio/Video evidence")
+                .setFlagComment("comment")
+                .setFlagCode("RA001")
+                .setHearingRelevant(NO)
+                .setStatus("Active")
+                .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+                .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
             return List.of(details1, details2, details3);
 
         }
 
         private List<FlagDetail> hearingRelevantFlagDetails() {
-            FlagDetail details1 = FlagDetail.builder()
-                .name("Vulnerable user")
-                .flagComment("comment")
-                .flagCode("AB001")
-                .hearingRelevant(YES)
-                .status("Active")
-                .dateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
-                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-                .build();
+            FlagDetail details1 = new FlagDetail()
+                .setName("Vulnerable user")
+                .setFlagComment("comment")
+                .setFlagCode("AB001")
+                .setHearingRelevant(YES)
+                .setStatus("Active")
+                .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+                .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
-            FlagDetail details2 = FlagDetail.builder()
-                .name("Flight risk")
-                .flagComment("comment")
-                .flagCode("SM001")
-                .hearingRelevant(YES)
-                .status("Active")
-                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-                .build();
+            FlagDetail details2 = new FlagDetail()
+                .setName("Flight risk")
+                .setFlagComment("comment")
+                .setFlagCode("SM001")
+                .setHearingRelevant(YES)
+                .setStatus("Active")
+                .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+                .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
-            FlagDetail details3 = FlagDetail.builder()
-                .name("Other")
-                .flagComment("comment")
-                .flagCode("AB001")
-                .hearingRelevant(YES)
-                .status("Inactive")
-                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-                .build();
+            FlagDetail details3 = new FlagDetail()
+                .setName("Other")
+                .setFlagComment("comment")
+                .setFlagCode("AB001")
+                .setHearingRelevant(YES)
+                .setStatus("Inactive")
+                .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+                .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
             return List.of(details1, details2, details3);
         }
@@ -718,26 +698,24 @@ class CaseFlagUtilsTest {
             void shouldUpdateFlagName_whenClaimant1NameUpdated() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicant1(caseData.getApplicant1().toBuilder()
-                                    .flags(Flags.builder()
-                                               .partyName("Mr. John Rambo")
-                                               .roleOnCase("applicant")
-                                               .details(wrapElements(List.of(
-                                                   FlagDetail.builder().name("flag name").build()))).build())
-                                    .individualFirstName("Johnny")
-                                    .individualLastName("Rambo new").build());
+                caseData.setApplicant1(caseData.getApplicant1().setFlags(new Flags()
+                                                      .setPartyName("Mr. John Rambo")
+                                                      .setRoleOnCase("applicant")
+                                                      .setDetails(wrapElements(List.of(
+                                                          new FlagDetail().setName("flag name")))))
+                                           .setIndividualFirstName("Johnny")
+                                           .setIndividualLastName("Rambo new"));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                Flags actual = builder.build().getApplicant1().getFlags();
-                Flags expected = Flags.builder().partyName("Mr. Johnny Rambo new")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("applicant").build();
+                Flags actual = caseData.getApplicant1().getFlags();
+                Flags expected = new Flags().setPartyName("Mr. Johnny Rambo new")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("applicant");
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -746,18 +724,17 @@ class CaseFlagUtilsTest {
             void shouldNotUpdateClaimant1FlagName_whenFlagIsMissing() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicant1(caseData.getApplicant1().toBuilder()
-                                    .individualFirstName("Johnny")
-                                    .individualLastName("Rambo new").build());
+                caseData.setApplicant1(caseData.getApplicant1()
+                                           .setIndividualFirstName("Johnny")
+                                           .setIndividualLastName("Rambo new"));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                Flags actual = builder.build().getApplicant1().getFlags();
-                Flags expected = builder.build().getApplicant1().getFlags();
+                Flags actual = caseData.getApplicant1().getFlags();
+                Flags expected = caseData.getApplicant1().getFlags();
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -767,26 +744,24 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateClaimIssued()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_TWO_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicant2(caseData.getApplicant2().toBuilder()
-                                    .flags(Flags.builder()
-                                               .partyName("Mr. Jason Rambo")
-                                               .roleOnCase("applicant")
-                                               .details(wrapElements(List.of(
-                                                   FlagDetail.builder().name("flag name").build()))).build())
-                                    .individualFirstName("JJ")
-                                    .individualLastName("Rambo edited").build());
+                caseData.setApplicant2(caseData.getApplicant2().setFlags(new Flags()
+                                                      .setPartyName("Mr. Jason Rambo")
+                                                      .setRoleOnCase("applicant")
+                                                      .setDetails(wrapElements(List.of(
+                                                          new FlagDetail().setName("flag name")))))
+                                           .setIndividualFirstName("JJ")
+                                           .setIndividualLastName("Rambo edited"));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                Flags actual = builder.build().getApplicant2().getFlags();
-                Flags expected = Flags.builder().partyName("Mr. JJ Rambo edited")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("applicant").build();
+                Flags actual = caseData.getApplicant2().getFlags();
+                Flags expected = new Flags().setPartyName("Mr. JJ Rambo edited")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("applicant");
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -796,18 +771,17 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateClaimIssued()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_TWO_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicant2(caseData.getApplicant2().toBuilder()
-                                    .individualFirstName("JJ")
-                                    .individualLastName("Rambo edited").build());
+                caseData.setApplicant2(caseData.getApplicant2()
+                                           .setIndividualFirstName("JJ")
+                                           .setIndividualLastName("Rambo edited"));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                Flags actual = builder.build().getApplicant2().getFlags();
-                Flags expected = builder.build().getApplicant2().getFlags();
+                Flags actual = caseData.getApplicant2().getFlags();
+                Flags expected = caseData.getApplicant2().getFlags();
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -816,26 +790,24 @@ class CaseFlagUtilsTest {
             void shouldUpdateFlagName_whenRespondent1NameUpdated() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent1(caseData.getRespondent1().toBuilder()
-                                    .flags(Flags.builder()
-                                               .partyName("Mr. Sole Trader")
-                                               .roleOnCase("respondent")
-                                               .details(wrapElements(List.of(
-                                                   FlagDetail.builder().name("flag name").build()))).build())
-                                    .soleTraderFirstName("Solo")
-                                    .soleTraderLastName("New trader").build());
+                caseData.setRespondent1(caseData.getRespondent1().setFlags(new Flags()
+                                                       .setPartyName("Mr. Sole Trader")
+                                                       .setRoleOnCase("respondent")
+                                                       .setDetails(wrapElements(List.of(
+                                                           new FlagDetail().setName("flag name")))))
+                                            .setSoleTraderFirstName("Solo")
+                                            .setSoleTraderLastName("New trader"));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                Flags actual = builder.build().getRespondent1().getFlags();
-                Flags expected = Flags.builder().partyName("Mr. Solo New trader")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("respondent").build();
+                Flags actual = caseData.getRespondent1().getFlags();
+                Flags expected = new Flags().setPartyName("Mr. Solo New trader")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("respondent");
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -844,18 +816,17 @@ class CaseFlagUtilsTest {
             void shouldNotUpdateDefendant1FlagName_whenFlagIsMissing() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent1(caseData.getRespondent1().toBuilder()
-                                     .soleTraderFirstName("Solo")
-                                     .soleTraderLastName("New trader").build());
+                caseData.setRespondent1(caseData.getRespondent1()
+                                            .setSoleTraderFirstName("Solo")
+                                            .setSoleTraderLastName("New trader"));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                Flags actual = builder.build().getRespondent1().getFlags();
-                Flags expected = builder.build().getRespondent1().getFlags();
+                Flags actual = caseData.getRespondent1().getFlags();
+                Flags expected = caseData.getRespondent1().getFlags();
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -865,27 +836,25 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent2(caseData.getRespondent2().toBuilder()
-                                     .flags(Flags.builder()
-                                                .partyName("Mr. John Rambo")
-                                                .roleOnCase("respondent")
-                                                .details(wrapElements(List.of(
-                                                    FlagDetail.builder().name("flag name").build()))).build())
-                                     .individualTitle("Miss")
-                                     .individualFirstName("Jenny")
-                                     .individualLastName("Rombo").build());
+                caseData.setRespondent2(caseData.getRespondent2().setFlags(new Flags()
+                                                       .setPartyName("Mr. John Rambo")
+                                                       .setRoleOnCase("respondent")
+                                                       .setDetails(wrapElements(List.of(
+                                                           new FlagDetail().setName("flag name")))))
+                                            .setIndividualTitle("Miss")
+                                            .setIndividualFirstName("Jenny")
+                                            .setIndividualLastName("Rombo"));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                Flags actual = builder.build().getRespondent2().getFlags();
-                Flags expected = Flags.builder().partyName("Miss Jenny Rombo")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("respondent").build();
+                Flags actual = caseData.getRespondent2().getFlags();
+                Flags expected = new Flags().setPartyName("Miss Jenny Rombo")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("respondent");
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -895,19 +864,18 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent2(caseData.getRespondent2().toBuilder()
-                                     .individualTitle("Miss")
-                                     .individualFirstName("Jenny")
-                                     .individualLastName("Rombo").build());
+                caseData.setRespondent2(caseData.getRespondent2()
+                                            .setIndividualTitle("Miss")
+                                            .setIndividualFirstName("Jenny")
+                                            .setIndividualLastName("Rombo"));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                Flags actual = builder.build().getRespondent2().getFlags();
-                Flags expected = builder.build().getRespondent2().getFlags();
+                Flags actual = caseData.getRespondent2().getFlags();
+                Flags expected = caseData.getRespondent2().getFlags();
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -921,27 +889,25 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addApplicant1LitigationFriend()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_LITIGATION_FRIEND_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_LITIGATION_FRIEND_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicant1LitigationFriend(caseData.getApplicant1LitigationFriend().toBuilder()
-                                    .flags(Flags.builder()
-                                               .partyName("Mr. Applicant Litigation Friend")
-                                               .roleOnCase("litigation friend")
-                                               .details(wrapElements(List.of(
-                                                   FlagDetail.builder().name("flag name").build()))).build())
-                                                    .fullName(null)
-                                                    .firstName("Johnny").lastName("Rambo new")
-                                                    .build());
+                caseData.setApplicant1LitigationFriend(caseData.getApplicant1LitigationFriend().copy()
+                                                           .setFlags(new Flags()
+                                                                      .setPartyName("Mr. Applicant Litigation Friend")
+                                                                      .setRoleOnCase("litigation friend")
+                                                                      .setDetails(wrapElements(List.of(
+                                                                          new FlagDetail().setName("flag name")))))
+                                                           .setFullName(null)
+                                                           .setFirstName("Johnny").setLastName("Rambo new"));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                Flags actual = builder.build().getApplicant1LitigationFriend().getFlags();
-                Flags expected = Flags.builder().partyName("Johnny Rambo new")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("litigation friend").build();
+                Flags actual = caseData.getApplicant1LitigationFriend().getFlags();
+                Flags expected = new Flags().setPartyName("Johnny Rambo new")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("litigation friend");
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -951,27 +917,25 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addApplicant2LitigationFriend()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_LITIGATION_FRIEND_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_TWO_LITIGATION_FRIEND_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicant2LitigationFriend(caseData.getApplicant2LitigationFriend().toBuilder()
-                                                    .flags(Flags.builder()
-                                                               .partyName("Applicant Two Litigation Friend")
-                                                               .roleOnCase("litigation friend")
-                                                               .details(wrapElements(List.of(
-                                                                   FlagDetail.builder().name("flag name").build()))).build())
-                                                    .fullName(null)
-                                                    .firstName("Johnny").lastName("Rambo new")
-                                                    .build());
+                caseData.setApplicant2LitigationFriend(caseData.getApplicant2LitigationFriend().copy()
+                                                           .setFlags(new Flags()
+                                                                      .setPartyName("Applicant Two Litigation Friend")
+                                                                      .setRoleOnCase("litigation friend")
+                                                                      .setDetails(wrapElements(List.of(
+                                                                          new FlagDetail().setName("flag name")))))
+                                                           .setFullName(null)
+                                                           .setFirstName("Johnny").setLastName("Rambo new"));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                Flags actual = builder.build().getApplicant2LitigationFriend().getFlags();
-                Flags expected = Flags.builder().partyName("Johnny Rambo new")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("litigation friend").build();
+                Flags actual = caseData.getApplicant2LitigationFriend().getFlags();
+                Flags expected = new Flags().setPartyName("Johnny Rambo new")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("litigation friend");
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -981,27 +945,25 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent1LitigationFriend()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_LITIGATION_FRIEND_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_LITIGATION_FRIEND_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent1LitigationFriend(caseData.getRespondent1LitigationFriend().toBuilder()
-                                                    .flags(Flags.builder()
-                                                               .partyName("Litigation Friend")
-                                                               .roleOnCase("litigation friend")
-                                                               .details(wrapElements(List.of(
-                                                                   FlagDetail.builder().name("flag name").build()))).build())
-                                                     .fullName(null)
-                                                     .firstName("Johnny").lastName("Rambo new")
-                                                     .build());
+                caseData.setRespondent1LitigationFriend(caseData.getRespondent1LitigationFriend().copy()
+                                                            .setFlags(new Flags()
+                                                                       .setPartyName("Litigation Friend")
+                                                                       .setRoleOnCase("litigation friend")
+                                                                       .setDetails(wrapElements(List.of(
+                                                                           new FlagDetail().setName("flag name")))))
+                                                            .setFullName(null)
+                                                            .setFirstName("Johnny").setLastName("Rambo new"));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                Flags actual = builder.build().getRespondent1LitigationFriend().getFlags();
-                Flags expected = Flags.builder().partyName("Johnny Rambo new")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("litigation friend").build();
+                Flags actual = caseData.getRespondent1LitigationFriend().getFlags();
+                Flags expected = new Flags().setPartyName("Johnny Rambo new")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("litigation friend");
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -1012,27 +974,25 @@ class CaseFlagUtilsTest {
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent2LitigationFriend()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_LITIGATION_FRIEND_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_LITIGATION_FRIEND_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent2LitigationFriend(caseData.getRespondent2LitigationFriend().toBuilder()
-                                                     .flags(Flags.builder()
-                                                                .partyName("Litigation Friend")
-                                                                .roleOnCase("litigation friend")
-                                                                .details(wrapElements(List.of(
-                                                                    FlagDetail.builder().name("flag name").build()))).build())
-                                                     .fullName(null)
-                                                     .firstName("Johnny").lastName("Rambo new")
-                                                     .build());
+                caseData.setRespondent2LitigationFriend(caseData.getRespondent2LitigationFriend().copy()
+                                                            .setFlags(new Flags()
+                                                                       .setPartyName("Litigation Friend")
+                                                                       .setRoleOnCase("litigation friend")
+                                                                       .setDetails(wrapElements(List.of(
+                                                                           new FlagDetail().setName("flag name")))))
+                                                            .setFullName(null)
+                                                            .setFirstName("Johnny").setLastName("Rambo new"));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                Flags actual = builder.build().getRespondent2LitigationFriend().getFlags();
-                Flags expected = Flags.builder().partyName("Johnny Rambo new")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("litigation friend").build();
+                Flags actual = caseData.getRespondent2LitigationFriend().getFlags();
+                Flags expected = new Flags().setPartyName("Johnny Rambo new")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("litigation friend");
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -1045,21 +1005,20 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenClaimantLRIndividualAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicant1LRIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                              .firstName("Legally").lastName("Rep")
-                                                              .build()));
+                caseData.setApplicant1LRIndividuals(wrapElements(new PartyFlagStructure()
+                                                                     .setFirstName("Legally").setLastName("Rep")
+                                                                     ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getApplicant1LRIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getApplicant1LRIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Legally Rep")
-                    .details(List.of())
-                    .roleOnCase("Civil - Organisation").build();
+                Flags expectedFlags = new Flags().setPartyName("Legally Rep")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Civil - Organisation");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1070,29 +1029,28 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addApplicantLRIndividual("Legal", "Rep")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure lrIndividual = unwrapElements(caseData.getApplicant1LRIndividuals()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicant1LRIndividuals(wrapElements(lrIndividual.toBuilder()
-                                                    .flags(Flags.builder()
-                                                               .partyName("Legal Rep")
-                                                               .roleOnCase("Civil - Organisation")
-                                                               .details(wrapElements(List.of(
-                                                                   FlagDetail.builder().name("flag name").build()))).build())
-                                                    .firstName("Legally").lastName("Rep")
-                                                    .build()));
+                caseData.setApplicant1LRIndividuals(wrapElements(lrIndividual.copy()
+                                                                     .setFlags(new Flags()
+                                                                                .setPartyName("Legal Rep")
+                                                                                .setRoleOnCase("Civil - Organisation")
+                                                                                .setDetails(wrapElements(List.of(
+                                                                                    new FlagDetail().setName("flag name")))))
+                                                                     .setFirstName("Legally").setLastName("Rep")
+                                                                     ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getApplicant1LRIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getApplicant1LRIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Legally Rep")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Civil - Organisation").build();
+                Flags expectedFlags = new Flags().setPartyName("Legally Rep")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Civil - Organisation");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("app-lr-ind-party-id");
@@ -1102,21 +1060,20 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent1LRIndividualAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent1LRIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                              .firstName("Legally").lastName("Rep")
-                                                              .build()));
+                caseData.setRespondent1LRIndividuals(wrapElements(new PartyFlagStructure()
+                                                                      .setFirstName("Legally").setLastName("Rep")
+                                                                      ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent1LRIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent1LRIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Legally Rep")
-                    .details(List.of())
-                    .roleOnCase("Civil - Organisation").build();
+                Flags expectedFlags = new Flags().setPartyName("Legally Rep")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Civil - Organisation");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1127,29 +1084,29 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent1LRIndividual("Legal", "Rep")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure lrIndividual = unwrapElements(caseData.getRespondent1LRIndividuals()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent1LRIndividuals(wrapElements(lrIndividual.toBuilder()
-                                                              .flags(Flags.builder()
-                                                                         .partyName("Legal Rep")
-                                                                         .roleOnCase("Civil - Organisation")
-                                                                         .details(wrapElements(List.of(
-                                                                             FlagDetail.builder().name("flag name").build()))).build())
-                                                              .firstName("Legally").lastName("Rep")
-                                                              .build()));
+                caseData.setRespondent1LRIndividuals(wrapElements(lrIndividual.copy()
+                                                                      .setFlags(new Flags()
+                                                                                 .setPartyName("Legal Rep")
+                                                                                 .setRoleOnCase("Civil - Organisation")
+                                                                                 .setDetails(wrapElements(List.of(
+                                                                                     new FlagDetail().setName(
+                                                                                         "flag name")))))
+                                                                      .setFirstName("Legally").setLastName("Rep")
+                                                                      ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent1LRIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent1LRIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Legally Rep")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Civil - Organisation").build();
+                Flags expectedFlags = new Flags().setPartyName("Legally Rep")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Civil - Organisation");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("res-1-lr-ind-party-id");
@@ -1159,21 +1116,20 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent2LRIndividualAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent2LRIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                               .firstName("Legally").lastName("Rep")
-                                                               .build()));
+                caseData.setRespondent2LRIndividuals(wrapElements(new PartyFlagStructure()
+                                                                      .setFirstName("Legally").setLastName("Rep")
+                                                                      ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent2LRIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent2LRIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Legally Rep")
-                    .details(List.of())
-                    .roleOnCase("Civil - Organisation").build();
+                Flags expectedFlags = new Flags().setPartyName("Legally Rep")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Civil - Organisation");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1184,29 +1140,29 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent2LRIndividual("Legal", "Rep")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure lrIndividual = unwrapElements(caseData.getRespondent2LRIndividuals()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent2LRIndividuals(wrapElements(lrIndividual.toBuilder()
-                                                               .flags(Flags.builder()
-                                                                          .partyName("Legal Rep")
-                                                                          .roleOnCase("Civil - Organisation")
-                                                                          .details(wrapElements(List.of(
-                                                                              FlagDetail.builder().name("flag name").build()))).build())
-                                                               .firstName("Legally").lastName("Rep")
-                                                               .build()));
+                caseData.setRespondent2LRIndividuals(wrapElements(lrIndividual.copy()
+                                                                      .setFlags(new Flags()
+                                                                                 .setPartyName("Legal Rep")
+                                                                                 .setRoleOnCase("Civil - Organisation")
+                                                                                 .setDetails(wrapElements(List.of(
+                                                                                     new FlagDetail().setName(
+                                                                                         "flag name")))))
+                                                                      .setFirstName("Legally").setLastName("Rep")
+                                                                      ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent2LRIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent2LRIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Legally Rep")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Civil - Organisation").build();
+                Flags expectedFlags = new Flags().setPartyName("Legally Rep")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Civil - Organisation");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("res-2-lr-ind-party-id");
@@ -1220,21 +1176,20 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenClaimant1OrgIndividualAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_ORG_INDIVIDUALS_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicant1OrgIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                              .firstName("Org").lastName("Ind")
-                                                              .build()));
+                caseData.setApplicant1OrgIndividuals(wrapElements(new PartyFlagStructure()
+                                                                      .setFirstName("Org").setLastName("Ind")
+                                                                      ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getApplicant1OrgIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getApplicant1OrgIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Org Ind")
-                    .details(List.of())
-                    .roleOnCase("Mr. John Rambo").build();
+                Flags expectedFlags = new Flags().setPartyName("Org Ind")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Mr. John Rambo");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1245,29 +1200,29 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addApplicant1OrgIndividual("Org", "Person")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_ORG_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure orgIndividual = unwrapElements(caseData.getApplicant1OrgIndividuals()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicant1OrgIndividuals(wrapElements(orgIndividual.toBuilder()
-                                                              .flags(Flags.builder()
-                                                                         .partyName("Org Person")
-                                                                         .roleOnCase("Mr. John Rambo")
-                                                                         .details(wrapElements(List.of(
-                                                                             FlagDetail.builder().name("flag name").build()))).build())
-                                                              .firstName("Org").lastName("Ind")
-                                                              .build()));
+                caseData.setApplicant1OrgIndividuals(wrapElements(orgIndividual.copy()
+                                                                      .setFlags(new Flags()
+                                                                                 .setPartyName("Org Person")
+                                                                                 .setRoleOnCase("Mr. John Rambo")
+                                                                                 .setDetails(wrapElements(List.of(
+                                                                                     new FlagDetail().setName(
+                                                                                         "flag name")))))
+                                                                      .setFirstName("Org").setLastName("Ind")
+                                                                      ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getApplicant1OrgIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getApplicant1OrgIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Org Ind")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Mr. John Rambo").build();
+                Flags expectedFlags = new Flags().setPartyName("Org Ind")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Mr. John Rambo");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("app-1-org-ind-party-id");
@@ -1278,21 +1233,20 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .multiPartyClaimTwoApplicants()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_TWO_ORG_INDIVIDUALS_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicant2OrgIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                               .firstName("Org").lastName("Ind")
-                                                               .build()));
+                caseData.setApplicant2OrgIndividuals(wrapElements(new PartyFlagStructure()
+                                                                      .setFirstName("Org").setLastName("Ind")
+                                                                      ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getApplicant2OrgIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getApplicant2OrgIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Org Ind")
-                    .details(List.of())
-                    .roleOnCase("Mr. Jason Rambo").build();
+                Flags expectedFlags = new Flags().setPartyName("Org Ind")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Mr. Jason Rambo");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1304,29 +1258,29 @@ class CaseFlagUtilsTest {
                     .atStateClaimIssued()
                     .multiPartyClaimTwoApplicants()
                     .addApplicant2OrgIndividual("Org", "Person")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_TWO_ORG_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure orgIndividual = unwrapElements(caseData.getApplicant2OrgIndividuals()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicant2OrgIndividuals(wrapElements(orgIndividual.toBuilder()
-                                                               .flags(Flags.builder()
-                                                                          .partyName("Org Person")
-                                                                          .roleOnCase("Mr. Jason Rambo")
-                                                                          .details(wrapElements(List.of(
-                                                                              FlagDetail.builder().name("flag name").build()))).build())
-                                                               .firstName("Org").lastName("Ind")
-                                                               .build()));
+                caseData.setApplicant2OrgIndividuals(wrapElements(orgIndividual.copy()
+                                                                      .setFlags(new Flags()
+                                                                                 .setPartyName("Org Person")
+                                                                                 .setRoleOnCase("Mr. Jason Rambo")
+                                                                                 .setDetails(wrapElements(List.of(
+                                                                                     new FlagDetail().setName(
+                                                                                         "flag name")))))
+                                                                      .setFirstName("Org").setLastName("Ind")
+                                                                      ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getApplicant2OrgIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getApplicant2OrgIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Org Ind")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Mr. Jason Rambo").build();
+                Flags expectedFlags = new Flags().setPartyName("Org Ind")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Mr. Jason Rambo");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("app-2-org-ind-party-id");
@@ -1336,21 +1290,20 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent1OrgIndividualAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_ORG_INDIVIDUALS_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent1OrgIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                               .firstName("Org").lastName("Ind")
-                                                               .build()));
+                caseData.setRespondent1OrgIndividuals(wrapElements(new PartyFlagStructure()
+                                                                       .setFirstName("Org").setLastName("Ind")
+                                                                       ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent1OrgIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent1OrgIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Org Ind")
-                    .details(List.of())
-                    .roleOnCase("Mr. Sole Trader").build();
+                Flags expectedFlags = new Flags().setPartyName("Org Ind")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Mr. Sole Trader");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1361,29 +1314,29 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent1OrgIndividual("Org", "Person")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_ORG_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure orgIndividual = unwrapElements(caseData.getRespondent1OrgIndividuals()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent1OrgIndividuals(wrapElements(orgIndividual.toBuilder()
-                                                               .flags(Flags.builder()
-                                                                          .partyName("Org Person")
-                                                                          .roleOnCase("Mr. Sole Trader")
-                                                                          .details(wrapElements(List.of(
-                                                                              FlagDetail.builder().name("flag name").build()))).build())
-                                                               .firstName("Org").lastName("Ind")
-                                                               .build()));
+                caseData.setRespondent1OrgIndividuals(wrapElements(orgIndividual.copy()
+                                                                       .setFlags(new Flags()
+                                                                                  .setPartyName("Org Person")
+                                                                                  .setRoleOnCase("Mr. Sole Trader")
+                                                                                  .setDetails(wrapElements(List.of(
+                                                                                      new FlagDetail().setName(
+                                                                                          "flag name")))))
+                                                                       .setFirstName("Org").setLastName("Ind")
+                                                                       ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent1OrgIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent1OrgIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Org Ind")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Mr. Sole Trader").build();
+                Flags expectedFlags = new Flags().setPartyName("Org Ind")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Mr. Sole Trader");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("res-1-org-ind-party-id");
@@ -1394,21 +1347,20 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_ORG_INDIVIDUALS_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent2OrgIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                                .firstName("Org").lastName("Ind")
-                                                                .build()));
+                caseData.setRespondent2OrgIndividuals(wrapElements(new PartyFlagStructure()
+                                                                       .setFirstName("Org").setLastName("Ind")
+                                                                       ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent2OrgIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent2OrgIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Org Ind")
-                    .details(List.of())
-                    .roleOnCase("Mr. John Rambo").build();
+                Flags expectedFlags = new Flags().setPartyName("Org Ind")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Mr. John Rambo");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1420,29 +1372,29 @@ class CaseFlagUtilsTest {
                     .atStateClaimIssued()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .addRespondent2OrgIndividual("Org", "Person")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_ORG_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure lrIndividual = unwrapElements(caseData.getRespondent2OrgIndividuals()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent2OrgIndividuals(wrapElements(lrIndividual.toBuilder()
-                                                                .flags(Flags.builder()
-                                                                           .partyName("Org Person")
-                                                                           .roleOnCase("Mr. John Rambo")
-                                                                           .details(wrapElements(List.of(
-                                                                               FlagDetail.builder().name("flag name").build()))).build())
-                                                                .firstName("Org").lastName("Ind")
-                                                                .build()));
+                caseData.setRespondent2OrgIndividuals(wrapElements(lrIndividual.copy()
+                                                                       .setFlags(new Flags()
+                                                                                  .setPartyName("Org Person")
+                                                                                  .setRoleOnCase("Mr. John Rambo")
+                                                                                  .setDetails(wrapElements(List.of(
+                                                                                      new FlagDetail().setName(
+                                                                                          "flag name")))))
+                                                                       .setFirstName("Org").setLastName("Ind")
+                                                                       ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent2OrgIndividuals()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent2OrgIndividuals()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Org Ind")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Mr. John Rambo").build();
+                Flags expectedFlags = new Flags().setPartyName("Org Ind")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Mr. John Rambo");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("res-2-org-ind-party-id");
@@ -1456,21 +1408,20 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenClaimantExpertsAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_EXPERTS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_EXPERTS_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicantExperts(wrapElements(PartyFlagStructure.builder()
-                                                       .firstName("Ex").lastName("Pert")
-                                                       .build()));
+                caseData.setApplicantExperts(wrapElements(new PartyFlagStructure()
+                                                              .setFirstName("Ex").setLastName("Pert")
+                                                              ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getApplicantExperts()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getApplicantExperts()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Ex Pert")
-                    .details(List.of())
-                    .roleOnCase("Claimant solicitor expert").build();
+                Flags expectedFlags = new Flags().setPartyName("Ex Pert")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Claimant solicitor expert");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1481,29 +1432,28 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addApplicant1ExpertsAndWitnesses()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_EXPERTS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_EXPERTS_ID))
                     .build();
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getApplicantExperts()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicantExperts(wrapElements(newParty.toBuilder()
-                                                       .flags(Flags.builder()
-                                                                  .partyName("Exxxx Pert")
-                                                                  .roleOnCase("Claimant solicitor expert")
-                                                                  .details(wrapElements(List.of(
-                                                                      FlagDetail.builder().name("flag name").build()))).build())
-                                                       .firstName("Ex").lastName("Pert")
-                                                       .build()));
+                caseData.setApplicantExperts(wrapElements(newParty.copy()
+                                                              .setFlags(new Flags()
+                                                                         .setPartyName("Exxxx Pert")
+                                                                         .setRoleOnCase("Claimant solicitor expert")
+                                                                         .setDetails(wrapElements(List.of(
+                                                                             new FlagDetail().setName("flag name")))))
+                                                              .setFirstName("Ex").setLastName("Pert")
+                                                              ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getApplicantExperts()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getApplicantExperts()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Ex Pert")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Claimant solicitor expert").build();
+                Flags expectedFlags = new Flags().setPartyName("Ex Pert")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Claimant solicitor expert");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("app-1-expert-party-id");
@@ -1513,21 +1463,20 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent1ExpertsAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_EXPERTS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_EXPERTS_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent1Experts(wrapElements(PartyFlagStructure.builder()
-                                                         .firstName("Ex").lastName("Pert")
-                                                         .build()));
+                caseData.setRespondent1Experts(wrapElements(new PartyFlagStructure()
+                                                                .setFirstName("Ex").setLastName("Pert")
+                                                                ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent1Experts()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent1Experts()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Ex Pert")
-                    .details(List.of())
-                    .roleOnCase("Defendant solicitor 1 expert").build();
+                Flags expectedFlags = new Flags().setPartyName("Ex Pert")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Defendant solicitor 1 expert");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1538,29 +1487,28 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent1ExpertsAndWitnesses()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_EXPERTS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_EXPERTS_ID))
                     .build();
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getRespondent1Experts()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent1Experts(wrapElements(newParty.toBuilder()
-                                                         .flags(Flags.builder()
-                                                                    .partyName("Exxxx Pert")
-                                                                    .roleOnCase("Defendant solicitor 1 expert")
-                                                                    .details(wrapElements(List.of(
-                                                                        FlagDetail.builder().name("flag name").build()))).build())
-                                                         .firstName("Ex").lastName("Pert")
-                                                         .build()));
+                caseData.setRespondent1Experts(wrapElements(newParty.copy()
+                                                                .setFlags(new Flags()
+                                                                           .setPartyName("Exxxx Pert")
+                                                                           .setRoleOnCase("Defendant solicitor 1 expert")
+                                                                           .setDetails(wrapElements(List.of(
+                                                                               new FlagDetail().setName("flag name")))))
+                                                                .setFirstName("Ex").setLastName("Pert")
+                                                                ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent1Experts()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent1Experts()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Ex Pert")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Defendant solicitor 1 expert").build();
+                Flags expectedFlags = new Flags().setPartyName("Ex Pert")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Defendant solicitor 1 expert");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("res-1-expert-party-id");
@@ -1570,21 +1518,20 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent2ExpertsAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_EXPERTS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_EXPERTS_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent2Experts(wrapElements(PartyFlagStructure.builder()
-                                                         .firstName("Ex").lastName("Pert")
-                                                         .build()));
+                caseData.setRespondent2Experts(wrapElements(new PartyFlagStructure()
+                                                                .setFirstName("Ex").setLastName("Pert")
+                                                                ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent2Experts()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent2Experts()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Ex Pert")
-                    .details(List.of())
-                    .roleOnCase("Defendant solicitor 2 expert").build();
+                Flags expectedFlags = new Flags().setPartyName("Ex Pert")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Defendant solicitor 2 expert");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1596,29 +1543,28 @@ class CaseFlagUtilsTest {
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateApplicantRespondToDefenceAndProceed(ONE_V_TWO_TWO_LEGAL_REP)
                     .addRespondent2ExpertsAndWitnesses()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_EXPERTS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_EXPERTS_ID))
                     .build();
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getRespondent2Experts()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent2Experts(wrapElements(newParty.toBuilder()
-                                                         .flags(Flags.builder()
-                                                                    .partyName("Exxxx Pert")
-                                                                    .roleOnCase("Defendant solicitor 2 expert")
-                                                                    .details(wrapElements(List.of(
-                                                                        FlagDetail.builder().name("flag name").build()))).build())
-                                                         .firstName("Ex").lastName("Pert")
-                                                         .build()));
+                caseData.setRespondent2Experts(wrapElements(newParty.copy()
+                                                                .setFlags(new Flags()
+                                                                           .setPartyName("Exxxx Pert")
+                                                                           .setRoleOnCase("Defendant solicitor 2 expert")
+                                                                           .setDetails(wrapElements(List.of(
+                                                                               new FlagDetail().setName("flag name")))))
+                                                                .setFirstName("Ex").setLastName("Pert")
+                                                                ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent2Experts()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent2Experts()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Ex Pert")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Defendant solicitor 2 expert").build();
+                Flags expectedFlags = new Flags().setPartyName("Ex Pert")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Defendant solicitor 2 expert");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("res-2-expert-party-id");
@@ -1632,21 +1578,20 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenClaimantWitnessAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_WITNESSES_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_WITNESSES_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicantWitnesses(wrapElements(PartyFlagStructure.builder()
-                                                         .firstName("Wit").lastName("Ness")
-                                                         .build()));
+                caseData.setApplicantWitnesses(wrapElements(new PartyFlagStructure()
+                                                                .setFirstName("Wit").setLastName("Ness")
+                                                                ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getApplicantWitnesses()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getApplicantWitnesses()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Wit Ness")
-                    .details(List.of())
-                    .roleOnCase("Claimant solicitor witness").build();
+                Flags expectedFlags = new Flags().setPartyName("Wit Ness")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Claimant solicitor witness");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1657,29 +1602,28 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addApplicant1ExpertsAndWitnesses()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_WITNESSES_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_WITNESSES_ID))
                     .build();
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getApplicantWitnesses()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .applicantWitnesses(wrapElements(newParty.toBuilder()
-                                                         .flags(Flags.builder()
-                                                                    .partyName("Wittyness")
-                                                                    .roleOnCase("Claimant solicitor witness")
-                                                                    .details(wrapElements(List.of(
-                                                                        FlagDetail.builder().name("flag name").build()))).build())
-                                                         .firstName("Wit").lastName("Ness")
-                                                         .build()));
+                caseData.setApplicantWitnesses(wrapElements(newParty.copy()
+                                                                .setFlags(new Flags()
+                                                                           .setPartyName("Wittyness")
+                                                                           .setRoleOnCase("Claimant solicitor witness")
+                                                                           .setDetails(wrapElements(List.of(
+                                                                               new FlagDetail().setName("flag name")))))
+                                                                .setFirstName("Wit").setLastName("Ness")
+                                                                ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getApplicantWitnesses()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getApplicantWitnesses()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Wit Ness")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Claimant solicitor witness").build();
+                Flags expectedFlags = new Flags().setPartyName("Wit Ness")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Claimant solicitor witness");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("app-1-witness-party-id");
@@ -1689,21 +1633,20 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent1WitnessAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_WITNESSES_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_WITNESSES_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent1Witnesses(wrapElements(PartyFlagStructure.builder()
-                                                           .firstName("Wit").lastName("Ness")
-                                                           .build()));
+                caseData.setRespondent1Witnesses(wrapElements(new PartyFlagStructure()
+                                                                  .setFirstName("Wit").setLastName("Ness")
+                                                                  ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent1Witnesses()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent1Witnesses()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Wit Ness")
-                    .details(List.of())
-                    .roleOnCase("Defendant solicitor 1 witness").build();
+                Flags expectedFlags = new Flags().setPartyName("Wit Ness")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Defendant solicitor 1 witness");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1714,29 +1657,29 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent1ExpertsAndWitnesses()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_WITNESSES_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_WITNESSES_ID))
                     .build();
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getRespondent1Witnesses()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent1Witnesses(wrapElements(newParty.toBuilder()
-                                                           .flags(Flags.builder()
-                                                                      .partyName("Wittyness")
-                                                                      .roleOnCase("Defendant solicitor 1 witness")
-                                                                      .details(wrapElements(List.of(
-                                                                          FlagDetail.builder().name("flag name").build()))).build())
-                                                           .firstName("Wit").lastName("Ness")
-                                                           .build()));
+                caseData.setRespondent1Witnesses(wrapElements(newParty.copy()
+                                                                  .setFlags(new Flags()
+                                                                             .setPartyName("Wittyness")
+                                                                             .setRoleOnCase(
+                                                                                 "Defendant solicitor 1 witness")
+                                                                             .setDetails(wrapElements(List.of(
+                                                                                 new FlagDetail().setName("flag name")))))
+                                                                  .setFirstName("Wit").setLastName("Ness")
+                                                                  ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent1Witnesses()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent1Witnesses()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Wit Ness")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Defendant solicitor 1 witness").build();
+                Flags expectedFlags = new Flags().setPartyName("Wit Ness")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Defendant solicitor 1 witness");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("res-1-witness-party-id");
@@ -1746,21 +1689,20 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent2WitnessAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_WITNESSES_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_WITNESSES_ID))
                     .build();
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent2Witnesses(wrapElements(PartyFlagStructure.builder()
-                                                           .firstName("Wit").lastName("Ness")
-                                                           .build()));
+                caseData.setRespondent2Witnesses(wrapElements(new PartyFlagStructure()
+                                                                  .setFirstName("Wit").setLastName("Ness")
+                                                                  ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent2Witnesses()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent2Witnesses()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Wit Ness")
-                    .details(List.of())
-                    .roleOnCase("Defendant solicitor 2 witness").build();
+                Flags expectedFlags = new Flags().setPartyName("Wit Ness")
+                    .setDetails(List.of())
+                    .setRoleOnCase("Defendant solicitor 2 witness");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
@@ -1772,29 +1714,29 @@ class CaseFlagUtilsTest {
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateApplicantRespondToDefenceAndProceed(ONE_V_TWO_TWO_LEGAL_REP)
                     .addRespondent2ExpertsAndWitnesses()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_WITNESSES_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_WITNESSES_ID))
                     .build();
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getRespondent2Witnesses()).get(0);
 
-                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                    .respondent2Witnesses(wrapElements(newParty.toBuilder()
-                                                           .flags(Flags.builder()
-                                                                      .partyName("Wittyness")
-                                                                      .roleOnCase("Defendant solicitor 2 witness")
-                                                                      .details(wrapElements(List.of(
-                                                                          FlagDetail.builder().name("flag name").build()))).build())
-                                                           .firstName("Wit").lastName("Ness")
-                                                           .build()));
+                caseData.setRespondent2Witnesses(wrapElements(newParty.copy()
+                                                                  .setFlags(new Flags()
+                                                                             .setPartyName("Wittyness")
+                                                                             .setRoleOnCase(
+                                                                                 "Defendant solicitor 2 witness")
+                                                                             .setDetails(wrapElements(List.of(
+                                                                                 new FlagDetail().setName("flag name")))))
+                                                                  .setFirstName("Wit").setLastName("Ness")
+                                                                  ));
 
-                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
-                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent2Witnesses()).get(0);
+                PartyFlagStructure individual = unwrapElements(caseData.getRespondent2Witnesses()).get(0);
                 Flags actualFlags = individual.getFlags();
-                Flags expectedFlags = Flags.builder().partyName("Wit Ness")
-                    .details(wrapElements(List.of(
-                        FlagDetail.builder().name("flag name").build())))
-                    .roleOnCase("Defendant solicitor 2 witness").build();
+                Flags expectedFlags = new Flags().setPartyName("Wit Ness")
+                    .setDetails(wrapElements(List.of(
+                        new FlagDetail().setName("flag name"))))
+                    .setRoleOnCase("Defendant solicitor 2 witness");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("res-2-witness-party-id");

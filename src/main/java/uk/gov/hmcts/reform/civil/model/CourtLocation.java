@@ -2,19 +2,22 @@ package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@Accessors(chain = true)
 public class CourtLocation {
 
-    private final String applicantPreferredCourt;
-    private final DynamicList applicantPreferredCourtLocationList;
-    private final CaseLocationCivil caseLocation;
-    private final String reasonForHearingAtSpecificCourt;
+    private String applicantPreferredCourt;
+    private DynamicList applicantPreferredCourtLocationList;
+    private CaseLocationCivil caseLocation;
+    private String reasonForHearingAtSpecificCourt;
 
     @JsonCreator
     CourtLocation(@JsonProperty("applicantPreferredCourt") String applicantPreferredCourt,

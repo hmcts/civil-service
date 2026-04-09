@@ -90,13 +90,14 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                 when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             }
             CaseData caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
-            caseData = caseData.toBuilder().ccdState(caseState).applicant1Represented(YesOrNo.NO).build();
+            caseData.setCcdState(caseState);
+            caseData.setApplicant1Represented(YesOrNo.NO);
             if (caseState == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM) {
-                caseData = caseData.toBuilder().caseDataLiP(
-                    CaseDataLiP.builder().applicant1LiPResponse(
-                        ClaimantLiPResponse.builder().claimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE).build())
-                        .build())
-                    .build();
+                ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+                claimantLiPResponse.setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE);
+                CaseDataLiP caseDataLiP = new CaseDataLiP();
+                caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+                caseData.setCaseDataLiP(caseDataLiP);
             }
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
@@ -113,7 +114,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 dashboardScenarios.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             if (caseState.equals(CaseState.CASE_SETTLED)) {
                 verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
@@ -131,7 +132,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                     "BEARER_TOKEN",
                     SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
                     caseData.getCcdCaseReference().toString(),
-                    ScenarioRequestParams.builder().params(scenarioParams).build()
+                    new ScenarioRequestParams(scenarioParams)
                 );
             }
         }
@@ -199,7 +200,8 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1Represented(YesOrNo.NO)
                 .applicant1AcceptPartAdmitPaymentPlanSpec(null)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .build().toBuilder().ccdState(CaseState.AWAITING_APPLICANT_INTENTION).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
@@ -210,7 +212,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 DashboardScenarios.SCENARIO_AAA6_CLAIM_PART_ADMIT_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -224,16 +226,14 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
-                .ccdCaseReference(1234L)
-                .applicant1Represented(YesOrNo.NO)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .applicant1SignedSettlementAgreement(YesOrNo.YES).build()
-                                 )
-                                 .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(1234L);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+            claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+            caseData.setCaseDataLiP(caseDataLiP);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -246,7 +246,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -257,21 +257,19 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             scenarioParams.put("legacyCaseReference", "reference");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-                .toBuilder()
-                .legacyCaseReference("reference")
-                .applicant1Represented(YesOrNo.NO)
-                .respondent1(Party.builder()
-                                 .companyName("Company one")
-                                 .type(Party.Type.COMPANY).build())
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                                   .builder()
-                                                   .whenWillThisAmountBePaid(LocalDate.now())
-                                                   .build())
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-                .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            Party party =  new Party();
+            party.setCompanyName("Company one");
+            party.setType(Party.Type.COMPANY);
+            caseData.setRespondent1(party);
+            RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+            respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(LocalDate.now());
+            caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+            caseData.setRespondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000));
+            caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -288,7 +286,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 scenario,
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -299,21 +297,20 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             scenarioParams.put("legacyCaseReference", "reference");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-                .toBuilder()
-                .legacyCaseReference("reference")
-                .applicant1Represented(YesOrNo.NO)
-                .respondent1(Party.builder()
-                                 .companyName("Org one")
-                                 .type(Party.Type.ORGANISATION).build())
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                              .firstRepaymentDate(LocalDate.now())
-                                              .paymentAmount(new BigDecimal(1000))
-                                              .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
-                                              .build())
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-                .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            Party party =  new Party();
+            party.setCompanyName("Org one");
+            party.setType(Party.Type.ORGANISATION);
+            caseData.setRespondent1(party);
+            RepaymentPlanLRspec repaymentPlanLRspec = new RepaymentPlanLRspec();
+            repaymentPlanLRspec.setFirstRepaymentDate(LocalDate.now());
+            repaymentPlanLRspec.setPaymentAmount(new BigDecimal(1000));
+            repaymentPlanLRspec.setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK);
+            caseData.setRespondent1RepaymentPlan(repaymentPlanLRspec);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
+            caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -330,7 +327,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 scenario,
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -344,18 +341,15 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
-                .ccdCaseReference(1234L)
-                .applicant1Represented(YesOrNo.NO)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .claimantResponseOnCourtDecision(
-                                                                ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
-                                                            .build()
-                                 )
-                                 .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(1234L);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+            claimantLiPResponse.setClaimantResponseOnCourtDecision(
+                ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+            caseData.setCaseDataLiP(caseDataLiP);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -368,7 +362,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }
@@ -379,16 +373,15 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
         HashMap<String, Object> params = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .applicant1Represented(YesOrNo.NO)
-            .ccdCaseReference(1234L)
-            .ccdState(CaseState.CASE_STAYED)
-            .applicant1ProceedWithClaim(YesOrNo.NO)
-            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
-            .defenceRouteRequired(DISPUTES_THE_CLAIM)
-            .respondent1Represented(YesOrNo.NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.CASE_STAYED);
+        caseData.setApplicant1ProceedWithClaim(YesOrNo.NO);
+        caseData.setRespondent1ClaimResponseTypeForSpec(FULL_DEFENCE);
+        caseData.setDefenceRouteRequired(DISPUTES_THE_CLAIM);
+        caseData.setRespondent1Represented(YesOrNo.NO);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -399,7 +392,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

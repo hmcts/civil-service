@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,18 +9,24 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 public class OrderDetailsGroupTest {
@@ -30,29 +37,29 @@ public class OrderDetailsGroupTest {
     @Test
     void shouldPopulateOrderDetails_WhenAllFieldsArePresent() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .orderOnCourtInitiative(FreeFormOrderValues.builder().onInitiativeSelectionTextArea("On initiative text").onInitiativeSelectionDate(
-                LocalDate.now()).build())
+            .orderOnCourtInitiative(new FreeFormOrderValues().setOnInitiativeSelectionTextArea("On initiative text")
+                                     .setOnInitiativeSelectionDate(LocalDate.now()))
             .freeFormRecordedTextArea("Recorded text")
             .freeFormOrderedTextArea("Ordered text")
-            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeText("On initiative text").build())
-            .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("Without notice text")
-                                    .withoutNoticeSelectionDate(LocalDate.now()).build())
+            .orderMadeOnDetailsOrderCourt(new OrderMadeOnDetails().setOwnInitiativeText("On initiative text"))
+            .orderWithoutNotice(new FreeFormOrderValues().setWithoutNoticeSelectionTextArea("Without notice text")
+                               .setWithoutNoticeSelectionDate(LocalDate.now()))
             .build();
         String freeFormRecordedText = "Recorded text";
         String freeFormOrderedText = "Ordered text";
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder()
-            .freeFormOrderedText("Ordered Text")
-            .freeFormRecordedText("Recorded text");
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm()
+            .setFreeFormOrderedText("Ordered Text")
+            .setFreeFormRecordedText("Recorded text");
 
-        builder = orderDetailsPopulator.populateOrderDetails(builder, caseData);
+        form = orderDetailsPopulator.populateOrderDetails(form, caseData);
 
         String onInitiativeText = "On initiative text";
         LocalDate onInitiativeDate = LocalDate.now();
         String withoutNoticeText = "Without notice text";
         LocalDate withoutNoticeDate = LocalDate.now();
 
-        JudgeFinalOrderForm result = builder.build();
+        JudgeFinalOrderForm result = form;
         Assertions.assertEquals(freeFormRecordedText, result.getFreeFormRecordedText());
         Assertions.assertEquals(freeFormOrderedText, result.getFreeFormOrderedText());
         Assertions.assertEquals(onInitiativeText, result.getOnInitiativeSelectionText());
@@ -72,46 +79,112 @@ public class OrderDetailsGroupTest {
         return Stream.of(
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder()
-                                                                                            .singleDate(LocalDate.of(
+                    .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders()
+                                                                                            .setSingleDate(LocalDate.of(
                                                                                                 2023,
                                                                                                 9,
                                                                                                 15
-                                                                                            ))
-                                                                                            .build()).build()).build(),
+                                                                                            )))).build(),
                 "on 15 September 2023"
             ),
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DatesFinalOrders.builder()
-                                                                                           .dateRangeFrom(LocalDate.of(
+                    .finalOrderDateHeardComplex(new OrderMade().setDateRangeSelection(new DatesFinalOrders()
+                                                                                           .setDateRangeFrom(LocalDate.of(
                                                                                                2023,
                                                                                                9,
                                                                                                13
                                                                                            ))
-                                                                                           .dateRangeTo(LocalDate.of(
+                                                                                           .setDateRangeTo(LocalDate.of(
                                                                                                2023,
                                                                                                9,
                                                                                                14
-                                                                                           ))
-                                                                                           .build()).build()).build(),
+                                                                                           )))).build(),
                 "between 13 September 2023 and 14 September 2023"
             ),
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderDateHeardComplex(OrderMade.builder().bespokeRangeSelection(DatesFinalOrders.builder()
-                                                                                              .bespokeRangeTextArea(
-                                                                                                  "date between 12 feb 2023, and 14 feb 2023")
-                                                                                              .build()).build()).build(),
+                    .finalOrderDateHeardComplex(new OrderMade().setBespokeRangeSelection(new DatesFinalOrders()
+                                                                                              .setBespokeRangeTextArea(
+                                                                                                  "date between 12 feb 2023, and 14 feb 2023"))).build(),
                 "on date between 12 feb 2023, and 14 feb 2023"
             ),
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderDateHeardComplex(OrderMade.builder().bespokeRangeSelection(null)
-                                                    .build()).build(),
+                    .finalOrderDateHeardComplex(new OrderMade().setBespokeRangeSelection(null)).build(),
                 null
             )
         );
+    }
+
+    @Nested
+    class PopulateAssistedOrderDetailsPenalNotice {
+
+        @Test
+        void shouldSetShowPenalNoticeAndContentWhenToggleIsShowAndContentProvided() {
+            String penalNoticeContent = "WARNING - Custom penal notice for Defendant attached to paragraph 5.";
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW))
+                .assistedOrderPenalNoticeContent(penalNoticeContent)
+                .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(
+                    new DatesFinalOrders().setSingleDate(LocalDate.of(2023, 9, 15))))
+                .finalOrderRecitalsRecorded(new FinalOrderRecitalsRecorded().setText("Recorded"))
+                .build();
+
+            JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+            JudgeFinalOrderForm result = orderDetailsPopulator.populateAssistedOrderDetails(form, caseData);
+
+            assertTrue(result.getShowPenalNotice());
+            assertEquals(penalNoticeContent, result.getPenalNoticeText());
+        }
+
+        @Test
+        void shouldSetShowPenalNoticeFalseAndContentNullWhenToggleIsNull() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .assistedOrderPenalNoticeToggle(null)
+                .assistedOrderPenalNoticeContent("Some content")
+                .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(
+                    new DatesFinalOrders().setSingleDate(LocalDate.of(2023, 9, 15))))
+                .build();
+
+            JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+            JudgeFinalOrderForm result = orderDetailsPopulator.populateAssistedOrderDetails(form, caseData);
+
+            assertFalse(result.getShowPenalNotice());
+            assertNull(result.getPenalNoticeText());
+        }
+
+        @Test
+        void shouldSetShowPenalNoticeFalseAndContentNullWhenToggleIsEmpty() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .assistedOrderPenalNoticeToggle(List.of())
+                .assistedOrderPenalNoticeContent("Some content")
+                .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(
+                    new DatesFinalOrders().setSingleDate(LocalDate.of(2023, 9, 15))))
+                .build();
+
+            JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+            JudgeFinalOrderForm result = orderDetailsPopulator.populateAssistedOrderDetails(form, caseData);
+
+            assertFalse(result.getShowPenalNotice());
+            assertNull(result.getPenalNoticeText());
+        }
+
+        @Test
+        void shouldSetPenalNoticeTextNullWhenToggleIsShowButContentIsNull() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .assistedOrderPenalNoticeToggle(List.of(FinalOrderToggle.SHOW))
+                .assistedOrderPenalNoticeContent(null)
+                .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(
+                    new DatesFinalOrders().setSingleDate(LocalDate.of(2023, 9, 15))))
+                .build();
+
+            JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+            JudgeFinalOrderForm result = orderDetailsPopulator.populateAssistedOrderDetails(form, caseData);
+
+            assertTrue(result.getShowPenalNotice());
+            assertNull(result.getPenalNoticeText());
+        }
     }
 
 }

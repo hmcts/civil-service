@@ -40,9 +40,7 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isCaseProgressionEnabled()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::sendHearingLetter)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::sendHearingLetter);
     }
 
     @Override
@@ -74,7 +72,7 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
         } else {
             sendHearingBulkPrintService.sendHearingToLIP(
                 callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
-                featureToggleService.isHmcForLipEnabled() && sendWelshHearingToLip(task, caseData)
+                sendWelshHearingToLip(task, caseData)
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder()

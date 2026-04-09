@@ -40,7 +40,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASH
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
@@ -86,63 +85,62 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
     @Nested
     class AboutToSubmitCallback {
         @Test
-        void shouldRecordScenario_whenInvokedWithoutCPToggle() {
+        void shouldRecordScenario_whenPreviousStateAwaitingApplicantIntention() {
             // Given
-            List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("54326781").build())
-                    .build());
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                    .respondent1Represented(YesOrNo.NO)
-                    .ccdCaseReference(12890L)
-                .generalApplications(gaApplications)
-                    .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+            CaseLink caseLink = new CaseLink();
+            caseLink.setCaseReference("54326781");
+
+            GeneralApplication generalApplication = new GeneralApplication();
+            generalApplication.setCaseLink(caseLink);
+
+            List<Element<GeneralApplication>> gaApplications = wrapElements(generalApplication);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(12890L);
+            caseData.setGeneralApplications(gaApplications);
+            caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isGaForLipsEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder()
-                    .eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
-            ).build();
-            // When
-            handler.handle(params);
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build())
+                .build();
 
-            // Then
+            handler.handle(callbackParams);
+
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
-                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
-
         }
 
         @Test
-        void shouldRecordScenario_whenInvokedForCaseProgressionFeatureToggle() {
+        void shouldRecordScenario_whenPreviousStateCaseProgression() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .ccdCaseReference(12890L)
-                .previousCCDState(CASE_PROGRESSION).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(12890L);
+            caseData.setPreviousCCDState(CASE_PROGRESSION);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -160,7 +158,7 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -169,13 +167,12 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
                 .includesRespondentCitizenQueryFollowUp(OffsetDateTime.now())
-                .build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .ccdCaseReference(12890L)
-                .previousCCDState(CASE_PROGRESSION).build();
+                .build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(12890L);
+            caseData.setPreviousCCDState(CASE_PROGRESSION);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -187,29 +184,22 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             // When
             handler.handle(params);
 
-            // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldNotRecordScenario_whenInvoked() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                    .respondent1Represented(YesOrNo.NO)
-                    .ccdCaseReference(12890L)
-                    .previousCCDState(PENDING_CASE_ISSUED).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(12890L);
+            caseData.setPreviousCCDState(PENDING_CASE_ISSUED);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
@@ -228,66 +218,7 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-        }
-
-        @Test
-        void shouldNotRecordScenario_whenCaseProgressionIsNotEnabledAndIsOnCaseProgressionState() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .ccdCaseReference(12890L)
-                .previousCCDState(CASE_PROGRESSION).build();
-
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(false);
-            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
-            ).build();
-
-            // When
-            handler.handle(params);
-
-            // Then
-            verify(dashboardScenariosService, never()).recordScenarios(
-                "BEARER_TOKEN",
-                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-        }
-
-        @Test
-        void shouldNotRecordScenario_whenNotInvoked() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                    .respondent1Represented(YesOrNo.NO)
-                    .ccdCaseReference(12890L)
-                    .build();
-
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
-            ).build();
-
-            // When
-            handler.handle(params);
-
-            // Then
-            verify(dashboardScenariosService, never()).recordScenarios(
-                "BEARER_TOKEN",
-                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -306,20 +237,21 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
         @Test
         void shouldRecordScenario_whenCoScFlagEnabledAndActiveJudgmentExists() {
             // Given
-            List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("54326781").build())
-                    .build());
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .ccdCaseReference(123210L)
-                .activeJudgment(JudgmentDetails.builder().build())
-                .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
-                .generalApplications(gaApplications)
-                .build();
+            CaseLink caseLink = new CaseLink();
+            caseLink.setCaseReference("54326781");
+
+            GeneralApplication generalApplication = new GeneralApplication();
+            generalApplication.setCaseLink(caseLink);
+
+            List<Element<GeneralApplication>> gaApplications = wrapElements(generalApplication);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(123210L);
+            caseData.setActiveJudgment(new JudgmentDetails());
+            caseData.setPreviousCCDState(CaseState.All_FINAL_ORDERS_ISSUED);
+            caseData.setGeneralApplications(gaApplications);
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-            when(toggleService.isCoSCEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -329,30 +261,27 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 CallbackRequest.builder().eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
             ).build();
 
-            // When
             handler.handle(params);
 
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordScenario_whenCoScFlagEnabledAndActiveJudgmentExistsOnFastTrackClaim() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .ccdCaseReference(123210L)
-                .activeJudgment(JudgmentDetails.builder().build())
-                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.toString())
-                .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(123210L);
+            caseData.setActiveJudgment(new JudgmentDetails());
+            caseData.setResponseClaimTrack(AllocatedTrack.FAST_CLAIM.toString());
+            caseData.setPreviousCCDState(CaseState.All_FINAL_ORDERS_ISSUED);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-            when(toggleService.isCoSCEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -360,16 +289,14 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 CallbackRequest.builder().eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
             ).build();
 
-            // When
             handler.handle(params);
 
-            // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

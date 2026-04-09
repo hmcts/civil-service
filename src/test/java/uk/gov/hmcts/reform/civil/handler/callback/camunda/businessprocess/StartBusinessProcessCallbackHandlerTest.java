@@ -45,8 +45,10 @@ class StartBusinessProcessCallbackHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, names = {"READY", "DISPATCHED"})
     void shouldSetStatusStarted_whenInitialStateIs(BusinessProcessStatus status) {
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(status).build()).build();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setStatus(status);
+        caseData.setBusinessProcess(businessProcess);
 
         Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
         });
@@ -58,15 +60,17 @@ class StartBusinessProcessCallbackHandlerTest extends BaseCallbackHandlerTest {
             = (AboutToStartOrSubmitCallbackResponse) startBusinessProcessCallbackHandler.handle(params);
 
         CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
-        BusinessProcess businessProcess = data.getBusinessProcess();
-        assertThat(businessProcess.getStatus()).isEqualTo(BusinessProcessStatus.STARTED);
+        BusinessProcess returnedBusinessProcess = data.getBusinessProcess();
+        assertThat(returnedBusinessProcess.getStatus()).isEqualTo(BusinessProcessStatus.STARTED);
     }
 
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, names = {"STARTED", "FINISHED"})
     void shouldReturnErrors_whenInitialStatusIs(BusinessProcessStatus status) {
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(status).build()).build();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setStatus(status);
+        caseData.setBusinessProcess(businessProcess);
 
         Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
         });

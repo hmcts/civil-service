@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import feign.FeignException;
+import feign.Request;
+import feign.Request.HttpMethod;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,15 +31,23 @@ import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
+
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -68,34 +79,31 @@ class DocumentRemovalServiceTest {
     }
 
     private CaseDocument buildCaseDocument(String url, String fileName, String binaryUrl, String uploadTimeStamp, String createdBy) {
-        return CaseDocument.builder()
-            .documentLink(Document.builder()
-                .documentUrl(url)
-                .documentFileName(fileName)
-                .documentBinaryUrl(binaryUrl)
-                .uploadTimestamp(uploadTimeStamp)
-                .build())
-            .createdBy(createdBy)
-            .build();
+        return new CaseDocument()
+            .setDocumentLink(new Document()
+                .setDocumentUrl(url)
+                .setDocumentFileName(fileName)
+                .setDocumentBinaryUrl(binaryUrl)
+                .setUploadTimestamp(uploadTimeStamp))
+            .setCreatedBy(createdBy);
     }
 
     private CaseDocumentToKeep buildCaseDocumentToKeep(String url, String fileName, String binaryUrl, LocalDateTime uploadTimeStamp) {
-        return CaseDocumentToKeep.builder()
-            .documentUrl(url)
-            .documentFilename(fileName)
-            .documentBinaryUrl(binaryUrl)
-            .uploadTimestamp(uploadTimeStamp)
-            .build();
+        CaseDocumentToKeep caseDocumentToKeep = new CaseDocumentToKeep();
+        caseDocumentToKeep.setDocumentUrl(url);
+        caseDocumentToKeep.setDocumentFilename(fileName);
+        caseDocumentToKeep.setDocumentBinaryUrl(binaryUrl);
+        caseDocumentToKeep.setUploadTimestamp(uploadTimeStamp);
+        return caseDocumentToKeep;
     }
 
     private Document buildDocument(String url, String fileName, String binaryUrl, String uploadTimeStamp) {
         return
-            Document.builder()
-                .documentUrl(url)
-                .documentFileName(fileName)
-                .documentBinaryUrl(binaryUrl)
-                .uploadTimestamp(uploadTimeStamp)
-                .build();
+            new Document()
+                .setDocumentUrl(url)
+                .setDocumentFileName(fileName)
+                .setDocumentBinaryUrl(binaryUrl)
+                .setUploadTimestamp(uploadTimeStamp);
     }
 
     @Nested
@@ -173,17 +181,17 @@ class DocumentRemovalServiceTest {
             Document document1 = buildDocument(
                 "https://example1.com/123", "Form-A.pdf", "https://example1.com/binary", FIRST_DATE);
             DocumentWithName documentWithName1 =
-                DocumentWithName.builder().documentName("testDocument1").document(document1).createdBy("bill bob").build();
+                new DocumentWithName().setDocumentName("testDocument1").setDocument(document1).setCreatedBy("bill bob");
 
             Document document2 = buildDocument(
                 "https://example2.com/456", "Form-B.pdf", "https://example2.com/binary", SECOND_DATE);
             DocumentWithName documentWithName2 =
-                DocumentWithName.builder().documentName("testDocument2").document(document2).createdBy("bill bob").build();
+                new DocumentWithName().setDocumentName("testDocument2").setDocument(document2).setCreatedBy("bill bob");
 
             Document document3 = buildDocument(
                 "https://example3.com/789", "Form-C.pdf", "https://example3.com/binary", THIRD_DATE);
             DocumentWithName documentWithName3 =
-                DocumentWithName.builder().documentName("testDocument3").document(document3).createdBy("bill bob").build();
+                new DocumentWithName().setDocumentName("testDocument3").setDocument(document3).setCreatedBy("bill bob");
 
             List<Element<DocumentWithName>> documentsList = wrapElements(documentWithName1, documentWithName2, documentWithName3);
 
@@ -218,7 +226,7 @@ class DocumentRemovalServiceTest {
             Document document1 = buildDocument(
                 "https://example3.com/789", "ThirdDoc.pdf", "https://example3.com/binary", THIRD_DATE);
             DocumentWithName documentWithName =
-                DocumentWithName.builder().documentName("testDocument3").document(document1).createdBy("bill bob").build();
+                new DocumentWithName().setDocumentName("testDocument3").setDocument(document1).setCreatedBy("bill bob");
 
             List<Element<DocumentWithName>> documentsList = wrapElements(documentWithName);
 
@@ -312,21 +320,19 @@ class DocumentRemovalServiceTest {
                 .decisionOnReconsiderationDocument(buildCaseDocument(
                     "https://example1.com/123", "Decision On Reconsideration Doc.pdf", "https://example1.com/binary", null, "user"))
                 .respondent1GeneratedResponseDocument(buildCaseDocument(
-                    "https://example2.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null, "user"))
-                .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
-                    .value(DocumentToKeep.builder()
-                        .documentId("456")
-                        .caseDocumentToKeep(buildCaseDocumentToKeep(
-                            "https://example2.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null))
-                        .build())
-                    .build()))
+                    "https://example2.com/456", " Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null, "user"))
+                .documentToKeepCollection(List.of(new DocumentToKeepCollection()
+                    .setValue(new DocumentToKeep()
+                        .setDocumentId("456")
+                        .setCaseDocumentToKeep(buildCaseDocumentToKeep(
+                            "https://example2.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null)))))
                 .build();
 
             DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
 
             assertNull(result.getCaseData().getDecisionOnReconsiderationDocument().getDocumentLink());
             assertNotNull(result.getCaseData().getRespondent1GeneratedResponseDocument());
-            assertEquals("Respondent1 Generated Response Doc.pdf",
+            assertEquals(" Respondent1 Generated Response Doc.pdf",
                 result.getCaseData().getRespondent1GeneratedResponseDocument().getDocumentLink().getDocumentFileName());
             assertNull(result.getCaseData().getDocumentToKeepCollection());
         }
@@ -343,19 +349,15 @@ class DocumentRemovalServiceTest {
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CASE_ID)
                 .claimantResponseDocuments(claimantResponseDocuments)
-                .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
-                        .value(DocumentToKeep.builder()
-                            .documentId("123")
-                            .caseDocumentToKeep(buildCaseDocumentToKeep("https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null))
-                            .build())
-                        .build(),
-                    DocumentToKeepCollection.builder()
-                        .value(DocumentToKeep.builder()
-                            .documentId("456")
-                            .caseDocumentToKeep(
-                                buildCaseDocumentToKeep("https://example2.com/456", "Form-D.pdf", "https://example2.com/binary", null))
-                            .build())
-                        .build()))
+                .documentToKeepCollection(List.of(new DocumentToKeepCollection()
+                        .setValue(new DocumentToKeep()
+                            .setDocumentId("123")
+                            .setCaseDocumentToKeep(buildCaseDocumentToKeep("https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null))),
+                    new DocumentToKeepCollection()
+                        .setValue(new DocumentToKeep()
+                            .setDocumentId("456")
+                            .setCaseDocumentToKeep(
+                                buildCaseDocumentToKeep("https://example2.com/456", "Form-D.pdf", "https://example2.com/binary", null)))))
                 .build();
 
             DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
@@ -376,13 +378,11 @@ class DocumentRemovalServiceTest {
                 .ccdCaseReference(CASE_ID)
                 .claimantResponseDocuments(claimantResponseDocuments)
                 .documentToKeepCollection(
-                    List.of(DocumentToKeepCollection.builder()
-                        .value(DocumentToKeep.builder()
-                            .documentId("123")
-                            .caseDocumentToKeep(
-                                buildCaseDocumentToKeep("https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null))
-                            .build())
-                        .build()))
+                    List.of(new DocumentToKeepCollection()
+                        .setValue(new DocumentToKeep()
+                            .setDocumentId("123")
+                            .setCaseDocumentToKeep(
+                                buildCaseDocumentToKeep("https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null)))))
                 .build();
 
             DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
@@ -397,25 +397,23 @@ class DocumentRemovalServiceTest {
             Document document1 = buildDocument(
                 "https://example1.com/123", "Approved Order1.pdf", "https://example1.com/binary", null);
             DocumentWithName documentWithName1 =
-                DocumentWithName.builder().documentName("Approved Order1.pdf").document(document1).createdBy("bill bob").build();
+                new DocumentWithName().setDocumentName("Approved Order1.pdf").setDocument(document1).setCreatedBy("bill bob");
 
             Document document2 = buildDocument(
                 "https://example2.com/456", "Additional Hearing Doc.pdf", "https://example2.com/binary", null);
             DocumentWithName documentWithName2 =
-                DocumentWithName.builder().documentName("Additional Hearing Doc.pdf").document(document2).createdBy("bill bob").build();
+                new DocumentWithName().setDocumentName("Additional Hearing Doc.pdf").setDocument(document2).setCreatedBy("bill bob");
 
             List<Element<DocumentWithName>> documentsList = wrapElements(documentWithName1, documentWithName2);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
                 .documentAndNameToAdd(documentsList)
-                .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
-                    .value(DocumentToKeep.builder()
-                        .documentId("456")
-                        .caseDocumentToKeep(
-                            buildCaseDocumentToKeep("https://example2.com/456", "Additional Hearing Doc.pdf", "https://example2.com/binary", null))
-                        .build())
-                    .build()))
+                .documentToKeepCollection(List.of(new DocumentToKeepCollection()
+                    .setValue(new DocumentToKeep()
+                        .setDocumentId("456")
+                        .setCaseDocumentToKeep(
+                            buildCaseDocumentToKeep("https://example2.com/456", "Additional Hearing Doc.pdf", "https://example2.com/binary", null)))))
                 .build();
 
             DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
@@ -434,13 +432,11 @@ class DocumentRemovalServiceTest {
                     "https://example1.com/123", "Decision On Reconsideration Doc.pdf", "https://example1.com/binary", null, "Civil"))
                 .respondent1GeneratedResponseDocument(buildCaseDocument(
                     "https://example2.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null, "user"))
-                .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
-                    .value(DocumentToKeep.builder()
-                        .documentId("456")
-                        .caseDocumentToKeep(buildCaseDocumentToKeep(
-                            "https://example2.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null))
-                        .build())
-                    .build()))
+                .documentToKeepCollection(List.of(new DocumentToKeepCollection()
+                    .setValue(new DocumentToKeep()
+                        .setDocumentId("456")
+                        .setCaseDocumentToKeep(buildCaseDocumentToKeep(
+                            "https://example2.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null)))))
                 .build();
 
             DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
@@ -459,23 +455,20 @@ class DocumentRemovalServiceTest {
         void shouldFlagBundlesAsSystemGeneratedRemoveDocuments_TopLevelDoc() {
 
             List<IdValue<Bundle>> bundles = List.of(
-                new IdValue<>("1", Bundle.builder().stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-                    .stitchedDocument(Optional.of(Document.builder()
-                        .documentUrl("https://example1.com/1234")
-                        .documentBinaryUrl("https://example1.com/1234/binary")
-                        .documentFileName("Trial-Bundle.pdf")
-                        .build())).build()));
+                new IdValue<>("1", new Bundle().setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
+                    .setStitchedDocument(Optional.of(new Document()
+                        .setDocumentUrl("https://example1.com/1234")
+                        .setDocumentBinaryUrl("https://example1.com/1234/binary")
+                        .setDocumentFileName("Trial-Bundle.pdf")))));
 
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CASE_ID)
                 .caseBundles(bundles)
-                .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
-                    .value(DocumentToKeep.builder()
-                        .documentId("456")
-                        .caseDocumentToKeep(buildCaseDocumentToKeep(
-                            "https://example1.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null))
-                        .build())
-                    .build()))
+                .documentToKeepCollection(List.of(new DocumentToKeepCollection()
+                    .setValue(new DocumentToKeep()
+                        .setDocumentId("456")
+                        .setCaseDocumentToKeep(buildCaseDocumentToKeep(
+                            "https://example1.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null)))))
                 .respondent1GeneratedResponseDocument(buildCaseDocument(
                     "https://example1.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null, "Civil"))
                 .build();
@@ -489,6 +482,46 @@ class DocumentRemovalServiceTest {
             assertEquals("Respondent1 Generated Response Doc.pdf",
                 result.getCaseData().getRespondent1GeneratedResponseDocument().getDocumentLink().getDocumentFileName());
             assertNull(result.getCaseData().getDocumentToKeepCollection());
+        }
+
+        @Test
+        void shouldContinueWhenCdamReturns404ForDocument() {
+            FeignException.NotFound notFoundException = new FeignException.NotFound(
+                "not found",
+                Request.create(HttpMethod.DELETE, "", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null),
+                "not found".getBytes(StandardCharsets.UTF_8),
+                Collections.emptyMap());
+
+            doThrow(new DocumentDownloadException("https://example1.com/123", notFoundException))
+                .when(documentManagementService).deleteDocument(anyString(), anyString());
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .decisionOnReconsiderationDocument(buildCaseDocument(
+                    "https://example1.com/123", "Decision.pdf", "https://example1.com/binary", null, "user"))
+                .documentToKeepCollection(List.of())
+                .build();
+
+            DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, CASE_ID, "Auth");
+
+            assertNull(result.getCaseData().getDecisionOnReconsiderationDocument().getDocumentLink());
+            assertNull(result.getCaseData().getDocumentToKeepCollection());
+        }
+
+        @Test
+        void shouldThrowWhenCdamReturnsNon404Error() {
+            doThrow(new DocumentDownloadException("https://example1.com/123", new RuntimeException("server error")))
+                .when(documentManagementService).deleteDocument(anyString(), anyString());
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .decisionOnReconsiderationDocument(buildCaseDocument(
+                    "https://example1.com/123", "Decision.pdf", "https://example1.com/binary", null, "user"))
+                .documentToKeepCollection(List.of())
+                .build();
+
+            assertThrows(DocumentDeleteException.class,
+                () -> documentRemovalService.removeDocuments(caseData, CASE_ID, "Auth"));
         }
 
     }

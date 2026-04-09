@@ -31,7 +31,6 @@ public class ValidateExpertsTask {
     }
 
     public CallbackResponse validateExperts(CaseData caseData, String authToken) {
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
         log.info("Validate experts for case ID {}", caseData.getCcdCaseReference());
         List<String> errors = new ArrayList<>();
 
@@ -49,7 +48,7 @@ public class ValidateExpertsTask {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }

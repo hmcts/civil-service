@@ -98,7 +98,7 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            Party respondent1 = PartyBuilder.builder().soleTrader()
+            Party respondent1 = new PartyBuilder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
 
@@ -129,14 +129,14 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            Party respondent1 = PartyBuilder.builder().soleTrader()
+            Party respondent1 = new PartyBuilder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(respondent1)
                 .respondent1OrgRegistered(null)
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")))
                 .specRespondent1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
                 .setClaimTypeToSpecClaim()
@@ -158,10 +158,10 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
         @Test
         void shouldNotifyRespondentLR_whenInvoked() {
             when(notificationsProperties.getNotifyRespondentLRMediationAgreementTemplate()).thenReturn("template-id");
-            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor org").build()));
+            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(new Organisation().setName("defendant solicitor org")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
-            Party respondent1 = PartyBuilder.builder().soleTrader()
+            Party respondent1 = new PartyBuilder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
@@ -187,11 +187,11 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
         @Test
         void shouldNotifyRespondent1LR_whenInvokedCarm() {
             when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn("template-mediation-id");
-            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor org").build()));
+            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(new Organisation().setName("defendant solicitor org")));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
-            Party respondent1 = PartyBuilder.builder().soleTrader()
+            Party respondent1 = new PartyBuilder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
@@ -218,11 +218,11 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
         @Test
         void shouldNotifyRespondent2LR_whenInvokedCarm() {
             when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn("template-mediation-id");
-            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor 2 org").build()));
+            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(new Organisation().setName("defendant solicitor 2 org")));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
-            Party respondent1 = PartyBuilder.builder().soleTrader()
+            Party respondent1 = new PartyBuilder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()

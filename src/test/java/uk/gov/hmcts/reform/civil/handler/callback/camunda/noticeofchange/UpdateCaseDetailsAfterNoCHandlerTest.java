@@ -64,20 +64,17 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
     OrganisationApi organisationApi;
 
     private static final String NEW_ORG_ID = "1234";
-    private static final ContactInformation CONTACT_INFORMATION = ContactInformation.builder()
-        .addressLine1("line 1")
-        .addressLine2("line 2")
-        .postCode("AB1 2XY")
-        .county("My county")
-        .dxAddress(List.of(DxAddress.builder()
-                               .dxNumber("DX 12345")
-                               .build()))
-        .build();
-    private static final Organisation ORGANISATION = Organisation.builder()
-        .organisationIdentifier("QWERTY R")
-        .name("Org Name")
-        .contactInformation(List.of(CONTACT_INFORMATION))
-        .build();
+    private static final ContactInformation CONTACT_INFORMATION = new ContactInformation()
+        .setAddressLine1("line 1")
+        .setAddressLine2("line 2")
+        .setPostCode("AB1 2XY")
+        .setCounty("My county")
+        .setDxAddress(List.of(new DxAddress()
+                               .setDxNumber("DX 12345")));
+    private static final Organisation ORGANISATION = new Organisation()
+        .setOrganisationIdentifier("QWERTY R")
+        .setName("Org Name")
+        .setContactInformation(List.of(CONTACT_INFORMATION));
 
     @BeforeEach
     void setUp() {
@@ -124,7 +121,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued()
                 .build();
 
-            caseData.toBuilder().changeOfRepresentation(null);
+            caseData.setChangeOfRepresentation(null);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -148,9 +145,10 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .addRespondent1LRIndividual("Legal", "Rep")
                 .setUnassignedCaseListDisplayOrganisationReferences()
                 .anyRepresented(NO)
-                .build().toBuilder()
-                .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build())
                 .build();
+            CaseQueriesCollection defendantQueries = new CaseQueriesCollection();
+            defendantQueries.setPartyName("Defendant");
+            caseData.setQmRespondentSolicitor1Queries(defendantQueries);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -171,7 +169,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .isEqualTo(updatedCaseData.getSolicitorReferences().getRespondentSolicitor1Reference());
             assertThat(updatedCaseData.getUnassignedCaseListDisplayOrganisationReferences()).isEmpty();
             assertThat(updatedCaseData.getApplicantSolicitor1UserDetails())
-                .isEqualTo(IdamUserDetails.builder().email("requester@example.com").build());
+                .isEqualTo(new IdamUserDetails().setEmail("requester@example.com"));
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName()).isEqualTo("Defendant");
@@ -387,6 +385,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .addRespondent2LRIndividual("Legal", "Rep2")
                 .build();
 
+            final var originalRespondent2LRIndividuals = caseData.getRespondent2LRIndividuals();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -406,7 +405,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .isEqualTo("requester@example.com");
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
-            assertThat(updatedCaseData.getRespondent1LRIndividuals()).isEqualTo(caseData.getRespondent2LRIndividuals());
+            assertThat(updatedCaseData.getRespondent1LRIndividuals()).isEqualTo(originalRespondent2LRIndividuals);
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
         }
 
@@ -421,9 +420,10 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .addApplicantLRIndividual("Legal", "Rep")
                 .addRespondent1LRIndividual("Legal", "Rep")
-                .build().toBuilder()
-                .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build())
                 .build();
+            CaseQueriesCollection defendantQueries = new CaseQueriesCollection();
+            defendantQueries.setPartyName("Defendant");
+            caseData.setQmRespondentSolicitor1Queries(defendantQueries);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -460,10 +460,12 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .updateOrgPolicyAfterNoC(false, false, NEW_ORG_ID)
                 .addApplicantLRIndividual("Legal", "Rep")
                 .addRespondent1LRIndividual("Legal", "Rep1")
-                .build().toBuilder()
-                .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build())
                 .build();
+            CaseQueriesCollection defendantQueries = new CaseQueriesCollection();
+            defendantQueries.setPartyName("Defendant");
+            caseData.setQmRespondentSolicitor1Queries(defendantQueries);
 
+            final var originalRespondent1LRIndividuals = caseData.getRespondent1LRIndividuals();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -484,7 +486,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
-            assertThat(updatedCaseData.getRespondent2LRIndividuals()).isEqualTo(caseData.getRespondent1LRIndividuals());
+            assertThat(updatedCaseData.getRespondent2LRIndividuals()).isEqualTo(originalRespondent1LRIndividuals);
             assertThat(updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName()).isEqualTo("Defendant 1");
         }
 
@@ -679,13 +681,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .changeOrganisationRequestField(false, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .anyRepresented(NO)
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("QWERTY R").build())
-                                                    .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-                                                    .build())
-                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build(),
-                                                           CaseDocument.builder().documentType(CLAIMANT_CLAIM_FORM).build()))
-                .build();
+                .respondent1OrganisationPolicy(organisationPolicy("QWERTY R", "[RESPONDENTSOLICITORONE]"))
+                .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(SEALED_CLAIM),
+                                                           new CaseDocument().setDocumentType(CLAIMANT_CLAIM_FORM))).build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -899,7 +897,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .changeOfRepresentation(true, false, NEW_ORG_ID, null, null)
                 .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
-                .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("xyz@hmcts.com").setId("1234"))
                 .applicant1Represented(NO)
                 .anyRepresented(NO)
                 .build();
@@ -975,7 +973,6 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldCaptureCCDPreState_whenProceedInHeritageSystemRequested() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
@@ -983,7 +980,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .changeOfRepresentation(true, false, NEW_ORG_ID, null, null)
                 .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
-                .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("xyz@hmcts.com").setId("1234"))
                 .applicant1Represented(NO)
                 .anyRepresented(NO)
                 .claimantBilingualLanguagePreference("WELSH")
@@ -994,5 +991,11 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
             assertThat(response.getData()).extracting("previousCCDState").isNotNull();
         }
+    }
+
+    private OrganisationPolicy organisationPolicy(String organisationId, String role) {
+        return new OrganisationPolicy()
+            .setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(organisationId))
+            .setOrgPolicyCaseAssignedRole(role);
     }
 }

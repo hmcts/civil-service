@@ -4,23 +4,60 @@ properties([
   pipelineTriggers([cron('H 17 * * 1-5')]),
   copyArtifactPermission('/HMCTS_a_to_c_Nightly/civil-service/*'),
   parameters([
-    string(name: 'FORCE_GREEN_BUILD', defaultValue: 'false', description: 'Should force pipeline to go green by not running any functional tests'),
-    string(name: 'RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES', defaultValue: 'false', description: 'Runs the failed test files and not executed test files from the first previous pipeline run that contains the following files \'failedTestFiles.json\' and \'notExecutedTestFiles.json\''),
-    string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment to test'),
-    string(name: 'FRONTEND_URL', defaultValue: 'https://manage-case.aat.platform.hmcts.net',
+    choice(name: 'FORCE_GREEN_BUILD', choices: ['false', 'true'],
+      description: 'Should force pipeline to go green by not running any functional tests'),
+    choice(name: 'RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES', choices: ['false', 'true'],
+      description: 'Runs the failed test files and test files that were not executed, contained within the \'testFilesReport.json\', from the latest previous pipeline run'),
+    choice(name: 'ENVIRONMENT', choices: ['aat', 'demo', 'preview'],
+      description: 'Environment to test'),
+    string(name: 'PR_NUMBER',
+      defaultValue: '', description: 'PR Number of deployed environment to be used to run tests against'),
+    choice(name: 'FRONTEND_URL',
+      choices: [
+                  'https://manage-case.aat.platform.hmcts.net',
+                  'https://manage-case.demo.platform.hmcts.net',
+                  'https://manage-case-int.demo.platform.hmcts.net',
+                  'https://manage-case-int1.demo.platform.hmcts.net',
+                  'https://manage-case-int2.demo.platform.hmcts.net',
+                  'https://manage-case-wa-int.demo.platform.hmcts.net',
+                  'https://manage-case-caa-assigned-case-view.demo.platform.hmcts.net',
+                  'https://xui-civil-ccd-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                  'https://xui-civil-service-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                  'https://xui-civil-citizen-ui-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                ],
       description: 'The URL you want to run the full functional tests against'),
-    string(name: 'IDAM_API_URL', defaultValue: 'https://idam-api.aat.platform.hmcts.net',
+    choice(name: 'IDAM_API_URL', choices: ['https://idam-api.aat.platform.hmcts.net', 'https://idam-api.demo.platform.hmcts.net'],
       description: 'The URL of idam api'),
-    string(name: 'DM_STORE_URL', defaultValue: 'http://dm-store-aat.service.core-compute-aat.internal',
+    choice(name: 'IDAM_TEST_SUPPORT_API_URL', choices: ['https://idam-testing-support-api.aat.platform.hmcts.net', 'https://idam-testing-support-api.demo.platform.hmcts.net'],
+      description: 'The URL of idam test user creation api'),
+    choice(name: 'DM_STORE_URL', choices: ['http://dm-store-aat.service.core-compute-aat.internal', 'http://dm-store-demo.service.core-compute-demo.internal'],
       description: 'The URL of dm store'),
-    string(name: 'SERVICE_AUTH_PROVIDER_API_BASE_URL', defaultValue: 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal',
+    choice(name: 'SERVICE_AUTH_PROVIDER_API_BASE_URL', choices: ['http://rpe-service-auth-provider-aat.service.core-compute-aat.internal', 'http://rpe-service-auth-provider-demo.service.core-compute-demo.internal'],
       description: 'The URL of service auth provider'),
-    string(name: 'CCD_DATA_STORE_URL', defaultValue: 'http://ccd-data-store-api-aat.service.core-compute-aat.internal',
+    choice(name: 'CCD_DATA_STORE_URL', choices: [
+                                                  'http://ccd-data-store-api-aat.service.core-compute-aat.internal',
+                                                  'http://ccd-data-store-api-demo.service.core-compute-demo.internal',
+                                                  'https://ccd-data-store-api-civil-ccd-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                                                  'https://ccd-data-store-api-civil-service-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                                                  'https://ccd-data-store-api-civil-citizen-ui-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                                                ],
       description: 'The URL of ccd data store'),
-    string(name: 'AAC_API_URL', defaultValue: 'http://aac-manage-case-assignment-aat.service.core-compute-aat.internal',
-      description: 'The URL of AAC service'),
-    string(name: 'CIVIL_SERVICE_URL', defaultValue: 'http://civil-service-aat.service.core-compute-aat.internal',
+    choice(name: 'CIVIL_SERVICE_URL', choices: [
+                                                  'http://civil-service-aat.service.core-compute-aat.internal',
+                                                  'http://civil-service-demo.service.core-compute-demo.internal',
+                                                  'https://civil-ccd-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                                                  'https://civil-service-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                                                  'https://civil-citizen-ui-pr-{PR_NUMBER}-civil-service.preview.platform.hmcts.net',
+                                                ],
       description: 'The URL of civil service'),
+    choice(name: 'AAC_API_URL', choices: [
+                                            'http://aac-manage-case-assignment-aat.service.core-compute-aat.internal',
+                                            'http://aac-manage-case-assignment-demo.service.core-compute-demo.internal',
+                                            'https://manage-case-assignment-civil-ccd-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                                            'https://manage-case-assignment-civil-service-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                                            'https://manage-case-assignment-civil-citizen-ui-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                                          ],
+      description: 'The URL of case assignment service'),
     string(name: 'WAIT_FOR_TIMEOUT_MS',
       defaultValue: '120000',
       description: 'Functional tests waitForTimeout value'),
@@ -61,6 +98,31 @@ def copyPrevFailedAndNotExecutedTestFilesJson() {
   }
 }
 
+def copyPreviousAllureHistory() {
+  def buildFound = false
+  def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
+  def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
+  def targetDir = "test-results/functional/allure-results/history"
+
+  while (!buildFound && buildNumber > minBuildNumber) {
+    try {
+      copyArtifacts(
+        projectName: env.JOB_NAME,
+        selector: specific("${buildNumber}"),
+        filter: "test-results/functional/allure-report/history/*",
+        target: targetDir,
+        flatten: true
+      )
+
+      buildFound = true
+      echo "Successfully imported Allure history from build ${buildNumber}"
+    } catch (Exception error) {
+      echo "Allure history artifact not found in build ${buildNumber}. Trying previous..."
+      buildNumber--
+    }
+  }
+}
+
 def secrets = [
   'civil-${env}': [
     secret('microservicekey-civil-service', 'S2S_SECRET'),
@@ -72,26 +134,45 @@ def secrets = [
 ]
 
 withNightlyPipeline(type, product, component) {
+  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
   env.FORCE_GREEN_BUILD=params.FORCE_GREEN_BUILD
   env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES=params.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES
-  env.URL = params.FRONTEND_URL
+  def prNumber = params.PR_NUMBER?.trim()
+  def resolvePreviewUrl = { String value, String paramName ->
+    if (value?.contains('{PR_NUMBER}')) {
+      if (!prNumber) {
+        error "Parameter ${paramName} contains '{PR_NUMBER}' but PR_NUMBER was not provided."
+      }
+      return value.replace('{PR_NUMBER}', prNumber)
+    }
+    return value
+  }
+
+  def frontendUrl = resolvePreviewUrl(params.FRONTEND_URL, 'FRONTEND_URL')
+  def ccdDataStoreUrl = resolvePreviewUrl(params.CCD_DATA_STORE_URL, 'CCD_DATA_STORE_URL')
+  def civilServiceUrl = resolvePreviewUrl(params.CIVIL_SERVICE_URL, 'CIVIL_SERVICE_URL')
+  def aacApiUrl = resolvePreviewUrl(params.AAC_API_URL, 'AAC_API_URL')
+
+  env.URL=frontendUrl
   env.DM_STORE_URL=params.DM_STORE_URL
   env.IDAM_API_URL=params.IDAM_API_URL
+  env.IDAM_TEST_SUPPORT_API_URL=params.IDAM_TEST_SUPPORT_API_URL
   env.SERVICE_AUTH_PROVIDER_API_BASE_URL = params.SERVICE_AUTH_PROVIDER_API_BASE_URL
-  env.CCD_DATA_STORE_URL = params.CCD_DATA_STORE_URL
-  env.CIVIL_SERVICE_URL = params.CIVIL_SERVICE_URL
+  env.CCD_DATA_STORE_URL = ccdDataStoreUrl
+  env.CIVIL_SERVICE_URL = civilServiceUrl
   env.WAIT_FOR_TIMEOUT_MS = params.WAIT_FOR_TIMEOUT_MS
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
-  env.AAC_API_URL = params.AAC_API_URL
+  env.AAC_API_URL = aacApiUrl
+  env.UNASSIGN_CASES = true
   overrideVaultEnvironments([
   'aat': params.ENVIRONMENT
   ])
   loadVaultSecrets(secrets)
 
-  boolean forceGreenBuild = env.FORCE_GREEN_BUILD.toBoolean();
-  boolean runPrevFailedAndNotExecutedTestFiles = env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES.toBoolean();
+  boolean forceGreenBuild = env.FORCE_GREEN_BUILD.toBoolean()
+  boolean runPrevFailedAndNotExecutedTestFiles = env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES.toBoolean()
 
   //enableMutationTest()
   if(!runPrevFailedAndNotExecutedTestFiles && !forceGreenBuild) {
@@ -108,19 +189,28 @@ withNightlyPipeline(type, product, component) {
   if(!forceGreenBuild) {
     afterAlways('DependencyCheckNightly') {
       sh """
-        ./bin/pull-latest-ccd-files.sh ${ccdBranch}
+        ./bin/pull-latest-civil-ccd-files.sh ${ccdBranch}
       """
-      yarnBuilder.yarn('yarn-update')
       yarnBuilder.yarn('install-dependencies')
     }
 
     before('fullFunctionalTest') {
+      copyPreviousAllureHistory()
       if(runPrevFailedAndNotExecutedTestFiles) {
         copyPrevFailedAndNotExecutedTestFilesJson()
       }
     }
 
     afterAlways('fullFunctionalTest') {
+      steps.sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
+      publishHTML([
+        allowMissing: false,
+        alwaysLinkToLastBuild: true,
+        keepAll: true,
+        reportDir: 'test-results/functional/allure-report',
+        reportFiles: 'index.html',
+        reportName: 'Nightly E2E Allure Report'
+      ])
       archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
       env.TESTS_FOR_ACCESSIBILITY = false
     }

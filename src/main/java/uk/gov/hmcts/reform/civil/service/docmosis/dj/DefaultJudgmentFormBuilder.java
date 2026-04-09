@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -11,19 +12,23 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM_SPEC;
-import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicants;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getPartyDetails;
 
 @Component
 public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase implements StandardDefaultJudgmentBuilder {
 
     @Autowired
-    public DefaultJudgmentFormBuilder(InterestCalculator interestCalculator, JudgmentAmountsCalculator judgmentAmountsCalculator,
-                                      OrganisationService organisationService) {
-        super(interestCalculator, judgmentAmountsCalculator, organisationService);
+    public DefaultJudgmentFormBuilder(InterestCalculator interestCalculator,
+                                      JudgmentAmountsCalculator judgmentAmountsCalculator,
+                                      OrganisationService organisationService,
+                                      DjWelshTextService djWelshTextService) {
+        super(interestCalculator, judgmentAmountsCalculator, organisationService, djWelshTextService);
     }
 
     public DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
                                                       uk.gov.hmcts.reform.civil.model.Party respondent,
+                                                      LitigationFriend litigationFriend,
                                                       String event,
                                                       boolean addReferenceOfSecondRes) {
         BigDecimal debtAmount = event.equals(GENERATE_DJ_FORM_SPEC.name())
@@ -42,21 +47,21 @@ public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase i
                 .getRespondentSolicitor1Reference() : null;
         }
 
-        return DefaultJudgmentForm.builder()
-            .caseNumber(caseData.getLegacyCaseReference())
-            .formText("No response,")
-            .applicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
-            .respondent(getPartyDetails(respondent))
-            .claimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy())
+        return new DefaultJudgmentForm()
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setFormText("No response,")
+            .setApplicant(getApplicants(caseData))
+            .setRespondent(getPartyDetails(litigationFriend, respondent))
+            .setClaimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy())
             )
-            .debt(debtAmount.toString())
-            .costs(cost.toString())
-            .totalCost(debtAmount.add(cost).setScale(2).toString())
-            .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
+            .setDebt(debtAmount.toString())
+            .setCosts(cost.toString())
+            .setTotalCost(debtAmount.add(cost).setScale(2).toString())
+            .setApplicantReference(Objects.isNull(caseData.getSolicitorReferences())
                 ? null : caseData.getSolicitorReferences()
                 .getApplicantSolicitor1Reference())
-            .respondentReference(Objects.isNull(caseData.getSolicitorReferences())
-                ? null : respReference).build();
+            .setRespondentReference(Objects.isNull(caseData.getSolicitorReferences())
+                ? null : respReference);
     }
 
 }
