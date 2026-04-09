@@ -1317,6 +1317,41 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppDateDeadline())
                 .isEqualTo(expectedDeadline);
         }
+
+        @Test
+        void shouldCallCalculateDeadlineWith4Days_whenUrgencyRequirementIsNullAndWithNotice() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build())
+                .toBuilder()
+                .generalAppUrgencyRequirement(null)  // null urgency requirement
+                .generalAppInformOtherParty(new GAInformOtherParty()
+                    .setIsWithNotice(YES))
+                .build();
+            when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+            service.buildCaseData(caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), new CallbackParams().toString());
+
+            verify(calc).calculateApplicantResponseDeadlineWithWeekendCheck(any(LocalDateTime.class), eq(4));
+        }
+
+        @Test
+        void shouldCallCalculateDeadlineWith4Days_whenGeneralAppUrgencyIsNullAndWithNotice() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build())
+                .toBuilder()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement()
+                    .setGeneralAppUrgency(null))  // urgency field is null
+                .generalAppInformOtherParty(new GAInformOtherParty()
+                    .setIsWithNotice(YES))
+                .build();
+            when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+            service.buildCaseData(caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), new CallbackParams().toString());
+
+            verify(calc).calculateApplicantResponseDeadlineWithWeekendCheck(any(LocalDateTime.class), eq(4));
+        }
     }
 
     private void assertCaseDateEntries(CaseData caseData) {

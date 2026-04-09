@@ -128,7 +128,48 @@ public class InitiateGeneralApplicationService {
     }
 
     private GeneralApplication finalizeApplication(GeneralApplication application, CaseData caseData, UserDetails userDetails) {
-        return helper.setRespondentDetailsIfPresent(application, caseData, userDetails, feesService);
+        GeneralApplication applicationBuilder = helper.setRespondentDetailsIfPresent(application, caseData, userDetails, feesService);
+
+        // Calculate deadline for Non-urgent & with notice application
+        LocalDateTime deadline = calculateDeadline(caseData, applicationBuilder);
+        applicationBuilder.setGeneralAppDateDeadline(deadline);
+
+        return applicationBuilder;
+    }
+
+    private LocalDateTime calculateDeadline(CaseData caseData, GeneralApplication applicationBuilder) {
+        // Skip deadline calculation for Welsh bilingual cases
+        if (featureToggleService.isGaForWelshEnabled()
+                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            log.info("Skipping deadline calculation for Welsh bilingual case: {}", caseData.getCcdCaseReference());
+            return null;
+        }
+
+        // Check if application is non-urgent
+        boolean isNonUrgent = applicationBuilder.getGeneralAppUrgencyRequirement() == null
+            || applicationBuilder.getGeneralAppUrgencyRequirement().getGeneralAppUrgency() == null
+            || applicationBuilder.getGeneralAppUrgencyRequirement().getGeneralAppUrgency() != YES;
+
+        // Check if application is with notice
+        boolean isWithNotice = applicationBuilder.getGeneralAppInformOtherParty() != null
+            && applicationBuilder.getGeneralAppInformOtherParty().getIsWithNotice() == YES;
+
+        log.info("Calculating deadline for case {}: isNonUrgent={}, isWithNotice={}",
+            caseData.getCcdCaseReference(), isNonUrgent, isWithNotice);
+
+        // Non-urgent with notice: 5 working days with weekend/bank holiday exclusion
+        if (isNonUrgent && isWithNotice) {
+            int numberOfDeadlineDays = 4;
+            LocalDateTime deadline = deadlinesCalculator.calculateApplicantResponseDeadlineWithWeekendCheck(
+                LocalDateTime.now(), numberOfDeadlineDays);
+            log.info("Deadline set for non-urgent with notice case {}: {}", caseData.getCcdCaseReference(), deadline);
+            return deadline;
+        }
+
+        // All other cases: use the deadline already set in setBusinessProcess
+        LocalDateTime deadline = applicationBuilder.getGeneralAppDateDeadline();
+        log.info("Deadline set for other case {}: {}", caseData.getCcdCaseReference(), deadline);
+        return deadline;
     }
 
     private static void setCaseNameGaInternal(CaseData caseData, GeneralApplication applicationBuilder) {
@@ -372,26 +413,8 @@ public class InitiateGeneralApplicationService {
         LocalDateTime deadline = null;
         if (!(featureToggleService.isGaForWelshEnabled()
                 && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()))) {
-
-            boolean isNonUrgent = caseData.getGeneralAppUrgencyRequirement() == null
-                || caseData.getGeneralAppUrgencyRequirement().getGeneralAppUrgency() == null
-                || caseData.getGeneralAppUrgencyRequirement().getGeneralAppUrgency() != YES;
-
-            boolean isWithNotice = applicationBuilder.getGeneralAppInformOtherParty() != null
-                && applicationBuilder.getGeneralAppInformOtherParty().getIsWithNotice() == YES;
-
-            log.info("Setting deadline for case {}: isNonUrgent={}, isWithNotice={}",
-                caseData.getCcdCaseReference(), isNonUrgent, isWithNotice);
-
-            if (isNonUrgent && isWithNotice) {
-                int numberOfDeadlineDays = 4;
-                deadline = deadlinesCalculator.calculateApplicantResponseDeadlineWithWeekendCheck(LocalDateTime.now(), numberOfDeadlineDays);
-                log.info("Deadline set for non-urgent with notice case {}: {}", caseData.getCcdCaseReference(), deadline);
-            } else {
-                int numberOfDeadlineDays = 5;
-                deadline = deadlinesCalculator.calculateApplicantResponseDeadline(LocalDateTime.now(), numberOfDeadlineDays);
-                log.info("Deadline set for other case {}: {}", caseData.getCcdCaseReference(), deadline);
-            }
+            int numberOfDeadlineDays = 5;
+            deadline = deadlinesCalculator.calculateApplicantResponseDeadline(LocalDateTime.now(), numberOfDeadlineDays);
         }
         applicationBuilder
             .setBusinessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
