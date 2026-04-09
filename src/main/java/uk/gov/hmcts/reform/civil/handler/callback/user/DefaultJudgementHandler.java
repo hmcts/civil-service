@@ -67,6 +67,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showcertifystatement"), this::checkStatus,
+            callbackKey(MID, "abandonOtherRemedy"), this::abandonOtherRemedy,
             callbackKey(MID, "checkPreferredLocations"), this::getLocation,
             callbackKey(MID, "acceptCPR"), this::acceptCPR,
             callbackKey(MID, "HearingSupportRequirementsDJ"), this::validateDateValues,
@@ -188,6 +189,20 @@ public class DefaultJudgementHandler extends CallbackHandler {
         caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse abandonOtherRemedy(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+        var isOtherRemedyAbandoned = callbackParams.getRequest().getCaseDetails().getData().get("isOtherRemedyAbandoned");
+        if (Objects.isNull(isOtherRemedyAbandoned) || isOtherRemedyAbandoned == YesOrNo.NO) {
+            errors.add("The event could not be created. Unable to proceed because there are one or more callback Errors or Warnings"
+                           + "- This feature is not available, please see guidance below");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 
