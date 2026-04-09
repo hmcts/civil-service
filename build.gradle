@@ -246,6 +246,7 @@ def sonarExclusions = [
   "**/handler/callback/camunda/dashboardnotifications/defendant/DefendantNotifyDiscontinuanceDashboardNotificationHandler.java",
   "**/handler/callback/user/RaiseQueryCallbackHandler.java",
   "**/handler/migration/MigrateCaseQueriesTask.java",
+  "**/handler/migration/FixDashboardParamsTextTask.java",
   "**/handler/callback/user/RespondQueryCallbackHandler.java",
   "**/service/servicebus/CcdCaseEventsExecutor.java",
   "**/tasklisteners/MigrateCasesTaskListener.java",
