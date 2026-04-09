@@ -186,18 +186,40 @@ task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
+task pullLatestCivilCcdDefinitions(type: Exec, description: 'Pulls the civil CCD definition repository branch needed for data setup.') {
+  doFirst {
+    def ccdDefinitionBranch = System.getenv('CCD_DEFINITION_BRANCH') ?: 'master'
+    commandLine './bin/pull-latest-civil-ccd-files.sh', ccdDefinitionBranch
+  }
+}
+
 task highLevelDataSetup(type: JavaExec, description: 'Loads roles and CCD definitions using the high-level data setup flow.') {
+  dependsOn 'buildCcdDefinitionsXls'
   mainClass = "uk.gov.hmcts.reform.civil.HighLevelDataSetupApp"
   classpath += sourceSets.main.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
 task buildCcdDefinitionsXls(type: Exec, description: 'Builds CCD XLS definitions.') {
+  dependsOn pullLatestCivilCcdDefinitions
   doFirst {
-    def dataSetupEnvironment = providers.gradleProperty('dataSetupEnvironment').orNull
+    def dataSetupEnvironment = System.getenv('ENVIRONMENT')
     if (!(dataSetupEnvironment in ['preview', 'aat'])) {
-      throw new GradleException("Property 'dataSetupEnvironment' must be one of: preview, aat")
+      throw new GradleException("ENVIRONMENT must be one of: preview, aat")
     }
+
+    if (dataSetupEnvironment == 'preview') {
+      def changeId = System.getenv('CHANGE_ID')
+      if (!changeId) {
+        throw new GradleException("CHANGE_ID must be set when ENVIRONMENT=preview")
+      }
+      environment 'CCD_DEF_CASE_SERVICE_BASE_URL', "http://civil-service-pr-${changeId}-java"
+      environment 'CCD_DEF_GEN_APP_SERVICE_BASE_URL', "http://civil-service-pr-${changeId}-java"
+    } else {
+      environment 'CCD_DEF_CASE_SERVICE_BASE_URL', 'http://civil-service-staging-java'
+      environment 'CCD_DEF_GEN_APP_SERVICE_BASE_URL', 'http://civil-service-staging-java'
+    }
+
     commandLine './bin/build-civil-xlsx-definitions.sh', dataSetupEnvironment
   }
 }

@@ -85,6 +85,7 @@ withPipeline(type, product, component) {
   onPR {
     env.ENVIRONMENT = "preview"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+    env.CCD_DEFINITION_BRANCH = checkForCcdDefinitionBranchLabel()
 
     setPreviewUrls(product, component)
 
@@ -98,6 +99,7 @@ withPipeline(type, product, component) {
 
   onMaster {
     env.ENVIRONMENT = "aat"
+    env.CCD_DEFINITION_BRANCH = checkForCcdDefinitionBranchLabel()
 
     setAatUrls()
 
@@ -106,25 +108,6 @@ withPipeline(type, product, component) {
 
   afterAlways('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/jacoco/**'
-  }
-
-  afterAlways('checkout') {
-    onPR {
-      sh """
-        set -e
-        eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
-        ./bin/pull-latest-civil-ccd-files.sh ${checkForCcdDefinitionBranchLabel()}
-        ./gradlew buildCcdDefinitionsXls -PdataSetupEnvironment=preview
-      """
-    }
-    onMaster {
-      sh """
-        set -e
-        eval \$(./bin/variables/load-staging-environment-variables.sh)
-        ./bin/pull-latest-civil-ccd-files.sh ${checkForCcdDefinitionBranchLabel()}
-        ./gradlew buildCcdDefinitionsXls -PdataSetupEnvironment=aat
-      """
-    }
   }
 
   afterAlways('pact-provider-verification') {
