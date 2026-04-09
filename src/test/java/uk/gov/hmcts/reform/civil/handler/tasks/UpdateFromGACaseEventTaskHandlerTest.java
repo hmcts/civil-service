@@ -346,7 +346,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         List<Element<CaseDocument>> toUpdatedDocs =
             (List<Element<CaseDocument>>) output.get("directionOrderDocStaff");
 
-        assertThat(toUpdatedDocs).isNotNull();
+        assertThat(toUpdatedDocs).hasSize(1);
     }
 
     @Test
@@ -433,7 +433,6 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         List<Element<Document>> toUpdatedDocs =
             (List<Element<Document>>) output.get("gaEvidenceDocStaff");
 
-        assertThat(toUpdatedDocs).isNotNull();
         assertThat(toUpdatedDocs).hasSize(1);
     }
 
@@ -457,9 +456,9 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         List<Element<CaseDocument>> toUpdatedDocs =
             (List<Element<CaseDocument>>) output.get("directionOrderDocClaimant");
 
-        assertThat(toUpdatedDocs).isNotNull();
-        assertThat(toUpdatedDocs).hasSize(1);
-        assertThat(toUpdatedDocs.getFirst().getValue()).isNull();
+        assertThat(toUpdatedDocs)
+            .singleElement()
+            .satisfies(doc -> assertThat(doc.getValue()).isNull());
     }
 
     @Test

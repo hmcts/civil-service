@@ -151,7 +151,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
     }
 
     protected void updateDocCollectionField(Map<String, Object> output, CaseData civilCaseData, CaseData generalAppCaseData, String docFieldName)
-        throws Exception {
+        throws ReflectiveOperationException {
         String civilDocPrefix = getCivilDocPrefix(docFieldName);
         String fromGaList = getFromGaList(docFieldName, civilDocPrefix);
 
@@ -181,7 +181,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         CaseData generalAppCaseData,
         String civilDocPrefix,
         String fromGaList
-    ) throws Exception {
+    ) throws ReflectiveOperationException {
         if (canViewClaimant(civilCaseData, generalAppCaseData, civilDocPrefix)) {
             updateDocCollection(output, generalAppCaseData, fromGaList, civilCaseData, civilDocPrefix + CIVIL_DOC_CLAIMANT_SUFFIX);
         }
@@ -195,7 +195,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         String fromGaList,
         String respondent,
         String civilSuffix
-    ) throws Exception {
+    ) throws ReflectiveOperationException {
         if (canViewResp(civilCaseData, generalAppCaseData, civilDocPrefix, respondent)) {
             updateDocCollection(output, generalAppCaseData, fromGaList, civilCaseData, civilDocPrefix + civilSuffix);
         }
