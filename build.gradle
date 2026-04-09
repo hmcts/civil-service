@@ -276,6 +276,9 @@ configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
 
 jacocoTestReport {
   executionData(test, integration)
+  subprojects.each {
+    sourceSets it.sourceSets.main
+  }
   reports {
     xml.getRequired().set(true)
     csv.getRequired().set(false)
