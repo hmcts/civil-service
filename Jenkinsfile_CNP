@@ -80,6 +80,7 @@ withPipeline(type, product, component) {
   env.ENABLE_SECURE_URL = true
   env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
   env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
+  env.BEFTA_S2S_CLIENT_ID = "ccd_data"
 
   loadVaultSecrets(secrets)
 
