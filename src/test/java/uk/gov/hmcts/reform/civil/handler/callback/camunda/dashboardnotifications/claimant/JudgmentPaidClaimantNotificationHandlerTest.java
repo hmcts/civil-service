@@ -12,8 +12,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -33,7 +31,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_NOTIFICATIONS_JUDGMENT_PAID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MARK_PAID_IN_FULL_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 public class JudgmentPaidClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -113,38 +110,6 @@ public class JudgmentPaidClaimantNotificationHandlerTest extends BaseCallbackHan
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_CLAIMANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                new ScenarioRequestParams(scenarioParams)
-            );
-        }
-
-        @Test
-        void shouldRecordScenario_whenInvoked_whenClaimantRepresented_And_MarkedPaid_And_Def_Mark_Paid_In_Full() {
-            CaseDataLiP caseDataLiP = new CaseDataLiP();
-            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
-            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(caseDataLiP)
-                .applicant1Represented(YesOrNo.NO).build();
-            caseData.setCaseDocumentUploadDate(LocalDateTime.now());
-
-            CaseData.CaseDataBuilder<?, ?> caseData2 = caseData.toBuilder();
-            caseData2.activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()));
-            caseData2.certOfSC(new CertOfSC().setDefendantFinalPaymentDate(LocalDate.now()));
-
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData2.build()).request(
-                CallbackRequest.builder().eventId(UPDATE_DASHBOARD_NOTIFICATIONS_JUDGMENT_PAID_CLAIMANT.name()).build()
-            ).build();
-
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
-            handler.handle(params);
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                SCENARIO_AAA6_MARK_PAID_IN_FULL_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
                 new ScenarioRequestParams(scenarioParams)
             );
