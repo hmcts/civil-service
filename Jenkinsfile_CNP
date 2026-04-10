@@ -81,10 +81,10 @@ withPipeline(type, product, component) {
   env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
   env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
 
-  enableHighLevelDataSetup()
   loadVaultSecrets(secrets)
 
   onPR {
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "preview"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
     env.CCD_DEFINITION_BRANCH = checkForCcdDefinitionBranchLabel()
