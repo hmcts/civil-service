@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeep;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
 
+import feign.FeignException;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -240,11 +242,15 @@ public class DocumentRemovalService {
                 documentUrl));
             documentManagementService.deleteDocument(authorisationToken, documentUrl);
         } catch (Exception e) {
-            log.error(format(
-                "Failed to delete document url %s",
-                documentUrl), e);
-
-            throw new DocumentDeleteException(e.getMessage(), e);
+            if (e.getCause() instanceof FeignException.NotFound) {
+                log.warn("Document not found in CDAM for url {} - may have already been deleted. "
+                    + "Continuing with case data removal.", documentUrl);
+            } else {
+                log.error(format(
+                    "Failed to delete document url %s",
+                    documentUrl), e);
+                throw new DocumentDeleteException(e.getMessage(), e);
+            }
         }
     }
 
