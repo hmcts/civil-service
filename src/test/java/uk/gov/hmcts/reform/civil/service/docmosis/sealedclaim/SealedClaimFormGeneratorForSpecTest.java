@@ -51,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL_LIP;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1_LIP;
 
 @ExtendWith(SpringExtension.class)
 class  SealedClaimFormGeneratorForSpecTest {
@@ -258,6 +259,30 @@ class  SealedClaimFormGeneratorForSpecTest {
         verify(representativeService).getRespondent1Representative(caseData);
         verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2_2V1));
+    }
+
+    @Test
+    void generateSealedClaimForm2v1RespondentLIP() {
+        CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseData = caseBuilder
+            .applicant2(new Party()
+                            .setType(Party.Type.COMPANY)
+                            .setPartyName("name"))
+            .specRespondent1Represented(YesOrNo.NO)
+            .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_2V1_LIP)))
+            .thenReturn(new DocmosisDocument(N2_2V1_LIP.getDocumentTitle(), bytes));
+
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+
+        CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+        verify(representativeService).getRespondent1Representative(caseData);
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2_2V1_LIP));
     }
 
     private CaseData.CaseDataBuilder getBaseCaseDataBuilder() {
