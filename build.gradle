@@ -543,29 +543,6 @@ wrapper {
   distributionType = Wrapper.DistributionType.ALL
 }
 
-task runOtherServices(type: Exec) {
-  group 'ccd tasks'
-
-  environment 'ADDITIONAL_COMPOSE_FILES', 'cftlib-additional-services.yml'
-  environment 'BASE_COMPOSE_FILES_PATH', './src/cftlib/resources/docker/'
-
-  commandLine './bin/add-services.sh'
-  doLast() {
-    importBpmnDiagrams
-  }
-}
-
-task importBpmnDiagrams(type: Exec) {
-  group 'ccd tasks'
-
-  dependsOn(runOtherServices)
-
-  environment 'CAMUNDA_BASE_URL', 'http://localhost:9404'
-  environment 'SERVICE_AUTH_PROVIDER_API_BASE_URL', 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
-
-  commandLine './bin/import-bpmn-diagram-cftlib.sh'
-}
-
 project.ext {
   pactVersion = getCheckedOutGitCommitHash()
 }
@@ -663,18 +640,6 @@ tasks.withType(Test).configureEach { t ->
 
 def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()
-}
-
-task loadEnvSecrets() {
-  doLast {
-    new ByteArrayOutputStream().withStream { os ->
-      exec {
-        commandLine 'az', 'keyvault', 'secret', 'show', '--vault-name', 'civil-aat', '-o', 'tsv', '--query', 'value', '--name', 'civil-service-dot-env'
-        standardOutput = os
-      }
-      project.file('./.aat-env').write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
-    }
-  }
 }
 
 publishing {

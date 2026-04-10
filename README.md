@@ -103,14 +103,6 @@ be found in the Azure key store.
 | `LAUNCH_DARKLY_OFFLINE_MODE` | Sets LaunchDarkly to use local values for flags rather than connecting to the service | `true` |
 | `SPRING_PROFILES_ACTIVE` | Sets the active Spring profile | `local` |
 
-#### Running through IntelliJ
-
-IntelliJ will create a Spring Boot run configuration for you. Which, after setting up your environment variables, can be
-run from there.
-
-They are also base64 encoded and stored in the aat-env keystore in azure, in civil-service-dot-env secret.
-
-The loadEnvSecrets gradle task downloads them to a local .aat-env file which is read in the gradle bootRun task.
 
 #### Create a Docker image
 
@@ -259,15 +251,8 @@ Example
 ./gradlew -DdependencyCheck.failBuild=true -Dnvd.api.check.validforhours=24 -Dnvd.api.key=<YOUR_API_KEY_HERE> dependencyCheckAggregate
 ```
 
-## CFTLib- Running Locally
-```
-./gradlew bootWithCCD
-```
 If you're seeing errors when pulling images, run the following command:
 
-```shell
-az acr login --name hmctspublic --subscription 8999dec3-0104-4a27-94ee-6588559729d1
-```
 If you're seeing errors after importing bpmn files then run it again.
 XUI will be running on http://localhost:3000/
 
