@@ -7,7 +7,7 @@ dir=$(dirname ${0})
 role=${1}
 
 if [ -z "${USER_TOKEN:-}" ]; then
-  userToken=$(${dir}/idam-lease-user-token.sh ${CCD_CONFIGURER_IMPORTER_USERNAME:-ccd.docker.default@hmcts.net} ${CCD_CONFIGURER_IMPORTER_PASSWORD:-Password12!})
+  userToken=$(${dir}/idam-lease-user-token.sh ${CCD_CONFIGURER_IMPORTER_USERNAME} ${CCD_CONFIGURER_IMPORTER_PASSWORD})
 else
   userToken=${USER_TOKEN}
 fi
