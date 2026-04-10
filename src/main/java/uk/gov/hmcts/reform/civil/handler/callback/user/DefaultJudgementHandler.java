@@ -193,12 +193,14 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private CallbackResponse abandonOtherRemedy(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
+        CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         var isOtherRemedyAbandoned = callbackParams.getRequest().getCaseDetails().getData().get("isOtherRemedyAbandoned");
         if (Objects.isNull(isOtherRemedyAbandoned) || isOtherRemedyAbandoned == YesOrNo.NO) {
             errors.add("The event could not be created. Unable to proceed because there are one or more callback Errors or Warnings"
                            + "- This feature is not available, please see guidance below");
+        } else {
+            caseData.setOtherRemedyAbandonedDate(LocalDate.now());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
