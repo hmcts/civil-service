@@ -44,7 +44,6 @@ public class GeneralAppsDeadlinesCalculator extends DeadlinesCalculator {
         long noOfHoliday = startDate.datesUntil(endDate.plusDays(1))
             .filter(data -> !workingDayIndicator.isWorkingDay(data))
             .count();
-        log.info("Non-working days in range: {}", noOfHoliday);
 
         LocalDate finalDeadline = endDate.plusDays(noOfHoliday);
         log.info("Deadline before working day check: {} ({})", finalDeadline, finalDeadline.getDayOfWeek());
