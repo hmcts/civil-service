@@ -115,11 +115,6 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     }
 
     @Override
-    protected boolean shouldTolerateDataSetupFailure() {
-        return BeftaMain.getConfig().getDefinitionStoreUrl().contains(".preview.");
-    }
-
-    @Override
     protected boolean shouldTolerateDataSetupFailure(Throwable e) {
         if (e instanceof ImportException importException) {
             return importException.getHttpStatusCode() == 504;
