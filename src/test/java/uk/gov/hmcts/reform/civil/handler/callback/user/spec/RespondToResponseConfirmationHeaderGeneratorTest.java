@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -8,33 +9,124 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AcceptPartAdmitAndPaidConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitNotProceedConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentByAdmissionConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitProceedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendNotProceedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendProceedConfHeader;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentByAdmissionConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentSubmittedConfHeader;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.ProposePaymentPlanConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.RejectWithMediationConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.RejectWithoutMediationConfHeader;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 
 public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDataToTextGeneratorTest
     .CaseDataToTextGeneratorIntentionConfig<RespondToResponseConfirmationHeaderGenerator> {
+
+    @Test
+    void shouldGeneratePayImmediatelyHeader() {
+        CaseData caseData = buildFullAdmitPayImmediatelyProceedCaseData();
+
+        assertThat(new PayImmediatelyHeader().generateTextFor(caseData, null)).contains(
+            String.format(
+                "# The defendant said they'll pay you immediately.%n## Claim number: %s",
+                caseData.getLegacyCaseReference()
+            )
+        );
+    }
+
+    @Test
+    void shouldGenerateAdmitProceedHeader() {
+        CaseData caseData = buildFullAdmitProceedCaseData();
+
+        assertThat(new AdmitProceedConfHeader().generateTextFor(caseData, null)).contains(
+            String.format(
+                "# You have submitted your intention to proceed%n## Claim number: %s",
+                caseData.getLegacyCaseReference()
+            )
+        );
+    }
+
+    @Test
+    void shouldGenerateJudgmentByAdmissionHeader() {
+        CaseData caseData = buildJudgmentSubmitProceedCaseDataAllFoi();
+
+        assertThat(new JudgmentByAdmissionConfHeader().generateTextFor(caseData, null)).contains(
+            String.format(
+                "# Judgment Submitted %n## A county court judgment(CCJ) has been submitted for case %s",
+                caseData.getLegacyCaseReference()
+            )
+        );
+    }
+
+    @Test
+    void shouldGeneratePayImmediatelyHeaderForPartAdmissionClaimSettled() {
+        CaseData caseData = buildPartAdmitPayImmediatelyProceedCaseData();
+
+        assertThat(new PayImmediatelyHeader().generateTextFor(caseData, null)).contains(
+            String.format(
+                "# The defendant said they'll pay you immediately.%n## Claim number: %s",
+                caseData.getLegacyCaseReference()
+            )
+        );
+    }
+
+    @Test
+    void shouldReturnEmptyForPayImmediatelyHeaderWhenPartAdmissionIsNotClaimSettled() {
+        CaseData caseData = buildPartAdmitPayImmediatelyProceedCaseData();
+        caseData.setApplicant1AcceptAdmitAmountPaidSpec(null);
+
+        assertThat(new PayImmediatelyHeader().generateTextFor(caseData, null)).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyForPayImmediatelyHeaderWhenImmediateOptionNotSelected() {
+        CaseData caseData = buildPartAdmitPayImmediatelyProceedCaseData();
+        caseData.setRespondForImmediateOption(YesOrNo.NO);
+
+        assertThat(new PayImmediatelyHeader().generateTextFor(caseData, null)).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyForAdmitProceedHeaderWhenClaimantAgreedToFreeMediation() {
+        CaseData caseData = buildFullAdmitProceedCaseDataWithMediation();
+
+        assertThat(new AdmitProceedConfHeader().generateTextFor(caseData, null)).isEmpty();
+    }
+
+    @Test
+    void shouldGenerateJudgmentByAdmissionHeaderForInstallmentPlan() {
+        CaseData caseData = buildJudgmentSubmitProceedCaseDataInstallment();
+
+        assertThat(new JudgmentByAdmissionConfHeader().generateTextFor(caseData, null)).contains(
+            String.format(
+                "# Judgment Submitted %n## A county court judgment(CCJ) has been submitted for case %s",
+                caseData.getLegacyCaseReference()
+            )
+        );
+    }
+
+    @Test
+    void shouldReturnEmptyForJudgmentByAdmissionHeaderWhenPaymentRouteIsNotEligible() {
+        CaseData caseData = buildJudgmentSubmitProceedCaseDataAllFoi();
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
+
+        assertThat(new JudgmentByAdmissionConfHeader().generateTextFor(caseData, null)).isEmpty();
+    }
 
     @Override
     public Class<RespondToResponseConfirmationHeaderGenerator> getIntentionInterface() {
@@ -94,6 +186,16 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
+    }
+
+    public static CaseData buildFullAdmitProceedCaseDataWithMediation() {
+        CaseData caseData = buildFullAdmitProceedCaseData();
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
+        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.Yes);
+        caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
+        caseData.setCaseDataLiP(caseDataLiP);
+        return caseData;
     }
 
     public static CaseData buildFullAdmitPayImmediatelyProceedCaseData() {
@@ -172,6 +274,14 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .build();
         caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        return caseData;
+    }
+
+    public static CaseData buildJudgmentSubmitProceedCaseDataInstallment() {
+        CaseData caseData = buildJudgmentSubmitProceedCaseDataAllFoi();
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN
+        );
         return caseData;
     }
 

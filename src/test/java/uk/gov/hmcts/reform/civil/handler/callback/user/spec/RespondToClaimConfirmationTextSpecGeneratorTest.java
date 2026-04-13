@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.CounterClaimConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitAlreadyPaidConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitSetDateConfirmationText;
@@ -14,11 +16,13 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.RepayPlanConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.SpecResponse1v2DivergentText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.SpecResponse2v1DifferentText;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -26,12 +30,146 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+
 /**
  * config for testing implementations of RespondToClaimConfirmationTextSpecGenerator.
  */
 public class RespondToClaimConfirmationTextSpecGeneratorTest
     implements CaseDataToTextGeneratorTest
     .CaseDataToTextGeneratorIntentionConfig<RespondToClaimConfirmationTextSpecGenerator> {
+
+    @Test
+    void shouldGenerateCounterClaimConfirmationText() {
+        CaseData caseData = getCounterClaim();
+
+        assertThat(new CounterClaimConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+            assertThat(text)
+                .contains("You've chosen to counterclaim - this means your defence cannot continue online.")
+                .contains("Download form N9B")
+        );
+    }
+
+    @Test
+    void shouldGeneratePartialAdmissionSetDateConfirmationText() {
+        CaseData caseData = getPartialAdmitSetDate();
+        String applicantName = caseData.getApplicant1().getPartyName();
+        String paymentDate = DateFormatHelper.formatLocalDate(
+            caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(),
+            DATE
+        );
+
+        assertThat(new PartialAdmitSetDateConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+            assertThat(text)
+                .contains("You believe you owe &#163;" + caseData.getRespondToAdmittedClaimOwingAmountPounds())
+                .contains(applicantName)
+                .contains("your offer to pay by " + paymentDate)
+                .contains(String.format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference()))
+                .contains("The court will decide how you must pay")
+        );
+    }
+
+    @Test
+    void shouldGenerateTextForDifferentResponsesPerClaimant() {
+        CaseData caseData = get2v1DifferentResponseCase().getFirst();
+
+        assertThat(new SpecResponse2v1DifferentText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+            assertThat(text)
+                .contains("The defendant has chosen different responses for each claimant and the claim cannot continue online.")
+                .contains("Download form N9A")
+                .contains("Download form N9B")
+                .contains("County Court Business Centre")
+        );
+    }
+
+    @Test
+    void shouldGenerateCounterClaimConfirmationTextWhenBothResponsesAreTheSame() {
+        CaseData caseData = getCounterClaim();
+        caseData.setRespondent2(new Party());
+        caseData.setRespondentResponseIsSame(YesOrNo.YES);
+
+        assertThat(new CounterClaimConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+            assertThat(text).contains("Download form N9B")
+        );
+    }
+
+    @Test
+    void shouldGenerateCounterClaimConfirmationTextWhenSecondRespondentAlsoCounterclaims() {
+        CaseData caseData = getCounterClaim();
+        caseData.setRespondent2(new Party());
+        caseData.setRespondentResponseIsSame(YesOrNo.NO);
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM);
+
+        assertThat(new CounterClaimConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+            assertThat(text).contains("Download form N9B")
+        );
+    }
+
+    @Test
+    void shouldReturnEmptyForDifferentResponsesPerClaimantWhenSingleResponseProvided() {
+        CaseData caseData = get2v1DifferentResponseCase().getFirst();
+        caseData.setDefendantSingleResponseToBothClaimants(YesOrNo.YES);
+
+        assertThat(new SpecResponse2v1DifferentText().generateTextFor(caseData, null)).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyForDifferentResponsesPerClaimantWhenResponsesMatch() {
+        Party applicant1 = new Party();
+        Party applicant2 = new Party();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1(applicant1);
+        caseData.setApplicant2(applicant2);
+        caseData.setClaimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setClaimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+
+        assertThat(new SpecResponse2v1DifferentText().generateTextFor(caseData, null)).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyForPartialAdmissionSetDateWhenRequiredFieldIsMissing() {
+        CaseData caseData = getPartialAdmitSetDate();
+        caseData.setTotalClaimAmount(null);
+
+        assertThat(new PartialAdmitSetDateConfirmationText().generateTextFor(caseData, null)).isEmpty();
+    }
+
+    @Test
+    void shouldGeneratePartialAdmissionSetDateTextForBilingualMultiClaimantMediationCase() {
+        CaseData caseData = getPartialAdmitSetDate();
+        caseData.setApplicant1(new PartyBuilder().individual("Alice").build());
+        caseData.setApplicant2(new PartyBuilder().company().build());
+        caseData.setClaimantBilingualLanguagePreference(Language.WELSH.toString());
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
+
+        assertThat(new PartialAdmitSetDateConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+            assertThat(text)
+                .contains("Mr. Alice Rambo and Company ltd")
+                .contains("We will let you know when the claimant responds.")
+                .contains("accept your offer")
+                .contains("We'll ask if they want to try mediation.")
+                .contains("If they do not want to try mediation the court will review the case for the full amount of &#163;"
+                              + caseData.getTotalClaimAmount())
+        );
+    }
+
+    @Test
+    void shouldGeneratePartialAdmissionSetDateTextForRepresentedApplicantNameEndingWithS() {
+        CaseData caseData = getPartialAdmitSetDate();
+        Party applicant1 = new Party();
+        applicant1.setType(Party.Type.COMPANY);
+        applicant1.setCompanyName("Evans");
+        applicant1.setPartyName("Evans");
+        caseData.setApplicant1(applicant1);
+        caseData.setTotalClaimAmount(caseData.getRespondToAdmittedClaimOwingAmountPounds());
+
+        assertThat(new PartialAdmitSetDateConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+            assertThat(text)
+                .contains("Contact Evans' legal representative if you need details on how to pay.")
+                .doesNotContain("and your explanation of why you do not owe the full amount.")
+        );
+    }
 
     private CaseData getFullAdmitAlreadyPaidCase() {
         CaseData caseData = CaseDataBuilder.builder()
