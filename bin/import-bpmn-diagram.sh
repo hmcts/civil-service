@@ -2,15 +2,24 @@
 
 set -eu
 workspace=${1}
+camundaBaseUrl=${CAMUNDA_BASE_URL:-http://localhost:9404}
+filepath="$(realpath $workspace)/camunda"
+
+echo "Importing Civil Camunda BPMN definitions"
+echo "Workspace: $(realpath $workspace)"
+echo "Camunda base URL: ${camundaBaseUrl}"
+echo "S2S_SECRET present: $([[ -n "${S2S_SECRET:-}" ]] && echo "yes" || echo "no")"
+echo "BPMN file count: $(find "${filepath}" -name '*.bpmn' | wc -l | tr -d ' ')"
 
 serviceToken=$($(realpath $workspace)/bin/utils/idam-lease-service-token.sh civil_service \
   $(docker run --rm hmctspublic.azurecr.io/imported/toolbelt/oathtool --totp -b ${S2S_SECRET:-AABBCCDDEEFFGGHH}))
-filepath="$(realpath $workspace)/camunda"
+echo "Service token generated: $([[ -n "${serviceToken}" ]] && echo "yes" || echo "no")"
 
 for file in $(find ${filepath} -name '*.bpmn')
 do
+  echo "Uploading BPMN diagram: $(basename ${file})"
   uploadResponse=$(curl --insecure --silent -w "\n%{http_code}" --show-error -X POST \
-    ${CAMUNDA_BASE_URL:-http://localhost:9404}/engine-rest/deployment/create \
+    ${camundaBaseUrl}/engine-rest/deployment/create \
     -H "Accept: application/json" \
     -H "ServiceAuthorization: Bearer ${serviceToken}" \
     -F "deployment-name=$(date +"%Y%m%d-%H%M%S")-$(basename ${file})" \

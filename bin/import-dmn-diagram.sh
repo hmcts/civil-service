@@ -4,8 +4,18 @@ set -eu
 workspace=${1}
 tenant_id=${2}
 product=${3}
+camundaBaseUrl=${CAMUNDA_BASE_URL:-http://localhost:9404}
+dmnFilepath="$(realpath $workspace)/resources"
 
 s2sSecret=${S2S_SECRET:-AABBCCDDEEFFGGHH}
+
+echo "Importing Civil WA DMN definitions"
+echo "Workspace: $(realpath $workspace)"
+echo "Camunda base URL: ${camundaBaseUrl}"
+echo "Tenant ID: ${tenant_id}"
+echo "Deployment source: ${product}"
+echo "S2S_SECRET present: $([[ -n "${S2S_SECRET:-}" ]] && echo "yes" || echo "no")"
+echo "DMN file count: $(find "${dmnFilepath}" -name '*.dmn' | wc -l | tr -d ' ')"
 
 #if [[ "${env}" == 'prod' ]]; then
 #  s2sSecret=${S2S_SECRET_PROD}-
@@ -13,13 +23,13 @@ s2sSecret=${S2S_SECRET:-AABBCCDDEEFFGGHH}
 
 serviceToken=$($(realpath ".")/bin/utils/idam-lease-service-token.sh civil_service \
   $(docker run --rm hmctspublic.azurecr.io/imported/toolbelt/oathtool --totp -b ${s2sSecret}))
-
-dmnFilepath="$(realpath $workspace)/resources"
+echo "Service token generated: $([[ -n "${serviceToken}" ]] && echo "yes" || echo "no")"
 
 for file in $(find ${dmnFilepath} -name '*.dmn')
 do
+  echo "Uploading DMN diagram: $(basename ${file})"
   uploadResponse=$(curl --insecure -v --silent -w "\n%{http_code}" --show-error -X POST \
-    ${CAMUNDA_BASE_URL:-http://localhost:9404}/engine-rest/deployment/create \
+    ${camundaBaseUrl}/engine-rest/deployment/create \
     -H "Accept: application/json" \
     -H "ServiceAuthorization: Bearer ${serviceToken}" \
     -F "deployment-name=$(basename ${file})" \
@@ -40,5 +50,4 @@ echo "$(basename ${file}) upload failed with http code ${upload_http_code} and r
 continue;
 
 done
-
 
