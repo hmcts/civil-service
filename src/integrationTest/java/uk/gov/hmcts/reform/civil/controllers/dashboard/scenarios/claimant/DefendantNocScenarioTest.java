@@ -75,7 +75,7 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
             .trialReadyApplicant(null)
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .orderType(OrderType.DECIDE_DAMAGES)
             .hearingFeePaymentDetails(paymentDetails)
             .build();
@@ -90,7 +90,7 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
             .trialReadyApplicant(null)
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .orderType(OrderType.DECIDE_DAMAGES)
             .hearingFeePaymentDetails(null)
             .build();
