@@ -44,10 +44,10 @@ class TrialReadyFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName_application = String.format(
+    private static final String FILE_NAME_APPLICATION = String.format(
         TRIAL_READY.getDocumentTitle(), "Rambo", formatLocalDate(LocalDate.now(), DATE));
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName_application)
+        .documentName(FILE_NAME_APPLICATION)
         .documentType(TRIAL_READY_DOCUMENT)
         .build();
     @MockBean
@@ -65,7 +65,7 @@ class TrialReadyFormGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(TRIAL_READY)))
             .thenReturn(new DocmosisDocument(TRIAL_READY.getDocumentTitle(), bytes));
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, TRIAL_READY_DOCUMENT)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, TRIAL_READY_DOCUMENT)))
             .thenReturn(CASE_DOCUMENT);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setTrialReadyApplicant(YesOrNo.YES);
@@ -80,7 +80,7 @@ class TrialReadyFormGeneratorTest {
         assertThat(caseDocument).isNotNull();
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, TRIAL_READY_DOCUMENT));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, TRIAL_READY_DOCUMENT));
     }
 
     @Test
