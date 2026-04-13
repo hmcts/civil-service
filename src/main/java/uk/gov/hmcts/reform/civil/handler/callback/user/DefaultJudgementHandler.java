@@ -195,7 +195,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private CallbackResponse abandonOtherRemedy(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
-        var isOtherRemedyAbandoned = callbackParams.getRequest().getCaseDetails().getData().get("isOtherRemedyAbandoned");
+        var isOtherRemedyAbandoned = caseData.getIsOtherRemedyAbandoned();
         if (Objects.isNull(isOtherRemedyAbandoned)) {
             errors.add("Are you confirming that you are abandoning your request for an other remedy (e.g. injunction, rescission, declaration)?  is required");
         } else if (isOtherRemedyAbandoned.equals(YesOrNo.NO)) {
