@@ -31,7 +31,7 @@ public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection
     }
 
     @Override
-    public Collection<GrantedAuthority> convert(@NonNull Jwt jwt) {
+    public @NonNull Collection<GrantedAuthority> convert(@NonNull Jwt jwt) {
         String tokenNameClaim = jwt.getClaimAsString(TOKEN_NAME);
 
         if (ACCESS_TOKEN.equals(tokenNameClaim)) {
