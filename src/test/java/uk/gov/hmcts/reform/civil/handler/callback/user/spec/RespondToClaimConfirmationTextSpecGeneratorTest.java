@@ -156,11 +156,11 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
 
     @Test
     void shouldGeneratePartialAdmissionSetDateTextForRepresentedApplicantNameEndingWithS() {
-        CaseData caseData = getPartialAdmitSetDate();
         Party applicant1 = new Party();
         applicant1.setType(Party.Type.COMPANY);
         applicant1.setCompanyName("Evans");
         applicant1.setPartyName("Evans");
+        CaseData caseData = getPartialAdmitSetDate();
         caseData.setApplicant1(applicant1);
         caseData.setTotalClaimAmount(caseData.getRespondToAdmittedClaimOwingAmountPounds());
 

@@ -135,8 +135,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
 
     @Override
     public List<Pair<CaseData,
-            Class<? extends RespondToResponseConfirmationHeaderGenerator>>>
-    getCasesToExpectedImplementation() {
+            Class<? extends RespondToResponseConfirmationHeaderGenerator>>> getCasesToExpectedImplementation() {
         return List.of(
                 Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), PayImmediatelyHeader.class),
                 Pair.of(buildPartAdmitPayImmediatelyProceedCaseData(), PayImmediatelyHeader.class),

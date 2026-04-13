@@ -108,8 +108,7 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
 
     @Override
     public List<Pair<CaseData,
-            Class<? extends RespondToResponseConfirmationTextGenerator>>>
-    getCasesToExpectedImplementation() {
+            Class<? extends RespondToResponseConfirmationTextGenerator>>> getCasesToExpectedImplementation() {
         return List.of(
                 Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), PayImmediatelyConfText.class),
                 Pair.of(buildPartAdmitPayImmediatelyProceedCaseData(), PayImmediatelyConfText.class),
