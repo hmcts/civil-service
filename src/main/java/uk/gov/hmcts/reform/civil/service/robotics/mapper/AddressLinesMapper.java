@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 
@@ -87,7 +88,7 @@ public class AddressLinesMapper {
     }
 
     private Queue<String> resolveWithoutOverflowAllowance(String addressLine, String overflow) {
-        String safeAddressLine = addressLine != null ? addressLine : STRING_EMPTY;
+        String safeAddressLine = Objects.requireNonNullElse(addressLine, STRING_EMPTY);
         int addLineLen = StringUtils.length(safeAddressLine);
         String addressLineCandidate = StringUtils.defaultString(overflow).concat(safeAddressLine);
         String returnAddress;
