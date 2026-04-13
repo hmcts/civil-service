@@ -11,7 +11,7 @@ class CamundaProcessIdentifierTest {
     void shouldContainAllExpectedEnumValues() {
         CamundaProcessIdentifier[] values = CamundaProcessIdentifier.values();
 
-        assertThat(values).hasSize(67)
+        assertThat(values).hasSize(68)
             .contains(
                 CamundaProcessIdentifier.ClaimDismissedNotifyParties,
                 CamundaProcessIdentifier.ClaimantConfirmProceedNotifyParties,
@@ -107,6 +107,6 @@ class CamundaProcessIdentifierTest {
 
         assertThat(values)
             .satisfies(v -> assertThat(v[0]).isEqualTo(CamundaProcessIdentifier.ClaimDismissedNotifyParties))
-            .satisfies(v -> assertThat(v[66]).isEqualTo(CamundaProcessIdentifier.DJ_NON_DIVERGENT_NOTIFIER));
+            .satisfies(v -> assertThat(v[67]).isEqualTo(CamundaProcessIdentifier.DJ_NON_DIVERGENT_NOTIFIER));
     }
 }
