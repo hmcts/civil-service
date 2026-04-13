@@ -176,4 +176,8 @@ public class FeatureToggleService {
     public boolean isOtherRemedyEnabled() {
         return featureToggleApi.isFeatureEnabled("other-remedy-enabled");
     }
+
+    public boolean isLinkDefendantTestingEnabled() {
+        return featureToggleApi.isFeatureEnabled("link-defendant-testing-enabled");
+    }
 }
