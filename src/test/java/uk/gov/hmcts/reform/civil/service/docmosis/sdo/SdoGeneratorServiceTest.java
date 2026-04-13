@@ -218,7 +218,7 @@ public class SdoGeneratorServiceTest {
             .build()
             .toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .claimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK)
             .build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -249,8 +249,8 @@ public class SdoGeneratorServiceTest {
             .build()
             .toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
+            .claimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK)
+            .smallClaimsMethod(SmallClaimsMethod.SMALL_CLAIMS_METHOD_IN_PERSON)
             .smallClaimsMethodInPerson(formValue)
             .build();
         when(documentHearingLocationHelper.getHearingLocation(locationLabel, caseData, BEARER_TOKEN))
@@ -285,8 +285,8 @@ public class SdoGeneratorServiceTest {
             .build()
             .toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .smallClaims(List.of(SmallTrack.smallClaimFlightDelay))
+            .claimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK)
+            .smallClaims(List.of(SmallTrack.SMALL_CLAIM_FLIGHT_DELAY))
             .smallClaimsFlightDelayToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
             .build();
         when(documentHearingLocationHelper.getHearingLocation(locationLabel, caseData, BEARER_TOKEN))
@@ -334,8 +334,8 @@ public class SdoGeneratorServiceTest {
             .build()
             .toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
+            .claimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK)
+            .smallClaimsMethod(SmallClaimsMethod.SMALL_CLAIMS_METHOD_IN_PERSON)
             .smallClaimsMethodInPerson(formValue)
             .build().toBuilder()
             .smallClaimsMediationSectionStatement(
@@ -373,7 +373,7 @@ public class SdoGeneratorServiceTest {
             .build()
             .toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -443,7 +443,7 @@ public class SdoGeneratorServiceTest {
 
         CaseData caseData = baseCase.toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .fastTrackTrialBundleToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
             .build();
 
@@ -467,7 +467,7 @@ public class SdoGeneratorServiceTest {
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(YesOrNo.NO)
             .orderType(OrderType.DISPOSAL)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .build();
 
         LocationRefData locationRefData = new LocationRefData();
@@ -513,8 +513,8 @@ public class SdoGeneratorServiceTest {
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(YesOrNo.NO)
             .orderType(OrderType.DISPOSAL)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
+            .disposalHearingMethod(DisposalHearingMethod.DISPOSAL_HEARING_METHOD_IN_PERSON)
             .disposalHearingMethodInPerson(formValue)
             .build();
         when(documentHearingLocationHelper.getHearingLocation(locationLabel, caseData, BEARER_TOKEN))
@@ -541,14 +541,14 @@ public class SdoGeneratorServiceTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_FAST);
         List<FastTrack> fastTrackList = new ArrayList<>();
-        fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+        fastTrackList.add(FastTrack.FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS);
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimDraft()
             .build()
             .toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .fastClaims(fastTrackList)
             .build();
 
@@ -566,8 +566,8 @@ public class SdoGeneratorServiceTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_FAST);
         List<FastTrack> fastTrackList = new ArrayList<>();
-        fastTrackList.add(FastTrack.fastClaimBuildingDispute);
-        fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+        fastTrackList.add(FastTrack.FAST_CLAIM_BUILDING_DISPUTE);
+        fastTrackList.add(FastTrack.FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS);
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimDraft()
@@ -576,7 +576,7 @@ public class SdoGeneratorServiceTest {
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(YesOrNo.NO)
             .orderType(OrderType.DECIDE_DAMAGES)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .trialAdditionalDirectionsForFastTrack(fastTrackList)
             .build();
 
@@ -784,9 +784,9 @@ public class SdoGeneratorServiceTest {
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .build()
             .toBuilder()
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .claimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK)
             .drawDirectionsOrderRequired(NO)
-            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+            .smallClaims(List.of(SmallTrack.SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING))
             .build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -809,9 +809,9 @@ public class SdoGeneratorServiceTest {
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .build()
             .toBuilder()
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .claimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK)
             .drawDirectionsOrderRequired(NO)
-            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+            .smallClaims(List.of(SmallTrack.SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING))
             .sdoR2SmallClaimsMediationSectionStatement(buildMediation("mediation representation"))
             .build();
 
