@@ -34,26 +34,27 @@ public enum DocumentHearingType {
     }
 
     private static String getTypeText(DocumentHearingType documentHearingType, AllocatedTrack allocatedTrack, DocumentContext context, boolean isWelsh) {
-        String labelText;
-        String hearingText;
-
-        if (documentHearingType.equals(TRI) && !isWelsh) {
-            labelText = documentHearingType.getLabel();
-            hearingText = "hearing";
-            return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
-        } else if (documentHearingType.equals(TRI) && context.equals(TITLE)) {
-            labelText = documentHearingType.getLabelWelsh();
-            hearingText = "wrandawiad";
-            return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
-        } else if (documentHearingType.equals(TRI)) {
-            labelText = "treial";
-            hearingText = "gwrandawiad";
-            return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
-        } else {
-            labelText = isWelsh ? documentHearingType.getLabelWelsh() : documentHearingType.getLabel();
-            hearingText = isWelsh ? "gwrandawiad" : "hearing";
-            return context.equals(TITLE) ? labelText : hearingText;
+        if (TRI.equals(documentHearingType)) {
+            return getTrialText(allocatedTrack, context, isWelsh);
         }
+
+        String labelText = isWelsh ? documentHearingType.getLabelWelsh() : documentHearingType.getLabel();
+        String hearingText = isWelsh ? "gwrandawiad" : "hearing";
+        return TITLE.equals(context) ? labelText : hearingText;
+    }
+
+    private static String getTrialText(AllocatedTrack allocatedTrack, DocumentContext context, boolean isWelsh) {
+        if (!isWelsh) {
+            return getTrackSpecificText(allocatedTrack, TRI.getLabel(), "hearing");
+        }
+        if (TITLE.equals(context)) {
+            return getTrackSpecificText(allocatedTrack, TRI.getLabelWelsh(), "wrandawiad");
+        }
+        return getTrackSpecificText(allocatedTrack, "treial", "gwrandawiad");
+    }
+
+    private static String getTrackSpecificText(AllocatedTrack allocatedTrack, String labelText, String hearingText) {
+        return FAST_CLAIM.equals(allocatedTrack) ? labelText : hearingText;
     }
 
     public static String getTitleText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, boolean isWelsh) {

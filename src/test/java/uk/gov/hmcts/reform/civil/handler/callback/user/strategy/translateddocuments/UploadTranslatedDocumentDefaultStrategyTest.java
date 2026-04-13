@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -224,6 +225,33 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
+    void shouldClearWelshMetadataAndUseDefaultBusinessProcessWhenTranslatedDocumentsAreMissing() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        caseData.setCaseDataLiP(null);
+        caseData.setPreTranslationDocumentType(PreTranslationDocumentType.HEARING_NOTICE);
+        caseData.setBilingualHint(YesOrNo.YES);
+        caseData.setCcdCaseReference(123L);
+
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+        //Then
+        assertThat(updatedData.getCaseDataLiP().getTranslatedDocuments()).isNull();
+        assertThat(updatedData.getPreTranslationDocumentType()).isNull();
+        assertThat(updatedData.getBilingualHint()).isEqualTo(YesOrNo.NO);
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT.name());
+    }
+
+    @Test
     void shouldUpdateBusinessProcess_WhenLipVsLipAndCcdState_In_Pending_Case_Issued_R2FlagEnabled() {
         //Given
         CaseData caseData = CaseDataBuilder.builder()
@@ -280,6 +308,66 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
+    void shouldUpdateBusinessProcess_WhenLipVsLRAndCcdState_In_Pending_Case_Issued_NocOnlineFlagEnabled() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
+            .respondent1Represented(YesOrNo.YES)
+            .specRespondent1Represented(YesOrNo.YES)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+        caseData.setCcdState(CaseState.PENDING_CASE_ISSUED);
+        caseData.setCcdCaseReference(123L);
+        TranslatedDocument translatedDoc = new TranslatedDocument();
+        translatedDoc.setDocumentType(CLAIM_ISSUE);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDoc)));
+        caseData.setCaseDataLiP(caseDataLiP);
+
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        //Then
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE.name());
+    }
+
+    @Test
+    void shouldUseDefaultBusinessProcess_WhenLipVsLipStateDoesNotMatchTranslatedClaimEvents() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .respondent1Represented(YesOrNo.NO)
+            .specRespondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        caseData.setPreTranslationDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
+        TranslatedDocument translatedDoc = new TranslatedDocument();
+        translatedDoc.setDocumentType(CLAIM_ISSUE);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDoc)));
+        caseData.setCaseDataLiP(caseDataLiP);
+
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        //Then
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT.name());
+    }
+
+    @Test
     void shouldUpdateBusinessProcess_WhenLrVsLipAndCcdState_InAwaitingClaimantResponse() {
         //Given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
@@ -325,6 +413,71 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .extracting("businessProcess")
             .extracting("camundaEvent")
             .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION.name());
+    }
+
+    @Test
+    void shouldUseDefaultBusinessProcess_WhenLrVsLipClaimantIntentionStateDoesNotMatchApplicantDqTranslation() {
+        //Given
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        Document translatedFile = new Document();
+        translatedFile.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(CLAIMANT_INTENTION);
+        translatedDocument1.setFile(translatedFile);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
+            .build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        caseData.setPreTranslationDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDocument1)));
+        caseData.setCaseDataLiP(caseDataLiP);
+
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        //Then
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT.name());
+    }
+
+    @Test
+    void shouldUseDefaultBusinessProcess_WhenLrVsLipClaimantIntentionHasNoWelshSupport() {
+        //Given
+        Document translatedFile = new Document();
+        translatedFile.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(CLAIMANT_INTENTION);
+        translatedDocument1.setFile(translatedFile);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
+            .build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        caseData.setPreTranslationDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDocument1)));
+        caseData.setCaseDataLiP(caseDataLiP);
+
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        //Then
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT.name());
     }
 
     @Test
@@ -1130,5 +1283,74 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         assertThat(documentsList)
             .isNotNull().isEmpty();
 
+    }
+
+    @Test
+    void shouldUseDefaultBusinessProcess_WhenDefendantResponseDoesNotMeetWelshSealedFormConditions() {
+        //Given
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(DEFENDANT_RESPONSE);
+        Document translatedFile = new Document();
+        translatedFile.setDocumentFileName(FILE_NAME_2);
+        translatedDocument1.setFile(translatedFile);
+
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any())).thenReturn(LocalDateTime.now().plusDays(28));
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build();
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setPreTranslationDocuments(new ArrayList<>());
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDocument1)));
+        caseData.setCaseDataLiP(caseDataLiP);
+
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        //Then
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT.name());
+    }
+
+    @Test
+    void shouldKeepDefendantSealedFormBusinessProcess_WhenWelshTranslationDoesNotMoveAtCurrentState() {
+        //Given
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(DEFENDANT_RESPONSE);
+        Document translatedFile = new Document();
+        translatedFile.setDocumentFileName(FILE_NAME_2);
+        translatedDocument1.setFile(translatedFile);
+
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any())).thenReturn(LocalDateTime.now().plusDays(28));
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setPreTranslationDocuments(new ArrayList<>());
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDocument1)));
+        caseData.setCaseDataLiP(caseDataLiP);
+
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        //Then
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM.name());
     }
 }

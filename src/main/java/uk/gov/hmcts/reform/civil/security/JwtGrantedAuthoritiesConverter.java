@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -29,7 +31,9 @@ public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection
         this.userService = userService;
     }
 
-    public Collection<GrantedAuthority> convert(Jwt jwt) {
+    @Override
+    @Nullable
+    public Collection<GrantedAuthority> convert(@NonNull Jwt jwt) {
         String tokenNameClaim = jwt.getClaimAsString(TOKEN_NAME);
 
         if (ACCESS_TOKEN.equals(tokenNameClaim)) {

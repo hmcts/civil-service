@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -130,6 +131,11 @@ class DQLipClaimantFormMapperTest {
         assertThat(expectedNonEletronicDisclosure).isEqualTo(new DisclosureOfNonElectronicDocuments()
                                                                  .setBespokeDirections("directions"));
 
+        DocumentsToBeConsideredSection expectedDocsToBeConsideredValue = getDocumentsToBeConsideredSection();
+        assertThat(expectedDocsToBeConsidered).isEqualTo(expectedDocsToBeConsideredValue);
+    }
+
+    private static @NotNull DocumentsToBeConsideredSection getDocumentsToBeConsideredSection() {
         DocumentsToBeConsideredSection expectedDocsToBeConsideredValue = new DocumentsToBeConsideredSection();
         expectedDocsToBeConsideredValue.setHasDocumentsToBeConsidered(YesOrNo.YES);
         expectedDocsToBeConsideredValue.setDetails("details");
@@ -137,7 +143,17 @@ class DQLipClaimantFormMapperTest {
         expectedDocsToBeConsideredValue.setQuestion(
             "Are there any documents the defendants have that you want the court to consider?"
         );
-        assertThat(expectedDocsToBeConsidered).isEqualTo(expectedDocsToBeConsideredValue);
+        return expectedDocsToBeConsideredValue;
+    }
+
+    @Test
+    void shouldReturnNullDocumentsToBeConsidered_whenClaimantDocumentsToBeConsideredIsNull() {
+        //Given
+        given(caseData.getApplicant1DQ()).willReturn(new Applicant1DQ());
+        //When
+        final DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipClaimantFormMapper.getDocumentsToBeConsidered(caseData);
+        //Then
+        assertThat(expectedDocsToBeConsidered).isNull();
     }
 
     @Test
