@@ -24,7 +24,7 @@ public class SdoCaseClassificationService {
         YesOrNo drawDirectionsOrderSmallClaims = caseData.getDrawDirectionsOrderSmallClaims();
 
         boolean smallClaimsViaTrack = drawDirectionsOrderRequired == NO
-            && claimsTrack == ClaimsTrack.smallClaimsTrack;
+            && claimsTrack == ClaimsTrack.SMALL_CLAIMS_TRACK;
         boolean smallClaimsViaOrder = drawDirectionsOrderRequired == YES
             && drawDirectionsOrderSmallClaims == YES;
 
@@ -38,7 +38,7 @@ public class SdoCaseClassificationService {
         OrderType orderType = caseData.getOrderType();
 
         boolean fastTrackViaTrack = drawDirectionsOrderRequired == NO
-            && claimsTrack == ClaimsTrack.fastTrack;
+            && claimsTrack == ClaimsTrack.FAST_TRACK;
         boolean fastTrackViaOrder = drawDirectionsOrderRequired == YES
             && drawDirectionsOrderSmallClaims == NO
             && orderType == OrderType.DECIDE_DAMAGES;
@@ -52,10 +52,10 @@ public class SdoCaseClassificationService {
 
         boolean selectedDuringDrawOrder = caseData.getDrawDirectionsOrderRequired() == YES
             && trialDirections != null
-            && trialDirections.contains(FastTrack.fastClaimNoiseInducedHearingLoss);
+            && trialDirections.contains(FastTrack.FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS);
         boolean selectedDuringCaseSetup = caseData.getDrawDirectionsOrderRequired() == NO
             && fastClaims != null
-            && fastClaims.contains(FastTrack.fastClaimNoiseInducedHearingLoss);
+            && fastClaims.contains(FastTrack.FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS);
 
         return selectedDuringDrawOrder || selectedDuringCaseSetup;
     }
@@ -66,10 +66,10 @@ public class SdoCaseClassificationService {
 
         boolean selectedDuringCaseSetup = caseData.getDrawDirectionsOrderRequired() == NO
             && smallClaimsSelections != null
-            && smallClaimsSelections.contains(SmallTrack.smallClaimDisputeResolutionHearing);
+            && smallClaimsSelections.contains(SmallTrack.SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING);
         boolean selectedDuringDrawOrder = caseData.getDrawDirectionsOrderRequired() == YES
             && additionalDirections != null
-            && additionalDirections.contains(SmallTrack.smallClaimDisputeResolutionHearing);
+            && additionalDirections.contains(SmallTrack.SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING);
 
         return selectedDuringCaseSetup || selectedDuringDrawOrder;
     }
