@@ -87,10 +87,7 @@ public class AddressLinesMapper {
     }
 
     private Queue<String> resolveWithoutOverflowAllowance(String addressLine, String overflow) {
-        String safeAddressLine = addressLine;
-        if (safeAddressLine == null) {
-            safeAddressLine = STRING_EMPTY;
-        }
+        String safeAddressLine = addressLine != null ? addressLine : STRING_EMPTY;
         int addLineLen = StringUtils.length(safeAddressLine);
         String addressLineCandidate = StringUtils.defaultString(overflow).concat(safeAddressLine);
         String returnAddress;
