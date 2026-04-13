@@ -196,7 +196,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         var isOtherRemedyAbandoned = callbackParams.getRequest().getCaseDetails().getData().get("isOtherRemedyAbandoned");
-        if (Objects.isNull(isOtherRemedyAbandoned) || isOtherRemedyAbandoned == YesOrNo.NO) {
+        if (Objects.isNull(isOtherRemedyAbandoned)) {
+            errors.add("Are you confirming that you are abandoning your request for an other remedy (e.g. injunction, rescission, declaration)?  is required");
+        } else if (isOtherRemedyAbandoned.equals(YesOrNo.NO)) {
             errors.add("The event could not be created. Unable to proceed because there are one or more callback Errors or Warnings"
                            + "- This feature is not available, please see guidance below");
         } else {
