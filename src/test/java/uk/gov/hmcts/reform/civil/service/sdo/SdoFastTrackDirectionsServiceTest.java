@@ -20,14 +20,14 @@ class SdoFastTrackDirectionsServiceTest {
     @Test
     void shouldResolveAdditionalDirectionsFromEitherSource() {
         CaseData viaFastClaims = CaseDataBuilder.builder().build();
-        viaFastClaims.setFastClaims(List.of(FastTrack.fastClaimPersonalInjury));
+        viaFastClaims.setFastClaims(List.of(FastTrack.FAST_CLAIM_PERSONAL_INJURY));
 
         CaseData viaTrialSelections = CaseDataBuilder.builder().build();
-        viaTrialSelections.setTrialAdditionalDirectionsForFastTrack(List.of(FastTrack.fastClaimRoadTrafficAccident));
+        viaTrialSelections.setTrialAdditionalDirectionsForFastTrack(List.of(FastTrack.FAST_CLAIM_ROAD_TRAFFIC_ACCIDENT));
 
-        assertThat(service.hasFastAdditionalDirections(viaFastClaims, FastTrack.fastClaimPersonalInjury)).isTrue();
-        assertThat(service.hasFastAdditionalDirections(viaFastClaims, FastTrack.fastClaimRoadTrafficAccident)).isFalse();
-        assertThat(service.hasFastAdditionalDirections(viaTrialSelections, FastTrack.fastClaimRoadTrafficAccident)).isTrue();
+        assertThat(service.hasFastAdditionalDirections(viaFastClaims, FastTrack.FAST_CLAIM_PERSONAL_INJURY)).isTrue();
+        assertThat(service.hasFastAdditionalDirections(viaFastClaims, FastTrack.FAST_CLAIM_ROAD_TRAFFIC_ACCIDENT)).isFalse();
+        assertThat(service.hasFastAdditionalDirections(viaTrialSelections, FastTrack.FAST_CLAIM_ROAD_TRAFFIC_ACCIDENT)).isTrue();
     }
 
     @Test
