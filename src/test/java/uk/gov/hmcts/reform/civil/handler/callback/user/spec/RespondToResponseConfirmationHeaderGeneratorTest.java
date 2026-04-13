@@ -34,7 +34,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 
-public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDataToTextGeneratorTest
+class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDataToTextGeneratorTest
         .CaseDataToTextGeneratorIntentionConfig<RespondToResponseConfirmationHeaderGenerator> {
 
     @Test

@@ -35,7 +35,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResp
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildPartAdmitProceedCaseData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildProposePaymentPlanCaseData;
 
-public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataToTextGeneratorTest
+class RespondToResponseConfirmationTextGeneratorTest implements CaseDataToTextGeneratorTest
         .CaseDataToTextGeneratorIntentionConfig<RespondToResponseConfirmationTextGenerator> {
 
     @Test

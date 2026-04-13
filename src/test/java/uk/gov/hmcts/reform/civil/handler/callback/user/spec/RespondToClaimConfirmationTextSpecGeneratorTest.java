@@ -36,7 +36,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 /**
  * config for testing implementations of RespondToClaimConfirmationTextSpecGenerator.
  */
-public class RespondToClaimConfirmationTextSpecGeneratorTest
+class RespondToClaimConfirmationTextSpecGeneratorTest
         implements CaseDataToTextGeneratorTest
         .CaseDataToTextGeneratorIntentionConfig<RespondToClaimConfirmationTextSpecGenerator> {
 
