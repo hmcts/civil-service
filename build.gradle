@@ -186,15 +186,67 @@ task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
+def dataSetupBranch(String envName) {
+  System.getenv(envName) ?: 'master'
+}
+
+def isPreviewEnvironment() {
+  System.getenv('ENVIRONMENT') == 'preview'
+}
+
+def isNightlyRun() {
+  System.getenv('NIGHTLY_RUN') == 'true'
+}
+
 task pullLatestCivilCcdDefinitions(type: Exec, description: 'Pulls the civil CCD definition repository branch needed for data setup.') {
   doFirst {
-    def ccdDefinitionBranch = System.getenv('CCD_DEFINITION_BRANCH') ?: 'master'
-    commandLine './bin/pull-latest-civil-ccd-files.sh', ccdDefinitionBranch
+    commandLine './bin/pull-latest-civil-ccd-files.sh', dataSetupBranch('CCD_DEFINITION_BRANCH')
   }
 }
 
-task highLevelDataSetup(type: JavaExec, description: 'Loads roles and CCD definitions using the high-level data setup flow.') {
-  dependsOn 'buildCcdDefinitionsXls'
+task pullLatestCivilCamundaDefinitions(type: Exec, description: 'Pulls the civil Camunda BPMN definition repository branch needed for data setup.') {
+  doFirst {
+    commandLine './bin/pull-latest-camunda-files.sh', dataSetupBranch('CAMUNDA_DEFINITION_BRANCH')
+  }
+}
+
+task pullLatestCivilWaDmnDefinitions(type: Exec, description: 'Pulls the civil WA DMN definition repository branch needed for data setup.') {
+  doFirst {
+    commandLine './bin/pull-latest-dmn-files.sh', dataSetupBranch('DMN_DEFINITION_BRANCH')
+  }
+}
+
+task pullLatestCivilWiremockMappings(type: Exec, description: 'Pulls the civil WireMock mappings repository branch needed for preview data setup.') {
+  onlyIf { isPreviewEnvironment() }
+  doFirst {
+    commandLine './bin/pull-latest-wiremock-mappings.sh', dataSetupBranch('WIREMOCK_MAPPINGS_BRANCH')
+  }
+}
+
+task installFunctionalTestDependencies(type: Exec, description: 'Installs dependencies for the copied civil CCD functional test project.') {
+  dependsOn pullLatestCivilCcdDefinitions
+  commandLine '/usr/bin/yarn', '--silent', 'install-dependencies'
+}
+
+task importCivilCamundaDefinitions(type: Exec, description: 'Imports civil Camunda BPMN definitions.') {
+  dependsOn pullLatestCivilCamundaDefinitions
+  commandLine './bin/import-bpmn-diagram.sh', '.'
+}
+
+task importCivilWaDmnDefinitions(type: Exec, description: 'Imports civil WA DMN definitions.') {
+  dependsOn pullLatestCivilWaDmnDefinitions
+  commandLine './bin/import-dmn-diagram.sh', './wa-dmn/.', 'civil', 'civil'
+}
+
+task loadCivilWiremockMappings(type: Exec, description: 'Loads civil WireMock mappings into the preview WireMock service.') {
+  onlyIf { isPreviewEnvironment() }
+  dependsOn pullLatestCivilWiremockMappings
+  commandLine './bin/load-wiremock-mappings.sh'
+}
+
+task highLevelDataSetup(type: JavaExec, description: 'Loads roles, CCD definitions, Camunda BPMNs, WA DMNs and preview WireMock mappings using the high-level data setup flow.') {
+  dependsOn 'buildCcdDefinitionsXls', 'importCivilCamundaDefinitions', 'importCivilWaDmnDefinitions',
+    'loadCivilWiremockMappings', 'installFunctionalTestDependencies'
   mainClass = "uk.gov.hmcts.reform.civil.HighLevelDataSetupApp"
   classpath += sourceSets.main.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
@@ -208,7 +260,7 @@ task buildCcdDefinitionsXls(type: Exec, description: 'Builds CCD XLS definitions
       throw new GradleException("ENVIRONMENT must be one of: preview, aat")
     }
 
-    if (dataSetupEnvironment == 'preview') {
+    if (isPreviewEnvironment()) {
       def changeId = System.getenv('CHANGE_ID')
       if (!changeId) {
         throw new GradleException("CHANGE_ID must be set when ENVIRONMENT=preview")
@@ -224,9 +276,16 @@ task buildCcdDefinitionsXls(type: Exec, description: 'Builds CCD XLS definitions
   }
 }
 
-task awaitApplicationReadiness(type: Exec, description: 'Awaits until application is ready.') {
+task waitForCivilService(type: Exec, description: 'Awaits until civil-service is ready.') {
   commandLine './bin/wait-for.sh'
+}
+
+task waitForManageCase(type: Exec, description: 'Awaits until manage-case is ready.') {
   commandLine './bin/wait-for.sh', 'manage-case'
+}
+
+task awaitApplicationReadiness(description: 'Awaits until application dependencies are ready.') {
+  dependsOn(inStrictOrder(waitForCivilService, waitForManageCase))
 }
 
 task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
@@ -235,14 +294,14 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
 
 task runApiTests(type: Exec, description: 'Runs Prod features in functional tests.') {
   onlyIf {
-    System.env.NIGHTLY_RUN != 'true'
+    !isNightlyRun()
   }
   commandLine './bin/run-api-tests.sh'
 }
 
 task runNightlyApiTests(type: Exec, description: 'Runs nightly tests.') {
   onlyIf {
-    return System.env.NIGHTLY_RUN == 'true'
+    isNightlyRun()
   }
   commandLine './bin/run-nightly-api-tests.sh'
 }
