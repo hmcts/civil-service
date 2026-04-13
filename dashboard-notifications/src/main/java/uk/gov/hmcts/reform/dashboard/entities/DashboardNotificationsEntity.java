@@ -60,7 +60,7 @@ public class DashboardNotificationsEntity implements Serializable {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "message_params", columnDefinition = "jsonb")
     @Schema(name = "message_params")
-    private HashMap<String, Object> params;
+    private transient HashMap<String, Object> params;
 
     @Schema(name = "created_by")
     private String createdBy;
