@@ -344,6 +344,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  YesOrNo bundleError;
     private  String bundleEvent;
     private  YesOrNo fullAdmitNoPaymentSchedulerProcessed;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private  YesOrNo isOtherRemedyAbandoned;
     private  LocalDate otherRemedyAbandonedDate;
 
