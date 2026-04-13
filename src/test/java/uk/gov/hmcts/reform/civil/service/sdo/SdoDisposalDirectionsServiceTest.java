@@ -35,8 +35,8 @@ class SdoDisposalDirectionsServiceTest {
     @Test
     void shouldReturnTelephoneAndVideoLabels() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setDisposalHearingMethodTelephoneHearing(DisposalHearingMethodTelephoneHearing.telephoneTheClaimant);
-        caseData.setDisposalHearingMethodVideoConferenceHearing(DisposalHearingMethodVideoConferenceHearing.videoTheDefendant);
+        caseData.setDisposalHearingMethodTelephoneHearing(DisposalHearingMethodTelephoneHearing.TELEPHONE_THE_CLAIMANT);
+        caseData.setDisposalHearingMethodVideoConferenceHearing(DisposalHearingMethodVideoConferenceHearing.VIDEO_THE_DEFENDANT);
 
         assertThat(service.getTelephoneHearingLabel(caseData)).isEqualTo("the claimant");
         assertThat(service.getVideoConferenceHearingLabel(caseData)).isEqualTo("the defendant");
