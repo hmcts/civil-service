@@ -36,16 +36,16 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResp
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildProposePaymentPlanCaseData;
 
 public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataToTextGeneratorTest
-    .CaseDataToTextGeneratorIntentionConfig<RespondToResponseConfirmationTextGenerator> {
+        .CaseDataToTextGeneratorIntentionConfig<RespondToResponseConfirmationTextGenerator> {
 
     @Test
     void shouldGenerateAdmitProceedConfirmationText() {
         CaseData caseData = buildFullAdmitProceedCaseData();
 
         assertThat(new AdmitProceedConfText().generateTextFor(caseData, null)).contains(
-            "<br>You've chosen to proceed with the claim.&nbsp;"
-                + "This means that your claim cannot continue online."
-                + "<br>We'll review the case and contact you about what to do next"
+                "<br>You've chosen to proceed with the claim.&nbsp;"
+                        + "This means that your claim cannot continue online."
+                        + "<br>We'll review the case and contact you about what to do next"
         );
     }
 
@@ -54,10 +54,10 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
         CaseData caseData = buildCaseDefendantWithOutMediationData();
 
         assertThat(new RejectWithoutMediationConfText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
-            assertThat(text)
-                .contains("<h2 class=\"govuk-heading-m\">What happens next</h2>")
-                .contains("We'll review the case and contact you about what to do next")
-                .contains(String.format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference()))
+                assertThat(text)
+                        .contains("<h2 class=\"govuk-heading-m\">What happens next</h2>")
+                        .contains("We'll review the case and contact you about what to do next")
+                        .contains(String.format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference()))
         );
     }
 
@@ -66,10 +66,10 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
         CaseData caseData = buildJudgmentSubmitProceedCaseDataAllFoi();
 
         assertThat(new JudgmentByAdmissionConfText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
-            assertThat(text)
-                .contains("Download county court judgment")
-                .contains("The defendant will be served the county court judgment")
-                .contains(String.format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference()))
+                assertThat(text)
+                        .contains("Download county court judgment")
+                        .contains("The defendant will be served the county court judgment")
+                        .contains(String.format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference()))
         );
     }
 
@@ -85,9 +85,9 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
         CaseData caseData = RespondToResponseConfirmationHeaderGeneratorTest.buildJudgmentSubmitProceedCaseDataInstallment();
 
         assertThat(new JudgmentByAdmissionConfText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
-            assertThat(text)
-                .contains("Download county court judgment")
-                .contains("The defendant will be served the county court judgment")
+                assertThat(text)
+                        .contains("Download county court judgment")
+                        .contains("The defendant will be served the county court judgment")
         );
     }
 
@@ -95,7 +95,7 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
     void shouldReturnEmptyForJudgmentByAdmissionConfirmationTextWhenPaymentRouteIsNotEligible() {
         CaseData caseData = buildJudgmentSubmitProceedCaseDataAllFoi();
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
-            uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY
+                uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY
         );
 
         assertThat(new JudgmentByAdmissionConfText().generateTextFor(caseData, null)).isEmpty();
@@ -108,25 +108,25 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
 
     @Override
     public List<Pair<CaseData,
-        Class<? extends RespondToResponseConfirmationTextGenerator>>>
-        getCasesToExpectedImplementation() {
+            Class<? extends RespondToResponseConfirmationTextGenerator>>>
+    getCasesToExpectedImplementation() {
         return List.of(
-            Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), PayImmediatelyConfText.class),
-            Pair.of(buildPartAdmitPayImmediatelyProceedCaseData(), PayImmediatelyConfText.class),
-            Pair.of(buildFullAdmitProceedCaseData(), AdmitProceedConfText.class),
-            Pair.of(buildFullAdmitNotProceedCaseData(), AdmitNotProceedConfText.class),
-            Pair.of(buildPartAdmitProceedCaseData(), AdmitProceedConfText.class),
-            Pair.of(buildPartAdmitNotProceedCaseData(), AdmitNotProceedConfText.class),
-            Pair.of(buildFullDefenceProceedCaseData(), DefendProceedConfText.class),
-            Pair.of(buildFullDefenceNotProceedCaseData(), DefendNotProceedConfText.class),
-            Pair.of(buildJudgmentSubmitProceedCaseData(), JudgmentSubmittedConfText.class),
-            Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfText.class),
-            Pair.of(buildCaseWithMediation(), RejectWithMediationConfText.class),
-            Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfText.class),
-            Pair.of(buildCaseDefendantWithOutMediationData(), RejectWithoutMediationConfText.class),
-            Pair.of(buildCaseWithOutMediationFastTrackData(), RejectWithoutMediationConfText.class),
-            Pair.of(buildCaseClaimantWithOutMediationData(), RejectWithoutMediationConfText.class),
-            Pair.of(buildJudgmentSubmitProceedCaseDataAllFoi(), JudgmentByAdmissionConfText.class)
+                Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), PayImmediatelyConfText.class),
+                Pair.of(buildPartAdmitPayImmediatelyProceedCaseData(), PayImmediatelyConfText.class),
+                Pair.of(buildFullAdmitProceedCaseData(), AdmitProceedConfText.class),
+                Pair.of(buildFullAdmitNotProceedCaseData(), AdmitNotProceedConfText.class),
+                Pair.of(buildPartAdmitProceedCaseData(), AdmitProceedConfText.class),
+                Pair.of(buildPartAdmitNotProceedCaseData(), AdmitNotProceedConfText.class),
+                Pair.of(buildFullDefenceProceedCaseData(), DefendProceedConfText.class),
+                Pair.of(buildFullDefenceNotProceedCaseData(), DefendNotProceedConfText.class),
+                Pair.of(buildJudgmentSubmitProceedCaseData(), JudgmentSubmittedConfText.class),
+                Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfText.class),
+                Pair.of(buildCaseWithMediation(), RejectWithMediationConfText.class),
+                Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfText.class),
+                Pair.of(buildCaseDefendantWithOutMediationData(), RejectWithoutMediationConfText.class),
+                Pair.of(buildCaseWithOutMediationFastTrackData(), RejectWithoutMediationConfText.class),
+                Pair.of(buildCaseClaimantWithOutMediationData(), RejectWithoutMediationConfText.class),
+                Pair.of(buildJudgmentSubmitProceedCaseDataAllFoi(), JudgmentByAdmissionConfText.class)
         );
     }
 }
