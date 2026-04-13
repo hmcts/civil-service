@@ -58,10 +58,10 @@ export CCD_API_GATEWAY_S2S_SECRET=$(az keyvault secret show --vault-name s2s-aat
 export S2S_SECRET=$(az keyvault secret show --vault-name civil-aat --name microservicekey-civil-service --query value -o tsv)
 export CCD_DEF_CASE_SERVICE_BASE_URL=$TEST_URL
 
-. ./bin/utils/idam-get-tokens.sh
+. ./bin/dev-setup/idam-get-tokens.sh
 
 echo "Importing Roles to the CCD pod"
-./bin/devuser/add-roles.sh
+./bin/dev-setup/add-roles.sh
 
 echo "Importing Camunda definitions"
 ./bin/pull-latest-camunda-files.sh "${camunda_branch}"
@@ -77,7 +77,7 @@ fi
 
 definition_input_dir=$(realpath "ccd-definition/civil")
 definition_output_file="$(realpath ".")/build/ccd-development-config/ccd-civil-dev.xlsx"
-./bin/utils/import-ccd-definition.sh \
+./bin/dev-setup/import-ccd-definition.sh \
   "${definition_input_dir}" \
   "${definition_output_file}" \
   "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"

@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # Source this script to export USER_TOKEN and SERVICE_TOKEN for reuse.
-# Usage: . ./bin/utils/idam-get-tokens.sh
+# Usage: . ./bin/dev-setup/idam-get-tokens.sh
 
 set -e
 

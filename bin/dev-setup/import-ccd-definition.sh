@@ -2,7 +2,8 @@
 
 set -ex
 
-dir=$(dirname ${0})
+dir=$(dirname "${0}")
+utils_dir="${dir}/../utils"
 
 if [[ ($# -ne 3) && ($# -ne 5) ]]; then
   echo "Usage: ./import-ccd-definition [-e 'UserProfile.json,*-nonprod.json'] - the -e argument is optional, "\
@@ -20,5 +21,5 @@ echo "Additional parameters: ${additionalParameters}"
 
 mkdir -p $(dirname ${definition_output_file})
 
-${dir}/process-definition.sh ${definition_input_dir} ${definition_output_file} "${additionalParameters}"
+${utils_dir}/process-definition.sh ${definition_input_dir} ${definition_output_file} "${additionalParameters}"
 ${dir}/ccd-import-definition.sh ${definition_output_file}
