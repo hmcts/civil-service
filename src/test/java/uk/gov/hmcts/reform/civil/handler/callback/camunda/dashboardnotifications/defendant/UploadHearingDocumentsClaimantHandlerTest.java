@@ -84,7 +84,7 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
         caseData.setApplicant1Represented(YesOrNo.NO);
         caseData.setCcdCaseReference(12349988L);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
         caseLocationCivil.setBaseLocation(selectedCourt.getCode());
@@ -120,7 +120,7 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
         caseData.setApplicant1Represented(YesOrNo.NO);
         caseData.setCcdCaseReference(12349988L);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
         caseLocationCivil.setBaseLocation(selectedCourt.getCode());
@@ -156,7 +156,7 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
         caseData.setApplicant1Represented(YesOrNo.NO);
         caseData.setCcdCaseReference(12349988L);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
         caseLocationCivil.setBaseLocation(selectedCourt.getCode());

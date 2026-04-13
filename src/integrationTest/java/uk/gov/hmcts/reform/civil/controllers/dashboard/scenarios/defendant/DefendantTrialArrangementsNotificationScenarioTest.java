@@ -34,7 +34,7 @@ public class DefendantTrialArrangementsNotificationScenarioTest extends Dashboar
             .ccdCaseReference(Long.valueOf(caseId))
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .orderType(OrderType.DECIDE_DAMAGES)
             .hearingDate(LocalDate.of(2024, 04, 1))
             .build();
