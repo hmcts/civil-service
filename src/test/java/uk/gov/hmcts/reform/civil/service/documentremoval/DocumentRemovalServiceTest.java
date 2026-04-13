@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import feign.FeignException;
+import feign.Request;
+import feign.Request.HttpMethod;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,15 +31,23 @@ import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
+
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -471,6 +482,46 @@ class DocumentRemovalServiceTest {
             assertEquals("Respondent1 Generated Response Doc.pdf",
                 result.getCaseData().getRespondent1GeneratedResponseDocument().getDocumentLink().getDocumentFileName());
             assertNull(result.getCaseData().getDocumentToKeepCollection());
+        }
+
+        @Test
+        void shouldContinueWhenCdamReturns404ForDocument() {
+            FeignException.NotFound notFoundException = new FeignException.NotFound(
+                "not found",
+                Request.create(HttpMethod.DELETE, "", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null),
+                "not found".getBytes(StandardCharsets.UTF_8),
+                Collections.emptyMap());
+
+            doThrow(new DocumentDownloadException("https://example1.com/123", notFoundException))
+                .when(documentManagementService).deleteDocument(anyString(), anyString());
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .decisionOnReconsiderationDocument(buildCaseDocument(
+                    "https://example1.com/123", "Decision.pdf", "https://example1.com/binary", null, "user"))
+                .documentToKeepCollection(List.of())
+                .build();
+
+            DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, CASE_ID, "Auth");
+
+            assertNull(result.getCaseData().getDecisionOnReconsiderationDocument().getDocumentLink());
+            assertNull(result.getCaseData().getDocumentToKeepCollection());
+        }
+
+        @Test
+        void shouldThrowWhenCdamReturnsNon404Error() {
+            doThrow(new DocumentDownloadException("https://example1.com/123", new RuntimeException("server error")))
+                .when(documentManagementService).deleteDocument(anyString(), anyString());
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .decisionOnReconsiderationDocument(buildCaseDocument(
+                    "https://example1.com/123", "Decision.pdf", "https://example1.com/binary", null, "user"))
+                .documentToKeepCollection(List.of())
+                .build();
+
+            assertThrows(DocumentDeleteException.class,
+                () -> documentRemovalService.removeDocuments(caseData, CASE_ID, "Auth"));
         }
 
     }
