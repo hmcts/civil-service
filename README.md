@@ -271,12 +271,12 @@ for the named developer use.
 While connected to the VPN simply run one of the below commands from your project's (civil-service) folder:
 Note: be sure to have Docker running
 ```shell
-npx @hmcts/dev-env@latest && ./bin/setup-devuser-preview-env.sh
+npx @hmcts/dev-env@latest --env .env.dev-env && ./bin/setup-devuser-preview-env.sh
 ```
 You can optionally specify a branch for CCD definitions and Camunda definitions like below or leave it blank to use master.
 
 ```shell
-npx @hmcts/dev-env@latest && ./bin/setup-devuser-preview-env.sh ccdBranchName camundaBranchName
+npx @hmcts/dev-env@latest --env .env.dev-env && ./bin/setup-devuser-preview-env.sh ccdBranchName camundaBranchName
 ```
 If you want to clean up the environment just run:
 
