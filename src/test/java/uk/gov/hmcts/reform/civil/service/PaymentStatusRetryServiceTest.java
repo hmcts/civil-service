@@ -75,6 +75,7 @@ class PaymentStatusRetryServiceTest {
         when(coreCaseDataService.getCase(123L)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(caseData.isLipvLipOneVOne()).thenReturn(false);
+        when(caseData.isLipvLROneVOne()).thenReturn(false);
         when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.UNSPEC_CLAIM);
 
         StartEventResponse startEventResponse = StartEventResponse.builder()
@@ -167,6 +168,7 @@ class PaymentStatusRetryServiceTest {
     void shouldReturnSpecEventForSpecClaim() {
         CaseData specCaseData = mock(CaseData.class);
         when(specCaseData.isLipvLipOneVOne()).thenReturn(false);
+        when(specCaseData.isLipvLROneVOne()).thenReturn(false);
         when(specCaseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
 
         CaseEvent event = service.determineEventFromFeeType(specCaseData, FeeType.CLAIMISSUED);
@@ -175,9 +177,31 @@ class PaymentStatusRetryServiceTest {
     }
 
     @Test
+    void shouldReturnCitizenHearingFeePaymentEventForLipVsLRCase() {
+        CaseData lipVsLRCaseData = mock(CaseData.class);
+        when(lipVsLRCaseData.isLipvLipOneVOne()).thenReturn(false);
+        when(lipVsLRCaseData.isLipvLROneVOne()).thenReturn(true);
+
+        CaseEvent event = service.determineEventFromFeeType(lipVsLRCaseData, FeeType.HEARING);
+
+        assertThat(event).isEqualTo(CaseEvent.CITIZEN_HEARING_FEE_PAYMENT);
+    }
+
+    @Test
+    void shouldReturnCitizenHearingFeePaymentEventForLipVsLipCase() {
+        CaseData lipVsLipCaseData = mock(CaseData.class);
+        when(lipVsLipCaseData.isLipvLipOneVOne()).thenReturn(true);
+
+        CaseEvent event = service.determineEventFromFeeType(lipVsLipCaseData, FeeType.HEARING);
+
+        assertThat(event).isEqualTo(CaseEvent.CITIZEN_HEARING_FEE_PAYMENT);
+    }
+
+    @Test
     void shouldThrowExceptionForUnsupportedFeeType() {
         CaseData dummyCaseData = mock(CaseData.class);
         when(dummyCaseData.isLipvLipOneVOne()).thenReturn(false);
+        when(dummyCaseData.isLipvLROneVOne()).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () ->
             service.determineEventFromFeeType(dummyCaseData, APPLICATION)
