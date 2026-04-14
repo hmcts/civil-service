@@ -252,12 +252,24 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         }
 
         String[] claimArray = claimProceedsInCaseman.toString().split(",");
+        if (hasOtherReason(claimArray)) {
+            return getOtherProceedsReason(claimArray);
+        }
         String standardReason = getStandardProceedsReason(claimArray);
         if (standardReason != null) {
             return standardReason;
         }
 
         return getOtherProceedsReason(claimArray);
+    }
+
+    private boolean hasOtherReason(String[] claimArray) {
+        for (String value : claimArray) {
+            if (value.contains("reason=" + OTHER.name())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String getStandardProceedsReason(String[] claimArray) {

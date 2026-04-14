@@ -398,7 +398,7 @@ class CaseEventTaskHandlerTest {
             CaseData caseData = getCaseData(TAKEN_OFFLINE_BY_STAFF);
             caseData.getClaimProceedsInCaseman()
                 .setReason(ReasonForProceedingOnPaper.OTHER)
-                .setOther("Manual reason");
+                .setOther("Manual APPLICATION reason");
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
             CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
@@ -416,7 +416,7 @@ class CaseEventTaskHandlerTest {
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
             Event event = caseDataContentArgumentCaptor.getValue().getEvent();
-            assertThat(event.getDescription()).isEqualTo("Other: Manual reason}");
+            assertThat(event.getDescription()).isEqualTo("Other: Manual APPLICATION reason}");
         }
 
         @Test
