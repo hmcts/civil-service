@@ -140,7 +140,7 @@ public class PaymentStatusRetryService {
     }
 
     CaseEvent determineEventFromFeeType(CaseData caseData, FeeType feeType) {
-        if (caseData.isLipvLipOneVOne()) {
+        if (caseData.isLipvLipOneVOne() || caseData.isLipvLROneVOne()) {
             return switch (feeType) {
                 case HEARING -> CITIZEN_HEARING_FEE_PAYMENT;
                 case CLAIMISSUED -> CITIZEN_CLAIM_ISSUE_PAYMENT;
