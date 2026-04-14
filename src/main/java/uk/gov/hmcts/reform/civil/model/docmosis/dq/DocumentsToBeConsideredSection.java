@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.dq;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class DocumentsToBeConsideredSection extends DocumentsToBeConsidered {
     private String sectionHeading;
     private String question;
 
+    @Builder
     public DocumentsToBeConsideredSection(
         YesOrNo hasDocumentsToBeConsidered,
         String details,
@@ -43,11 +45,11 @@ public class DocumentsToBeConsideredSection extends DocumentsToBeConsidered {
         String question = isDefendantSection ? String.format(QUESTION_FORMAT, CLAIMANTS.toLowerCase())
             : String.format(QUESTION_FORMAT, DEFENDANTS.toLowerCase());
 
-        return new DocumentsToBeConsideredSection(
-            documentsToBeConsidered.getHasDocumentsToBeConsidered(),
-            documentsToBeConsidered.getDetails(),
-            sectionHeading,
-            question
-        );
+        return DocumentsToBeConsideredSection.builder()
+            .hasDocumentsToBeConsidered(documentsToBeConsidered.getHasDocumentsToBeConsidered())
+            .details(documentsToBeConsidered.getDetails())
+            .sectionHeading(sectionHeading)
+            .question(question)
+            .build();
     }
 }
