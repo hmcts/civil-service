@@ -52,7 +52,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '10.26.1'
+    toolVersion = '13.4.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
     ignoreFailures = System.getenv('CHECKSTYLE_SKIP') == 'true'
   }
