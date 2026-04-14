@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_DEF1;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.CLAIMANT_INTENTION;
@@ -62,6 +63,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         COURT_OFFICER_ORDER, CaseEvent.COURT_OFFICER_ORDER,
         DECISION_MADE_ON_APPLICATIONS, CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST,
         HEARING_NOTICE, CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE
+    );
+    private static final Set<TranslatedDocumentType> FIRST_DOCUMENT_PRIORITY_TYPES = Set.of(
+        ORDER_NOTICE,
+        STANDARD_DIRECTION_ORDER,
+        INTERLOCUTORY_JUDGMENT,
+        MANUAL_DETERMINATION,
+        FINAL_ORDER
     );
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final ObjectMapper objectMapper;
@@ -533,14 +541,16 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
     private CaseEvent getDocumentSpecificBusinessProcessEvent(CaseData caseData,
                                                               List<Element<TranslatedDocument>> translatedDocuments) {
-        CaseEvent documentSpecificEvent = DOCUMENT_SPECIFIC_BUSINESS_PROCESS_EVENTS.get(
-            translatedDocuments.getFirst().getValue().getDocumentType()
-        );
-        if (documentSpecificEvent != null) {
-            return documentSpecificEvent;
+        TranslatedDocumentType firstDocumentType = translatedDocuments.getFirst().getValue().getDocumentType();
+        if (FIRST_DOCUMENT_PRIORITY_TYPES.contains(firstDocumentType)) {
+            return DOCUMENT_SPECIFIC_BUSINESS_PROCESS_EVENTS.get(firstDocumentType);
         }
         if (isContainsSpecifiedDocType(translatedDocuments, NOTICE_OF_DISCONTINUANCE_DEFENDANT)) {
             return CaseEvent.UPLOAD_TRANSLATED_DISCONTINUANCE_DOC;
+        }
+        CaseEvent documentSpecificEvent = DOCUMENT_SPECIFIC_BUSINESS_PROCESS_EVENTS.get(firstDocumentType);
+        if (documentSpecificEvent != null) {
+            return documentSpecificEvent;
         }
         return isDefendantSealedFormBusinessProcessEvent(caseData, translatedDocuments)
             ? CaseEvent.UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM

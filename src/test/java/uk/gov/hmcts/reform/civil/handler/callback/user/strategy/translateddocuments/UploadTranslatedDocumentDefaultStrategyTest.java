@@ -1141,6 +1141,61 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
+    void shouldUpdateBusinessProcess_WhenLipIsBilingual_discontinueClaimTakesPrecedenceOverSettlementAgreement() {
+        //Given
+        Document settlementFileDoc = new Document();
+        settlementFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument settlementAgreementDocument = new TranslatedDocument();
+        settlementAgreementDocument.setDocumentType(SETTLEMENT_AGREEMENT);
+        settlementAgreementDocument.setFile(settlementFileDoc);
+
+        Document noticeDiscontinueFileDoc = new Document();
+        noticeDiscontinueFileDoc.setDocumentFileName(FILE_NAME_2);
+        TranslatedDocument noticeOfDiscontinuanceDocument = new TranslatedDocument();
+        noticeOfDiscontinuanceDocument.setDocumentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT);
+        noticeOfDiscontinuanceDocument.setFile(noticeDiscontinueFileDoc);
+
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document settlementDoc = new Document();
+        settlementDoc.setDocumentFileName("settlement_agreement.pdf");
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            settlementDoc,
+            DocumentType.SETTLEMENT_AGREEMENT
+        )));
+        Document noticeDoc = new Document();
+        noticeDoc.setDocumentFileName("notice_of_discontinuance.pdf");
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            noticeDoc,
+            DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT
+        )));
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build();
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
+            element(settlementAgreementDocument),
+            element(noticeOfDiscontinuanceDocument)
+        ));
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(translatedDocument);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setCourtPermissionNeeded(NO);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
+
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        //Then
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DISCONTINUANCE_DOC.name());
+    }
+
+    @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentType_discontinue_claimForJudgeVerification() {
         //Given
         Document noticeDiscontinueFileDoc = new Document();
