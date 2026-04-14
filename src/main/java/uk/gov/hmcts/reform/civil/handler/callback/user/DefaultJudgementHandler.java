@@ -199,8 +199,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         var isOtherRemedyAbandoned = caseData.getIsOtherRemedyAbandoned();
         if (YesOrNo.NO.equals(isOtherRemedyAbandoned)) {
-            errors.add("The event could not be created. Unable to proceed because there are one or more callback Errors or Warnings"
-                           + "- This feature is not available, please see guidance below");
+            errors.add("This feature is not available, please see guidance below");
         } else if (YesOrNo.YES.equals(isOtherRemedyAbandoned)) {
             caseData.setOtherRemedyAbandonedDate(LocalDate.now());
         } else {

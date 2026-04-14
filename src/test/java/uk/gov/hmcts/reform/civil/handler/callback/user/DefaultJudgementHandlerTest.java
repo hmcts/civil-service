@@ -474,8 +474,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNotEmpty();
             Assertions.assertEquals(
-                "The event could not be created. Unable to proceed because there are one or more callback Errors or Warnings"
-                    + "- This feature is not available, please see guidance below",
+                "This feature is not available, please see guidance below",
                 response.getErrors().getFirst()
             );
         }
