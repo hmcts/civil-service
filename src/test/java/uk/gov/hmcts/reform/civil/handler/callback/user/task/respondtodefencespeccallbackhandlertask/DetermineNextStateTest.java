@@ -56,7 +56,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.ALL_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
@@ -231,7 +231,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
                                                                        "", businessProcess);
         }
 
-        assertEquals(All_FINAL_ORDERS_ISSUED.name(), resultState);
+        assertEquals(ALL_FINAL_ORDERS_ISSUED.name(), resultState);
         assertThat(caseData.getActiveJudgment()).isEqualTo(activeJudgment);
         assertThat(caseData.getJoIsLiveJudgmentExists()).isEqualTo(YesOrNo.YES);
         assertThat(caseData.getJoJudgementByAdmissionIssueDate()).isEqualTo(now);
@@ -487,7 +487,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    "", businessProcess);
         assertNotNull(resultState);
-        assertEquals(All_FINAL_ORDERS_ISSUED.name(), resultState);
+        assertEquals(ALL_FINAL_ORDERS_ISSUED.name(), resultState);
     }
 
     private CallbackParams callbackParams(CaseData caseData) {

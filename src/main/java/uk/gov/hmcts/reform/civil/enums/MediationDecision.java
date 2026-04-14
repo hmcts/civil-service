@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum MediationDecision {
-    Yes("I have read and understood the above"),
-    No("Opt out of mediation");
+    YES("I have read and understood the above"),
+    NO("Opt out of mediation");
 
     private final String displayedValue;
 }

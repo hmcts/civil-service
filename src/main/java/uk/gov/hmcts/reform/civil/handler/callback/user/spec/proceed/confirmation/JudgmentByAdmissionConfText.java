@@ -16,7 +16,7 @@ public class JudgmentByAdmissionConfText implements RespondToResponseConfirmatio
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()
+        if (CaseState.ALL_FINAL_ORDERS_ISSUED == caseData.getCcdState()
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment())) {
             return Optional.of(format(
                 "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"

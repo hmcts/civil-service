@@ -62,7 +62,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.ALL_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -691,7 +691,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             }
             assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(CaseState.ALL_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
@@ -860,7 +860,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             }
 
             assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(CaseState.ALL_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
@@ -938,7 +938,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             caseData.setDefendantDetailsSpec(dynamicList);
             caseData.setCcjPaymentDetails(ccjPaymentDetails);
             caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"));
-            caseData.setCcdState(All_FINAL_ORDERS_ISSUED);
+            caseData.setCcdState(ALL_FINAL_ORDERS_ISSUED);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);

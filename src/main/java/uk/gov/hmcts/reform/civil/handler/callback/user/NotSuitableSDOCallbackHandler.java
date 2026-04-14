@@ -30,13 +30,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOT_SUITABLE_SDO;
 
 @Service
 @RequiredArgsConstructor
 public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(NotSuitable_SDO);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(NOT_SUITABLE_SDO);
     public static final String NOT_SUITABLE_SDO_CONFIRMATION_BODY = "<br />If a Judge has submitted this information, "
         + "a notification will be sent to the listing officer to look at this case offline."
         + "%n%nIf a legal adviser has submitted this information a notification will be sent to a judge for review.";
@@ -122,7 +122,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private CaseData getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (!isTransferOnlineCase(caseData)) {
-            caseData.setBusinessProcess(BusinessProcess.ready(NotSuitable_SDO));
+            caseData.setBusinessProcess(BusinessProcess.ready(NOT_SUITABLE_SDO));
         }
         return caseData;
     }

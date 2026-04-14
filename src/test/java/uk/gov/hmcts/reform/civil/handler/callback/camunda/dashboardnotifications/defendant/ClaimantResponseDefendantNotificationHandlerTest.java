@@ -471,7 +471,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
-        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.NO);
 
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);

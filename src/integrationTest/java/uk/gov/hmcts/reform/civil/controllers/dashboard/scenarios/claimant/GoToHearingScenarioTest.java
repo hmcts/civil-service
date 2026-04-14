@@ -36,7 +36,7 @@ public class GoToHearingScenarioTest extends DashboardBaseIntegrationTest {
             .respondent1Represented(YesOrNo.NO)
             .responseClaimMediationSpecRequired(YesOrNo.YES)
             .caseDataLiP(new CaseDataLiP().setApplicant1ClaimMediationSpecRequiredLip(
-                new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.No)))
+                new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.NO)))
             .build();
 
         // When

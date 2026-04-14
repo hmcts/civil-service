@@ -33,7 +33,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.ALL_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT;
 
@@ -132,7 +132,7 @@ class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHand
         caseData.setIsFinalOrder(YesOrNo.YES);
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT.name())
-                .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+                .caseDetails(CaseDetails.builder().state(ALL_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
@@ -159,7 +159,7 @@ class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHand
 
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT.name())
-                .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+                .caseDetails(CaseDetails.builder().state(ALL_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 

@@ -21,7 +21,7 @@ public enum CaseState {
     DECISION_OUTCOME("Decision Outcome"),
     IN_MEDIATION("In Mediation"),
     CASE_STAYED("Case Stayed"),
-    All_FINAL_ORDERS_ISSUED("All final orders issued"),
+    ALL_FINAL_ORDERS_ISSUED("All final orders issued"),
     CASE_SETTLED("Case Settled"),
     CASE_DISCONTINUED("Case Discontinued"),
     CLOSED("Closed"),

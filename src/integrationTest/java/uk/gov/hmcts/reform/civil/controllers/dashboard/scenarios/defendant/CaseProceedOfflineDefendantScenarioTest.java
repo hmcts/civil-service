@@ -71,7 +71,7 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
             .activeJudgment(new JudgmentDetails().setState(JudgmentState.ISSUED))
-            .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .previousCCDState(CaseState.ALL_FINAL_ORDERS_ISSUED)
             .build();
 
         handler.handle(callbackParams(caseData));

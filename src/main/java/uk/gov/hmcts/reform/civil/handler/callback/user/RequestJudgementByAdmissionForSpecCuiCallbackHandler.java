@@ -151,7 +151,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         if (featureToggleService.isJudgmentOnlineLive()
             && (isOneVOne(data))
             && data.isPayImmediately()) {
-            nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
+            nextState = CaseState.ALL_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
         } else {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
@@ -205,7 +205,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     }
 
     private String setUpBody(CaseData caseData) {
-        if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+        if (CaseState.ALL_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
             return format(
                 "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"
                     + "<br><br>The defendant will be served the county court judgment<br><br>",
