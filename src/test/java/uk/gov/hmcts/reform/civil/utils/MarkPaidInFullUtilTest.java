@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
@@ -16,7 +17,7 @@ class MarkPaidInFullUtilTest {
     void shouldReturnTrue_whenAllConditionsAreMet() {
         CaseData caseData = CaseData.builder()
             .activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()))
-            .certOfSC(new CertOfSC().setDefendantFinalPaymentDate(LocalDate.now()))
+            .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
             .build();
 
         assertTrue(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));
@@ -35,7 +36,7 @@ class MarkPaidInFullUtilTest {
     void shouldReturnFalse_whenFullyPaymentMadeDateIsNull() {
         CaseData caseData = CaseData.builder()
             .activeJudgment(new JudgmentDetails())
-            .certOfSC(new CertOfSC().setDefendantFinalPaymentDate(LocalDate.now()))
+            .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
             .build();
 
         assertFalse(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));
@@ -54,7 +55,7 @@ class MarkPaidInFullUtilTest {
     void shouldReturnFalse_whenDefendantFinalPaymentDateIsNull() {
         CaseData caseData = CaseData.builder()
             .activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()))
-            .certOfSC(new CertOfSC())
+            .coSCApplicationStatus(CoscApplicationStatus.INACTIVE)
             .build();
 
         assertFalse(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));

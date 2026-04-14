@@ -31,11 +31,11 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
-import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -51,7 +51,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -83,6 +82,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
+import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
 
 @ExtendWith(MockitoExtension.class)
 class CaseEventTaskHandlerTest {
@@ -166,7 +166,7 @@ class CaseEventTaskHandlerTest {
                 .build();
             CaseData.CaseDataBuilder<?, ?> caseData2 = caseData1.toBuilder();
             caseData2.activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()));
-            caseData2.certOfSC(new CertOfSC().setDefendantFinalPaymentDate(LocalDate.now()));
+            caseData2.coSCApplicationStatus(CoscApplicationStatus.ACTIVE);
             CaseData caseData  = caseData2.build();
 
             VariableMap variables = Variables.createVariables();
@@ -222,13 +222,6 @@ class CaseEventTaskHandlerTest {
             verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_EVENT);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
-        }
-
-        private boolean checkMarkPaidInFull(CaseData data) {
-            return (Objects.nonNull(data.getActiveJudgment())
-                && data.getActiveJudgment().getFullyPaymentMadeDate() != null
-                && Objects.nonNull(data.getCertOfSC())
-                && data.getCertOfSC().getDefendantFinalPaymentDate() != null);
         }
     }
 
