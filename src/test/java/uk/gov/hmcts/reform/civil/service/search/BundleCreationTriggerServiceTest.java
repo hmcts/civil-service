@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -20,18 +21,19 @@ class BundleCreationTriggerServiceTest extends ElasticSearchServiceTest {
 
     @Override
     protected Query buildQuery(int fromValue) {
+        LocalDate hearingDateCutoff = LocalDate.now(ZoneOffset.UTC).plusDays(10);
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.hearingDate").lte(LocalDate.now().plusDays(10)))
+                        .must(rangeQuery("data.hearingDate").lte(hearingDateCutoff))
                         .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
             .should(boolQuery()
-                        .must(rangeQuery("data.hearingDate").lte(LocalDate.now().plusDays(10)))
+                        .must(rangeQuery("data.hearingDate").lte(hearingDateCutoff))
                         .must(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))))
             .mustNot(matchQuery("data.allocatedTrack", "MULTI_CLAIM"))
             .mustNot(matchQuery("data.allocatedTrack", "INTERMEDIATE_CLAIM"))
             .mustNot(matchQuery("data.responseClaimTrack", "MULTI_CLAIM"))
             .mustNot(matchQuery("data.responseClaimTrack", "INTERMEDIATE_CLAIM"));
-        return new Query(query, List.of("reference"), fromValue);
+        return new Query(query, List.of("reference"), fromValue, true);
     }
 }
