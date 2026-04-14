@@ -29,6 +29,7 @@ public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection
         this.userService = userService;
     }
 
+    @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
         String tokenNameClaim = jwt.getClaimAsString(TOKEN_NAME);
 

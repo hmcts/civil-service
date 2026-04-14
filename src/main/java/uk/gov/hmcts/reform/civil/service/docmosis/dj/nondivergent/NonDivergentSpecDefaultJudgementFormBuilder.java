@@ -82,27 +82,31 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
     }
 
     private Party getRespondentLROrLipDetails(CaseData caseData, String partyType) {
-        if (partyType.equals(RESPONDENT_1)) {
-            if (caseData.isRespondent1LiP()) {
-                return getRespondent1Details(caseData);
-            } else {
-                if (caseData.getRespondent1OrganisationPolicy() != null) {
-                    return getApplicantOrgDetails(caseData.getRespondent1OrganisationPolicy());
-                } else {
-                    return null;
-                }
-            }
-        } else {
-            if (caseData.isRespondent2LiP()) {
-                return getRespondent2Details(caseData);
-            } else {
-                if (caseData.getRespondent2OrganisationPolicy() != null) {
-                    return getApplicantOrgDetails(caseData.getRespondent2OrganisationPolicy());
-                } else {
-                    return null;
-                }
-            }
+        boolean respondentOne = RESPONDENT_1.equals(partyType);
+
+        if (isRespondentLip(caseData, respondentOne)) {
+            return getRespondentLipDetails(caseData, respondentOne);
         }
+
+        return getRespondentOrganisationDetails(caseData, respondentOne);
+    }
+
+    private boolean isRespondentLip(CaseData caseData, boolean respondentOne) {
+        return respondentOne ? caseData.isRespondent1LiP() : caseData.isRespondent2LiP();
+    }
+
+    private Party getRespondentLipDetails(CaseData caseData, boolean respondentOne) {
+        return respondentOne ? getRespondent1Details(caseData) : getRespondent2Details(caseData);
+    }
+
+    private Party getRespondentOrganisationDetails(CaseData caseData, boolean respondentOne) {
+        if (respondentOne && caseData.getRespondent1OrganisationPolicy() != null) {
+            return getApplicantOrgDetails(caseData.getRespondent1OrganisationPolicy());
+        }
+        if (!respondentOne && caseData.getRespondent2OrganisationPolicy() != null) {
+            return getApplicantOrgDetails(caseData.getRespondent2OrganisationPolicy());
+        }
+        return null;
     }
 
     private Party getClaimantLipOrLRDetailsForPaymentAddress(CaseData caseData) {
