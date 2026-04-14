@@ -10,8 +10,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -44,154 +47,33 @@ public class EventHistorySequencer {
 
     private EventHistory prepareEventHistory(List<Event> events) {
         EventHistory history = new EventHistory();
-        events.forEach(event -> {
-            EventType eventType = EventType.valueOfCode(event.getEventCode()).orElseThrow(IllegalStateException::new);
-            switch (eventType) {
-                case MISCELLANEOUS:
-                    history.setMiscellaneous(appendEvent(history.getMiscellaneous(), event));
-                    break;
-                case ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED:
-                    history.setAcknowledgementOfServiceReceived(appendEvent(history.getAcknowledgementOfServiceReceived(), event));
-                    break;
-                case CONSENT_EXTENSION_FILING_DEFENCE:
-                    history.setConsentExtensionFilingDefence(appendEvent(history.getConsentExtensionFilingDefence(), event));
-                    break;
-                case DEFENCE_FILED:
-                    history.setDefenceFiled(appendEvent(history.getDefenceFiled(), event));
-                    break;
-                case STATES_PAID:
-                    history.setStatesPaid(appendEvent(history.getStatesPaid(), event));
-                    break;
-                case DEFENCE_AND_COUNTER_CLAIM:
-                    history.setDefenceAndCounterClaim(appendEvent(history.getDefenceAndCounterClaim(), event));
-                    break;
-                case RECEIPT_OF_PART_ADMISSION:
-                    history.setReceiptOfPartAdmission(appendEvent(history.getReceiptOfPartAdmission(), event));
-                    break;
-                case RECEIPT_OF_ADMISSION:
-                    history.setReceiptOfAdmission(appendEvent(history.getReceiptOfAdmission(), event));
-                    break;
-                case REPLY_TO_DEFENCE:
-                    history.setReplyToDefence(appendEvent(history.getReplyToDefence(), event));
-                    break;
-                case DIRECTIONS_QUESTIONNAIRE_FILED:
-                    history.setDirectionsQuestionnaireFiled(appendEvent(history.getDirectionsQuestionnaireFiled(), event));
-                    break;
-                case BREATHING_SPACE_ENTERED:
-                    history.setBreathingSpaceEntered(appendEvent(history.getBreathingSpaceEntered(), event));
-                    break;
-                case BREATHING_SPACE_LIFTED:
-                    history.setBreathingSpaceLifted(appendEvent(history.getBreathingSpaceLifted(), event));
-                    break;
-                case MENTAL_HEALTH_BREATHING_SPACE_ENTERED:
-                    history.setBreathingSpaceMentalHealthEntered(appendEvent(history.getBreathingSpaceMentalHealthEntered(), event));
-                    break;
-                case MENTAL_HEALTH_BREATHING_SPACE_LIFTED:
-                    history.setBreathingSpaceMentalHealthLifted(appendEvent(history.getBreathingSpaceMentalHealthLifted(), event));
-                    break;
-                case INTERLOCUTORY_JUDGMENT_GRANTED:
-                    history.setInterlocutoryJudgment(appendEvent(history.getInterlocutoryJudgment(), event));
-                    break;
-                case DEFAULT_JUDGMENT_GRANTED:
-                    history.setDefaultJudgment(appendEvent(history.getDefaultJudgment(), event));
-                    break;
-                case JUDGEMENT_BY_ADMISSION:
-                    history.setJudgmentByAdmission(appendEvent(history.getJudgmentByAdmission(), event));
-                    break;
-                case GENERAL_FORM_OF_APPLICATION:
-                    history.setGeneralFormOfApplication(appendEvent(history.getGeneralFormOfApplication(), event));
-                    break;
-                case DEFENCE_STRUCK_OUT:
-                    history.setDefenceStruckOut(appendEvent(history.getDefenceStruckOut(), event));
-                    break;
-                case SET_ASIDE_JUDGMENT:
-                    history.setSetAsideJudgment(appendEvent(history.getSetAsideJudgment(), event));
-                    break;
-                case CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION:
-                    history.setCertificateOfSatisfactionOrCancellation(appendEvent(history.getCertificateOfSatisfactionOrCancellation(), event));
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected event type: " + eventType);
-            }
-        });
-
-        if (isEmpty(history.getDirectionsQuestionnaireFiled())) {
-            history.setDirectionsQuestionnaireFiled(List.of(new Event()));
-        }
-        if (isEmpty(history.getDefenceFiled())) {
-            history.setDefenceFiled(List.of(new Event()));
-        }
-        if (isEmpty(history.getStatesPaid())) {
-            history.setStatesPaid(List.of(new Event()));
-        }
-        if (isEmpty(history.getReceiptOfAdmission())) {
-            history.setReceiptOfAdmission(List.of(new Event()));
-        }
-        if (isEmpty(history.getReceiptOfPartAdmission())) {
-            history.setReceiptOfPartAdmission(List.of(new Event()));
-        }
-        if (isEmpty(history.getDefenceAndCounterClaim())) {
-            history.setDefenceAndCounterClaim(List.of(new Event()));
-        }
-        if (isEmpty(history.getAcknowledgementOfServiceReceived())) {
-            history.setAcknowledgementOfServiceReceived(List.of(new Event()));
-        }
-        if (isEmpty(history.getConsentExtensionFilingDefence())) {
-            history.setConsentExtensionFilingDefence(List.of(new Event()));
-        }
-        if (isEmpty(history.getReplyToDefence())) {
-            history.setReplyToDefence(List.of(new Event()));
-        }
-        if (isEmpty(history.getBreathingSpaceEntered())) {
-            history.setBreathingSpaceEntered(List.of(new Event()));
-        }
-        if (isEmpty(history.getBreathingSpaceLifted())) {
-            history.setBreathingSpaceLifted(List.of(new Event()));
-        }
-        if (isEmpty(history.getBreathingSpaceMentalHealthEntered())) {
-            history.setBreathingSpaceMentalHealthEntered(List.of(new Event()));
-        }
-        if (isEmpty(history.getBreathingSpaceMentalHealthLifted())) {
-            history.setBreathingSpaceMentalHealthLifted(List.of(new Event()));
-        }
-        if (isEmpty(history.getInterlocutoryJudgment())) {
-            history.setInterlocutoryJudgment(List.of(new Event()));
-        }
-        if (isEmpty(history.getDefaultJudgment())) {
-            history.setDefaultJudgment(List.of(new Event()));
-        }
-        if (isEmpty(history.getJudgmentByAdmission())) {
-            history.setJudgmentByAdmission(List.of(new Event()));
-        }
-        if (isEmpty(history.getGeneralFormOfApplication())) {
-            history.setGeneralFormOfApplication(List.of(new Event()));
-        }
-        if (isEmpty(history.getDefenceStruckOut())) {
-            history.setDefenceStruckOut(List.of(new Event()));
-        }
-        if (isEmpty(history.getSetAsideJudgment())) {
-            history.setSetAsideJudgment(List.of(new Event()));
-        }
-        if (isEmpty(history.getCertificateOfSatisfactionOrCancellation())) {
-            history.setCertificateOfSatisfactionOrCancellation(List.of(new Event()));
-        }
-
+        events.forEach(event -> addEvent(history, event));
+        ensureRequiredLists(history);
         return history;
     }
 
-    private List<Event> appendEvent(List<Event> events, Event event) {
+    private static void ensureRequiredLists(EventHistory history) {
+        REQUIRED_EVENT_LISTS.forEach(accessor -> {
+            if (isEmpty(accessor.getter().apply(history))) {
+                accessor.setter().accept(history, List.of(new Event()));
+            }
+        });
+    }
+
+    private void addEvent(EventHistory history, Event event) {
+        EventType eventType = EventType.valueOfCode(event.getEventCode()).orElseThrow(IllegalStateException::new);
+        BiConsumer<EventHistory, Event> handler = EVENT_APPENDERS.get(eventType);
+        if (handler == null) {
+            throw new IllegalStateException("Unexpected event type: " + eventType);
+        }
+        handler.accept(history, event);
+    }
+
+    private static List<Event> appendEvent(List<Event> events, Event event) {
         if (events == null) {
             events = new ArrayList<>();
         }
         events.add(event);
-        return events;
-    }
-
-    private List<Event> appendEvents(List<Event> events, List<Event> eventsToAdd) {
-        if (events == null) {
-            events = new ArrayList<>();
-        }
-        events.addAll(eventsToAdd);
         return events;
     }
 
@@ -235,5 +117,101 @@ public class EventHistorySequencer {
             .flatMap(Collection::stream)
             .filter(event -> event.getDateReceived() != null)
             .collect(Collectors.toList());
+    }
+
+    private static final Map<EventType, BiConsumer<EventHistory, Event>> EVENT_APPENDERS = Map.ofEntries(
+        Map.entry(EventType.MISCELLANEOUS,
+                  (history, event) -> history.setMiscellaneous(appendEvent(history.getMiscellaneous(), event))),
+        Map.entry(EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED,
+                  (history, event) -> history.setAcknowledgementOfServiceReceived(
+                      appendEvent(history.getAcknowledgementOfServiceReceived(), event))),
+        Map.entry(EventType.CONSENT_EXTENSION_FILING_DEFENCE,
+                  (history, event) -> history.setConsentExtensionFilingDefence(
+                      appendEvent(history.getConsentExtensionFilingDefence(), event))),
+        Map.entry(EventType.DEFENCE_FILED,
+                  (history, event) -> history.setDefenceFiled(appendEvent(history.getDefenceFiled(), event))),
+        Map.entry(EventType.STATES_PAID,
+                  (history, event) -> history.setStatesPaid(appendEvent(history.getStatesPaid(), event))),
+        Map.entry(EventType.DEFENCE_AND_COUNTER_CLAIM,
+                  (history, event) -> history.setDefenceAndCounterClaim(
+                      appendEvent(history.getDefenceAndCounterClaim(), event))),
+        Map.entry(EventType.RECEIPT_OF_PART_ADMISSION,
+                  (history, event) -> history.setReceiptOfPartAdmission(
+                      appendEvent(history.getReceiptOfPartAdmission(), event))),
+        Map.entry(EventType.RECEIPT_OF_ADMISSION,
+                  (history, event) -> history.setReceiptOfAdmission(
+                      appendEvent(history.getReceiptOfAdmission(), event))),
+        Map.entry(EventType.REPLY_TO_DEFENCE,
+                  (history, event) -> history.setReplyToDefence(appendEvent(history.getReplyToDefence(), event))),
+        Map.entry(EventType.DIRECTIONS_QUESTIONNAIRE_FILED,
+                  (history, event) -> history.setDirectionsQuestionnaireFiled(
+                      appendEvent(history.getDirectionsQuestionnaireFiled(), event))),
+        Map.entry(EventType.BREATHING_SPACE_ENTERED,
+                  (history, event) -> history.setBreathingSpaceEntered(
+                      appendEvent(history.getBreathingSpaceEntered(), event))),
+        Map.entry(EventType.BREATHING_SPACE_LIFTED,
+                  (history, event) -> history.setBreathingSpaceLifted(
+                      appendEvent(history.getBreathingSpaceLifted(), event))),
+        Map.entry(EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED,
+                  (history, event) -> history.setBreathingSpaceMentalHealthEntered(
+                      appendEvent(history.getBreathingSpaceMentalHealthEntered(), event))),
+        Map.entry(EventType.MENTAL_HEALTH_BREATHING_SPACE_LIFTED,
+                  (history, event) -> history.setBreathingSpaceMentalHealthLifted(
+                      appendEvent(history.getBreathingSpaceMentalHealthLifted(), event))),
+        Map.entry(EventType.INTERLOCUTORY_JUDGMENT_GRANTED,
+                  (history, event) -> history.setInterlocutoryJudgment(
+                      appendEvent(history.getInterlocutoryJudgment(), event))),
+        Map.entry(EventType.DEFAULT_JUDGMENT_GRANTED,
+                  (history, event) -> history.setDefaultJudgment(appendEvent(history.getDefaultJudgment(), event))),
+        Map.entry(EventType.JUDGEMENT_BY_ADMISSION,
+                  (history, event) -> history.setJudgmentByAdmission(
+                      appendEvent(history.getJudgmentByAdmission(), event))),
+        Map.entry(EventType.GENERAL_FORM_OF_APPLICATION,
+                  (history, event) -> history.setGeneralFormOfApplication(
+                      appendEvent(history.getGeneralFormOfApplication(), event))),
+        Map.entry(EventType.DEFENCE_STRUCK_OUT,
+                  (history, event) -> history.setDefenceStruckOut(
+                      appendEvent(history.getDefenceStruckOut(), event))),
+        Map.entry(EventType.SET_ASIDE_JUDGMENT,
+                  (history, event) -> history.setSetAsideJudgment(
+                      appendEvent(history.getSetAsideJudgment(), event))),
+        Map.entry(EventType.CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION,
+                  (history, event) -> history.setCertificateOfSatisfactionOrCancellation(
+                      appendEvent(history.getCertificateOfSatisfactionOrCancellation(), event)))
+    );
+
+    private static final List<EventHistoryListAccessor> REQUIRED_EVENT_LISTS = List.of(
+        new EventHistoryListAccessor(EventHistory::getDirectionsQuestionnaireFiled,
+                                     EventHistory::setDirectionsQuestionnaireFiled),
+        new EventHistoryListAccessor(EventHistory::getDefenceFiled, EventHistory::setDefenceFiled),
+        new EventHistoryListAccessor(EventHistory::getStatesPaid, EventHistory::setStatesPaid),
+        new EventHistoryListAccessor(EventHistory::getReceiptOfAdmission, EventHistory::setReceiptOfAdmission),
+        new EventHistoryListAccessor(EventHistory::getReceiptOfPartAdmission, EventHistory::setReceiptOfPartAdmission),
+        new EventHistoryListAccessor(EventHistory::getDefenceAndCounterClaim,
+                                     EventHistory::setDefenceAndCounterClaim),
+        new EventHistoryListAccessor(EventHistory::getAcknowledgementOfServiceReceived,
+                                     EventHistory::setAcknowledgementOfServiceReceived),
+        new EventHistoryListAccessor(EventHistory::getConsentExtensionFilingDefence,
+                                     EventHistory::setConsentExtensionFilingDefence),
+        new EventHistoryListAccessor(EventHistory::getReplyToDefence, EventHistory::setReplyToDefence),
+        new EventHistoryListAccessor(EventHistory::getBreathingSpaceEntered, EventHistory::setBreathingSpaceEntered),
+        new EventHistoryListAccessor(EventHistory::getBreathingSpaceLifted, EventHistory::setBreathingSpaceLifted),
+        new EventHistoryListAccessor(EventHistory::getBreathingSpaceMentalHealthEntered,
+                                     EventHistory::setBreathingSpaceMentalHealthEntered),
+        new EventHistoryListAccessor(EventHistory::getBreathingSpaceMentalHealthLifted,
+                                     EventHistory::setBreathingSpaceMentalHealthLifted),
+        new EventHistoryListAccessor(EventHistory::getInterlocutoryJudgment, EventHistory::setInterlocutoryJudgment),
+        new EventHistoryListAccessor(EventHistory::getDefaultJudgment, EventHistory::setDefaultJudgment),
+        new EventHistoryListAccessor(EventHistory::getJudgmentByAdmission, EventHistory::setJudgmentByAdmission),
+        new EventHistoryListAccessor(EventHistory::getGeneralFormOfApplication,
+                                     EventHistory::setGeneralFormOfApplication),
+        new EventHistoryListAccessor(EventHistory::getDefenceStruckOut, EventHistory::setDefenceStruckOut),
+        new EventHistoryListAccessor(EventHistory::getSetAsideJudgment, EventHistory::setSetAsideJudgment),
+        new EventHistoryListAccessor(EventHistory::getCertificateOfSatisfactionOrCancellation,
+                                     EventHistory::setCertificateOfSatisfactionOrCancellation)
+    );
+
+    private record EventHistoryListAccessor(Function<EventHistory, List<Event>> getter,
+                                            BiConsumer<EventHistory, List<Event>> setter) {
     }
 }
