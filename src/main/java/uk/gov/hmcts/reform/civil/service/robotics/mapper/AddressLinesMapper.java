@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Queue;
 
 import static java.util.Arrays.asList;
@@ -62,55 +64,77 @@ public class AddressLinesMapper {
     }
 
     private Queue<String> resolveAddressLine(String addressLine, String overflow, boolean overflowAllowed) {
-        addressLine = StringUtils.defaultString(addressLine);
-        if (StringUtils.isEmpty(addressLine)) {
-            if (StringUtils.isEmpty(overflow)) {
-                return new LinkedList<>(Arrays.asList(null, STRING_EMPTY));
-            } else if (StringUtils.length(overflow) <= LINE_LIMIT) {
-                return new LinkedList<>(List.of(overflow, STRING_EMPTY));
-            }
+        String normalisedAddressLine = StringUtils.defaultString(addressLine);
+        Optional<Queue<String>> emptyResolution = resolveWhenAddressLineEmpty(normalisedAddressLine, overflow);
+        if (emptyResolution.isPresent()) {
+            return emptyResolution.get();
         }
         if (!overflowAllowed) {
-            int addLineLen = addressLine != null ? StringUtils.length(addressLine) : 0;
-            String addressLineCandidate = StringUtils.defaultString(overflow)
-                .concat(StringUtils.defaultString(addressLine));
-            String returnAddress;
-            if (addressLineCandidate.length() > LINE_LIMIT) {
-                if (addLineLen >= LINE_LIMIT) {
-                    returnAddress = addressLine != null ? addressLine.substring(0, Math.min(addressLine.length(), LINE_LIMIT - 1)) : "";
-                } else {
-                    String overflowSubstring = overflow != null ? overflow.substring(0, Math.max(0, LINE_LIMIT - 3 - addLineLen)) : "";
-                    returnAddress = overflowSubstring.concat(STRING_COMMA_SPACE).concat(StringUtils.defaultString(addressLine));
-                }
-            } else {
-                returnAddress = addressLineCandidate;
-            }
-            return new LinkedList<>(Arrays.asList(returnAddress, STRING_EMPTY));
+            return resolveWithoutOverflowAllowance(normalisedAddressLine, overflow);
         }
+        return resolveWithOverflowAllowance(normalisedAddressLine, overflow);
+    }
 
-        String retained;
-        if (StringUtils.length(StringUtils.defaultString(overflow)) + StringUtils.length(addressLine) > LINE_LIMIT) {
-            retained = STRING_EMPTY;
-            Queue<String> addressParts = new LinkedList<>(Splitter.on(CHAR_SPACE).omitEmptyStrings()
-                                                              .splitToList(StringUtils.defaultString(overflow).concat(
-                                                                  addressLine)));
-            while (!addressParts.isEmpty() && retained.concat(STRING_SPACE).concat(addressParts.peek())
-                .length() <= LINE_LIMIT) {
-                retained = retained.concat(STRING_SPACE).concat(requireNonNull(addressParts.poll()));
+    private Optional<Queue<String>> resolveWhenAddressLineEmpty(String addressLine, String overflow) {
+        if (StringUtils.isEmpty(addressLine)) {
+            if (StringUtils.isEmpty(overflow)) {
+                return Optional.of(new LinkedList<>(Arrays.asList(null, STRING_EMPTY)));
             }
-            if (StringUtils.isEmpty(retained)) {
-                retained = StringUtils.defaultString(addressLine);
-                overflow = STRING_EMPTY;
+            if (StringUtils.length(overflow) <= LINE_LIMIT) {
+                return Optional.of(new LinkedList<>(List.of(overflow, STRING_EMPTY)));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Queue<String> resolveWithoutOverflowAllowance(String addressLine, String overflow) {
+        String safeAddressLine = Objects.requireNonNullElse(addressLine, STRING_EMPTY);
+        int addLineLen = StringUtils.length(safeAddressLine);
+        String addressLineCandidate = StringUtils.defaultString(overflow).concat(safeAddressLine);
+        String returnAddress;
+        if (addressLineCandidate.length() > LINE_LIMIT) {
+            if (addLineLen >= LINE_LIMIT) {
+                returnAddress = safeAddressLine.substring(0, Math.min(safeAddressLine.length(), LINE_LIMIT - 1));
             } else {
-                String overflowStr = String.join(STRING_SPACE, addressParts);
-                overflow = overflowStr.concat(overflowStr.trim().endsWith(STRING_COMMA)
-                                                  ? STRING_SPACE : STRING_COMMA_SPACE);
+                String overflowSubstring = overflow != null
+                    ? overflow.substring(0, Math.max(0, LINE_LIMIT - 3 - addLineLen)) : STRING_EMPTY;
+                returnAddress = overflowSubstring.concat(STRING_COMMA_SPACE).concat(safeAddressLine);
             }
         } else {
-            retained = StringUtils.defaultString(overflow).concat(StringUtils.defaultString(addressLine));
-            overflow = STRING_EMPTY;
+            returnAddress = addressLineCandidate;
         }
-        return new LinkedList<>(List.of(retained.trim(), overflow));
+        return new LinkedList<>(Arrays.asList(returnAddress, STRING_EMPTY));
+    }
+
+    private Queue<String> resolveWithOverflowAllowance(String addressLine, String overflow) {
+        String safeAddressLine = StringUtils.defaultString(addressLine);
+        String normalisedOverflow = overflow == null ? STRING_EMPTY : overflow;
+        if (StringUtils.length(normalisedOverflow) + StringUtils.length(safeAddressLine) > LINE_LIMIT) {
+            return splitOverflowingAddress(safeAddressLine, normalisedOverflow);
+        }
+        String retained = normalisedOverflow.concat(safeAddressLine);
+        return new LinkedList<>(List.of(retained.trim(), STRING_EMPTY));
+    }
+
+    private Queue<String> splitOverflowingAddress(String addressLine, String overflow) {
+        String safeAddressLine = StringUtils.defaultString(addressLine);
+        String safeOverflow = StringUtils.defaultString(overflow);
+        String retained = STRING_EMPTY;
+        Queue<String> addressParts = new LinkedList<>(Splitter.on(CHAR_SPACE).omitEmptyStrings()
+                                                          .splitToList(safeOverflow.concat(safeAddressLine)));
+        while (!addressParts.isEmpty() && retained.concat(STRING_SPACE).concat(addressParts.peek()).length() <= LINE_LIMIT) {
+            retained = retained.concat(STRING_SPACE).concat(requireNonNull(addressParts.poll()));
+        }
+        String processedOverflow;
+        if (StringUtils.isEmpty(retained)) {
+            retained = safeAddressLine;
+            processedOverflow = STRING_EMPTY;
+        } else {
+            String overflowStr = String.join(STRING_SPACE, addressParts);
+            processedOverflow = overflowStr.concat(overflowStr.trim().endsWith(STRING_COMMA)
+                                                  ? STRING_SPACE : STRING_COMMA_SPACE);
+        }
+        return new LinkedList<>(List.of(retained.trim(), processedOverflow));
     }
 
     private List<String> prepareAddressLines(Address originalAddress) {
