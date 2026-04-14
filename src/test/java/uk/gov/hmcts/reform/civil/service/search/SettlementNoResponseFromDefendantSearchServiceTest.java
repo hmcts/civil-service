@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -26,7 +27,7 @@ class SettlementNoResponseFromDefendantSearchServiceTest extends ElasticSearchSe
     @Override
     protected Query buildQuery(int fromValue) {
         String expectedDate = DateUtils.addDaysSkippingWeekends(
-                LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW).atTime(END_OF_BUSINESS_DAY)
+                LocalDate.now(ZoneOffset.UTC).minusDays(1), BUSINESS_DAYS_FROM_NOW).atTime(END_OF_BUSINESS_DAY)
             .format(DateTimeFormatter.ISO_DATE);
 
         BoolQueryBuilder query = boolQuery()

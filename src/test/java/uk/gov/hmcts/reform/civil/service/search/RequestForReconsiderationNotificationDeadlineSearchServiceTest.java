@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -21,12 +22,11 @@ class RequestForReconsiderationNotificationDeadlineSearchServiceTest extends Ela
 
     @Override
     protected Query buildQuery(int fromValue) {
+        String deadlineCutoff = LocalDate.now(ZoneOffset.UTC).atTime(LocalTime.MIN).toString();
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.requestForReconsiderationDeadline").lt(LocalDate.now()
-                                                                       .atTime(LocalTime.MIN)
-                                                                       .toString()))
+                        .must(rangeQuery("data.requestForReconsiderationDeadline").lt(deadlineCutoff))
                         .mustNot(matchQuery("data.requestForReconsiderationDeadlineChecked", "Yes"))
                         .must(boolQuery().must(matchQuery("state", "CASE_PROGRESSION"))));
         return new Query(query, List.of("reference"), fromValue);
