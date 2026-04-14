@@ -1,17 +1,26 @@
 package uk.gov.hmcts.reform.civil.service.docmosis;
 
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.ACKNOWLEDGEMENT_OF_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.CERTIFICATE_OF_DEBT_PAYMENT_PDF;
 import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.DEFAULT_JUDGMENT_SPEC_FORM;
 import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.DIRECTIONS_QUESTIONNAIRE_FORM;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.JUDGMENT_BY_ADMISSION_CLAIMANT_PDF;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.JUDGMENT_BY_ADMISSION_DEFENDANT_PDF;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.MAKE_WITH_NOTICE;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.NOTICE_OF_DISCONTINUANCE;
 import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.ORDERS;
 import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.RESPONSE_SEALED_FORM;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.SEALED_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.SEALED_CLAIM_FORM_SPEC;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.SETTLE_CLAIM_PAID_IN_FULL_LETTER;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.SMALL_CLAIMS_SDO;
 
 import jakarta.validation.constraints.NotNull;
 
 public enum DocmosisTemplates {
-    N1("CV-UNS-CLM-ENG-01126.docx", "sealed_claim_form_%s.pdf"),
-    N1_MULTIPARTY_SAME_SOL("CV-UNS-CLM-ENG-01125.docx", "sealed_claim_form_%s.pdf"),
+    N1("CV-UNS-CLM-ENG-01126.docx", SEALED_CLAIM_FORM),
+    N1_MULTIPARTY_SAME_SOL("CV-UNS-CLM-ENG-01125.docx", SEALED_CLAIM_FORM),
     N2("CV-SPC-CLM-ENG-01349.docx", SEALED_CLAIM_FORM_SPEC),
     N2_2V1_LIP("CV-SPC-CLM-ENG-01355.docx", SEALED_CLAIM_FORM_SPEC),
     N2_1V2_SAME_SOL("CV-SPC-CLM-ENG-01351.docx", SEALED_CLAIM_FORM_SPEC),
@@ -19,8 +28,8 @@ public enum DocmosisTemplates {
     N2_1V2_DIFFERENT_SOL_LIP("CV-SPC-CLM-ENG-01354.docx", SEALED_CLAIM_FORM_SPEC),
     N2_2V1("CV-SPC-CLM-ENG-01352.docx", SEALED_CLAIM_FORM_SPEC),
     N10("CV-SPEC-ACK-ENG-00001-v01.docx", "acknowledgement_of_service_form_spec_%s.pdf"),
-    N9_MULTIPARTY_SAME_SOL("CV-UNS-ACK-ENG-01142.docx", "acknowledgement_of_claim_form_%s.pdf"),
-    N11("CV-UNS-ACK-ENG-01146.docx", "acknowledgement_of_claim_form_%s.pdf"),
+    N9_MULTIPARTY_SAME_SOL("CV-UNS-ACK-ENG-01142.docx", ACKNOWLEDGEMENT_OF_CLAIM_FORM),
+    N11("CV-UNS-ACK-ENG-01146.docx", ACKNOWLEDGEMENT_OF_CLAIM_FORM),
     N121_SPEC("CV-SPC-DEC-ENG-00910.docx", DEFAULT_JUDGMENT_SPEC_FORM),
     N121_SPEC_NON_IMMEDIATE("CV-SPC-DEC-ENG-00913.docx", DEFAULT_JUDGMENT_SPEC_FORM),
     N121_SPEC_DEFENDANT("CV-SPC-DEC-ENG-00911.docx", DEFAULT_JUDGMENT_SPEC_FORM),
@@ -35,8 +44,8 @@ public enum DocmosisTemplates {
     SDO_R2_DISPOSAL("CV-UNS-STD-ENG-01390.docx", "disposal_hearing_sdo_%s.pdf"),
     DJ_SDO_R2_DISPOSAL("CV-UNS-DEC-ENG-01331.docx", "Order_disposal_%s.pdf"),
     DJ_SDO_R2_TRIAL("CV-UNS-DEC-ENG-01379.docx", "Order_trial_%s.pdf"),
-    SDO_SMALL_R2("CV-UNS-STD-ENG-01388.docx", "small_claims_sdo_%s.pdf"),
-    SDO_SMALL_DRH("CV-UNS-STD-ENG-01389.docx", "small_claims_sdo_%s.pdf"),
+    SDO_SMALL_R2("CV-UNS-STD-ENG-01388.docx", SMALL_CLAIMS_SDO),
+    SDO_SMALL_DRH("CV-UNS-STD-ENG-01389.docx", SMALL_CLAIMS_SDO),
     SDO_FAST_TRACK_NIHL("CV-UNS-STD-ENG-01387.docx", "fast_track_nihl_sdo_%s.pdf"),
     SDO_FAST_FAST_TRACK_INT_R2("CV-UNS-STD-ENG-01378_13066.docx", "fast_track_sdo_%s.pdf"),
     DEFENDANT_RESPONSE_LIP_SPEC("CV-SPC-CLM-ENG-01067-LIP.docx", "response_sealed_form_%s.pdf"),
@@ -46,8 +55,8 @@ public enum DocmosisTemplates {
     RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0003.docx", "record_judgment_determination_of_means_letter.pdf"),
     DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0004.docx", "default_judgment_non_divergent_spec_pin_letter.pdf"),
     DEFAULT_JUDGMENT_COVER_LETTER("CV-SPC-STD-ENG-DJ-COVER-LETTER-00985.docx", "default_judgment_cover_letter.pdf"),
-    SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER("CV-SPC-LET-ENG-LIP-SD0001.docx", "settle_claim_paid_in_full_letter.pdf"),
-    SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_WELSH("CV-SPC-LET-WEL-LIP-SD0001.docx", "settle_claim_paid_in_full_letter.pdf"),
+    SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER("CV-SPC-LET-ENG-LIP-SD0001.docx", SETTLE_CLAIM_PAID_IN_FULL_LETTER),
+    SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_WELSH("CV-SPC-LET-WEL-LIP-SD0001.docx", SETTLE_CLAIM_PAID_IN_FULL_LETTER),
     DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT("CV-SPC-HRN-ENG-01358.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
     CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01356.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
     CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT("CV-SPC-HRN-ENG-01359.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
@@ -91,16 +100,16 @@ public enum DocmosisTemplates {
     GENERATE_LIP_CLAIMANT_CLAIM_FORM("CV-SPC-CLM-ENG-CLAIMANT-CLAIM-FORM.docx", "%s-claim-form-claimant-copy.pdf"),
     GENERATE_LIP_DEFENDANT_CLAIM_FORM("CV-SPC-CLM-ENG-DEFENDANT-CLAIM-FORM.docx", "%s-sealed-claim-form.pdf"),
     RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF("CV-UNS-DEC-ENG-00001.docx", "Decision_on_reconsideration_request_%s.pdf"),
-    JUDGMENT_BY_ADMISSION_CLAIMANT("CV-SPC-DEC-ENG-00916.docx", "Judgment_by_admission_claimant.pdf"),
-    JUDGMENT_BY_ADMISSION_DEFENDANT("CV-SPC-DEC-ENG-00915.docx", "Judgment_by_admission_defendant.pdf"),
-    JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL("CV-SPC-DEC-WEL-00916.docx", "Judgment_by_admission_claimant.pdf"),
-    JUDGMENT_BY_ADMISSION_DEFENDANT_BILINGUAL("CV-SPC-DEC-WEL-00915.docx", "Judgment_by_admission_defendant.pdf"),
+    JUDGMENT_BY_ADMISSION_CLAIMANT("CV-SPC-DEC-ENG-00916.docx", JUDGMENT_BY_ADMISSION_CLAIMANT_PDF),
+    JUDGMENT_BY_ADMISSION_DEFENDANT("CV-SPC-DEC-ENG-00915.docx", JUDGMENT_BY_ADMISSION_DEFENDANT_PDF),
+    JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL("CV-SPC-DEC-WEL-00916.docx", JUDGMENT_BY_ADMISSION_CLAIMANT_PDF),
+    JUDGMENT_BY_ADMISSION_DEFENDANT_BILINGUAL("CV-SPC-DEC-WEL-00915.docx", JUDGMENT_BY_ADMISSION_DEFENDANT_PDF),
     JUDGMENT_BY_DETERMINATION_CLAIMANT("CV-SPC-DEC-ENG-00982.docx", "Judgment_by_determination_claimant.pdf"),
     JUDGMENT_BY_DETERMINATION_DEFENDANT("CV-SPC-DEC-ENG-00981.docx", "Judgment_by_determination_defendant.pdf"),
-    NOTICE_OF_DISCONTINUANCE_PDF("CV-SPC-GNO-ENG-SD0001.docx", "notice_of_discontinuance_%s.pdf"),
-    NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF("CV-SPC-GNO-WEL-SD0001.docx", "notice_of_discontinuance_%s.pdf"),
-    CERTIFICATE_OF_DEBT_PAYMENT("CV-SPC-STD-ENG-N441A.docx", "Certificate_of_debt_payment_%s.pdf"),
-    CERTIFICATE_OF_DEBT_PAYMENT_WELSH("CV-SPC-STD-WEL-N441A.docx", "Certificate_of_debt_payment_%s.pdf"),
+    NOTICE_OF_DISCONTINUANCE_PDF("CV-SPC-GNO-ENG-SD0001.docx", NOTICE_OF_DISCONTINUANCE),
+    NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF("CV-SPC-GNO-WEL-SD0001.docx", NOTICE_OF_DISCONTINUANCE),
+    CERTIFICATE_OF_DEBT_PAYMENT("CV-SPC-STD-ENG-N441A.docx", CERTIFICATE_OF_DEBT_PAYMENT_PDF),
+    CERTIFICATE_OF_DEBT_PAYMENT_WELSH("CV-SPC-STD-WEL-N441A.docx", CERTIFICATE_OF_DEBT_PAYMENT_PDF),
     COVER_LETTER("CV-SPC-LET-ENG-COVER-LETTER.docx", "cover_letter.pdf"),
     SDO_COVER_LETTER("CV-SPC-STD-ENG-COVER-LETTER.docx", "sdo_cover_letter.pdf"),
     QUERY_DOCUMENT("CV-UNS-CLM-ENG-0451.docx", "%s.pdf"),
@@ -120,8 +129,8 @@ public enum DocmosisTemplates {
     ASSISTED_ORDER_FORM("CV-UNS-GAP-ENG-01076.docx", GENERAL_ORDER.getDocumentTitle()),
     CONSENT_ORDER_FORM("CV-UNS-GAP-ENG-01078.docx", "Consent_order_for_application_%s.pdf"),
     GENERAL_APPLICATION_DRAFT("CV-UNS-GAP-ENG-01077.docx", "Draft_application_%s.pdf"),
-    REQUEST_FOR_INFORMATION_SEND_TO_OTHER_PARTY("CV-SPC-GAP-ENG-SEND-TO-OTHER-PARTY.docx", "make-with-notice_%s.pdf"),
-    REQUEST_FOR_INFORMATION_SEND_TO_OTHER_PARTY_BILINGUAL("CV-SPC-GAP-ENG-SEND-TO-OTHER-PARTY-BILINGUAL.docx", "make-with-notice_%s.pdf"),
+    REQUEST_FOR_INFORMATION_SEND_TO_OTHER_PARTY("CV-SPC-GAP-ENG-SEND-TO-OTHER-PARTY.docx", MAKE_WITH_NOTICE),
+    REQUEST_FOR_INFORMATION_SEND_TO_OTHER_PARTY_BILINGUAL("CV-SPC-GAP-ENG-SEND-TO-OTHER-PARTY-BILINGUAL.docx", MAKE_WITH_NOTICE),
     RESPOND_FOR_INFORMATION("CV-UNS-GAP-ENG-01079.docx", "Respond_for_information_for_application_%s.pdf"),
     RESPOND_FOR_WRITTEN_REPRESENTATION("CV-SPC-GAP-ENG-01080.docx", "Respond_for_written_representation_for_application_%s.pdf"),
     POST_ORDER_COVER_LETTER_LIP("CV-UNS-GAP-ENG-0110.docx", "Judge_order_cover_letter.pdf"),
