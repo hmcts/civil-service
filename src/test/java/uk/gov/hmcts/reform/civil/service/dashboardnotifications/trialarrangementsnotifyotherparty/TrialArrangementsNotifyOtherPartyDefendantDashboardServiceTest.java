@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -54,7 +55,7 @@ class TrialArrangementsNotifyOtherPartyDefendantDashboardServiceTest {
         service.notifyTrialArrangementsNotifyOtherParty(caseData, AUTH_TOKEN);
 
         verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("1234", "DEFENDANT");
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("1234", "DEFENDANT");
+        verify(taskListService).makeSelectedProgressAbleTasksInactiveForCaseIdentifierAndRole("1234", "DEFENDANT", Collections.singletonList("Hearing.Arrangements.Add"));
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT.getScenario(),
