@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -47,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DefaultJudgementHandler extends CallbackHandler {
 
     public static final String NOT_VALID_DJ = "The Claim is not eligible for Default Judgment until %s";
@@ -196,13 +198,13 @@ public class DefaultJudgementHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         var isOtherRemedyAbandoned = caseData.getIsOtherRemedyAbandoned();
-        if (Objects.isNull(isOtherRemedyAbandoned)) {
-            errors.add("Are you confirming that you are abandoning your request for an other remedy (e.g. injunction, rescission, declaration)?  is required");
-        } else if (isOtherRemedyAbandoned.equals(YesOrNo.NO)) {
+        if (YesOrNo.NO.equals(isOtherRemedyAbandoned)) {
             errors.add("The event could not be created. Unable to proceed because there are one or more callback Errors or Warnings"
                            + "- This feature is not available, please see guidance below");
-        } else {
+        } else if (YesOrNo.YES.equals(isOtherRemedyAbandoned)) {
             caseData.setOtherRemedyAbandonedDate(LocalDate.now());
+        } else {
+            errors.add("Are you confirming that you are abandoning your request for an other remedy (e.g. injunction, rescission, declaration)?  is required");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
