@@ -450,6 +450,47 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Nested
+    class MidEventAbandonOtherRemedyCallback {
+        private static final String PAGE_ID = "abandonOtherRemedy";
+
+        @Test
+        void shouldReturnError_whenAbandonOtherRemedyNotSelected() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNotEmpty();
+            Assertions.assertEquals(
+                "Are you confirming that you are abandoning your request for an other remedy (e.g. injunction, rescission, declaration)?  is required",
+                response.getErrors().getFirst()
+            );
+        }
+
+        @Test
+        void shouldReturnError_whenUserDecidedNotToAbandonOtherRemedyClaim() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setIsOtherRemedyAbandoned(YesOrNo.NO);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNotEmpty();
+            Assertions.assertEquals(
+                "The event could not be created. Unable to proceed because there are one or more callback Errors or Warnings"
+                    + "- This feature is not available, please see guidance below",
+                response.getErrors().getFirst()
+            );
+        }
+
+        @Test
+        void shouldReturnResponse_whenAbandonOtherRemedySelected() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setIsOtherRemedyAbandoned(YesOrNo.YES);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getData()).containsKey("otherRemedyAbandonedDate");
+        }
+
+    }
     @Test
     void shouldExtendDeadline() {
         when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(36, LocalDate.now()))
