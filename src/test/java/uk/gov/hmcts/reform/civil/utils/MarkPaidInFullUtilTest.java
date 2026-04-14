@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 
 import java.time.LocalDate;
@@ -13,51 +13,105 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MarkPaidInFullUtilTest {
 
-    @Test
-    void shouldReturnTrue_whenAllConditionsAreMet() {
-        CaseData caseData = CaseData.builder()
-            .activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()))
-            .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
-            .build();
+    @Nested
+    class CheckMarkPaidInFull {
+        @Test
+        void shouldReturnTrue_whenAllConditionsAreMet() {
+            CaseData caseData = CaseData.builder()
+                .activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()))
+                .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
+                .build();
 
-        assertTrue(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));
+            assertTrue(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenActiveJudgmentIsNull() {
+            CaseData caseData = CaseData.builder()
+                .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
+                .build();
+
+            assertFalse(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenFullyPaymentMadeDateIsNull() {
+            CaseData caseData = CaseData.builder()
+                .activeJudgment(new JudgmentDetails())
+                .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
+                .build();
+
+            assertFalse(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCoSCApplicationStatusIsNull() {
+            CaseData caseData = CaseData.builder()
+                .activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()))
+                .build();
+
+            assertFalse(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCoSCApplicationStatusIsNotActive() {
+            CaseData caseData = CaseData.builder()
+                .activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()))
+                .coSCApplicationStatus(CoscApplicationStatus.PROCESSED)
+                .build();
+
+            assertFalse(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));
+        }
     }
 
-    @Test
-    void shouldReturnFalse_whenActiveJudgmentIsNull() {
-        CaseData caseData = CaseData.builder()
-            .certOfSC(new CertOfSC().setDefendantFinalPaymentDate(LocalDate.now()))
-            .build();
+    @Nested
+    class CheckMarkPaidInFullAndPaidForApplication {
+        @Test
+        void shouldReturnTrue_whenAllConditionsAreMet() {
+            CaseData caseData = CaseData.builder()
+                .activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()))
+                .coSCApplicationStatus(CoscApplicationStatus.PROCESSED)
+                .build();
 
-        assertFalse(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));
-    }
+            assertTrue(MarkPaidInFullUtil.checkMarkPaidInFullAndPaidForApplication(caseData));
+        }
 
-    @Test
-    void shouldReturnFalse_whenFullyPaymentMadeDateIsNull() {
-        CaseData caseData = CaseData.builder()
-            .activeJudgment(new JudgmentDetails())
-            .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
-            .build();
+        @Test
+        void shouldReturnFalse_whenActiveJudgmentIsNull() {
+            CaseData caseData = CaseData.builder()
+                .coSCApplicationStatus(CoscApplicationStatus.PROCESSED)
+                .build();
 
-        assertFalse(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));
-    }
+            assertFalse(MarkPaidInFullUtil.checkMarkPaidInFullAndPaidForApplication(caseData));
+        }
 
-    @Test
-    void shouldReturnFalse_whenCertOfSCIsNull() {
-        CaseData caseData = CaseData.builder()
-            .activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()))
-            .build();
+        @Test
+        void shouldReturnFalse_whenFullyPaymentMadeDateIsNull() {
+            CaseData caseData = CaseData.builder()
+                .activeJudgment(new JudgmentDetails())
+                .coSCApplicationStatus(CoscApplicationStatus.PROCESSED)
+                .build();
 
-        assertFalse(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));
-    }
+            assertFalse(MarkPaidInFullUtil.checkMarkPaidInFullAndPaidForApplication(caseData));
+        }
 
-    @Test
-    void shouldReturnFalse_whenDefendantFinalPaymentDateIsNull() {
-        CaseData caseData = CaseData.builder()
-            .activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()))
-            .coSCApplicationStatus(CoscApplicationStatus.INACTIVE)
-            .build();
+        @Test
+        void shouldReturnFalse_whenCoSCApplicationStatusIsNull() {
+            CaseData caseData = CaseData.builder()
+                .activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()))
+                .build();
 
-        assertFalse(MarkPaidInFullUtil.checkMarkPaidInFull(caseData));
+            assertFalse(MarkPaidInFullUtil.checkMarkPaidInFullAndPaidForApplication(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCoSCApplicationStatusIsNotProcessed() {
+            CaseData caseData = CaseData.builder()
+                .activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()))
+                .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
+                .build();
+
+            assertFalse(MarkPaidInFullUtil.checkMarkPaidInFullAndPaidForApplication(caseData));
+        }
     }
 }

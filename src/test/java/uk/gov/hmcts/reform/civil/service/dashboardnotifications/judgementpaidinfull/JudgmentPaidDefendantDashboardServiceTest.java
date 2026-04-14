@@ -66,7 +66,7 @@ class JudgmentPaidDefendantDashboardServiceTest {
         caseData.setCcdCaseReference(1234L);
         CaseData.CaseDataBuilder<?, ?> caseData2 = caseData.toBuilder();
         caseData2.activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()));
-        caseData2.coSCApplicationStatus(CoscApplicationStatus.ACTIVE);
+        caseData2.coSCApplicationStatus(CoscApplicationStatus.PROCESSED);
 
         service.notifyJudgmentPaidInFull(caseData2.build(), AUTH_TOKEN);
 
