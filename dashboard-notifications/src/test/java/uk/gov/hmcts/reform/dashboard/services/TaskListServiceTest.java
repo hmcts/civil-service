@@ -331,6 +331,79 @@ class TaskListServiceTest {
     }
 
     @Test
+    void shouldMakeOnlySelectedProgressAbleTaskListInactive_whenTaskListIsPresent() {
+
+        List<TaskListEntity> tasks = getTaskListEntitiesWithAnchorNames();
+        List<String> templateNames = List.of("TemplateA", "TemplateB");
+
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplateTemplateNameIn(
+            "123",
+            "Claimant",
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(),
+                TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            ),
+            templateNames
+        )).thenReturn(tasks);
+
+        taskListService.makeSelectedProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", templateNames);
+
+        verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplateTemplateNameIn(
+            "123",
+            "Claimant",
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(),
+                TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            ),
+            templateNames
+        );
+
+        verify(taskListRepository, atLeast(4)).save(ArgumentMatchers.argThat(
+            a -> {
+                Assertions.assertEquals(TaskStatus.INACTIVE.getPlaceValue(), a.getCurrentStatus());
+                Assertions.assertEquals(TaskStatus.INACTIVE.getPlaceValue(), a.getNextStatus());
+                Assertions.assertTrue(StringUtils.isBlank(a.getHintTextCy()));
+                Assertions.assertTrue(StringUtils.isBlank(a.getHintTextEn()));
+                Assertions.assertEquals("Link name", a.getTaskNameEn());
+                Assertions.assertEquals("Link name Welsh", a.getTaskNameCy());
+                return true;
+            }
+        ));
+    }
+
+    @Test
+    void shouldNotQueryRepositoryWhenNoSelectedTemplatesProvided() {
+
+        taskListService.makeSelectedProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", List.of());
+
+        verify(taskListRepository, never())
+            .findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplateTemplateNameIn(
+                any(),
+                any(),
+                any(),
+                any()
+            );
+        verify(taskListRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldNotQueryRepositoryWhenSelectedTemplatesAreNull() {
+
+        taskListService.makeSelectedProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", null);
+
+        verify(taskListRepository, never())
+            .findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplateTemplateNameIn(
+                any(),
+                any(),
+                any(),
+                any()
+            );
+        verify(taskListRepository, never()).save(any());
+    }
+
+    @Test
     void shouldMakeProgressAbleTaskListInactive_Except_Ga_whenTaskListIsPresent() {
 
         //given
