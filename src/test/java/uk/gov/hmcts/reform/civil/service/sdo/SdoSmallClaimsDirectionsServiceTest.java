@@ -18,16 +18,16 @@ class SdoSmallClaimsDirectionsServiceTest {
     @Test
     void shouldResolveAdditionalDirections() {
         CaseData viaStandardList = CaseDataBuilder.builder().build();
-        viaStandardList.setSmallClaims(List.of(SmallTrack.smallClaimCreditHire));
+        viaStandardList.setSmallClaims(List.of(SmallTrack.SMALL_CLAIM_CREDIT_HIRE));
 
         CaseData viaDrawDirections = CaseDataBuilder.builder().build();
         viaDrawDirections.setDrawDirectionsOrderSmallClaimsAdditionalDirections(
-            List.of(SmallTrack.smallClaimRoadTrafficAccident)
+            List.of(SmallTrack.SMALL_CLAIM_ROAD_TRAFFIC_ACCIDENT)
         );
 
-        assertThat(service.hasSmallAdditionalDirections(viaStandardList, SmallTrack.smallClaimCreditHire)).isTrue();
-        assertThat(service.hasSmallAdditionalDirections(viaStandardList, SmallTrack.smallClaimRoadTrafficAccident)).isFalse();
-        assertThat(service.hasSmallAdditionalDirections(viaDrawDirections, SmallTrack.smallClaimRoadTrafficAccident)).isTrue();
+        assertThat(service.hasSmallAdditionalDirections(viaStandardList, SmallTrack.SMALL_CLAIM_CREDIT_HIRE)).isTrue();
+        assertThat(service.hasSmallAdditionalDirections(viaStandardList, SmallTrack.SMALL_CLAIM_ROAD_TRAFFIC_ACCIDENT)).isFalse();
+        assertThat(service.hasSmallAdditionalDirections(viaDrawDirections, SmallTrack.SMALL_CLAIM_ROAD_TRAFFIC_ACCIDENT)).isTrue();
     }
 
     @Test
