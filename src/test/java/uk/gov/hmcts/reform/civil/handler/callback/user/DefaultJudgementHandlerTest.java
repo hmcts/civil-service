@@ -489,8 +489,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isEmpty();
             assertThat(response.getData()).containsKey("otherRemedyAbandonedDate");
         }
-
     }
+
     @Test
     void shouldExtendDeadline() {
         when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(36, LocalDate.now()))
