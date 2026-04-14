@@ -672,6 +672,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private  YesOrNo isHumanRightsActIssues;
 
+    private  String defendantEmailAddress;
+
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
