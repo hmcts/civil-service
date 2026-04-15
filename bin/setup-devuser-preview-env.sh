@@ -4,7 +4,7 @@ camundaBranch=${2:-master}
 echo "export ENVIRONMENT=devuser-preview"
 echo "Loading Environment Variables"
 source ./bin/variables/load-dev-user-preview-environment-variables.sh
-. ./bin/utils/idam-get-tokens.sh
+. ./bin/shared/idam-get-tokens.sh
 echo "Importing Roles to the CCD pod"
 ./bin/add-roles.sh
 echo "Importing Camunda definitions"
