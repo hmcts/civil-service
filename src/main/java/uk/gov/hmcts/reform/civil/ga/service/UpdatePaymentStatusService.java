@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidPaymentStatusException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -30,7 +31,7 @@ public class UpdatePaymentStatusService {
     private final GaCoreCaseDataService gaCoreCaseDataService;
     private final ObjectMapper objectMapper;
 
-    @Retryable(value = CaseDataUpdateException.class, maxAttempts = 3, backoff = @Backoff(delay = 500))
+    @Retryable(retryFor = CaseDataUpdateException.class, noRetryFor = InvalidPaymentStatusException.class, backoff = @Backoff(delay = 500))
     public void updatePaymentStatus(String caseReference, CardPaymentStatusResponse cardPaymentStatusResponse) {
         log.info("Starting updatePaymentStatus for caseReference: {}", caseReference);
         log.debug("CardPaymentStatusResponse received: {}", cardPaymentStatusResponse);
@@ -42,8 +43,12 @@ public class UpdatePaymentStatusService {
 
             log.info("Creating event for updated payment status on caseReference: {}", caseReference);
             createEvent(caseData, caseReference);
+        } catch (InvalidPaymentStatusException ex) {
+            log.info("Payment status is invalid for caseReference: {}", caseReference, ex);
+            throw ex;
         } catch (Exception ex) {
-            throw new CaseDataUpdateException();
+            log.info("Retrying GA payment status update for case {}", caseReference, ex);
+            throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
     }
 
@@ -89,7 +94,7 @@ public class UpdatePaymentStatusService {
             : pbaDetails.copy();
 
         PaymentDetails paymentDetails = new PaymentDetails()
-            .setStatus(PaymentStatus.valueOf(cardPaymentStatusResponse.getStatus().toUpperCase()))
+            .setStatus(PaymentStatus.resolvePaymentStatus(cardPaymentStatusResponse.getStatus()))
             .setReference(cardPaymentStatusResponse.getPaymentReference())
             .setErrorCode(cardPaymentStatusResponse.getErrorCode())
             .setErrorMessage(cardPaymentStatusResponse.getErrorDescription())

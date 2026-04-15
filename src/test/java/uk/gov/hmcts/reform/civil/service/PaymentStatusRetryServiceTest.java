@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -93,12 +92,6 @@ class PaymentStatusRetryServiceTest {
         service.updatePaymentStatus(FeeType.CLAIMISSUED, "123", response);
 
         verify(coreCaseDataService).submitUpdate(eq("123"), any());
-    }
-
-    @Test
-    void shouldResolvePaymentStatus() {
-        PaymentStatus status = service.resolvePaymentStatus("success");
-        assertThat(status).isEqualTo(PaymentStatus.SUCCESS);
     }
 
     @Test

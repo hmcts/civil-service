@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidPaymentStatusException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -36,18 +37,18 @@ public class PaymentStatusRetryService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
 
-    @Retryable(value = CaseDataUpdateException.class, backoff = @Backoff(delay = 500))
+    @Retryable(retryFor = CaseDataUpdateException.class, backoff = @Backoff(delay = 500))
     public void updatePaymentStatus(FeeType feeType, String caseReference, CaseData caseData) {
         try {
             Long caseId = Long.valueOf(caseReference);
             submitUpdatePaymentEvent(caseData, caseId, feeType);
         } catch (Exception ex) {
-            log.info("Retrying payment status update for case {}", caseReference);
-            throw new CaseDataUpdateException();
+            log.info("Retrying payment status update for case {}", caseReference, ex);
+            throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
     }
 
-    @Retryable(value = CaseDataUpdateException.class, backoff = @Backoff(delay = 500))
+    @Retryable(retryFor = CaseDataUpdateException.class, noRetryFor = InvalidPaymentStatusException.class, backoff = @Backoff(delay = 500))
     public void updatePaymentStatus(FeeType feeType, String caseReference, CardPaymentStatusResponse response) {
         try {
             Long caseId = Long.valueOf(caseReference);
@@ -55,9 +56,12 @@ public class PaymentStatusRetryService {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             caseData = updateCaseDataWithPaymentDetails(response, caseData, feeType);
             submitUpdatePaymentEvent(caseData, caseId, feeType);
+        } catch (InvalidPaymentStatusException ex) {
+            log.info("Payment status is invalid for caseReference: {}", caseReference, ex);
+            throw ex;
         } catch (Exception ex) {
-            log.info("Retrying payment status update for case {}", caseReference);
-            throw new CaseDataUpdateException();
+            log.info("Retrying payment status update for case {}", caseReference, ex);
+            throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
     }
 
@@ -101,7 +105,7 @@ public class PaymentStatusRetryService {
         PaymentDetails existingPayment = getPaymentDetails(feeType, caseData);
         PaymentDetails paymentDetails = existingPayment != null ? existingPayment : new PaymentDetails();
 
-        paymentDetails.setStatus(resolvePaymentStatus(response.getStatus()));
+        paymentDetails.setStatus(PaymentStatus.resolvePaymentStatus(response.getStatus()));
         paymentDetails.setReference(response.getPaymentReference());
         paymentDetails.setErrorCode(response.getErrorCode());
         paymentDetails.setErrorMessage(response.getErrorDescription());
@@ -128,10 +132,6 @@ public class PaymentStatusRetryService {
             default -> throw new IllegalArgumentException("Unsupported fee type for case update: " + feeType);
         }
         return caseData;
-    }
-
-    PaymentStatus resolvePaymentStatus(String status) {
-        return status != null ? PaymentStatus.valueOf(status.toUpperCase()) : null;
     }
 
     private void submitUpdatePaymentEvent(CaseData caseData, Long caseId, FeeType feeType) {
