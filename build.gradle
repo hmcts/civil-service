@@ -223,11 +223,6 @@ task pullLatestCivilWiremockMappings(type: Exec, description: 'Pulls the civil W
   }
 }
 
-task installFunctionalTestDependencies(type: Exec, description: 'Installs dependencies for the copied civil CCD functional test project.') {
-  dependsOn pullLatestCivilCcdDefinitions
-  commandLine '/usr/bin/yarn', '--silent', 'install-dependencies'
-}
-
 task importCivilCamundaDefinitions(type: Exec, description: 'Imports civil Camunda BPMN definitions.') {
   dependsOn pullLatestCivilCamundaDefinitions
   commandLine './bin/import-bpmn-diagram.sh', '.'
@@ -246,7 +241,7 @@ task loadCivilWiremockMappings(type: Exec, description: 'Loads civil WireMock ma
 
 task highLevelDataSetup(type: JavaExec, description: 'Loads roles, CCD definitions, Camunda BPMNs, WA DMNs and preview WireMock mappings using the high-level data setup flow.') {
   dependsOn 'buildCcdDefinitionsXls', 'importCivilCamundaDefinitions', 'importCivilWaDmnDefinitions',
-    'loadCivilWiremockMappings', 'installFunctionalTestDependencies'
+    'loadCivilWiremockMappings'
   mainClass = "uk.gov.hmcts.reform.civil.HighLevelDataSetupApp"
   classpath += sourceSets.main.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
