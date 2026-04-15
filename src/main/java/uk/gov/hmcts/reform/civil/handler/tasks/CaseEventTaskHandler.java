@@ -58,8 +58,10 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
             String caseId = ofNullable(variables.getCaseId())
                 .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
-            log.info("Start Event {} for caseId {} activityId {}", variables.getCaseEvent(), caseId, externalTask.getActivityId());
-            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, variables.getCaseEvent());
+            CaseEvent caseEvent = ofNullable(variables.getCaseEvent())
+                .orElseThrow(() -> new InvalidCaseDataException("The caseEvent was not provided"));
+            log.info("Start Event {} for caseId {} activityId {}", caseEvent, caseId, externalTask.getActivityId());
+            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
             CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
             BusinessProcess businessProcess = startEventData.getBusinessProcess()
                 .updateActivityId(externalTask.getActivityId());
