@@ -48,6 +48,8 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2
 @Slf4j
 public class JudgmentByAdmissionOrDeterminationMapper {
 
+    private static final String EVERY_TWO_WEEKS = "every 2 weeks";
+
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final JudgementService judgementService;
     private final OrganisationService organisationService;
@@ -316,7 +318,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return "each week";
             case ONCE_ONE_MONTH: return "each month";
-            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            case ONCE_TWO_WEEKS: return EVERY_TWO_WEEKS;
             default: return null;
         }
     }
@@ -328,7 +330,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         return switch (repaymentFrequency) {
             case ONCE_ONE_WEEK -> "each week";
             case ONCE_ONE_MONTH -> "each month";
-            case ONCE_TWO_WEEKS -> "every 2 weeks";
+            case ONCE_TWO_WEEKS -> EVERY_TWO_WEEKS;
         };
     }
 
@@ -345,7 +347,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return "per week";
             case ONCE_ONE_MONTH: return "per month";
-            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            case ONCE_TWO_WEEKS: return EVERY_TWO_WEEKS;
             default: return null;
         }
     }
@@ -356,8 +358,8 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         }
         return switch (repaymentFrequency) {
             case ONCE_ONE_WEEK -> "per week";
-            case ONCE_ONE_MONTH ->  "per month";
-            case ONCE_TWO_WEEKS ->  "every 2 weeks";
+            case ONCE_ONE_MONTH -> "per month";
+            case ONCE_TWO_WEEKS -> EVERY_TWO_WEEKS;
         };
     }
 
