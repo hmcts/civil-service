@@ -9,5 +9,5 @@ ccdDefArgs="-e *-prod.json,AuthorisationCaseType-shuttered.json"
 mkdir -p $outputPath
 touch "$xlsxOutputFile"
 
-echo "${basePath}/civil-ccd-definition/bin/utils/process-definition.sh ${definitionsPath} ${xlsxOutputFile} ${ccdDefArgs}"
-sh ${basePath}/civil-ccd-definition/bin/utils/process-definition.sh ${definitionsPath} ${xlsxOutputFile} "${ccdDefArgs}"
+echo "${basePath}/civil-ccd-definition/bin/shared/process-definition.sh ${definitionsPath} ${xlsxOutputFile} ${ccdDefArgs}"
+sh ${basePath}/civil-ccd-definition/bin/shared/process-definition.sh ${definitionsPath} ${xlsxOutputFile} "${ccdDefArgs}"
