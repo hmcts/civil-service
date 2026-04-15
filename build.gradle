@@ -283,7 +283,12 @@ task awaitApplicationReadiness(description: 'Awaits until application dependenci
   dependsOn(inStrictOrder(waitForCivilService, waitForManageCase))
 }
 
+task installSmokeTestDependencies(type: Exec, description: 'Installs dependencies needed to run smoke tests.') {
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'install-dependencies'
+}
+
 task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
+  dependsOn installSmokeTestDependencies
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:civil-service-smoke'
 }
 
