@@ -367,14 +367,15 @@ sonarqube {
     property "sonar.exclusions", sonarExclusions.join(", ")
     property "sonar.gradle.skipCompile", "true"
     property "sonar.branch.cache.enabled", "true"
-    property "sonar.working.directory", "${buildDir}/sonar"
+    property "sonar.working.directory", layout.buildDirectory.dir("sonar").get().asFile
   }
 }
 
 configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
   sonarqube {
     properties {
-      property "sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+      property "sonar.coverage.jacoco.xmlReportPaths",
+        rootProject.layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile
     }
   }
 }
@@ -556,6 +557,7 @@ dependencies {
   testAnnotationProcessor "org.projectlombok:lombok:${versions.lombok}"
   testCompileOnly "org.projectlombok:lombok:${versions.lombok}"
 
+  testImplementation libraries.junit5
   testRuntimeOnly "org.junit.platform:junit-platform-launcher:${versions.junitPlatform}"
   testImplementation "org.springframework.boot:spring-boot-starter-test"
 
