@@ -63,7 +63,7 @@ public class BundleUpdatedDefendantScenarioTest extends DashboardBaseIntegration
             .respondent1Represented(respondentRepresented)
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .orderType(OrderType.DECIDE_DAMAGES)
             .caseBundles(bundles)
             .build();
@@ -71,7 +71,7 @@ public class BundleUpdatedDefendantScenarioTest extends DashboardBaseIntegration
         if (isFastTrack) {
             caseData = caseData.toBuilder().drawDirectionsOrderRequired(YesOrNo.YES)
                 .drawDirectionsOrderSmallClaims(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
+                .claimsTrack(ClaimsTrack.FAST_TRACK)
                 .orderType(OrderType.DECIDE_DAMAGES)
                 .build();
         }
