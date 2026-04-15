@@ -372,7 +372,12 @@ configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
 }
 
 tasks.named('jacocoTestReport') {
-  executionData(tasks.named('test'), integration)
+  dependsOn tasks.named('test')
+  dependsOn subprojects.collect { it.tasks.named('test') }
+  executionData(layout.buildDirectory.file("jacoco/test.exec").get().asFile)
+  executionData(subprojects.collect { it.layout.buildDirectory.file("jacoco/test.exec").get().asFile })
+  executionData(layout.buildDirectory.file("jacoco/integration.exec").get().asFile)
+  mustRunAfter integration
   subprojects.each {
     sourceSets it.sourceSets.main
   }
