@@ -33,11 +33,11 @@ esac
 mkdir -p "${outputPath}"
 touch "${civilOutputFile}"
 
-echo "${rootDir}/bin/utils/process-definition.sh ${definitionsPath}/civil ${civilOutputFile} ${ccdDefArgs}"
-sh "${rootDir}/bin/utils/process-definition.sh" "${definitionsPath}/civil" "${civilOutputFile}" "${ccdDefArgs}"
+echo "${rootDir}/bin/shared/process-definition.sh ${definitionsPath}/civil ${civilOutputFile} ${ccdDefArgs}"
+sh "${rootDir}/bin/shared/process-definition.sh" "${definitionsPath}/civil" "${civilOutputFile}" "${ccdDefArgs}"
 
 if [ -n "${generalApplicationOutputFile}" ]; then
   touch "${generalApplicationOutputFile}"
-  echo "${rootDir}/bin/utils/process-definition.sh ${definitionsPath}/generalapplication ${generalApplicationOutputFile} ${ccdDefArgs}"
-  sh "${rootDir}/bin/utils/process-definition.sh" "${definitionsPath}/generalapplication" "${generalApplicationOutputFile}" "${ccdDefArgs}"
+  echo "${rootDir}/bin/shared/process-definition.sh ${definitionsPath}/generalapplication ${generalApplicationOutputFile} ${ccdDefArgs}"
+  sh "${rootDir}/bin/shared/process-definition.sh" "${definitionsPath}/generalapplication" "${generalApplicationOutputFile}" "${ccdDefArgs}"
 fi

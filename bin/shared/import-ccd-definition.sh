@@ -2,8 +2,7 @@
 
 set -ex
 
-dir=$(dirname "${0}")
-shared_dir="${dir}/../shared"
+dir=$(dirname ${0})
 
 if [[ ($# -ne 3) && ($# -ne 5) ]]; then
   echo "Usage: ./import-ccd-definition [-e 'UserProfile.json,*-nonprod.json'] - the -e argument is optional, "\
@@ -21,5 +20,5 @@ echo "Additional parameters: ${additionalParameters}"
 
 mkdir -p $(dirname ${definition_output_file})
 
-${shared_dir}/process-definition.sh ${definition_input_dir} ${definition_output_file} "${additionalParameters}"
+${dir}/process-definition.sh ${definition_input_dir} ${definition_output_file} "${additionalParameters}"
 ${dir}/ccd-import-definition.sh ${definition_output_file}

@@ -25,7 +25,7 @@ echo "CCD_API_GATEWAY_S2S_KEY present: $([[ -n "${CCD_API_GATEWAY_S2S_KEY:-}" ]]
 echo "S2S_SECRET present: $([[ -n "${S2S_SECRET:-}" ]] && echo "yes" || echo "no")"
 echo "BPMN file count: $(find "${filepath}" -name '*.bpmn' | wc -l | tr -d ' ')"
 
-serviceToken=$($(realpath $workspace)/bin/utils/idam-lease-service-token.sh "${s2sClientId}" \
+serviceToken=$($(realpath $workspace)/bin/shared/idam-lease-service-token.sh "${s2sClientId}" \
   $(docker run --rm hmctspublic.azurecr.io/imported/toolbelt/oathtool --totp -b ${s2sSecret}))
 echo "Service token generated: $([[ -n "${serviceToken}" ]] && echo "yes" || echo "no")"
 

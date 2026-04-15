@@ -3,7 +3,6 @@
 set -ex
 
 dir=$(dirname ${0})
-shared_dir="${dir}/../shared"
 
 role=${1}
 
@@ -12,13 +11,13 @@ IMPORTER_USERNAME=${CCD_CONFIGURER_IMPORTER_USERNAME:-${DEFINITION_IMPORTER_USER
 IMPORTER_PASSWORD=${CCD_CONFIGURER_IMPORTER_PASSWORD:-${DEFINITION_IMPORTER_PASSWORD}}
 
 if [ -z "${USER_TOKEN:-}" ]; then
-  userToken=$(${shared_dir}/idam-lease-user-token.sh ${IMPORTER_USERNAME} ${IMPORTER_PASSWORD})
+  userToken=$(${dir}/idam-lease-user-token.sh ${IMPORTER_USERNAME} ${IMPORTER_PASSWORD})
 else
   userToken=${USER_TOKEN}
 fi
 
 if [ -z "${SERVICE_TOKEN:-}" ]; then
-  serviceToken=$(${shared_dir}/idam-lease-service-token.sh ccd_gw $(docker run --rm hmctspublic.azurecr.io/imported/toolbelt/oathtool --totp -b ${CCD_API_GATEWAY_S2S_SECRET:-AAAAAAAAAAAAAAAC}))
+  serviceToken=$(${dir}/idam-lease-service-token.sh ccd_gw $(docker run --rm hmctspublic.azurecr.io/imported/toolbelt/oathtool --totp -b ${CCD_API_GATEWAY_S2S_SECRET:-AAAAAAAAAAAAAAAC}))
 else
   serviceToken=${SERVICE_TOKEN}
 fi

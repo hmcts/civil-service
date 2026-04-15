@@ -33,7 +33,7 @@ echo "DMN file count: $(find "${dmnFilepath}" -name '*.dmn' | wc -l | tr -d ' ')
 #  s2sSecret=${S2S_SECRET_PROD}-
 #fi
 
-serviceToken=$($(realpath ".")/bin/utils/idam-lease-service-token.sh "${s2sClientId}" \
+serviceToken=$($(realpath ".")/bin/shared/idam-lease-service-token.sh "${s2sClientId}" \
   $(docker run --rm hmctspublic.azurecr.io/imported/toolbelt/oathtool --totp -b ${s2sSecret}))
 echo "Service token generated: $([[ -n "${serviceToken}" ]] && echo "yes" || echo "no")"
 
