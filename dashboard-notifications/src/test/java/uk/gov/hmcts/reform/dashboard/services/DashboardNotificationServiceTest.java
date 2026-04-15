@@ -146,7 +146,9 @@ public class DashboardNotificationServiceTest {
             String reference = "reference";
             String claimant = "CLAIMANT";
             dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, claimant);
-            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, claimant);
+            var inOrder = Mockito.inOrder(dashboardNotificationsRepository);
+            inOrder.verify(dashboardNotificationsRepository).deleteActionsByReferenceAndCitizenRole(reference, claimant);
+            inOrder.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, claimant);
         }
 
         @Test
@@ -154,7 +156,9 @@ public class DashboardNotificationServiceTest {
             String reference = "reference";
             String defendant = "DEFENDANT";
             dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, defendant);
-            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, defendant);
+            var inOrder = Mockito.inOrder(dashboardNotificationsRepository);
+            inOrder.verify(dashboardNotificationsRepository).deleteActionsByReferenceAndCitizenRole(reference, defendant);
+            inOrder.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, defendant);
         }
 
         @Test
@@ -162,7 +166,9 @@ public class DashboardNotificationServiceTest {
             String templateName = "template.name";
             String reference = "reference";
             dashboardNotificationService.deleteByNameAndReference(templateName, reference);
-            Mockito.verify(dashboardNotificationsRepository).deleteByNameAndReference(templateName, reference);
+            var inOrder = Mockito.inOrder(dashboardNotificationsRepository);
+            inOrder.verify(dashboardNotificationsRepository).deleteActionsByNameAndReference(templateName, reference);
+            inOrder.verify(dashboardNotificationsRepository).deleteByNameAndReference(templateName, reference);
         }
     }
 

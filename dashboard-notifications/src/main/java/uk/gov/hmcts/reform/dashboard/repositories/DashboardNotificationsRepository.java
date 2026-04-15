@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.dashboard.repositories;
 
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 
@@ -18,9 +21,44 @@ public interface DashboardNotificationsRepository extends CrudRepository<Dashboa
     List<DashboardNotificationsEntity> findByReferenceAndCitizenRoleAndName(
         String reference, String role, String name);
 
-    int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String role);
+    @Modifying
+    @Query(value = "DELETE FROM dbs.notification_action WHERE dashboard_notifications_id IN "
+        + "(SELECT id FROM dbs.dashboard_notifications WHERE notification_name = :name "
+        + "AND reference = :reference AND citizen_role = :role)", nativeQuery = true)
+    void deleteActionsByNameAndReferenceAndCitizenRole(@Param("name") String name,
+                                                       @Param("reference") String reference,
+                                                       @Param("role") String role);
 
-    int deleteByReferenceAndCitizenRole(String reference, String role);
+    @Modifying
+    @Query(value = "DELETE FROM dbs.dashboard_notifications WHERE notification_name = :name "
+        + "AND reference = :reference AND citizen_role = :role", nativeQuery = true)
+    int deleteByNameAndReferenceAndCitizenRole(@Param("name") String name,
+                                               @Param("reference") String reference,
+                                               @Param("role") String role);
 
-    int deleteByNameAndReference(String name, String reference);
+    @Modifying
+    @Query(value = "DELETE FROM dbs.notification_action WHERE dashboard_notifications_id IN "
+        + "(SELECT id FROM dbs.dashboard_notifications WHERE reference = :reference "
+        + "AND citizen_role = :role)", nativeQuery = true)
+    void deleteActionsByReferenceAndCitizenRole(@Param("reference") String reference,
+                                                @Param("role") String role);
+
+    @Modifying
+    @Query(value = "DELETE FROM dbs.dashboard_notifications WHERE reference = :reference "
+        + "AND citizen_role = :role", nativeQuery = true)
+    int deleteByReferenceAndCitizenRole(@Param("reference") String reference,
+                                        @Param("role") String role);
+
+    @Modifying
+    @Query(value = "DELETE FROM dbs.notification_action WHERE dashboard_notifications_id IN "
+        + "(SELECT id FROM dbs.dashboard_notifications WHERE notification_name = :name "
+        + "AND reference = :reference)", nativeQuery = true)
+    void deleteActionsByNameAndReference(@Param("name") String name,
+                                         @Param("reference") String reference);
+
+    @Modifying
+    @Query(value = "DELETE FROM dbs.dashboard_notifications WHERE notification_name = :name "
+        + "AND reference = :reference", nativeQuery = true)
+    int deleteByNameAndReference(@Param("name") String name,
+                                 @Param("reference") String reference);
 }
