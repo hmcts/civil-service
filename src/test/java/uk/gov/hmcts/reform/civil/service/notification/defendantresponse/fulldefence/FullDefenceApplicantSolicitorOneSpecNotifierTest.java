@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -204,6 +205,39 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
     }
 
     @Test
+    void shouldNotifyApplicantLipWithDefaultTemplate_whenResponseIsNotFullDefence() {
+        LocalDate whenWillPay = LocalDate.now().plusMonths(1);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                              .setWhenWillThisAmountBePaid(whenWillPay)
+            )
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+
+        when(notificationsProperties.getClaimantSolicitorDefendantResponseForSpec())
+            .thenReturn("spec-claimant-template-id");
+
+        notifier.notifySolicitorForDefendantResponse(caseData);
+
+        verify(notificationService).sendMail(
+            ArgumentMatchers.eq("rambo@email.com"),
+            ArgumentMatchers.eq("spec-claimant-template-id"),
+            ArgumentMatchers.argThat(map -> {
+                Map<String, String> expected = getNotificationDataMapSpec();
+                return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                    && map.get(CLAIMANT_NAME).equals(expected.get(CLAIMANT_NAME));
+            }),
+            ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+        );
+    }
+
+    @Test
     void shouldNotifyApplicantLipSpecFullDefenceForBilingual_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
@@ -225,6 +259,72 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             ArgumentMatchers.argThat(map -> {
                 Map<String, String> expected = getNotificationDataMapSpec();
                 return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                    && map.get(CLAIMANT_NAME).equals(expected.get(CLAIMANT_NAME));
+            }),
+            ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+        );
+    }
+
+    @Test
+    void shouldNotifyApplicantSolicitorSpec1v2_whenInvoked() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefenceSpec_1v2_BothPartiesFullDefenceResponses()
+            .build();
+        caseData = caseData.toBuilder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .respondent2(caseData.getRespondent1())
+            .respondent2SameLegalRepresentative(YesOrNo.NO)
+            .build();
+
+        when(notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec()).thenReturn("template-1v2-id");
+
+        notifier.notifySolicitorForDefendantResponse(caseData);
+
+        verify(notificationService).sendMail(
+            ArgumentMatchers.eq("applicantsolicitor@example.com"),
+            ArgumentMatchers.eq("template-1v2-id"),
+            ArgumentMatchers.argThat(map -> {
+                Map<String, String> expected = getNotificationDataMapSpec();
+                return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                    && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
+            }),
+            ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+        );
+    }
+
+    @Test
+    void shouldUseApplicantSolicitorNameWhenOrganisationIsMissing() {
+        LocalDate whenWillPay = LocalDate.now().plusMonths(1);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                              .setWhenWillThisAmountBePaid(whenWillPay)
+            )
+            .applicant1OrganisationPolicy(
+                new uk.gov.hmcts.reform.ccd.model.OrganisationPolicy()
+                    .setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("missing-org"))
+            )
+            .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth().setName("Fallback Signer"))
+            .build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+
+        when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.empty());
+        when(notificationsProperties.getClaimantSolicitorDefendantResponseForSpec())
+            .thenReturn("spec-claimant-template-id");
+
+        notifier.notifySolicitorForDefendantResponse(caseData);
+
+        verify(notificationService).sendMail(
+            ArgumentMatchers.eq("applicantsolicitor@example.com"),
+            ArgumentMatchers.eq("spec-claimant-template-id"),
+            ArgumentMatchers.argThat(map -> {
+                Map<String, String> expected = getNotificationDataMapSpec();
+                return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                    && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals("Fallback Signer")
                     && map.get(CLAIMANT_NAME).equals(expected.get(CLAIMANT_NAME));
             }),
             ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
