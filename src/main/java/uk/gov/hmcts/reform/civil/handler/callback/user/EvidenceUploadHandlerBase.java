@@ -321,7 +321,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         }
         documentUpload.forEach(date -> {
             LocalDate dateToCheck = dateExtractor.apply(date);
-            if (dateToCheck.isBefore(LocalDateTime.now().toLocalDate())) {
+            if (dateToCheck!= null && dateToCheck.isBefore(LocalDateTime.now().toLocalDate())) {
                 errors.add(errorMessage);
             }
         });
