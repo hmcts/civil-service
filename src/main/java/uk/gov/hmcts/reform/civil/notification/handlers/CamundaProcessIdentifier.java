@@ -59,6 +59,7 @@ public enum CamundaProcessIdentifier {
     BundleCreationNotify,
     CreateSDONotify,
     RaiseQueryNotifier,
+    JudgmentByAdmissionNotifier,
     TrialReadyNotificationNotifier,
     OtherPartyQueryRaisedNotifier,
     RespondToQueryNotifier,
@@ -68,5 +69,6 @@ public enum CamundaProcessIdentifier {
     GenerateSpecDJFormNotifier,
     NotifyDecisionOnReconsiderationRequestNotifier,
     SettleClaimPaidInFullNotificationNotifier,
-    ClaimantResponsePartAdmitPayImmediatelyNotifier;
+    ClaimantResponsePartAdmitPayImmediatelyNotifier,
+    DJ_NON_DIVERGENT_NOTIFIER;
 }
