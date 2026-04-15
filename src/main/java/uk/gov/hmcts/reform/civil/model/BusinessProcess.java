@@ -8,6 +8,8 @@ import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import java.time.LocalDateTime;
+import java.util.Objects;
+
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
@@ -41,7 +43,7 @@ public class BusinessProcess {
 
     @JsonIgnore
     public boolean hasSameProcessInstanceId(String processInstanceId) {
-        return this.getProcessInstanceId().equals(processInstanceId);
+        return Objects.equals(this.getProcessInstanceId(), processInstanceId);
     }
 
     @JsonIgnore
