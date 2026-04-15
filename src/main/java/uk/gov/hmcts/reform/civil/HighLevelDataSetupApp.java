@@ -109,6 +109,18 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     }
 
     @Override
+    public void importDefinitions() {
+        try {
+            super.importDefinitions();
+        } catch (RuntimeException e) {
+            if (!shouldTolerateDataSetupFailure(e)) {
+                throw e;
+            }
+            logger.warn("Tolerating CCD definition import failure", e);
+        }
+    }
+
+    @Override
     public void createRoleAssignments() {
         BeftaUtils.defaultLog("Will NOT create role assignments!");
     }
@@ -118,9 +130,17 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
         if (e instanceof ImportException importException) {
             return importException.getHttpStatusCode() == 504;
         }
-        if (e instanceof SSLException || e instanceof AEADBadTagException) {
-            return true;
+        return containsCause(e, SSLException.class) || containsCause(e, AEADBadTagException.class);
+    }
+
+    private static boolean containsCause(Throwable e, Class<? extends Throwable> causeType) {
+        Throwable current = e;
+        while (current != null) {
+            if (causeType.isInstance(current)) {
+                return true;
+            }
+            current = current.getCause();
         }
-        return shouldTolerateDataSetupFailure();
+        return false;
     }
 }
