@@ -1,0 +1,17 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "POST",
+        "urlPattern": "/service-request/(\\d*-\\d*)/pba-payments"
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "payments-waystopay/serviceRequestPBAPaidSuccess.json"
+      }
+    }
+  ]
+}
