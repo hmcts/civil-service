@@ -3,12 +3,11 @@
 branchName=${1:-master}
 
 #Checkout specific branch of civil wiremock mappings
-rm -rf ./civil-wiremock-mappings ./mappings ./__files
 git clone https://github.com/hmcts/civil-wiremock-mappings.git
 cd civil-wiremock-mappings
 
 echo "Switch to ${branchName} branch on civil-wiremock-mappings"
-git checkout "${branchName}"
+git checkout ${branchName}
 cd ..
 
 #Copy mappings, response files, and load script

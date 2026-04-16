@@ -1,0 +1,72 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "POST",
+        "urlPath": "/credit-account-payments",
+        "bodyPatterns": [
+          {
+            "contains": "\"PBA0088192\""
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "payment/successResponse.json"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "urlPath": "/card-payments",
+        "bodyPatterns": [
+          {
+            "contains": "Money Claims"
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "_links": {
+            "next_url": {
+              "href": "/claim/{{jsonPath request.body '$.case_reference'}}/finish-payment",
+              "method": "GET"
+            }
+          },
+          "reference": "RC-1234-1234-1234-1234",
+          "date_created": "2020-02-20T20:20:20.222+0000",
+          "status": "Success",
+          "payment_group_reference": "2020-1582230020222",
+          "payment_reference": "DUMMY-PAYMENT-REF",
+          "status_histories": [
+            {
+              "status": "success",
+              "date_created": "2020-02-20T20:20:20.222+0000",
+              "date_updated": "2020-02-20T20:20:20.222+0000"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/card-payments(.*)"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "payment/successResponseOcmc.json"
+      }
+    }
+  ]
+}
