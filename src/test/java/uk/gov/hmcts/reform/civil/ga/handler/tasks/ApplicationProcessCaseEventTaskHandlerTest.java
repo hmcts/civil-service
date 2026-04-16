@@ -204,7 +204,7 @@ class ApplicationProcessCaseEventTaskHandlerTest {
             when(coreCaseDataService.startGaUpdate(CASE_ID, GENERATE_JUDGES_FORM))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
             when(coreCaseDataService.submitGaUpdate(eq(CASE_ID), any(CaseDataContent.class)))
-                .thenThrow(buildAlreadyProcessedFeignException("Event GENERATE_JUDGES_FORM is already processed"));
+                .thenThrow(buildAlreadyProcessedFeignException("Event GENERATE_JUDGES_FORM has already been processed"));
             when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
 
             applicationProcessCaseEventTaskHandler.execute(mockTask, externalTaskService);

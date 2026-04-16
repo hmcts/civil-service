@@ -152,7 +152,7 @@ class IncidentRetryEventHandlerTest {
         ProcessInstanceDto pi = newProcessInstance("proc1");
 
         IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
-        incident.setIncidentMessage("422 - already processed"); // KEY FOR THIS TEST
+        incident.setIncidentMessage("422 - Event NOTIFY_EVENT has already been processed"); // KEY FOR THIS TEST
 
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
 

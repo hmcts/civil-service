@@ -204,7 +204,9 @@ class GaCaseEventTaskHandlerTest {
             when(coreCaseDataService.startUpdate(CASE_ID, INITIATE_GENERAL_APPLICATION))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
             when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class)))
-                .thenThrow(buildAlreadyProcessedFeignException("Event INITIATE_GENERAL_APPLICATION is already processed"));
+                .thenThrow(buildAlreadyProcessedFeignException(
+                    "Event INITIATE_GENERAL_APPLICATION has already been processed"
+                ));
             when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
             when(caseDetailsConverter.toGeneralApplicationCaseData(any(CaseDetails.class))).thenReturn(gaCaseData);

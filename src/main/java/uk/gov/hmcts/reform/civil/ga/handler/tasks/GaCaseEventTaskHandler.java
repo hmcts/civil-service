@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 public class GaCaseEventTaskHandler extends BaseExternalTaskHandler {
 
     private static final Pattern ALREADY_PROCESSED_PATTERN =
-        Pattern.compile("event .* is already processed|already processed", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("already\\s+(been\\s+)?processed", Pattern.CASE_INSENSITIVE);
 
     private final GaCoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;

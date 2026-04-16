@@ -43,7 +43,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private static final String CASE_ID_VARIABLE = "caseId";
     private static final int PAGE_SIZE = 50;
     private static final Pattern ALREADY_PROCESSED_PATTERN =
-        Pattern.compile("already processed|already performed", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("already\\s+(been\\s+)?processed|already\\s+performed", Pattern.CASE_INSENSITIVE);
     private static final String ACTIVITY_ID = "activityId";
     private static final DateTimeFormatter INCIDENT_FORMATTER =
         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")

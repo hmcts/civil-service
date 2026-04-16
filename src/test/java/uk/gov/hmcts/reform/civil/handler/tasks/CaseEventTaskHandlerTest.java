@@ -233,23 +233,23 @@ class CaseEventTaskHandlerTest {
                                      .setStatus(BusinessProcessStatus.READY)
                                      .setProcessInstanceId("processInstanceId"))
                 .build();
-            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
-            VariableMap variables = Variables.createVariables();
-            variables.putValue(FLOW_STATE, "MAIN.DRAFT");
-            variables.putValue(FLOW_FLAGS, Map.of());
 
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(PENDING_CLAIM_ISSUED.fullName());
             when(mockTask.getActivityId()).thenReturn("activityId");
             when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
             when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class)))
-                .thenThrow(buildAlreadyProcessedFeignException("already processed"));
+                .thenThrow(buildAlreadyProcessedFeignException("Event NOTIFY_EVENT has already been processed"));
             when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
             when(stateFlowEngine.getStateFlow(any(CaseData.class)))
                 .thenReturn(new StateFlowDTO().setState(State.from("MAIN.DRAFT")).setFlags(Map.of()));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
             verify(externalTaskService).complete(mockTask, variables);
             verify(externalTaskService, never()).handleFailure(
                 eq(mockTask), anyString(), anyString(), anyInt(), anyLong()

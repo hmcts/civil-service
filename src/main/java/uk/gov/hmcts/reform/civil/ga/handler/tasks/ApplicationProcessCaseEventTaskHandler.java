@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 public class ApplicationProcessCaseEventTaskHandler extends BaseExternalTaskHandler {
 
     private static final Pattern ALREADY_PROCESSED_PATTERN =
-        Pattern.compile("event .* is already processed|already processed", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("already\\s+(been\\s+)?processed", Pattern.CASE_INSENSITIVE);
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final GaStateFlowEngine stateFlowEngine;
