@@ -28,7 +28,7 @@ class DjBuildingDisputeDirectionsServiceTest {
     @BeforeEach
     void setUp() {
         service = new DjBuildingDisputeDirectionsService(deadlineService);
-       when(deadlineService.nextWorkingDayInWeeks(anyInt()))
+        when(deadlineService.nextWorkingDayInWeeks(anyInt()))
             .thenAnswer(invocation -> LocalDate.of(2025, 6, 1)
                 .plusWeeks(invocation.getArgument(0, Integer.class)));
     }
