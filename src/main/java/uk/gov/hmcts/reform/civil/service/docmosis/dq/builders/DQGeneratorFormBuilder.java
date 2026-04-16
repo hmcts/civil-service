@@ -367,6 +367,7 @@ public class DQGeneratorFormBuilder {
 
         String furtherJudgeInfo = Stream.of(
             Optional.ofNullable(caseData.getAdditionalInformationForJudge()),
+            Optional.ofNullable(caseData.getApplicantAdditionalInformationForJudge()),
             dqFurtherInformation
                 .map(FurtherInformation::getOtherInformationForJudge)
         ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);

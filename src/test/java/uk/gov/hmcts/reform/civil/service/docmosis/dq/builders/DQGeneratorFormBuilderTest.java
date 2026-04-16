@@ -415,6 +415,30 @@ class DQGeneratorFormBuilderTest {
     }
 
     @Test
+    void shouldCorrectlyMapApplicantAdditionalInformationForJudge() {
+        // Given: Claimant DQ with applicantAdditionalInformationForJudge
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicantAdditionalInformationForJudge("Test judge info for claimant")
+            .businessProcess(createBusinessProcess("CLAIMANT_RESPONSE_SPEC"))
+            .build();
+
+        // When: Generate DQ form
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        // Then: Further judge info should be populated
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals("Test judge info for claimant", result.getFurtherInformation().getOtherInformationForJudge());
+    }
+
+    @Test
     void shouldHandleNullApplicant1DQFutureApplicationsFieldWithoutNPE() {
         // Given: Applicant1DQ with null FutureApplications field
         Witnesses mockWitnesses = mock(Witnesses.class);
