@@ -18,11 +18,65 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialRequestMoreIn
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 
 import java.util.Collections;
 
 public class GaFlowPredicateTest {
+
+    @Test
+    public void testWithoutNoticeApplication_whenRespondentAgreedAndNoticeDataMissing() {
+        GeneralApplicationCaseData caseData =
+            new GeneralApplicationCaseData()
+                .generalAppRespondentAgreement(
+                    new GARespondentOrderAgreement().setHasAgreed(YesOrNo.YES))
+                .build();
+
+        boolean result = GaFlowPredicate.withOutNoticeApplication.test(caseData);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testWithoutNoticeApplication_whenInformOtherPartySaysWithoutNotice() {
+        GeneralApplicationCaseData caseData =
+            new GeneralApplicationCaseData()
+                .generalAppInformOtherParty(
+                    new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
+                .build();
+
+        boolean result = GaFlowPredicate.withOutNoticeApplication.test(caseData);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testWithNoticeApplication_whenRespondentDidNotAgreeAndNoticeDataMissing() {
+        GeneralApplicationCaseData caseData =
+            new GeneralApplicationCaseData()
+                .generalAppRespondentAgreement(
+                    new GARespondentOrderAgreement().setHasAgreed(YesOrNo.NO))
+                .build();
+
+        boolean result = GaFlowPredicate.withNoticeApplication.test(caseData);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testWithNoticeApplication_whenInformOtherPartySaysWithNotice() {
+        GeneralApplicationCaseData caseData =
+            new GeneralApplicationCaseData()
+                .generalAppInformOtherParty(
+                    new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
+                .build();
+
+        boolean result = GaFlowPredicate.withNoticeApplication.test(caseData);
+
+        assertThat(result).isTrue();
+    }
 
     @Test
     public void testJudgeNotMadeDismissalOrder_noJudicialDecision() {
