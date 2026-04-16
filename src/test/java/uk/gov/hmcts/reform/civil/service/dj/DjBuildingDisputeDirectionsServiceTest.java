@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_CLAIMANT_INSTRUCTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_COLUMNS_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_DEFENDANT_INSTRUCTION;
@@ -28,7 +28,7 @@ class DjBuildingDisputeDirectionsServiceTest {
     @BeforeEach
     void setUp() {
         service = new DjBuildingDisputeDirectionsService(deadlineService);
-        lenient().when(deadlineService.nextWorkingDayInWeeks(anyInt()))
+       when(deadlineService.nextWorkingDayInWeeks(anyInt()))
             .thenAnswer(invocation -> LocalDate.of(2025, 6, 1)
                 .plusWeeks(invocation.getArgument(0, Integer.class)));
     }

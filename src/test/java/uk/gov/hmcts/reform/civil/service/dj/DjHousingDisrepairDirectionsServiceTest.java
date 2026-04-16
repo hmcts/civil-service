@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_A;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_COLUMNS_DJ;
@@ -29,7 +29,7 @@ class DjHousingDisrepairDirectionsServiceTest {
     @BeforeEach
     void setUp() {
         service = new DjHousingDisrepairDirectionsService(deadlineService);
-        lenient().when(deadlineService.nextWorkingDayInWeeks(anyInt()))
+        when(deadlineService.nextWorkingDayInWeeks(anyInt()))
             .thenAnswer(invocation -> LocalDate.of(2025, 6, 1)
                 .plusWeeks(invocation.getArgument(0, Integer.class)));
     }
