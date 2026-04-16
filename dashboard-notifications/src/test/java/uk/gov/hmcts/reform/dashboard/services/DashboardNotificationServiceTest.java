@@ -160,32 +160,32 @@ public class DashboardNotificationServiceTest {
             inOrder.verify(dashboardNotificationsRepository).deleteActionsByReferenceAndCitizenRole(reference, defendant);
             inOrder.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, defendant);
         }
+    }
 
-        @Test
-        void deleteNotificationsByNameAndReference() {
-            String templateName = "template.name";
-            String reference = "reference";
-            dashboardNotificationService.deleteByNameAndReference(templateName, reference);
-            var inOrder = Mockito.inOrder(dashboardNotificationsRepository);
-            inOrder.verify(dashboardNotificationsRepository).deleteActionsByNameAndReference(templateName, reference);
-            inOrder.verify(dashboardNotificationsRepository).deleteByNameAndReference(templateName, reference);
-        }
+    @Test
+    void deleteNotificationsByNameAndReference() {
+        String templateName = "template.name";
+        String reference = "reference";
+        dashboardNotificationService.deleteByNameAndReference(templateName, reference);
+        var inOrder = Mockito.inOrder(dashboardNotificationsRepository);
+        inOrder.verify(dashboardNotificationsRepository).deleteActionsByNameAndReference(templateName, reference);
+        inOrder.verify(dashboardNotificationsRepository).deleteByNameAndReference(templateName, reference);
+    }
 
-        @Test
-        void deleteNotificationsByNameAndReferenceAndCitizenRole() {
-            String templateName = "template.name";
-            String reference = "reference";
-            String citizenRole = "CLAIMANT";
-            when(dashboardNotificationsRepository.deleteByNameAndReferenceAndCitizenRole(templateName, reference, citizenRole))
-                .thenReturn(1);
+    @Test
+    void deleteNotificationsByNameAndReferenceAndCitizenRole() {
+        String templateName = "template.name";
+        String reference = "reference";
+        String citizenRole = "CLAIMANT";
+        when(dashboardNotificationsRepository.deleteByNameAndReferenceAndCitizenRole(templateName, reference, citizenRole))
+            .thenReturn(1);
 
-            int result = dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(templateName, reference, citizenRole);
+        int result = dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(templateName, reference, citizenRole);
 
-            assertThat(result).isEqualTo(1);
-            var inOrder = Mockito.inOrder(dashboardNotificationsRepository);
-            inOrder.verify(dashboardNotificationsRepository).deleteActionsByNameAndReferenceAndCitizenRole(templateName, reference, citizenRole);
-            inOrder.verify(dashboardNotificationsRepository).deleteByNameAndReferenceAndCitizenRole(templateName, reference, citizenRole);
-        }
+        assertThat(result).isEqualTo(1);
+        var inOrder = Mockito.inOrder(dashboardNotificationsRepository);
+        inOrder.verify(dashboardNotificationsRepository).deleteActionsByNameAndReferenceAndCitizenRole(templateName, reference, citizenRole);
+        inOrder.verify(dashboardNotificationsRepository).deleteByNameAndReferenceAndCitizenRole(templateName, reference, citizenRole);
     }
 
     @Test
