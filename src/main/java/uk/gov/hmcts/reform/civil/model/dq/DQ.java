@@ -26,9 +26,9 @@ public interface DQ {
 
     ExpertDetails getSmallClaimExperts();
 
-    Experts getExperts();
-
     FutureApplications getFutureApplications();
+
+    Experts getExperts();
 
     default Experts getExperts(Experts experts) {
         if (experts != null && experts.getExpertRequired() != null
