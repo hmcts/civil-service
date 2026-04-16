@@ -37,6 +37,7 @@ public class Applicant2DQ implements DQ {
     private RemoteHearingLRspec applicant2DQRemoteHearingLRspec;
     private StatementOfTruth applicant2DQStatementOfTruth;
     private VulnerabilityQuestions applicant2DQVulnerabilityQuestions;
+    private FutureApplications applicant2DQFutureApplications;
 
     private RemoteHearing remoteHearing;
 
@@ -182,6 +183,12 @@ public class Applicant2DQ implements DQ {
         return null;
     }
 
+    @Override
+    @JsonProperty("applicant2DQFutureApplications")
+    public FutureApplications getFutureApplications() {
+        return applicant2DQFutureApplications;
+    }
+
     public Applicant2DQ copy() {
         return new Applicant2DQ()
             .setApplicant2DQFileDirectionsQuestionnaire(applicant2DQFileDirectionsQuestionnaire)
@@ -204,6 +211,7 @@ public class Applicant2DQ implements DQ {
             .setApplicant2DQRemoteHearingLRspec(applicant2DQRemoteHearingLRspec)
             .setApplicant2DQStatementOfTruth(applicant2DQStatementOfTruth)
             .setApplicant2DQVulnerabilityQuestions(applicant2DQVulnerabilityQuestions)
+            .setApplicant2DQFutureApplications(applicant2DQFutureApplications)
             .setRemoteHearing(remoteHearing);
     }
 }

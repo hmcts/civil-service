@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.GetRespondentsForDQGenerator;
@@ -346,15 +345,13 @@ public class DQGeneratorFormBuilder {
 
     private FurtherInformation getFurtherInformation(DQ dq, CaseData caseData) {
         Optional<FurtherInformation> dqFurtherInformation = ofNullable(dq.getFurtherInformation());
-        Respondent1DQ respondent1dq = null;
-        if (dq instanceof Respondent1DQ r1dq) {
-            respondent1dq = r1dq;
-        }
-        Optional<FutureApplications> r1dqFutureApplications = ofNullable(respondent1dq)
-            .map(Respondent1DQ::getFutureApplications);
+
+        // Get FutureApplications from the DQ (works for both Applicant1DQ and Respondent1DQ now)
+        Optional<FutureApplications> dqFutureApplications = ofNullable(dq)
+            .map(DQ::getFutureApplications);
 
         YesOrNo wantMore = Stream.of(
-            r1dqFutureApplications
+            dqFutureApplications
                 .map(FutureApplications::getIntentionToMakeFutureApplications),
             dqFurtherInformation
                 .map(FurtherInformation::getFutureApplications)
@@ -362,7 +359,7 @@ public class DQGeneratorFormBuilder {
 
         String whatMoreFor = NO.equals(wantMore) ? null :
             Stream.of(
-                r1dqFutureApplications
+                dqFutureApplications
                     .map(FutureApplications::getWhatWillFutureApplicationsBeMadeFor),
                 dqFurtherInformation
                     .map(FurtherInformation::getReasonForFutureApplications)

@@ -13,6 +13,9 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -80,6 +83,12 @@ class DQGeneratorFormBuilderTest {
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
         when(stateFlow.getState()).thenReturn(state);
         when(state.getName()).thenReturn(FULL_DEFENCE.fullName());
+    }
+
+    private uk.gov.hmcts.reform.civil.model.BusinessProcess createBusinessProcess(String camundaEvent) {
+        uk.gov.hmcts.reform.civil.model.BusinessProcess businessProcess = new uk.gov.hmcts.reform.civil.model.BusinessProcess();
+        businessProcess.setCamundaEvent(camundaEvent);
+        return businessProcess;
     }
 
     @Test
@@ -249,5 +258,247 @@ class DQGeneratorFormBuilderTest {
 
         assertNotNull(result);
         assertNull(result.getStatementOfTruthText());
+    }
+
+    @Test
+    void shouldCorrectlyMapFutureApplicationsForDefendant() {
+        // Given: Defendant DQ with future applications set to YES
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        FutureApplications futureApplications = new FutureApplications()
+            .setIntentionToMakeFutureApplications(YesOrNo.YES)
+            .setWhatWillFutureApplicationsBeMadeFor("Test application details for defendant");
+
+        Respondent1DQ respondent1DQ = new Respondent1DQ()
+            .setRespondent1DQFutureApplications(futureApplications);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .respondent1DQ(respondent1DQ)
+            .build();
+
+        // When: Generate DQ form
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        // Then: Future applications should be YES and reason should be populated
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals(YesOrNo.YES, result.getFurtherInformation().getFutureApplications());
+        assertEquals(YesOrNo.YES, result.getFurtherInformation().getIntentionToMakeFutureApplications());
+        assertEquals("Test application details for defendant", result.getFurtherInformation().getReasonForFutureApplications());
+    }
+
+    @Test
+    void shouldCorrectlyMapFutureApplicationsForClaimant() {
+        // Given: Claimant DQ with future applications set to YES
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        FutureApplications futureApplications = new FutureApplications()
+            .setIntentionToMakeFutureApplications(YesOrNo.YES)
+            .setWhatWillFutureApplicationsBeMadeFor("Test application details for claimant");
+
+        Applicant1DQ applicant1DQ = new Applicant1DQ()
+            .setApplicant1DQFutureApplications(futureApplications);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicant1DQ(applicant1DQ)
+            .businessProcess(createBusinessProcess("CLAIMANT_RESPONSE_SPEC"))
+            .build();
+
+        // When: Generate DQ form
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        // Then: Future applications should be YES and reason should be populated
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals(YesOrNo.YES, result.getFurtherInformation().getFutureApplications());
+        assertEquals(YesOrNo.YES, result.getFurtherInformation().getIntentionToMakeFutureApplications());
+        assertEquals("Test application details for claimant", result.getFurtherInformation().getReasonForFutureApplications());
+    }
+
+    @Test
+    void shouldDefaultToNoWhenFutureApplicationsNotSetForDefendant() {
+        // Given: Defendant DQ without future applications
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .respondent1DQ(respondent1DQ)
+            .build();
+
+        // When: Generate DQ form
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        // Then: Future applications should default to NO
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals(YesOrNo.NO, result.getFurtherInformation().getFutureApplications());
+        assertEquals(YesOrNo.NO, result.getFurtherInformation().getIntentionToMakeFutureApplications());
+        assertNull(result.getFurtherInformation().getReasonForFutureApplications());
+    }
+
+    @Test
+    void shouldDefaultToNoWhenFutureApplicationsNotSetForClaimant() {
+        // Given: Claimant DQ without future applications
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicant1DQ(applicant1DQ)
+            .businessProcess(createBusinessProcess("CLAIMANT_RESPONSE_SPEC"))
+            .build();
+
+        // When: Generate DQ form
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        // Then: Future applications should default to NO
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals(YesOrNo.NO, result.getFurtherInformation().getFutureApplications());
+        assertEquals(YesOrNo.NO, result.getFurtherInformation().getIntentionToMakeFutureApplications());
+        assertNull(result.getFurtherInformation().getReasonForFutureApplications());
+    }
+
+    @Test
+    void shouldHandleFutureApplicationsSetToNoForClaimant() {
+        // Given: Claimant DQ with future applications explicitly set to NO
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        FutureApplications futureApplications = new FutureApplications()
+            .setIntentionToMakeFutureApplications(YesOrNo.NO);
+
+        Applicant1DQ applicant1DQ = new Applicant1DQ()
+            .setApplicant1DQFutureApplications(futureApplications);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicant1DQ(applicant1DQ)
+            .businessProcess(createBusinessProcess("CLAIMANT_RESPONSE_SPEC"))
+            .build();
+
+        // When: Generate DQ form
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        // Then: Future applications should be NO and reason should be null
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals(YesOrNo.NO, result.getFurtherInformation().getFutureApplications());
+        assertEquals(YesOrNo.NO, result.getFurtherInformation().getIntentionToMakeFutureApplications());
+        assertNull(result.getFurtherInformation().getReasonForFutureApplications());
+    }
+
+    @Test
+    void shouldHandleNullApplicant1DQFutureApplicationsFieldWithoutNPE() {
+        // Given: Applicant1DQ with null FutureApplications field
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        // Explicitly set futureApplications to null
+        applicant1DQ.setApplicant1DQFutureApplications(null);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicant1DQ(applicant1DQ)
+            .businessProcess(createBusinessProcess("CLAIMANT_RESPONSE_SPEC"))
+            .build();
+
+        // When: Generate DQ form - should not throw NPE
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        // Then: Should default to NO without NPE
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals(YesOrNo.NO, result.getFurtherInformation().getFutureApplications());
+        assertNull(result.getFurtherInformation().getReasonForFutureApplications());
+    }
+
+    @Test
+    void shouldHandleNullRespondent1DQFutureApplicationsFieldWithoutNPE() {
+        // Given: Respondent1DQ with null FutureApplications field
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        // Explicitly set futureApplications to null
+        respondent1DQ.setRespondent1DQFutureApplications(null);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .respondent1DQ(respondent1DQ)
+            .build();
+
+        // When: Generate DQ form - should not throw NPE
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        // Then: Should default to NO without NPE
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals(YesOrNo.NO, result.getFurtherInformation().getFutureApplications());
+        assertNull(result.getFurtherInformation().getReasonForFutureApplications());
+    }
+
+    @Test
+    void shouldHandleNullFutureApplicationsIntentionFieldWithoutNPE() {
+        // Given: FutureApplications object with null intentionToMakeFutureApplications
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        FutureApplications futureApplications = new FutureApplications();
+        // Both fields are null
+        futureApplications.setIntentionToMakeFutureApplications(null);
+        futureApplications.setWhatWillFutureApplicationsBeMadeFor(null);
+
+        Applicant1DQ applicant1DQ = new Applicant1DQ()
+            .setApplicant1DQFutureApplications(futureApplications);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicant1DQ(applicant1DQ)
+            .businessProcess(createBusinessProcess("CLAIMANT_RESPONSE_SPEC"))
+            .build();
+
+        // When: Generate DQ form - should not throw NPE
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        // Then: Should default to NO without NPE
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals(YesOrNo.NO, result.getFurtherInformation().getFutureApplications());
+        assertNull(result.getFurtherInformation().getReasonForFutureApplications());
     }
 }

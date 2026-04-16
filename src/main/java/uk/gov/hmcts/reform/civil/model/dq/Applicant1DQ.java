@@ -215,6 +215,12 @@ public class Applicant1DQ implements DQ {
         return applicant1DQDefendantDocumentsToBeConsidered;
     }
 
+    @Override
+    @JsonProperty("applicant1DQFutureApplications")
+    public FutureApplications getFutureApplications() {
+        return applicant1DQFutureApplications;
+    }
+
     public Applicant1DQ copy() {
         return new Applicant1DQ()
             .setApplicant1DQFileDirectionsQuestionnaire(applicant1DQFileDirectionsQuestionnaire)

@@ -217,6 +217,12 @@ public class Respondent2DQ implements DQ {
         return respondent2DQRemoteHearing;
     }
 
+    @Override
+    @JsonProperty("respondent2DQFutureApplications")
+    public FutureApplications getFutureApplications() {
+        return respondent2DQFutureApplications;
+    }
+
     public Respondent2DQ copy() {
         return new Respondent2DQ()
             .setRespondent2DQFileDirectionsQuestionnaire(respondent2DQFileDirectionsQuestionnaire)
