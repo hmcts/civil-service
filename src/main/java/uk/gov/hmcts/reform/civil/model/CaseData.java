@@ -412,7 +412,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final String additionalInformationForJudge;
     private final String applicantAdditionalInformationForJudge;
-    private final String applicant1AdditionalInformationForJudge;
     @JsonUnwrapped
     private  ExpertRequirements respondToClaimExperts;
 

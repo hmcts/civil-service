@@ -368,15 +368,8 @@ public class DQGeneratorFormBuilder {
                     .map(FurtherInformation::getReasonForFutureApplications)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
 
-        // Get additional information for judge from the correct field based on party type
-        String additionalInfo = isClaimantResponse(caseData)
-            ? (caseData.getApplicant1AdditionalInformationForJudge() != null
-                ? caseData.getApplicant1AdditionalInformationForJudge()
-                : caseData.getApplicantAdditionalInformationForJudge())
-            : caseData.getAdditionalInformationForJudge();
-
         String furtherJudgeInfo = Stream.of(
-            Optional.ofNullable(additionalInfo),
+            Optional.ofNullable(caseData.getAdditionalInformationForJudge()),
             dqFurtherInformation
                 .map(FurtherInformation::getOtherInformationForJudge)
         ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
