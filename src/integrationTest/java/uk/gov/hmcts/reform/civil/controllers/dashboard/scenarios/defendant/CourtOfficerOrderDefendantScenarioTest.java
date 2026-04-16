@@ -66,7 +66,6 @@ public class CourtOfficerOrderDefendantScenarioTest extends DashboardBaseIntegra
             .previousCCDState(CaseState.DECISION_OUTCOME)
             .build();
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created

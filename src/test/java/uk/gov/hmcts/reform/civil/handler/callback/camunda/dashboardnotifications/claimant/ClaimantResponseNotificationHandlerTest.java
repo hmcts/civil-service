@@ -79,7 +79,6 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void before() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @ParameterizedTest
@@ -372,7 +371,6 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
         HashMap<String, Object> params = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
         caseData.setApplicant1Represented(YesOrNo.NO);

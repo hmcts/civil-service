@@ -60,7 +60,6 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
         caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -99,7 +98,6 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
         caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 

@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -45,7 +44,6 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseAssignmentApi caseAssignmentApi;
     private final ObjectMapper objectMapper;
-    private final FeatureToggleService featureToggleService;
 
     private static final String CHANGE_ORGANISATION_REQUEST = "changeOrganisationRequestField";
     private static final String ORG_ID_FOR_AUTO_APPROVAL =
@@ -219,7 +217,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             return APPLY_NOC_DECISION_LIP;
         } else if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)
             && postDecisionCaseData.isRespondent1LiP()
-            && featureToggleService.isLipVLipEnabled()) {
+            ) {
             return APPLY_NOC_DECISION_DEFENDANT_LIP;
         }
         return APPLY_NOC_DECISION;

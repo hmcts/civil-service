@@ -267,7 +267,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseDataLiP.setTranslatedDocuments(List.of(element(translatedDoc)));
         caseData.setCaseDataLiP(caseDataLiP);
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
@@ -354,7 +353,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseDataLiP.setTranslatedDocuments(List.of(element(translatedDoc)));
         caseData.setCaseDataLiP(caseDataLiP);
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
@@ -811,7 +809,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldCopyOtherDocumentExceptSealedClaimForm() {
         //Given
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         Document claimIssueFileDoc = new Document();
         claimIssueFileDoc.setDocumentFileName(FILE_NAME_1);
         TranslatedDocument translatedDocument1 = new TranslatedDocument();
@@ -866,7 +863,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             expectedTranslatedDocs,
             any(CaseData.class)
         )).willReturn(documents);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         Document claimIssueFileDoc = new Document();
         claimIssueFileDoc.setDocumentFileName(FILE_NAME_1);
         TranslatedDocument translatedDocument1 = new TranslatedDocument();
@@ -923,7 +919,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             expectedTranslatedDocs,
             any(CaseData.class)
         )).willReturn(documents);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Document claimIssueFileDoc = new Document();
         claimIssueFileDoc.setDocumentFileName(FILE_NAME_1);

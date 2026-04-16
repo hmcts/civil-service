@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.cosc;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.civil.utils.CoscHandlerUtility;
@@ -18,17 +17,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class CertificateGeneratedDefendantDashboardService extends DashboardScenarioService {
 
-    private final FeatureToggleService featureToggleService;
     private final DashboardNotificationService dashboardNotificationService;
     private final CoscDashboardHelper coscDashboardHelper;
 
     protected CertificateGeneratedDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                             DashboardNotificationsParamsMapper mapper,
-                                                            FeatureToggleService featureToggleService,
                                                             DashboardNotificationService dashboardNotificationService,
                                                             CoscDashboardHelper coscDashboardHelper) {
         super(dashboardScenariosService, mapper);
-        this.featureToggleService = featureToggleService;
         this.dashboardNotificationService = dashboardNotificationService;
         this.coscDashboardHelper = coscDashboardHelper;
     }
@@ -48,8 +44,7 @@ public class CertificateGeneratedDefendantDashboardService extends DashboardScen
 
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
-        return featureToggleService.isLipVLipEnabled()
-            && coscDashboardHelper.isMarkedPaidInFull(caseData)
+        return coscDashboardHelper.isMarkedPaidInFull(caseData)
             && caseData.isRespondent1NotRepresented();
     }
 

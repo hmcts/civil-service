@@ -67,9 +67,8 @@ class LipDefendantCaseAssignmentServiceTest {
     }
 
     @Test
-    void shouldAddDefendantDetails_whenLipVLipFlagIsEnabled() {
+    void shouldAddDefendantDetails_forLipVLipCase() {
         //Given
-        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
         given(userService.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL).build());
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         Party respondent1 = caseData.getRespondent1()
@@ -103,13 +102,12 @@ class LipDefendantCaseAssignmentServiceTest {
     }
 
     @Test
-    void shouldRemovePinPostDetails_whenLipVLipFlagIsEnabled() {
+    void shouldRemovePinPostDetails_forLipVLipCase() {
         //Given
         DefendantPinToPostLRspec pinInPostData = new DefendantPinToPostLRspec();
         pinInPostData.setExpiryDate(LocalDate.now().plusDays(180));
         Map<String, Object> data = new HashMap<>();
         data.put("respondent1PinToPostLRspec", pinInPostData);
-        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
         given(userService.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL)
                                                                      .build());
         given(defendantPinToPostLRspecService.removePinInPostData(any())).willReturn(data);

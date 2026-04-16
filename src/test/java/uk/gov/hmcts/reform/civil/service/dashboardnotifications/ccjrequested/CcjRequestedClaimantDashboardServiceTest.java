@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -42,8 +41,6 @@ class CcjRequestedClaimantDashboardServiceTest {
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private CcjRequestedClaimantDashboardService service;
@@ -55,7 +52,6 @@ class CcjRequestedClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordCcjRequestedScenarioWhenEligible() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseDocument caseDocument = new CaseDocument();
         caseDocument.setDocumentType(DocumentType.DEFAULT_JUDGMENT);
@@ -80,7 +76,6 @@ class CcjRequestedClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordRequestedCcjScenarioWhenEligibleButNoDefaultJudgment() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -99,7 +94,6 @@ class CcjRequestedClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordCcjRequestedScenarioWhenPaymentDateBeforeToday() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         RespondToClaimAdmitPartLRspec respondToClaimAdmitPart = new RespondToClaimAdmitPartLRspec();
         respondToClaimAdmitPart.setWhenWillThisAmountBePaid(LocalDate.now().minusDays(1));
@@ -125,7 +119,6 @@ class CcjRequestedClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordRequestedCcjScenarioWhenPaymentDateBeforeTodayButNotImmediate() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         RespondToClaimAdmitPartLRspec respondToClaimAdmitPart = new RespondToClaimAdmitPartLRspec();
         respondToClaimAdmitPart.setWhenWillThisAmountBePaid(LocalDate.now().minusDays(1));
@@ -151,7 +144,6 @@ class CcjRequestedClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordCcjRequestedScenarioWhenRepaymentSummaryPresent() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -171,7 +163,6 @@ class CcjRequestedClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordRequestedCcjScenarioWhenPaymentDateAfterToday() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         RespondToClaimAdmitPartLRspec respondToClaimAdmitPart = new RespondToClaimAdmitPartLRspec();
         respondToClaimAdmitPart.setWhenWillThisAmountBePaid(LocalDate.now().plusDays(1));
@@ -197,7 +188,6 @@ class CcjRequestedClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordRequestedCcjScenarioWhenDocumentTypeIsNotDefaultJudgment() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseDocument caseDocument = new CaseDocument();
         caseDocument.setDocumentType(DocumentType.SEALED_CLAIM);
@@ -221,22 +211,7 @@ class CcjRequestedClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotRecordWhenToggleDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCcdCaseReference(1234L);
-        caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setDefaultJudgmentDocuments(List.of());
-
-        service.notifyClaimant(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
     void shouldNotRecordWhenApplicantIsRepresented() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setApplicant1Represented(YesOrNo.YES);

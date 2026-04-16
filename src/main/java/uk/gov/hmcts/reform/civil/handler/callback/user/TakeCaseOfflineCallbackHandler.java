@@ -59,8 +59,13 @@ public class TakeCaseOfflineCallbackHandler extends CallbackHandler {
 
     private CaseState getPreviousCaseSate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
-            ? CaseState.valueOf(callbackParams.getRequest().getCaseDetailsBefore().getState())
-            : null;
+        String previousState = callbackParams.getRequest().getCaseDetailsBefore() == null
+            ? null
+            : callbackParams.getRequest().getCaseDetailsBefore().getState();
+        if (!(caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
+            || previousState == null) {
+            return null;
+        }
+        return CaseState.valueOf(previousState);
     }
 }

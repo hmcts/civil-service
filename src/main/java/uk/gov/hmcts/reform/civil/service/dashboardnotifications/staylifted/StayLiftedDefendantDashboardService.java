@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -21,14 +20,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class StayLiftedDefendantDashboardService extends DashboardScenarioService {
 
-    private final FeatureToggleService featureToggleService;
     private static final String citizenRole = "DEFENDANT";
 
     protected StayLiftedDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
-                                                  DashboardNotificationsParamsMapper mapper,
-                                                  FeatureToggleService featureToggleService) {
+                                                  DashboardNotificationsParamsMapper mapper) {
         super(dashboardScenariosService, mapper);
-        this.featureToggleService = featureToggleService;
     }
 
     public void notifyStayLifted(CaseData caseData, String authToken) {
@@ -43,7 +39,7 @@ public class StayLiftedDefendantDashboardService extends DashboardScenarioServic
 
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
-        if (caseData.isRespondent1NotRepresented() && featureToggleService.isLipVLipEnabled()) {
+        if (caseData.isRespondent1NotRepresented() ) {
             Map<String, Boolean> scenarios = new HashMap<>();
             scenarios.put(SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(), true);
             scenarios.putAll(getScenariosBasedOnPreStayState(caseData));

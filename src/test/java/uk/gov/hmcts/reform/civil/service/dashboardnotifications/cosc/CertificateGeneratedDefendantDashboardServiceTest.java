@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -43,8 +42,6 @@ class CertificateGeneratedDefendantDashboardServiceTest {
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
-    private FeatureToggleService featureToggleService;
-    @Mock
     private DashboardNotificationService dashboardNotificationService;
     @Mock
     private CoscDashboardHelper coscDashboardHelper;
@@ -57,7 +54,6 @@ class CertificateGeneratedDefendantDashboardServiceTest {
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(true);
 
         CaseDataLiP caseDataLiP = new CaseDataLiP();
@@ -88,7 +84,6 @@ class CertificateGeneratedDefendantDashboardServiceTest {
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(true);
 
         CaseDataLiP caseDataLiP = new CaseDataLiP();
@@ -121,7 +116,6 @@ class CertificateGeneratedDefendantDashboardServiceTest {
     void shouldRecordScenario_whenPaymentCompletedAndCertificateAvailable() {
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(true);
 
         CaseLink caseLink = new CaseLink();
@@ -168,7 +162,6 @@ class CertificateGeneratedDefendantDashboardServiceTest {
     void shouldNotRecordScenario_whenRespondentRepresented() {
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(true);
 
         CaseLink caseLink = new CaseLink();
@@ -200,39 +193,7 @@ class CertificateGeneratedDefendantDashboardServiceTest {
     void shouldNotRecordScenario_whenIsNotPaidInFull() {
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(false);
-
-        CaseLink caseLink = new CaseLink();
-        caseLink.setCaseReference("54326781");
-
-        GeneralApplication generalApplication = new GeneralApplication();
-        generalApplication.setCaseLink(caseLink);
-        GAApplicationType gaApplicationType = new GAApplicationType();
-        gaApplicationType.setTypes(singletonList(CONFIRM_CCJ_DEBT_PAID));
-        generalApplication.setGeneralAppType(gaApplicationType);
-
-        List<Element<GeneralApplication>> gaApplications = wrapElements(generalApplication);
-
-        CaseDataLiP caseDataLiP = new CaseDataLiP();
-        caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-            .caseDataLip(caseDataLiP)
-            .respondent1Represented(YesOrNo.NO).build();
-        caseData.setGeneralApplications(gaApplications);
-
-        dashboardService.notifyCertificateGenerated(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
-        verifyNoInteractions(dashboardNotificationService);
-    }
-
-    @Test
-    void shouldNotRecordScenario_whenLipVLipDisabled() {
-        HashMap<String, Object> scenarioParams = new HashMap<>();
-        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
         CaseLink caseLink = new CaseLink();
         caseLink.setCaseReference("54326781");

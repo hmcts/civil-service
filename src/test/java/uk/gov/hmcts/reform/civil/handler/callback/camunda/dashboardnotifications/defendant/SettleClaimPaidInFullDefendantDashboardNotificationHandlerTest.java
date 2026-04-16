@@ -69,7 +69,6 @@ class SettleClaimPaidInFullDefendantDashboardNotificationHandlerTest extends Bas
     void shouldCreateDashboardNotifications_whenDefendantIsLiPAndSettleClaimMarkedPaidInFull() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -95,7 +94,6 @@ class SettleClaimPaidInFullDefendantDashboardNotificationHandlerTest extends Bas
     void shouldNotCreateDashboardNotifications_whenDefendantIsNotLipAndSettleClaimMarkedPaidInFull() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();

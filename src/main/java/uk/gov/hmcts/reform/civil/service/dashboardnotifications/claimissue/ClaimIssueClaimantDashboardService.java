@@ -29,7 +29,7 @@ public class ClaimIssueClaimantDashboardService extends DashboardScenarioService
 
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
-        return featureToggleService.isLipVLipEnabled();
+        return true;
     }
 
     @Override
@@ -40,15 +40,13 @@ public class ClaimIssueClaimantDashboardService extends DashboardScenarioService
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
         Map<String, Boolean> scenarios = new HashMap<>();
-        if (featureToggleService.isLipVLipEnabled()) {
-            if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
-                scenarios.put(DashboardScenarios.SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(), true);
-                scenarios.put(DashboardScenarios.SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(), true);
-            }
+        if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
+            scenarios.put(DashboardScenarios.SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(), true);
+            scenarios.put(DashboardScenarios.SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(), true);
+        }
 
-            if (caseData.isHWFTypeClaimIssued() && caseData.claimIssueFullRemissionNotGrantedHWF()) {
-                scenarios.put(DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_PHONE_PAYMENT.getScenario(), true);
-            }
+        if (caseData.isHWFTypeClaimIssued() && caseData.claimIssueFullRemissionNotGrantedHWF()) {
+            scenarios.put(DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_PHONE_PAYMENT.getScenario(), true);
         }
         return scenarios;
     }

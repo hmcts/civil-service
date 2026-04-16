@@ -55,7 +55,7 @@ public class FeesClientService {
             String keyword;
             String jurisdiction2;
 
-            if (featureToggleService.isLipVLipEnabled() && isFastTrackClaimAndHearingEvent(amount, event)) {
+            if (isFastTrackClaimAndHearingEvent(amount, event)) {
                 keyword = FAST_TRACK_HEARING;
                 jurisdiction2 = this.jurisdictionFastTrackClaim;
             } else {

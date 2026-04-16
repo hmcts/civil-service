@@ -69,7 +69,6 @@ class DefendantResponseDeadlineDashboardNotificationHandlerTest extends BaseCall
 
         @BeforeEach
         void setup() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test

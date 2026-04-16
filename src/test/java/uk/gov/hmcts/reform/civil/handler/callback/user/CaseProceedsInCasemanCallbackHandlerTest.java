@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import jakarta.validation.Validation;
@@ -43,9 +42,6 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private Time time;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     private CaseProceedsInCasemanCallbackHandler handler;
 
     @BeforeEach
@@ -59,7 +55,7 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
             .buildValidatorFactory();
 
         Validator validator = validatorFactory.getValidator();
-        handler = new CaseProceedsInCasemanCallbackHandler(validator, time, objectMapper, featureToggleService);
+        handler = new CaseProceedsInCasemanCallbackHandler(validator, time, objectMapper);
     }
 
     @Nested
@@ -116,7 +112,6 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(time.now()).thenReturn(takenOfflineByStaffDate);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         }
 
         @Test
@@ -146,7 +141,6 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .respondent1Represented(YesOrNo.NO)
                     .build();
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().getCaseDetailsBefore().setState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
@@ -161,7 +155,6 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotAddPreviousCaseState_whenInvokedForLipVLipOrLrVLip() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .build();
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().getCaseDetailsBefore().setState(null);
 

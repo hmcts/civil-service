@@ -9,38 +9,44 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.EvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ExpertReportLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HearingSupportLip;
 import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.DisabilityRequirement;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DocumentsToBeConsideredSection;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.ExpertReportTemplate;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExperts;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQ;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQEvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DocumentsToBeConsidered;
 import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
+import uk.gov.hmcts.reform.civil.model.dq.RequirementsLip;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 class DQLipClaimantFormMapperTest {
 
-    @Mock
-    private CaseDataLiP caseDataLiPMock;
-    @Mock
-    private DQExtraDetailsLip dqExtraDetailsLipMock;
-    @Mock
-    private ExpertLiP expertLiPMock;
-    @Mock
-    private ClaimantLiPResponse claimantLiPResponse;
     @Mock
     private CaseData caseData;
     @Mock
@@ -57,47 +63,70 @@ class DQLipClaimantFormMapperTest {
 
     @Test
     void shouldNotPopulateDtoWithLipData_whenCaseDataLipIsNull() {
-        //Given
         Optional<CaseDataLiP> emptyOptional = Optional.empty();
-        //When
+
         DirectionsQuestionnaireForm resultForm = dqLipClaimantFormMapper.addLipDQs(form, emptyOptional);
-        //Then
+
         assertThat(resultForm.getLipExtraDQ()).isNull();
     }
 
     @Test
     void shouldNotPopulateLipExtraDQ_whenDQExtraDetailsLipIsNull() {
-        //Given
-        Optional<CaseDataLiP> caseDataLiPOptional = Optional.of(caseDataLiPMock);
-        given(caseDataLiPMock.getApplicant1LiPResponse()).willReturn(claimantLiPResponse);
-        given(claimantLiPResponse.getApplicant1DQExtraDetails()).willReturn(null);
-        //When
+        Optional<CaseDataLiP> caseDataLiPOptional = Optional.of(new CaseDataLiP()
+                                                                    .setApplicant1LiPResponse(new ClaimantLiPResponse()));
+
         DirectionsQuestionnaireForm resultForm = dqLipClaimantFormMapper.addLipDQs(form, caseDataLiPOptional);
-        //Then
+
         assertThat(resultForm.getLipExtraDQ()).isNull();
     }
 
     @Test
-    void shouldPopulateLipExtraDQ_whenDQExtraDetailsLipIsNotNull() {
-        //Given
-        Optional<CaseDataLiP> caseDataLiPOptional = Optional.of(caseDataLiPMock);
-        given(caseDataLiPMock.getApplicant1LiPResponse()).willReturn(claimantLiPResponse);
-        given(claimantLiPResponse.getApplicant1DQExtraDetails()).willReturn(dqExtraDetailsLipMock);
-        given(dqExtraDetailsLipMock.getApplicant1DQLiPExpert()).willReturn(expertLiPMock);
-        given(dqExtraDetailsLipMock.getTriedToSettle()).willReturn(YesOrNo.YES);
-        given(dqExtraDetailsLipMock.getRequestExtra4weeks()).willReturn(YesOrNo.YES);
-        given(dqExtraDetailsLipMock.getGiveEvidenceYourSelf()).willReturn(YesOrNo.YES);
-        given(dqExtraDetailsLipMock.getConsiderClaimantDocumentsDetails()).willReturn("test");
-        given(dqExtraDetailsLipMock.getDeterminationWithoutHearingRequired()).willReturn(YesOrNo.NO);
-        //When
+    void shouldPopulateClaimantLipSpecificDetails() {
+        Optional<CaseDataLiP> caseDataLiPOptional = Optional.of(new CaseDataLiP().setApplicant1LiPResponse(
+            new ClaimantLiPResponse()
+                .setApplicant1DQExtraDetails(claimantExtraDetails())
+                .setApplicant1DQEvidenceConfirmDetails(claimantEvidenceConfirmDetails())
+                .setApplicant1DQHearingSupportLip(claimantHearingSupport())
+        ));
+
         DirectionsQuestionnaireForm resultForm = dqLipClaimantFormMapper.addLipDQs(form, caseDataLiPOptional);
-        //Then
-        assertThat(resultForm.getLipExtraDQ()).isNotNull();
+
+        assertThat(resultForm.getHearingLipSupportRequirements()).containsExactly(
+            new HearingLipSupportRequirements()
+                .setName("Accessible hearing")
+                .setOtherSupport("Wheelchair space")
+                .setRequirements(List.of(
+                    new DisabilityRequirement(SupportRequirements.DISABLED_ACCESS.getDisplayedValue()),
+                    new DisabilityRequirement("Wheelchair space")
+                ))
+        );
+        assertThat(resultForm.getLipExtraDQ()).isEqualTo(new LipExtraDQ()
+            .setWantPhoneOrVideoHearing(YesOrNo.NO)
+            .setWhyPhoneOrVideoHearing("Prefers in-person hearing")
+            .setGiveEvidenceYourSelf(YesOrNo.YES)
+            .setTriedToSettle(YesOrNo.NO)
+            .setDeterminationWithoutHearingRequired(YesOrNo.YES)
+            .setDeterminationWithoutHearingReason("Documents are sufficient")
+            .setRequestExtra4weeks(YesOrNo.NO)
+            .setConsiderClaimantDocuments(YesOrNo.NO)
+            .setConsiderClaimantDocumentsDetails("No further documents")
+            .setGiveEvidenceConfirmDetails(new LipExtraDQEvidenceConfirmDetails()
+                .setFirstName("Alex")
+                .setLastName("Smith")
+                .setEmail("alex.smith@example.com")
+                .setPhone("07111111111")
+                .setJobTitle("Owner")));
+        assertThat(resultForm.getLipExperts()).isEqualTo(new LipExperts()
+            .setCaseNeedsAnExpert(YesOrNo.NO)
+            .setExpertCanStillExamineDetails("Accountant")
+            .setExpertReportRequired(YesOrNo.NO)
+            .setDetails(List.of(
+                new ExpertReportTemplate().setExpertName("Ms Expert").setReportDate(LocalDate.of(2024, 3, 15))
+            )));
     }
 
     @Test
     void shouldPopulateLipDQ_whenDQIsNotNullMinti() {
-        //Given
         given(caseData.getApplicant1DQ()).willReturn(new Applicant1DQ()
                                                          .setApplicant1DQFixedRecoverableCostsIntermediate(new FixedRecoverableCosts()
                                                                                                               .setIsSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
@@ -111,12 +140,12 @@ class DQLipClaimantFormMapperTest {
                                                          .setApplicant1DQDefendantDocumentsToBeConsidered(new DocumentsToBeConsidered()
                                                                                                               .setHasDocumentsToBeConsidered(YesOrNo.YES)
                                                                                                               .setDetails("details")));
-        //When
+
         final FixedRecoverableCostsSection expectedFrc = dqLipClaimantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
         final DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipClaimantFormMapper.getDisclosureOfElectronicDocuments(caseData);
         final DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipClaimantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
         final DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipClaimantFormMapper.getDocumentsToBeConsidered(caseData);
-        //Then
+
         FixedRecoverableCostsSection expectedFrcValue = new FixedRecoverableCostsSection();
         expectedFrcValue.setIsSubjectToFixedRecoverableCostRegime(YesOrNo.YES);
         expectedFrcValue.setComplexityBandingAgreed(YesOrNo.YES);
@@ -148,23 +177,64 @@ class DQLipClaimantFormMapperTest {
 
     @Test
     void shouldReturnNullDocumentsToBeConsidered_whenClaimantDocumentsToBeConsideredIsNull() {
-        //Given
         given(caseData.getApplicant1DQ()).willReturn(new Applicant1DQ());
-        //When
+
         final DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipClaimantFormMapper.getDocumentsToBeConsidered(caseData);
-        //Then
+
         assertThat(expectedDocsToBeConsidered).isNull();
     }
 
     @Test
     void shouldReturnClaimantSignature_whenGetStatementOfTruth() {
-        //Given
         given(caseData.getApplicant1()).willReturn(applicant1);
         given(applicant1.getPartyName()).willReturn(NAME);
-        //When
+
         String result = dqLipClaimantFormMapper.getStatementOfTruthName(caseData);
-        //Then
+
         assertThat(result).isEqualTo(NAME);
         verify(caseData).getApplicant1();
+    }
+
+    private static DQExtraDetailsLip claimantExtraDetails() {
+        return new DQExtraDetailsLip()
+            .setWantPhoneOrVideoHearing(YesOrNo.NO)
+            .setWhyPhoneOrVideoHearing("Prefers in-person hearing")
+            .setGiveEvidenceYourSelf(YesOrNo.YES)
+            .setTriedToSettle(YesOrNo.NO)
+            .setDeterminationWithoutHearingRequired(YesOrNo.YES)
+            .setDeterminationWithoutHearingReason("Documents are sufficient")
+            .setRequestExtra4weeks(YesOrNo.NO)
+            .setConsiderClaimantDocuments(YesOrNo.NO)
+            .setConsiderClaimantDocumentsDetails("No further documents")
+            .setApplicant1DQLiPExpert(new ExpertLiP()
+                .setCaseNeedsAnExpert(YesOrNo.NO)
+                .setExpertCanStillExamineDetails("Accountant")
+                .setExpertReportRequired(YesOrNo.NO)
+                .setDetails(wrapElements(
+                    new ExpertReportLiP("Ms Expert", LocalDate.of(2024, 3, 15))
+                )));
+    }
+
+    private static EvidenceConfirmDetails claimantEvidenceConfirmDetails() {
+        return new EvidenceConfirmDetails()
+            .setFirstName("Alex")
+            .setLastName("Smith")
+            .setEmail("alex.smith@example.com")
+            .setPhone("07111111111")
+            .setJobTitle("Owner");
+    }
+
+    private static HearingSupportLip claimantHearingSupport() {
+        return new HearingSupportLip()
+            .setSupportRequirementLip(YesOrNo.YES)
+            .setRequirementsLip(wrapElements(
+                new RequirementsLip()
+                    .setName("Accessible hearing")
+                    .setRequirements(List.of(
+                        SupportRequirements.DISABLED_ACCESS,
+                        SupportRequirements.OTHER_SUPPORT
+                    ))
+                    .setOtherSupport("Wheelchair space")
+            ));
     }
 }

@@ -181,8 +181,6 @@ class DJApplicantReceivedNotificationHandlerTest {
         void shouldNotifyApplicantSolicitor_whenInvokedAndLiPvsLiPEnabled() {
             when(notificationsProperties.getApplicantLiPDefaultJudgmentRequested())
                 .thenReturn("test-template-requested-lip-id");
-            when(featureToggleService.isLipVLipEnabled())
-                .thenReturn(true);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -212,8 +210,6 @@ class DJApplicantReceivedNotificationHandlerTest {
         void shouldNotifyApplicantLip_whenInvokedAndLiPvsLiPEnabledAndBilingual() {
             when(notificationsProperties.getApplicantLiPDefaultJudgmentRequestedBilingualTemplate())
                 .thenReturn("test-template-requested-lip-id-bilingual");
-            when(featureToggleService.isLipVLipEnabled())
-                    .thenReturn(true);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));

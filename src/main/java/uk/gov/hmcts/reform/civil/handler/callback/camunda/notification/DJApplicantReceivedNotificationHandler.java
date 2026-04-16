@@ -80,7 +80,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
         if (caseData.isLipvLipOneVOne()
-            && toggleService.isLipVLipEnabled()) {
+            ) {
             template = getLipEmailTemplate(caseData.isClaimantBilingual());
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
@@ -128,7 +128,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         }
 
         if (caseData.isLipvLipOneVOne()
-            && toggleService.isLipVLipEnabled()) {
+            ) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
                 identifyTemplate(caseData),

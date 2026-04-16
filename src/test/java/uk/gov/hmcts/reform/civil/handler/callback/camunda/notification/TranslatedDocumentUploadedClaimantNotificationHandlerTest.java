@@ -132,7 +132,6 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
                     .applicant1Represented(YesOrNo.NO)
                     .claimantBilingualLanguagePreference("BOTH")
                     .build();
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CaseEvent.NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED.name())
                             .build()).build();
@@ -163,7 +162,6 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
                 .build();
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED.name())
                     .build()).build();

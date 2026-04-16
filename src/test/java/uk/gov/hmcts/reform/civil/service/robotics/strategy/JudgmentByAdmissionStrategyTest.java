@@ -74,7 +74,6 @@ class JudgmentByAdmissionStrategyTest {
     @Test
     void contributeAddsOfflineJudgmentEvents() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11);
         LocalDateTime responseDate = LocalDateTime.of(2024, 2, 1, 10, 0);
         when(timelineHelper.ensurePresentOrNow(any(LocalDateTime.class))).thenReturn(responseDate);
@@ -156,9 +155,12 @@ class JudgmentByAdmissionStrategyTest {
         ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000));
         ccjPaymentDetails.setCcjJudgmentLipInterest(BigDecimal.valueOf(150));
         ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO);
+        Fee claimFee = new Fee();
+        claimFee.setCalculatedAmountInPence(new BigDecimal("5500"));
 
         CaseData caseData = CaseDataBuilder.builder()
             .ccjPaymentDetails(ccjPaymentDetails)
+            .claimFee(claimFee)
             .totalInterest(BigDecimal.valueOf(200))
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
@@ -172,6 +174,8 @@ class JudgmentByAdmissionStrategyTest {
         assertThat(builder.getJudgmentByAdmission()).hasSize(1);
         assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfJudgment())
             .isEqualByComparingTo("1150.00");
+        assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfCosts())
+            .isEqualByComparingTo("55.00");
     }
 
     @Test
@@ -186,9 +190,12 @@ class JudgmentByAdmissionStrategyTest {
         ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000));
         ccjPaymentDetails.setCcjJudgmentLipInterest(BigDecimal.valueOf(150));
         ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO);
+        Fee claimFee = new Fee();
+        claimFee.setCalculatedAmountInPence(new BigDecimal("5500"));
 
         CaseData caseData = CaseDataBuilder.builder()
             .ccjPaymentDetails(ccjPaymentDetails)
+            .claimFee(claimFee)
             .totalInterest(BigDecimal.ZERO)
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
@@ -202,12 +209,13 @@ class JudgmentByAdmissionStrategyTest {
         assertThat(builder.getJudgmentByAdmission()).hasSize(1);
         assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfJudgment())
             .isEqualByComparingTo("1000.00");
+        assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfCosts())
+            .isEqualByComparingTo("55.00");
     }
 
     @Test
     void contributeUsesJoIssueDateWhenLiveFeedActive() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(21, 22);
 
         CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
@@ -237,7 +245,6 @@ class JudgmentByAdmissionStrategyTest {
     @Test
     void populatesClaimantInstalmentDetailsWhenLipEnabled() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(31, 32);
         LocalDateTime responseDate = LocalDateTime.of(2024, 5, 1, 9, 0);
         when(timelineHelper.ensurePresentOrNow(any(LocalDateTime.class))).thenReturn(responseDate);
@@ -289,7 +296,6 @@ class JudgmentByAdmissionStrategyTest {
     @Test
     void usesDefendantSetDateWhenJoActive() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(41, 42);
 
         LocalDate paymentDate = LocalDate.of(2024, 8, 20);
@@ -325,7 +331,6 @@ class JudgmentByAdmissionStrategyTest {
     @Test
     void includesInterestForLrClaims() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(61, 62);
 
         LocalDateTime responseDate = LocalDateTime.of(2024, 11, 5, 10, 0);
@@ -355,7 +360,6 @@ class JudgmentByAdmissionStrategyTest {
     @Test
     void returnsFwCodeWhenJoActiveAndImmediatePayment() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(51, 52);
 
         RepaymentPlanLRspec repaymentPlan = new RepaymentPlanLRspec();

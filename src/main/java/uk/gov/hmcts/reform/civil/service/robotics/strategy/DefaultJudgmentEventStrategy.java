@@ -124,7 +124,7 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
         LocalDateTime paymentInFullDate = computePaymentInFullDate(caseData);
 
         BigDecimal amountOfCosts =
-                (caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
+                caseData.isApplicantLipOneVOne()
                         ? ClaimFeeUtility.getCourtFee(caseData)
                         : JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData)
                                 .add(JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));

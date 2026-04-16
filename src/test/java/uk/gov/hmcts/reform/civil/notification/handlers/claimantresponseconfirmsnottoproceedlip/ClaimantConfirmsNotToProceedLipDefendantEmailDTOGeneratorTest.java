@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.HashMap;
@@ -38,9 +37,6 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -63,7 +59,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldReturnCorrectEmailTemplateWhenLipVLipEnabledAndClaimantDontWantToProceedWithFulLDefenceFD() {
+    void shouldReturnUpdatedClaimTemplateWhenClaimantDoesNotWantToProceedWithFullDefence() {
         CaseData caseData = CaseData.builder()
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .applicant1ProceedWithClaim(NO)
@@ -71,7 +67,6 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
@@ -79,7 +74,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldReturnCorrectEmailTemplateWhenLipVLipEnabledAndClaimantDontWantToProceedWithFulLDefenceFDBilingual() {
+    void shouldReturnTranslatedTemplateWhenClaimantDoesNotWantToProceedWithFullDefenceAndRespondentIsBilingual() {
         CaseData caseData = CaseData.builder()
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .applicant1ProceedWithClaim(NO)
@@ -93,7 +88,6 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
@@ -101,41 +95,11 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldReturnCorrectEmailTemplateWhenLipVLipDisabledAndNotClaimantDontWantToProceedWithFulLDefence() {
+    void shouldReturnSolicitorTemplateWhenCaseDoesNotMatchLipResponsePaths() {
         CaseData caseData = CaseData.builder().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
-
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-    }
-
-    @Test
-    void shouldReturnCorrectEmailTemplateWhenLipVLipEnabledAndNotClaimantDontWantToProceedWithFulLDefence() {
-        CaseData caseData = CaseData.builder().build();
-        String expectedTemplateId = "template-id";
-
-        when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
-        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
-
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-    }
-
-    @Test
-    void shouldReturnCorrectEmailTemplateWhenLipVLipDisabledAndClaimantDontWantToProceedWithFulLDefence() {
-        CaseData caseData = CaseData.builder()
-            .defenceRouteRequired(DISPUTES_THE_CLAIM)
-            .applicant1ProceedWithClaim(NO)
-            .build();
-        String expectedTemplateId = "template-id";
-
-        when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
@@ -150,7 +114,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldReturnCorrectCustomPropertiesWhenLipVLipEnabledAndClaimantDontWantToProceedWithFulLDefenceFD() {
+    void shouldReturnCorrectCustomPropertiesWhenClaimantDoesNotWantToProceedWithFullDefence() {
         Party party = new Party();
         String legacyCaseNumber = "legacyCaseNumber";
         CaseData caseData = CaseData.builder()
@@ -160,7 +124,6 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
             .respondent1(party)
             .build();
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         String partyName = "partyName";
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
@@ -220,27 +183,4 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
         assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, partyName);
     }
 
-    @Test
-    void shouldReturnCorrectCustomPropertiesWhenIsNotPartAdmitPayImmediatelyAcceptedAndLipVLipDisabled() {
-        Party party = new Party();
-        CaseData caseData = CaseData.builder()
-            .defenceRouteRequired(DISPUTES_THE_CLAIM)
-            .applicant1ProceedWithClaim(NO)
-            .respondent1(party)
-            .build();
-
-        String partyName = "partyName";
-        MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
-        partyUtilsMockedStatic.when(() -> PartyUtils.getPartyNameBasedOnType(party, false)).thenReturn(partyName);
-
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        Map<String, String> properties = new HashMap<>();
-        Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
-
-        partyUtilsMockedStatic.close();
-
-        assertThat(updatedProperties.size()).isEqualTo(1);
-        assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, partyName);
-    }
 }

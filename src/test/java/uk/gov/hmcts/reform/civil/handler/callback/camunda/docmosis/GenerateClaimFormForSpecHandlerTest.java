@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
@@ -78,14 +77,11 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private LitigantInPersonFormGenerator litigantInPersonFormGenerator;
 
-    @Mock
-    private FeatureToggleService toggleService;
-
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
         handler = new GenerateClaimFormForSpecCallbackHandler(sealedClaimFormGeneratorForSpec, mapper, time, deadlinesCalculator,
-                                                              civilStitchService, assignCategoryId, toggleService);
+                                                              civilStitchService, assignCategoryId);
         mapper.registerModule(new JavaTimeModule());
     }
 
@@ -579,7 +575,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                                 "Supported docs",
                                                                 LocalDate.now().toString()));
-            given(toggleService.isLipVLipEnabled()).willReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssuedUnrepresentedDefendant().build();

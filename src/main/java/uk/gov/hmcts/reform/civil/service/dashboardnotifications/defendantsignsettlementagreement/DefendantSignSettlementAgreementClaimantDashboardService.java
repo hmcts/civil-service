@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -14,13 +13,9 @@ import static java.util.Objects.nonNull;
 @Service
 public class DefendantSignSettlementAgreementClaimantDashboardService extends DashboardScenarioService {
 
-    private final FeatureToggleService featureToggleService;
-
     public DefendantSignSettlementAgreementClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
-                                                                    DashboardNotificationsParamsMapper mapper,
-                                                                    FeatureToggleService featureToggleService) {
+                                                                    DashboardNotificationsParamsMapper mapper) {
         super(dashboardScenariosService, mapper);
-        this.featureToggleService = featureToggleService;
     }
 
     public void notifyDefendantSignSettlementAgreement(CaseData caseData, String authToken) {
@@ -36,8 +31,7 @@ public class DefendantSignSettlementAgreementClaimantDashboardService extends Da
 
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
-        return featureToggleService.isLipVLipEnabled()
-            && nonNull(caseData)
+        return nonNull(caseData)
             && nonNull(caseData.getCaseDataLiP())
             && caseData.isApplicant1NotRepresented();
     }

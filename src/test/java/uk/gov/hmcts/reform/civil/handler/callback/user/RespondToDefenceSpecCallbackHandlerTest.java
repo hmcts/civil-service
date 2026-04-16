@@ -1752,45 +1752,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseManagementLocation(caseLocation).build();
             caseData.setDefenceRouteRequired(DISPUTES_THE_CLAIM);
 
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             var params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getState()).isEqualTo(CASE_STAYED.toString());
-
-        }
-
-        @Test
-        void shouldNotMoveCaseTo_case_stayed_State_LRvLip_One_V_One() {
-            Party party2 = new Party();
-            party2.setPartyName("name");
-            party2.setType(INDIVIDUAL);
-            Applicant1DQ applicant1DQ = new Applicant1DQ();
-            applicant1DQ.setApplicant1RespondToClaimExperts(new ExpertDetails());
-            Party party1 = new Party();
-            party1.setPrimaryAddress(new Address());
-            party1.setType(Party.Type.INDIVIDUAL);
-            CaseLocationCivil caseLocation = new CaseLocationCivil();
-            caseLocation.setBaseLocation("11111");
-            caseLocation.setRegion("2");
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(party2)
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .respondent1Represented(NO)
-                .applicant1Represented(YES)
-                .responseClaimTrack(SMALL_CLAIM.name())
-                .applicant1ProceedWithClaim(NO)
-                .applicant1DQ(applicant1DQ)
-                .respondent1(party1)
-                .caseManagementLocation(caseLocation).build();
-            caseData.setDefenceRouteRequired(DISPUTES_THE_CLAIM);
-
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-            var params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getState()).isNotEqualTo(CASE_STAYED.toString());
 
         }
 

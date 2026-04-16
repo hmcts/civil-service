@@ -122,7 +122,7 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     }
 
     @Test
-    void shouldGenerateForm_whenIsLipVLipEnabledStitchingDisabled() {
+    void shouldGenerateForm_whenLipResponseCaseStitchingDisabled() {
         //Given
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -135,9 +135,8 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     }
 
     @Test
-    void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabled() {
+    void shouldGenerateForm_whenLipResponseCaseStitchingEnabled() {
         //Given
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CaseDocument doc1 = new CaseDocument();
@@ -160,7 +159,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
                 .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
 
         //When
@@ -176,7 +174,7 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     }
 
     @Test
-    void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabledButRespondent1ClaimResponseTypeForSpecIsFullAdmissionSoNoDqWillGenerate() {
+    void shouldGenerateForm_whenLipResponseCaseStitchingEnabledButRespondentHasFullAdmission() {
         //Given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         CaseDocument doc1 = new CaseDocument();
@@ -189,7 +187,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
 
         //When
@@ -208,7 +205,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     void shouldNotCreateDuplicateDocuments_whenStitchingEnabledAndStitchedDocumentCreated() {
         //Given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
 
         CaseDocument doc1 = new CaseDocument();
@@ -247,7 +243,7 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     }
 
     @Test
-    void shouldGenerateForm_whenIsLipVLipEnabledStitchingBilingual() {
+    void shouldGenerateForm_whenLipResponseCaseIsBilingual() {
         //Given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
@@ -260,7 +256,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
         CaseDocument caseDocument = new CaseDocument();
         caseDocument.setDocumentName("defendant-dq-form");
         caseData.setRespondent1OriginalDqDoc(caseDocument);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
 
         //When

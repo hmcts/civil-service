@@ -86,7 +86,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("defaultRespondTime", "4pm");
         params.put("responseDeadline", "11 March 2024");
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -123,7 +122,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("defaultRespondTime", "4pm");
         params.put("responseDeadline", "11 March 2024");
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -153,7 +151,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("ccdCaseReference", "123");
         params.put("defaultRespondTime", "4pm");
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -189,7 +186,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("claimantRepaymentPlanDecisionCy", "derbyn");
         params.put("respondent1PartyName", "Mr Defendant Guy");
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()

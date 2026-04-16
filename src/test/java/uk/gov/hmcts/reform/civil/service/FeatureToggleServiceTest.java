@@ -66,15 +66,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsLipVLipInvoked(Boolean toggleStat) {
-        var lipVlipKey = "cuiReleaseTwoEnabled";
-        givenToggle(lipVlipKey, toggleStat);
-
-        assertThat(featureToggleService.isLipVLipEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenEnableRPAEmailsInvoked(Boolean toggleStat) {
         var enableRPAEmailsKey = "enable-rpa-emails";
         givenToggle(enableRPAEmailsKey, toggleStat);
@@ -184,18 +175,13 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsDashboardEnabledForCase(Boolean toggleStat) {
-        var cuiReKey = "cuiReleaseTwoEnabled";
         var dashboardKey = "is-dashboard-enabled-for-case";
-        givenToggle(cuiReKey, toggleStat);
+        when(featureToggleApi.isFeatureEnabledForDate(eq(dashboardKey), anyLong(), eq(false)))
+            .thenReturn(toggleStat);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .setClaimTypeToSpecClaim()
             .build();
-
-        if (toggleStat) {
-            when(featureToggleApi.isFeatureEnabledForDate(eq(dashboardKey), anyLong(), eq(false)))
-                .thenReturn(true);
-        }
 
         assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isEqualTo(toggleStat);
     }

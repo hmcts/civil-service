@@ -45,7 +45,6 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
-    private final FeatureToggleService toggleService;
     private final PinInPostConfiguration pipInPostConfiguration;
     private final FeatureToggleService featureToggleService;
     private final NotificationsSignatureConfiguration configuration;
@@ -82,7 +81,7 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
+        if (caseData.isLipvLipOneVOne() ) {
             HashMap<String, String> lipProperties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
@@ -119,7 +118,7 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
     }
 
     private String getTemplate(CaseData caseData) {
-        if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
+        if (caseData.isLipvLipOneVOne() ) {
             return caseData.isClaimantBilingual() && featureToggleService.isDefendantNoCOnlineForCase(caseData)
                 ? notificationsProperties.getClaimantLipDeadlineExtensionWelsh()
                 : notificationsProperties.getClaimantLipDeadlineExtension();
@@ -128,7 +127,7 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
     }
 
     private String getEmail(CaseData caseData) {
-        if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
+        if (caseData.isLipvLipOneVOne() ) {
             return caseData.getApplicant1Email();
         }
         return caseData.getApplicantSolicitor1UserDetails().getEmail();
