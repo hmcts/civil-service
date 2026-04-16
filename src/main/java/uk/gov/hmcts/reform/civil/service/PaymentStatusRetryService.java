@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
-import uk.gov.hmcts.reform.civil.exceptions.InvalidPaymentStatusException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -48,7 +47,7 @@ public class PaymentStatusRetryService {
         }
     }
 
-    @Retryable(retryFor = CaseDataUpdateException.class, noRetryFor = InvalidPaymentStatusException.class, backoff = @Backoff(delay = 500))
+    @Retryable(retryFor = CaseDataUpdateException.class, noRetryFor = IllegalArgumentException.class, backoff = @Backoff(delay = 500))
     public void updatePaymentStatus(FeeType feeType, String caseReference, CardPaymentStatusResponse response) {
         try {
             Long caseId = Long.valueOf(caseReference);
@@ -56,8 +55,8 @@ public class PaymentStatusRetryService {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             caseData = updateCaseDataWithPaymentDetails(response, caseData, feeType);
             submitUpdatePaymentEvent(caseData, caseId, feeType);
-        } catch (InvalidPaymentStatusException ex) {
-            log.info("Payment status is invalid for caseReference: {}", caseReference, ex);
+        } catch (IllegalArgumentException ex) {
+            log.info("Unable to update payment status for case {}", caseReference, ex);
             throw ex;
         } catch (Exception ex) {
             log.info("Retrying payment status update for case {}", caseReference, ex);

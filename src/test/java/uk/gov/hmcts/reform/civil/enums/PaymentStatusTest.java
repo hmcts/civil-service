@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.enums;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import uk.gov.hmcts.reform.civil.exceptions.InvalidPaymentStatusException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,15 +20,15 @@ class PaymentStatusTest {
     @Test
     void shouldThrowExceptionForInvalidPaymentStatus() {
         assertThatThrownBy(() -> PaymentStatus.resolvePaymentStatus("invalid"))
-            .isInstanceOf(InvalidPaymentStatusException.class)
+            .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Invalid payment status: invalid");
 
         assertThatThrownBy(() -> PaymentStatus.resolvePaymentStatus(null))
-            .isInstanceOf(InvalidPaymentStatusException.class)
+            .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Invalid payment status: null");
 
         assertThatThrownBy(() -> PaymentStatus.resolvePaymentStatus(""))
-            .isInstanceOf(InvalidPaymentStatusException.class)
+            .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Invalid payment status: ");
     }
 

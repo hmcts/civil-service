@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.enums;
 
-import uk.gov.hmcts.reform.civil.exceptions.InvalidPaymentStatusException;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -20,7 +18,7 @@ public enum PaymentStatus {
         return Optional.ofNullable(status)
             .map(String::toUpperCase)
             .map(LOOKUP::get)
-            .orElseThrow(() -> new InvalidPaymentStatusException("Invalid payment status: " + status));
+            .orElseThrow(() -> new IllegalArgumentException("Invalid payment status: " + status));
     }
 
     public static boolean isValid(String status) {
