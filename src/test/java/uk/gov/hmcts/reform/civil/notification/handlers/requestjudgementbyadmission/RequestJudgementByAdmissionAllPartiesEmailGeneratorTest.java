@@ -16,6 +16,9 @@ class RequestJudgementByAdmissionAllPartiesEmailGeneratorTest {
     private RequestJudgementByAdmissionApplicantEmailDTOGenerator applicantEmailDTOGenerator;
 
     @Mock
+    private RequestJudgementByAdmissionAppSolOneEmailDTOGenerator appSolOneEmailDTOGenerator;
+
+    @Mock
     private RequestJudgementByAdmissionLipRespondentEmailDTOGenerator lipRespondentEmailDTOGenerator;
 
     @Mock
