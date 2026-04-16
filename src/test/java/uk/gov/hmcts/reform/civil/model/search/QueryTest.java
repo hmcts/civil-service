@@ -15,7 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class QueryTest {
 
     public static final String EXPECTED_QUERY =
-        "{\"query\": {\"match_all\": {\"boost\": 1.0 }}, \"_source\": [\"reference\",\"other field\"], \"from\": 0}";
+        "{\"query\": {\"match_all\": {\"boost\": 1.0 }}, \"_source\": [\"reference\",\"other field\"], "
+            + "\"sort\": [{\"reference.keyword\": \"asc\"}], \"from\": 0}";
     public static final String EXPECTED_QUERY_WITH_SORT =
         "{\"query\": {\"match_all\": {\"boost\": 1.0 }}, \"_source\": [\"reference\",\"other field\"], "
             + "\"sort\": [{\"reference.keyword\": \"asc\"}], \"from\": 10}";

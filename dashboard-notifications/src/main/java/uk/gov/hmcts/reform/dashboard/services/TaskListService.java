@@ -30,6 +30,11 @@ public class TaskListService {
     private final EntityManager entityManager;
     private static final String DOCUMENT_TEMPLATE_NAME = "Hearing.Document.View";
     private static final List<String> ROLES = List.of("CLAIMANT", "DEFENDANT");
+    private static final List<Integer> NON_PROGRESSABLE_STATUSES = List.of(
+        TaskStatus.AVAILABLE.getPlaceValue(),
+        TaskStatus.DONE.getPlaceValue(),
+        TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+    );
 
     @Autowired
     public TaskListService(TaskListRepository taskListRepository,
@@ -183,40 +188,19 @@ public class TaskListService {
             if (Objects.nonNull(categories)) {
                 List<Long> catIds = categories.stream().map(TaskItemTemplateEntity::getId).toList();
                 tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
-                    caseIdentifier, role, List.of(
-                        TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
-                        TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
-                    ), catIds
+                    caseIdentifier, role, NON_PROGRESSABLE_STATUSES, catIds
                 );
             }
         } else if (Objects.nonNull(excludedTemplate)) {
             tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplateTemplateNameNot(
-                caseIdentifier, role, List.of(
-                    TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
-                    TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
-                ), excludedTemplate
+                caseIdentifier, role, NON_PROGRESSABLE_STATUSES, excludedTemplate
             );
         } else {
             tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
-                caseIdentifier, role, List.of(
-                    TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
-                    TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
-                )
+                caseIdentifier, role, NON_PROGRESSABLE_STATUSES
             );
         }
-        tasks.forEach(t -> {
-            TaskListEntity task = copyTaskList(t);
-            task.setCurrentStatus(TaskStatus.INACTIVE.getPlaceValue());
-            task.setNextStatus(TaskStatus.INACTIVE.getPlaceValue());
-            task.setHintTextCy("");
-            task.setHintTextEn("");
-            task.setUpdatedAt(OffsetDateTime.now());
-            task.setTaskNameEn(StringUtility.removeAnchor(t.getTaskNameEn()));
-            task.setTaskNameCy(StringUtility.removeAnchor(t.getTaskNameCy()));
-            log.info("{} task made inactive for claim = {}", task.getTaskNameEn(), caseIdentifier);
-            taskListRepository.save(task);
-        });
-        log.info("Total {} tasks made inactive for claim = {}", tasks.size(), caseIdentifier);
+        markTasksInactive(caseIdentifier, tasks);
     }
 
     @Transactional
@@ -245,6 +229,32 @@ public class TaskListService {
             caseIdentifier, role, excludedTemplate
         );
         makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, null, excludedTemplate);
+    }
+
+    @Transactional
+    public void makeSelectedProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier,
+                                                                              String role,
+                                                                              List<String> templateNames) {
+        log.info(
+            "makeSelectedProgressAbleTasksInactiveForCaseIdentifierAndRole caseIdentifier:{} role:{} templateNames:{}",
+            caseIdentifier,
+            role,
+            templateNames
+        );
+
+        if (templateNames == null || templateNames.isEmpty()) {
+            log.info("No template names supplied for selective inactivation for claim = {}", caseIdentifier);
+            return;
+        }
+
+        List<TaskListEntity> tasks =
+            taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplateTemplateNameIn(
+                caseIdentifier,
+                role,
+                NON_PROGRESSABLE_STATUSES,
+                templateNames
+            );
+        markTasksInactive(caseIdentifier, tasks);
     }
 
     @Transactional
@@ -287,5 +297,21 @@ public class TaskListService {
             task.getUpdatedBy(),
             task.getMessageParams()
         );
+    }
+
+    private void markTasksInactive(String caseIdentifier, List<TaskListEntity> tasks) {
+        tasks.forEach(t -> {
+            TaskListEntity task = copyTaskList(t);
+            task.setCurrentStatus(TaskStatus.INACTIVE.getPlaceValue());
+            task.setNextStatus(TaskStatus.INACTIVE.getPlaceValue());
+            task.setHintTextCy("");
+            task.setHintTextEn("");
+            task.setUpdatedAt(OffsetDateTime.now());
+            task.setTaskNameEn(StringUtility.removeAnchor(t.getTaskNameEn()));
+            task.setTaskNameCy(StringUtility.removeAnchor(t.getTaskNameCy()));
+            log.info("{} task made inactive for claim = {}", task.getTaskNameEn(), caseIdentifier);
+            taskListRepository.save(task);
+        });
+        log.info("Total {} tasks made inactive for claim = {}", tasks.size(), caseIdentifier);
     }
 }
