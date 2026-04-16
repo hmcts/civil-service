@@ -438,8 +438,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE.name()).build()
             ).build();
-
-
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
             handler.handle(params);

@@ -123,8 +123,6 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
             .legacyCaseReference(legacyCaseNumber)
             .respondent1(party)
             .build();
-
-
         String partyName = "partyName";
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
         partyUtilsMockedStatic.when(() -> PartyUtils.getPartyNameBasedOnType(party)).thenReturn(partyName);

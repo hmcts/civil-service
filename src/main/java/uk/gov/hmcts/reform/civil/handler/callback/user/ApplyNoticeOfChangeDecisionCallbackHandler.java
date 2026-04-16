@@ -216,8 +216,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             && postDecisionCaseData.isApplicantLiP()) {
             return APPLY_NOC_DECISION_LIP;
         } else if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)
-            && postDecisionCaseData.isRespondent1LiP()
-            ) {
+            && postDecisionCaseData.isRespondent1LiP()) {
             return APPLY_NOC_DECISION_DEFENDANT_LIP;
         }
         return APPLY_NOC_DECISION;

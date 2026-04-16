@@ -352,8 +352,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setTranslatedDocuments(List.of(element(translatedDoc)));
         caseData.setCaseDataLiP(caseDataLiP);
-
-
         CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(

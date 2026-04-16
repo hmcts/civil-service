@@ -373,8 +373,6 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             //given
             HashMap<String, Object> params = new HashMap<>();
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
-
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
             caseData.setLegacyCaseReference("reference");
             caseData.setCcdCaseReference(1234L);
@@ -402,8 +400,6 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
-
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
             caseData.setLegacyCaseReference("reference");
             caseData.setCcdCaseReference(530012L);
@@ -433,8 +429,6 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
-
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
             caseData.setLegacyCaseReference("reference");
             caseData.setCcdCaseReference(1234L);

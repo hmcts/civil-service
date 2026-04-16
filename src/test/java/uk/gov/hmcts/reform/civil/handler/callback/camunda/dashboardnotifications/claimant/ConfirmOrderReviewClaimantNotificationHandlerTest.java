@@ -132,11 +132,8 @@ class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHand
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT.name())
                 .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
-
-
-        handler.handle(params);
-
         // Then
+        handler.handle(params);
         HashMap<String, Object> scenarioParams = new HashMap<>();
         verifyDeleteNotificationsAndTaskListUpdates(caseData);
         verify(dashboardScenariosService).recordScenarios(
@@ -158,11 +155,8 @@ class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHand
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT.name())
                 .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
-
-
-        handler.handle(params);
-
         // Then
+        handler.handle(params);
         verifyDeleteNotificationsAndTaskListUpdates(caseData);
         HashMap<String, Object> scenarioParams = new HashMap<>();
         verify(dashboardScenariosService).recordScenarios(

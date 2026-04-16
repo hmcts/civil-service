@@ -53,7 +53,7 @@ public class ClaimIssuedPaymentSuccessfulNotificationHandler extends CallbackHan
     private CallbackResponse notifyClaimantRejectRepayment(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (caseData.isLipvLipOneVOne() ) {
+        if (caseData.isLipvLipOneVOne()) {
             notificationService.sendMail(
                 addEmail(caseData),
                 addTemplate(),

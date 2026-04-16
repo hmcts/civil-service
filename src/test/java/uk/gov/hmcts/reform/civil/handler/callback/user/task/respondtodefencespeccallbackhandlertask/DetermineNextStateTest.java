@@ -378,8 +378,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
         caseData.setApplicant1ProceedWithClaim(NO);
         caseData.setDefenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM);
-
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));

@@ -40,7 +40,7 @@ public class StayLiftedClaimantDashboardService extends DashboardScenarioService
 
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
-        if (caseData.isApplicant1NotRepresented() ) {
+        if (caseData.isApplicant1NotRepresented()) {
             Map<String, Boolean> scenarios = new HashMap<>();
             scenarios.put(SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(), true);
             scenarios.putAll(getScenariosBasedOnPreStayState(caseData));
