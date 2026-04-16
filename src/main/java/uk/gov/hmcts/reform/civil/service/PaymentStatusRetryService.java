@@ -42,7 +42,6 @@ public class PaymentStatusRetryService {
             Long caseId = Long.valueOf(caseReference);
             submitUpdatePaymentEvent(caseData, caseId, feeType);
         } catch (Exception ex) {
-            log.info("Retrying payment status update for case {}", caseReference, ex);
             throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
     }
@@ -56,10 +55,8 @@ public class PaymentStatusRetryService {
             caseData = updateCaseDataWithPaymentDetails(response, caseData, feeType);
             submitUpdatePaymentEvent(caseData, caseId, feeType);
         } catch (IllegalArgumentException ex) {
-            log.info("Unable to update payment status for case {}", caseReference, ex);
             throw ex;
         } catch (Exception ex) {
-            log.info("Retrying payment status update for case {}", caseReference, ex);
             throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
     }

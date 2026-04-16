@@ -44,10 +44,8 @@ public class UpdatePaymentStatusService {
             log.info("Creating event for updated payment status on caseReference: {}", caseReference);
             createEvent(caseData, caseReference);
         } catch (IllegalArgumentException ex) {
-            log.info("Unable to update payment status for case {}", caseReference, ex);
             throw ex;
         } catch (Exception ex) {
-            log.info("Retrying GA payment status update for case {}", caseReference, ex);
             throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
     }

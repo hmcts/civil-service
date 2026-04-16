@@ -171,11 +171,6 @@ class PaymentStatusRetryServiceTest {
             spyService.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), response)
         );
 
-        assertThat(listAppender.list).hasSize(1);
-        assertThat(listAppender.list.getFirst().getLevel()).isEqualTo(Level.INFO);
-        assertThat(listAppender.list.getFirst().getFormattedMessage())
-            .contains("Retrying payment status update for case 123");
-
         CardPaymentStatusResponse recoverResponse = new CardPaymentStatusResponse()
             .setStatus("FAILED")
             .setPaymentReference("REF123")
@@ -185,9 +180,9 @@ class PaymentStatusRetryServiceTest {
         CaseDataUpdateException ex = new CaseDataUpdateException("test error", new RuntimeException());
         service.recover(ex, FeeType.CLAIMISSUED, CASE_ID.toString(), recoverResponse);
 
-        assertThat(listAppender.list).hasSize(2);
-        assertThat(listAppender.list.get(1).getLevel()).isEqualTo(Level.ERROR);
-        assertThat(listAppender.list.get(1).getFormattedMessage())
+        assertThat(listAppender.list).hasSize(1);
+        assertThat(listAppender.list.getFirst().getLevel()).isEqualTo(Level.ERROR);
+        assertThat(listAppender.list.getFirst().getFormattedMessage())
             .contains("Payment status update failed after retries for case 123 and fee type CLAIMISSUED. Status: FAILED, ErrorCode: ERR001");
     }
 
