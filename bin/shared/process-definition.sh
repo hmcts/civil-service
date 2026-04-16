@@ -14,7 +14,7 @@ if [[ ! -e ${definition_output_file} ]]; then
    touch ${definition_output_file}
 fi
 
-echo "Generating definition xls for CCD_DEF_CASE_SERVICE_BASE_URL ${CCD_DEF_CASE_SERVICE_BASE_URL}"
+echo "Uploading definition to CCD_DEF_CASE_SERVICE_BASE_URL ${CCD_DEF_CASE_SERVICE_BASE_URL}"
 
 docker run --rm --name json2xlsx \
   -v ${definition_input_dir}:/tmp/ccd-definition \
