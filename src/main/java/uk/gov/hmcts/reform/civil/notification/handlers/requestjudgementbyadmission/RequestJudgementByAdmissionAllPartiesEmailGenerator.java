@@ -10,10 +10,12 @@ public class RequestJudgementByAdmissionAllPartiesEmailGenerator extends AllPart
 
     public RequestJudgementByAdmissionAllPartiesEmailGenerator(
         RequestJudgementByAdmissionApplicantEmailDTOGenerator applicantEmailDTOGenerator,
+        RequestJudgementByAdmissionAppSolOneEmailDTOGenerator appSolOneEmailDTOGenerator,
         RequestJudgementByAdmissionLipRespondentEmailDTOGenerator lipRespondentEmailDTOGenerator,
         RequestJudgementByAdmissionRespSolOneEmailDTOGenerator respSolOneEmailDTOGenerator,
         RequestJudgementByAdmissionDefendantEmailDTOGenerator defendantEmailDTOGenerator) {
         super(List.of(applicantEmailDTOGenerator,
+                      appSolOneEmailDTOGenerator,
                       lipRespondentEmailDTOGenerator,
                       respSolOneEmailDTOGenerator,
                       defendantEmailDTOGenerator));
