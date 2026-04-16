@@ -1,12 +1,13 @@
 #!groovy
+
+@Library("Infrastructure")
+
+import uk.gov.hmcts.contino.AppPipelineDsl
+import uk.gov.hmcts.contino.GithubAPI
+
 properties([
   copyArtifactPermission('/HMCTS_a_to_c/civil-service/*'),
 ])
-
-@Library("Infrastructure")
-import uk.gov.hmcts.contino.AppPipelineConfig
-import uk.gov.hmcts.contino.AppPipelineDsl
-import uk.gov.hmcts.contino.GithubAPI
 
 def type = "java"
 def product = "civil"
@@ -14,9 +15,183 @@ def component = "service"
 def camundaBranch = "master"
 def dmnBranch = "master"
 def wiremockMappingsBranch = "master"
-def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
-AppPipelineConfig pipelineConf
+static Map<String, Object> secret(String secretName, String envVariable) {
+  [$class     : 'AzureKeyVaultSecret',
+   secretType : 'Secret',
+   name       : secretName,
+   envVariable: envVariable
+  ]
+}
+
+def secrets = [
+  's2s-${env}'  : [
+    secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
+    secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
+    secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
+  ],
+  'ccd-${env}'  : [
+    secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
+    secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET'),
+    secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
+    secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
+    secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET'),
+    secret('idam-data-store-system-user-username', 'IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
+    secret('idam-data-store-system-user-password', 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
+    secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY')
+  ],
+  'civil-${env}': [
+    secret('case-document-am-api-s2s-secret', 'CASE_DOCUMENT_AM_API_S2S_SECRET'),
+    secret('microservicekey-civil-service', 'S2S_SECRET'),
+    secret('ccd-importer-username', 'CCD_CONFIGURER_IMPORTER_USERNAME'),
+    secret('ccd-importer-password', 'CCD_CONFIGURER_IMPORTER_PASSWORD'),
+    secret('postgres-user', 'POSTGRES_USER'),
+    secret('postgres-password', 'POSTGRES_PASSWORD'),
+    secret('default-password', 'DEFAULT_PASSWORD'),
+    secret('judge-default-password', 'JUDGE_DEFAULT_PASSWORD'),
+    secret('iac-default-password', 'IAC_DEFAULT_PASSWORD'),
+    secret('system-update-user-password', 'SYSTEM_USER_PASSWORD'),
+    secret('ccd-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
+    secret('ccd-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
+    secret('generic-docker-pact-broker-password', 'GENERIC_DOCKER_PACT_BROKER_YAML_PASS')
+  ],
+  'aac-${env}'  : [
+    secret('idam-mca-client-secret', 'IDAM_MCA_CLIENT_SECRET'),
+    secret('idam-mca-system-user-username', 'IDAM_CAA_USERNAME'),
+    secret('idam-mca-system-user-password', 'IDAM_CAA_PASSWORD'),
+    secret('idam-noc-approver-username', 'IDAM_NOC_APPROVER_USERNAME'),
+    secret('idam-noc-approver-password', 'IDAM_NOC_APPROVER_PASSWORD'),
+    secret('aac-manage-case-s2s-secret', 'MANAGE_CASE_S2S_KEY'),
+    secret('notify-mca-api-key-secret', 'NOTIFY_MCA_API_KEY')
+  ],
+]
+
+withPipeline(type, product, component) {
+  env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
+  env.EM_CCD_ORCHESTRATOR_URL = 'http://em-ccd-orchestrator-aat.service.core-compute-aat.internal'
+  env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
+  env.PACT_BROKER_PORT = "443"
+  env.PACT_BROKER_SCHEME = "https"
+  env.ENABLE_SECURE_URL = true
+  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
+  env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
+  env.BEFTA_S2S_CLIENT_ID = "ccd_data"
+  env.CAMUNDA_DEFINITION_BRANCH = camundaBranch
+  env.DMN_DEFINITION_BRANCH = dmnBranch
+  env.WIREMOCK_MAPPINGS_BRANCH = wiremockMappingsBranch
+  env.UNASSIGN_CASES = true
+
+  enableHighLevelDataSetup("", true)
+  loadVaultSecrets(secrets)
+
+  onPR {
+    env.ENVIRONMENT = "preview"
+    env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+    env.CCD_DEFINITION_BRANCH = checkForCcdDefinitionBranchLabel()
+    env.PR_FT_GROUPS = getFunctionalTestsGroups()
+
+    setPreviewUrls(product, component)
+
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
+    before('build') {
+      sh """
+      ./bin/validate-migration-files.sh ${env.CHANGE_BRANCH} ${env.CHANGE_TARGET} --jenkins
+       """
+    }
+  }
+
+  onMaster {
+    env.ENVIRONMENT = "aat"
+    env.CCD_DEFINITION_BRANCH = "master"
+
+    setAatUrls()
+
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
+  }
+
+  afterAlways('test') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/jacoco/**'
+  }
+
+  afterAlways('pact-provider-verification') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
+  }
+
+  afterAlways('smoketest:preview') {
+    archiveSmokeTestResults()
+  }
+
+  afterAlways('functionalTest:preview') {
+    publishFunctionalTestResults()
+  }
+
+  afterAlways('smoketest:aat') {
+    archiveSmokeTestResults()
+  }
+
+  afterAlways('functionalTest:aat') {
+    publishFunctionalTestResults()
+  }
+
+  before('functionalTest:preview') {
+    prepareFunctionalTests(checkForRunAllFunctionalTests(env.BRANCH_NAME))
+  }
+
+  before('functionalTest:aat') {
+    prepareFunctionalTests(false)
+  }
+}
+
+def checkForRunAllFunctionalTests(branch_name) {
+  return new GithubAPI(this).getLabelsbyPattern(branch_name, "runAllFunctionalTests").contains("runAllFunctionalTests")
+}
+
+def checkForDisableWiremockLabel(branch_name) {
+  return new GithubAPI(this).getLabelsbyPattern(branch_name, "disableWiremock").contains("disableWiremock")
+}
+
+def checkForCcdDefinitionBranchLabel() {
+  def githubApi = new GithubAPI(this)
+  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
+    return label.minus("civilDefinitionBranch:").trim()
+  }
+  return "master"
+}
+
+def getFunctionalTestsGroups() {
+  def githubApi = new GithubAPI(this)
+  def functionalTestGroups = []
+  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr_ft_")) {
+    functionalTestGroups.add(label.substring(6, label.length()))
+  }
+  return functionalTestGroups.join(",")
+}
+
+def archiveSmokeTestResults() {
+  archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
+}
+
+def publishFunctionalTestResults() {
+  sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
+  publishHTML([
+    allowMissing: false,
+    alwaysLinkToLastBuild: true,
+    keepAll: true,
+    reportDir: 'test-results/functional/allure-report',
+    reportFiles: 'index.html',
+    reportName: 'Non-Prod E2E Allure Report'
+  ])
+  archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
+}
+
+def prepareFunctionalTests(boolean runAllFunctionalTests) {
+  if (runAllFunctionalTests) {
+    env.RUN_ALL_FUNCTIONAL_TESTS = true
+  } else {
+    copyPrevFailedAndNotExecutedTestFilesJson()
+  }
+  copyPreviousAllureHistory()
+}
 
 def copyPrevFailedAndNotExecutedTestFilesJson() {
   def buildFound = false
@@ -58,107 +233,37 @@ def copyPreviousAllureHistory() {
   }
 }
 
-def getFunctionalTestsGroups() {
-  def githubApi = new GithubAPI(this)
-  def functionalTestGroups = []
-  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr_ft_")) {
-    functionalTestGroups.add(label.substring(6, label.length()))
-  }
-  return functionalTestGroups.join(",")
-}
+def setPreviewUrls(String product, String component) {
+  env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.CAMUNDA_BASE_URL = "https://camunda-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  setAatIntegrationUrls()
+  env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.AAC_API_URL = "https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
 
-static Map<String, Object> secret(String secretName, String envVariable) {
-  [$class     : 'AzureKeyVaultSecret',
-   secretType : 'Secret',
-   name       : secretName,
-   envVariable: envVariable
-  ]
-}
+  def previewServiceName = "${product}-${component}-pr-${CHANGE_ID}"
+  def disableWiremock = checkForDisableWiremockLabel(env.BRANCH_NAME)
+  def wiremockUrl = "http://${previewServiceName}-wiremock"
 
-def secrets = [
-  's2s-${env}'  : [
-    secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
-    secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
-    secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
-  ],
-  'ccd-${env}'  : [
-    secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
-    secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET'),
-    secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
-    secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
-    secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET'),
-    secret('idam-data-store-system-user-username', 'IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
-    secret('idam-data-store-system-user-password', 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
-    secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY')
-  ],
-  'civil-${env}': [
-    secret('case-document-am-api-s2s-secret', 'CASE_DOCUMENT_AM_API_S2S_SECRET'),
-    secret('microservicekey-civil-service', 'S2S_SECRET'),
-    secret('ccd-importer-username', 'CCD_CONFIGURER_IMPORTER_USERNAME'),
-    secret('ccd-importer-password', 'CCD_CONFIGURER_IMPORTER_PASSWORD'),
-    secret('postgres-user', 'POSTGRES_USER'),
-    secret('postgres-password', 'POSTGRES_PASSWORD'),
-    secret('default-password', 'DEFAULT_PASSWORD'),
-    secret('judge-default-password', 'JUDGE_DEFAULT_PASSWORD'),
-    secret('iac-default-password', 'IAC_DEFAULT_PASSWORD'),
-    secret('system-update-user-password', 'SYSTEM_USER_PASSWORD'),
-    secret('generic-docker-pact-broker-password', 'GENERIC_DOCKER_PACT_BROKER_YAML_PASS')
-  ],
-  'aac-${env}'  : [
-    secret('idam-mca-client-secret', 'IDAM_MCA_CLIENT_SECRET'),
-    secret('idam-mca-system-user-username', 'IDAM_CAA_USERNAME'),
-    secret('idam-mca-system-user-password', 'IDAM_CAA_PASSWORD'),
-    secret('idam-noc-approver-username', 'IDAM_NOC_APPROVER_USERNAME'),
-    secret('idam-noc-approver-password', 'IDAM_NOC_APPROVER_PASSWORD'),
-    secret('aac-manage-case-s2s-secret', 'MANAGE_CASE_S2S_KEY'),
-    secret('notify-mca-api-key-secret', 'NOTIFY_MCA_API_KEY')
-  ],
-]
-
-// Vars for Kubernetes
-env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
-env.EM_CCD_ORCHESTRATOR_URL = 'http://em-ccd-orchestrator-aat.service.core-compute-aat.internal'
-
-def checkForRunAllFunctionalTests(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "runAllFunctionalTests").contains("runAllFunctionalTests")
-}
-
-def checkForEnableHelmLabel(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
-}
-
-def checkForDisableWiremockLabel(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "disableWiremock").contains("disableWiremock")
-}
-
-def getCivilCcdDefinitionBranch() {
-  def githubApi = new GithubAPI(this)
-  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
-    return label.minus("civilDefinitionBranch:").trim()
-  }
-  return "master"
-}
-
-withPipeline(type, product, component) {
-  env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
-  env.PACT_BROKER_PORT = "443"
-  env.PACT_BROKER_SCHEME = "https"
-  env.ENABLE_SECURE_URL = true
-  env.SONAR_SKIP_COMPILE = "true"
-  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
-  // Only run checkstyle on PR pipeline
-  env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
-
-  onPR {
-    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
-    env.ENVIRONMENT = "preview"
-    env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
-    loadVaultSecrets(secrets)
-
-    def previewServiceName = "${product}-${component}-pr-${CHANGE_ID}"
-    def wiremockUrl = "http://${previewServiceName}-wiremock"
-    def disableWiremock = checkForDisableWiremockLabel(env.BRANCH_NAME)
-
+  if (disableWiremock) {
+    echo "disableWiremock label detected - pointing API URLs to AAT instances"
+    env.PREVIEW_ACA_SERVICE_API_BASEURL = "http://${previewServiceName}-aac-manage-case-assignment"
+    env.PREVIEW_HMC_API_URL = wiremockUrl
+    env.PREVIEW_RD_PROFESSIONAL_API_URL = wiremockUrl
+    env.PREVIEW_RD_COMMONDATA_API_URL = "http://rd-commondata-api-aat.service.core-compute-aat.internal"
+    env.PREVIEW_DOCMOSIS_TORNADO_URL = wiremockUrl
+    env.PREVIEW_SEND_LETTER_URL = "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
+    env.PREVIEW_FEES_API_URL = "http://fees-register-api-aat.service.core-compute-aat.internal"
+    env.PREVIEW_CLAIM_STORE_URL = "http://cmc-claim-store-aat.service.core-compute-aat.internal"
+    env.PREVIEW_ROLE_ASSIGNMENT_URL = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+    env.PREVIEW_GENAPP_LRD_URL = "http://rd-location-ref-api-aat.service.core-compute-aat.internal"
+    env.PREVIEW_RTL_API_URL = wiremockUrl
+    env.PREVIEW_SENDGRID_HOST = ""
+    env.PREVIEW_SENDGRID_TEST = "false"
+  } else {
+    echo "disableWiremock label not detected - using wiremock URLs for API endpoints"
     env.PREVIEW_ACA_SERVICE_API_BASEURL = wiremockUrl
     env.PREVIEW_HMC_API_URL = wiremockUrl
     env.PREVIEW_RD_PROFESSIONAL_API_URL = wiremockUrl
@@ -172,152 +277,23 @@ withPipeline(type, product, component) {
     env.PREVIEW_RTL_API_URL = wiremockUrl
     env.PREVIEW_SENDGRID_HOST = "${previewServiceName}-wiremock"
     env.PREVIEW_SENDGRID_TEST = "true"
-
-    if (disableWiremock) {
-      echo "disableWiremock label detected - pointing API URLs to AAT instances"
-      env.PREVIEW_ACA_SERVICE_API_BASEURL = "http://${previewServiceName}-aac-manage-case-assignment"
-      env.PREVIEW_RD_COMMONDATA_API_URL = "http://rd-commondata-api-aat.service.core-compute-aat.internal"
-      env.PREVIEW_SEND_LETTER_URL = "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
-      env.PREVIEW_FEES_API_URL = "http://fees-register-api-aat.service.core-compute-aat.internal"
-      env.PREVIEW_CLAIM_STORE_URL = "http://cmc-claim-store-aat.service.core-compute-aat.internal"
-      env.PREVIEW_ROLE_ASSIGNMENT_URL = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
-      env.PREVIEW_GENAPP_LRD_URL = "http://rd-location-ref-api-aat.service.core-compute-aat.internal"
-      env.PREVIEW_SENDGRID_HOST = ""
-      env.PREVIEW_SENDGRID_TEST = "false"
-    } else {
-      echo "disableWiremock label not detected - using wiremock URLs for API endpoints"
-    }
-
-    before('build') {
-      sh """
-      ./bin/validate-migration-files.sh ${env.CHANGE_BRANCH} ${env.CHANGE_TARGET} --jenkins
-       """
-    }
   }
-  onMaster {
-    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
-    env.ENVIRONMENT = "aat"
-    loadVaultSecrets(secrets)
-  }
-  onDemo {
-    loadVaultSecrets(secrets)
-  }
+}
 
-  afterAlways('test') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/jacoco/**'
-  }
+def setAatUrls() {
+  env.URL = "https://civil-service-xui-staging.aat.platform.hmcts.net"
+  env.CIVIL_SERVICE_URL = "https://civil-service-staging.aat.platform.hmcts.net"
+  env.CAMUNDA_BASE_URL = "https://civil-service-camunda-staging-aat.service.core-compute-aat.internal"
+  env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+  setAatIntegrationUrls()
+  env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
+  env.AAC_API_URL = "https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
+}
 
-  before('smoketest:preview') {
-    env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-
-    retry(3) {
-      sh """
-        eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
-        ./bin/wait-for.sh definition-store
-        . ./bin/utils/idam-get-tokens.sh
-        ./bin/add-roles.sh
-        ./bin/pull-latest-wiremock-mappings.sh ${wiremockMappingsBranch}
-        ./bin/load-wiremock-mappings.sh
-        ./bin/pull-latest-camunda-files.sh ${camundaBranch}
-        ./bin/pull-latest-dmn-files.sh ${dmnBranch}
-        ./bin/pull-latest-civil-ccd-files.sh ${getCivilCcdDefinitionBranch()}
-        ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
-        ./bin/import-gen-apps-ccd-definition.sh "-e *-nonprod.json"
-      """
-    }
-
-    yarnBuilder.yarn('install-dependencies')
-    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.IDAM_TEST_SUPPORT_API_URL = "https://idam-testing-support-api.aat.platform.hmcts.net"
-    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.PAYMENT_API_URL = "http://payment-api-aat.service.core-compute-aat.internal"
-    env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.AAC_API_URL = "https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.PR_FT_GROUPS = getFunctionalTestsGroups()
-  }
-
-  afterAlways('smoketest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
-    if (checkForEnableHelmLabel(env.BRANCH_NAME)) {
-      error "The 'pr-values: enableHelm' label is active on the PR. The build will be interrupted to avoid wasting build time needlessly."
-    }
-  }
-
-  afterAlways('pact-provider-verification') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
-  }
-
-  before('functionalTest:preview') {
-    if(checkForRunAllFunctionalTests(env.BRANCH_NAME)) {
-      env.RUN_ALL_FUNCTIONAL_TESTS = true
-    } else {
-      copyPrevFailedAndNotExecutedTestFilesJson()
-    }
-    copyPreviousAllureHistory()
-    env.UNASSIGN_CASES = true
-  }
-
-  afterAlways('functionalTest:preview') {
-    steps.sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
-    publishHTML([
-      allowMissing: false,
-      alwaysLinkToLastBuild: true,
-      keepAll: true,
-      reportDir: 'test-results/functional/allure-report',
-      reportFiles: 'index.html',
-      reportName: 'Non-Prod E2E Allure Report'
-    ])
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
-  }
-
-  before('smoketest:aat') {
-    sh """
-      eval \$(./bin/variables/load-staging-environment-variables.sh)
-      . ./bin/utils/idam-get-tokens.sh
-      ./bin/add-roles.sh
-      ./bin/pull-latest-camunda-files.sh ${camundaBranch}
-      ./bin/pull-latest-dmn-files.sh ${dmnBranch}
-      ./bin/pull-latest-civil-ccd-files.sh ${getCivilCcdDefinitionBranch()}
-      ./bin/import-ccd-definition.sh "-e *-nonprod.json,*COS-nonprod.json,AuthorisationCaseType-shuttered.json"
-      ./bin/import-gen-apps-ccd-definition.sh "-e *-nonprod.json"
-      ./bin/import-bpmn-diagram.sh .
-    """
-    env.URL = "https://civil-service-xui-staging.aat.platform.hmcts.net"
-    env.CIVIL_SERVICE_URL = "https://civil-service-staging.aat.platform.hmcts.net"
-    env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
-    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.IDAM_TEST_SUPPORT_API_URL = "https://idam-testing-support-api.aat.platform.hmcts.net"
-    env.PAYMENT_API_URL = "http://payment-api-aat.service.core-compute-aat.internal"
-    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
-    env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.AAC_API_URL = "https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
-    yarnBuilder.yarn('install-dependencies')
-  }
-
-  afterAlways('smoketest:aat') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
-  }
-
-  before('functionalTest:aat') {
-    copyPrevFailedAndNotExecutedTestFilesJson()
-    copyPreviousAllureHistory()
-    env.UNASSIGN_CASES = true
-  }
-
-  afterAlways('functionalTest:aat') {
-    steps.sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
-    publishHTML([
-      allowMissing: false,
-      alwaysLinkToLastBuild: true,
-      keepAll: true,
-      reportDir: 'test-results/functional/allure-report',
-      reportFiles: 'index.html',
-      reportName: 'Non-Prod E2E Allure Report'
-    ])
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
-  }
+def setAatIntegrationUrls() {
+  env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+  env.IDAM_TEST_SUPPORT_API_URL = "https://idam-testing-support-api.aat.platform.hmcts.net"
+  env.PAYMENT_API_URL = "http://payment-api-aat.service.core-compute-aat.internal"
+  env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+  env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 }
