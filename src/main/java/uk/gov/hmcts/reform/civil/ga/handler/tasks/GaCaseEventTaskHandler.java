@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -20,11 +21,15 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class GaCaseEventTaskHandler extends BaseExternalTaskHandler {
+
+    private static final Pattern ALREADY_PROCESSED_PATTERN =
+        Pattern.compile("event .* is already processed|already processed", Pattern.CASE_INSENSITIVE);
 
     private final GaCoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -35,16 +40,27 @@ public class GaCaseEventTaskHandler extends BaseExternalTaskHandler {
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
         String caseId = variables.getCaseId();
-        log.info("Starting case event task for case ID: {}, event: {}", caseId, variables.getCaseEvent());
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId,
-                                                                                variables.getCaseEvent());
-        CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-        BusinessProcess businessProcess = startEventData
-            .getBusinessProcess().copy()
-            .setActivityId(externalTask.getActivityId());
-        CaseDataContent caseDataContent = caseDataContent(startEventResponse, businessProcess);
-        var data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
-        return new ExternalTaskData().setParentCaseData(data);
+        try {
+            log.info("Starting case event task for case ID: {}, event: {}", caseId, variables.getCaseEvent());
+            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId,
+                                                                                    variables.getCaseEvent());
+            CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+            BusinessProcess businessProcess = startEventData
+                .getBusinessProcess().copy()
+                .setActivityId(externalTask.getActivityId());
+            CaseDataContent caseDataContent = caseDataContent(startEventResponse, businessProcess);
+            var data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
+            return new ExternalTaskData().setParentCaseData(data);
+        } catch (FeignException e) {
+            if (isAlreadyProcessedException(e)) {
+                log.info("Event already processed for caseId {}, completing GA task with current CCD state", caseId);
+                var caseData = caseDetailsConverter.toGeneralApplicationCaseData(
+                    coreCaseDataService.getCase(Long.valueOf(caseId))
+                );
+                return new ExternalTaskData().setParentCaseData(caseData);
+            }
+            throw e;
+        }
     }
 
     @Override
@@ -84,5 +100,10 @@ public class GaCaseEventTaskHandler extends BaseExternalTaskHandler {
     private String getDescription() {
 
         return null;
+    }
+
+    private boolean isAlreadyProcessedException(FeignException exception) {
+        return exception.status() == 422
+            && ALREADY_PROCESSED_PATTERN.matcher(exception.contentUTF8() + " " + exception.getMessage()).find();
     }
 }

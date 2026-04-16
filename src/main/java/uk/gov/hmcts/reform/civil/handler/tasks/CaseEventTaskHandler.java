@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.client.exception.ValueMapperException;
@@ -44,6 +46,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @RequiredArgsConstructor
 @Component
 public class CaseEventTaskHandler extends BaseExternalTaskHandler {
+    private static final Pattern ALREADY_PROCESSED_PATTERN =
+        Pattern.compile("event .* is already processed|already processed", Pattern.CASE_INSENSITIVE);
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -81,6 +85,15 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
             log.info("Submit Event {} for caseId {}", startEventResponse.getEventId(), caseId);
             var data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
             return new ExternalTaskData().setCaseData(data);
+        } catch (FeignException e) {
+            if (isAlreadyProcessedException(e)) {
+                log.info("Event already processed for caseId {}, completing task with current CCD state", caseIdFrom(externalTask));
+                CaseData caseData = caseDetailsConverter.toCaseData(
+                    coreCaseDataService.getCase(Long.valueOf(caseIdFrom(externalTask)))
+                );
+                return new ExternalTaskData().setCaseData(caseData);
+            }
+            throw e;
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
@@ -254,5 +267,16 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
                 return null;
             }
         }
+    }
+
+    private boolean isAlreadyProcessedException(FeignException exception) {
+        return exception.status() == 422
+            && ALREADY_PROCESSED_PATTERN.matcher(exception.contentUTF8() + " " + exception.getMessage()).find();
+    }
+
+    private String caseIdFrom(ExternalTask externalTask) {
+        ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
+        return ofNullable(variables.getCaseId())
+            .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
     }
 }

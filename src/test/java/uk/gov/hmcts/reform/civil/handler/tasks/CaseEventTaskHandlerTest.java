@@ -49,10 +49,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -221,6 +223,36 @@ class CaseEventTaskHandlerTest {
                 anyString(),
                 eq(2),
                 eq(300000L)
+            );
+        }
+
+        @Test
+        void shouldCompleteTask_whenFeign422EventAlreadyProcessed() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.READY)
+                                     .setProcessInstanceId("processInstanceId"))
+                .build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
+
+            when(mockTask.getVariable(FLOW_STATE)).thenReturn(PENDING_CLAIM_ISSUED.fullName());
+            when(mockTask.getActivityId()).thenReturn("activityId");
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class)))
+                .thenThrow(buildAlreadyProcessedFeignException("already processed"));
+            when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
+            when(stateFlowEngine.getStateFlow(any(CaseData.class)))
+                .thenReturn(new StateFlowDTO().setState(State.from("MAIN.DRAFT")).setFlags(Map.of()));
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(externalTaskService).complete(mockTask, variables);
+            verify(externalTaskService, never()).handleFailure(
+                eq(mockTask), anyString(), anyString(), anyInt(), anyLong()
             );
         }
     }
@@ -944,5 +976,25 @@ class CaseEventTaskHandlerTest {
                 anyLong()
             );
         }
+    }
+
+    private FeignException buildAlreadyProcessedFeignException(String body) {
+        return FeignException.errorStatus(
+            "duplicate",
+            Response.builder()
+                .request(
+                    Request.create(
+                        Request.HttpMethod.POST,
+                        "example url",
+                        new HashMap<>(),
+                        null,
+                        null,
+                        null
+                    )
+                )
+                .status(422)
+                .body(body, StandardCharsets.UTF_8)
+                .build()
+        );
     }
 }

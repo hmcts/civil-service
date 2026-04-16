@@ -36,8 +36,11 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -180,5 +183,61 @@ class GaCaseEventTaskHandlerTest {
                 eq(300000L)
             );
         }
+
+        @Test
+        void shouldCompleteTask_whenFeign422EventAlreadyProcessed() {
+            GaStateFlow stateFlow = mock(GaStateFlow.class);
+            State state = mock(State.class);
+            when(state.getName()).thenReturn("MAIN.DRAFT");
+            when(stateFlow.getState()).thenReturn(state);
+            when(stateFlow.getFlags()).thenReturn(Map.of());
+            when(gaStateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(stateFlow);
+
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
+                .build();
+            GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
+                .build();
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(coreCaseDataService.startUpdate(CASE_ID, INITIATE_GENERAL_APPLICATION))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class)))
+                .thenThrow(buildAlreadyProcessedFeignException("Event INITIATE_GENERAL_APPLICATION is already processed"));
+            when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any(CaseDetails.class))).thenReturn(gaCaseData);
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(BaseExternalTaskHandler.FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
+            verify(externalTaskService).complete(mockTask, variables);
+            verify(externalTaskService, never()).handleFailure(
+                eq(mockTask), anyString(), anyString(), anyInt(), anyLong()
+            );
+        }
+    }
+
+    private FeignException buildAlreadyProcessedFeignException(String body) {
+        return FeignException.errorStatus(
+            "duplicate",
+            Response.builder()
+                .request(
+                    Request.create(
+                        Request.HttpMethod.POST,
+                        "example url",
+                        new HashMap<>(),
+                        null,
+                        null,
+                        null
+                    )
+                )
+                .status(422)
+                .body(body, StandardCharsets.UTF_8)
+                .build()
+        );
     }
 }

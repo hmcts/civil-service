@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -186,6 +187,39 @@ class ApplicationProcessCaseEventTaskHandlerTest {
         }
 
         @Test
+        void shouldCompleteTask_whenFeign422EventAlreadyProcessed() {
+            GaStateFlow stateFlow = mock(GaStateFlow.class);
+            State state = mock(State.class);
+            when(state.getName()).thenReturn("MAIN.DRAFT");
+            when(stateFlow.getState()).thenReturn(state);
+            when(stateFlow.getFlags()).thenReturn(Map.of());
+            when(gaStateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(stateFlow);
+
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
+                .build();
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(coreCaseDataService.startGaUpdate(CASE_ID, GENERATE_JUDGES_FORM))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+            when(coreCaseDataService.submitGaUpdate(eq(CASE_ID), any(CaseDataContent.class)))
+                .thenThrow(buildAlreadyProcessedFeignException("Event GENERATE_JUDGES_FORM is already processed"));
+            when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
+
+            applicationProcessCaseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
+            variables.putValue("generalAppParentCaseLink", PARENT_CASE_ID);
+            verify(externalTaskService).complete(mockTask, variables);
+            verify(externalTaskService, never()).handleFailure(
+                eq(mockTask), anyString(), anyString(), anyInt(), anyLong()
+            );
+        }
+
+        @Test
         void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
                 .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
@@ -208,5 +242,25 @@ class ApplicationProcessCaseEventTaskHandlerTest {
                 anyLong()
             );
         }
+    }
+
+    private FeignException buildAlreadyProcessedFeignException(String body) {
+        return FeignException.errorStatus(
+            "duplicate",
+            Response.builder()
+                .request(
+                    Request.create(
+                        Request.HttpMethod.POST,
+                        "example url",
+                        new HashMap<>(),
+                        null,
+                        null,
+                        null
+                    )
+                )
+                .status(422)
+                .body(body, StandardCharsets.UTF_8)
+                .build()
+        );
     }
 }
