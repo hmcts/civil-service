@@ -362,14 +362,6 @@ sonarqube {
   }
 }
 
-configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
-  sonarqube {
-    properties {
-      property "sonar.coverage.jacoco.xmlReportPaths",
-        rootProject.layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile
-    }
-  }
-}
 
 tasks.named('jacocoTestReport') {
   dependsOn tasks.named('test')
@@ -439,7 +431,10 @@ dependencies {
 
   annotationProcessor "org.projectlombok:lombok:${versions.lombok}"
 
-  implementation project(':dashboard-notifications')
+  implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+  implementation "jakarta.inject:jakarta.inject-api:2.0.1"
+  implementation "io.swagger.core.v3:swagger-annotations"
+
   implementation "org.springframework.data:spring-data-jpa"
   implementation "org.springframework.boot:spring-boot-starter-web"
   implementation "org.springframework.boot:spring-boot-starter-actuator"
