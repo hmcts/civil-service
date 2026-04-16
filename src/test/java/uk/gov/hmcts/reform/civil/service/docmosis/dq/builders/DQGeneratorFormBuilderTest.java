@@ -439,6 +439,54 @@ class DQGeneratorFormBuilderTest {
     }
 
     @Test
+    void shouldCorrectlyMapApplicant1AdditionalInformationForJudge() {
+        // Given: Claimant DQ with applicant1AdditionalInformationForJudge
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicant1AdditionalInformationForJudge("Test judge info for claimant 1")
+            .businessProcess(createBusinessProcess("CLAIMANT_RESPONSE_SPEC"))
+            .build();
+
+        // When: Generate DQ form
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        // Then: Further judge info should be populated
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals("Test judge info for claimant 1", result.getFurtherInformation().getOtherInformationForJudge());
+    }
+
+    @Test
+    void shouldCorrectlyMapAdditionalInformationForJudge2() {
+        // Given: Respondent DQ with additionalInformationForJudge2
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .additionalInformationForJudge2("Test judge info for respondent 2")
+            .businessProcess(createBusinessProcess("DEFENDANT_RESPONSE_SPEC"))
+            .build();
+
+        // When: Generate DQ form
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        // Then: Further judge info should be populated
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals("Test judge info for respondent 2", result.getFurtherInformation().getOtherInformationForJudge());
+    }
+
+    @Test
     void shouldHandleNullApplicant1DQFutureApplicationsFieldWithoutNPE() {
         // Given: Applicant1DQ with null FutureApplications field
         Witnesses mockWitnesses = mock(Witnesses.class);
