@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -49,6 +50,20 @@ public class UpdatePaymentStatusService {
             log.info("Retrying GA payment status update for case {}", caseReference, ex);
             throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
+    }
+
+    @Recover
+    public void recover(CaseDataUpdateException ex, String caseReference, CardPaymentStatusResponse cardPaymentStatusResponse) {
+        String status = cardPaymentStatusResponse != null ? cardPaymentStatusResponse.getStatus() : "N/A";
+        String errorCode = cardPaymentStatusResponse != null ? cardPaymentStatusResponse.getErrorCode() : "N/A";
+
+        log.error(
+            "GA Payment status update failed after retries for case {}. Status: {}, ErrorCode: {}",
+            caseReference,
+            status,
+            errorCode,
+            ex
+        );
     }
 
     private void createEvent(GeneralApplicationCaseData caseData, String caseReference) {

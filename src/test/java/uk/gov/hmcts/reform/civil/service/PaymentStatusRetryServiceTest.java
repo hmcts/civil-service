@@ -256,5 +256,35 @@ class PaymentStatusRetryServiceTest {
         );
     }
 
+    @Test
+    void shouldLogRetryAndRecoverForCaseData() {
+        CaseDataUpdateException ex = new CaseDataUpdateException("Test Error", new RuntimeException());
+        CaseData caseData = mock(CaseData.class);
+
+        service.recover(ex, FeeType.CLAIMISSUED, "123", caseData);
+
+        assertThat(listAppender.list).hasSize(1);
+        assertThat(listAppender.list.getFirst().getLevel()).isEqualTo(Level.ERROR);
+        assertThat(listAppender.list.getFirst().getFormattedMessage())
+            .contains("Payment status update (CaseData) failed after retries for case 123 and fee type CLAIMISSUED");
+    }
+
+    @Test
+    void recoverShouldLogErrorForCardPaymentResponse() {
+        CaseDataUpdateException ex = new CaseDataUpdateException("Test Error", new RuntimeException());
+
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setStatus("FAILED")
+            .setErrorCode("ERR123")
+            .setErrorDescription("Payment failed")
+            .setPaymentReference("PAY123");
+
+        service.recover(ex, FeeType.CLAIMISSUED, "12345", response);
+
+        assertThat(listAppender.list).hasSize(1);
+        assertThat(listAppender.list.getFirst().getLevel()).isEqualTo(Level.ERROR);
+        assertThat(listAppender.list.getFirst().getFormattedMessage())
+            .contains("Payment status update failed after retries for case 12345 and fee type CLAIMISSUED. Status: FAILED, ErrorCode: ERR123");
+    }
 }
 
