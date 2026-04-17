@@ -70,12 +70,11 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
         .setDocumentType(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)
         .setDocumentLink(new Document().setDocumentFileName(FILE_NAME).setDocumentBinaryUrl("Binary/url").setDocumentUrl("url"));
     private static final Address RESPONDENT_ADDRESS = address("123 road", "London", "EX12RT");
-    private static final Party DEFENDANT = Party.builder().primaryAddress(RESPONDENT_ADDRESS)
-        .type(Party.Type.INDIVIDUAL)
-        .individualTitle("Mr.")
-        .individualFirstName("Smith")
-        .individualLastName("John")
-        .build();
+    private static final Party DEFENDANT = new Party().setPrimaryAddress(RESPONDENT_ADDRESS)
+        .setType(Party.Type.INDIVIDUAL)
+        .setIndividualTitle("Mr.")
+        .setIndividualFirstName("Smith")
+        .setIndividualLastName("John");
 
     private static Address address(String addressLine1, String postTown, String postCode) {
         Address address = new Address();
@@ -88,21 +87,20 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
     private static final CaseData CASE_DATA = CaseData.builder()
         .legacyCaseReference(CLAIM_REFERENCE)
         .ccdCaseReference(12325480L)
-        .applicant1(Party.builder()
-                        .type(Party.Type.INDIVIDUAL)
-                        .individualTitle("Mr.")
-                        .individualFirstName("John")
-                        .individualLastName("Smith").build())
+        .applicant1(new Party()
+                        .setType(Party.Type.INDIVIDUAL)
+                        .setIndividualTitle("Mr.")
+                        .setIndividualFirstName("John")
+                        .setIndividualLastName("Smith"))
         .respondent1(DEFENDANT)
         .respondent1Represented(YesOrNo.NO)
         .respondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode(PIN))
         .submittedDate(LocalDateTime.now())
         .defaultJudgmentDocuments(List.of(
-            Element.<CaseDocument>builder()
-                .value(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT_DEFENDANT1)
+            new Element<CaseDocument>().setValue(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT_DEFENDANT1)
                 .setDocumentName("DefendantDJ.pdf")
                 .setDocumentLink(new Document().setDocumentFileName("DefendantDJ.pdf").setDocumentBinaryUrl("Binary/url").setDocumentUrl("url"))
-                .setCreatedDatetime(LocalDateTime.now())).build()))
+                .setCreatedDatetime(LocalDateTime.now()))))
         .build();
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF = "default-judgment-non-divergent-spec-pin_in_letter";

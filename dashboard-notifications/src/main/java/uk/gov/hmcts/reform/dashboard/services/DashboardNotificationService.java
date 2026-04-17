@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Objects.nonNull;
@@ -29,6 +30,10 @@ public class DashboardNotificationService {
 
     private final DashboardNotificationsRepository dashboardNotificationsRepository;
     private final NotificationActionRepository notificationActionRepository;
+    private static final Set<String> CASE_STAY_TEMPLATES = Set.of(
+        "Notice.AAA6.CP.Case.Stayed.Claimant",
+        "Notice.AAA6.CP.Case.Stayed.Defendant"
+    );
 
     private final IdamApi idamApi;
 
@@ -52,13 +57,31 @@ public class DashboardNotificationService {
 
     public List<Notification> getNotifications(String ccdCaseIdentifier, String roleType) {
 
-        List<DashboardNotificationsEntity> dashboardNotificationsEntityList = dashboardNotificationsRepository
-            .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
+        List<DashboardNotificationsEntity> all =
+            dashboardNotificationsRepository.findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
 
-        return dashboardNotificationsEntityList.stream()
-            .sorted(Comparator.comparing(DashboardNotificationsEntity::getCreatedAt, Comparator.reverseOrder()))
+        // Sort all notifications
+        List<DashboardNotificationsEntity> sortedAllNotifications = all.stream()
+            .sorted(Comparator.comparing(DashboardNotificationsEntity::getCreatedAt).reversed())
+            .toList();
+
+        // Filter stay lifted
+        List<DashboardNotificationsEntity> caseStayedNotification = sortedAllNotifications.stream()
+            .filter(n -> n.getName() != null && CASE_STAY_TEMPLATES.contains(n.getName()))
+            .toList();
+
+        // If found, return only those, otherwise return all
+        List<DashboardNotificationsEntity> result =
+            caseStayedNotification.isEmpty() ? sortedAllNotifications : caseStayedNotification;
+
+        return result.stream()
             .map(Notification::from)
             .toList();
+    }
+
+    public List<DashboardNotificationsEntity> getDashboardNotifications(String ccdCaseIdentifier, String roleType) {
+        return dashboardNotificationsRepository
+            .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
     }
 
     public Map<String, List<Notification>> getAllCasesNotifications(List<String> ccdCaseIdentifiers, String roleType) {
@@ -88,7 +111,8 @@ public class DashboardNotificationService {
                 notification.getReference());
             if (nonNull(existingNotification) && !existingNotification.isEmpty()) {
                 DashboardNotificationsEntity dashboardNotification = existingNotification.get(0);
-                updated = notification.toBuilder().id(dashboardNotification.getId()).build();
+                updated = copyNotification(notification);
+                updated.setId(dashboardNotification.getId());
                 for (DashboardNotificationsEntity dashNotification : existingNotification) {
                     notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(
                         dashNotification,
@@ -112,13 +136,14 @@ public class DashboardNotificationService {
         Optional<DashboardNotificationsEntity> dashboardNotification = dashboardNotificationsRepository.findById(id);
 
         dashboardNotification.ifPresent(notification -> {
-            NotificationActionEntity notificationAction = NotificationActionEntity.builder()
-                .reference(notification.getReference())
-                .dashboardNotification(notification)
-                .actionPerformed(clickAction)
-                .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
-                .createdAt(OffsetDateTime.now())
-                .build();
+            NotificationActionEntity notificationAction = new NotificationActionEntity(
+                null,
+                notification.getReference(),
+                clickAction,
+                idamApi.retrieveUserDetails(authToken).getFullName(),
+                OffsetDateTime.now(),
+                notification
+            );
 
             if (nonNull(notification.getNotificationAction())
                 && notification.getNotificationAction().getActionPerformed().equals(clickAction)) {
@@ -140,5 +165,26 @@ public class DashboardNotificationService {
     public void deleteByReferenceAndCitizenRole(String reference, String citizenRole) {
         int deleted = dashboardNotificationsRepository.deleteByReferenceAndCitizenRole(reference, citizenRole);
         log.info("{} notifications removed for claim = {}", deleted, reference);
+    }
+
+    private DashboardNotificationsEntity copyNotification(DashboardNotificationsEntity notification) {
+        return new DashboardNotificationsEntity(
+            notification.getId(),
+            notification.getNotificationAction(),
+            notification.getReference(),
+            notification.getName(),
+            notification.getCitizenRole(),
+            notification.getTitleEn(),
+            notification.getDescriptionEn(),
+            notification.getTitleCy(),
+            notification.getDescriptionCy(),
+            notification.getParams(),
+            notification.getCreatedBy(),
+            notification.getCreatedAt(),
+            notification.getUpdatedBy(),
+            notification.getUpdatedOn(),
+            notification.getDeadline(),
+            notification.getTimeToLive()
+        );
     }
 }

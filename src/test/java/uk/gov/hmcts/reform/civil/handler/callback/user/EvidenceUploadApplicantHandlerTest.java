@@ -104,7 +104,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     private final UploadEvidenceExpert uploadEvidenceDate = new UploadEvidenceExpert();
     private final UploadEvidenceWitness uploadEvidenceDate2 = new UploadEvidenceWitness();
     private final UploadEvidenceDocumentType uploadEvidenceDate3 = new UploadEvidenceDocumentType();
-    private static final String NotificationWhenBothClaimant = "\n"
+    private static final String NOTIFICATION_WHEN_BOTH_CLAIMANT = "\n"
         + "Both claimants - Disclosure list\n"
         + "Both claimants - Documents for disclosure\n"
         + "Both claimants - Documents referred to in the statement\n"
@@ -118,7 +118,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         + "Both claimants - Costs\n"
         + "Both claimants - Documentary evidence for trial\n"
         + "Both claimants - Bundle";
-    private static final String NotificationWhenClaimantTwo = "\n"
+    private static final String NOTIFICATION_WHEN_CLAIMANT_TWO = "\n"
         + "Claimant 2 - Disclosure list\n"
         + "Claimant 2 - Documents for disclosure\n"
         + "Claimant 2 - Documents referred to in the statement\n"
@@ -178,8 +178,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         caseData.setClaimType(null);
         caseData.setTotalClaimAmount(BigDecimal.valueOf(12500));
         caseData.setAddApplicant2(YES);
-        caseData.setApplicant1(PartyBuilder.builder().individual().build());
-        caseData.setApplicant2(PartyBuilder.builder().individual().build());
+        caseData.setApplicant1(new PartyBuilder().individual().build());
+        caseData.setApplicant2(new PartyBuilder().individual().build());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -197,8 +197,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             EvidenceUploadHandlerBase.OPTION_APP_BOTH);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         caseData.setAddApplicant2(YES);
-        caseData.setApplicant1(PartyBuilder.builder().individual().build());
-        caseData.setApplicant2(PartyBuilder.builder().individual().build());
+        caseData.setApplicant1(new PartyBuilder().individual().build());
+        caseData.setApplicant2(new PartyBuilder().individual().build());
         caseData.setEvidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false));
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
         // When
@@ -400,14 +400,14 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setAddApplicant2(YES);
-        caseData.setApplicant1(PartyBuilder.builder().individual().build());
-        caseData.setApplicant2(PartyBuilder.builder().individual().build());
+        caseData.setApplicant1(new PartyBuilder().individual().build());
+        caseData.setApplicant2(new PartyBuilder().individual().build());
         caseData.setCaseTypeFlag("ApplicantTwoFields");
         invoke(caseData, collectionField, date);
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseDataBefore.setAddApplicant2(YES);
-        caseDataBefore.setApplicant1(PartyBuilder.builder().individual().build());
-        caseDataBefore.setApplicant2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setApplicant1(new PartyBuilder().individual().build());
+        caseDataBefore.setApplicant2(new PartyBuilder().individual().build());
         caseDataBefore.setCaseTypeFlag("ApplicantTwoFields");
         invoke(caseDataBefore, collectionField, List.of());
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
@@ -522,15 +522,15 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setAddApplicant2(YES);
-        caseData.setApplicant1(PartyBuilder.builder().individual().build());
-        caseData.setApplicant2(PartyBuilder.builder().individual().build());
+        caseData.setApplicant1(new PartyBuilder().individual().build());
+        caseData.setApplicant2(new PartyBuilder().individual().build());
         caseData.setCaseTypeFlag("ApplicantTwoFields");
         invoke(caseData, collectionField, date);
 
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseDataBefore.setAddApplicant2(YES);
-        caseDataBefore.setApplicant1(PartyBuilder.builder().individual().build());
-        caseDataBefore.setApplicant2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setApplicant1(new PartyBuilder().individual().build());
+        caseDataBefore.setApplicant2(new PartyBuilder().individual().build());
         caseDataBefore.setCaseTypeFlag("ApplicantTwoFields");
         invoke(caseDataBefore, collectionField, List.of());
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
@@ -1089,8 +1089,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             EvidenceUploadHandlerBase.OPTION_APP_BOTH);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setAddApplicant2(YES);
-        caseData.setApplicant1(PartyBuilder.builder().individual().build());
-        caseData.setApplicant2(PartyBuilder.builder().individual().build());
+        caseData.setApplicant1(new PartyBuilder().individual().build());
+        caseData.setApplicant2(new PartyBuilder().individual().build());
         caseData.setEvidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false));
         caseData.setDocumentWitnessSummary(
                         createWitnessDocs(witnessName, createdDate, witnessDate));
@@ -1112,8 +1112,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         caseData.setBundleEvidence(createEvidenceDocs(null, "A bundle", null, bundleDate));
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseDataBefore.setAddApplicant2(YES);
-        caseDataBefore.setApplicant1(PartyBuilder.builder().individual().build());
-        caseDataBefore.setApplicant2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setApplicant1(new PartyBuilder().individual().build());
+        caseDataBefore.setApplicant2(new PartyBuilder().individual().build());
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(createUserInfo("uid"));
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
@@ -1219,7 +1219,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
             assertThat(updatedData.getDocumentCostsApp2().get(0).getValue()
                 .getDocumentUpload().getCategoryID()).isEqualTo(DocumentCategory.APPLICANT_TWO_SCHEDULE_OF_COSTS.getCategoryId());
-            assertThat(updatedData.getNotificationText()).isEqualTo(NotificationWhenBothClaimant);
+            assertThat(updatedData.getNotificationText()).isEqualTo(NOTIFICATION_WHEN_BOTH_CLAIMANT);
         }
     }
 
@@ -1234,8 +1234,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         LocalDate bundleDate = LocalDate.of(2023, 2, 10);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setAddApplicant2(YES);
-        caseData.setApplicant1(PartyBuilder.builder().individual().build());
-        caseData.setApplicant2(PartyBuilder.builder().individual().build());
+        caseData.setApplicant1(new PartyBuilder().individual().build());
+        caseData.setApplicant2(new PartyBuilder().individual().build());
         caseData.setEvidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(1), false));
         caseData.setDocumentWitnessSummaryApp2(createWitnessDocs(witnessName, createdDate, witnessDate));
         caseData.setDocumentWitnessStatementApp2(createWitnessDocs(witnessName, createdDate, witnessDate));
@@ -1296,7 +1296,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                        .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCostsApp2().get(0).getValue()
                        .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
-        assertThat(updatedData.getNotificationText()).isEqualTo(NotificationWhenClaimantTwo);
+        assertThat(updatedData.getNotificationText()).isEqualTo(NOTIFICATION_WHEN_CLAIMANT_TWO);
     }
 
     @Test
@@ -1308,7 +1308,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setNotificationText("Documentation that has been uploaded: \n\n Claimant 1 - Joint Statement of Experts / Single Joint Expert Report \n");
-        caseData.setApplicant1(PartyBuilder.builder().individual().build());
+        caseData.setApplicant1(new PartyBuilder().individual().build());
         caseData.setEvidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(0), false));
         caseData.setDocumentJointStatement(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

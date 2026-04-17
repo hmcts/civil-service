@@ -34,10 +34,11 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
-import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant1Details;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicants;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrgDetails;
-import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getPartyDetails;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1Details;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1SolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 
@@ -45,6 +46,8 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2
 @RequiredArgsConstructor
 @Slf4j
 public class JudgmentByAdmissionOrDeterminationMapper {
+
+    private static final String EVERY_TWO_WEEKS = "every 2 weeks";
 
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final JudgementService judgementService;
@@ -222,7 +225,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
     private Party getClaimantLipOrLRDetailsForPaymentAddress(CaseData caseData) {
         if (caseData.isApplicantLiP()) {
-            return getPartyDetails(caseData.getApplicant1());
+            return getApplicant1Details(caseData);
         } else {
             if (caseData.getApplicant1OrganisationPolicy() != null) {
                 return getOrgDetails(caseData.getApplicant1OrganisationPolicy(), organisationService);
@@ -234,7 +237,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
     private Party getRespondentLROrLipDetails(CaseData caseData) {
         if (caseData.isRespondent1LiP()) {
-            return getPartyDetails(caseData.getRespondent1());
+            return getRespondent1Details(caseData);
         } else {
             if (caseData.getRespondent1OrganisationPolicy() != null) {
                 return getOrgDetails(caseData.getRespondent1OrganisationPolicy(), organisationService);
@@ -262,7 +265,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .setRespondent2Ref(getRespondent2SolicitorRef(caseData))
             .setApplicantReference(getApplicantSolicitorRef(caseData))
             .setApplicant(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
-            .setApplicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
+            .setApplicants(getApplicants(caseData))
             .setRespondent(getRespondentLROrLipDetails(caseData))
             .setTotalClaimAmount(totalClaimAmount)
             .setTotalInterestAmount(totalInterest)
@@ -319,7 +322,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return "each week";
             case ONCE_ONE_MONTH: return "each month";
-            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            case ONCE_TWO_WEEKS: return EVERY_TWO_WEEKS;
             default: return null;
         }
     }
@@ -331,7 +334,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         return switch (repaymentFrequency) {
             case ONCE_ONE_WEEK -> "each week";
             case ONCE_ONE_MONTH -> "each month";
-            case ONCE_TWO_WEEKS -> "every 2 weeks";
+            case ONCE_TWO_WEEKS -> EVERY_TWO_WEEKS;
         };
     }
 
@@ -348,7 +351,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return "per week";
             case ONCE_ONE_MONTH: return "per month";
-            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            case ONCE_TWO_WEEKS: return EVERY_TWO_WEEKS;
             default: return null;
         }
     }
@@ -359,8 +362,8 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         }
         return switch (repaymentFrequency) {
             case ONCE_ONE_WEEK -> "per week";
-            case ONCE_ONE_MONTH ->  "per month";
-            case ONCE_TWO_WEEKS ->  "every 2 weeks";
+            case ONCE_ONE_MONTH -> "per month";
+            case ONCE_TWO_WEEKS -> EVERY_TWO_WEEKS;
         };
     }
 

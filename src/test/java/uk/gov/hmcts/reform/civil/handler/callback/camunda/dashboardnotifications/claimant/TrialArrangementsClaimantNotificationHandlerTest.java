@@ -92,7 +92,7 @@ class TrialArrangementsClaimantNotificationHandlerTest extends BaseCallbackHandl
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         } else {
             verifyNoInteractions(dashboardScenariosService);
@@ -104,13 +104,13 @@ class TrialArrangementsClaimantNotificationHandlerTest extends BaseCallbackHandl
         caseData.setApplicant1Represented(YesOrNo.NO);
         caseData.setDrawDirectionsOrderRequired(YES);
         caseData.setDrawDirectionsOrderSmallClaims(NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setOrderType(OrderType.DECIDE_DAMAGES);
         CaseData caseDataReady = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseDataReady.setApplicant1Represented(YesOrNo.NO);
         caseDataReady.setDrawDirectionsOrderRequired(YES);
         caseDataReady.setDrawDirectionsOrderSmallClaims(NO);
-        caseDataReady.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseDataReady.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseDataReady.setOrderType(OrderType.DECIDE_DAMAGES);
         caseDataReady.setTrialReadyApplicant(YES);
         return Stream.of(

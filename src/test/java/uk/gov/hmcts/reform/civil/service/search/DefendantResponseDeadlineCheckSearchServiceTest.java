@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.search;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -16,6 +17,8 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class DefendantResponseDeadlineCheckSearchServiceTest {
@@ -42,6 +45,7 @@ class DefendantResponseDeadlineCheckSearchServiceTest {
         assertThat(query).isNotNull();
         assertThat(query.toString()).contains("\"from\": 0");
         assertThat(query.toString()).contains("\"_source\": [\"reference\"]");
+        assertThat(query.toString()).contains("\"sort\": [{\"reference.keyword\": \"asc\"}]");
         assertThat(query.toString()).contains("\"query\"");
     }
 
@@ -54,6 +58,7 @@ class DefendantResponseDeadlineCheckSearchServiceTest {
         assertThat(query).isNotNull();
         assertThat(query.toString()).contains("\"from\": 0");
         assertThat(query.toString()).contains("\"_source\": [\"reference\"]");
+        assertThat(query.toString()).contains("\"sort\": [{\"reference.keyword\": \"asc\"}]");
         assertThat(query.toString()).contains("\"query\"");
     }
 
@@ -91,18 +96,6 @@ class DefendantResponseDeadlineCheckSearchServiceTest {
         BoolQueryBuilder query = searchService.haveNoOngoingBusinessProcess();
         assertThat(query.toString()).contains("data.businessProcess.status");
         assertThat(query.toString()).contains("FINISHED");
-    }
-
-    @Test
-    void shouldReturnQuery_whenCallingQueryWithSingleParameter() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-        Query query = searchService.query(0);
-
-        assertThat(query).isNotNull();
-        assertThat(query.toString()).contains("\"from\": 0");
-        assertThat(query.toString()).contains("\"_source\": [\"reference\"]");
-        assertThat(query.toString()).contains("\"query\"");
     }
 
     @Test
@@ -147,5 +140,14 @@ class DefendantResponseDeadlineCheckSearchServiceTest {
         assertThat(results).hasSize(15);
         assertThat(results).extracting(CaseDetails::getId)
             .containsExactlyInAnyOrder(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 13L, 14L, 15L);
+
+        ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
+        verify(coreCaseDataService, times(2)).searchCases(queryCaptor.capture());
+        assertThat(queryCaptor.getAllValues()).hasSize(2);
+        assertThat(queryCaptor.getAllValues().get(0).toString()).contains("\"from\": 0");
+        assertThat(queryCaptor.getAllValues().get(1).toString()).contains("\"from\": 10");
+        assertThat(queryCaptor.getAllValues())
+            .extracting(Query::toString)
+            .allSatisfy(query -> assertThat(query).contains("\"sort\": [{\"reference.keyword\": \"asc\"}]"));
     }
 }

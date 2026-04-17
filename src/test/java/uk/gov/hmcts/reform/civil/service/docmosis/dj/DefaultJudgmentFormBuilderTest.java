@@ -66,11 +66,11 @@ class DefaultJudgmentFormBuilderTest {
             .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(1000)))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
-        uk.gov.hmcts.reform.civil.model.Party respondent = PartyBuilder.builder().individual().build();
+        uk.gov.hmcts.reform.civil.model.Party respondent = new PartyBuilder().individual().build();
         when(judgmentAmountsCalculator.getClaimFee(any())).thenReturn(new BigDecimal("50.00"));
         when(judgmentAmountsCalculator.getDebtAmount(any())).thenReturn(new BigDecimal("1006.00"));
 
-        DefaultJudgmentForm form = defaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData, respondent, CaseEvent.GENERATE_DJ_FORM_SPEC.name(), false);
+        DefaultJudgmentForm form = defaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData, respondent, null, CaseEvent.GENERATE_DJ_FORM_SPEC.name(), false);
 
         assertThat(form.getCaseNumber()).isEqualTo("12345");
         assertThat(form.getDebt()).isEqualTo("1006.00");
@@ -87,11 +87,11 @@ class DefaultJudgmentFormBuilderTest {
             .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(1000)))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
-        uk.gov.hmcts.reform.civil.model.Party respondent = PartyBuilder.builder().individual().build();
+        uk.gov.hmcts.reform.civil.model.Party respondent = new PartyBuilder().individual().build();
         when(judgmentAmountsCalculator.getClaimFee(any())).thenReturn(new BigDecimal("50.00"));
         when(judgmentAmountsCalculator.getDebtAmount(any())).thenReturn(new BigDecimal("-45.00"));
 
-        DefaultJudgmentForm form = defaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData, respondent, CaseEvent.GENERATE_DJ_FORM_SPEC.name(), false);
+        DefaultJudgmentForm form = defaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData, respondent, null, CaseEvent.GENERATE_DJ_FORM_SPEC.name(), false);
 
         assertThat(form.getCaseNumber()).isEqualTo("12345");
         assertThat(form.getDebt()).isEqualTo("0");
@@ -123,7 +123,7 @@ class DefaultJudgmentFormBuilderTest {
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
 
-        DefaultJudgmentForm form = defaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData, caseData.getRespondent1(), "event", true);
+        DefaultJudgmentForm form = defaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData, caseData.getRespondent1(), null, "event", true);
 
         assertThat(form.getApplicantReference()).isEqualTo("12345");
         assertThat(form.getRespondentReference()).isEqualTo("6789");

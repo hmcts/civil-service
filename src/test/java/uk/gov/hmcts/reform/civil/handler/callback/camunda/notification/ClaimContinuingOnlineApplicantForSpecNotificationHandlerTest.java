@@ -85,7 +85,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
     public static final String APPLICANT_SOLICITOR_EMAIL = "applicantsolicitor@example.com";
     public static final String REFERENCE = "claim-continuing-online-notification-000DC001";
     public static final String TEMPLATE = "template-id";
-    public static final String TEMPLATE_1v2 = "template-id-1v2-two-legal-reps";
+    public static final String TEMPLATE_1V2 = "template-id-1v2-two-legal-reps";
     public static final String RESPONSE_DEADLINE = "responseDeadline";
     public static final String PARTY_NAME = "partyName";
 
@@ -137,7 +137,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
         @Test
         void shouldNotifyClaimantSolicitor_when1v2_SameLegalRep() {
-            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()).thenReturn(TEMPLATE_1v2);
+            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()).thenReturn(TEMPLATE_1V2);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(new Organisation().setName(ORG_NAME)));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -159,7 +159,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
-                TEMPLATE_1v2,
+                TEMPLATE_1V2,
                 getNotificationDataMap(caseData, false),
                 REFERENCE
             );
@@ -167,7 +167,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
         @Test
         void shouldNotifyClaimantSolicitor_when1v2_TwoLegalReps() {
-            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()).thenReturn(TEMPLATE_1v2);
+            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()).thenReturn(TEMPLATE_1V2);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(new Organisation().setName(ORG_NAME)));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -189,7 +189,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
-                TEMPLATE_1v2,
+                TEMPLATE_1V2,
                 getNotificationDataMap(caseData, true),
                 REFERENCE
             );
@@ -269,7 +269,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             CaseData caseData =
                 CaseDataBuilder.builder()
-                    .respondent1(Party.builder().partyName(PARTY_NAME).build())
+                    .respondent1(new Party().setPartyName(PARTY_NAME))
                     .atStateClaimDetailsNotified().respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -300,7 +300,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             CaseData caseData =
                 CaseDataBuilder.builder()
-                    .respondent1(Party.builder().partyName(PARTY_NAME).build())
+                    .respondent1(new Party().setPartyName(PARTY_NAME))
                     .atStateClaimDetailsNotified().respondent1Represented(YesOrNo.YES).build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)

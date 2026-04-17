@@ -75,12 +75,12 @@ class PostClaimantLipJbaLetterTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1L);
         caseData.setLegacyCaseReference("001MC001");
-        caseData.setApplicant1(PartyBuilder.builder().individual("John").build());
-        caseData.setRespondent1(PartyBuilder.builder().individual("Mike").build());
+        caseData.setApplicant1(new PartyBuilder().individual("John").build());
+        caseData.setRespondent1(new PartyBuilder().individual("Mike").build());
         caseData.setSystemGeneratedCaseDocuments(List.of(element(caseDocument)));
         caseData.setApplicant1Represented(NO);
 
-        when(coverLetterService.generateDocumentWithCoverLetterBinary(any(Party.class), any(CaseData.class), any(), anyString(), anyString()))
+        when(coverLetterService.generateDocumentWithCoverLetterBinary(any(Party.class), any(), any(CaseData.class), any(), anyString(), anyString()))
             .thenReturn("PDF".getBytes());
         when(objectMapper.convertValue(any(), eq(Map.class))).thenReturn(Map.of());
 
@@ -106,8 +106,8 @@ class PostClaimantLipJbaLetterTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1L);
         caseData.setLegacyCaseReference("001MC001");
-        caseData.setApplicant1(PartyBuilder.builder().individual("John").build());
-        caseData.setRespondent1(PartyBuilder.builder().individual("Mike").build());
+        caseData.setApplicant1(new PartyBuilder().individual("John").build());
+        caseData.setRespondent1(new PartyBuilder().individual("Mike").build());
         caseData.setApplicant1Represented(YES);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()

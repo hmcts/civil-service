@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -55,12 +56,12 @@ class TrialArrangementsNotifyOtherPartyClaimantDashboardServiceTest {
         service.notifyTrialArrangementsNotifyOtherParty(caseData, AUTH_TOKEN);
 
         verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("1234", "CLAIMANT");
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("1234", "CLAIMANT");
+        verify(taskListService).makeSelectedProgressAbleTasksInactiveForCaseIdentifierAndRole("1234", "CLAIMANT", Collections.singletonList("Hearing.Arrangements.Add"));
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -76,7 +77,7 @@ class TrialArrangementsNotifyOtherPartyClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT.getScenario(),
             "5678",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -92,7 +93,7 @@ class TrialArrangementsNotifyOtherPartyClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_LR_CLAIMANT.getScenario(),
             "9012",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verifyNoInteractions(dashboardNotificationService);
         verifyNoInteractions(taskListService);
@@ -110,7 +111,7 @@ class TrialArrangementsNotifyOtherPartyClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_LR_CLAIMANT.getScenario(),
             "3456",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verifyNoInteractions(dashboardNotificationService);
         verifyNoInteractions(taskListService);

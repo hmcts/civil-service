@@ -75,15 +75,15 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
     @InjectMocks
     private ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandler handler;
 
-    public static final String targetEmail = "sole.trader@email.com";
-    public static final String template = "spec-lip-template-id";
-    public static final String templateEmail_lr = "respondent1email@hmcts.net";
-    public static final String template_id_lr = "spec-lr-template-id";
-    public static final String bilingualTemplate = "spec-lip-template-bilingual-id";
-    public static final String englishLangResponse = "ENGLISH";
-    public static final String bothLangResponse = "BOTH";
+    public static final String TARGET_EMAIL = "sole.trader@email.com";
+    public static final String TEMPLATE = "spec-lip-template-id";
+    public static final String TEMPLATE_EMAIL_LR = "respondent1email@hmcts.net";
+    public static final String TEMPLATE_ID_LR = "spec-lr-template-id";
+    public static final String BILINGUAL_TEMPLATE = "spec-lip-template-bilingual-id";
+    public static final String ENGLISH_LANG_RESPONSE = "ENGLISH";
+    public static final String BOTH_LANG_RESPONSE = "BOTH";
 
-    public static final String reference = "claimant-part-admit-settle-respondent-notification-000DC001";
+    public static final String REFERENCE = "claimant-part-admit-settle-respondent-notification-000DC001";
     public static final String EVENT_ID = "NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED";
     private static final String ORGANISATION_NAME = "Defendant solicitor org";
 
@@ -105,7 +105,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
         @Test
         void shouldNotifyRespondent_whenInvoked_spec_lip() {
-            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn(template);
+            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn(TEMPLATE);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -121,10 +121,10 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                targetEmail,
-                template,
+                TARGET_EMAIL,
+                TEMPLATE,
                 getNotificationDataMap(caseData),
-                reference
+                REFERENCE
             );
         }
 
@@ -152,7 +152,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .specClaim1v1LrVsLip()
-                .respondent1(PartyBuilder.builder().soleTrader().partyEmail(null).build())
+                .respondent1(new PartyBuilder().soleTrader().partyEmail(null).build())
                 .build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
@@ -168,14 +168,16 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
         @Test
         void shouldNotify_whenInvoked_spec_lip_bilingual() {
-            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()).thenReturn(bilingualTemplate);
+            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()).thenReturn(
+                BILINGUAL_TEMPLATE);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .specClaim1v1LrVsLip()
-                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(bothLangResponse)))
+                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(
+                    BOTH_LANG_RESPONSE)))
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -185,23 +187,24 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                targetEmail,
-                bilingualTemplate,
+                TARGET_EMAIL,
+                BILINGUAL_TEMPLATE,
                 getNotificationDataMap(caseData),
-                reference
+                REFERENCE
             );
         }
 
         @Test
         void shouldNotify_whenInvoked_spec_lip_english() {
-            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn(template);
+            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn(TEMPLATE);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .specClaim1v1LrVsLip()
-                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(englishLangResponse)))
+                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(
+                    ENGLISH_LANG_RESPONSE)))
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -211,16 +214,16 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                targetEmail,
-                template,
+                TARGET_EMAIL,
+                TEMPLATE,
                 getNotificationDataMap(caseData),
-                reference
+                REFERENCE
             );
         }
 
         @Test
         void shouldNotifyRespondent_whenInvoked_spec_lr() {
-            when(notificationsProperties.getRespondentLrPartAdmitSettleClaimTemplate()).thenReturn(template_id_lr);
+            when(notificationsProperties.getRespondentLrPartAdmitSettleClaimTemplate()).thenReturn(TEMPLATE_ID_LR);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
@@ -237,10 +240,10 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                templateEmail_lr,
-                template_id_lr,
+                TEMPLATE_EMAIL_LR,
+                TEMPLATE_ID_LR,
                 getNotificationDataMap(caseData),
-                reference
+                REFERENCE
             );
         }
 

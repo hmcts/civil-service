@@ -64,7 +64,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
 
         @Test
         void shouldRecordClaimantScenarioApplicationFee_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .hwfFeeType(FeeType.APPLICATION)
                 .gaHwfDetails(new HelpWithFeesDetails()
@@ -86,13 +86,13 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_REJECTED_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordClaimantScenarioAdditionalApplicationFee_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .additionalHwfDetails(new HelpWithFeesDetails()
@@ -114,13 +114,13 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_REJECTED_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordClaimantScenarioApplicationFee_whenPartialRemissionInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .hwfFeeType(FeeType.APPLICATION)
                 .gaHwfDetails(new HelpWithFeesDetails()
@@ -142,13 +142,13 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_PARTIAL_REMISSION_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordApplicantScenarioAdditionalApplicationFee_MoreInfo_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .additionalHwfDetails(new HelpWithFeesDetails()
@@ -170,13 +170,13 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_MORE_INFORMATION_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordApplicantScenarioApplicationFee_InvalidHwfRef_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .hwfFeeType(FeeType.APPLICATION)
                 .gaHwfDetails(new HelpWithFeesDetails()
@@ -194,13 +194,13 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_INVALID_REFERENCE_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldRecordApplicantScenarioAdditionalApplicationFee_InvalidHwfRef_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .additionalHwfDetails(new HelpWithFeesDetails()
@@ -218,7 +218,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_INVALID_REFERENCE_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

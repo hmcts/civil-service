@@ -424,6 +424,43 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
     }
 
     @Test
+    void shouldNotGenerateApplicationDraftDocument_whenJudgeHasMadeDecision_LR() {
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
+        caseData = caseData.copy()
+            .judicialDecision(new uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+                                      .setFee(new Fee().setCode("FREE"))).build();
+        when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        handler.handle(params);
+
+        verifyNoInteractions(generalApplicationDraftGenerator);
+    }
+
+    @Test
+    void shouldNotGenerateApplicationDraftDocument_whenNotLip_AndNoConditionMet_LR() {
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        // Non-urgent, With Notice, Paid - but maybe we want to test when NONE of the 4 conditions match.
+        // 1. Urgent and Free: NO (Not urgent)
+        // 2. Non-urgent, without notice, paid: NO (With notice)
+        // 3. Urgent and paid: NO (Not urgent)
+        // 4. RespondentsResponseSatisfied: NO (Assume false by default for this data)
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, NO);
+        caseData = caseData.copy()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+                                      .setFee(new Fee().setCode("NotFree"))).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        handler.handle(params);
+
+        verifyNoInteractions(generalApplicationDraftGenerator);
+    }
+
+    @Test
     void shouldNotGenerateApplicationDraftDocument_whenAboutToSubmitEventIsCalledAndFreeApp_Lip() {
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseDataLip(YES, NO, NO);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
@@ -483,42 +520,41 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
 
     private GeneralApplication getGeneralApplication(YesOrNo isConsented, YesOrNo isTobeNotified,
                                                      YesOrNo isUrgent) {
-        DynamicListElement location1 = DynamicListElement.builder()
-            .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
-        return GeneralApplication.builder()
-            .generalAppType(GAApplicationType.builder().types(List.of(RELIEF_FROM_SANCTIONS)).build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
-            .generalAppPBADetails(
-                GAPbaDetails.builder()
-                    .fee(
+        DynamicListElement location1 = new DynamicListElement()
+            .setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
+        return new GeneralApplication()
+            .setGeneralAppType(new GAApplicationType().setTypes(List.of(RELIEF_FROM_SANCTIONS)))
+            .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(isConsented))
+            .setGeneralAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(isTobeNotified))
+            .setGeneralAppPBADetails(
+                new GAPbaDetails()
+                    .setFee(
                         new Fee()
                             .setCode("FE203")
                             .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
                             .setVersion("1")
                             )
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .generalAppDetailsOfOrder(STRING_CONSTANT)
-            .generalAppReasonsOfOrder(STRING_CONSTANT)
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(isUrgent).build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .hearingPreferredLocation(DynamicList.builder()
-                                                                        .listItems(List.of(location1))
-                                                                        .value(location1).build())
-                                          .vulnerabilityQuestionsYesOrNo(YES)
-                                          .vulnerabilityQuestion("dummy2")
-                                          .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                          .hearingDuration(GAHearingDuration.MINUTES_30)
-                                          .hearingDetailsEmailID(DUMMY_EMAIL)
-                                          .hearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM).build())
-            .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec.builder()
-                                                             .email("abc@gmail.com").build()))
-            .isMultiParty(NO)
-            .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
-                                          .setCaseReference(PARENT_CCD_REF.toString()))
-            .build();
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
+            .setGeneralAppDetailsOfOrder(STRING_CONSTANT)
+            .setGeneralAppReasonsOfOrder(STRING_CONSTANT)
+            .setGeneralAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(isUrgent))
+            .setGeneralAppStatementOfTruth(new GAStatementOfTruth())
+            .setGeneralAppHearingDetails(new GAHearingDetails()
+                                          .setHearingPreferredLocation(new DynamicList()
+                                                                        .setListItems(List.of(location1))
+                                                                        .setValue(location1))
+                                          .setVulnerabilityQuestionsYesOrNo(YES)
+                                          .setVulnerabilityQuestion("dummy2")
+                                          .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                                          .setHearingDuration(GAHearingDuration.MINUTES_30)
+                                          .setHearingDetailsEmailID(DUMMY_EMAIL)
+                                          .setHearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM))
+            .setGeneralAppRespondentSolicitors(wrapElements(new GASolicitorDetailsGAspec()
+                                                             .setEmail("abc@gmail.com")))
+            .setIsMultiParty(NO)
+            .setParentClaimantIsApplicant(YES)
+            .setGeneralAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(PARENT_CCD_REF.toString()));
     }
 
 }

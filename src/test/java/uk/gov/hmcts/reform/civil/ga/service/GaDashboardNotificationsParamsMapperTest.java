@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOptions;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAHearingNoticeDetail;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialRequestMoreInfo;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepresentations;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
@@ -270,8 +271,7 @@ public class GaDashboardNotificationsParamsMapperTest {
             .legacyCaseReference("000DC001")
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppSuperClaimType("SPEC_CLAIM")
-            .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
-                                .build())
+            .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.VARY_ORDER)))
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES).setHelpWithFeesReferenceNumber(
                 "HWF-A1B-23C"))
             .ccdState(CaseState.AWAITING_APPLICATION_PAYMENT)
@@ -310,8 +310,7 @@ public class GaDashboardNotificationsParamsMapperTest {
             .legacyCaseReference("000DC001")
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppSuperClaimType("SPEC_CLAIM")
-            .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
-                                .build())
+            .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.VARY_ORDER)))
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES).setHelpWithFeesReferenceNumber(
                 "HWF-A1B-23C"))
             .ccdState(APPLICATION_ADD_PAYMENT)
@@ -326,7 +325,7 @@ public class GaDashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldNotMapDataWhenNotPresent() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
         caseData = caseData.copy().generalAppPBADetails(null).build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
         assertFalse(result.containsKey("applicationFee"));
@@ -337,7 +336,7 @@ public class GaDashboardNotificationsParamsMapperTest {
     @Test
     void shouldMapAllParametersWhenIsRequestedForHearingScheduled() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildCaseWorkerHearingScheduledInfo();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildCaseWorkerHearingScheduledInfo().build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
         assertThat(result).extracting("hearingNoticeApplicationDateEn").isEqualTo("4 September 2024");
         assertThat(result).extracting("hearingNoticeApplicationDateCy").isEqualTo("4 Medi 2024");
@@ -346,9 +345,25 @@ public class GaDashboardNotificationsParamsMapperTest {
     @Test
     void shouldNotMapCaseworkerHearingDateInfoDateNotPresent() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
         caseData = caseData.copy().generalAppPBADetails(null).build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
         assertFalse(result.containsKey("hearingNoticeApplicationDateEn"));
+    }
+
+    @Test
+    void shouldOnlyMapHearingDateWhenCaseIsListingForHearing() {
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
+            .ccdCaseReference(1644495739087775L)
+            .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
+            .gaHearingNoticeDetail(new GAHearingNoticeDetail().setHearingDate(LocalDate.of(2024, 9, 4)))
+            .build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("ccdCaseReference").isEqualTo(1644495739087775L);
+        assertThat(result).extracting("testRef").isEqualTo("string");
+        assertFalse(result.containsKey("hearingNoticeApplicationDateEn"));
+        assertFalse(result.containsKey("hearingNoticeApplicationDateCy"));
     }
 }

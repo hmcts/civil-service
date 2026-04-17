@@ -45,7 +45,7 @@ class FinalOrderDefendantDashboardServiceTest {
     void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
 
         when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(true);
@@ -58,7 +58,7 @@ class FinalOrderDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
     }
@@ -67,7 +67,7 @@ class FinalOrderDefendantDashboardServiceTest {
     void shouldRecordScenarioDefendantFinalOrderFastTrackTrialReady_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
@@ -81,7 +81,7 @@ class FinalOrderDefendantDashboardServiceTest {
             AUTH_TOKEN,
             "Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders",
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
     }
@@ -90,7 +90,7 @@ class FinalOrderDefendantDashboardServiceTest {
     void shouldNotRecordScenario_whenRespondentRepresented() {
         CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
         caseData.setRespondent1Represented(YesOrNo.YES);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
@@ -106,7 +106,7 @@ class FinalOrderDefendantDashboardServiceTest {
     void shouldNotRecordScenario_whenLipVLipDisabled() {
         CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
@@ -123,7 +123,7 @@ class FinalOrderDefendantDashboardServiceTest {
     void shouldNotRecordScenario_whenDashBoardDisabled() {
         CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
 

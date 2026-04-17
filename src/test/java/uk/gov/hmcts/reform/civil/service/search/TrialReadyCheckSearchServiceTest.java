@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -14,18 +16,30 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 class TrialReadyCheckSearchServiceTest extends ElasticSearchServiceTest {
 
+    private String capturedTimeNow;
+
     @BeforeEach
     void setup() {
-        searchService = new TrialReadyCheckSearchService(coreCaseDataService);
+        searchService = new TrialReadyCheckSearchService(coreCaseDataService) {
+            @Override
+            public Query query(int startIndex, String timeNow) {
+                capturedTimeNow = timeNow;
+                return super.query(startIndex, timeNow);
+            }
+        };
     }
 
     @Override
     protected Query buildQuery(int fromValue) {
+        ZonedDateTime now = (capturedTimeNow != null
+            ? ZonedDateTime.parse(capturedTimeNow)
+            : ZonedDateTime.now(ZoneOffset.UTC))
+            .withZoneSameInstant(ZoneOffset.UTC);
+        LocalDate baseDate = now.toLocalDate();
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                .must(rangeQuery("data.hearingDate").lt(LocalDate.now().atTime(LocalTime.MIN).plusWeeks(3)
-                                                            .toString()))
+                .must(rangeQuery("data.hearingDate").lt(baseDate.atTime(LocalTime.MIN).plusWeeks(3).atZone(ZoneOffset.UTC).toString()))
                 .must(boolQuery()
                           .minimumShouldMatch(1)
                           .should(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING")))

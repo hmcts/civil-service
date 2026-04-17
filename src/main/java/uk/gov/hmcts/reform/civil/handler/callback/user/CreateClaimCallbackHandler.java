@@ -40,7 +40,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -117,10 +117,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "of the claim details.%n%n If notification of the claim is processed in the digital portal, the exact date "
         + "when you must notify the claim details will be provided when you first notify the Defendant legal "
         + "representative of the claim.";
+    private static final String PARTICULARS_OF_CLAIM = "particularsOfClaim";
 
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
-    private final ReferenceNumberRepository referenceNumberRepository;
+    private final CasemanReferenceNumberRepository casemanReferenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
     private final OrganisationService organisationService;
@@ -624,7 +625,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         caseData.setBusinessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
-        caseData.setLegacyCaseReference(referenceNumberRepository.getReferenceNumber());
+        caseData.setLegacyCaseReference(casemanReferenceNumberRepository.next("unspec"));
 
         ClaimType claimType = ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(caseData.getClaimTypeUnSpec());
         caseData.setClaimType(claimType);
@@ -728,15 +729,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private void assignParticularOfClaimCategoryIds(CaseData caseData) {
         if (YES.equals(caseData.getUploadParticularsOfClaim())) {
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
-                                                     Element::getValue, "particularsOfClaim");
+                                                          Element::getValue, PARTICULARS_OF_CLAIM
+            );
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getMedicalReport(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                     document -> document.getValue().getDocument(), PARTICULARS_OF_CLAIM
+            );
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                     document -> document.getValue().getDocument(), PARTICULARS_OF_CLAIM
+            );
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                     document -> document.getValue().getDocument(), PARTICULARS_OF_CLAIM
+            );
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getOther(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                     document -> document.getValue().getDocument(), PARTICULARS_OF_CLAIM
+            );
         }
     }
 }

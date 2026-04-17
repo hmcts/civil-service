@@ -177,6 +177,7 @@ idam:
   client:
     id: civil-service
     secret: ${CIVIL_CLIENT_SECRET:AAAAAAA}
+    scope: ${IDAM_SCOPE:openid profile roles}
 
 auth:
   idam:
@@ -738,6 +739,7 @@ idam:
     id: civil-service
     redirect_uri: https://localhost:3000/oauth2/callback
     secret: ${CIVIL_CLIENT_SECRET:OOOOOOOOOOOOOOOO}
+    scope: ${IDAM_SCOPE:openid profile roles}
 
 document_management:
   url: ${DOCUMENT_MANAGEMENT_URL:http://localhost:3453}
@@ -905,6 +907,7 @@ idam:
     id: civil-service
     redirect_uri: https://localhost:3000/oauth2/callback
     secret: ${CIVIL_CLIENT_SECRET:OOOOOOOOOOOOOOOO}
+    scope: ${IDAM_SCOPE:openid profile roles}
 
 caseFlags:
   logging:
@@ -913,10 +916,6 @@ caseFlags:
 
 court_location_dmn:
   enabled: ${COURT_LOCATION_WA_DMN_ENABLED:true}
-
-other_remedy:
-  enabled: ${OTHER_REMEDY_ENABLED:false}
-
 
 stitch-bundle:
   wait-time-in-milliseconds: ${WAIT_TIME_IN_MILLISECONDS:3000}

@@ -71,12 +71,16 @@ class NonImmediatePaymentTypeDefaultJudgmentFormBuilderTest {
             .repaymentDate(LocalDate.now().plusMonths(4))
             .repaymentSuggestion("200")
             .build();
-        uk.gov.hmcts.reform.civil.model.Party respondent = PartyBuilder.builder().individual().build();
+        uk.gov.hmcts.reform.civil.model.Party respondent = new PartyBuilder().individual().build();
 
         when(judgmentAmountsCalculator.getClaimFee(any())).thenReturn(new BigDecimal("50.00"));
         when(judgmentAmountsCalculator.getDebtAmount(any())).thenReturn(new BigDecimal("1006.00"));
 
-        DefaultJudgmentForm form = nonImmediatePaymentTypeDefaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData, respondent, CaseEvent.GENERATE_DJ_FORM_SPEC.name(), false);
+        DefaultJudgmentForm form = nonImmediatePaymentTypeDefaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData,
+                                                                                                            respondent,
+                                                                                                            null,
+                                                                                                            CaseEvent.GENERATE_DJ_FORM_SPEC.name(),
+                                                                                                            false);
 
         assertThat(form.getCaseNumber()).isEqualTo("12345");
         assertThat(form.getDebt()).isEqualTo("1006.00");
@@ -99,9 +103,13 @@ class NonImmediatePaymentTypeDefaultJudgmentFormBuilderTest {
             .repaymentDate(LocalDate.now().plusMonths(4))
             .repaymentSuggestion("200")
             .build();
-        uk.gov.hmcts.reform.civil.model.Party respondent = PartyBuilder.builder().individual().build();
+        uk.gov.hmcts.reform.civil.model.Party respondent = new PartyBuilder().individual().build();
 
-        DefaultJudgmentForm form = nonImmediatePaymentTypeDefaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData, respondent, CaseEvent.GENERATE_DJ_FORM.name(), false);
+        DefaultJudgmentForm form = nonImmediatePaymentTypeDefaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData,
+                                                                                                            respondent,
+                                                                                                            null,
+                                                                                                            CaseEvent.GENERATE_DJ_FORM.name(),
+                                                                                                            false);
 
         assertThat(form.getPaymentPlan()).isEqualTo(DJPaymentTypeSelection.REPAYMENT_PLAN.name());
         assertThat(form.getRepaymentFrequency()).isEqualTo("per month");
@@ -114,9 +122,13 @@ class NonImmediatePaymentTypeDefaultJudgmentFormBuilderTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
             .build();
-        uk.gov.hmcts.reform.civil.model.Party respondent = PartyBuilder.builder().individual().build();
+        uk.gov.hmcts.reform.civil.model.Party respondent = new PartyBuilder().individual().build();
 
-        DefaultJudgmentForm form = nonImmediatePaymentTypeDefaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData, respondent, CaseEvent.GENERATE_DJ_FORM.name(), false);
+        DefaultJudgmentForm form = nonImmediatePaymentTypeDefaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData,
+                                                                                                            respondent,
+                                                                                                            null,
+                                                                                                            CaseEvent.GENERATE_DJ_FORM.name(),
+                                                                                                            false);
 
         assertThat(form.getPaymentPlan()).isEqualTo(DJPaymentTypeSelection.REPAYMENT_PLAN.name());
         assertThat(form.getRepaymentFrequency()).isNull();
@@ -130,12 +142,16 @@ class NonImmediatePaymentTypeDefaultJudgmentFormBuilderTest {
             .paymentTypeSelection(DJPaymentTypeSelection.SET_DATE)
             .paymentSetDate(LocalDate.now().plusDays(5))
             .build();
-        uk.gov.hmcts.reform.civil.model.Party respondent = PartyBuilder.builder().individual().build();
+        uk.gov.hmcts.reform.civil.model.Party respondent = new PartyBuilder().individual().build();
 
         when(judgmentAmountsCalculator.getClaimFee(any())).thenReturn(new BigDecimal("50.00"));
         when(judgmentAmountsCalculator.getDebtAmount(any())).thenReturn(new BigDecimal("1006.00"));
 
-        DefaultJudgmentForm form = nonImmediatePaymentTypeDefaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData, respondent, CaseEvent.GENERATE_DJ_FORM_SPEC.name(), false);
+        DefaultJudgmentForm form = nonImmediatePaymentTypeDefaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData,
+                                                                                                            respondent,
+                                                                                                            null,
+                                                                                                            CaseEvent.GENERATE_DJ_FORM_SPEC.name(),
+                                                                                                            false);
 
         assertThat(form.getCaseNumber()).isEqualTo("000DC001");
         assertThat(form.getDebt()).isEqualTo("1006.00");

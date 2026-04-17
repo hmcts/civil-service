@@ -172,4 +172,12 @@ public class FeatureToggleService {
     public boolean isCuiGaNroEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-ga-nro");
     }
+
+    public boolean isOtherRemedyEnabled() {
+        return featureToggleApi.isFeatureEnabled("other-remedy-enabled");
+    }
+
+    public boolean isLinkDefendantTestingEnabled() {
+        return featureToggleApi.isFeatureEnabled("link-defendant-testing-enabled");
+    }
 }

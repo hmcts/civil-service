@@ -63,7 +63,7 @@ class CoverLetterServiceTest {
         CaseDocument coverLetter = mock(CaseDocument.class);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("001MC001").build();
-        Party party = PartyBuilder.builder().individual().build();
+        Party party = new PartyBuilder().individual().build();
 
         DocumentMetaData metaData = new DocumentMetaData(mock(Document.class), "doc", LocalDate.now().toString());
         CaseDocument stitchedDoc = mock(CaseDocument.class);
@@ -84,6 +84,7 @@ class CoverLetterServiceTest {
 
         CaseDocument result = coverLetterService.generateDocumentWithCoverLetter(
             party,
+            null,
             caseData,
             List.of(metaData),
             "docName",
@@ -102,7 +103,7 @@ class CoverLetterServiceTest {
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("001MC001").build();
-        Party party = PartyBuilder.builder().individual().build();
+        Party party = new PartyBuilder().individual().build();
 
         when(documentManagementService.uploadDocument(anyString(), any(PDF.class))).thenReturn(stitchedDoc);
         when(documentGeneratorService.generateDocmosisDocument(any(), any())).thenReturn(new DocmosisDocument(
@@ -124,6 +125,7 @@ class CoverLetterServiceTest {
             ));
         byte[] result = coverLetterService.generateDocumentWithCoverLetterBinary(
             party,
+            null,
             caseData,
             List.of(metaData),
             "docName",
@@ -141,7 +143,7 @@ class CoverLetterServiceTest {
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("001MC001").build();
-        Party party = PartyBuilder.builder().individual().build();
+        Party party = new PartyBuilder().individual().build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(), any())).thenReturn(new DocmosisDocument(
             "file",
@@ -161,6 +163,7 @@ class CoverLetterServiceTest {
         assertThatThrownBy(() ->
                                coverLetterService.generateDocumentWithCoverLetterBinary(
                                    party,
+                                   null,
                                    caseData,
                                    List.of(metaData),
                                    "docName",
@@ -173,9 +176,9 @@ class CoverLetterServiceTest {
     void shouldBuildTemplateDataCorrectly() {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("001MC001").build();
-        Party party = PartyBuilder.builder().individual().build();
+        Party party = new PartyBuilder().individual().build();
 
-        JudgementCoverLetter result = coverLetterService.buildTemplateData(party, caseData);
+        JudgementCoverLetter result = coverLetterService.buildTemplateData(party, null, caseData);
 
         assertThat(result).isEqualTo(
             new JudgementCoverLetter()
@@ -199,7 +202,7 @@ class CoverLetterServiceTest {
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("001MC001").build();
-        Party party = PartyBuilder.builder().individual().build();
+        Party party = new PartyBuilder().individual().build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(), any()))
             .thenReturn(new DocmosisDocument("file", dummyBytes));
@@ -216,6 +219,7 @@ class CoverLetterServiceTest {
         assertThatThrownBy(() ->
                                coverLetterService.generateDocumentWithCoverLetterBinary(
                                    party,
+                                   null,
                                    caseData,
                                    List.of(metaData),
                                    "docName",

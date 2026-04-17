@@ -56,7 +56,7 @@ public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandle
 
         @Test
         void shouldRecordTranslatedDocUploadedScenario_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();
@@ -71,13 +71,13 @@ public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandle
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_RESPONDENT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
         void shouldNotRecordTranslatedDocUploadedScenario_ifNotWithNotice() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withoutNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withoutNoticeCaseData().build();
             caseData = caseData.copy().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();

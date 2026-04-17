@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.UUID;
 
 @lombok.Data
-@lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity
@@ -79,5 +78,5 @@ public class TaskListEntity implements Serializable {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     @Schema(name = "message_params")
-    private HashMap<String, Object> messageParams;
+    private transient HashMap<String, Object> messageParams;
 }

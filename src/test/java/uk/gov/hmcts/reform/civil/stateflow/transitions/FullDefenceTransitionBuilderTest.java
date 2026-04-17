@@ -61,18 +61,17 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(10);
+        assertThat(result).hasSize(9);
 
         assertTransition(result.get(0), "MAIN.FULL_DEFENCE", "MAIN.IN_MEDIATION");
-        assertTransition(result.get(1), "MAIN.FULL_DEFENCE", "MAIN.IN_MEDIATION");
+        assertTransition(result.get(1), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
         assertTransition(result.get(2), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
         assertTransition(result.get(3), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
         assertTransition(result.get(4), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
         assertTransition(result.get(5), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
-        assertTransition(result.get(6), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
-        assertTransition(result.get(7), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_NOT_PROCEED");
-        assertTransition(result.get(8), "MAIN.FULL_DEFENCE", "MAIN.TAKEN_OFFLINE_BY_STAFF");
-        assertTransition(result.get(9), "MAIN.FULL_DEFENCE", "MAIN.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA");
+        assertTransition(result.get(6), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_NOT_PROCEED");
+        assertTransition(result.get(7), "MAIN.FULL_DEFENCE", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(8), "MAIN.FULL_DEFENCE", "MAIN.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA");
     }
 
     @Test
@@ -366,7 +365,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2SameLegalRepresentative(YES)
             .build();
 
@@ -393,7 +392,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2SameLegalRepresentative(NO)
             .build();
 
@@ -803,7 +802,7 @@ public class FullDefenceTransitionBuilderTest {
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.YES)
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .responseClaimMediationSpec2Required(YesOrNo.NO)
             .build();

@@ -69,7 +69,7 @@ class GeneratePipLetterHandlerTest {
         CaseData caseData = CaseData.builder()
                 .legacyCaseReference("12345")
                 .ccdCaseReference(12345L)
-                .respondent1(Party.builder().partyName("Test Respondent").type(Party.Type.COMPANY).build())
+                .respondent1(new Party().setPartyName("Test Respondent").setType(Party.Type.COMPANY))
                 .respondent1Represented(YesOrNo.NO)
                 .build();
         CallbackParams params = CallbackParamsBuilder.builder()

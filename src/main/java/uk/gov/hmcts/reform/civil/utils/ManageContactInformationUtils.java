@@ -141,14 +141,14 @@ public class ManageContactInformationUtils {
         if (dqExperts != null && dqExperts.getDetails() != null) {
             for (Element<Expert> party : dqExperts.getDetails()) {
                 Expert expert = party.getValue();
-                newExperts.addAll(wrapElements(UpdatePartyDetailsForm.builder()
-                                                   .firstName(expert.getFirstName())
-                                                   .lastName(expert.getLastName())
-                                                   .emailAddress(expert.getEmailAddress())
-                                                   .phoneNumber(expert.getPhoneNumber())
-                                                   .fieldOfExpertise(expert.getFieldOfExpertise())
-                                                   .partyId(expert.getPartyID()) //this will need to be added in new ticket
-                                                   .build()));
+                UpdatePartyDetailsForm form = new UpdatePartyDetailsForm();
+                form.setFirstName(expert.getFirstName());
+                form.setLastName(expert.getLastName());
+                form.setEmailAddress(expert.getEmailAddress());
+                form.setPhoneNumber(expert.getPhoneNumber());
+                form.setFieldOfExpertise(expert.getFieldOfExpertise());
+                form.setPartyId(expert.getPartyID()); //this will need to be added in new ticket
+                newExperts.addAll(wrapElements(form));
             }
         }
         return newExperts;
@@ -204,13 +204,13 @@ public class ManageContactInformationUtils {
         if (dqWitnesses != null && dqWitnesses.getDetails() != null) {
             for (Element<Witness> party : dqWitnesses.getDetails()) {
                 Witness witness = party.getValue();
-                newWitnesses.addAll(wrapElements(UpdatePartyDetailsForm.builder()
-                                                   .firstName(witness.getFirstName())
-                                                   .lastName(witness.getLastName())
-                                                   .emailAddress(witness.getEmailAddress())
-                                                   .phoneNumber(witness.getPhoneNumber())
-                                                   .partyId(witness.getPartyID())
-                                                   .build()));
+                UpdatePartyDetailsForm form = new UpdatePartyDetailsForm();
+                form.setFirstName(witness.getFirstName());
+                form.setLastName(witness.getLastName());
+                form.setEmailAddress(witness.getEmailAddress());
+                form.setPhoneNumber(witness.getPhoneNumber());
+                form.setPartyId(witness.getPartyID());
+                newWitnesses.addAll(wrapElements(form));
             }
         }
         return newWitnesses;
@@ -495,29 +495,31 @@ public class ManageContactInformationUtils {
     }
 
     public static List<Element<UpdatePartyDetailsForm>> mapPartyFieldsToPartyFormData(List<Element<PartyFlagStructure>> partyFields) {
-        return ofNullable(partyFields).orElse(new ArrayList<>()).stream().map(partyElement ->
-                        Element.<UpdatePartyDetailsForm>builder()
-                                .id(partyElement.getId())
-                                .value(UpdatePartyDetailsForm.builder()
-                                        .firstName(partyElement.getValue().getFirstName())
-                                        .lastName(partyElement.getValue().getLastName())
-                                        .emailAddress(partyElement.getValue().getEmail())
-                                        .phoneNumber(partyElement.getValue().getPhone())
-                                        .build())
-                                .build())
-                .toList();
+        return ofNullable(partyFields).orElse(new ArrayList<>()).stream()
+            .map(partyElement -> {
+                UpdatePartyDetailsForm form = new UpdatePartyDetailsForm();
+                form.setFirstName(partyElement.getValue().getFirstName());
+                form.setLastName(partyElement.getValue().getLastName());
+                form.setEmailAddress(partyElement.getValue().getEmail());
+                form.setPhoneNumber(partyElement.getValue().getPhone());
+                return new Element<UpdatePartyDetailsForm>().setId(partyElement.getId()).setValue(form);
+            })
+            .toList();
     }
 
     public static List<Element<PartyFlagStructure>> mapFormDataToIndividualsData(List<Element<PartyFlagStructure>> existing,
                                                                            List<Element<UpdatePartyDetailsForm>> updatedData) {
-        return updatedData.stream().map(updatedParty -> Element.<PartyFlagStructure>builder()
-                        .id(updatedParty.getId())
-                        .value(updateIndividualWithFormData(ofNullable(existing).orElse(new ArrayList<>()).stream()
-                                .filter(existingParty -> existingParty.getId().equals(updatedParty.getId()))
-                                .map(Element::getValue)
-                                .findFirst().orElse(new PartyFlagStructure()), updatedParty.getValue()))
-                        .build())
-                .toList();
+        return updatedData.stream().map(updatedParty -> {
+            PartyFlagStructure matchingExistingParty = ofNullable(existing).orElse(new ArrayList<>()).stream()
+                .filter(existingParty -> existingParty.getId().equals(updatedParty.getId()))
+                .map(Element::getValue)
+                .findFirst()
+                .orElse(new PartyFlagStructure());
+
+            return new Element<PartyFlagStructure>()
+                .setId(updatedParty.getId())
+                .setValue(updateIndividualWithFormData(matchingExistingParty, updatedParty.getValue()));
+        }).toList();
     }
 
     private static PartyFlagStructure updateIndividualWithFormData(PartyFlagStructure individual, UpdatePartyDetailsForm form) {

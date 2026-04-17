@@ -251,16 +251,14 @@ public class CaseDataBuilderSpec {
             ;
         claimValue = new ClaimValue()
             .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
-        applicantSolicitor1PbaAccounts = DynamicList.builder()
-            .value(DynamicListElement.builder().label("PBA0077597").build())
-            .build();
+        applicantSolicitor1PbaAccounts = new DynamicList().setValue(new DynamicListElement().setLabel("PBA0077597"));
         claimFee = new Fee()
             .setVersion("1")
             .setCode("CODE")
             .setCalculatedAmountInPence(BigDecimal.valueOf(100))
             ;
-        applicant1 = PartyBuilder.builder().individual().build();
-        respondent1 = PartyBuilder.builder().soleTrader().build();
+        applicant1 = new PartyBuilder().individual().build();
+        respondent1 = new PartyBuilder().soleTrader().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
@@ -290,7 +288,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateClaimSubmittedTwoRespondentSameSolicitorSpec() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent2SameLegalRepresentative = YES;
         return this;
     }
@@ -298,7 +296,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2Represented = YES;
@@ -310,7 +308,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateClaimSubmitted2v1() {
         atStateSpec1v1ClaimSubmitted();
         addApplicant2 = YES;
-        applicant2 = PartyBuilder.builder().individual().build();
+        applicant2 = new PartyBuilder().individual().build();
         return this;
     }
 
@@ -323,7 +321,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec2v1DefendantUnrepresentedClaimSubmitted() {
         atStateSpec1v1ClaimSubmitted();
         addApplicant2 = YES;
-        applicant2 = PartyBuilder.builder().individual().build();
+        applicant2 = new PartyBuilder().individual().build();
         respondent1Represented = NO;
         return this;
     }
@@ -331,7 +329,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v2OneDefendantUnrepresentedClaimSubmitted() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2Represented = NO;
@@ -342,7 +340,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v2BothDefendantUnrepresentedClaimSubmitted() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = NO;
         respondent2Represented = NO;
         respondent1OrgRegistered = null;
@@ -360,7 +358,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec2v1DefendantUnregisteredClaimSubmitted() {
         atStateSpec1v1ClaimSubmitted();
         addApplicant2 = YES;
-        applicant2 = PartyBuilder.builder().individual().build();
+        applicant2 = new PartyBuilder().individual().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         return this;
@@ -369,7 +367,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v2Solicitor1UnregisteredSolicitor2RegisteredAndRepresented() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2Represented = YES;
@@ -381,7 +379,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = NO;
         respondent1OrgRegistered = null;
         respondent2Represented = YES;
@@ -392,7 +390,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantRepresentedAndUnregistered() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent2SameLegalRepresentative = NO;
         respondent1Represented = YES;
         respondent2Represented = YES;
@@ -404,7 +402,7 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantRepresentedAndUnregistered() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent2SameLegalRepresentative = YES;
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;

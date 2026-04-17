@@ -145,7 +145,7 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
             "BEARER_TOKEN",
             SCENARIO_AAA6_UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -155,7 +155,7 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
 
         CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setIsFinalOrder(YesOrNo.YES);
 
@@ -172,7 +172,7 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
             "BEARER_TOKEN",
             SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 

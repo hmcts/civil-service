@@ -139,7 +139,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.OrderMade.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -168,7 +168,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.OrderMade.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -201,13 +201,13 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
                 SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.OrderMade.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -236,7 +236,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.OrderMade.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -258,7 +258,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -292,7 +292,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.MediationUnsuccessfulWithoutUploadDocuments.TrackChange.CARM.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -327,7 +327,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -362,7 +362,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.MediationUnsuccessfulWithoutUploadDocuments.TrackChange.CARM.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -398,7 +398,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.MediationUnsuccessfulWithoutUploadDocuments.TrackChange.CARM.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -422,7 +422,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -449,7 +449,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.SDOMadebyLA.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -476,13 +476,13 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
                 SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.SDOMadebyLA.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -507,7 +507,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 eq("BEARER_TOKEN"),
                 secondParamCaptor.capture(),
                 eq(caseData.getCcdCaseReference().toString()),
-                eq(ScenarioRequestParams.builder().params(scenarioParams).build())
+                eq(new ScenarioRequestParams(scenarioParams))
             );
             String capturedSecondParam = secondParamCaptor.getValue();
             Assertions.assertNotEquals("Scenario.AAA6.CP.SDOMadebyLA.Claimant", capturedSecondParam);
@@ -541,7 +541,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 eq("BEARER_TOKEN"),
                 secondParamCaptor.capture(),
                 eq(caseData.getCcdCaseReference().toString()),
-                eq(ScenarioRequestParams.builder().params(scenarioParams).build())
+                eq(new ScenarioRequestParams(scenarioParams))
             );
             String capturedSecondParam = secondParamCaptor.getValue();
             if (expectedScenario.startsWith("not ")) {
@@ -565,7 +565,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
         void shouldRecordScenarioClaimantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
             caseData.setApplicant1Represented(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -583,7 +583,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -591,7 +591,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
         void shouldRecordScenarioClaimantFinalOrderFastTrackTrialReady_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
             caseData.setApplicant1Represented(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
             caseData.setTrialReadyApplicant(YesOrNo.YES);
 
@@ -608,7 +608,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }
