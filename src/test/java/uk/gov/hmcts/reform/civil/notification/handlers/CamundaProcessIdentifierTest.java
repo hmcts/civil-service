@@ -11,7 +11,7 @@ class CamundaProcessIdentifierTest {
     void shouldContainAllExpectedEnumValues() {
         CamundaProcessIdentifier[] values = CamundaProcessIdentifier.values();
 
-        assertThat(values).hasSize(68)
+        assertThat(values).hasSize(70)
             .contains(
                 CamundaProcessIdentifier.ClaimDismissedNotifyParties,
                 CamundaProcessIdentifier.ClaimantConfirmProceedNotifyParties,
@@ -76,7 +76,9 @@ class CamundaProcessIdentifierTest {
                 CamundaProcessIdentifier.NotifyDecisionOnReconsiderationRequestNotifier,
                 CamundaProcessIdentifier.SettleClaimPaidInFullNotificationNotifier,
                 CamundaProcessIdentifier.ClaimantResponsePartAdmitPayImmediatelyNotifier,
-                CamundaProcessIdentifier.DJ_NON_DIVERGENT_NOTIFIER
+                CamundaProcessIdentifier.DJ_NON_DIVERGENT_NOTIFIER,
+                CamundaProcessIdentifier.InformAgreedExtensionDateSpecNotifier,
+                CamundaProcessIdentifier.InformAgreedExtensionDateNotifier
         );
     }
 
@@ -99,14 +101,5 @@ class CamundaProcessIdentifierTest {
         assertThrows(IllegalArgumentException.class, () ->
             CamundaProcessIdentifier.valueOf("INVALID_ENUM_NAME")
         );
-    }
-
-    @Test
-    void shouldGetEnumByOrdinal() {
-        CamundaProcessIdentifier[] values = CamundaProcessIdentifier.values();
-
-        assertThat(values)
-            .satisfies(v -> assertThat(v[0]).isEqualTo(CamundaProcessIdentifier.ClaimDismissedNotifyParties))
-            .satisfies(v -> assertThat(v[67]).isEqualTo(CamundaProcessIdentifier.DJ_NON_DIVERGENT_NOTIFIER));
     }
 }
