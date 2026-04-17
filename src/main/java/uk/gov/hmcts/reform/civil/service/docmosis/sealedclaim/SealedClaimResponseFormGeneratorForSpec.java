@@ -67,11 +67,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
         log.info("GetTemplateData for case ID {}", caseData.getCcdCaseReference());
         SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
-        try {
-            log.info("CaseDate for case {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caseData));
-        } catch (JsonProcessingException e) {
-            log.debug("CaseData (toString fallback): {}", caseData, e);
-        }
+        log.info("CaseDate for case {}", safeWrite(caseData));
 
         referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, authorisation);
         statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
@@ -79,15 +75,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         addCarmMediationDetails(form, caseData);
         addRepaymentPlanDetails(form, caseData);
         handleRespondents(form, caseData);
-
-        try {
-            log.info(
-                "caseData after handleRespondents {}",
-                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caseData)
-            );
-        } catch (JsonProcessingException e) {
-            log.debug("CaseData (toString fallback handleRespondents): {}", caseData, e);
-        }
+        log.info("caseData after handleRespondents {}", safeWrite(caseData));
 
         Optional.ofNullable(caseData.getSolicitorReferences()).ifPresent(form::setSolicitorReferences);
 
@@ -97,21 +85,18 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         handleTimeline(form, caseData);
         handleDefenceResponseDocument(form, caseData);
         handlePayments(caseData, form);
-
-        try {
-            log.info(
-                "SealedClaimResponseFormForSpec form getTemplateData {}",
-                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(form)
-            );
-            log.info(
-                "caseData before returning {}",
-                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caseData)
-            );
-        } catch (JsonProcessingException e) {
-            log.debug("CaseData (toString fallback before returning): {}", caseData, e);
-        }
+        log.info("SealedClaimResponseFormForSpec form getTemplateData {}", safeWrite(form));
+        log.info("caseData before returning {}", safeWrite(caseData));
 
         return form;
+    }
+
+    private String safeWrite(Object obj) {
+        try {
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+        } catch (JsonProcessingException e) { // NOSONAR
+            return String.valueOf(obj);
+        }
     }
 
     private void handleRespondents(SealedClaimResponseFormForSpec form, CaseData caseData) {
@@ -449,16 +434,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     public CaseDocument generate(CaseData caseData, String authorization) {
         SealedClaimResponseFormForSpec templateData = getTemplateData(caseData, authorization);
-
-        try {
-            log.info(
-                "templateData in generate {}",
-                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(templateData)
-            );
-        } catch (JsonProcessingException e) {
-            log.debug("CaseData (toString fallback): {}", caseData, e);
-        }
-
+        log.info("templateData in generate {}", safeWrite(templateData));
         DocmosisTemplates docmosisTemplate = getTemplate(caseData);
         log.info("docmosisTemplate in generate {}", docmosisTemplate);
 
