@@ -1222,7 +1222,34 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public RespondToClaim getResponseToClaim() {
-        return getRespondToAdmittedClaim() != null ? getRespondToAdmittedClaim() : getRespondToClaim();
+        // Prefer respondent-specific admitted-claim when the relevant respondent flag is explicitly set to YES,
+        // but fall back safely to avoid returning null (some test journeys set only one of the admitted-claim fields).
+        if (YES.equals(getIsRespondent1())) {
+            if (getRespondToAdmittedClaim() != null) {
+                return getRespondToAdmittedClaim();
+            }
+            if (getRespondToClaim() != null) {
+                return getRespondToClaim();
+            }
+        }
+
+        if (YES.equals(getIsRespondent2())) {
+            if (getRespondToAdmittedClaim2() != null) {
+                return getRespondToAdmittedClaim2();
+            }
+            if (getRespondToClaim2() != null) {
+                return getRespondToClaim2();
+            }
+        }
+
+        // If respondent flags are not set, fall back to whichever admitted-claim exists.
+        if (getRespondToAdmittedClaim() != null) {
+            return getRespondToAdmittedClaim();
+        }
+        if (getRespondToAdmittedClaim2() != null) {
+            return getRespondToAdmittedClaim2();
+        }
+        return getRespondToClaim();
     }
 
     @JsonIgnore

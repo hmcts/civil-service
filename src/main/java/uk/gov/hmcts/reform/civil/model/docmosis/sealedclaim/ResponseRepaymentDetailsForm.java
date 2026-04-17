@@ -90,6 +90,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != null && !useRespondent2(caseData)) {
             data.setHowToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
             data.setResponseType(caseData.getRespondent1ClaimResponseTypeForSpec());
+            log.info("caseData.getRespondent1ClaimResponseTypeForSpec() {}", caseData.getRespondent1ClaimResponseTypeForSpec());
             switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
                 case FULL_ADMISSION -> addRepaymentMethod(caseData, data, getTotalClaimAmountWithInterest(caseData));
                 case PART_ADMISSION -> partAdmissionData(caseData, data);
@@ -99,7 +100,9 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
             }
         } else if (caseData.getRespondent2ClaimResponseTypeForSpec() != null && useRespondent2(caseData)) {
             data.setHowToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            log.info("caseData.getDefenceAdmitPartPaymentTimeRouteRequired() {}", caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
             data.setResponseType(caseData.getRespondent2ClaimResponseTypeForSpec());
+            log.info("caseData.getRespondent2ClaimResponseTypeForSpec() {}", caseData.getRespondent2ClaimResponseTypeForSpec());
             switch (caseData.getRespondent2ClaimResponseTypeForSpec()) {
                 case FULL_ADMISSION -> addRepaymentMethod(caseData, data, getTotalClaimAmountWithInterest(caseData));
                 case PART_ADMISSION -> partAdmissionData(caseData, data);
@@ -109,6 +112,9 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
             }
         }
 
+        log.info("caseData.getResponseToClaimAdmitPartWhyNotPayLRspec() {}", caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+        log.info("caseData.getRespondent1ClaimResponseTypeForSpec() {}", caseData.getRespondent1ClaimResponseTypeForSpec());
+        log.info("caseData.getResponseClaimMediationSpecRequired() {}", caseData.getResponseClaimMediationSpecRequired());
         return data
             .setWhyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec())
             .setResponseType(caseData.getRespondent1ClaimResponseTypeForSpec())
@@ -136,6 +142,9 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
     }
 
     private static void addRepaymentMethod(CaseData caseData, ResponseRepaymentDetailsFormData data, BigDecimal totalAmount) {
+        log.info("caseData.isPayImmediately() {}", caseData.isPayImmediately());
+        log.info("caseData.isPayByInstallment() {}", caseData.isPayByInstallment());
+        log.info("caseData.isPayBySetDate() {}", caseData.isPayBySetDate());
         if (caseData.isPayImmediately()) {
             addPayByDatePayImmediately(data, totalAmount, caseData);
         } else if (caseData.isPayByInstallment()) {
@@ -189,6 +198,11 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
 
     private static void alreadyPaid(CaseData caseData, ResponseRepaymentDetailsFormData data) {
         RespondToClaim respondToClaim = caseData.getResponseToClaim();
+        log.info("caseData getIsRespondent1{}", caseData.getIsRespondent1());
+        log.info("caseData getIsRespondent2{}", caseData.getIsRespondent2());
+        log.info("respondToClaim.getHowMuchWasPaid() {}", respondToClaim.getHowMuchWasPaid());
+        log.info("respondToClaim.getWhenWasThisAmountPaid() {}", respondToClaim.getWhenWasThisAmountPaid());
+        log.info("respondToClaim.getExplanationOnHowTheAmountWasPaid() {}", respondToClaim.getExplanationOnHowTheAmountWasPaid());
         String howMuchWasPaidAsString = MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "";
         data.setWhyReject("ALREADY_PAID")
             .setHowMuchWasPaid(howMuchWasPaidAsString)
@@ -209,6 +223,8 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
 
     private static void fullDefenceData(CaseData caseData, ResponseRepaymentDetailsFormData data) {
         addDetailsOnWhyClaimIsRejected(caseData, data);
+        log.info("caseData.hasDefendantPaidTheAmountClaimed() {}", caseData.hasDefendantPaidTheAmountClaimed());
+        log.info("caseData.isClaimBeingDisputed() {}", caseData.isClaimBeingDisputed());
         if (caseData.hasDefendantPaidTheAmountClaimed()) {
             alreadyPaid(caseData, data);
         } else if (caseData.isClaimBeingDisputed()) {
@@ -218,6 +234,9 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
 
     private static void partAdmissionData(CaseData caseData, ResponseRepaymentDetailsFormData data) {
         addDetailsOnWhyClaimIsRejected(caseData, data);
+        log.info("caseData.getSpecDefenceAdmittedRequired() {}", caseData.getSpecDefenceAdmittedRequired());
+        log.info("caseData.getRespondToAdmittedClaimOwingAmount2() {}", caseData.getRespondToAdmittedClaimOwingAmount2());
+        log.info("caseData.getRespondToAdmittedClaimOwingAmount() {}", caseData.getRespondToAdmittedClaimOwingAmount());
         if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
             alreadyPaid(caseData, data);
         } else {
@@ -234,6 +253,9 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
     }
 
     private static boolean useRespondent2(CaseData caseData) {
+        log.info("MultiPartyScenario.getMultiPartyScenario(caseData) {}", MultiPartyScenario.getMultiPartyScenario(caseData));
+        log.info("caseData.getRespondent1ResponseDate() {}", caseData.getRespondent1ResponseDate());
+        log.info("caseData.getRespondent2ResponseDate() {}", caseData.getRespondent2ResponseDate());
         return MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP
             && caseData.getRespondent1ResponseDate() == null
             || (caseData.getRespondent2ResponseDate() != null

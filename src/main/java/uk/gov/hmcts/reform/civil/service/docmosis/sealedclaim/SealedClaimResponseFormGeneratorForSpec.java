@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -57,10 +59,17 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     private final ReferenceNumberAndCourtDetailsPopulator referenceNumberPopulator;
     private final StatementOfTruthPopulator statementOfTruthPopulator;
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
     @Override
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
         log.info("GetTemplateData for case ID {}", caseData.getCcdCaseReference());
         SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
+        try {
+            log.info("CaseDate for case {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caseData));
+        } catch (JsonProcessingException e) {
+            log.debug("CaseData (toString fallback): {}", caseData, e);
+        }
 
         referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, authorisation);
         statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
@@ -68,6 +77,12 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         addCarmMediationDetails(form, caseData);
         addRepaymentPlanDetails(form, caseData);
         handleRespondents(form, caseData);
+
+        try {
+            log.info("caseData after handleRespondents {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caseData));
+        } catch (JsonProcessingException e) {
+            log.debug("CaseData (toString fallback handleRespondents): {}", caseData, e);
+        }
 
         Optional.ofNullable(caseData.getSolicitorReferences()).ifPresent(form::setSolicitorReferences);
 
@@ -77,6 +92,13 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         handleTimeline(form, caseData);
         handleDefenceResponseDocument(form, caseData);
         handlePayments(caseData, form);
+
+        try {
+            log.info("SealedClaimResponseFormForSpec form getTemplateData {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(form));
+            log.info("caseData before returning {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caseData));
+        } catch (JsonProcessingException e) {
+            log.debug("CaseData (toString fallback before returning): {}", caseData, e);
+        }
 
         return form;
     }
@@ -106,16 +128,19 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     private void handleClaimResponse(SealedClaimResponseFormForSpec form, CaseData caseData) {
         if (isRespondent2(caseData) && !YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
+            log.info("isRespondent2(caseData) && !YesOrNo.YES.equals(caseData.getRespondentResponseIsSame()) {}", caseData.getRespondent2ResponseDate());
             Optional.ofNullable(caseData.getRespondent2ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedValue)
                 .ifPresent(form::setDefendantResponse);
             form.setSubmittedOn(caseData.getRespondent2ResponseDate().toLocalDate());
         } else if (caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
+            log.info("caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame()) {}", caseData.getRespondent1ResponseDate());
             Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedSingularValue)
                 .ifPresent(form::setDefendantResponse);
             form.setSubmittedOn(caseData.getRespondent1ResponseDate().toLocalDate());
         } else {
+            log.info("else block handleClaimResponse {}", caseData.getRespondent1ResponseDate());
             Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedValue)
                 .ifPresent(form::setDefendantResponse);
@@ -136,9 +161,11 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         if (caseData.getRespondent2() != null && isRespondent2(caseData)) {
             // respondent 2 answered last
             why = caseData.getDetailsOfWhyDoesYouDisputeTheClaim2();
+            log.info("caseData.getRespondent2() != null && isRespondent2(caseData) WHY **** {}", caseData.getDetailsOfWhyDoesYouDisputeTheClaim2());
         } else {
             // single defendant or respondent 1 is the latest
             why = caseData.getDetailsOfWhyDoesYouDisputeTheClaim();
+            log.info("else WHY *** {}", caseData.getDetailsOfWhyDoesYouDisputeTheClaim());
         }
         form.setWhyDisputeTheClaim(why);
     }
@@ -402,7 +429,14 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     public CaseDocument generate(CaseData caseData, String authorization) {
         SealedClaimResponseFormForSpec templateData = getTemplateData(caseData, authorization);
+        try {
+            log.info("templateData in generate {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(templateData));
+        } catch (JsonProcessingException e) {
+            log.debug("CaseData (toString fallback): {}", caseData, e);
+        }
+
         DocmosisTemplates docmosisTemplate = getTemplate(caseData);
+        log.info("docmosisTemplate in generate {}", docmosisTemplate);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData, docmosisTemplate
