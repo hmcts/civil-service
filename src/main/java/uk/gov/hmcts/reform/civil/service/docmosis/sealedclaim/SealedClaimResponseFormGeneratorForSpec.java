@@ -65,12 +65,10 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
         log.info("GetTemplateData for case ID {}", caseData.getCcdCaseReference());
         SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
-        if (log.isInfoEnabled()) {
-            try {
-                log.info("CaseDate for case {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caseData));
-            } catch (JsonProcessingException e) {
-                log.debug("CaseData (toString fallback): {}", caseData, e);
-            }
+        try {
+            log.info("CaseDate for case {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caseData));
+        } catch (JsonProcessingException e) {
+            log.debug("CaseData (toString fallback): {}", caseData, e);
         }
 
         referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, authorisation);
@@ -80,15 +78,13 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         addRepaymentPlanDetails(form, caseData);
         handleRespondents(form, caseData);
 
-        if (log.isInfoEnabled()) {
-            try {
-                log.info(
-                    "caseData after handleRespondents {}",
-                    mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caseData)
-                );
-            } catch (JsonProcessingException e) {
-                log.debug("CaseData (toString fallback handleRespondents): {}", caseData, e);
-            }
+        try {
+            log.info(
+                "caseData after handleRespondents {}",
+                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caseData)
+            );
+        } catch (JsonProcessingException e) {
+            log.debug("CaseData (toString fallback handleRespondents): {}", caseData, e);
         }
 
         Optional.ofNullable(caseData.getSolicitorReferences()).ifPresent(form::setSolicitorReferences);
@@ -100,19 +96,17 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         handleDefenceResponseDocument(form, caseData);
         handlePayments(caseData, form);
 
-        if (log.isInfoEnabled()) {
-            try {
-                log.info(
-                    "SealedClaimResponseFormForSpec form getTemplateData {}",
-                    mapper.writerWithDefaultPrettyPrinter().writeValueAsString(form)
-                );
-                log.info(
-                    "caseData before returning {}",
-                    mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caseData)
-                );
-            } catch (JsonProcessingException e) {
-                log.debug("CaseData (toString fallback before returning): {}", caseData, e);
-            }
+        try {
+            log.info(
+                "SealedClaimResponseFormForSpec form getTemplateData {}",
+                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(form)
+            );
+            log.info(
+                "caseData before returning {}",
+                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caseData)
+            );
+        } catch (JsonProcessingException e) {
+            log.debug("CaseData (toString fallback before returning): {}", caseData, e);
         }
 
         return form;
@@ -143,31 +137,25 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     private void handleClaimResponse(SealedClaimResponseFormForSpec form, CaseData caseData) {
         if (isRespondent2(caseData) && !YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
-            if (log.isInfoEnabled()) {
-                log.info(
-                    "isRespondent2(caseData) && !YesOrNo.YES.equals(caseData.getRespondentResponseIsSame()) {}",
-                    caseData.getRespondent2ResponseDate()
-                );
-            }
+            log.info(
+                "isRespondent2(caseData) && !YesOrNo.YES.equals(caseData.getRespondentResponseIsSame()) {}",
+                caseData.getRespondent2ResponseDate()
+            );
             Optional.ofNullable(caseData.getRespondent2ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedValue)
                 .ifPresent(form::setDefendantResponse);
             form.setSubmittedOn(caseData.getRespondent2ResponseDate().toLocalDate());
         } else if (caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
-            if (log.isInfoEnabled()) {
-                log.info(
-                    "caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame()) {}",
-                    caseData.getRespondent1ResponseDate()
-                );
-            }
+            log.info(
+                "caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame()) {}",
+                caseData.getRespondent1ResponseDate()
+            );
             Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedSingularValue)
                 .ifPresent(form::setDefendantResponse);
             form.setSubmittedOn(caseData.getRespondent1ResponseDate().toLocalDate());
         } else {
-            if (log.isInfoEnabled()) {
-                log.info("else block handleClaimResponse {}", caseData.getRespondent1ResponseDate());
-            }
+            log.info("else block handleClaimResponse {}", caseData.getRespondent1ResponseDate());
             Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedValue)
                 .ifPresent(form::setDefendantResponse);
@@ -188,18 +176,14 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         if (caseData.getRespondent2() != null && isRespondent2(caseData)) {
             // respondent 2 answered last
             why = caseData.getDetailsOfWhyDoesYouDisputeTheClaim2();
-            if (log.isInfoEnabled()) {
-                log.info(
-                    "caseData.getRespondent2() != null && isRespondent2(caseData) WHY **** {}",
-                    caseData.getDetailsOfWhyDoesYouDisputeTheClaim2()
-                );
-            }
+            log.info(
+                "caseData.getRespondent2() != null && isRespondent2(caseData) WHY **** {}",
+                caseData.getDetailsOfWhyDoesYouDisputeTheClaim2()
+            );
         } else {
             // single defendant or respondent 1 is the latest
             why = caseData.getDetailsOfWhyDoesYouDisputeTheClaim();
-            if (log.isInfoEnabled()) {
-                log.info("else WHY *** {}", caseData.getDetailsOfWhyDoesYouDisputeTheClaim());
-            }
+            log.info("else WHY *** {}", caseData.getDetailsOfWhyDoesYouDisputeTheClaim());
         }
         form.setWhyDisputeTheClaim(why);
     }
@@ -464,21 +448,17 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     public CaseDocument generate(CaseData caseData, String authorization) {
         SealedClaimResponseFormForSpec templateData = getTemplateData(caseData, authorization);
 
-        if (log.isInfoEnabled()) {
-            try {
-                log.info(
-                    "templateData in generate {}",
-                    mapper.writerWithDefaultPrettyPrinter().writeValueAsString(templateData)
-                );
-            } catch (JsonProcessingException e) {
-                log.debug("CaseData (toString fallback): {}", caseData, e);
-            }
+        try {
+            log.info(
+                "templateData in generate {}",
+                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(templateData)
+            );
+        } catch (JsonProcessingException e) {
+            log.debug("CaseData (toString fallback): {}", caseData, e);
         }
 
         DocmosisTemplates docmosisTemplate = getTemplate(caseData);
-        if (log.isInfoEnabled()) {
-            log.info("docmosisTemplate in generate {}", docmosisTemplate);
-        }
+        log.info("docmosisTemplate in generate {}", docmosisTemplate);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData, docmosisTemplate

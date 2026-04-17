@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,6 +10,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -78,6 +81,9 @@ class SealedClaimResponseFormGeneratorForSpecTest {
 
     @BeforeEach
     void init() {
+        ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
+
         Party applicant1 = new Party();
         applicant1.setType(Party.Type.COMPANY);
         applicant1.setCompanyName("Applicant Ltd");
