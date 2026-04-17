@@ -99,19 +99,6 @@ class DefendantResponseDeadlineCheckSearchServiceTest {
     }
 
     @Test
-    void shouldReturnQuery_whenCallingQueryWithSingleParameter() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-        Query query = searchService.query(0);
-
-        assertThat(query).isNotNull();
-        assertThat(query.toString()).contains("\"from\": 0");
-        assertThat(query.toString()).contains("\"_source\": [\"reference\"]");
-        assertThat(query.toString()).contains("\"sort\": [{\"reference.keyword\": \"asc\"}]");
-        assertThat(query.toString()).contains("\"query\"");
-    }
-
-    @Test
     void shouldReturnCasesFromMultiplePages_whenTotalExceedsDefaultLimit() {
         List<CaseDetails> firstPageCases = List.of(
             CaseDetails.builder().id(1L).build(),

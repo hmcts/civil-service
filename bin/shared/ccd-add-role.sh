@@ -6,8 +6,12 @@ dir=$(dirname ${0})
 
 role=${1}
 
+# Support both naming conventions (CCD_CONFIGURER_IMPORTER_* is canonical)
+IMPORTER_USERNAME=${CCD_CONFIGURER_IMPORTER_USERNAME:-${DEFINITION_IMPORTER_USERNAME}}
+IMPORTER_PASSWORD=${CCD_CONFIGURER_IMPORTER_PASSWORD:-${DEFINITION_IMPORTER_PASSWORD}}
+
 if [ -z "${USER_TOKEN:-}" ]; then
-  userToken=$(${dir}/idam-lease-user-token.sh ${CCD_CONFIGURER_IMPORTER_USERNAME} ${CCD_CONFIGURER_IMPORTER_PASSWORD})
+  userToken=$(${dir}/idam-lease-user-token.sh ${IMPORTER_USERNAME} ${IMPORTER_PASSWORD})
 else
   userToken=${USER_TOKEN}
 fi

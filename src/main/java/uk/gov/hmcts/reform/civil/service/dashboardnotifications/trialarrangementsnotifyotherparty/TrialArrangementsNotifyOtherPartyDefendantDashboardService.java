@@ -8,6 +8,9 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
+import java.util.Collections;
+import java.util.List;
+
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT;
 
 @Service
@@ -15,6 +18,7 @@ public class TrialArrangementsNotifyOtherPartyDefendantDashboardService extends 
 
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
+    private static final List<String> TRIAL_TEMPLATE_NAMES = Collections.singletonList("Hearing.Arrangements.Add");
 
     public TrialArrangementsNotifyOtherPartyDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                                       DashboardNotificationService dashboardNotificationService,
@@ -47,9 +51,10 @@ public class TrialArrangementsNotifyOtherPartyDefendantDashboardService extends 
             DEFENDANT_ROLE
         );
 
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        taskListService.makeSelectedProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseId,
-            DEFENDANT_ROLE
+            DEFENDANT_ROLE,
+            TRIAL_TEMPLATE_NAMES
         );
     }
 }
