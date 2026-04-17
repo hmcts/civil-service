@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -59,7 +60,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     private final ReferenceNumberAndCourtDetailsPopulator referenceNumberPopulator;
     private final StatementOfTruthPopulator statementOfTruthPopulator;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule());
 
     @Override
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
