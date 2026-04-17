@@ -182,6 +182,7 @@ withPipeline(type, product, component) {
       env.PREVIEW_CLAIM_STORE_URL = "http://cmc-claim-store-aat.service.core-compute-aat.internal"
       env.PREVIEW_ROLE_ASSIGNMENT_URL = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
       env.PREVIEW_GENAPP_LRD_URL = "http://rd-location-ref-api-aat.service.core-compute-aat.internal"
+      env.PREVIEW_DOCMOSIS_TORNADO_URL = "https://docmosis.aat.platform.hmcts.net"
       env.PREVIEW_SENDGRID_HOST = ""
       env.PREVIEW_SENDGRID_TEST = "false"
     } else {
