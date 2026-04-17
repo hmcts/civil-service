@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.callback;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
@@ -25,13 +25,16 @@ public class CallbackHandlerFactory {
     private final HashMap<String, CallbackHandler> eventHandlers = new HashMap<>();
     private final CaseDetailsConverter caseDetailsConverter;
     private final CaseTypeHandlerKeyFactory caseTypeHandlerKeyFactory;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public CallbackHandlerFactory(CaseDetailsConverter caseDetailsConverter,
                                   CaseTypeHandlerKeyFactory caseTypeHandlerKeyFactory,
+                                  ObjectMapper objectMapper,
                                   CallbackHandler... callbackHandlers) {
         this.caseDetailsConverter = caseDetailsConverter;
         this.caseTypeHandlerKeyFactory = caseTypeHandlerKeyFactory;
+        this.objectMapper = objectMapper;
         Arrays.asList(callbackHandlers).forEach(
             callbackHandler ->
                 callbackHandler.handledEvents().forEach(
@@ -58,19 +61,18 @@ public class CallbackHandlerFactory {
     private CallbackResponse processEvent(CallbackHandler handler, CallbackParams callbackParams, String eventId) {
         return Optional.ofNullable(callbackParams.getRequest().getCaseDetailsBefore())
             .map(caseDetailsConverter::toCaseData)
-            .map(CaseData::getBusinessProcess)
-            .map(businessProcess -> handler.isEventAlreadyProcessed(callbackParams, businessProcess))
-            .filter(isProcessed -> isProcessed)
-            .map(isProcessed -> eventAlreadyProcessedResponse(eventId))
-            .orElse(handler.handle(callbackParams));
+            .filter(caseData -> Optional.ofNullable(caseData.getBusinessProcess())
+                .map(businessProcess -> handler.isEventAlreadyProcessed(callbackParams, businessProcess))
+                .orElse(false))
+            .map(caseData -> eventAlreadyProcessedResponse(eventId, caseData))
+            .orElseGet(() -> handler.handle(callbackParams));
     }
 
-    private CallbackResponse eventAlreadyProcessedResponse(String eventId) {
-        String errorMessage = String.format("Event %s is already processed", eventId);
-        log.error(errorMessage);
+    private CallbackResponse eventAlreadyProcessedResponse(String eventId, CaseData caseData) {
+        log.info("Event is already processed for the case {} .. eventId {}", caseData.getCcdCaseReference(), eventId);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(List.of(errorMessage))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

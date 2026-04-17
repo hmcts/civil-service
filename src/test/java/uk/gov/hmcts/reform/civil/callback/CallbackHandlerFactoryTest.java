@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -35,10 +35,6 @@ class CallbackHandlerFactoryTest {
         .data(Map.of("state", "created"))
         .build();
 
-    public static final CallbackResponse ALREADY_HANDLED_EVENT_RESPONSE = AboutToStartOrSubmitCallbackResponse.builder()
-        .errors(List.of(format("Event %s is already processed", NOTIFY_EVENT.name())))
-        .build();
-
     public static final CallbackResponse CIVIL_ONLY_EVENT_RESPONSE = AboutToStartOrSubmitCallbackResponse.builder()
         .data(Map.of("caseType", "civil"))
         .build();
@@ -48,18 +44,21 @@ class CallbackHandlerFactoryTest {
         .build();
 
     private CallbackHandlerFactory callbackHandlerFactory;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
+        objectMapper = new ObjectMapper();
         callbackHandlerFactory = buildFactory();
     }
 
     private CallbackHandlerFactory buildFactory() {
-        CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(new ObjectMapper());
+        CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
         CaseTypeHandlerKeyFactory keyFactory = new CaseTypeHandlerKeyFactory();
         return new CallbackHandlerFactory(
             caseDetailsConverter,
             keyFactory,
+            objectMapper,
             new CreateCaseCallbackHandler(),
             new SendSealedClaimCallbackHandler(),
             new DefendantResponseHandlerWithoutCallbackVersion(),
@@ -118,7 +117,8 @@ class CallbackHandlerFactoryTest {
             .version(V_1)
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN));
 
-        CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
+        AboutToStartOrSubmitCallbackResponse callbackResponse =
+            (AboutToStartOrSubmitCallbackResponse) callbackHandlerFactory.dispatch(params);
 
         assertEquals(EVENT_HANDLED_RESPONSE, callbackResponse);
     }
@@ -140,9 +140,41 @@ class CallbackHandlerFactoryTest {
             .version(V_1)
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN));
 
-        CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
+        AboutToStartOrSubmitCallbackResponse callbackResponse =
+            (AboutToStartOrSubmitCallbackResponse) callbackHandlerFactory.dispatch(params);
 
-        assertEquals(ALREADY_HANDLED_EVENT_RESPONSE, callbackResponse);
+        assertThat(callbackResponse.getErrors()).isNull();
+        assertThat(callbackResponse.getData())
+            .containsEntry(
+                "businessProcess",
+                objectMapper.convertValue(
+                    new BusinessProcess().setActivityId("CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1"),
+                    Map.class
+                )
+            );
+    }
+
+    @Test
+    void shouldProcessEvent_whenCaseDataHasNoBusinessProcess() {
+        CallbackRequest callbackRequest = CallbackRequest
+            .builder()
+            .eventId(NOTIFY_EVENT.name())
+            .caseDetailsBefore(CaseDetails.builder().data(Map.of(
+                "state",
+                "created"
+            )).build())
+            .build();
+
+        CallbackParams params = new CallbackParams()
+            .request(callbackRequest)
+            .type(ABOUT_TO_SUBMIT)
+            .version(V_1)
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN));
+
+        AboutToStartOrSubmitCallbackResponse callbackResponse =
+            (AboutToStartOrSubmitCallbackResponse) callbackHandlerFactory.dispatch(params);
+
+        assertEquals(EVENT_HANDLED_RESPONSE, callbackResponse);
     }
 
     @Test
