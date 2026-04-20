@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
@@ -31,16 +34,18 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 
 @ExtendWith(MockitoExtension.class)
-class GASpecCaseEventExternalTaskHandlerTest {
+class GaSpecExternalCaseEventTaskHandlerTest {
 
     private static final String CASE_ID = "1";
 
@@ -65,23 +70,20 @@ class GASpecCaseEventExternalTaskHandlerTest {
     @Spy
     private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
-    @BeforeEach
-    void init() {
-        when(mockTask.getTopicName()).thenReturn("test");
-
-        GaStateFlow stateFlow = mock(GaStateFlow.class);
-        State state = mock(State.class);
-        when(state.getName()).thenReturn("MAIN.DRAFT");
-        when(stateFlow.getState()).thenReturn(state);
-        when(stateFlow.getFlags()).thenReturn(Map.of());
-        when(gaStateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(stateFlow);
-    }
-
     @Nested
     class NotifyRespondent {
 
         @BeforeEach
-        void init() {
+        void setup() {
+            when(mockTask.getTopicName()).thenReturn("test");
+
+            GaStateFlow stateFlow = mock(GaStateFlow.class);
+            State state = mock(State.class);
+            when(state.getName()).thenReturn("MAIN.DRAFT");
+            when(stateFlow.getState()).thenReturn(state);
+            when(stateFlow.getFlags()).thenReturn(Map.of());
+            when(gaStateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(stateFlow);
+
             Map<String, Object> variables = Map.of(
                 "caseId", CASE_ID,
                 "caseEvent", INITIATE_GENERAL_APPLICATION.name()
@@ -92,8 +94,11 @@ class GASpecCaseEventExternalTaskHandlerTest {
 
         @Test
         void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
+            BusinessProcess businessProcess = new BusinessProcess()
+                .setStatus(BusinessProcessStatus.READY)
+                .setProcessInstanceId("other-id");
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
+                .businessProcess(businessProcess)
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(BaseExternalTaskHandler.FLOW_STATE, "MAIN.DRAFT");
@@ -101,6 +106,7 @@ class GASpecCaseEventExternalTaskHandlerTest {
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
+            when(mockTask.getProcessInstanceId()).thenReturn("process-id");
             when(caseDetailsConverter.toGeneralApplicationCaseData(any(CaseDetails.class))).thenReturn(caseData);
             when(coreCaseDataService.startGaUpdate(CASE_ID, INITIATE_GENERAL_APPLICATION))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
@@ -111,6 +117,53 @@ class GASpecCaseEventExternalTaskHandlerTest {
             verify(coreCaseDataService).startGaUpdate(CASE_ID, INITIATE_GENERAL_APPLICATION);
             verify(coreCaseDataService).submitGaUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
+        }
+
+        @Test
+        void shouldNotTriggerCCDEvent_whenEventIsAlreadyProcessed() {
+            String processInstanceId = "process-id";
+            String activityId = "activity-id";
+            BusinessProcess businessProcess = new BusinessProcess()
+                .setStatus(BusinessProcessStatus.STARTED)
+                .setProcessInstanceId(processInstanceId)
+                .setActivityId(activityId);
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
+                .businessProcess(businessProcess)
+                .build();
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(BaseExternalTaskHandler.FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
+
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(mockTask.getProcessInstanceId()).thenReturn(processInstanceId);
+            when(mockTask.getActivityId()).thenReturn(activityId);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any(CaseDetails.class))).thenReturn(caseData);
+            when(coreCaseDataService.startGaUpdate(CASE_ID, INITIATE_GENERAL_APPLICATION))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+
+            gaSpecCaseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService).startGaUpdate(CASE_ID, INITIATE_GENERAL_APPLICATION);
+            verify(coreCaseDataService, never()).submitGaUpdate(any(), any());
+            verify(externalTaskService).complete(mockTask, variables);
+        }
+    }
+
+    @Nested
+    class Validation {
+
+        @ParameterizedTest
+        @ValueSource(strings = {"caseId", "caseEvent"})
+        void shouldThrowInvalidCaseDataException_whenRequiredVariableIsMissing(String missingVariable) {
+            Map<String, Object> variables = new java.util.HashMap<>();
+            variables.put("caseId", CASE_ID);
+            variables.put("caseEvent", INITIATE_GENERAL_APPLICATION.name());
+            variables.remove(missingVariable);
+
+            when(mockTask.getAllVariables()).thenReturn(variables);
+
+            assertThrows(InvalidCaseDataException.class, () -> gaSpecCaseEventTaskHandler.handleTask(mockTask));
         }
     }
 }

@@ -100,12 +100,6 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         return coreCaseDataService.submitUpdate(caseId, caseDataContent);
     }
 
-    private boolean isEventAlreadyProcessed(ExternalTask externalTask, BusinessProcess businessProcess) {
-        return businessProcess != null
-            && businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())
-            && Objects.equals(externalTask.getActivityId(), businessProcess.getActivityId());
-    }
-
     @Override
     public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
         var data = externalTaskData.caseData().orElseThrow();
