@@ -37,7 +37,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.ReferenceN
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.StatementOfTruthPopulator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -203,13 +202,11 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         log.info("caseData.getRespondToClaim2() {}", caseData.getRespondToClaim2());
         log.info("caseData.getRespondToAdmittedClaim() {}", caseData.getRespondToAdmittedClaim());
         log.info("caseData.getRespondToAdmittedClaim2() {}", caseData.getRespondToAdmittedClaim2());
-        log.info("form.getCommonDetails().howMuchWasPaid() {}", form.getCommonDetails().howMuchWasPaid());
-        log.info("form.getCommonDetails().paymentDate() {}", form.getCommonDetails().paymentDate());
-        log.info("form.getCommonDetails().paymentHow() {}", form.getCommonDetails().paymentHow());
-        if (form.getCommonDetails() != null) {
-        form.setPoundsPaid(MonetaryConversions.penniesToPounds(new BigDecimal(form.getCommonDetails().howMuchWasPaid())).toString())
-            .setPaymentDate(form.getCommonDetails().paymentDate())
-            .setPaymentMethod(form.getCommonDetails().paymentHow());
+        RespondToClaim respondToClaim = caseData.getResponseToClaim();
+        if (respondToClaim != null) {
+            form.setPoundsPaid(MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()).toString())
+                .setPaymentDate(respondToClaim.getWhenWasThisAmountPaid())
+                .setPaymentMethod(getPaymentMethod(respondToClaim));
         }
     }
 
