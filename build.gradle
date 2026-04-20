@@ -256,13 +256,6 @@ sonarqube {
   }
 }
 
-configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
-  sonarqube {
-    properties {
-      property "sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-    }
-  }
-}
 
 jacocoTestReport {
   dependsOn "bootStartScripts"
@@ -344,7 +337,6 @@ dependencies {
   def withoutJunit4 = {
     exclude group: 'junit', module: 'junit'
   }
-  implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
@@ -354,6 +346,9 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
 
+  implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+  implementation "jakarta.inject:jakarta.inject-api:2.0.1"
+  implementation "io.swagger.core.v3:swagger-annotations"
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-core', version: versions.springStatemachine
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
