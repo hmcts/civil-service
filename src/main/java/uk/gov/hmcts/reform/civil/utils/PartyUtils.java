@@ -55,6 +55,10 @@ public class PartyUtils {
     }
 
     public static String getPartyNameBasedOnType(Party party, boolean omitTitle, LitigationFriend litigationFriend) {
+        if (party == null) {
+            log.error("Invalid Party, Party is null or empty.");
+            return null;
+        }
         return switch (party.getType()) {
             case COMPANY -> party.getCompanyName();
             case INDIVIDUAL -> ofNullable(litigationFriend)
