@@ -104,14 +104,14 @@ class TrialArrangementsDefendantNotificationHandlerTest extends BaseCallbackHand
         caseData1.setRespondent1Represented(YesOrNo.NO);
         caseData1.setDrawDirectionsOrderRequired(YES);
         caseData1.setDrawDirectionsOrderSmallClaims(NO);
-        caseData1.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData1.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData1.setOrderType(OrderType.DECIDE_DAMAGES);
 
         CaseData caseData2 = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData2.setRespondent1Represented(YesOrNo.NO);
         caseData2.setDrawDirectionsOrderRequired(YES);
         caseData2.setDrawDirectionsOrderSmallClaims(NO);
-        caseData2.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData2.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData2.setOrderType(OrderType.DECIDE_DAMAGES);
         caseData2.setTrialReadyRespondent1(YES);
 

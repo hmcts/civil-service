@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -25,17 +27,18 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchServiceTest extends Ela
 
     @Override
     protected Query buildQuery(int fromValue) {
-        String expectedDate = DateUtils.addDaysSkippingWeekends(
-                LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW)
-            .format(DateTimeFormatter.ISO_DATE);
-
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        LocalDate upperBound = now.toLocalDate().minusDays(1);
+        LocalDate lowerBound = DateUtils.addDaysSkippingWeekends(now.toLocalDate().minusDays(8), BUSINESS_DAYS_FROM_NOW);
+        String expectedLower = lowerBound.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String expectedUpper = upperBound.format(DateTimeFormatter.ISO_LOCAL_DATE);
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
                         .mustNot(matchQuery("data.fullAdmitNoPaymentSchedulerProcessed", "Yes"))
                         .must(rangeQuery(
                             "data.respondToClaimAdmitPartLRspec.whenWillThisAmountBePaid")
-                                  .gte("now-8d/d").lte("now-1d/d"))
+                                  .gte(expectedLower).lte(expectedUpper))
                         .must(matchQuery(
                             "data.respondent1ClaimResponseTypeForSpec",
                             RespondentResponseType.FULL_ADMISSION

@@ -145,68 +145,95 @@ public class RoboticsNotificationService {
     }
 
     private String getSubjectForSpec(CaseData caseData, String triggerEvent, boolean isMultiParty) {
-        String subject;
         if (caseData.isRespondent1NotRepresented()) {
-            if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-                if (nonNull(caseData.getPaymentTypeSelection())
-                    && (caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())
-                    || isNonDivergentSpecDJ(caseData))) {
-                    subject = String.format(
-                        "LiP v LiP Default Judgement Case Data for %s",
-                        caseData.getLegacyCaseReference()
-                    );
-                } else if (caseData.isCcjRequestJudgmentByAdmission()) {
-                    subject = String.format(
-                        "LiP v LiP Judgement by Admission Case Data for %s",
-                        caseData.getLegacyCaseReference()
-                    );
-                } else {
-                    subject = String.format(
-                        "LiP v LiP Case Data for %s",
-                        caseData.getLegacyCaseReference()
-                    );
-                }
-            } else {
-                if (nonNull(caseData.getPaymentTypeSelection())) {
-                    subject = String.format(
-                        "LR v LiP Default Judgement Case Data for %s",
-                        caseData.getLegacyCaseReference()
-                    );
-                } else if (caseData.isCcjRequestJudgmentByAdmission()) {
-                    subject = String.format(
-                        "LR v LiP Judgement by Admission Case Data for %s",
-                        caseData.getLegacyCaseReference()
-                    );
-                } else {
-                    subject = String.format(
-                        "LR v LiP Case Data for %s",
-                        caseData.getLegacyCaseReference()
-                    );
-                }
-            }
+            return getRespondentNotRepresentedSubject(caseData);
+        }
 
-        } else if (isMultiParty) {
-            subject = String.format("Multiparty LR v LR Case Data for %s - %s - %s",
-                                    caseData.getLegacyCaseReference(),
-                                    caseData.getCcdState(), triggerEvent
+        if (isMultiParty) {
+            return String.format("Multiparty LR v LR Case Data for %s - %s - %s",
+                                 caseData.getLegacyCaseReference(),
+                                 caseData.getCcdState(), triggerEvent
             );
-        } else if (nonNull(caseData.getPaymentTypeSelection()) && caseData.isLipvLROneVOne()) {
-            subject = String.format(
+        }
+
+        if (hasPaymentType(caseData) && caseData.isLipvLROneVOne()) {
+            return String.format(
                 "LIP v LR Default Judgment Case Data for %s",
                 caseData.getLegacyCaseReference()
             );
-        } else if (caseData.isLipvLROneVOne()) {
-            subject = String.format(
+        }
+
+        if (caseData.isLipvLROneVOne()) {
+            return String.format(
                 "LIP v LR Case Data for %s",
                 caseData.getLegacyCaseReference()
             );
-        } else {
-            subject = String.format(
-                "LR v LR Case Data for %s",
+        }
+
+        return String.format(
+            "LR v LR Case Data for %s",
+            caseData.getLegacyCaseReference()
+        );
+    }
+
+    private String getRespondentNotRepresentedSubject(CaseData caseData) {
+        if (isLipVsLipCase(caseData)) {
+            return getLipVsLipSubject(caseData);
+        }
+
+        if (hasPaymentType(caseData)) {
+            return String.format(
+                "LR v LiP Default Judgement Case Data for %s",
                 caseData.getLegacyCaseReference()
             );
         }
-        return subject;
+
+        if (caseData.isCcjRequestJudgmentByAdmission()) {
+            return String.format(
+                "LR v LiP Judgement by Admission Case Data for %s",
+                caseData.getLegacyCaseReference()
+            );
+        }
+
+        return String.format(
+            "LR v LiP Case Data for %s",
+            caseData.getLegacyCaseReference()
+        );
+    }
+
+    private String getLipVsLipSubject(CaseData caseData) {
+        if (isDefaultJudgementSpec(caseData)) {
+            return String.format(
+                "LiP v LiP Default Judgement Case Data for %s",
+                caseData.getLegacyCaseReference()
+            );
+        }
+
+        if (caseData.isCcjRequestJudgmentByAdmission()) {
+            return String.format(
+                "LiP v LiP Judgement by Admission Case Data for %s",
+                caseData.getLegacyCaseReference()
+            );
+        }
+
+        return String.format(
+            "LiP v LiP Case Data for %s",
+            caseData.getLegacyCaseReference()
+        );
+    }
+
+    private boolean isLipVsLipCase(CaseData caseData) {
+        return caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled();
+    }
+
+    private boolean isDefaultJudgementSpec(CaseData caseData) {
+        return hasPaymentType(caseData)
+            && (caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())
+            || isNonDivergentSpecDJ(caseData));
+    }
+
+    private boolean hasPaymentType(CaseData caseData) {
+        return nonNull(caseData.getPaymentTypeSelection());
     }
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
