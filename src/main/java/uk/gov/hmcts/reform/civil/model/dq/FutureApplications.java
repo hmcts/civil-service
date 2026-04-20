@@ -14,4 +14,5 @@ public class FutureApplications {
 
     private YesOrNo intentionToMakeFutureApplications;
     private String whatWillFutureApplicationsBeMadeFor;
+    private String additionalInformationForJudge;
 }
