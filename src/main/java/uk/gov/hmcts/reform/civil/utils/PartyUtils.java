@@ -51,9 +51,15 @@ public class PartyUtils {
     }
 
     public static String getPartyNameBasedOnType(Party party, boolean omitTitle) {
+        return getPartyNameBasedOnType(party, omitTitle, null);
+    }
+
+    public static String getPartyNameBasedOnType(Party party, boolean omitTitle, LitigationFriend litigationFriend) {
         return switch (party.getType()) {
             case COMPANY -> party.getCompanyName();
-            case INDIVIDUAL -> getIndividualName(party, omitTitle);
+            case INDIVIDUAL -> ofNullable(litigationFriend)
+                .map(lf -> getIndividualName(party) + " L/F " + lf.getFirstName() + " " + lf.getLastName())
+                .orElse(getIndividualName(party, omitTitle));
             case SOLE_TRADER -> buildSoleTraderName(party, omitTitle);
             case ORGANISATION -> party.getOrganisationName();
             default -> throw new IllegalArgumentException("Invalid Party type in " + party);
@@ -62,6 +68,10 @@ public class PartyUtils {
 
     public static String getPartyNameBasedOnType(Party party) {
         return getPartyNameBasedOnType(party, false);
+    }
+
+    public static String getLitigiousPartyName(Party party, LitigationFriend litigationFriend) {
+        return getPartyNameBasedOnType(party, false, litigationFriend);
     }
 
     private static String buildSoleTraderName(Party party, boolean omitTitle) {
@@ -74,18 +84,6 @@ public class PartyUtils {
         return ofNullable(party.getSoleTraderTradingAs())
             .map(ta -> String.format(TRADING_AS,  ta))
             .orElse(null);
-    }
-
-    public static String getLitigiousPartyName(Party party, LitigationFriend litigationFriend) {
-        return switch (party.getType()) {
-            case COMPANY -> party.getCompanyName();
-            case INDIVIDUAL -> ofNullable(litigationFriend)
-                .map(lf -> getIndividualName(party) + " L/F " + lf.getFirstName() + " " + lf.getLastName())
-                .orElse(getIndividualName(party));
-            case SOLE_TRADER -> buildSoleTraderName(party, false);
-            case ORGANISATION -> party.getOrganisationName();
-            default -> throw new IllegalArgumentException("Invalid Party type in " + party);
-        };
     }
 
     public static String getApplicant1NameWithLitigiousFriend(CaseData caseData) {
