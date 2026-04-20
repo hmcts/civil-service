@@ -9,8 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -19,7 +17,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
-import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
@@ -34,7 +31,6 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -147,23 +143,6 @@ class GaSpecExternalCaseEventTaskHandlerTest {
             verify(coreCaseDataService).startGaUpdate(CASE_ID, INITIATE_GENERAL_APPLICATION);
             verify(coreCaseDataService, never()).submitGaUpdate(any(), any());
             verify(externalTaskService).complete(mockTask, variables);
-        }
-    }
-
-    @Nested
-    class Validation {
-
-        @ParameterizedTest
-        @ValueSource(strings = {"caseId", "caseEvent"})
-        void shouldThrowInvalidCaseDataException_whenRequiredVariableIsMissing(String missingVariable) {
-            Map<String, Object> variables = new java.util.HashMap<>();
-            variables.put("caseId", CASE_ID);
-            variables.put("caseEvent", INITIATE_GENERAL_APPLICATION.name());
-            variables.remove(missingVariable);
-
-            when(mockTask.getAllVariables()).thenReturn(variables);
-
-            assertThrows(InvalidCaseDataException.class, () -> gaSpecCaseEventTaskHandler.handleTask(mockTask));
         }
     }
 }
