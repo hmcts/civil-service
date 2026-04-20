@@ -154,27 +154,43 @@ public class DashboardNotificationService {
     }
 
     public void deleteById(UUID id) {
-        notificationActionRepository.deleteByDashboardNotificationId(id);
-        dashboardNotificationsRepository.deleteById(id);
+        performBulkDelete(List.of(id));
     }
 
     public int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String citizenRole) {
-        dashboardNotificationsRepository.findByReferenceAndCitizenRoleAndName(reference, citizenRole, name)
-            .forEach(n -> notificationActionRepository.deleteByDashboardNotificationId(n.getId()));
-        return dashboardNotificationsRepository.deleteByNameAndReferenceAndCitizenRole(name, reference, citizenRole);
+        List<DashboardNotificationsEntity> notifications = dashboardNotificationsRepository
+            .findByReferenceAndCitizenRoleAndName(reference, citizenRole, name);
+
+        performBulkDelete(notifications.stream().map(DashboardNotificationsEntity::getId).toList());
+
+        return notifications.size();
     }
 
     public int deleteByNameAndReference(String name, String reference) {
-        dashboardNotificationsRepository.findByReferenceAndName(reference, name)
-            .forEach(n -> notificationActionRepository.deleteByDashboardNotificationId(n.getId()));
-        return dashboardNotificationsRepository.deleteByNameAndReference(name, reference);
+        List<DashboardNotificationsEntity> notifications = dashboardNotificationsRepository
+            .findByReferenceAndName(reference, name);
+
+        performBulkDelete(notifications.stream().map(DashboardNotificationsEntity::getId).toList());
+
+        return notifications.size();
     }
 
     public void deleteByReferenceAndCitizenRole(String reference, String citizenRole) {
-        dashboardNotificationsRepository.findByReferenceAndCitizenRole(reference, citizenRole)
-            .forEach(n -> notificationActionRepository.deleteByDashboardNotificationId(n.getId()));
-        int deleted = dashboardNotificationsRepository.deleteByReferenceAndCitizenRole(reference, citizenRole);
-        log.info("{} notifications removed for claim = {}", deleted, reference);
+        List<DashboardNotificationsEntity> notifications = dashboardNotificationsRepository
+            .findByReferenceAndCitizenRole(reference, citizenRole);
+
+        performBulkDelete(notifications.stream().map(DashboardNotificationsEntity::getId).toList());
+
+        log.info("{} notifications removed for claim = {}", notifications.size(), reference);
+    }
+
+    private void performBulkDelete(List<UUID> ids) {
+        if (ids.isEmpty()) {
+            return;
+        }
+
+        notificationActionRepository.deleteByDashboardNotificationIdIn(ids);
+        dashboardNotificationsRepository.deleteByDashboardNotificationIdIn(ids);
     }
 
     private DashboardNotificationsEntity copyNotification(DashboardNotificationsEntity notification) {

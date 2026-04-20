@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
@@ -28,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -137,35 +135,54 @@ class DashboardNotificationServiceTest {
 
         @Test
         void shouldReturnOkWhenDeletingEntity() {
-            //when
             dashboardNotificationService.deleteById(id);
-
-            //then
-            verify(dashboardNotificationsRepository).deleteById(id);
+            verify(notificationActionRepository).deleteByDashboardNotificationIdIn(List.of(id));
+            verify(dashboardNotificationsRepository).deleteByDashboardNotificationIdIn(List.of(id));
         }
 
         @Test
         void deleteAllNotificationsToClaimant() {
             String reference = "reference";
             String claimant = "CLAIMANT";
+            DashboardNotificationsEntity entity = new DashboardNotificationsEntity();
+            entity.setId(id);
+            when(dashboardNotificationsRepository.findByReferenceAndCitizenRole(reference, claimant))
+                .thenReturn(List.of(entity));
+
             dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, claimant);
-            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, claimant);
+
+            verify(notificationActionRepository).deleteByDashboardNotificationIdIn(List.of(id));
+            verify(dashboardNotificationsRepository).deleteByDashboardNotificationIdIn(List.of(id));
         }
 
         @Test
         void deleteAllNotificationsToDefendant() {
             String reference = "reference";
             String defendant = "DEFENDANT";
+            DashboardNotificationsEntity entity = new DashboardNotificationsEntity();
+            entity.setId(id);
+            when(dashboardNotificationsRepository.findByReferenceAndCitizenRole(reference, defendant))
+                .thenReturn(List.of(entity));
+
             dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, defendant);
-            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, defendant);
+
+            verify(notificationActionRepository).deleteByDashboardNotificationIdIn(List.of(id));
+            verify(dashboardNotificationsRepository).deleteByDashboardNotificationIdIn(List.of(id));
         }
 
         @Test
         void deleteNotificationsByNameAndReference() {
             String templateName = "template.name";
             String reference = "reference";
+            DashboardNotificationsEntity entity = new DashboardNotificationsEntity();
+            entity.setId(id);
+            when(dashboardNotificationsRepository.findByReferenceAndName(reference, templateName))
+                .thenReturn(List.of(entity));
+
             dashboardNotificationService.deleteByNameAndReference(templateName, reference);
-            Mockito.verify(dashboardNotificationsRepository).deleteByNameAndReference(templateName, reference);
+
+            verify(notificationActionRepository).deleteByDashboardNotificationIdIn(List.of(id));
+            verify(dashboardNotificationsRepository).deleteByDashboardNotificationIdIn(List.of(id));
         }
     }
 
@@ -366,8 +383,8 @@ class DashboardNotificationServiceTest {
             List<Notification> result = dashboardNotificationService.getNotifications("ref", "role");
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).getNotificationAction()).isNotNull();
-            assertThat(result.get(0).getNotificationAction().getActionPerformed()).isEqualTo("Click");
+            assertThat(result.getFirst().getNotificationAction()).isNotNull();
+            assertThat(result.getFirst().getNotificationAction().getActionPerformed()).isEqualTo("Click");
         }
 
         @Test
@@ -385,7 +402,7 @@ class DashboardNotificationServiceTest {
             List<Notification> result = dashboardNotificationService.getNotifications("ref", "role");
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).getNotificationAction()).isNull();
+            assertThat(result.getFirst().getNotificationAction()).isNull();
         }
 
         @Test
@@ -410,8 +427,8 @@ class DashboardNotificationServiceTest {
             List<Notification> result = dashboardNotificationService.getNotifications("ref", "role");
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).getNotificationAction().getCreatedBy()).isEqualTo("LatestUser");
-            assertThat(result.get(0).getNotificationAction().getId()).isEqualTo(2L);
+            assertThat(result.getFirst().getNotificationAction().getCreatedBy()).isEqualTo("LatestUser");
+            assertThat(result.getFirst().getNotificationAction().getId()).isEqualTo(2L);
         }
     }
 
@@ -498,10 +515,11 @@ class DashboardNotificationServiceTest {
         @Test
         void shouldDeleteNotificationById() {
             UUID notifId = UUID.randomUUID();
+
             dashboardNotificationService.deleteById(notifId);
-            InOrder inOrder = inOrder(notificationActionRepository, dashboardNotificationsRepository);
-            inOrder.verify(notificationActionRepository).deleteByDashboardNotificationId(notifId);
-            inOrder.verify(dashboardNotificationsRepository).deleteById(notifId);
+
+            verify(notificationActionRepository).deleteByDashboardNotificationIdIn(List.of(notifId));
+            verify(dashboardNotificationsRepository).deleteByDashboardNotificationIdIn(List.of(notifId));
         }
 
         @Test
@@ -509,9 +527,11 @@ class DashboardNotificationServiceTest {
             DashboardNotificationsEntity notification = getNotification(UUID.randomUUID());
             when(dashboardNotificationsRepository.findByReferenceAndCitizenRoleAndName("ref", "CLAIMANT", "name"))
                 .thenReturn(List.of(notification));
+
             dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole("name", "ref", "CLAIMANT");
-            verify(notificationActionRepository).deleteByDashboardNotificationId(notification.getId());
-            verify(dashboardNotificationsRepository).deleteByNameAndReferenceAndCitizenRole("name", "ref", "CLAIMANT");
+
+            verify(notificationActionRepository).deleteByDashboardNotificationIdIn(List.of(notification.getId()));
+            verify(dashboardNotificationsRepository).deleteByDashboardNotificationIdIn(List.of(notification.getId()));
         }
 
         @Test
@@ -519,9 +539,11 @@ class DashboardNotificationServiceTest {
             DashboardNotificationsEntity notification = getNotification(UUID.randomUUID());
             when(dashboardNotificationsRepository.findByReferenceAndName("ref", "name"))
                 .thenReturn(List.of(notification));
+
             dashboardNotificationService.deleteByNameAndReference("name", "ref");
-            verify(notificationActionRepository).deleteByDashboardNotificationId(notification.getId());
-            verify(dashboardNotificationsRepository).deleteByNameAndReference("name", "ref");
+
+            verify(notificationActionRepository).deleteByDashboardNotificationIdIn(List.of(notification.getId()));
+            verify(dashboardNotificationsRepository).deleteByDashboardNotificationIdIn(List.of(notification.getId()));
         }
 
         @Test
@@ -529,9 +551,11 @@ class DashboardNotificationServiceTest {
             DashboardNotificationsEntity notification = getNotification(UUID.randomUUID());
             when(dashboardNotificationsRepository.findByReferenceAndCitizenRole("ref", "DEFENDANT"))
                 .thenReturn(List.of(notification));
+
             dashboardNotificationService.deleteByReferenceAndCitizenRole("ref", "DEFENDANT");
-            verify(notificationActionRepository).deleteByDashboardNotificationId(notification.getId());
-            verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole("ref", "DEFENDANT");
+
+            verify(notificationActionRepository).deleteByDashboardNotificationIdIn(List.of(notification.getId()));
+            verify(dashboardNotificationsRepository).deleteByDashboardNotificationIdIn(List.of(notification.getId()));
         }
     }
 
