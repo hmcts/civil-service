@@ -707,14 +707,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             Element<FastTrackAddNewDirections> fastTrackAddNewDirectionsElement = new Element<>();
             fastTrackAddNewDirectionsElement.setValue(fastTrackAddNewDirections);
 
-            List<FastTrack> directions = List.of(FastTrack.fastClaimBuildingDispute);
-            List<SmallTrack> smallDirections = List.of(SmallTrack.smallClaimCreditHire);
+            List<FastTrack> directions = List.of(FastTrack.FAST_CLAIM_BUILDING_DISPUTE);
+            List<SmallTrack> smallDirections = List.of(SmallTrack.SMALL_CLAIM_CREDIT_HIRE);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setDrawDirectionsOrderRequired(YES);
             caseData.setDrawDirectionsOrderSmallClaims(YES);
             caseData.setFastClaims(directions);
             caseData.setSmallClaims(smallDirections);
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
             caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             caseData.setTrialAdditionalDirectionsForFastTrack(directions);
             caseData.setDrawDirectionsOrderSmallClaimsAdditionalDirections(smallDirections);
@@ -767,8 +767,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
-            caseData.setFastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss));
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
+            caseData.setFastClaims(List.of(FastTrack.FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS));
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
 
@@ -791,7 +791,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateDefaultFieldsForNihl() {
             List<FastTrack> fastTrackList = new ArrayList<>();
-            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+            fastTrackList.add(FastTrack.FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS);
 
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
@@ -808,7 +808,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft().build();
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setFastClaims(fastTrackList);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
@@ -1068,7 +1068,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateWelshSectionForSDOR2() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued().build();
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
             caseData.setDrawDirectionsOrderRequired(NO);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
@@ -1094,7 +1094,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setCaseAccessCategory(SPEC_CLAIM);
             caseData.setCaseManagementLocation(createCaseLocation(ccmccEpimsId, "ccmcRegion"));
             caseData.setTotalClaimAmount(BigDecimal.valueOf(999));
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
             Party applicant1 = new Party();
             applicant1.setType(Party.Type.INDIVIDUAL);
             caseData.setApplicant1(applicant1);
@@ -1166,7 +1166,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             existingLocation.setRegion("orange");
             caseData.setCaseManagementLocation(existingLocation);
             caseData.setTotalClaimAmount(BigDecimal.valueOf(1999));
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
             Party applicant1 = new Party();
             applicant1.setType(Party.Type.INDIVIDUAL);
             caseData.setApplicant1(applicant1);
@@ -1220,7 +1220,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
             CaseData caseData = params.getCaseData();
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
             caseData.setDrawDirectionsOrderRequired(NO);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 params.copy().caseData(caseData)
@@ -1319,7 +1319,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         DynamicList localOptions = createDynamicList(List.of(optionOne, optionTwo, optionThree), null);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-        caseData.setDisposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson);
+        caseData.setDisposalHearingMethod(DisposalHearingMethod.DISPOSAL_HEARING_METHOD_IN_PERSON);
         caseData.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(localOptions, optionTwo));
         caseData.setFastTrackMethodInPerson(localOptions);
         caseData.setSmallClaimsMethodInPerson(localOptions);
@@ -1552,7 +1552,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario1.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
         scenario1.setFastTrackMethodInPerson(fastTrackSelection);
         scenario1.setDrawDirectionsOrderRequired(NO);
-        scenario1.setClaimsTrack(ClaimsTrack.fastTrack);
+        scenario1.setClaimsTrack(ClaimsTrack.FAST_TRACK);
 
         CaseData scenario2 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
@@ -1583,7 +1583,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario4.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         scenario4.setSmallClaimsMethodInPerson(smallClaimsSelection);
         scenario4.setDrawDirectionsOrderRequired(NO);
-        scenario4.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+        scenario4.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
 
         CaseData scenario5 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
@@ -1636,7 +1636,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario1.setResponseClaimTrack("SMALL_CLAIM");
         scenario1.setFastTrackMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
         scenario1.setDrawDirectionsOrderRequired(NO);
-        scenario1.setClaimsTrack(ClaimsTrack.fastTrack);
+        scenario1.setClaimsTrack(ClaimsTrack.FAST_TRACK);
 
         CaseData scenario2 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
@@ -1683,7 +1683,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario6.setResponseClaimTrack("FAST_CLAIM");
         scenario6.setSmallClaimsMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
         scenario6.setDrawDirectionsOrderRequired(NO);
-        scenario6.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+        scenario6.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
 
         CaseData scenario7 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
@@ -2661,7 +2661,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft().build();
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2691,8 +2691,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft().build();
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
-            caseData.setFastClaims(List.of(FastTrack.fastClaimBuildingDispute));
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
+            caseData.setFastClaims(List.of(FastTrack.FAST_CLAIM_BUILDING_DISPUTE));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2709,8 +2709,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
             caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.NO);
             caseData.setOrderType(OrderType.DECIDE_DAMAGES);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
-            caseData.setFastClaims(List.of(FastTrack.fastClaimBuildingDispute));
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
+            caseData.setFastClaims(List.of(FastTrack.FAST_CLAIM_BUILDING_DISPUTE));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2724,15 +2724,15 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void fastTRackSdoR2NihlPathTwo() {
 
             List<FastTrack> fastTrackList = new ArrayList<>();
-            fastTrackList.add(FastTrack.fastClaimBuildingDispute);
-            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+            fastTrackList.add(FastTrack.FAST_CLAIM_BUILDING_DISPUTE);
+            fastTrackList.add(FastTrack.FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft().build();
             caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
             caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.NO);
             caseData.setOrderType(OrderType.DECIDE_DAMAGES);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setTrialAdditionalDirectionsForFastTrack(fastTrackList);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2747,13 +2747,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void fastTrackFlagSetToYesNihlPathOne() {
             List<FastTrack> fastTrackList = new ArrayList<>();
-            fastTrackList.add(FastTrack.fastClaimBuildingDispute);
-            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+            fastTrackList.add(FastTrack.FAST_CLAIM_BUILDING_DISPUTE);
+            fastTrackList.add(FastTrack.FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft().build();
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setFastClaims(fastTrackList);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2770,8 +2770,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft().build();
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
-            caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
+            caseData.setSmallClaims(List.of(SmallTrack.SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2788,7 +2788,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDraft().build();
             caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
             caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.YES);
-            caseData.setDrawDirectionsOrderSmallClaimsAdditionalDirections(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
+            caseData.setDrawDirectionsOrderSmallClaimsAdditionalDirections(List.of(SmallTrack.SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2928,13 +2928,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldGenerateAndSaveSdoOrder_whenNihl() {
             List<FastTrack> fastTrackList = new ArrayList<>();
-            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+            fastTrackList.add(FastTrack.FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .atStateClaimDraft()
                 .build();
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setFastClaims(fastTrackList);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2950,7 +2950,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ValueSource(booleans = {true, false})
         void shouldValidateFieldsForNihl(boolean valid) {
             List<FastTrack> fastTrackList = new ArrayList<>();
-            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+            fastTrackList.add(FastTrack.FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS);
 
             LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now();
 
@@ -3009,7 +3009,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDraft()
                 .build();
             caseData.setDrawDirectionsOrderRequired(NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setFastClaims(fastTrackList);
             caseData.setSdoR2DisclosureOfDocuments(disclosureOfDocuments);
             caseData.setSdoR2AddendumReport(addendumReport);
@@ -3041,9 +3041,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssued()
                 .build();
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
             caseData.setDrawDirectionsOrderRequired(NO);
-            caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
+            caseData.setSmallClaims(List.of(SmallTrack.SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING));
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
             CaseDocument order = createCaseDocument();
@@ -3125,7 +3125,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atSmallClaimsWitnessStatementWithNegativeInputs()
                 .build();
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
@@ -3139,7 +3139,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atFastTrackWitnessOfFactWithNegativeInputs()
                 .build();
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
@@ -3153,7 +3153,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atSmallClaimsWitnessStatementWithPositiveInputs()
                 .build();
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
@@ -3168,7 +3168,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atFastTrackWitnessOfFactWithPositiveInputs()
                 .build();
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
@@ -3198,9 +3198,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .build();
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
             caseData.setDrawDirectionsOrderRequired(NO);
-            caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
+            caseData.setSmallClaims(List.of(SmallTrack.SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING));
             caseData.setSdoR2SmallClaimsPPI(smallClaimsPPI);
             caseData.setSdoR2SmallClaimsHearing(smallClaimsHearing);
             caseData.setSdoR2SmallClaimsImpNotes(impNotes);
@@ -3224,9 +3224,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .build();
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
             caseData.setDrawDirectionsOrderRequired(NO);
-            caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
+            caseData.setSmallClaims(List.of(SmallTrack.SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING));
             caseData.setSdoR2SmallClaimsImpNotes(impNotes);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
@@ -3250,9 +3250,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .build();
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
             caseData.setDrawDirectionsOrderRequired(NO);
-            caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
+            caseData.setSmallClaims(List.of(SmallTrack.SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING));
             caseData.setSdoR2SmallClaimsHearing(hearing);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);

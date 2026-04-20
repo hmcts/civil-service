@@ -20,8 +20,8 @@ class SdoFastTrackTemplateFieldServiceTest {
     @Test
     void shouldResolveHearingMethodLabels() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setFastTrackMethodTelephoneHearing(FastTrackMethodTelephoneHearing.telephoneTheClaimant);
-        caseData.setFastTrackMethodVideoConferenceHearing(FastTrackMethodVideoConferenceHearing.videoTheDefendant);
+        caseData.setFastTrackMethodTelephoneHearing(FastTrackMethodTelephoneHearing.TELEPHONE_THE_CLAIMANT);
+        caseData.setFastTrackMethodVideoConferenceHearing(FastTrackMethodVideoConferenceHearing.VIDEO_THE_DEFENDANT);
 
         assertThat(service.getMethodTelephoneHearingLabel(caseData)).isEqualTo("the claimant");
         assertThat(service.getMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the defendant");

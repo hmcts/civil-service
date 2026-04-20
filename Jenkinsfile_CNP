@@ -216,6 +216,7 @@ withPipeline(type, product, component) {
       sh """
         eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
         ./bin/wait-for.sh definition-store
+        . ./bin/shared/idam-get-tokens.sh
         ./bin/add-roles.sh
         ./bin/pull-latest-wiremock-mappings.sh ${wiremockMappingsBranch}
         ./bin/load-wiremock-mappings.sh
@@ -275,6 +276,7 @@ withPipeline(type, product, component) {
   before('smoketest:aat') {
     sh """
       eval \$(./bin/variables/load-staging-environment-variables.sh)
+      . ./bin/shared/idam-get-tokens.sh
       ./bin/add-roles.sh
       ./bin/pull-latest-camunda-files.sh ${camundaBranch}
       ./bin/pull-latest-dmn-files.sh ${dmnBranch}
