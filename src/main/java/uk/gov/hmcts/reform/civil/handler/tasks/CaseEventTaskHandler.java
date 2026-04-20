@@ -75,7 +75,10 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         BusinessProcess businessProcess = startEventData.getBusinessProcess();
 
         if (isEventAlreadyProcessed(externalTask, businessProcess)) {
-            log.info("Event {} for caseId {} is already processed", startEventResponse.getEventId(), caseId);
+            log.info("Event {} for caseId {} activityId {} is already processed",
+                     startEventResponse.getEventId(),
+                     caseId,
+                     externalTask.getActivityId());
             return startEventData;
         }
 
