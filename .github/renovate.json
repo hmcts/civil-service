@@ -78,6 +78,17 @@
       "automerge": true,
       "automergeType": "pr",
       "automergeSchedule": ["before 4pm every weekday"]
+    },
+    {
+      "matchPackagePatterns": [
+        "org.projectlombok",
+        "io.freefair.lombok"
+      ],
+      "groupName": "Lombok updates",
+      "groupSlug": "lombok",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeSchedule": ["before 4pm every weekday"]
     }
   ]
 }
