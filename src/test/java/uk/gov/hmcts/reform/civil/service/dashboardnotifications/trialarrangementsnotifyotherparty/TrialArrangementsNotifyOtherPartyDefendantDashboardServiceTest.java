@@ -11,11 +11,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
-import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
-import java.util.Collections;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -32,10 +29,6 @@ class TrialArrangementsNotifyOtherPartyDefendantDashboardServiceTest {
     @Mock
     private DashboardScenariosService dashboardScenariosService;
     @Mock
-    private DashboardNotificationService dashboardNotificationService;
-    @Mock
-    private TaskListService taskListService;
-    @Mock
     private DashboardNotificationsParamsMapper mapper;
 
     @InjectMocks
@@ -47,15 +40,13 @@ class TrialArrangementsNotifyOtherPartyDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotifyDefendantWhenTrialArrangementsNotifyOtherPartyAndUnrepresented() {
+    void shouldNotifyDefendantWhenUnrepresented() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setCcdCaseReference(1234L);
 
         service.notifyTrialArrangementsNotifyOtherParty(caseData, AUTH_TOKEN);
 
-        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("1234", "DEFENDANT");
-        verify(taskListService).makeSelectedProgressAbleTasksInactiveForCaseIdentifierAndRole("1234", "DEFENDANT", Collections.singletonList("Hearing.Arrangements.Add"));
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT.getScenario(),
@@ -65,31 +56,13 @@ class TrialArrangementsNotifyOtherPartyDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldUseDefendantScenarioWhenUnrepresented() {
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setCcdCaseReference(5678L);
-
-        service.notifyTrialArrangementsNotifyOtherParty(caseData, AUTH_TOKEN);
-
-        verify(dashboardScenariosService).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT.getScenario(),
-            "5678",
-            new ScenarioRequestParams(new HashMap<>())
-        );
-    }
-
-    @Test
-    void shouldNotNotifyDefendantWhenRepresentedYes() {
+    void shouldNotNotifyDefendantWhenRepresented() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setRespondent1Represented(YesOrNo.YES);
         caseData.setCcdCaseReference(3456L);
 
         service.notifyTrialArrangementsNotifyOtherParty(caseData, AUTH_TOKEN);
 
-        verifyNoInteractions(dashboardNotificationService);
-        verifyNoInteractions(taskListService);
         verifyNoInteractions(dashboardScenariosService);
     }
 }
