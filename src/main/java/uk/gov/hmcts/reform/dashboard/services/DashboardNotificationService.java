@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 
@@ -28,16 +30,16 @@ import static java.util.Objects.nonNull;
 @SuppressWarnings("deprecation")
 public class DashboardNotificationService {
 
-    private final DashboardNotificationsRepository dashboardNotificationsRepository;
-    private final NotificationActionRepository notificationActionRepository;
     private static final Set<String> CASE_STAY_TEMPLATES = Set.of(
         "Notice.AAA6.CP.Case.Stayed.Claimant",
         "Notice.AAA6.CP.Case.Stayed.Defendant"
     );
+    private static final String CLICK_ACTION = "Click";
+
+    private final DashboardNotificationsRepository dashboardNotificationsRepository;
+    private final NotificationActionRepository notificationActionRepository;
 
     private final IdamApi idamApi;
-
-    private final String clickAction = "Click";
 
     @Autowired
     public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository,
@@ -74,8 +76,11 @@ public class DashboardNotificationService {
         List<DashboardNotificationsEntity> result =
             caseStayedNotification.isEmpty() ? sortedAllNotifications : caseStayedNotification;
 
+        List<UUID> notificationIds = result.stream().map(DashboardNotificationsEntity::getId).toList();
+        Map<UUID, NotificationActionEntity> latestActions = findLatestNotificationActions(notificationIds);
+
         return result.stream()
-            .map(Notification::from)
+            .map(entity -> Notification.from(entity, latestActions.get(entity.getId())))
             .toList();
     }
 
@@ -95,11 +100,8 @@ public class DashboardNotificationService {
         DashboardNotificationsEntity updated = notification;
         if (nonNull(notification.getName())) {
             log.info("Query for dashboard notifications using notification reference= {}, citizenRole = {}, templateName = {}",
-                notification.getReference(),
-                notification.getCitizenRole(),
-                notification.getName()
-            );
-            List<DashboardNotificationsEntity> existingNotification = dashboardNotificationsRepository
+                notification.getReference(), notification.getCitizenRole(), notification.getName());
+            List<DashboardNotificationsEntity> existingNotifications = dashboardNotificationsRepository
                 .findByReferenceAndCitizenRoleAndName(
                     notification.getReference(),
                     notification.getCitizenRole(),
@@ -107,62 +109,70 @@ public class DashboardNotificationService {
                 );
 
             log.info("Found {} dashboard notifications in database for reference {}",
-                nonNull(existingNotification) ? existingNotification.size() : null,
-                notification.getReference());
-            if (nonNull(existingNotification) && !existingNotification.isEmpty()) {
-                DashboardNotificationsEntity dashboardNotification = existingNotification.get(0);
+                     existingNotifications.size(), notification.getReference());
+
+            if (!existingNotifications.isEmpty()) {
+                DashboardNotificationsEntity match = findMatchingOrLatestNotification(existingNotifications, notification);
                 updated = copyNotification(notification);
-                updated.setId(dashboardNotification.getId());
-                for (DashboardNotificationsEntity dashNotification : existingNotification) {
-                    notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(
-                        dashNotification,
-                        clickAction
+                updated.setId(match.getId());
+                // Delete click actions so the notification is unread after content changes.
+                // This applies to both reconfigured notifications and reapplied scenarios where
+                // the content may have been updated.
+                for (DashboardNotificationsEntity dashNotification : existingNotifications) {
+                    notificationActionRepository.deleteByDashboardNotificationIdAndActionPerformed(
+                        dashNotification.getId(),
+                        CLICK_ACTION
                     );
-                    log.info("Existing notification deleted reference = {}, id = {}", notification.getReference(), dashNotification.getId());
+                    log.debug("Existing {} notification action deleted reference = {}, id = {}",
+                              CLICK_ACTION, notification.getReference(), dashNotification.getId());
                 }
+            } else {
+                log.debug("Existing notification not present reference = {}", notification.getReference());
             }
         } else {
-            log.info("Existing notification not present reference = {}", notification.getReference());
+            log.warn("Notification 'name' not provided reference = {}", notification.getReference());
         }
 
         return dashboardNotificationsRepository.save(updated);
     }
 
-    public void deleteById(UUID id) {
-        dashboardNotificationsRepository.deleteById(id);
-    }
-
     public void recordClick(UUID id, String authToken) {
-        Optional<DashboardNotificationsEntity> dashboardNotification = dashboardNotificationsRepository.findById(id);
-
-        dashboardNotification.ifPresent(notification -> {
+        dashboardNotificationsRepository.findById(id).ifPresent(notification -> {
             NotificationActionEntity notificationAction = new NotificationActionEntity(
                 null,
                 notification.getReference(),
-                clickAction,
+                CLICK_ACTION,
                 idamApi.retrieveUserDetails(authToken).getFullName(),
                 OffsetDateTime.now(),
-                notification
+                id
             );
 
-            if (nonNull(notification.getNotificationAction())
-                && notification.getNotificationAction().getActionPerformed().equals(clickAction)) {
-                notificationAction.setId(notification.getNotificationAction().getId());
-            }
-            notification.setNotificationAction(notificationAction);
-            dashboardNotificationsRepository.save(notification);
+            findLatestClickAction(id).ifPresent(e -> notificationAction.setId(e.getId()));
+
+            notificationActionRepository.save(notificationAction);
         });
     }
 
+    public void deleteById(UUID id) {
+        notificationActionRepository.deleteByDashboardNotificationId(id);
+        dashboardNotificationsRepository.deleteById(id);
+    }
+
     public int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String citizenRole) {
+        dashboardNotificationsRepository.findByReferenceAndCitizenRoleAndName(reference, citizenRole, name)
+            .forEach(n -> notificationActionRepository.deleteByDashboardNotificationId(n.getId()));
         return dashboardNotificationsRepository.deleteByNameAndReferenceAndCitizenRole(name, reference, citizenRole);
     }
 
     public int deleteByNameAndReference(String name, String reference) {
+        dashboardNotificationsRepository.findByReferenceAndName(reference, name)
+            .forEach(n -> notificationActionRepository.deleteByDashboardNotificationId(n.getId()));
         return dashboardNotificationsRepository.deleteByNameAndReference(name, reference);
     }
 
     public void deleteByReferenceAndCitizenRole(String reference, String citizenRole) {
+        dashboardNotificationsRepository.findByReferenceAndCitizenRole(reference, citizenRole)
+            .forEach(n -> notificationActionRepository.deleteByDashboardNotificationId(n.getId()));
         int deleted = dashboardNotificationsRepository.deleteByReferenceAndCitizenRole(reference, citizenRole);
         log.info("{} notifications removed for claim = {}", deleted, reference);
     }
@@ -170,7 +180,6 @@ public class DashboardNotificationService {
     private DashboardNotificationsEntity copyNotification(DashboardNotificationsEntity notification) {
         return new DashboardNotificationsEntity(
             notification.getId(),
-            notification.getNotificationAction(),
             notification.getReference(),
             notification.getName(),
             notification.getCitizenRole(),
@@ -186,5 +195,48 @@ public class DashboardNotificationService {
             notification.getDeadline(),
             notification.getTimeToLive()
         );
+    }
+
+    private Optional<NotificationActionEntity> findLatestClickAction(UUID dashboardNotificationId) {
+        return notificationActionRepository
+            .findByDashboardNotificationIdIn(List.of(dashboardNotificationId))
+            .stream()
+            .filter(a -> CLICK_ACTION.equals(a.getActionPerformed()))
+            .max(Comparator.comparing(
+                NotificationActionEntity::getCreatedAt,
+                Comparator.nullsFirst(Comparator.naturalOrder())
+            ));
+    }
+
+    private Map<UUID, NotificationActionEntity> findLatestNotificationActions(List<UUID> dashboardNotificationIds) {
+        if (dashboardNotificationIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return notificationActionRepository
+            .findByDashboardNotificationIdIn(dashboardNotificationIds)
+            .stream()
+            .collect(Collectors.groupingBy(
+                NotificationActionEntity::getDashboardNotificationId,
+                Collectors.collectingAndThen(
+                    Collectors.maxBy(Comparator.comparing(
+                        NotificationActionEntity::getCreatedAt,
+                        Comparator.nullsFirst(Comparator.naturalOrder())
+                    )),
+                    opt -> opt.orElse(null)
+                )
+            ));
+    }
+
+    private DashboardNotificationsEntity findMatchingOrLatestNotification(List<DashboardNotificationsEntity> existingNotifications,
+                                                                          DashboardNotificationsEntity notification) {
+        return existingNotifications.stream()
+            .filter(n -> n.getId().equals(notification.getId()))
+            .findFirst()
+            .orElseGet(() -> existingNotifications.stream()
+                .max(Comparator.comparing(
+                    DashboardNotificationsEntity::getCreatedAt,
+                    Comparator.nullsFirst(Comparator.naturalOrder())
+                ).thenComparing(DashboardNotificationsEntity::getId))
+                .orElse(existingNotifications.getFirst()));
     }
 }
