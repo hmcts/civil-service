@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsEmployersLiability;
+import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_EMPLOYERS_LIABILITY;
 import static uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle.SHOW;
 
 /**
@@ -28,6 +28,6 @@ public class DjDirectionsToggleService {
 
     public boolean hasEmployerLiability(List<CaseManagementOrderAdditional> additionalDirections) {
         return nonNull(additionalDirections)
-            && additionalDirections.contains(OrderTypeTrialAdditionalDirectionsEmployersLiability);
+            && additionalDirections.contains(ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_EMPLOYERS_LIABILITY);
     }
 }
