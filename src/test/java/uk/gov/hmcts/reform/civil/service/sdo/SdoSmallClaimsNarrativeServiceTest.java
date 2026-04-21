@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -25,13 +25,14 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_D;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_E;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_HEARING_LISTING_NOTICE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ROAD_TRAFFIC_ACCIDENT_SMALL_CLAIMS;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_WARNING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIM_WITNESS_STATEMENT_TEXT;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_HEARING_LISTING_NOTICE;
 
 @ExtendWith(MockitoExtension.class)
 class SdoSmallClaimsNarrativeServiceTest {
@@ -97,7 +98,6 @@ class SdoSmallClaimsNarrativeServiceTest {
     @Test
     void shouldPopulateFlightDelayHearingAndNotes() {
         CaseData caseData = CaseDataBuilder.builder().build();
-
         service.applyFlightDelaySection(caseData, List.of(OrderDetailsPagesSectionsToggle.SHOW));
         service.applyHearingSection(caseData);
         service.applyNotesSection(caseData);
@@ -110,6 +110,8 @@ class SdoSmallClaimsNarrativeServiceTest {
             .isEqualTo(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE);
         assertThat(caseData.getSmallClaimsHearing().getInput2()).isNotBlank();
         assertThat(caseData.getSmallClaimsHearing().getInput1()).isEqualTo(SMALL_CLAIMS_HEARING_LISTING_NOTICE);
+        assertThat(caseData.getSmallClaimsHearing().getDateFrom()).isEqualTo(LocalDate.now().plusWeeks(20));
+        assertThat(caseData.getSmallClaimsHearing().getDateTo()).isEqualTo(LocalDate.now().plusWeeks(29));
         assertThat(caseData.getSmallClaimsNotes().getInput())
             .startsWith(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE);
     }
