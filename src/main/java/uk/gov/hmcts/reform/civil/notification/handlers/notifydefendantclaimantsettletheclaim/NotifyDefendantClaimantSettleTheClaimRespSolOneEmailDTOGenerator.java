@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
 @Component
 public class NotifyDefendantClaimantSettleTheClaimRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
@@ -43,6 +44,8 @@ public class NotifyDefendantClaimantSettleTheClaimRespSolOneEmailDTOGenerator ex
         properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
         properties.put(CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString());
         properties.put(DEFENDANT_REFERENCE_NUMBER, getDefRefNumber(caseData));
+        properties.put(LEGAL_REP_NAME,
+                       getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService));
         return properties;
     }
 
