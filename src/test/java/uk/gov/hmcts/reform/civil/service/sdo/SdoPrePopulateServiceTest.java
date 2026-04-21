@@ -80,7 +80,7 @@ class SdoPrePopulateServiceTest {
                 journeyToggleService
             );
 
-        SdoExpertEvidenceFieldsService expertEvidenceFieldsService = new SdoExpertEvidenceFieldsService(deadlineService);
+        SdoExpertEvidenceFieldsService expertEvidenceFieldsService = new SdoExpertEvidenceFieldsService();
         SdoDisclosureOfDocumentsFieldsService disclosureOfDocumentsFieldsService =
             new SdoDisclosureOfDocumentsFieldsService(deadlineService);
 

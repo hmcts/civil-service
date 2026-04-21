@@ -8,8 +8,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_INSPECTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_STANDARD_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX;
 
 /**
  * Encapsulates the standard disclosure paragraph so multiple stages can reuse the same
@@ -24,12 +22,10 @@ public class SdoDisclosureOfDocumentsFieldsService {
     public void populateFastTrackDisclosureOfDocuments(CaseData caseData) {
         FastTrackDisclosureOfDocuments disclosure = new FastTrackDisclosureOfDocuments()
             .setInput1(FAST_TRACK_DISCLOSURE_STANDARD_SDO)
-            .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
+            .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(2))
             .setInput2(FAST_TRACK_DISCLOSURE_INSPECTION)
-            .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(5))
-            .setInput3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_SDO)
-            .setInput4(FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX + " " + FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE)
-            .setDate3(sdoDeadlineService.nextWorkingDayFromNowWeeks(8));
+            .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(3))
+            .setInput3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_SDO);
 
         caseData.setFastTrackDisclosureOfDocuments(disclosure);
     }
