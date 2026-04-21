@@ -386,14 +386,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input3")
                 .isEqualTo("Requests will be complied with within 7 days of the receipt of the request");
-            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input4")
-                .isEqualTo("Each party must upload to the Digital Portal"
-                               + " copies of those documents on which they wish to rely"
-                               + " at trial");
-            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input5")
-                .isEqualTo("by 4pm on");
-            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date3")
-                .isEqualTo(nextWorkingDayDate.toString());
 
             //trialHearingWitnessOfFactDJ
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input1")
@@ -416,7 +408,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Witness statements shall be uploaded to the "
                                + "Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("date1")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(5).toString());
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input9")
                 .isEqualTo("Evidence will not be permitted at trial from a witness whose "
                                + "statement has not been uploaded in accordance with this"
@@ -560,19 +552,19 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("input1")
                 .isEqualTo(PERSONAL_INJURY_PERMISSION_DJ);
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("date1")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isNull();
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("input2")
                 .isEqualTo(PERSONAL_INJURY_QUESTIONS);
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("date2")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(7).toString());
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("input3")
                 .isEqualTo(PERSONAL_INJURY_ANSWERS);
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("date3")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(9).toString());
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("input4")
                 .isEqualTo(PERSONAL_INJURY_UPLOAD);
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("date4")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
 
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("input")
                 .isEqualTo(ROAD_TRAFFIC_ACCIDENT_UPLOAD_DJ);
@@ -625,14 +617,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input3")
                 .isEqualTo("Requests will be complied with within 7 days of the receipt of the request");
-            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input4")
-                .isEqualTo("Each party must upload to the Digital Portal"
-                               + " copies of those documents on which they wish to rely"
-                               + " at trial");
-            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input5")
-                .isEqualTo("by 4pm on");
-            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date3")
-                .isEqualTo(nextWorkingDayDate.toString());
         }
 
         @Test

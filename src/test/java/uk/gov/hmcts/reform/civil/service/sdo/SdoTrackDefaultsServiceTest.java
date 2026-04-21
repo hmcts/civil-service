@@ -53,7 +53,7 @@ class SdoTrackDefaultsServiceTest {
                 new SdoSmallClaimsNarrativeService(mainFeatureToggleService, deadlineService),
                 journeyToggleService
         );
-        SdoExpertEvidenceFieldsService expertEvidenceFieldsService = new SdoExpertEvidenceFieldsService(deadlineService);
+        SdoExpertEvidenceFieldsService expertEvidenceFieldsService = new SdoExpertEvidenceFieldsService();
         SdoDisclosureOfDocumentsFieldsService disclosureOfDocumentsFieldsService = new SdoDisclosureOfDocumentsFieldsService(deadlineService);
         service = new SdoTrackDefaultsService(
                 journeyToggleService,
