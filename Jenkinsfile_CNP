@@ -281,13 +281,13 @@ def setPreviewUrls(String product, String component) {
 }
 
 def setAatUrls() {
-  env.URL = "https://civil-service-xui-staging.aat.platform.hmcts.net"
-  env.CIVIL_SERVICE_URL = "https://civil-service-staging.aat.platform.hmcts.net"
-  env.CAMUNDA_BASE_URL = "https://civil-service-camunda-staging-aat.service.core-compute-aat.internal"
+  env.URL = "https://manage-case.aat.platform.hmcts.net"
+  env.CIVIL_SERVICE_URL = "http://civil-service-aat.service.core-compute-aat.internal"
+  env.CAMUNDA_BASE_URL = "http://camunda-api-aat.service.core-compute-aat.internal"
   env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
   setAatIntegrationUrls()
-  env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
-  env.AAC_API_URL = "https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
+  env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+  env.AAC_API_URL = "http://aac-manage-case-assignment-aat.service.core-compute-aat.internal"
 }
 
 def setAatIntegrationUrls() {

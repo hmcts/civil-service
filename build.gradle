@@ -221,8 +221,11 @@ def buildCcdDefinitionsXls = tasks.register('buildCcdDefinitionsXls', Exec) {
       environment 'CCD_DEF_CASE_SERVICE_BASE_URL', "http://civil-service-pr-${changeId}-java"
       environment 'CCD_DEF_GEN_APP_SERVICE_BASE_URL', "http://civil-service-pr-${changeId}-java"
     } else {
-      environment 'CCD_DEF_CASE_SERVICE_BASE_URL', 'http://civil-service-staging-java'
-      environment 'CCD_DEF_GEN_APP_SERVICE_BASE_URL', 'http://civil-service-staging-java'
+      def aatCivilServiceUrl = 'http://civil-service-aat.service.core-compute-aat.internal'
+      environment 'CCD_DEF_CASE_SERVICE_BASE_URL',
+        System.getenv('CCD_DEF_CASE_SERVICE_BASE_URL') ?: aatCivilServiceUrl
+      environment 'CCD_DEF_GEN_APP_SERVICE_BASE_URL',
+        System.getenv('CCD_DEF_GEN_APP_SERVICE_BASE_URL') ?: aatCivilServiceUrl
     }
 
     commandLine './bin/build-civil-xlsx-definitions.sh', dataSetupEnvironment
