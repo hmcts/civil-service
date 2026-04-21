@@ -217,7 +217,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIM_WITNESS_STATEMENT_TEXT;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK;
 
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
