@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_INSPECTION;
@@ -74,7 +75,7 @@ public class DjTrialNarrativeService {
             .setInput6("10")
             .setInput7(WITNESS_PAGE_LIMIT_SUFFIX_DJ)
             .setInput8(SMALL_CLAIMS_WITNESS_DEADLINE)
-            .setDate1(deadlineService.nextWorkingDayInWeeks(8))
+            .setDate1(LocalDate.now().plusWeeks(5))
             .setInput9(SMALL_CLAIMS_WITNESS_LATE_WARNING);
     }
 
@@ -101,8 +102,8 @@ public class DjTrialNarrativeService {
             .setHelpText1(FAST_TRACK_TRIAL_HEARING_HELP_TEXT)
             .setHelpText2(FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE)
             .setDateToToggle(DATE_TO_SHOW)
-            .setDate1(deadlineService.weeksFromNow(22))
-            .setDate2(deadlineService.weeksFromNow(30));
+            .setDate1(deadlineService.weeksFromNow(20))
+            .setDate2(deadlineService.weeksFromNow(29));
     }
 
     public TrialHearingNotes buildTrialHearingNotes() {

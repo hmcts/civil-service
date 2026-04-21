@@ -67,7 +67,7 @@ class DjTrialDirectionsServiceTest {
         DjCreditHireDirectionsService creditHireDirectionsService = new DjCreditHireDirectionsService(djDeadlineService);
         DjBuildingDisputeDirectionsService buildingDisputeDirectionsService =
             new DjBuildingDisputeDirectionsService(djDeadlineService);
-        DjClinicalDirectionsService clinicalDirectionsService = new DjClinicalDirectionsService(djDeadlineService);
+        DjClinicalDirectionsService clinicalDirectionsService = new DjClinicalDirectionsService();
         DjRoadTrafficAccidentDirectionsService roadTrafficAccidentDirectionsService =
             new DjRoadTrafficAccidentDirectionsService(djDeadlineService);
         DjSpecialistNarrativeService narrativeService = new DjSpecialistNarrativeService(

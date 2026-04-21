@@ -109,8 +109,8 @@ public class SdoFastTrackNarrativeService {
     }
 
     private void applyHearingTime(CaseData caseData) {
-        LocalDate trialStart = calendarWeeksFromNow(TRIAL_WINDOW_START_WEEKS);
-        LocalDate trialEnd = calendarWeeksFromNow(TRIAL_WINDOW_END_WEEKS);
+        LocalDate trialStart = calendarWeeksFromNow(20);
+        LocalDate trialEnd = calendarWeeksFromNow(29);
         caseData.setFastTrackHearingTime(new FastTrackHearingTime()
                                                  .setDateFrom(trialStart)
                                                  .setDateTo(trialEnd)
@@ -158,7 +158,7 @@ public class SdoFastTrackNarrativeService {
         witnessOfFact.setSdoR2RestrictWitness(restrictWitness);
         witnessOfFact.setSdoRestrictPages(restrictPages);
         witnessOfFact.setSdoWitnessDeadline(DEADLINE);
-        witnessOfFact.setSdoWitnessDeadlineDate(sdoDeadlineService.calendarDaysFromNow(70));
+        witnessOfFact.setSdoWitnessDeadlineDate(LocalDate.now().plusWeeks(5));
         witnessOfFact.setSdoWitnessDeadlineText(DEADLINE_EVIDENCE);
         return witnessOfFact;
     }
