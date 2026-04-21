@@ -118,6 +118,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalOrderDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDocumentService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDrhFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoExpertEvidenceFieldsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackNarrativeService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackOrderDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackSpecialistDirectionsService;
@@ -134,7 +135,6 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsNarrativeService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsOrderDefaultsService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoTrackDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoValidationService;
@@ -220,6 +220,7 @@ import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK;
 
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
@@ -820,11 +821,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
                 .extracting("standardDisclosureTxt").asString().isEqualTo(STANDARD_DISCLOSURE);
             assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
-                .extracting("standardDisclosureDate").asString().isEqualTo(LocalDate.now().plusDays(28).toString());
+                .extracting("standardDisclosureDate").asString().isEqualTo(LocalDate.now().plusWeeks(2).toString());
             assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
                 .extracting("inspectionTxt").asString().isEqualTo(INSPECTION);
             assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
-                .extracting("inspectionDate").asString().isEqualTo(LocalDate.now().plusDays(42).toString());
+                .extracting("inspectionDate").asString().isEqualTo(LocalDate.now().plusWeeks(3).toString());
             assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
                 .extracting("requestsWillBeCompiledLabel").asString().isEqualTo(REQUEST_COMPILED_WITH);
             assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoStatementOfWitness").asString().isEqualTo(
@@ -861,11 +862,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
                 .extracting("isClaimForPecuniaryLoss").asString().isEqualTo("No");
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
-                .extracting("sdoR2ScheduleOfLossClaimantDate").asString().isEqualTo(LocalDate.now().plusDays(364).toString());
+                .extracting("sdoR2ScheduleOfLossClaimantDate").asString().isEqualTo(LocalDate.now().plusWeeks(12).toString());
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
                 .extracting("sdoR2ScheduleOfLossDefendantText").asString().isEqualTo(SCHEDULE_OF_LOSS_DEFENDANT);
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
-                .extracting("sdoR2ScheduleOfLossDefendantDate").asString().isEqualTo(LocalDate.now().plusDays(378).toString());
+                .extracting("sdoR2ScheduleOfLossDefendantDate").asString().isEqualTo(LocalDate.now().plusWeeks(14).toString());
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
                 .extracting("sdoR2ScheduleOfLossPecuniaryLossTxt").asString().isEqualTo(PECUNIARY_LOSS);
             assertThat(response.getData()).extracting("sdoR2Trial")
@@ -1058,8 +1059,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getFontDetails())
                 .isEqualTo(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2);
             assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadline()).isEqualTo(SdoR2UiConstantFastTrack.DEADLINE);
-            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineDate()).isEqualTo(LocalDate.now().plusDays(
-                70));
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineDate()).isEqualTo(LocalDate.now().plusWeeks(5));
             assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineText()).isEqualTo(
                 SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE);
         }
@@ -1901,11 +1901,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input3")
                 .isEqualTo("Requests will be complied with within 7 days of the receipt of the request.");
-            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input4")
-                .isEqualTo("Each party must upload to the Digital Portal copies of those documents on which they "
-                               + "wish to rely at trial by 4pm on");
-            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date3")
-                .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("input1")
                 .isEqualTo("The claimant must upload to the Digital Portal an up-to-date schedule of loss by 4pm on");
@@ -1997,18 +1992,15 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                     "sdoR2FastTrackCreditHireDetails").extracting("input2")
                 .isEqualTo("""
-                        The claimant must upload to the Digital Portal a witness statement addressing
-                        a) the need to hire a replacement vehicle; and
-                        b) impecuniosity""");
+                        The Claimant’s witness statement must address, if relied upon, evidence in support of
+                        a) need to hire a replacement vehicle; and
+                        b) impecuniosity.""");
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                     "sdoR2FastTrackCreditHireDetails").extracting("date1")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                     "sdoR2FastTrackCreditHireDetails").extracting("input3")
-                .isEqualTo(
-                    "A failure to comply with the paragraph above will result in the claimant being debarred "
-                        + "from asserting need or relying on impecuniosity as the case may be at the final "
-                        + "hearing, save with permission of the Trial Judge.");
+                .isEqualTo(CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK);
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                     "sdoR2FastTrackCreditHireDetails").extracting("input4")
                 .isEqualTo(
@@ -2063,15 +2055,15 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The Defendant(s) may ask questions of the Claimant's " +
                                "expert which must be sent to the expert directly and uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date2")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(7).toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input3")
                 .isEqualTo("The answers to the questions shall be answered by the Expert by");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date3")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(9).toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input4")
                 .isEqualTo("and uploaded to the Digital Portal by the party who has asked the question by");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date4")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
 
             assertThat(response.getData()).extracting("fastTrackRoadTrafficAccident").extracting("input")
                 .isEqualTo("Photographs and/or a plan of the accident location shall be prepared and agreed by the "
@@ -2188,9 +2180,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "they must inform the court within 7 days of the date of this order.");
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateToToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateFrom")
-                .isEqualTo(LocalDate.now().plusWeeks(22).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(20).toString());
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateTo")
-                .isEqualTo(LocalDate.now().plusWeeks(30).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(29).toString());
             assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").extracting("input")
                 .isEqualTo(String.format(
                     "This order has been made without hearing. "
@@ -2291,15 +2283,15 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The Defendant(s) may ask questions of the Claimant's " +
                                "expert which must be sent to the expert directly and uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date2")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(7).toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input3")
                 .isEqualTo("The answers to the questions shall be answered by the Expert by");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date3")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(9).toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input4")
                 .isEqualTo("and uploaded to the Digital Portal by the party who has asked the question by");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date4")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
 
         }
 
@@ -2426,11 +2418,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input3")
                 .isEqualTo("Requests will be complied with within 7 days of the receipt of the request.");
-            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input4")
-                .isEqualTo("Each party must upload to the Digital Portal copies of those documents on which they "
-                               + "wish to rely at trial by 4pm on");
-            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date3")
-                .isEqualTo(nextWorkingDayDate.toString());
 
         }
 
