@@ -43,7 +43,7 @@ public class StandardDirectionOrderDJRespSolTwoEmailDTOGenerator extends RespSol
     public Boolean getShouldNotify(CaseData caseData) {
         return YesOrNo.YES.equals(caseData.getAddRespondent2())
             && isOneVTwoTwoLegalRep(caseData)
-            && !YesOrNo.YES.equals(caseData.getRespondent2Represented())
+            && YesOrNo.YES.equals(caseData.getRespondent2Represented())
             && notificationHelper.isTargetDefendant(caseData, caseData.getRespondent2());
     }
 

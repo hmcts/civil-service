@@ -89,7 +89,7 @@ class StandardDirectionOrderDJRespSolTwoEmailDTOGeneratorTest
         CaseData caseData = mock(CaseData.class);
 
         when(caseData.getAddRespondent2()).thenReturn(YesOrNo.YES);
-        when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.NO);
+        when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.YES);
 
         multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData))
             .thenReturn(true);
@@ -115,7 +115,7 @@ class StandardDirectionOrderDJRespSolTwoEmailDTOGeneratorTest
         CaseData caseData = mock(CaseData.class);
 
         when(caseData.getAddRespondent2()).thenReturn(YesOrNo.YES);
-        when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.NO);
+        when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.YES);
 
         multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData))
             .thenReturn(false);
@@ -126,11 +126,11 @@ class StandardDirectionOrderDJRespSolTwoEmailDTOGeneratorTest
     }
 
     @Test
-    void shouldReturnFalseWhenRespondent2IsRepresented() {
+    void shouldReturnFalseWhenRespondent2IsNotRepresented() {
         CaseData caseData = mock(CaseData.class);
 
         when(caseData.getAddRespondent2()).thenReturn(YesOrNo.YES);
-        when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.YES);
+        when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.NO);
 
         multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData))
             .thenReturn(true);
