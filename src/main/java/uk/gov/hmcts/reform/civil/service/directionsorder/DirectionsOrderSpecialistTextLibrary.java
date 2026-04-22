@@ -416,7 +416,7 @@ public final class DirectionsOrderSpecialistTextLibrary {
 
     /* Disposal hearings */
     public static final String DISPOSAL_DOCUMENTS_EXCHANGE =
-        "The parties must upload to the Digital Portal copies of those documents which they wish the court to consider when deciding" +
+        "The parties must upload to the Digital Portal copies of those documents which they wish the court to consider when deciding " +
             "the amount of damages, by 4pm on";
     public static final String DISPOSAL_DOCUMENTS_UPLOAD =
         "The parties must upload to the Digital Portal copies of those documents which they wish the "
