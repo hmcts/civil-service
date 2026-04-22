@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,7 +26,11 @@ class StandardDirectionOrderDJRespSolOneEmailDTOGeneratorTest
         OrganisationService organisationService) {
         StandardDirectionOrderDJEmailDTOGeneratorBase templateHelper =
             new StandardDirectionOrderDJEmailDTOGeneratorBase(notificationsProperties);
-        return new StandardDirectionOrderDJRespSolOneEmailDTOGenerator(organisationService, templateHelper);
+        StandardDirectionOrderDJNotificationHelper notificationHelper =
+            mock(StandardDirectionOrderDJNotificationHelper.class);
+        when(notificationHelper.isTargetDefendant(any(), any())).thenReturn(true);
+        return new StandardDirectionOrderDJRespSolOneEmailDTOGenerator(
+            organisationService, templateHelper, notificationHelper);
     }
 
     @Override

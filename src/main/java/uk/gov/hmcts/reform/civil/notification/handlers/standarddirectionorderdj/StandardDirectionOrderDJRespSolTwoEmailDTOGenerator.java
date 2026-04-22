@@ -17,13 +17,16 @@ public class StandardDirectionOrderDJRespSolTwoEmailDTOGenerator extends RespSol
 
     private static final String REFERENCE_TEMPLATE_SDO_DJ = "sdo-dj-order-notification-defendant-%s";
     private final StandardDirectionOrderDJEmailDTOGeneratorBase templateHelper;
+    private final StandardDirectionOrderDJNotificationHelper notificationHelper;
 
     public StandardDirectionOrderDJRespSolTwoEmailDTOGenerator(
         OrganisationService organisationService,
-        StandardDirectionOrderDJEmailDTOGeneratorBase templateHelper
+        StandardDirectionOrderDJEmailDTOGeneratorBase templateHelper,
+        StandardDirectionOrderDJNotificationHelper notificationHelper
     ) {
         super(organisationService);
         this.templateHelper = templateHelper;
+        this.notificationHelper = notificationHelper;
     }
 
     @Override
@@ -40,7 +43,8 @@ public class StandardDirectionOrderDJRespSolTwoEmailDTOGenerator extends RespSol
     public Boolean getShouldNotify(CaseData caseData) {
         return YesOrNo.YES.equals(caseData.getAddRespondent2())
             && isOneVTwoTwoLegalRep(caseData)
-            && !YesOrNo.YES.equals(caseData.getRespondent2Represented());
+            && !YesOrNo.YES.equals(caseData.getRespondent2Represented())
+            && notificationHelper.isTargetDefendant(caseData, caseData.getRespondent2());
     }
 
     @Override
