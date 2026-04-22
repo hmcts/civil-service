@@ -574,7 +574,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(DISPOSAL_FINAL_HEARING_LISTING_DJ);
 
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").extracting("date")
-                .isEqualTo(LocalDate.now().plusWeeks(16).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
 
             assertThat(response.getData()).extracting("trialHearingTimeDJ").extracting("helpText1")
                 .isEqualTo("If either party considers that the time estimate is insufficient, "

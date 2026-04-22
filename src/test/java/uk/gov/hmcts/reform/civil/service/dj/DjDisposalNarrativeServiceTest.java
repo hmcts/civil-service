@@ -61,8 +61,9 @@ class DjDisposalNarrativeServiceTest {
     void shouldBuildSchedulesOfLossWithSequentialDeadlines() {
         var schedules = service.buildSchedulesOfLoss();
 
-        assertThat(schedules.getDate1()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(10));
-        assertThat(schedules.getDate2()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(12));
+        assertThat(schedules.getDate1()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(8));
+        assertThat(schedules.getDate2()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(10));
+        assertThat(schedules.getDate3()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(10));
         assertThat(schedules.getInput1()).isEqualTo(DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ);
         assertThat(schedules.getInput2()).isEqualTo(DISPOSAL_SCHEDULE_COUNTER_SEND);
         assertThat(schedules.getInput3()).isEqualTo(DISPOSAL_SCHEDULE_COUNTER_UPLOAD_DJ);
