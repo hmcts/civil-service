@@ -1107,7 +1107,7 @@ public class HearingsPartyMapperTest {
         partyDetails.setIndividualDetails(individualDetails);
         partyDetails.setOrganisationDetails(null);
         partyDetails.setUnavailabilityDOW(null);
-        partyDetails.setUnavailabilityRanges(emptyList());
+        partyDetails.setUnavailabilityRanges(null);
         partyDetails.setHearingSubChannel(null);
         return partyDetails;
     }
@@ -1129,7 +1129,7 @@ public class HearingsPartyMapperTest {
         partyDetails.setIndividualDetails(null);
         partyDetails.setOrganisationDetails(organisationDetails);
         partyDetails.setUnavailabilityDOW(null);
-        partyDetails.setUnavailabilityRanges(emptyList());
+        partyDetails.setUnavailabilityRanges(null);
         partyDetails.setHearingSubChannel(null);
         return partyDetails;
     }

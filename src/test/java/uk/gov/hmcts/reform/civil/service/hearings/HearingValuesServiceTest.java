@@ -779,7 +779,7 @@ public class HearingValuesServiceTest {
         partyDetails.setIndividualDetails(buildExpectedIndividualDetails(firstName, lastName, email));
         partyDetails.setOrganisationDetails(null);
         partyDetails.setUnavailabilityDOW(null);
-        partyDetails.setUnavailabilityRanges(emptyList());
+        partyDetails.setUnavailabilityRanges(null);
         partyDetails.setHearingSubChannel(null);
         return partyDetails;
     }
@@ -815,7 +815,7 @@ public class HearingValuesServiceTest {
         partyDetails.setIndividualDetails(null);
         partyDetails.setOrganisationDetails(organisationDetails);
         partyDetails.setUnavailabilityDOW(null);
-        partyDetails.setUnavailabilityRanges(emptyList());
+        partyDetails.setUnavailabilityRanges(null);
         partyDetails.setHearingSubChannel(null);
         return partyDetails;
     }

@@ -348,7 +348,7 @@ public class HearingsPartyMapper {
 
     private static List<UnavailabilityRangeModel> getUnavailabilityRanges(List<Element<UnavailableDate>> unavailableDates) {
         if (unavailableDates == null) {
-            return emptyList();
+            return null;
         }
         return unwrapElements(unavailableDates).stream()
             .map(HearingsPartyMapper::mapUnAvailableDateToRange)
