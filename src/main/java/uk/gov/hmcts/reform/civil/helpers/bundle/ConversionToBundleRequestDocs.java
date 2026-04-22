@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.buildBundlingRequestDoc;
@@ -43,10 +44,16 @@ public class ConversionToBundleRequestDocs {
         log.debug("Converting other witness evidence to bundle request docs for party {}", party);
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         removePartyEntries(witnessStatmentsMap, party);
+        boolean amendBundleEnabled = featureToggleService.isAmendBundleEnabled();
         witnessStatmentsMap.forEach((witnessName, witnessEvidence) ->
             addOtherWitnessEvidenceDocuments(
                 bundlingRequestDocuments,
-                filterDocumentsForBundle(witnessEvidence, UploadEvidenceWitness::getWitnessOptionDocument),
+                witnessEvidence,
+                filterDocumentsForBundle(
+                    witnessEvidence,
+                    UploadEvidenceWitness::getWitnessOptionDocument,
+                    amendBundleEnabled
+                ),
                 displayName,
                 documentType
             )
@@ -146,6 +153,7 @@ public class ConversionToBundleRequestDocs {
 
     private String getFileNameBaseOnType(String fileNamePrefix, Element<UploadEvidenceDocumentType> uploadEvidence,
                                          String documentType, PartyType party) {
+        Objects.requireNonNull(fileNamePrefix);
         if (DOC_FILE_NAME.equals(fileNamePrefix)) {
             return getDocumentFileNameWithoutExtension(uploadEvidence.getValue().getDocumentUpload());
         }
@@ -157,12 +165,13 @@ public class ConversionToBundleRequestDocs {
                 getDateForOriginalFileName(documentType, uploadEvidence.getValue())
             );
         }
+        String partyName = getPartyName(fileNamePrefix, party);
         if (documentType.equals(EvidenceUploadType.DOCUMENTS_REFERRED.name())) {
             return getEvidenceUploadTypeWithNameFileName(fileNamePrefix, uploadEvidence.getValue());
         }
         return generateDocName(
             fileNamePrefix,
-            getPartyName(fileNamePrefix, party),
+            partyName,
             null,
             getDateForGeneratedFileName(documentType, uploadEvidence.getValue())
         );
@@ -189,27 +198,34 @@ public class ConversionToBundleRequestDocs {
     }
 
     private void addOtherWitnessEvidenceDocuments(List<BundlingRequestDocument> bundlingRequestDocuments,
+                                                  List<Element<UploadEvidenceWitness>> originalWitnessEvidence,
                                                   List<Element<UploadEvidenceWitness>> witnessEvidence,
                                                   String displayName,
                                                   String documentType) {
-        for (int index = 0; index < witnessEvidence.size(); index++) {
-            UploadEvidenceWitness uploadEvidenceWitness = witnessEvidence.get(index).getValue();
+        for (Element<UploadEvidenceWitness> uploadEvidenceWitnessElement : witnessEvidence) {
+            UploadEvidenceWitness uploadEvidenceWitness = uploadEvidenceWitnessElement.getValue();
             String docName = generateDocName(
-                displayName,
-                uploadEvidenceWitness.getWitnessOptionName(),
-                String.valueOf(index + 1),
-                uploadEvidenceWitness.getWitnessOptionUploadDate()
+                    displayName,
+                    uploadEvidenceWitness.getWitnessOptionName(),
+                    String.valueOf(originalWitnessEvidence.indexOf(uploadEvidenceWitnessElement) + 1),
+                    uploadEvidenceWitness.getWitnessOptionUploadDate()
             );
             bundlingRequestDocuments.add(buildBundlingRequestDoc(
-                docName,
-                uploadEvidenceWitness.getWitnessOptionDocument(),
-                documentType
+                    docName,
+                    uploadEvidenceWitness.getWitnessOptionDocument(),
+                    documentType
             ));
         }
     }
 
     private <T> List<Element<T>> filterDocumentsForBundle(List<Element<T>> documents, Function<T, Document> documentExtractor) {
-        if (!featureToggleService.isAmendBundleEnabled()) {
+        return filterDocumentsForBundle(documents, documentExtractor, featureToggleService.isAmendBundleEnabled());
+    }
+
+    private <T> List<Element<T>> filterDocumentsForBundle(List<Element<T>> documents,
+                                                          Function<T, Document> documentExtractor,
+                                                          boolean amendBundleEnabled) {
+        if (!amendBundleEnabled) {
             return documents;
         }
         return new ArrayList<>(documents.stream()

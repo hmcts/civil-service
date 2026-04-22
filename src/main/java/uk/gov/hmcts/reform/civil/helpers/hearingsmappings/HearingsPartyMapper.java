@@ -222,7 +222,7 @@ public class HearingsPartyMapper {
     private static void addSolicitorOrganisation(List<PartyDetailsModel> parties,
                                                  OrganisationPolicy organisationPolicy,
                                                  OrganisationService organisationService) {
-        if (organisationPolicy != null && organisationPolicy.getOrganisation() != null) {
+        if (organisationPolicy.getOrganisation() != null) {
             parties.add(getDetailsForSolicitorOrganisation(organisationPolicy, organisationService));
         }
     }

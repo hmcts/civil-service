@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.IND;
@@ -1066,6 +1067,19 @@ public class HearingsPartyMapperTest {
             organisationService
         );
         assertThat(actualPartyDetailsModel).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldThrow_whenApplicantOrganisationPolicyIsNull() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build()
+            .toBuilder()
+            .applicant1OrganisationPolicy(null)
+            .build();
+
+        assertThatThrownBy(() -> buildPartyObjectForHearingPayload(caseData, organisationService))
+            .isInstanceOf(NullPointerException.class);
     }
 
     private PartyDetailsModel buildExpectedIndividualPartyDetails(String partyId, String firstName, String lastName,

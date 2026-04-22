@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.function.Supplier;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -125,7 +125,7 @@ public class HearingDetailsMapper {
     }
 
     private static boolean isAudioVideoEvidenceFlag(Element<FlagDetail> flag) {
-        return flag.getValue() != null && AUDIO_VIDEO_EVIDENCE_FLAG.equals(flag.getValue().getFlagCode());
+        return flag.getValue() != null && flag.getValue().getFlagCode().equals(AUDIO_VIDEO_EVIDENCE_FLAG);
     }
 
     private static String formatListingComment(Element<FlagDetail> flag) {
@@ -173,39 +173,52 @@ public class HearingDetailsMapper {
             log.info("Hearing method codes are not available for hmctsServiceId {} caseId {}", hmctsServiceId, caseData.getCcdCaseReference());
             return null;
         }
-        String hearingMethod = resolveHearingMethod(caseData);
-        return hearingMethod != null ? List.of(hearingMethodCode.get(hearingMethod)) : null;
+        DynamicList hearingMethod = resolveHearingMethod(caseData);
+        return hearingMethod != null ? List.of(hearingMethodCode.get(getDynamicListValue(hearingMethod))) : null;
     }
 
-    private static String resolveHearingMethod(CaseData caseData) {
-        return Stream.of(
-            getSdoR2SmallClaimsHearingMethod(caseData),
-            getSdoR2TrialHearingMethod(caseData),
-            getDynamicListValueIfPresent(caseData.getHearingMethodValuesFastTrack()),
-            getDynamicListValueIfPresent(caseData.getHearingMethodValuesDisposalHearing()),
-            getDynamicListValueIfPresent(caseData.getHearingMethodValuesDisposalHearingDJ()),
-            getDynamicListValueIfPresent(caseData.getHearingMethodValuesTrialHearingDJ()),
-            getDynamicListValueIfPresent(caseData.getHearingMethodValuesSmallClaims())
-        )
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElse(null);
+    private static DynamicList resolveHearingMethod(CaseData caseData) {
+        DynamicList hearingMethod = getSdoR2SmallClaimsHearingMethod(caseData);
+        if (hearingMethod != null) {
+            return hearingMethod;
+        }
+        hearingMethod = getSdoR2TrialHearingMethod(caseData);
+        if (hearingMethod != null) {
+            return hearingMethod;
+        }
+        return getFirstAvailableHearingMethod(caseData);
     }
 
-    private static String getSdoR2SmallClaimsHearingMethod(CaseData caseData) {
+    private static DynamicList getSdoR2SmallClaimsHearingMethod(CaseData caseData) {
         return caseData.getSdoR2SmallClaimsHearing() != null
-            ? getDynamicListValueIfPresent(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())
+            ? caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing()
             : null;
     }
 
-    private static String getSdoR2TrialHearingMethod(CaseData caseData) {
+    private static DynamicList getSdoR2TrialHearingMethod(CaseData caseData) {
         return caseData.getSdoR2Trial() != null
-            ? getDynamicListValueIfPresent(caseData.getSdoR2Trial().getMethodOfHearing())
+            ? caseData.getSdoR2Trial().getMethodOfHearing()
             : null;
     }
 
-    private static String getDynamicListValueIfPresent(DynamicList dynamicList) {
-        return dynamicList != null ? getDynamicListValue(dynamicList) : null;
+    private static DynamicList getFirstAvailableHearingMethod(CaseData caseData) {
+        return firstAvailableHearingMethod(List.of(
+            caseData::getHearingMethodValuesFastTrack,
+            caseData::getHearingMethodValuesDisposalHearing,
+            caseData::getHearingMethodValuesDisposalHearingDJ,
+            caseData::getHearingMethodValuesTrialHearingDJ,
+            caseData::getHearingMethodValuesSmallClaims
+        ));
+    }
+
+    private static DynamicList firstAvailableHearingMethod(List<Supplier<DynamicList>> hearingMethodSuppliers) {
+        for (Supplier<DynamicList> supplier : hearingMethodSuppliers) {
+            DynamicList hearingMethod = supplier.get();
+            if (hearingMethod != null) {
+                return hearingMethod;
+            }
+        }
+        return null;
     }
 
 }
