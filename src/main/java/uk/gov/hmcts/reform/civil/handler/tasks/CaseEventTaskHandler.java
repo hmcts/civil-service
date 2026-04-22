@@ -263,7 +263,10 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
                 return standardReason;
             }
             if (value.contains(OTHER.name())) {
-                return getOtherProceedsReason(claimArray);
+                String otherReason = getOtherProceedsReason(claimArray);
+                if (otherReason != null) {
+                    return otherReason;
+                }
             }
         }
         return null;
