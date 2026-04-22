@@ -78,6 +78,7 @@ class IncidentRetryEventHandlerTest {
         handler.handleTask(externalTask);
 
         verify(casesStuckCheckSearchService).getCases("8");
+        verifyNoInteractions(caseTaskTrackingService);
     }
 
     @Test
@@ -90,6 +91,7 @@ class IncidentRetryEventHandlerTest {
         handler.handleTask(externalTask);
 
         verify(casesStuckCheckSearchService).getCases("7");
+        verifyNoInteractions(caseTaskTrackingService);
     }
 
     @Test
@@ -260,6 +262,74 @@ class IncidentRetryEventHandlerTest {
                 && "retry_failed".equals(properties.get("retryStatus"))
                 && "true".equals(properties.get("retryExhausted"))
                 && "job1".equals(properties.get("jobId")))
+        );
+        verify(caseTaskTrackingService).trackCaseTask(
+            eq("MULTIPLE"),
+            eq("incidentRetryDailySummary"),
+            eq("StuckCasesDailyDigest"),
+            argThat(properties -> "2025-01-01T00:00:00Z".equals(properties.get("incidentStartTime"))
+                && "2025-12-31T23:59:59Z".equals(properties.get("incidentEndTime"))
+                && "true".equals(properties.get("manualInterventionRequired"))
+                && "1".equals(properties.get("stuckCaseCount"))
+                && "1".equals(properties.get("failedIncidentCount"))
+                && "1".equals(properties.get("totalRetries"))
+                && "0".equals(properties.get("successRetries"))
+                && "1".equals(properties.get("failedRetries"))
+                && "case-proc1".equals(properties.get("caseIds"))
+                && "inc1".equals(properties.get("incidentIds"))
+                && "proc1".equals(properties.get("processInstanceIds"))
+                && "activity1".equals(properties.get("failedActivityIds")))
+        );
+    }
+
+    @Test
+    void shouldTrackSingleDailySummaryEventForMultipleFailedCases() {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+
+        List<ProcessInstanceDto> processInstances = List.of(
+            newProcessInstance("proc1"), newProcessInstance("proc2")
+        );
+
+        when(camundaRuntimeApi.queryProcessInstances(
+            any(), eq(0), eq(50), any(), any(), anyMap()
+        )).thenReturn(processInstances);
+
+        IncidentDto incident1 = newIncident("proc1", "inc1", "job1");
+        IncidentDto incident2 = newIncident("proc2", "inc2", "job2");
+
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq("proc1"), any(), any(), anyInt()
+        )).thenReturn(List.of(incident1));
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq("proc2"), any(), any(), anyInt()
+        )).thenReturn(List.of(incident2));
+
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
+            .thenReturn(processVariables("case-proc1", "CASE_PROGRESSION", "CASE_EVENT"));
+        when(camundaRuntimeApi.getProcessVariables(eq("proc2"), any()))
+            .thenReturn(processVariables("case-proc2", "CASE_PROGRESSION", "CASE_EVENT"));
+
+        doThrow(new RuntimeException("Failed to modify process instance"))
+            .when(camundaRuntimeApi)
+            .modifyProcessInstance(any(), any(), anyMap());
+
+        handler.handleTask(externalTask);
+
+        verify(caseTaskTrackingService).trackCaseTask(
+            eq("MULTIPLE"),
+            eq("incidentRetryDailySummary"),
+            eq("StuckCasesDailyDigest"),
+            argThat(properties -> "2".equals(properties.get("stuckCaseCount"))
+                && "2".equals(properties.get("failedIncidentCount"))
+                && "2".equals(properties.get("totalRetries"))
+                && "0".equals(properties.get("successRetries"))
+                && "2".equals(properties.get("failedRetries"))
+                && "case-proc1,case-proc2".equals(properties.get("caseIds"))
+                && "inc1,inc2".equals(properties.get("incidentIds"))
+                && "proc1,proc2".equals(properties.get("processInstanceIds"))
+                && "activity1".equals(properties.get("failedActivityIds")))
         );
     }
 
