@@ -265,7 +265,7 @@ tasks.register('highLevelDataSetup', JavaExec) {
   description = 'Loads roles, CCD definitions, Camunda BPMNs, WA DMNs and preview WireMock mappings using the high-level data setup flow.'
   onlyIf { !isCommonAatCcdSetupSkipped() }
   dependsOn buildCcdDefinitionsXls, camundaHighLevelDataSetup, loadCivilWiremockMappings
-  mainClass.set("uk.gov.hmcts.reform.civil.HighLevelDataSetupApp")
+  mainClass.set("uk.gov.hmcts.reform.civil.setup.HighLevelDataSetupApp")
   classpath += sourceSets.main.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
@@ -360,7 +360,11 @@ def sonarExclusions = [
   "**/tasklisteners/MigrateCasesTaskListener.java",
   "**/migration/MigrationTask.java",
   "**/migration/CustomRequestScopeAttr.java",
-  "**/HighLevelDataSetupApp.java"
+  "**/HighLevelDataSetupApp.java",
+  "**/setup/CamundaHighLevelDataSetupApp.java",
+  "**/setup/CamundaDefinitionImporter.java",
+  "**/setup/CamundaImportConfiguration.java",
+  "**/setup/ServiceAuthorisationRestApi.java"
 ]
 
 sonarqube {
