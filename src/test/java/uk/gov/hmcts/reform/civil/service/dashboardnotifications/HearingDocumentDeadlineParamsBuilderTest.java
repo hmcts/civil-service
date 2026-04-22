@@ -60,7 +60,7 @@ class HearingDocumentDeadlineParamsBuilderTest {
         when(sdoCaseClassificationService.isSmallClaimsTrack(caseData)).thenReturn(false);
         when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(false);
         when(caseData.getDisposalHearingDisclosureOfDocuments()).thenReturn(disposalDisclosure);
-        when(disposalDisclosure.getDate2()).thenReturn(expectedDate);
+        when(disposalDisclosure.getDate1()).thenReturn(expectedDate);
 
         Optional<LocalDate> result = builder.getHearingDocumentDeadline(caseData);
 

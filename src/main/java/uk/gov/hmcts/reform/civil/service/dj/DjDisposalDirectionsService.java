@@ -31,7 +31,7 @@ public class DjDisposalDirectionsService {
 
         // copy of disposalHearingNotesDJ field to update order made without hearing field without breaking
         // existing cases
-        LocalDate orderDeadline = deadlineService.workingDaysFromNow(5);
+        LocalDate orderDeadline = deadlineService.nextWorkingDayInDays(7);
         caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(
             new DisposalHearingOrderMadeWithoutHearingDJ()
                 .setInput(welshLanguageService.buildOrderMadeWithoutHearingText(orderDeadline)));

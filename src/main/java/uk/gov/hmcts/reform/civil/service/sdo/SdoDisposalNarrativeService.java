@@ -19,7 +19,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_JUDGES_RECITAL_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_UPLOAD_SDO;
@@ -50,9 +49,7 @@ public class SdoDisposalNarrativeService {
     public void applyDisclosureOfDocuments(CaseData caseData) {
         caseData.setDisposalHearingDisclosureOfDocuments(new DisposalHearingDisclosureOfDocuments()
                                                              .setInput1(DISPOSAL_DOCUMENTS_EXCHANGE)
-                                                             .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
-                                                             .setInput2(DISPOSAL_DOCUMENTS_UPLOAD)
-                                                             .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(4)));
+                                                             .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4)));
     }
 
     public void applyWitnessOfFact(CaseData caseData) {
@@ -95,6 +92,7 @@ public class SdoDisposalNarrativeService {
     public void applyHearingTime(CaseData caseData) {
         caseData.setDisposalHearingHearingTime(new DisposalHearingHearingTime()
                                                        .setInput(DISPOSAL_FINAL_HEARING_LISTING_SDO)
+                                                       .setDateFrom(LocalDate.now().plusWeeks(12))
                                                        .setDateTo(LocalDate.now().plusWeeks(16)));
     }
 

@@ -14,7 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.lenient;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_JUDGES_RECITAL_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_UPLOAD_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_SEND;
@@ -56,8 +55,6 @@ class SdoDisposalNarrativeServiceTest {
             .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(4));
         assertThat(caseData.getDisposalHearingDisclosureOfDocuments().getInput1())
             .isEqualTo(DISPOSAL_DOCUMENTS_EXCHANGE);
-        assertThat(caseData.getDisposalHearingDisclosureOfDocuments().getInput2())
-            .isEqualTo(DISPOSAL_DOCUMENTS_UPLOAD);
         assertThat(caseData.getDisposalHearingWitnessOfFact().getDate2())
             .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(4));
         assertThat(caseData.getDisposalHearingWitnessOfFact().getInput3())
@@ -117,6 +114,7 @@ class SdoDisposalNarrativeServiceTest {
         service.applyHearingTime(caseData);
 
         assertThat(caseData.getDisposalHearingFinalDisposalHearing().getDate()).isEqualTo(LocalDate.now().plusWeeks(12));
+        assertThat(caseData.getDisposalHearingHearingTime().getDateFrom()).isEqualTo(LocalDate.now().plusWeeks(12));
         assertThat(caseData.getDisposalHearingHearingTime().getDateTo()).isEqualTo(LocalDate.now().plusWeeks(16));
     }
 }
