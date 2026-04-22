@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
@@ -13,11 +13,11 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.dj.DjBuildingDisputeDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjClinicalDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDeadlineService;
 import uk.gov.hmcts.reform.civil.service.dj.DjTrialNarrativeService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -87,9 +87,7 @@ class DjTrialTemplateServiceTest {
             .atStateSdoTrialDj()
             .build();
         DjDeadlineService witnessDeadlineService = Mockito.mock(DjDeadlineService.class);
-        when(witnessDeadlineService.nextWorkingDayInWeeks(anyInt()))
-            .thenAnswer(invocation -> LocalDate.of(2025, 2, 1)
-                .plusWeeks(invocation.getArgument(0, Integer.class)));
+
         DjTrialNarrativeService trialNarrativeService = new DjTrialNarrativeService(witnessDeadlineService);
         CaseData caseData = baseCase.toBuilder()
             .trialHearingWitnessOfFactDJ(trialNarrativeService.buildWitnessOfFact())
@@ -157,7 +155,7 @@ class DjTrialTemplateServiceTest {
                 .plusWeeks(invocation.getArgument(0, Integer.class)));
 
         DjBuildingDisputeDirectionsService buildingService = new DjBuildingDisputeDirectionsService(deadlineService);
-        DjClinicalDirectionsService clinicalService = new DjClinicalDirectionsService(deadlineService);
+        DjClinicalDirectionsService clinicalService = new DjClinicalDirectionsService();
 
         return baseCase.toBuilder()
             .trialBuildingDispute(buildingService.buildTrialBuildingDispute())
