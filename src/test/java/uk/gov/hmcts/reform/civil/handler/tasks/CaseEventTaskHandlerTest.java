@@ -148,6 +148,34 @@ class CaseEventTaskHandlerTest {
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
         }
+
+        @Test
+        void shouldFailBeforeSubmit_whenFlowStateIsMissing() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.READY)
+                                     .setProcessInstanceId("processInstanceId"))
+                .build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+
+            when(mockTask.getVariable(FLOW_STATE)).thenReturn(null);
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
+                .thenReturn(StartEventResponse.builder()
+                                .caseDetails(caseDetails)
+                                .eventId(NOTIFY_EVENT.name())
+                                .build());
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService, never()).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).handleFailure(
+                eq(mockTask),
+                eq("Mapper conversion failed due to incompatible types"),
+                anyString(),
+                eq(0),
+                eq(1000L)
+            );
+        }
     }
 
     @Nested

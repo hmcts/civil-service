@@ -236,16 +236,19 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     }
 
     private String getDescription(String eventId, Map<String, Object> data, String state, CaseData caseData) {
+        Object claimProceedsInCaseman = data.get("claimProceedsInCaseman");
+        FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
+
         if (!isProceedsInHeritageEvent(eventId)) {
             return null;
         }
 
-        String claimProceedsDescription = getClaimProceedsInCasemanDescription(data.get("claimProceedsInCaseman"));
+        String claimProceedsDescription = getClaimProceedsInCasemanDescription(claimProceedsInCaseman);
         if (claimProceedsDescription != null) {
             return claimProceedsDescription;
         }
 
-        return getFlowStateDescription((FlowState.Main) FlowState.fromFullName(state), caseData);
+        return getFlowStateDescription(flowState, caseData);
     }
 
     private String getClaimProceedsInCasemanDescription(Object claimProceedsInCaseman) {
@@ -254,40 +257,30 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         }
 
         String[] claimArray = claimProceedsInCaseman.toString().split(",");
-        if (hasOtherReason(claimArray)) {
-            return getOtherProceedsReason(claimArray);
+        for (String value : claimArray) {
+            String standardReason = getStandardProceedsReason(value);
+            if (standardReason != null) {
+                return standardReason;
+            }
+            if (value.contains(OTHER.name())) {
+                return getOtherProceedsReason(claimArray);
+            }
         }
-        String standardReason = getStandardProceedsReason(claimArray);
-        if (standardReason != null) {
-            return standardReason;
-        }
-
-        return getOtherProceedsReason(claimArray);
+        return null;
     }
 
-    private boolean hasOtherReason(String[] claimArray) {
-        for (String value : claimArray) {
-            if (value.contains("reason=" + OTHER.name())) {
-                return true;
-            }
+    private String getStandardProceedsReason(String value) {
+        if (value.contains(APPLICATION.name())) {
+            return "Application.";
         }
-        return false;
-    }
-
-    private String getStandardProceedsReason(String[] claimArray) {
-        for (String value : claimArray) {
-            if (value.contains(APPLICATION.name())) {
-                return "Application.";
-            }
-            if (value.contains(CASE_SETTLED.name())) {
-                return "Case settled.";
-            }
-            if (value.contains(DEFENDANT_DOES_NOT_CONSENT.name())) {
-                return "Defendant does not consent to accept service.";
-            }
-            if (value.contains(JUDGEMENT_REQUEST.name())) {
-                return "Judgement request.";
-            }
+        if (value.contains(CASE_SETTLED.name())) {
+            return "Case settled.";
+        }
+        if (value.contains(DEFENDANT_DOES_NOT_CONSENT.name())) {
+            return "Defendant does not consent to accept service.";
+        }
+        if (value.contains(JUDGEMENT_REQUEST.name())) {
+            return "Judgement request.";
         }
         return null;
     }

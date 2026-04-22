@@ -436,7 +436,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         return (generalAppCaseData.getGeneralAppInformOtherParty() != null
             && YES.equals(generalAppCaseData.getGeneralAppInformOtherParty().getIsWithNotice()))
             || (generalAppCaseData.getGeneralAppRespondentAgreement() != null
-            && YES.equals(generalAppCaseData.getGeneralAppRespondentAgreement().getHasAgreed()));
+            && generalAppCaseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES));
     }
 
     private List<Element<GADetailsRespondentSol>> getRespondentGaAppDetails(CaseData civilCaseData, String respondent) {

@@ -69,6 +69,10 @@ class MigrateCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn("");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
         when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
         when(externalTask.getVariable("state")).thenReturn(null);
         when(externalTask.getVariable("isGACase")).thenReturn(null);
@@ -239,6 +243,10 @@ class MigrateCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn("");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
         when(externalTask.getVariable("state")).thenReturn(null);
         when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
         when(externalTask.getVariable("isGACase")).thenReturn(null);
@@ -276,6 +284,10 @@ class MigrateCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn("");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
         when(externalTask.getVariable("csvFileName")).thenReturn("empty.csv"); // stub csvFileName
 
         @SuppressWarnings("unchecked")
@@ -295,6 +307,11 @@ class MigrateCasesEventHandlerTest {
         // Arrange
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("excelTask");
+        when(externalTask.getVariable("caseIds")).thenReturn("");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
         when(externalTask.getVariable("state")).thenReturn(null);
         when(externalTask.getVariable("isGACase")).thenReturn(null);
 
@@ -325,8 +342,15 @@ class MigrateCasesEventHandlerTest {
     void shouldNotMigrateCasesWhenExcelTaskTypeIsNotExcelMappable() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("excelTask");
+        when(externalTask.getVariable("caseIds")).thenReturn("");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
 
+        byte[] excelBytes = "dummy content".getBytes();
         FileValue fileValue = mock(FileValue.class);
+        when(fileValue.getValue()).thenReturn(new ByteArrayInputStream(excelBytes));
         when(externalTask.getVariableTyped("excelFile", false)).thenReturn(fileValue);
 
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);

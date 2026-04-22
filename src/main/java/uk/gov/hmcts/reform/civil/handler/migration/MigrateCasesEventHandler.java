@@ -87,24 +87,32 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     }
 
     private <T extends CaseReference> List<T> resolveCaseReferences(ExternalTask externalTask, MigrationTask<T> task) {
+        String caseIds = externalTask.getVariable(CASE_IDS);
+        String scenario = externalTask.getVariable(SCENARIO);
+        String camundaProcessIdentifier = externalTask.getVariable(NOTIFICATION_CAMUNDA_PROCESS_IDENTIFIER);
+        String caseNoteElementId = externalTask.getVariable(CASE_NOTE_ELEMENT_ID);
+        String notifyEventId = externalTask.getVariable(NOTIFY_EVENT_ID);
+
         FileValue excelFileValue = externalTask.getVariableTyped(EXCEL_FILE, false);
         if (excelFileValue != null) {
             return getCaseReferencesFromExcel(task, excelFileValue);
         }
 
-        String caseIds = externalTask.getVariable(CASE_IDS);
         if (caseIds != null && !caseIds.isEmpty()) {
-            return getCaseReferencesFromVariables(externalTask, task, caseIds);
+            return getCaseReferencesFromVariables(
+                task, caseIds, scenario, camundaProcessIdentifier, caseNoteElementId, notifyEventId
+            );
         }
 
         return getCaseReferencesFromCsv(externalTask, task.getType());
     }
 
     private <T extends CaseReference> List<T> getCaseReferencesFromExcel(MigrationTask<T> task, FileValue excelFileValue) {
+        byte[] excelBytes = readExcelBytes(excelFileValue);
         if (!ExcelMappable.class.isAssignableFrom(task.getType())) {
             return new ArrayList<>();
         }
-        return caseReferenceCsvLoader.loadFromExcelBytes(task.getType(), readExcelBytes(excelFileValue));
+        return caseReferenceCsvLoader.loadFromExcelBytes(task.getType(), excelBytes);
     }
 
     private byte[] readExcelBytes(FileValue excelFileValue) {
@@ -122,15 +130,13 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     }
 
     private <T extends CaseReference> List<T> getCaseReferencesFromVariables(
-        ExternalTask externalTask,
         MigrationTask<T> task,
-        String caseIds
+        String caseIds,
+        String scenario,
+        String camundaProcessIdentifier,
+        String caseNoteElementId,
+        String notifyEventId
     ) {
-        String scenario = externalTask.getVariable(SCENARIO);
-        String camundaProcessIdentifier = externalTask.getVariable(NOTIFICATION_CAMUNDA_PROCESS_IDENTIFIER);
-        String caseNoteElementId = externalTask.getVariable(CASE_NOTE_ELEMENT_ID);
-        String notifyEventId = externalTask.getVariable(NOTIFY_EVENT_ID);
-
         List<T> caseReferences = Arrays.stream(caseIds.split(","))
             .map(String::trim)
             .filter(s -> !s.isEmpty())
