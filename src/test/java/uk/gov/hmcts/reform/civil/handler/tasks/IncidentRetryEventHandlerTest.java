@@ -32,6 +32,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 class IncidentRetryEventHandlerTest {
@@ -129,9 +130,9 @@ class IncidentRetryEventHandlerTest {
 
         for (ProcessInstanceDto pi : processInstances) {
             IncidentDto incident = newIncident(pi.getId(), "inc-" + pi.getId(), "job-" + pi.getId());
-            when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            doReturn(List.of(incident), List.of()).when(camundaRuntimeApi).getLatestOpenIncidentForProcessInstance(
                 any(), anyBoolean(), eq(pi.getId()), any(), any(), anyInt()
-            )).thenReturn(List.of(incident));
+            );
 
             HashMap<String, VariableValueDto> vars = new HashMap<>();
             VariableValueDto variable = new VariableValueDto();
@@ -175,9 +176,8 @@ class IncidentRetryEventHandlerTest {
             .thenReturn(List.of(pi));
 
         // Incident returned with message "already processed"
-        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
-            any(), anyBoolean(), eq("proc1"), anyString(), anyString(), anyInt()))
-            .thenReturn(List.of(incident));
+        doReturn(List.of(incident), List.of()).when(camundaRuntimeApi).getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq("proc1"), anyString(), anyString(), anyInt());
 
         // caseId exists
         HashMap<String, VariableValueDto> vars = new HashMap<>();
@@ -283,6 +283,49 @@ class IncidentRetryEventHandlerTest {
     }
 
     @Test
+    void shouldTreatIncidentStillOpenAfterRetryAsFailed() {
+        ProcessInstanceDto pi = newProcessInstance("proc1");
+        IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
+
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+
+        when(camundaRuntimeApi.queryProcessInstances(
+            any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()
+        )).thenReturn(List.of(pi));
+
+        doReturn(List.of(incident), List.of(incident)).when(camundaRuntimeApi).getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq(pi.getId()), any(), any(), anyInt()
+        );
+
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
+            .thenReturn(processVariables("case-proc1", "CASE_PROGRESSION", "CASE_EVENT"));
+
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        assertThat(result).isNotNull();
+        verify(camundaRuntimeApi).modifyProcessInstance(any(), any(), anyMap());
+        verify(caseTaskTrackingService).trackCaseTask(
+            eq("case-proc1"),
+            eq("incidentRetry"),
+            eq("StuckCaseDetected"),
+            argThat(properties -> "retry_validation_failed".equals(properties.get("retryStatus"))
+                && "inc1".equals(properties.get("incidentId"))
+                && "proc1".equals(properties.get("processInstanceId")))
+        );
+        verify(caseTaskTrackingService).trackCaseTask(
+            eq("MULTIPLE"),
+            eq("incidentRetryDailySummary"),
+            eq("StuckCasesDailyDigest"),
+            argThat(properties -> "1".equals(properties.get("stuckCaseCount"))
+                && "0".equals(properties.get("successRetries"))
+                && "1".equals(properties.get("failedRetries"))
+                && "case-proc1".equals(properties.get("caseIds")))
+        );
+    }
+
+    @Test
     void shouldTrackSingleDailySummaryEventForMultipleFailedCases() {
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
         when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
@@ -357,8 +400,8 @@ class IncidentRetryEventHandlerTest {
 
         when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
             .thenReturn(List.of(pi));
-        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(any(), anyBoolean(), eq("proc1"), any(), any(), anyInt()))
-            .thenReturn(List.of(incident));
+        doReturn(List.of(incident), List.of()).when(camundaRuntimeApi)
+            .getLatestOpenIncidentForProcessInstance(any(), anyBoolean(), eq("proc1"), any(), any(), anyInt());
         when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any())).thenReturn(new HashMap<>());
 
         handler.handleTask(externalTask);

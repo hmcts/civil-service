@@ -317,6 +317,17 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 return false;
             }
 
+            if (hasOpenIncident(processInstanceId, incident.getId(), serviceAuthorization)) {
+                stuckCasesForManualIntervention.add(new StuckCaseSummaryItem(
+                    incidentCaseId,
+                    defaultIfBlank(incident.getId()),
+                    defaultIfBlank(processInstanceId),
+                    defaultIfBlank(failedActivityId)
+                ));
+                trackStuckCaseEvent(incident, incidentCaseId, stateId, lastEventId, "retry_validation_failed", null);
+                return false;
+            }
+
             log.info(
                 "Retries reset for job {} (processInstanceId={}, caseId={})",
                 jobId,
@@ -340,6 +351,34 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 e
             );
             return false;
+        }
+    }
+
+    private boolean hasOpenIncident(String processInstanceId, String originalIncidentId, String serviceAuthorization) {
+        try {
+            List<IncidentDto> incidents = camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+                serviceAuthorization,
+                true,
+                processInstanceId,
+                "incidentTimestamp",
+                "desc",
+                1
+            );
+            if (incidents.isEmpty()) {
+                return false;
+            }
+
+            IncidentDto latestIncident = incidents.get(0);
+            log.info(
+                "Open incident {} still exists for processInstanceId={} after retry (originalIncidentId={})",
+                latestIncident.getId(),
+                processInstanceId,
+                originalIncidentId
+            );
+            return true;
+        } catch (Exception e) {
+            log.warn("Could not verify incident clearance for processInstanceId={}", processInstanceId, e);
+            return true;
         }
     }
 
