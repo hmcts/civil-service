@@ -39,7 +39,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardMapperTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
@@ -735,17 +734,9 @@ public class DashboardNotificationsParamsMapperTest {
         caseData.setDrawDirectionsOrderRequired(YES);
         caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.NO);
         caseData.setOrderType(OrderType.DECIDE_DAMAGES);
-        FastTrackDisclosureOfDocuments fastTrackDisclosure = new FastTrackDisclosureOfDocuments();
-        LocalDate date = LocalDate.now();
-        fastTrackDisclosure.setDate3(date);
-        caseData.setFastTrackDisclosureOfDocuments(fastTrackDisclosure);
-
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
-        assertThat(result).extracting("sdoDocumentUploadRequestedDateEn")
-            .isEqualTo(DateUtils.formatDate(date));
-        assertThat(result).extracting("sdoDocumentUploadRequestedDateCy")
-            .isEqualTo(DateUtils.formatDateInWelsh(date, false));
+        assertThat(result).doesNotContainKeys("sdoDocumentUploadRequestedDateEn", "sdoDocumentUploadRequestedDateCy");
     }
 
     @Test
