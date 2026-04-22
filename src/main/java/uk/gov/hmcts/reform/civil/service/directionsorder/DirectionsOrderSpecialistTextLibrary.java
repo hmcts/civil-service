@@ -292,7 +292,7 @@ public final class DirectionsOrderSpecialistTextLibrary {
         "The court may refuse to consider any document which has not been uploaded to the Digital "
             + "Portal by the above date.";
     public static final String SMALL_CLAIM_WITNESS_STATEMENT_TEXT = "Each party must upload to the Digital Portal copies of all "
-        + "witness statements of the witnesses(including the parties themselves) upon whose evidence they intend to rely at the hearing by 4pm on";
+        + "witness statements of the witnesses (including the parties themselves) upon whose evidence they intend to rely at the hearing by 4pm on";
     public static final String SMALL_CLAIMS_WITNESS_DEADLINE =
         "Witness statements shall be uploaded to the Digital Portal by 4pm on";
     public static final String SMALL_CLAIMS_WITNESS_LATE_WARNING =
