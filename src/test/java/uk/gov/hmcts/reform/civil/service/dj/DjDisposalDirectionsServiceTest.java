@@ -20,7 +20,6 @@ import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,12 +43,6 @@ class DjDisposalDirectionsServiceTest {
 
         when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))
             .thenAnswer(invocation -> invocation.getArgument(0, LocalDate.class));
-        when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), anyInt()))
-            .thenAnswer(invocation -> {
-                LocalDate date = invocation.getArgument(0, LocalDate.class);
-                int days = invocation.getArgument(1, Integer.class);
-                return date.plusDays(days);
-            });
     }
 
     @Test
@@ -70,7 +63,7 @@ class DjDisposalDirectionsServiceTest {
 
         DisposalHearingOrderMadeWithoutHearingDJ orderWithoutHearing =
             result.getDisposalHearingOrderMadeWithoutHearingDJ();
-        String expectedDeadline = LocalDate.now().plusDays(5)
+        String expectedDeadline = LocalDate.now().plusDays(7)
             .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         assertThat(orderWithoutHearing.getInput()).contains(expectedDeadline);
 

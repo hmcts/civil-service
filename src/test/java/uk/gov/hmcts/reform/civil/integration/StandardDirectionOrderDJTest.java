@@ -568,7 +568,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingOrderMadeWithoutHearingDJ").extracting("input")
                 .isEqualTo(String.format("%s %s.",
                     ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE,
-                    date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))));
+                    nextWorkingDayDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))));
 
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").extracting("input")
                 .isEqualTo(DISPOSAL_FINAL_HEARING_LISTING_DJ);
