@@ -177,13 +177,17 @@ class ConversionToBundleRequestDocsTest {
                                    .setDocumentBinaryUrl("https://example.com/documentBinary.pdf")
                                    .setDocumentFileName("document.pdf")
                                    .setCategoryID("SomeCategoryID"));
+        List<Element<UploadEvidenceDocumentType>> evidenceUploadDocuments =
+            List.of(new Element<UploadEvidenceDocumentType>().setValue(uploadEvidenceDocumentType));
+        String fileNamePrefix = "%s %s %s";
+        String documentType = EvidenceUploadType.DOCUMENTS_REFERRED.name();
 
         assertThrows(
             NullPointerException.class,
             () -> conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
-                List.of(new Element<UploadEvidenceDocumentType>().setValue(uploadEvidenceDocumentType)),
-                "%s %s %s",
-                EvidenceUploadType.DOCUMENTS_REFERRED.name(),
+                evidenceUploadDocuments,
+                fileNamePrefix,
+                documentType,
                 null
             )
         );
