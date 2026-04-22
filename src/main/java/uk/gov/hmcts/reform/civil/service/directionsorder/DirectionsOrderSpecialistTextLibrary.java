@@ -202,10 +202,19 @@ public final class DirectionsOrderSpecialistTextLibrary {
                     The claimant must upload to the Digital Portal a witness statement addressing
                     a) the need to hire a replacement vehicle; and
                     b) impecuniosity""";
+    public static final String CREDIT_HIRE_STATEMENT_PROMPT_SDO_FAST_TRACK =
+        """
+                The Claimant’s witness statement must address, if relied upon, evidence in support of
+                a) need to hire a replacement vehicle; and
+                b) impecuniosity.""";
     public static final String CREDIT_HIRE_NON_COMPLIANCE_SDO =
         "A failure to comply with the paragraph above will result in the claimant being debarred from asserting "
             + "need or relying on impecuniosity as the case may be at the final hearing, "
             + "save with permission of the Trial Judge.";
+    public static final String CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK =
+        "Failure to comply with the above paragraphs providing for disclosure and witness evidence on the issues "
+            + "of need and impecuniosity will result in the claimant being debarred from asserting need or relying on "
+            + "impecuniosity as the case may be at the final hearing, save with permission of the Trial Judge.";
     public static final String CREDIT_HIRE_PARTIES_LIAISE =
         "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no later than 4pm on";
     public static final String CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO =
@@ -241,7 +250,7 @@ public final class DirectionsOrderSpecialistTextLibrary {
     public static final String CREDIT_HIRE_STATEMENT_DEADLINE_DJ =
         "This statement must be uploaded to the Digital Portal by 4pm on";
     public static final String CREDIT_HIRE_NON_COMPLIANCE_DJ =
-        "A failure to comply will result in the claimant being "
+        "Failure to comply will result in the claimant being "
             + "debarred from asserting need or relying on impecuniosity "
             + "as the case may be at the final hearing, unless they "
             + "have the permission of the trial Judge.";
@@ -259,10 +268,8 @@ public final class DirectionsOrderSpecialistTextLibrary {
     public static final String PERSONAL_INJURY_PERMISSION_DJ =
         "The claimant has permission to rely upon the written "
             + "expert evidence already uploaded to the Digital"
-            + " Portal with the particulars of claim and in addition "
-            + "has permission to rely upon any associated "
-            + "correspondence or updating report which is uploaded "
-            + "to the Digital Portal by 4pm on";
+            + " Portal with the particulars of claim";
+
     public static final String PERSONAL_INJURY_QUESTIONS =
         "Any questions which are to be addressed to an expert must be sent to the expert directly "
             + "and uploaded to the Digital Portal by 4pm on";

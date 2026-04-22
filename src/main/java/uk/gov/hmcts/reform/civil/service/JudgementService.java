@@ -71,6 +71,23 @@ public class JudgementService {
         return claimAmount.setScale(2);
     }
 
+    public BigDecimal ccjJudgmentClaimAmountWithInterest(CaseData caseData) {
+        BigDecimal claimAmount = caseData.getTotalClaimAmount();
+        if (isLrFullAdmitRepaymentPlan(caseData)
+            || isLrFullAdmitPayImmediately(caseData)
+            || isLipFullAdmitRepaymentPlan(caseData)
+            || isLipFullAdmitPayImmediately(caseData)
+            || isLipvLipOneVOne(caseData)) {
+            BigDecimal interest = getLatestInterest(caseData);
+            claimAmount = claimAmount.add(interest);
+        } else {
+            if (caseData.isPartAdmitClaimSpec()) {
+                claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
+            }
+        }
+        return claimAmount.setScale(2);
+    }
+
     public BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
         if (caseData.getOutstandingFeeInPounds() != null) {
             return caseData.getOutstandingFeeInPounds();
@@ -150,6 +167,15 @@ public class JudgementService {
             && caseData.isFullAdmitClaimSpec();
     }
 
+    public boolean isLipAdmissionRepaymentPlan(CaseData caseData) {
+        return caseData.isApplicantLiP() && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
+    }
+
+    public boolean isLipFullAdmitRepaymentPlan(CaseData caseData) {
+        return isLipAdmissionRepaymentPlan(caseData)
+            && caseData.isFullAdmitClaimSpec();
+    }
+
     public boolean isLRPartAdmitRepaymentPlan(CaseData caseData) {
         return isLRAdmissionRepaymentPlan(caseData)
             && caseData.isPartAdmitClaimSpec();
@@ -157,6 +183,10 @@ public class JudgementService {
 
     public boolean isLrvLrOneVOneBulkAdmissionsEnabled(CaseData caseData) {
         return !caseData.isApplicantLiP() && isOneVOne(caseData);
+    }
+
+    public boolean isLipvLipOneVOneBulkAdmissionsEnabled(CaseData caseData) {
+        return caseData.isApplicantLiP() && isOneVOne(caseData);
     }
 
     public boolean isLipvLip(CaseData caseData) {
@@ -174,8 +204,24 @@ public class JudgementService {
             && caseData.isPayImmediately();
     }
 
+    public boolean isLipPayImmediatelyPlan(CaseData caseData) {
+        return isLipvLipOneVOneBulkAdmissionsEnabled(caseData)
+            && caseData.isPayImmediately();
+    }
+
     public boolean isLrFullAdmitPayImmediately(CaseData caseData) {
         return isLrPayImmediatelyPlan(caseData)
+            && caseData.isFullAdmitClaimSpec();
+    }
+
+    public boolean isLipFullAdmitPayImmediately(CaseData caseData) {
+        return isLipPayImmediatelyPlan(caseData)
+            && caseData.isFullAdmitClaimSpec();
+    }
+
+    public boolean isLipvLipOneVOne(CaseData caseData) {
+        return caseData.isLipvLipOneVOne()
+            && caseData.isPayBySetDate()
             && caseData.isFullAdmitClaimSpec();
     }
 

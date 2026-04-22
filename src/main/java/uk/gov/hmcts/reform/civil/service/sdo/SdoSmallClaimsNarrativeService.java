@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1;
@@ -128,6 +129,8 @@ public class SdoSmallClaimsNarrativeService {
 
     public void applyHearingSection(CaseData caseData) {
         SmallClaimsHearing hearing = new SmallClaimsHearing();
+        hearing.setDateFrom(LocalDate.now().plusWeeks(20L));
+        hearing.setDateTo(LocalDate.now().plusWeeks(29L));
         hearing.setInput1(SMALL_CLAIMS_HEARING_LISTING_NOTICE);
         hearing.setInput2(SMALL_CLAIMS_HEARING_FEE_WARNING);
         caseData.setSmallClaimsHearing(hearing);
