@@ -45,74 +45,110 @@ public class ValidateEmailService {
     see https://github.com/alphagov/notifications-utils/blob/master/notifications_utils/recipients.py#L494-L534
      */
     private boolean isValid(String email) {
-
         if (isEmpty(email)) {
             log.warn("Email is null or empty");
             return false;
         }
 
         final String emailAddress = StringUtils.trim(email);
+        final String username = emailAddress.split("@")[0];
+        Matcher emailMatcher = getValidEmailMatcher(emailAddress, username);
+        return emailMatcher != null && hasValidHostname(emailMatcher.group(1));
+    }
 
+    private Matcher getValidEmailMatcher(String emailAddress, String username) {
+        if (hasInvalidEmailAddress(emailAddress, username)) {
+            return null;
+        }
+
+        Matcher emailMatcher = EMAIL_PATTERN.matcher(emailAddress);
+        return matchesEmailPattern(emailMatcher) ? emailMatcher : null;
+    }
+
+    private boolean hasInvalidEmailAddress(String emailAddress, String username) {
+        return hasInvalidUsernameFormat(emailAddress, username)
+            || exceedsLengthLimits(username, emailAddress)
+            || containsInvalidSequences(emailAddress);
+    }
+
+    private boolean hasValidHostname(String hostname) {
+        String asciiHostname = toAsciiHostname(hostname);
+        if (asciiHostname == null) {
+            return false;
+        }
+
+        String[] hostParts = split(asciiHostname, ".");
+        return !hasInvalidHostname(asciiHostname, hostParts)
+            && hasValidHostParts(hostParts)
+            && hasValidTopLevelDomain(hostParts[hostParts.length - 1]);
+    }
+
+    private boolean hasInvalidUsernameFormat(String emailAddress, String username) {
         if (emailAddress.startsWith(".")) {
             log.warn("Email begins with .");
-            return false;
+            return true;
         }
-
-        final String username = emailAddress.split("@")[0];
-
         if (username.endsWith(".")) {
             log.warn("Username ends with .");
-            return false;
+            return true;
         }
+        return false;
+    }
 
+    private boolean exceedsLengthLimits(String username, String emailAddress) {
         if (username.length() > USERNAME_MAX_LENGTH) {
             log.warn("Email username is longer than {} characters", USERNAME_MAX_LENGTH);
-            return false;
+            return true;
         }
-
         if (emailAddress.length() > EMAIL_MAX_LENGTH) {
             log.warn("Email is longer than {} characters", EMAIL_MAX_LENGTH);
-            return false;
+            return true;
         }
+        return false;
+    }
 
+    private boolean containsInvalidSequences(String emailAddress) {
         if (emailAddress.contains("..")) {
             log.warn("Email contains ..");
-            return false;
+            return true;
         }
-
         if (emailAddress.contains("'")) {
             log.warn("Email contains apostrophe");
-            return false;
+            return true;
         }
+        return false;
+    }
 
-        final Matcher emailMatcher = EMAIL_PATTERN.matcher(emailAddress);
-
+    private boolean matchesEmailPattern(Matcher emailMatcher) {
         if (!emailMatcher.matches()) {
             log.warn("Email does not match pattern");
             return false;
         }
+        return true;
+    }
 
-        String hostname = emailMatcher.group(1);
-
+    private String toAsciiHostname(String hostname) {
         try {
-            hostname = toASCII(toUnicode(hostname));
+            return toASCII(toUnicode(hostname));
         } catch (Exception e) {
             log.warn("Email hostname can not be converted to ascii");
-            return false;
+            return null;
         }
+    }
 
-        final String[] hostParts = split(hostname, ".");
-
+    private boolean hasInvalidHostname(String hostname, String[] hostParts) {
         if (hostname.length() > HOST_MAX_LENGTH) {
             log.warn("Email hostname is longer than {} characters", HOST_MAX_LENGTH);
-            return false;
+            return true;
         }
-
         if (hostParts.length < 2) {
             log.warn("Email hostname parts is {}", hostParts.length);
-            return false;
+            return true;
         }
+        return false;
+    }
 
+    private boolean hasValidHostParts(String[] hostParts) {
         for (String hostPart : hostParts) {
             if (hostPart.length() > HOST_PART_MAX_LENGTH) {
                 log.warn("Email hostname part is longer than {}", HOST_PART_MAX_LENGTH);
@@ -124,12 +160,14 @@ public class ValidateEmailService {
                 return false;
             }
         }
+        return true;
+    }
 
-        if (!TLD_PATTERN.matcher(hostParts[hostParts.length - 1]).matches()) {
+    private boolean hasValidTopLevelDomain(String topLevelDomain) {
+        if (!TLD_PATTERN.matcher(topLevelDomain).matches()) {
             log.warn("Email top level domain does not match pattern");
             return false;
         }
-
         return true;
     }
 }
