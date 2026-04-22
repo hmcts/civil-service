@@ -4,6 +4,7 @@ set -eu
 
 ccd_branch=${1:-master}
 camunda_branch=${2:-master}
+dmn_branch=${3:-${camunda_branch}}
 
 user=$(whoami | tr -cd '[:alnum:]' | tr '[:upper:]' '[:lower:]' | cut -c1-8)
 service_name="civil-service-${user}"
@@ -46,6 +47,7 @@ export ENVIRONMENT=preview
 export URL=$XUI_WEBAPP_URL
 export CIVIL_SERVICE_URL=$TEST_URL
 export SERVICE_AUTH_PROVIDER_API_BASE_URL="http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+export S2S_URL_BASE=$SERVICE_AUTH_PROVIDER_API_BASE_URL
 export IDAM_API_BASE_URL="https://idam-api.aat.platform.hmcts.net"
 export IDAM_API_URL="https://idam-api.aat.platform.hmcts.net"
 export CCD_IDAM_REDIRECT_URL="https://ccd-case-management-web-aat.service.core-compute-aat.internal/oauth2redirect"
@@ -65,7 +67,8 @@ echo "Importing Roles to the CCD pod"
 
 echo "Importing Camunda definitions"
 ./bin/pull-latest-camunda-files.sh "${camunda_branch}"
-./bin/import-bpmn-diagram.sh .
+./bin/pull-latest-dmn-files.sh "${dmn_branch}"
+./gradlew camundaHighLevelDataSetup
 
 echo "Importing CCD definitions"
 ./bin/pull-latest-civil-ccd-files.sh "${ccd_branch}"
@@ -85,6 +88,7 @@ definition_output_file="$(realpath ".")/build/ccd-development-config/ccd-civil-d
 rm -rf "$(pwd)/ccd-definition"
 rm -rf "$(pwd)/build/ccd-development-config"
 rm -rf "$(pwd)/camunda"
+rm -rf "$(pwd)/wa-dmn"
 
 echo "ENV variables set for devuser-preview environment."
 echo "XUI_URL: $XUI_WEBAPP_URL"

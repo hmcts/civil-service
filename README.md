@@ -273,10 +273,10 @@ Note: be sure to have Docker running
 ```shell
 ./bin/dev-setup/start-devuser-preview-environment.sh
 ```
-You can optionally specify a branch for CCD definitions and Camunda definitions like below or leave it blank to use master.
+You can optionally specify branches for CCD definitions, Camunda BPMN definitions and WA DMN definitions like below or leave them blank to use master.
 
 ```shell
-./bin/dev-setup/start-devuser-preview-environment.sh ccdBranchName camundaBranchName
+./bin/dev-setup/start-devuser-preview-environment.sh ccdBranchName camundaBranchName dmnBranchName
 ```
 If you want to clean up the environment just run:
 

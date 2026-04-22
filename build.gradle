@@ -171,12 +171,22 @@ static def isPreviewEnvironment() {
   System.getenv('ENVIRONMENT') == 'preview'
 }
 
+static def isCamundaImportEnabled() {
+  def camundaBaseUrl = System.getenv('CAMUNDA_BASE_URL')
+  camundaBaseUrl != null && !camundaBaseUrl.trim().isEmpty()
+}
+
+static def isCommonAatCcdSetupSkipped() {
+  System.getenv('ENVIRONMENT') == 'aat' && Boolean.parseBoolean(System.getenv('SKIP_COMMON_AAT_CCD_SETUP'))
+}
+
 static def isNightlyRun() {
   System.getenv('NIGHTLY_RUN') == 'true'
 }
 
 def pullLatestCivilCcdDefinitions = tasks.register('pullLatestCivilCcdDefinitions', Exec) {
   description = 'Pulls the civil CCD definition repository branch needed for data setup.'
+  onlyIf { !isCommonAatCcdSetupSkipped() }
   doFirst {
     commandLine './bin/pull-latest-civil-ccd-files.sh', dataSetupBranch('CCD_DEFINITION_BRANCH')
   }
@@ -184,6 +194,7 @@ def pullLatestCivilCcdDefinitions = tasks.register('pullLatestCivilCcdDefinition
 
 def pullLatestCivilCamundaDefinitions = tasks.register('pullLatestCivilCamundaDefinitions', Exec) {
   description = 'Pulls the civil Camunda BPMN definition repository branch needed for data setup.'
+  onlyIf { isCamundaImportEnabled() }
   doFirst {
     commandLine './bin/pull-latest-camunda-files.sh', dataSetupBranch('CAMUNDA_DEFINITION_BRANCH')
   }
@@ -191,6 +202,7 @@ def pullLatestCivilCamundaDefinitions = tasks.register('pullLatestCivilCamundaDe
 
 def pullLatestCivilWaDmnDefinitions = tasks.register('pullLatestCivilWaDmnDefinitions', Exec) {
   description = 'Pulls the civil WA DMN definition repository branch needed for data setup.'
+  onlyIf { isCamundaImportEnabled() }
   doFirst {
     commandLine './bin/pull-latest-dmn-files.sh', dataSetupBranch('DMN_DEFINITION_BRANCH')
   }
@@ -206,6 +218,7 @@ def pullLatestCivilWiremockMappings = tasks.register('pullLatestCivilWiremockMap
 
 def buildCcdDefinitionsXls = tasks.register('buildCcdDefinitionsXls', Exec) {
   description = 'Builds CCD XLS definitions.'
+  onlyIf { !isCommonAatCcdSetupSkipped() }
   dependsOn pullLatestCivilCcdDefinitions
   doFirst {
     def dataSetupEnvironment = System.getenv('ENVIRONMENT')
@@ -232,16 +245,13 @@ def buildCcdDefinitionsXls = tasks.register('buildCcdDefinitionsXls', Exec) {
   }
 }
 
-def importCivilCamundaDefinitions = tasks.register('importCivilCamundaDefinitions', Exec) {
-  description = 'Imports civil Camunda BPMN definitions.'
-  dependsOn pullLatestCivilCamundaDefinitions
-  commandLine './bin/import-bpmn-diagram.sh', '.'
-}
-
-def importCivilWaDmnDefinitions = tasks.register('importCivilWaDmnDefinitions', Exec) {
-  description = 'Imports civil WA DMN definitions.'
-  dependsOn pullLatestCivilWaDmnDefinitions
-  commandLine './bin/import-dmn-diagram.sh', './wa-dmn/.', 'civil', 'civil'
+def camundaHighLevelDataSetup = tasks.register('camundaHighLevelDataSetup', JavaExec) {
+  description = 'Imports civil Camunda BPMN and WA DMN definitions using the high-level data setup flow.'
+  onlyIf { isCamundaImportEnabled() }
+  dependsOn pullLatestCivilCamundaDefinitions, pullLatestCivilWaDmnDefinitions
+  mainClass.set("uk.gov.hmcts.reform.civil.setup.CamundaHighLevelDataSetupApp")
+  classpath += sourceSets.main.runtimeClasspath
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
 def loadCivilWiremockMappings = tasks.register('loadCivilWiremockMappings', Exec) {
@@ -253,8 +263,8 @@ def loadCivilWiremockMappings = tasks.register('loadCivilWiremockMappings', Exec
 
 tasks.register('highLevelDataSetup', JavaExec) {
   description = 'Loads roles, CCD definitions, Camunda BPMNs, WA DMNs and preview WireMock mappings using the high-level data setup flow.'
-  dependsOn buildCcdDefinitionsXls, importCivilCamundaDefinitions, importCivilWaDmnDefinitions,
-    loadCivilWiremockMappings
+  onlyIf { !isCommonAatCcdSetupSkipped() }
+  dependsOn buildCcdDefinitionsXls, camundaHighLevelDataSetup, loadCivilWiremockMappings
   mainClass.set("uk.gov.hmcts.reform.civil.HighLevelDataSetupApp")
   classpath += sourceSets.main.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']

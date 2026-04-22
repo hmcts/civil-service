@@ -16,6 +16,7 @@ import java.util.Locale;
 public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     private static final Logger logger = LoggerFactory.getLogger(HighLevelDataSetupApp.class);
+    private static final String SKIP_COMMON_AAT_CCD_SETUP = "SKIP_COMMON_AAT_CCD_SETUP";
 
     private static final CcdRoleConfig[] CCD_ROLES_NEEDED_FOR_CIVIL = {
         new CcdRoleConfig("caseworker-civil", "PUBLIC"),
@@ -86,6 +87,10 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     @Override
     public void addCcdRoles() {
+        if (shouldSkipCcdSetup()) {
+            logger.info("Skipping CCD role setup for shared AAT high level data setup");
+            return;
+        }
         for (CcdRoleConfig roleConfig : CCD_ROLES_NEEDED_FOR_CIVIL) {
             try {
                 logger.info("Adding CCD role {}", roleConfig);
@@ -110,6 +115,10 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     @Override
     public void importDefinitions() {
+        if (shouldSkipCcdSetup()) {
+            logger.info("Skipping CCD definition import for shared AAT high level data setup");
+            return;
+        }
         try {
             super.importDefinitions();
         } catch (RuntimeException e) {
@@ -142,5 +151,13 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
             current = current.getCause();
         }
         return false;
+    }
+
+    static boolean shouldSkipCcdSetup(CcdEnvironment environment, String skipFlag) {
+        return environment == CcdEnvironment.AAT && Boolean.parseBoolean(skipFlag);
+    }
+
+    private boolean shouldSkipCcdSetup() {
+        return shouldSkipCcdSetup(environment, System.getenv(SKIP_COMMON_AAT_CCD_SETUP));
     }
 }

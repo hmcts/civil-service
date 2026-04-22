@@ -103,8 +103,11 @@ withPipeline(type, product, component) {
   onMaster {
     env.ENVIRONMENT = "aat"
     env.CCD_DEFINITION_BRANCH = "master"
+    env.SKIP_COMMON_AAT_CCD_SETUP = "true"
 
-    setAatUrls()
+    afterSuccess('akschartsinstall') {
+      runStagingHighLevelDataSetup()
+    }
 
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
   }
@@ -125,6 +128,10 @@ withPipeline(type, product, component) {
     publishFunctionalTestResults()
   }
 
+  before('smoketest:aat') {
+    setStagingUrls()
+  }
+
   afterAlways('smoketest:aat') {
     archiveSmokeTestResults()
   }
@@ -139,6 +146,7 @@ withPipeline(type, product, component) {
 
   before('functionalTest:aat') {
     prepareFunctionalTests(false)
+    setStagingUrls()
   }
 }
 
@@ -280,14 +288,33 @@ def setPreviewUrls(String product, String component) {
   }
 }
 
-def setAatUrls() {
-  env.URL = "https://manage-case.aat.platform.hmcts.net"
-  env.CIVIL_SERVICE_URL = "http://civil-service-aat.service.core-compute-aat.internal"
-  env.CAMUNDA_BASE_URL = "http://camunda-api-aat.service.core-compute-aat.internal"
+def runStagingHighLevelDataSetup() {
+  withEnv([
+    'ENVIRONMENT=aat',
+    'TEST_DATA_LOAD_SKIP_PERIOD=0',
+    'SKIP_COMMON_AAT_CCD_SETUP=false',
+    'IDAM_API_URL_BASE=https://idam-api.aat.platform.hmcts.net',
+    'S2S_URL_BASE=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal',
+    'CCD_API_GATEWAY_S2S_ID=ccd_gw',
+    'CCD_API_GATEWAY_OAUTH2_CLIENT_ID=ccd_gateway',
+    'CCD_API_GATEWAY_OAUTH2_REDIRECT_URL=https://www-ccd.aat.platform.hmcts.net/oauth2redirect',
+    'DEFINITION_STORE_URL_BASE=https://civil-service-definition-store-staging-aat.service.core-compute-aat.internal',
+    'CAMUNDA_BASE_URL=https://civil-service-camunda-staging-aat.service.core-compute-aat.internal',
+    'CCD_DEF_CASE_SERVICE_BASE_URL=http://civil-service-staging-java',
+    'CCD_DEF_GEN_APP_SERVICE_BASE_URL=http://civil-service-staging-java'
+  ]) {
+    sh './gradlew --rerun-tasks highLevelDataSetup --args=aat'
+  }
+}
+
+def setStagingUrls() {
+  env.URL = "https://civil-service-xui-staging.aat.platform.hmcts.net"
+  env.CIVIL_SERVICE_URL = "https://civil-service-staging.aat.platform.hmcts.net"
+  env.CAMUNDA_BASE_URL = "https://civil-service-camunda-staging-aat.service.core-compute-aat.internal"
   env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
   setAatIntegrationUrls()
-  env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-  env.AAC_API_URL = "http://aac-manage-case-assignment-aat.service.core-compute-aat.internal"
+  env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
+  env.AAC_API_URL = "https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
 }
 
 def setAatIntegrationUrls() {
