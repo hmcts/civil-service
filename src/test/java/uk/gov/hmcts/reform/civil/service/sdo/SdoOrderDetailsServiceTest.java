@@ -146,7 +146,7 @@ class SdoOrderDetailsServiceTest {
 
         CaseData result = service.updateOrderDetails(orderDetailsContext(caseData, V_1));
 
-        assertThat(result.getDisposalHearingMethod()).isEqualTo(DisposalHearingMethod.disposalHearingMethodInPerson);
+        assertThat(result.getDisposalHearingMethod()).isEqualTo(DisposalHearingMethod.DISPOSAL_HEARING_METHOD_IN_PERSON);
     }
 
     @Test
@@ -164,7 +164,7 @@ class SdoOrderDetailsServiceTest {
 
         CaseData result = service.updateOrderDetails(orderDetailsContext(caseData, V_1));
 
-        assertThat(result.getFastTrackMethod()).isEqualTo(FastTrackMethod.fastTrackMethodTelephoneHearing);
+        assertThat(result.getFastTrackMethod()).isEqualTo(FastTrackMethod.FAST_TRACK_METHOD_TELEPHONE_HEARING);
     }
 
     @Test
@@ -200,7 +200,7 @@ class SdoOrderDetailsServiceTest {
 
         CaseData result = service.updateOrderDetails(orderDetailsContext(caseData, V_1));
 
-        assertThat(result.getSmallClaimsMethod()).isEqualTo(SmallClaimsMethod.smallClaimsMethodVideoConferenceHearing);
+        assertThat(result.getSmallClaimsMethod()).isEqualTo(SmallClaimsMethod.SMALL_CLAIMS_METHOD_VIDEO_CONFERENCE_HEARING);
     }
 
     private DirectionsOrderTaskContext orderDetailsContext(CaseData caseData, CallbackVersion version) {

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -16,24 +17,27 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKN
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 
 @Service
+@Slf4j
 public class CaseDismissedSearchService extends ElasticSearchService {
 
     public CaseDismissedSearchService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
     }
 
-    public Query query(int startIndex) {
+    @Override
+    public Query query(int startIndex, String timeNow) {
+        log.info("Call to CaseDismissedSearchService query with index {} and timeNow {}", startIndex, timeNow);
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.claimDetailsNotificationDeadline").lt("now"))
+                            .must(rangeQuery("data.claimDetailsNotificationDeadline").lt(timeNow))
                             .must(beState(AWAITING_CASE_DETAILS_NOTIFICATION)))
                 .should(boolQuery()
-                            .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
+                            .must(rangeQuery("data.claimNotificationDeadline").lt(timeNow))
                             .must(beState(CASE_ISSUED)))
                 .should(boolQuery()
-                            .must(rangeQuery("data.claimDismissedDeadline").lt("now"))
+                            .must(rangeQuery("data.claimDismissedDeadline").lt(timeNow))
                             .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
             List.of("reference"),
             startIndex

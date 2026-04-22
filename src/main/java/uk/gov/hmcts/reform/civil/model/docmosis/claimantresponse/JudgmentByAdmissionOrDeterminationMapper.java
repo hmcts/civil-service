@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -47,11 +48,14 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2
 @Slf4j
 public class JudgmentByAdmissionOrDeterminationMapper {
 
+    private static final String EVERY_TWO_WEEKS = "every 2 weeks";
+
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final JudgementService judgementService;
     private final OrganisationService organisationService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
+    private static final int DECIMAL_SCALE = 2;
 
     public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData, CaseEvent caseEvent) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
@@ -73,11 +77,9 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             getContactPerson(defendantDetails)
         );
 
-        String totalClaimAmount = Optional.ofNullable(caseData.getTotalClaimAmount())
-            .map(amount -> amount.setScale(2).toString())
-            .orElse("0");
+        String totalClaimAmount = format(caseData.getTotalClaimAmount());
 
-        String totalInterest = judgementService.ccjJudgmentInterest(caseData).setScale(2).toString();
+        String totalInterest = format(judgementService.ccjJudgmentInterest(caseData));
 
         JudgmentByAdmissionOrDetermination form = new JudgmentByAdmissionOrDetermination();
         LocalDateTime now = LocalDateTime.now();
@@ -94,12 +96,12 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .setPaymentTypeDisplayValue(paymentPlan != null ? paymentPlan.getDisplayedValue() : null)
             .setPayBy(setPayByDate(caseData))
             .setRepaymentPlan(addRepaymentPlan(caseData))
-            .setCcjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
+            .setCcjJudgmentAmount(getJudgmentAmount(caseData))
             .setCcjInterestToDate(totalInterest)
             .setClaimFee(getClaimFee(caseData).toString())
-            .setCcjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
+            .setCcjSubtotal(format(judgementService.ccjJudgementSubTotal(caseData)))
             .setCcjAlreadyPaidAmount(getAlreadyPaidAmount(caseData))
-            .setCcjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
+            .setCcjFinalTotal(format(judgementService.ccjJudgmentFinalTotal(caseData)))
             .setDefendantResponse(caseData.getRespondent1ClaimResponseTypeForSpec())
             .setGenerationDate(now.toLocalDate())
             .setGenerationDateTime(now.format(formatter));
@@ -246,14 +248,9 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     public JudgmentByAdmissionOrDetermination toNonDivergentDocs(CaseData caseData) {
-        String totalClaimAmount = Optional.ofNullable(caseData.getTotalClaimAmount())
-            .map(amount -> amount.setScale(2).toString())
-            .orElse("0");
-
-        String totalInterest = judgementService.ccjJudgmentInterest(caseData).setScale(2).toString();
-
+        String totalClaimAmount = format(caseData.getTotalClaimAmount());
+        String totalInterest = format(judgementService.ccjJudgmentInterest(caseData));
         LocalDate payByDate = getPayByDate(caseData);
-
         JudgmentByAdmissionOrDetermination form = new JudgmentByAdmissionOrDetermination();
         return form
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
@@ -274,19 +271,20 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .setRepaymentFrequency(getRepaymentFrequencyStr(caseData))
             .setRepaymentDate(getRepaymentDate(caseData))
             .setInstallmentAmount(getInstalmentAmount(caseData))
-            .setCcjJudgmentAmount(getJudgmentAmount(caseData).setScale(2).toString())
+            .setCcjJudgmentAmount(getJudgmentAmount(caseData))
             .setCcjInterestToDate(totalInterest)
             .setClaimFee(getClaimCosts(caseData))
-            .setCcjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
-            .setCcjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString());
+            .setCcjSubtotal(format(judgementService.ccjJudgementSubTotal(caseData)))
+            .setCcjFinalTotal(format(judgementService.ccjJudgmentFinalTotal(caseData)));
     }
 
-    private BigDecimal getJudgmentAmount(CaseData caseData) {
-        if (caseData.isLipvLipOneVOne() && caseData.isPayBySetDate() && caseData.isFullAdmitClaimSpec()) {
-            BigDecimal interest = judgementService.getLatestInterest(caseData);
-            return judgementService.ccjJudgmentClaimAmount(caseData).add(interest);
-        }
-        return judgementService.ccjJudgmentClaimAmount(caseData);
+    private String getJudgmentAmount(CaseData caseData) {
+        BigDecimal judgementAmount = judgementService.ccjJudgmentClaimAmountWithInterest(caseData);
+        return format(judgementAmount);
+    }
+
+    private String format(BigDecimal amount) {
+        return Optional.ofNullable(amount).map(val -> val.setScale(DECIMAL_SCALE).toString()).orElse("0");
     }
 
     public JudgmentByAdmissionOrDetermination toNonDivergentWelshDocs(CaseData caseData, JudgmentByAdmissionOrDetermination form) {
@@ -320,7 +318,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return "each week";
             case ONCE_ONE_MONTH: return "each month";
-            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            case ONCE_TWO_WEEKS: return EVERY_TWO_WEEKS;
             default: return null;
         }
     }
@@ -332,7 +330,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         return switch (repaymentFrequency) {
             case ONCE_ONE_WEEK -> "each week";
             case ONCE_ONE_MONTH -> "each month";
-            case ONCE_TWO_WEEKS -> "every 2 weeks";
+            case ONCE_TWO_WEEKS -> EVERY_TWO_WEEKS;
         };
     }
 
@@ -349,7 +347,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return "per week";
             case ONCE_ONE_MONTH: return "per month";
-            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            case ONCE_TWO_WEEKS: return EVERY_TWO_WEEKS;
             default: return null;
         }
     }
@@ -360,8 +358,8 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         }
         return switch (repaymentFrequency) {
             case ONCE_ONE_WEEK -> "per week";
-            case ONCE_ONE_MONTH ->  "per month";
-            case ONCE_TWO_WEEKS ->  "every 2 weeks";
+            case ONCE_ONE_MONTH -> "per month";
+            case ONCE_TWO_WEEKS -> EVERY_TWO_WEEKS;
         };
     }
 
@@ -411,16 +409,25 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private LocalDate getPayByDate(CaseData caseData) {
-        if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()
-            || caseData.hasApplicant1AcceptedCourtDecision()) {
-            return caseData.hasApplicant1AcceptedCourtDecision()
-                ? caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate()
-                : caseData.getApplicant1RequestedPaymentDateForDefendantSpec() != null
-                ? caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate() : null;
+        if (isCourtDecisionInFavour(caseData)) {
+            return getPaymentDateForCourtDecision(caseData);
         } else if (caseData.getRespondToClaimAdmitPartLRspec() != null) {
             return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
         }
         return null;
+    }
+
+    private boolean isCourtDecisionInFavour(CaseData caseData) {
+        return caseData.hasApplicant1CourtDecisionInFavourOfClaimant()
+            || caseData.hasApplicant1AcceptedCourtDecision();
+    }
+
+    private LocalDate getPaymentDateForCourtDecision(CaseData caseData) {
+        if (caseData.hasApplicant1AcceptedCourtDecision()) {
+            return caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate();
+        }
+        PaymentBySetDate paymentDateForSpec = caseData.getApplicant1RequestedPaymentDateForDefendantSpec();
+        return paymentDateForSpec != null ? paymentDateForSpec.getPaymentSetDate() : null;
     }
 
     private String getPaymentStr(CaseData caseData) {

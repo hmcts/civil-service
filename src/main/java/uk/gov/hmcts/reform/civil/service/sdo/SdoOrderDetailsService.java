@@ -51,11 +51,11 @@ public class SdoOrderDetailsService {
         boolean isSmallClaimsTrack = caseClassificationService.isSmallClaimsTrack(caseData);
         boolean isFastTrack = caseClassificationService.isFastTrack(caseData);
 
-        if (isSmallClaimsTrack && !smallClaimsDirectionsService.hasSmallAdditionalDirections(caseData, SmallTrack.smallClaimPPI)) {
+        if (isSmallClaimsTrack && !smallClaimsDirectionsService.hasSmallAdditionalDirections(caseData, SmallTrack.SMALL_CLAIM_PPI)) {
             caseData.setSmallClaimsPPI(null);
         }
 
-        if (isFastTrack && !fastTrackDirectionsService.hasFastAdditionalDirections(caseData, FastTrack.fastClaimPPI)) {
+        if (isFastTrack && !fastTrackDirectionsService.hasFastAdditionalDirections(caseData, FastTrack.FAST_CLAIM_PPI)) {
             caseData.setFastTrackPPI(null);
         }
     }
@@ -64,11 +64,11 @@ public class SdoOrderDetailsService {
         boolean isSmallClaimsTrack = caseClassificationService.isSmallClaimsTrack(caseData);
         boolean isFastTrack = caseClassificationService.isFastTrack(caseData);
 
-        if (isSmallClaimsTrack && !smallClaimsDirectionsService.hasSmallAdditionalDirections(caseData, SmallTrack.smallClaimHousingDisrepair)) {
+        if (isSmallClaimsTrack && !smallClaimsDirectionsService.hasSmallAdditionalDirections(caseData, SmallTrack.SMALL_CLAIM_HOUSING_DISREPAIR)) {
             caseData.setSmallClaimsHousingDisrepair(null);
         }
 
-        if (isFastTrack && !fastTrackDirectionsService.hasFastAdditionalDirections(caseData, FastTrack.fastClaimHousingDisrepair)) {
+        if (isFastTrack && !fastTrackDirectionsService.hasFastAdditionalDirections(caseData, FastTrack.FAST_CLAIM_HOUSING_DISREPAIR)) {
             caseData.setFastTrackHousingDisrepair(null);
         }
     }
@@ -120,9 +120,9 @@ public class SdoOrderDetailsService {
 
         applyHearingMethod(caseData.getHearingMethodValuesDisposalHearing(), method -> {
             switch (method) {
-                case IN_PERSON -> caseData.setDisposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson);
-                case VIDEO -> caseData.setDisposalHearingMethod(DisposalHearingMethod.disposalHearingMethodVideoConferenceHearing);
-                case TELEPHONE -> caseData.setDisposalHearingMethod(DisposalHearingMethod.disposalHearingMethodTelephoneHearing);
+                case IN_PERSON -> caseData.setDisposalHearingMethod(DisposalHearingMethod.DISPOSAL_HEARING_METHOD_IN_PERSON);
+                case VIDEO -> caseData.setDisposalHearingMethod(DisposalHearingMethod.DISPOSAL_HEARING_METHOD_VIDEO_CONFERENCE_HEARING);
+                case TELEPHONE -> caseData.setDisposalHearingMethod(DisposalHearingMethod.DISPOSAL_HEARING_METHOD_TELEPHONE_HEARING);
                 default -> {
                     // No other values are expected;
                 }
@@ -131,9 +131,9 @@ public class SdoOrderDetailsService {
 
         applyHearingMethod(caseData.getHearingMethodValuesFastTrack(), method -> {
             switch (method) {
-                case IN_PERSON -> caseData.setFastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
-                case VIDEO -> caseData.setFastTrackMethod(FastTrackMethod.fastTrackMethodVideoConferenceHearing);
-                case TELEPHONE -> caseData.setFastTrackMethod(FastTrackMethod.fastTrackMethodTelephoneHearing);
+                case IN_PERSON -> caseData.setFastTrackMethod(FastTrackMethod.FAST_TRACK_METHOD_IN_PERSON);
+                case VIDEO -> caseData.setFastTrackMethod(FastTrackMethod.FAST_TRACK_METHOD_VIDEO_CONFERENCE_HEARING);
+                case TELEPHONE -> caseData.setFastTrackMethod(FastTrackMethod.FAST_TRACK_METHOD_TELEPHONE_HEARING);
                 default -> {
                     // No other values are expected;
                 }
@@ -142,9 +142,9 @@ public class SdoOrderDetailsService {
 
         applyHearingMethod(caseData.getHearingMethodValuesSmallClaims(), method -> {
             switch (method) {
-                case IN_PERSON -> caseData.setSmallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
-                case VIDEO -> caseData.setSmallClaimsMethod(SmallClaimsMethod.smallClaimsMethodVideoConferenceHearing);
-                case TELEPHONE -> caseData.setSmallClaimsMethod(SmallClaimsMethod.smallClaimsMethodTelephoneHearing);
+                case IN_PERSON -> caseData.setSmallClaimsMethod(SmallClaimsMethod.SMALL_CLAIMS_METHOD_IN_PERSON);
+                case VIDEO -> caseData.setSmallClaimsMethod(SmallClaimsMethod.SMALL_CLAIMS_METHOD_VIDEO_CONFERENCE_HEARING);
+                case TELEPHONE -> caseData.setSmallClaimsMethod(SmallClaimsMethod.SMALL_CLAIMS_METHOD_TELEPHONE_HEARING);
                 default -> {
                     // No other values are expected;
                 }
