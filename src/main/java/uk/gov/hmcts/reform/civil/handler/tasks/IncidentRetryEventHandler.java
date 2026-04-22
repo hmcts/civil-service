@@ -10,6 +10,7 @@ import org.camunda.community.rest.client.model.VariableValueDto;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 import uk.gov.hmcts.reform.civil.service.search.CasesStuckCheckSearchService;
 
@@ -38,13 +39,19 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private final CasesStuckCheckSearchService casesStuckCheckSearchService;
     private final CamundaRuntimeApi camundaRuntimeApi;
     private final AuthTokenGenerator authTokenGenerator;
+    private final CaseTaskTrackingService caseTaskTrackingService;
 
     private static final int MAX_THREADS = 10;
     private static final String CASE_ID_VARIABLE = "caseId";
+    private static final String STATE_ID_VARIABLE = "stateId";
+    private static final String EVENT_ID_VARIABLE = "eventId";
     private static final int PAGE_SIZE = 50;
     private static final Pattern ALREADY_PROCESSED_PATTERN =
         Pattern.compile("already processed|already performed", Pattern.CASE_INSENSITIVE);
     private static final String ACTIVITY_ID = "activityId";
+    private static final String UNKNOWN = "UNKNOWN";
+    private static final String STUCK_CASE_EVENT_TYPE = "incidentRetry";
+    private static final String STUCK_CASE_EVENT_NAME = "StuckCaseDetected";
     private static final DateTimeFormatter INCIDENT_FORMATTER =
         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
             .withZone(ZoneOffset.UTC);
@@ -237,10 +244,14 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     }
 
     private boolean retryIncidentSafely(IncidentDto incident, String serviceAuthorization, Set<String> caseIds) {
+        String processInstanceId = incident.getProcessInstanceId();
+        Map<String, VariableValueDto> processVariables = fetchProcessVariables(processInstanceId, serviceAuthorization);
+        String incidentCaseId = resolveVariable(processVariables, CASE_ID_VARIABLE);
+        String stateId = resolveVariable(processVariables, STATE_ID_VARIABLE);
+        String lastEventId = resolveVariable(processVariables, EVENT_ID_VARIABLE);
+
         try {
-            String processInstanceId = incident.getProcessInstanceId();
             String failedActivityId = incident.getActivityId();
-            String incidentCaseId = fetchCaseId(processInstanceId, serviceAuthorization);
             caseIds.add(incidentCaseId);
 
             String jobId = incident.getConfiguration();
@@ -252,10 +263,20 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
             boolean alreadyProcessed = incident.getIncidentMessage() != null
                 && ALREADY_PROCESSED_PATTERN.matcher(incident.getIncidentMessage()).find();
+            boolean retrySucceeded;
             if (alreadyProcessed) {
-                completeAlreadyProcessedIncident(incident.getProcessInstanceId(), serviceAuthorization, failedActivityId);
+                retrySucceeded = completeAlreadyProcessedIncident(
+                    incident.getProcessInstanceId(),
+                    serviceAuthorization,
+                    failedActivityId
+                );
             } else {
-                retryProcessInstance(processInstanceId, serviceAuthorization, failedActivityId);
+                retrySucceeded = retryProcessInstance(processInstanceId, serviceAuthorization, failedActivityId);
+            }
+
+            if (!retrySucceeded) {
+                trackStuckCaseEvent(incident, incidentCaseId, stateId, lastEventId, "retry_failed", null);
+                return false;
             }
 
             log.info(
@@ -265,8 +286,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 incidentCaseId
             );
             return true;
-
         } catch (Exception e) {
+            trackStuckCaseEvent(incident, incidentCaseId, stateId, lastEventId, "retry_failed_exception", e.getMessage());
             log.error(
                 "Error retrying incident {} (processInstanceId={}): {}",
                 incident.getId(),
@@ -278,7 +299,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         }
     }
 
-    private void completeAlreadyProcessedIncident(String processInstanceId, String serviceAuthorization, String failedActivityId) {
+    private boolean completeAlreadyProcessedIncident(String processInstanceId, String serviceAuthorization, String failedActivityId) {
         try {
             log.info("Completing incident for processInstance {} (already processed)",
                       processInstanceId);
@@ -302,14 +323,16 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             );
 
             log.info("Successfully completed activity {} for process instance {}", failedActivityId, processInstanceId);
+            return true;
 
         } catch (Exception e) {
             log.error("Failed to complete already processed activity {} for processInstance {}: {}",
                       failedActivityId, processInstanceId, e.getMessage(), e);
+            return false;
         }
     }
 
-    private void retryProcessInstance(String processInstanceId, String serviceAuthorization, String failedActivityId) {
+    private boolean retryProcessInstance(String processInstanceId, String serviceAuthorization, String failedActivityId) {
         Map<String, Object> modificationRequest = new HashMap<>();
         modificationRequest.put("skipCustomListeners", true);
         modificationRequest.put("skipIoMappings", false);
@@ -334,24 +357,63 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 modificationRequest
             );
             log.info("Process instance {} successfully modified to retry activity {}", processInstanceId, failedActivityId);
+            return true;
         } catch (Exception e) {
             log.error("Failed to retry activity {} for processInstanceId={}: {}", failedActivityId, processInstanceId, e.getMessage(), e);
+            return false;
         }
     }
 
-    private String fetchCaseId(String processInstanceId, String serviceAuthorization) {
+    private Map<String, VariableValueDto> fetchProcessVariables(String processInstanceId, String serviceAuthorization) {
         try {
-            Map<String, VariableValueDto> variables = camundaRuntimeApi.getProcessVariables(
+            return camundaRuntimeApi.getProcessVariables(
                 processInstanceId,
                 serviceAuthorization
             );
-            if (variables.containsKey(CASE_ID_VARIABLE) && variables.get(CASE_ID_VARIABLE).getValue() != null) {
-                return String.valueOf(variables.get(CASE_ID_VARIABLE).getValue());
-            }
         } catch (Exception e) {
-            log.warn("Could not fetch caseId for processInstanceId={}", processInstanceId, e);
+            log.warn("Could not fetch process variables for processInstanceId={}", processInstanceId, e);
         }
-        return "UNKNOWN";
+        return Collections.emptyMap();
+    }
+
+    private String resolveVariable(Map<String, VariableValueDto> variables, String variableName) {
+        if (variables.containsKey(variableName) && variables.get(variableName).getValue() != null) {
+            return String.valueOf(variables.get(variableName).getValue());
+        }
+        return UNKNOWN;
+    }
+
+    private void trackStuckCaseEvent(IncidentDto incident,
+                                     String caseId,
+                                     String stateId,
+                                     String lastEventId,
+                                     String retryStatus,
+                                     String retryFailureReason) {
+        Map<String, String> additionalProperties = new HashMap<>();
+        additionalProperties.put("processInstanceId", defaultIfBlank(incident.getProcessInstanceId()));
+        additionalProperties.put("incidentId", defaultIfBlank(incident.getId()));
+        additionalProperties.put("incidentMessage", defaultIfBlank(incident.getIncidentMessage()));
+        additionalProperties.put(STATE_ID_VARIABLE, defaultIfBlank(stateId));
+        additionalProperties.put("lastEventId", defaultIfBlank(lastEventId));
+        additionalProperties.put("failedActivityId", defaultIfBlank(incident.getActivityId()));
+        additionalProperties.put("errorLocation", defaultIfBlank(incident.getActivityId()));
+        additionalProperties.put("retryStatus", retryStatus);
+        additionalProperties.put("retryExhausted", Boolean.TRUE.toString());
+        additionalProperties.put("jobId", defaultIfBlank(incident.getConfiguration()));
+        if (StringUtils.isNotBlank(retryFailureReason)) {
+            additionalProperties.put("retryFailureReason", retryFailureReason);
+        }
+
+        caseTaskTrackingService.trackCaseTask(
+            defaultIfBlank(caseId),
+            STUCK_CASE_EVENT_TYPE,
+            STUCK_CASE_EVENT_NAME,
+            additionalProperties
+        );
+    }
+
+    private String defaultIfBlank(String value) {
+        return StringUtils.isBlank(value) ? UNKNOWN : value;
     }
 
     private List<IncidentDto> getLatestIncidentsForProcessInstances(

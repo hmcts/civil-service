@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 import uk.gov.hmcts.reform.civil.service.search.CasesStuckCheckSearchService;
 
@@ -29,6 +30,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +47,9 @@ class IncidentRetryEventHandlerTest {
 
     @Mock
     private CasesStuckCheckSearchService casesStuckCheckSearchService;
+
+    @Mock
+    private CaseTaskTrackingService caseTaskTrackingService;
 
     @InjectMocks
     private IncidentRetryEventHandler handler;
@@ -130,6 +135,8 @@ class IncidentRetryEventHandlerTest {
             VariableValueDto variable = new VariableValueDto();
             variable.setValue("case-" + pi.getId());
             vars.put("caseId", variable);
+            vars.put("stateId", variable("CASE_PROGRESSION"));
+            vars.put("eventId", variable("CASE_EVENT"));
             when(camundaRuntimeApi.getProcessVariables(pi.getId(), "serviceAuth")).thenReturn(vars);
         }
 
@@ -144,6 +151,7 @@ class IncidentRetryEventHandlerTest {
                 anyMap()
             );
         }
+        verifyNoInteractions(caseTaskTrackingService);
     }
 
     @Test
@@ -227,6 +235,9 @@ class IncidentRetryEventHandlerTest {
             any(), anyBoolean(), eq(pi.getId()), any(), any(), anyInt()
         )).thenReturn(List.of(incident));
 
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
+            .thenReturn(processVariables("case-proc1", "CASE_PROGRESSION", "CASE_EVENT"));
+
         doThrow(new RuntimeException("Failed to modify process instance"))
             .when(camundaRuntimeApi)
             .modifyProcessInstance(any(), any(), anyMap());
@@ -235,6 +246,21 @@ class IncidentRetryEventHandlerTest {
 
         assertThat(result).isNotNull();
         verify(camundaRuntimeApi).modifyProcessInstance(any(), any(), anyMap());
+        verify(caseTaskTrackingService).trackCaseTask(
+            eq("case-proc1"),
+            eq("incidentRetry"),
+            eq("StuckCaseDetected"),
+            argThat(properties -> "proc1".equals(properties.get("processInstanceId"))
+                && "inc1".equals(properties.get("incidentId"))
+                && "UNKNOWN".equals(properties.get("incidentMessage"))
+                && "CASE_PROGRESSION".equals(properties.get("stateId"))
+                && "CASE_EVENT".equals(properties.get("lastEventId"))
+                && "activity1".equals(properties.get("failedActivityId"))
+                && "activity1".equals(properties.get("errorLocation"))
+                && "retry_failed".equals(properties.get("retryStatus"))
+                && "true".equals(properties.get("retryExhausted"))
+                && "job1".equals(properties.get("jobId")))
+        );
     }
 
     @Test
@@ -284,5 +310,19 @@ class IncidentRetryEventHandlerTest {
         inc.setConfiguration(jobId);
         inc.setActivityId("activity1");
         return inc;
+    }
+
+    private HashMap<String, VariableValueDto> processVariables(String caseId, String stateId, String eventId) {
+        HashMap<String, VariableValueDto> vars = new HashMap<>();
+        vars.put("caseId", variable(caseId));
+        vars.put("stateId", variable(stateId));
+        vars.put("eventId", variable(eventId));
+        return vars;
+    }
+
+    private VariableValueDto variable(String value) {
+        VariableValueDto variable = new VariableValueDto();
+        variable.setValue(value);
+        return variable;
     }
 }
