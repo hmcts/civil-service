@@ -5,11 +5,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class SdoExpertEvidenceFieldsService {
-
-    private final SdoDeadlineService sdoDeadlineService;
 
     public void populateFastTrackExpertEvidence(CaseData caseData) {
         FastTrackPersonalInjury expertEvidence = new FastTrackPersonalInjury()
@@ -17,11 +17,11 @@ public class SdoExpertEvidenceFieldsService {
                 + " Digital Portal with the particulars of claim")
             .setInput2("The Defendant(s) may ask questions of the Claimant's expert which must be sent to the expert "
                 + "directly and uploaded to the Digital Portal by 4pm on")
-            .setDate2(sdoDeadlineService.nextWorkingDayFromNowDays(14))
+            .setDate2(LocalDate.now().plusWeeks(7))
             .setInput3("The answers to the questions shall be answered by the Expert by")
-            .setDate3(sdoDeadlineService.nextWorkingDayFromNowDays(42))
+            .setDate3(LocalDate.now().plusWeeks(9))
             .setInput4("and uploaded to the Digital Portal by the party who has asked the question by")
-            .setDate4(sdoDeadlineService.nextWorkingDayFromNowDays(49));
+            .setDate4(LocalDate.now().plusWeeks(10));
 
         caseData.setFastTrackPersonalInjury(expertEvidence);
     }
