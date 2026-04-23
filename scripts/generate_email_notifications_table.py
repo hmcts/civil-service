@@ -684,34 +684,35 @@ def normalize_docmosis_title(title: Optional[str]) -> Optional[str]:
 def load_ccd_event_names(definition_root: Path) -> Dict[str, str]:
     if not definition_root or not definition_root.exists():
         return {}
-    case_event_root = definition_root / "CaseEvent"
-    if not case_event_root.exists():
+    case_event_dirs = [d for d in definition_root.rglob("CaseEvent") if d.is_dir()]
+    if not case_event_dirs:
         return {}
     names: Dict[str, tuple[int, str]] = {}
-    for path in sorted(case_event_root.rglob("*.json")):
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            continue
-        if not isinstance(data, list):
-            continue
-        priority = 2
-        path_str = str(path).replace("\\", "/")
-        if "/CaseEvent/User/" in path_str:
-            priority = 0
-        elif "/CaseEvent/Camunda/" in path_str:
-            priority = 1
-        for entry in data:
-            if not isinstance(entry, dict):
+    for case_event_root in case_event_dirs:
+        for path in sorted(case_event_root.rglob("*.json")):
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
                 continue
-            event_id = entry.get("ID")
-            name = entry.get("Name")
-            if not event_id or not name:
+            if not isinstance(data, list):
                 continue
-            existing = names.get(event_id)
-            if existing and existing[0] <= priority:
-                continue
-            names[event_id] = (priority, str(name))
+            priority = 2
+            path_str = str(path).replace("\\", "/")
+            if "/CaseEvent/User/" in path_str:
+                priority = 0
+            elif "/CaseEvent/Camunda/" in path_str:
+                priority = 1
+            for entry in data:
+                if not isinstance(entry, dict):
+                    continue
+                event_id = entry.get("ID")
+                name = entry.get("Name")
+                if not event_id or not name:
+                    continue
+                existing = names.get(event_id)
+                if existing and existing[0] <= priority:
+                    continue
+                names[event_id] = (priority, str(name))
     return {event_id: name for event_id, (_, name) in names.items()}
 
 
