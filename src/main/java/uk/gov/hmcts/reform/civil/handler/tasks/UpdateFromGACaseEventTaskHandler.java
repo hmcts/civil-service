@@ -147,7 +147,11 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
 
     protected <T> int checkIfDocumentExists(List<Element<T>> civilCaseDocumentList,
                                             List<Element<T>> gaCaseDocumentlist) {
-        return countExistingDocuments(civilCaseDocumentList, gaCaseDocumentlist, this::getDocumentUrl);
+        return countExistingDocuments(
+            civilCaseDocumentList,
+            gaCaseDocumentlist,
+            getDocumentUrlExtractor(gaCaseDocumentlist)
+        );
     }
 
     protected void updateDocCollectionField(Map<String, Object> output, CaseData civilCaseData, CaseData generalAppCaseData, String docFieldName)
@@ -390,14 +394,19 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
             .count();
     }
 
+    private <T> Function<T, String> getDocumentUrlExtractor(List<Element<T>> gaCaseDocumentList) {
+        if (gaCaseDocumentList.getFirst().getValue().getClass().equals(CaseDocument.class)) {
+            return this::getCaseDocumentUrl;
+        }
+        return this::getDocumentUrl;
+    }
+
+    private <T> String getCaseDocumentUrl(T document) {
+        return ((CaseDocument) document).getDocumentLink().getDocumentUrl();
+    }
+
     private <T> String getDocumentUrl(T document) {
-        if (document instanceof CaseDocument caseDocument) {
-            return caseDocument.getDocumentLink().getDocumentUrl();
-        }
-        if (document instanceof Document gaDocument) {
-            return gaDocument.getDocumentUrl();
-        }
-        throw new IllegalArgumentException("Unsupported document type " + document.getClass().getName());
+        return ((Document) document).getDocumentUrl();
     }
 
     protected boolean canViewClaimant(CaseData civilCaseData, CaseData generalAppCaseData, String civilDocPrefix) {
