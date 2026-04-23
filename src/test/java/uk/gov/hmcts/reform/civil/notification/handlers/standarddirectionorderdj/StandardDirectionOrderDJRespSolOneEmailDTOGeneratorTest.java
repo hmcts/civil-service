@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.standarddirectionorderdj;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
@@ -10,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 class StandardDirectionOrderDJRespSolOneEmailDTOGeneratorTest
@@ -20,15 +23,16 @@ class StandardDirectionOrderDJRespSolOneEmailDTOGeneratorTest
     private static final String RESPONDENT_LEGAL_ORG_NAME = "Test Respondent Legal Org";
     private static final String REFERENCE_TEMPLATE_SDO_DJ = "sdo-dj-order-notification-defendant-%s";
 
+    private StandardDirectionOrderDJNotificationHelper notificationHelper;
+    private MockedStatic<MultiPartyScenario> multiPartyScenarioMockedStatic;
+
     @Override
     protected StandardDirectionOrderDJRespSolOneEmailDTOGenerator createGenerator(
         NotificationsProperties notificationsProperties,
         OrganisationService organisationService) {
         StandardDirectionOrderDJEmailDTOGeneratorBase templateHelper =
             new StandardDirectionOrderDJEmailDTOGeneratorBase(notificationsProperties);
-        StandardDirectionOrderDJNotificationHelper notificationHelper =
-            mock(StandardDirectionOrderDJNotificationHelper.class);
-        when(notificationHelper.isTargetDefendant(any(), any())).thenReturn(true);
+        notificationHelper = mock(StandardDirectionOrderDJNotificationHelper.class);
         return new StandardDirectionOrderDJRespSolOneEmailDTOGenerator(
             organisationService, templateHelper, notificationHelper);
     }
@@ -46,6 +50,18 @@ class StandardDirectionOrderDJRespSolOneEmailDTOGeneratorTest
     @Override
     protected String getReferenceTemplate() {
         return generator.getReferenceTemplate();
+    }
+
+    @Override
+    protected void setupAdditionalMocks() {
+        multiPartyScenarioMockedStatic = mockStatic(MultiPartyScenario.class);
+    }
+
+    @Override
+    protected void tearDownAdditionalMocks() {
+        if (multiPartyScenarioMockedStatic != null) {
+            multiPartyScenarioMockedStatic.close();
+        }
     }
 
     @Test
@@ -67,10 +83,13 @@ class StandardDirectionOrderDJRespSolOneEmailDTOGeneratorTest
     }
 
     @Test
-    void shouldReturnTrueWhenRespondent1IsRepresented() {
+    void shouldReturnTrueWhenRespondent1IsTargetDefendant() {
         CaseData caseData = mock(CaseData.class);
+        Party respondent1 = mock(Party.class);
 
         when(caseData.isRespondent1NotRepresented()).thenReturn(false);
+        when(caseData.getRespondent1()).thenReturn(respondent1);
+        when(notificationHelper.isTargetDefendant(caseData, respondent1)).thenReturn(true);
 
         Boolean result = generator.getShouldNotify(caseData);
 
@@ -82,6 +101,63 @@ class StandardDirectionOrderDJRespSolOneEmailDTOGeneratorTest
         CaseData caseData = mock(CaseData.class);
 
         when(caseData.isRespondent1NotRepresented()).thenReturn(true);
+
+        Boolean result = generator.getShouldNotify(caseData);
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldReturnTrueWhenOneVTwoOneLegalRepAndRespondent2IsTargetDefendant() {
+        CaseData caseData = mock(CaseData.class);
+        Party respondent1 = mock(Party.class);
+        Party respondent2 = mock(Party.class);
+
+        when(caseData.isRespondent1NotRepresented()).thenReturn(false);
+        when(caseData.getRespondent1()).thenReturn(respondent1);
+        when(caseData.getRespondent2()).thenReturn(respondent2);
+        when(notificationHelper.isTargetDefendant(caseData, respondent1)).thenReturn(false);
+        when(notificationHelper.isTargetDefendant(caseData, respondent2)).thenReturn(true);
+        multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoLegalRep(caseData))
+            .thenReturn(true);
+
+        Boolean result = generator.getShouldNotify(caseData);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseWhenRespondent1NotTargetAndNotOneVTwoOneLegalRep() {
+        CaseData caseData = mock(CaseData.class);
+        Party respondent1 = mock(Party.class);
+        Party respondent2 = mock(Party.class);
+
+        when(caseData.isRespondent1NotRepresented()).thenReturn(false);
+        when(caseData.getRespondent1()).thenReturn(respondent1);
+        when(caseData.getRespondent2()).thenReturn(respondent2);
+        when(notificationHelper.isTargetDefendant(caseData, respondent1)).thenReturn(false);
+        when(notificationHelper.isTargetDefendant(caseData, respondent2)).thenReturn(true);
+        multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoLegalRep(caseData))
+            .thenReturn(false);
+
+        Boolean result = generator.getShouldNotify(caseData);
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalseWhenOneVTwoOneLegalRepButRespondent2NotTarget() {
+        CaseData caseData = mock(CaseData.class);
+        Party respondent1 = mock(Party.class);
+        Party respondent2 = mock(Party.class);
+
+        when(caseData.isRespondent1NotRepresented()).thenReturn(false);
+        when(caseData.getRespondent1()).thenReturn(respondent1);
+        when(caseData.getRespondent2()).thenReturn(respondent2);
+        when(notificationHelper.isTargetDefendant(caseData, respondent1)).thenReturn(false);
+        when(notificationHelper.isTargetDefendant(caseData, respondent2)).thenReturn(false);
+        multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoLegalRep(caseData))
+            .thenReturn(true);
 
         Boolean result = generator.getShouldNotify(caseData);
 

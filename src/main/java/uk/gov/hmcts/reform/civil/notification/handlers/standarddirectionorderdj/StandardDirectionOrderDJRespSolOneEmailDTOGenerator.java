@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
@@ -39,8 +40,16 @@ public class StandardDirectionOrderDJRespSolOneEmailDTOGenerator extends RespSol
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        return !caseData.isRespondent1NotRepresented()
-            && notificationHelper.isTargetDefendant(caseData, caseData.getRespondent1());
+        if (caseData.isRespondent1NotRepresented()) {
+            return false;
+        }
+        if (notificationHelper.isTargetDefendant(caseData, caseData.getRespondent1())) {
+            return true;
+        }
+        // In 1v2 with a single legal rep, respondent 1's solicitor also represents respondent 2,
+        // so they must be notified when respondent 2 is the selected defendant.
+        return isOneVTwoLegalRep(caseData)
+            && notificationHelper.isTargetDefendant(caseData, caseData.getRespondent2());
     }
 
     @Override
