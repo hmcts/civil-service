@@ -167,7 +167,7 @@ class DjTrialTemplateServiceTest {
 
         DjBuildingDisputeDirectionsService buildingService = new DjBuildingDisputeDirectionsService(deadlineService);
         DjHousingDisrepairDirectionsService housingService = new DjHousingDisrepairDirectionsService(deadlineService);
-        DjClinicalDirectionsService clinicalService = new DjClinicalDirectionsService(deadlineService);
+        DjClinicalDirectionsService clinicalService = new DjClinicalDirectionsService();
 
         return baseCase.toBuilder()
             .trialBuildingDispute(buildingService.buildTrialBuildingDispute())

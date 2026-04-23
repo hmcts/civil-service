@@ -313,7 +313,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalHearing().build()
                 .toBuilder()
                 .caseManagementOrderAdditional(List.of(
-                    CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsHousingDisrepair
+                    CaseManagementOrderAdditional.ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_HOUSING_DISREPAIR
                 ))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);

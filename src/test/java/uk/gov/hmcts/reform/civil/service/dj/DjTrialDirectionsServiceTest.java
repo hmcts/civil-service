@@ -67,11 +67,12 @@ class DjTrialDirectionsServiceTest {
 
     private static @NotNull DjSpecialistDirectionsService getDjSpecialistDirectionsService(DjDeadlineService djDeadlineService) {
         DjCreditHireDirectionsService creditHireDirectionsService = new DjCreditHireDirectionsService(djDeadlineService);
-        DjBuildingDisputeDirectionsService buildingDisputeDirectionsService = new DjBuildingDisputeDirectionsService(djDeadlineService);
+        DjBuildingDisputeDirectionsService buildingDisputeDirectionsService =
+            new DjBuildingDisputeDirectionsService(djDeadlineService);
         DjHousingDisrepairDirectionsService housingDisrepairDirectionsService =
             new DjHousingDisrepairDirectionsService(djDeadlineService);
         DjPpiDirectionsService ppiDirectionsService = new DjPpiDirectionsService();
-        DjClinicalDirectionsService clinicalDirectionsService = new DjClinicalDirectionsService(djDeadlineService);
+        DjClinicalDirectionsService clinicalDirectionsService = new DjClinicalDirectionsService();
         DjRoadTrafficAccidentDirectionsService roadTrafficAccidentDirectionsService =
             new DjRoadTrafficAccidentDirectionsService(djDeadlineService);
         DjSpecialistNarrativeService narrativeService = new DjSpecialistNarrativeService(
