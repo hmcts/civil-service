@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -27,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -455,6 +458,23 @@ public class HearingDetailsMapperTest {
         }
 
         @Test
+        void shouldThrow_whenFlagCodeIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(
+                    new Party()
+                        .setFlags(new Flags()
+                                      .setDetails(wrapElements(List.of(
+                                          new FlagDetail()
+                                              .setName("Audio/Video Evidence")
+                                              .setStatus("Active")
+                                      )))))
+                .build();
+
+            assertThatThrownBy(() -> HearingDetailsMapper.getListingComments(caseData))
+                .isInstanceOf(NullPointerException.class);
+        }
+
+        @Test
         void shouldReturnTruncatedComment_whenTheResultingListingCommentsAreOver200CharactersLong() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
@@ -531,6 +551,21 @@ public class HearingDetailsMapperTest {
                 .atStateClaimIssuedFastTrackSDOInPersonHearing()
                 .build();
             assertThat(HearingDetailsMapper.getHearingChannels("", "", caseData, categoryService)).isEqualTo(List.of("INTER"));
+        }
+
+        @Test
+        void shouldThrow_whenFirstPresentHearingChannelHasNoSelectedValue() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build()
+                .toBuilder()
+                .hearingMethodValuesFastTrack(new DynamicList())
+                .hearingMethodValuesDisposalHearing(new DynamicList()
+                                                        .setValue(new DynamicListElement().setLabel("In Person")))
+                .build();
+
+            assertThatThrownBy(() -> HearingDetailsMapper.getHearingChannels("", "", caseData, categoryService))
+                .isInstanceOf(NullPointerException.class);
         }
 
         @Test
