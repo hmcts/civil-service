@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -26,6 +27,7 @@ import java.util.Locale;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,21 +69,32 @@ class DjTrialDirectionsServiceTest {
         DjCreditHireDirectionsService creditHireDirectionsService = new DjCreditHireDirectionsService(djDeadlineService);
         DjBuildingDisputeDirectionsService buildingDisputeDirectionsService =
             new DjBuildingDisputeDirectionsService(djDeadlineService);
+        DjHousingDisrepairDirectionsService housingDisrepairDirectionsService =
+            new DjHousingDisrepairDirectionsService(djDeadlineService);
+        DjPpiDirectionsService ppiDirectionsService = new DjPpiDirectionsService();
         DjClinicalDirectionsService clinicalDirectionsService = new DjClinicalDirectionsService();
         DjRoadTrafficAccidentDirectionsService roadTrafficAccidentDirectionsService =
             new DjRoadTrafficAccidentDirectionsService(djDeadlineService);
         DjSpecialistNarrativeService narrativeService = new DjSpecialistNarrativeService(
             buildingDisputeDirectionsService,
+            housingDisrepairDirectionsService,
+            ppiDirectionsService,
             clinicalDirectionsService,
             roadTrafficAccidentDirectionsService,
             creditHireDirectionsService
         );
-        return new DjSpecialistDirectionsService(narrativeService);
+        FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
+        when(featureToggleService.isOtherRemedyEnabled()).thenReturn(false);
+        return new DjSpecialistDirectionsService(
+            narrativeService,
+            featureToggleService
+        );
     }
 
     @Test
     void shouldPopulateTrialDirections() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseDataBuilder.builder().build().toBuilder();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         service.populateTrialDirections(builder, JUDGE_NAME);
 

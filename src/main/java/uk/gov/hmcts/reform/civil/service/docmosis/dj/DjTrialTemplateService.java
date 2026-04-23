@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -19,6 +20,7 @@ public class DjTrialTemplateService {
 
     private final UserService userService;
     private final DocumentHearingLocationHelper locationHelper;
+    private final FeatureToggleService featureToggleService;
     private final DjAuthorisationFieldService authorisationFieldService;
     private final DjDirectionsToggleService directionsToggleService;
     private final DjPartyFieldService partyFieldService;
@@ -34,6 +36,7 @@ public class DjTrialTemplateService {
             .setWrittenByJudge(writtenByJudge)
             .setJudgeNameTitle(caseData.getTrialHearingJudgesRecitalDJ().getJudgeNameTitle())
             .setCaseNumber(caseData.getLegacyCaseReference())
+            .setOtherRemedyEnabled(featureToggleService.isOtherRemedyEnabled())
             .setTrialBuildingDispute(caseData.getTrialBuildingDispute())
             .setTrialBuildingDisputeAddSection(nonNull(caseData.getTrialBuildingDispute()))
             .setTrialClinicalNegligence(caseData.getTrialClinicalNegligence())
@@ -76,6 +79,8 @@ public class DjTrialTemplateService {
             .setVideoConferenceOrganisedBy(hearingMethodFieldService.resolveVideoOrganisedBy(caseData))
             .setTrialHousingDisrepair(caseData.getTrialHousingDisrepair())
             .setTrialHousingDisrepairAddSection(nonNull(caseData.getTrialHousingDisrepair()))
+            .setTrialPPI(caseData.getTrialPPI())
+            .setTrialPPIAddSection(nonNull(caseData.getTrialPPI()))
             .setTrialHearingMethodInPersonAddSection(
                 hearingMethodFieldService.isInPerson(caseData.getTrialHearingMethodDJ()))
             .setTrialHearingLocation(trialHearingLocation)
