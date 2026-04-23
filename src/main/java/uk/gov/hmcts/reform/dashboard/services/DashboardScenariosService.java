@@ -102,7 +102,6 @@ public class DashboardScenariosService {
 
         DashboardNotificationsEntity updated = new DashboardNotificationsEntity(
             existingNotification.getId(),
-            existingNotification.getNotificationAction(),
             existingNotification.getReference(),
             existingNotification.getName(),
             existingNotification.getCitizenRole(),
@@ -169,7 +168,6 @@ public class DashboardScenariosService {
 
                 DashboardNotificationsEntity notification = new DashboardNotificationsEntity(
                     UUID.randomUUID(),
-                    null,
                     uniqueCaseIdentifier,
                     template.getName(),
                     template.getRole(),
