@@ -86,7 +86,7 @@ public final class DirectionsOrderSpecialistTextLibrary {
         "b)   The defendant has permission to rely on the written report of an expert surveyor "
             + "and if that report has not already been served then it must be served by 4pm";
     public static final String HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE =
-        "c)   Where the Defendant has served an expert report, the parties' expert "
+        "c)   Where the Defendant has served an expert report, the experts "
             + "shall liaise to seek to narrow the scope of any disagreement between them and shall, by 4pm";
     public static final String HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE =
         ", send to each party a joint statement setting out areas of agreement, "
