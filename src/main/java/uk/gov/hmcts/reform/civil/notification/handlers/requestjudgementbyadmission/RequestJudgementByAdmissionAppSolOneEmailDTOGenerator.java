@@ -20,7 +20,7 @@ public class RequestJudgementByAdmissionAppSolOneEmailDTOGenerator extends AppSo
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getRespondentSolicitorCcjNotificationTemplate();
+        return notificationsProperties.getNotifyClaimantLRJudgmentByAdmissionTemplate();
     }
 
     @Override

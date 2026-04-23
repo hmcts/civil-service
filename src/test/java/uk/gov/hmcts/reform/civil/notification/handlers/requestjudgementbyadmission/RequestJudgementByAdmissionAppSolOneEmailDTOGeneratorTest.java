@@ -28,7 +28,7 @@ class RequestJudgementByAdmissionAppSolOneEmailDTOGeneratorTest {
     void shouldReturnCorrectEmailTemplateId() {
         CaseData caseData = CaseData.builder().build();
         String expectedTemplateId = "template-id";
-        when(notificationsProperties.getRespondentSolicitorCcjNotificationTemplate()).thenReturn(expectedTemplateId);
+        when(notificationsProperties.getNotifyClaimantLRJudgmentByAdmissionTemplate()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
