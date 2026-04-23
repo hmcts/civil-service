@@ -5,11 +5,9 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -30,10 +28,6 @@ public class DashboardNotificationsEntity implements Serializable {
     @NotNull
     @Schema(name = "id")
     private UUID id;
-
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "dashboardNotification")
-    @Schema(name = "notification_action_id")
-    private NotificationActionEntity notificationAction;
 
     @Schema(name = "reference")
     private String reference;
