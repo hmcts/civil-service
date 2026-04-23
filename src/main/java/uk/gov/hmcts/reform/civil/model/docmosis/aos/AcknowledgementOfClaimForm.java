@@ -28,6 +28,7 @@ public class AcknowledgementOfClaimForm implements MappableObject {
     @JsonProperty("courtseal")
     private String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
     private String caseName;
+    private String ccdCaseReference;
     private String referenceNumber;
     private SolicitorReferences solicitorReferences;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")

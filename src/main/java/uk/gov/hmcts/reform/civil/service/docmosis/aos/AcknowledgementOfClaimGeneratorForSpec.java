@@ -47,6 +47,7 @@ public class AcknowledgementOfClaimGeneratorForSpec
         return new AcknowledgementOfClaimFormForSpec(
             "[userImage:courtseal.PNG]",
             DocmosisTemplateDataUtils.toCaseName.apply(caseData),
+            String.valueOf(caseData.getCcdCaseReference()),
             caseData.getLegacyCaseReference(),
             DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData),
             caseData.getIssueDate(),
