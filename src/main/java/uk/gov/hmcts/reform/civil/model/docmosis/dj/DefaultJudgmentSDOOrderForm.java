@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLo
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPPI;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
@@ -50,6 +51,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private  String applicant;
     private  String respondent;
     private  String judgeNameTitle;
+    private  boolean otherRemedyEnabled;
 
     //default judgement SDO fields for disposal
     private  DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
@@ -77,6 +79,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private  TrialPersonalInjury trialPersonalInjury;
     private  TrialRoadTrafficAccident trialRoadTrafficAccident;
     private  TrialHousingDisrepair trialHousingDisrepair;
+    private  TrialPPI trialPPI;
     private  List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private  LocationRefData hearingLocation;
     private  LocationRefData caseManagementLocation;
@@ -117,6 +120,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private  boolean trialPersonalInjuryAddSection;
     private  boolean trialRoadTrafficAccidentAddSection;
     private  boolean trialHousingDisrepairAddSection;
+    private  boolean trialPPIAddSection;
     private  boolean trialHearingMethodInPersonAddSection;
     private  DisposalHearingMethodDJ trialHearingMethodDJ;
     private  String trialHearingLocation;
