@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.StandardDirectionOrderDJ;
@@ -53,6 +54,8 @@ import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjDirectionsToggleService;
 import uk.gov.hmcts.reform.civil.service.dj.DjCreditHireDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjBuildingDisputeDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjClinicalDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjHousingDisrepairDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjPpiDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjRoadTrafficAccidentDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjOrderDetailsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjValidationService;
@@ -165,6 +168,8 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
     DjDisposalDirectionsService.class,
     DjSpecialistDirectionsService.class,
     DjBuildingDisputeDirectionsService.class,
+    DjHousingDisrepairDirectionsService.class,
+    DjPpiDirectionsService.class,
     DjClinicalDirectionsService.class,
     DjRoadTrafficAccidentDirectionsService.class,
     DjSpecialistNarrativeService.class,
@@ -305,7 +310,12 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .atStateClaimIssuedDisposalHearing().build();
+                .atStateClaimIssuedDisposalHearing().build()
+                .toBuilder()
+                .caseManagementOrderAdditional(List.of(
+                    CaseManagementOrderAdditional.ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_HOUSING_DISREPAIR
+                ))
+                .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
