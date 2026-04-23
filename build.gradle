@@ -482,7 +482,7 @@ dependencies {
   implementation "com.github.hmcts:core-case-data-store-client:5.2.0"
   implementation "com.github.hmcts:document-management-client:7.0.1"
   implementation "com.github.hmcts:send-letter-client:5.1.1"
-  implementation "net.logstash.logback:logstash-logback-encoder:7.4"
+  implementation "net.logstash.logback:logstash-logback-encoder:9.0"
   implementation "uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE"
   implementation "com.github.hmcts:ccd-case-document-am-client:1.59.2"
   implementation "com.sendgrid:sendgrid-java:4.10.3"
