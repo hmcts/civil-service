@@ -134,14 +134,6 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
         BeftaUtils.defaultLog("Will NOT create role assignments!");
     }
 
-    @Override
-    protected boolean shouldTolerateDataSetupFailure(Throwable e) {
-        if (e instanceof ImportException importException) {
-            return importException.getHttpStatusCode() == 504;
-        }
-        return containsCause(e, SSLException.class) || containsCause(e, AEADBadTagException.class);
-    }
-
     private static boolean containsCause(Throwable e, Class<? extends Throwable> causeType) {
         Throwable current = e;
         while (current != null) {
