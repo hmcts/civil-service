@@ -347,6 +347,8 @@ def sonarExclusions = [
   "**/utils/**",
   "**/filters/**",
   "**/model/hearingvalues/**",
+  "**/config/AsyncHandlerConfiguration.java",
+  "**/config/HttpClientConfiguration.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java",
