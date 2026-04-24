@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.search.JudgmentRequestedSearchService;
 public class JudgementBufferScheduler {
 
     public static final String SCHEDULER_NAME = "JudgementBuffer";
+
     private final JudgmentRequestedSearchService searchService;
     private final ScheduledTaskRunner scheduledTaskRunner;
     private final JudgementBufferScheduledTask judgementBufferScheduledTask;
@@ -25,8 +26,8 @@ public class JudgementBufferScheduler {
 
     @Scheduled(cron = "${scheduler.judgement-buffer.cronExpression}")
     @SchedulerLock(name = "JudgementBufferScheduler_issueJudgement",
-        lockAtMostFor = "${scheduler.judgement-buffer.lockAtMostFor}",
-        lockAtLeastFor = "${scheduler.judgement-buffer.lockAtLeastFor}")
+        lockAtMostFor = "${scheduler.lockAtMostFor}",
+        lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     public void issueJudgement() {
         if (isSchedulerEnabled) {
             scheduledTaskRunner.run(
