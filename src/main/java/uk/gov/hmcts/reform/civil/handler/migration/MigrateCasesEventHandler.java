@@ -29,6 +29,15 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
     protected static final String TASK_NAME = "taskName";
     protected static final String CSV_FILE_NAME = "csvFileName";
+    private static final String CASE_IDS = "caseIds";
+    private static final String SCENARIO = "scenario";
+    private static final String NOTIFICATION_CAMUNDA_PROCESS_IDENTIFIER = "notificationCamundaProcessIdentifier";
+    private static final String CASE_NOTE_ELEMENT_ID = "caseNoteElementId";
+    private static final String NOTIFY_EVENT_ID = "notifyEventId";
+    private static final String EXCEL_FILE = "excelFile";
+    private static final String STATE = "state";
+    private static final String IS_GA_CASE = "isGACase";
+    private static final int EXCEL_BUFFER_SIZE = 8192;
     private final CaseReferenceCsvLoader caseReferenceCsvLoader;
     private final MigrationTaskFactory migrationTaskFactory;
     private final AsyncCaseMigrationService asyncCaseMigrationService;
@@ -60,83 +69,8 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         return handleTypedTask(externalTask, task);
     }
 
-    @SuppressWarnings("unchecked")
     private <T extends CaseReference> ExternalTaskData handleTypedTask(ExternalTask externalTask, MigrationTask<T> task) {
-        List<T> caseReferences = new ArrayList<>();
-        String caseIds = externalTask.getVariable("caseIds");
-        String scenario = externalTask.getVariable("scenario");
-        String camundaProcessIdentifier = externalTask.getVariable("notificationCamundaProcessIdentifier");
-        String caseNoteElementId = externalTask.getVariable("caseNoteElementId");
-        String notifyEventId = externalTask.getVariable("notifyEventId");
-
-        FileValue excelFileValue = externalTask.getVariableTyped("excelFile", false);
-
-        if (excelFileValue != null) {
-            byte[] excelBytes;
-            try (InputStream is = excelFileValue.getValue();
-                 ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-                while ((bytesRead = is.read(buffer)) != -1) {
-                    baos.write(buffer, 0, bytesRead);
-                }
-                excelBytes = baos.toByteArray();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            if (ExcelMappable.class.isAssignableFrom(task.getType())) {
-                caseReferences = caseReferenceCsvLoader.loadFromExcelBytes(task.getType(), excelBytes);
-            }
-
-        } else if (caseIds != null && !caseIds.isEmpty()) {
-            List<String> caseIdList = Arrays.stream(caseIds.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .toList();
-
-            caseReferences = caseIdList.stream()
-                .map(id -> {
-                    Object instance;
-                    if (scenario != null) {
-                        DashboardScenarioCaseReference scenarioInstance = new DashboardScenarioCaseReference();
-                        scenarioInstance.setCaseReference(id);
-                        scenarioInstance.setDashboardScenario(scenario);
-                        instance = scenarioInstance;
-                    } else if (camundaProcessIdentifier != null) {
-                        NotificationCaseReference notifyCaseReference = new NotificationCaseReference();
-                        notifyCaseReference.setCaseReference(id);
-                        notifyCaseReference.setCamundaProcessIdentifier(camundaProcessIdentifier);
-                        instance = notifyCaseReference;
-                    } else if (caseNoteElementId != null) {
-                        CaseNoteReference caseNoteReference = new CaseNoteReference();
-                        caseNoteReference.setCaseReference(id);
-                        caseNoteReference.setCaseNoteElementId(caseNoteElementId);
-                        instance = caseNoteReference;
-                    } else if (notifyEventId != null) {
-                        NotifyRpaFeedCaseReference notifyRpaFeedCaseReference = new NotifyRpaFeedCaseReference();
-                        notifyRpaFeedCaseReference.setCaseReference(id);
-                        notifyRpaFeedCaseReference.setNotifyEventId(notifyEventId);
-                        instance = notifyRpaFeedCaseReference;
-                    } else {
-                        CaseReference caseRef = new CaseReference();
-                        caseRef.setCaseReference(id);
-                        instance = caseRef;
-                    }
-                    return task.getType().cast(instance);
-                })
-                .toList();
-            log.info("Created {} case references from Camunda variables", caseReferences.size());
-        } else {
-            log.info("caseIds or scenario are not provided. Falling back to csv check");
-            // Fallback to CSV
-            String csvFileName = externalTask.getVariable(CSV_FILE_NAME);
-            if (csvFileName == null) {
-                throw new IllegalArgumentException("csvFileName is missing and no caseIds provided");
-            }
-            caseReferences = getCaseReferenceList(task.getType(), csvFileName);
-        }
+        List<T> caseReferences = resolveCaseReferences(externalTask, task);
 
         if (caseReferences.isEmpty()) {
             log.warn("No case references found to process");
@@ -145,12 +79,137 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
         log.info("Found {} case references to process", caseReferences.size());
 
-        String state = externalTask.getVariable("state");
-
-        String isGACase = externalTask.getVariable("isGACase");
+        String state = externalTask.getVariable(STATE);
+        String isGACase = externalTask.getVariable(IS_GA_CASE);
         asyncCaseMigrationService.migrateCasesAsync(task, caseReferences, state, isGACase != null);
 
         return new ExternalTaskData();
+    }
+
+    private <T extends CaseReference> List<T> resolveCaseReferences(ExternalTask externalTask, MigrationTask<T> task) {
+        String caseIds = externalTask.getVariable(CASE_IDS);
+        String scenario = externalTask.getVariable(SCENARIO);
+        String camundaProcessIdentifier = externalTask.getVariable(NOTIFICATION_CAMUNDA_PROCESS_IDENTIFIER);
+        String caseNoteElementId = externalTask.getVariable(CASE_NOTE_ELEMENT_ID);
+        String notifyEventId = externalTask.getVariable(NOTIFY_EVENT_ID);
+
+        FileValue excelFileValue = externalTask.getVariableTyped(EXCEL_FILE, false);
+        if (excelFileValue != null) {
+            return getCaseReferencesFromExcel(task, excelFileValue);
+        }
+
+        if (caseIds != null && !caseIds.isEmpty()) {
+            return getCaseReferencesFromVariables(
+                task, caseIds, scenario, camundaProcessIdentifier, caseNoteElementId, notifyEventId
+            );
+        }
+
+        return getCaseReferencesFromCsv(externalTask, task.getType());
+    }
+
+    private <T extends CaseReference> List<T> getCaseReferencesFromExcel(MigrationTask<T> task, FileValue excelFileValue) {
+        byte[] excelBytes = readExcelBytes(excelFileValue);
+        if (!ExcelMappable.class.isAssignableFrom(task.getType())) {
+            return new ArrayList<>();
+        }
+        return caseReferenceCsvLoader.loadFromExcelBytes(task.getType(), excelBytes);
+    }
+
+    private byte[] readExcelBytes(FileValue excelFileValue) {
+        try (InputStream is = excelFileValue.getValue();
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[EXCEL_BUFFER_SIZE];
+            int bytesRead;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                baos.write(buffer, 0, bytesRead);
+            }
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private <T extends CaseReference> List<T> getCaseReferencesFromVariables(
+        MigrationTask<T> task,
+        String caseIds,
+        String scenario,
+        String camundaProcessIdentifier,
+        String caseNoteElementId,
+        String notifyEventId
+    ) {
+        List<T> caseReferences = Arrays.stream(caseIds.split(","))
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .map(id -> buildCaseReference(task.getType(), id, scenario, camundaProcessIdentifier, caseNoteElementId, notifyEventId))
+            .toList();
+        log.info("Created {} case references from Camunda variables", caseReferences.size());
+        return caseReferences;
+    }
+
+    private <T extends CaseReference> T buildCaseReference(
+        Class<T> type,
+        String caseId,
+        String scenario,
+        String camundaProcessIdentifier,
+        String caseNoteElementId,
+        String notifyEventId
+    ) {
+        if (scenario != null) {
+            return type.cast(buildScenarioCaseReference(caseId, scenario));
+        }
+        if (camundaProcessIdentifier != null) {
+            return type.cast(buildNotificationCaseReference(caseId, camundaProcessIdentifier));
+        }
+        if (caseNoteElementId != null) {
+            return type.cast(buildCaseNoteReference(caseId, caseNoteElementId));
+        }
+        if (notifyEventId != null) {
+            return type.cast(buildNotifyRpaFeedCaseReference(caseId, notifyEventId));
+        }
+        return type.cast(buildBaseCaseReference(caseId));
+    }
+
+    private DashboardScenarioCaseReference buildScenarioCaseReference(String caseId, String scenario) {
+        DashboardScenarioCaseReference scenarioCaseReference = new DashboardScenarioCaseReference();
+        scenarioCaseReference.setCaseReference(caseId);
+        scenarioCaseReference.setDashboardScenario(scenario);
+        return scenarioCaseReference;
+    }
+
+    private NotificationCaseReference buildNotificationCaseReference(String caseId, String camundaProcessIdentifier) {
+        NotificationCaseReference notificationCaseReference = new NotificationCaseReference();
+        notificationCaseReference.setCaseReference(caseId);
+        notificationCaseReference.setCamundaProcessIdentifier(camundaProcessIdentifier);
+        return notificationCaseReference;
+    }
+
+    private CaseNoteReference buildCaseNoteReference(String caseId, String caseNoteElementId) {
+        CaseNoteReference caseNoteReference = new CaseNoteReference();
+        caseNoteReference.setCaseReference(caseId);
+        caseNoteReference.setCaseNoteElementId(caseNoteElementId);
+        return caseNoteReference;
+    }
+
+    private NotifyRpaFeedCaseReference buildNotifyRpaFeedCaseReference(String caseId, String notifyEventId) {
+        NotifyRpaFeedCaseReference notifyRpaFeedCaseReference = new NotifyRpaFeedCaseReference();
+        notifyRpaFeedCaseReference.setCaseReference(caseId);
+        notifyRpaFeedCaseReference.setNotifyEventId(notifyEventId);
+        return notifyRpaFeedCaseReference;
+    }
+
+    private CaseReference buildBaseCaseReference(String caseId) {
+        CaseReference caseReference = new CaseReference();
+        caseReference.setCaseReference(caseId);
+        return caseReference;
+    }
+
+    private <T extends CaseReference> List<T> getCaseReferencesFromCsv(ExternalTask externalTask, Class<T> type) {
+        log.info("caseIds or scenario are not provided. Falling back to csv check");
+        String csvFileName = externalTask.getVariable(CSV_FILE_NAME);
+        if (csvFileName == null) {
+            throw new IllegalArgumentException("csvFileName is missing and no caseIds provided");
+        }
+        return getCaseReferenceList(type, csvFileName);
     }
 
     protected <T extends CaseReference> List<T> getCaseReferenceList(Class<T> type, String csvFileName) {

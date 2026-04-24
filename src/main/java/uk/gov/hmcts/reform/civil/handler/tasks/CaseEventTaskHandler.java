@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,6 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -49,7 +49,6 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
-    private final FeatureToggleService featureToggleService;
     private final RoboticsEventTextFormatter textFormatter;
 
     @Override
@@ -127,132 +126,230 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     }
 
     private String getSummary(String eventId, String state, CaseData caseData) {
-        if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
-            FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
-            return switch (flowState) {
-                case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, DIVERGENT_RESPOND_GO_OFFLINE ->
-                    textFormatter.divergentRespond();
-                case FULL_ADMISSION -> getFullOrPartAdmission(caseData, state);
-                case PART_ADMISSION -> getFullOrPartAdmission(caseData, state);
-                case COUNTER_CLAIM -> textFormatter.defendantRejectsAndCounterClaims();
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT ->
-                    textFormatter.unrepresentedDefendants();
-                case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT ->
-                    textFormatter.unregisteredDefendantSolicitorFirms();
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT ->
-                    textFormatter.unrepresentedAndUnregisteredDefendantSolicitorFirm();
-                case FULL_DEFENCE_PROCEED, FULL_ADMIT_PROCEED, FULL_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PROCEED ->
-                    textFormatter.claimantsProceed();
-                case FULL_DEFENCE_NOT_PROCEED, FULL_ADMIT_NOT_PROCEED, PART_ADMIT_NOT_PROCEED ->
-                    "RPA Reason: Claimant(s) intends not to proceed.";
-                case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED, TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED ->
-                    textFormatter.onlyOneDefendantNotified();
-                case TAKEN_OFFLINE_BY_STAFF -> textFormatter.caseTakenOfflineByStaff();
-                case CLAIM_DETAILS_NOTIFIED, NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
-                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, NOTIFICATION_ACKNOWLEDGED,
-                    PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA ->
-                    textFormatter.notSuitableForSdo();
-                case FULL_ADMIT_AGREE_REPAYMENT, PART_ADMIT_AGREE_REPAYMENT, FULL_ADMIT_JUDGMENT_ADMISSION ->
-                    textFormatter.judgementByAdmissionRequested();
-                case SPEC_DEFENDANT_NOC -> textFormatter.withRpaPrefix("Notice of Change filed.");
-                default -> {
-                    log.info("Unexpected flow state {}", flowState.fullName());
-                    yield null;
-                }
-            };
-        } else if (Objects.equals(eventId, CaseEvent.NOTIFY_EVENT.name())) {
+        if (isProceedsInHeritageEvent(eventId)) {
+            return getProceedsInHeritageSummary((FlowState.Main) FlowState.fromFullName(state), caseData);
+        }
+        if (isNotifyEvent(eventId)) {
             return caseData.getBusinessProcess().getActivityId();
         }
         return null;
     }
 
-    private String getDescription(String eventId, Map data, String state, CaseData caseData) {
-        Object claimProceedsInCaseman = data.get("claimProceedsInCaseman");
-        FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
+    private String getProceedsInHeritageSummary(FlowState.Main flowState, CaseData caseData) {
+        String summary = getFirstAvailableSummary(
+            () -> getSpecialProceedsSummary(flowState),
+            () -> getAdmissionOrCounterClaimSummary(flowState, caseData),
+            () -> getPendingClaimSummary(flowState),
+            () -> getClaimantProceedSummary(flowState),
+            () -> getOfflineSummary(flowState),
+            () -> getNotSuitableForSdoSummary(flowState),
+            () -> getJudgmentSummary(flowState),
+            () -> getSpecDefendantNocSummary(flowState)
+        );
+        if (summary != null) {
+            return summary;
+        }
 
-        if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
-            if (Objects.nonNull(claimProceedsInCaseman)) {
-                String claimString = claimProceedsInCaseman.toString();
-                String[] claimArray = claimString.split(",");
-                for (String value : claimArray) {
-                    if (value.contains(APPLICATION.name())) {
-                        return "Application.";
-                    } else if (value.contains(CASE_SETTLED.name())) {
-                        return "Case settled.";
-                    } else if (value.contains(DEFENDANT_DOES_NOT_CONSENT.name())) {
-                        return "Defendant does not consent to accept service.";
-                    } else if (value.contains(JUDGEMENT_REQUEST.name())) {
-                        return "Judgement request.";
-                    } else if (value.contains(OTHER.name())) {
-                        for (String description : claimArray) {
-                            if (description.contains("other=")) {
-                                return format("Other: %s", description.substring(description.indexOf("=") + 1));
-                            }
-                        }
-                    }
-                }
-            }
+        if (log.isInfoEnabled()) {
+            log.info("Unexpected flow state {}", flowState.fullName());
+        }
+        return null;
+    }
 
-            final String and = " and ";
-            switch (flowState) {
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
-                    return format("Unrepresented defendant: %s",
-                                      StringUtils.join(
-                                          getDefendantNames(UNREPRESENTED, caseData), and
-                                      ));
-                case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
-                    return format("Unregistered defendant solicitor firm: %s",
-                                     StringUtils.join(
-                                         getDefendantNames(UNREGISTERED,
-                                                           caseData), and
-                                     ));
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
-                    return format("Unrepresented defendant and unregistered defendant solicitor firm. "
-                                      + "Unrepresented defendant: %s. "
-                                      + "Unregistered defendant solicitor firm: %s.",
-                                        StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), and),
-                                        StringUtils.join(
-                                            getDefendantNames(UNREGISTERED,
-                                                              caseData), and
-                                        ));
-                case FULL_DEFENCE_PROCEED:
-                    return !SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                        ? getDescriptionFullDefenceProceed(caseData) : null;
-                default:
-                    break;
+    @SafeVarargs
+    private String getFirstAvailableSummary(Supplier<String>... summarySuppliers) {
+        for (Supplier<String> summarySupplier : summarySuppliers) {
+            String summary = summarySupplier.get();
+            if (summary != null) {
+                return summary;
             }
         }
         return null;
+    }
+
+    private String getSpecialProceedsSummary(FlowState.Main flowState) {
+        return switch (flowState) {
+            case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, DIVERGENT_RESPOND_GO_OFFLINE ->
+                textFormatter.divergentRespond();
+            default -> null;
+        };
+    }
+
+    private String getAdmissionOrCounterClaimSummary(FlowState.Main flowState, CaseData caseData) {
+        return switch (flowState) {
+            case FULL_ADMISSION, PART_ADMISSION -> getFullOrPartAdmission(caseData, flowState.fullName());
+            case COUNTER_CLAIM -> textFormatter.defendantRejectsAndCounterClaims();
+            default -> null;
+        };
+    }
+
+    private String getPendingClaimSummary(FlowState.Main flowState) {
+        return switch (flowState) {
+            case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT ->
+                textFormatter.unrepresentedDefendants();
+            case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT ->
+                textFormatter.unregisteredDefendantSolicitorFirms();
+            case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT ->
+                textFormatter.unrepresentedAndUnregisteredDefendantSolicitorFirm();
+            default -> null;
+        };
+    }
+
+    private String getClaimantProceedSummary(FlowState.Main flowState) {
+        return switch (flowState) {
+            case FULL_DEFENCE_PROCEED, FULL_ADMIT_PROCEED, FULL_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PROCEED ->
+                textFormatter.claimantsProceed();
+            case FULL_DEFENCE_NOT_PROCEED, FULL_ADMIT_NOT_PROCEED, PART_ADMIT_NOT_PROCEED ->
+                "RPA Reason: Claimant(s) intends not to proceed.";
+            default -> null;
+        };
+    }
+
+    private String getOfflineSummary(FlowState.Main flowState) {
+        return switch (flowState) {
+            case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED, TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED ->
+                textFormatter.onlyOneDefendantNotified();
+            case TAKEN_OFFLINE_BY_STAFF -> textFormatter.caseTakenOfflineByStaff();
+            default -> null;
+        };
+    }
+
+    private String getNotSuitableForSdoSummary(FlowState.Main flowState) {
+        return switch (flowState) {
+            case CLAIM_DETAILS_NOTIFIED, NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
+                CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, NOTIFICATION_ACKNOWLEDGED,
+                PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA -> textFormatter.notSuitableForSdo();
+            default -> null;
+        };
+    }
+
+    private String getJudgmentSummary(FlowState.Main flowState) {
+        return switch (flowState) {
+            case FULL_ADMIT_AGREE_REPAYMENT, PART_ADMIT_AGREE_REPAYMENT, FULL_ADMIT_JUDGMENT_ADMISSION ->
+                textFormatter.judgementByAdmissionRequested();
+            default -> null;
+        };
+    }
+
+    private String getSpecDefendantNocSummary(FlowState.Main flowState) {
+        return flowState == FlowState.Main.SPEC_DEFENDANT_NOC ? textFormatter.withRpaPrefix("Notice of Change filed.") : null;
+    }
+
+    private String getDescription(String eventId, Map<String, Object> data, String state, CaseData caseData) {
+        Object claimProceedsInCaseman = data.get("claimProceedsInCaseman");
+        FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
+
+        if (!isProceedsInHeritageEvent(eventId)) {
+            return null;
+        }
+
+        String claimProceedsDescription = getClaimProceedsInCasemanDescription(claimProceedsInCaseman);
+        if (claimProceedsDescription != null) {
+            return claimProceedsDescription;
+        }
+
+        return getFlowStateDescription(flowState, caseData);
+    }
+
+    private String getClaimProceedsInCasemanDescription(Object claimProceedsInCaseman) {
+        if (Objects.isNull(claimProceedsInCaseman)) {
+            return null;
+        }
+
+        String[] claimArray = claimProceedsInCaseman.toString().split(",");
+        for (String value : claimArray) {
+            String standardReason = getStandardProceedsReason(value);
+            if (standardReason != null) {
+                return standardReason;
+            }
+            if (value.contains(OTHER.name())) {
+                String otherReason = getOtherProceedsReason(claimArray);
+                if (otherReason != null) {
+                    return otherReason;
+                }
+            }
+        }
+        return null;
+    }
+
+    private String getStandardProceedsReason(String value) {
+        if (value.contains(APPLICATION.name())) {
+            return "Application.";
+        }
+        if (value.contains(CASE_SETTLED.name())) {
+            return "Case settled.";
+        }
+        if (value.contains(DEFENDANT_DOES_NOT_CONSENT.name())) {
+            return "Defendant does not consent to accept service.";
+        }
+        if (value.contains(JUDGEMENT_REQUEST.name())) {
+            return "Judgement request.";
+        }
+        return null;
+    }
+
+    private String getOtherProceedsReason(String[] claimArray) {
+        for (String value : claimArray) {
+            if (value.contains(OTHER.name())) {
+                for (String description : claimArray) {
+                    if (description.contains("other=")) {
+                        return format("Other: %s", description.substring(description.indexOf("=") + 1));
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private String getFlowStateDescription(FlowState.Main flowState, CaseData caseData) {
+        final String and = " and ";
+        return switch (flowState) {
+            case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT ->
+                format("Unrepresented defendant: %s", StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), and));
+            case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT ->
+                format("Unregistered defendant solicitor firm: %s", StringUtils.join(getDefendantNames(UNREGISTERED, caseData), and));
+            case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT ->
+                format("Unrepresented defendant and unregistered defendant solicitor firm. "
+                           + "Unrepresented defendant: %s. "
+                           + "Unregistered defendant solicitor firm: %s.",
+                       StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), and),
+                       StringUtils.join(getDefendantNames(UNREGISTERED, caseData), and));
+            case FULL_DEFENCE_PROCEED ->
+                !SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ? getDescriptionFullDefenceProceed(caseData) : null;
+            default -> null;
+        };
+    }
+
+    private boolean isProceedsInHeritageEvent(String eventId) {
+        return Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+    }
+
+    private boolean isNotifyEvent(String eventId) {
+        return Objects.equals(eventId, CaseEvent.NOTIFY_EVENT.name());
     }
 
     static final String PROCEED = "proceed";
     static final String NOT_PROCEED = "not proceed";
 
     private String getDescriptionFullDefenceProceed(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP: {
-                return format(
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP -> format(
                     "Claimant has provided intention: %s against defendant: %s and %s against defendant: %s",
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                        ? PROCEED : NOT_PROCEED,
+                            ? PROCEED : NOT_PROCEED,
                     caseData.getRespondent1().getPartyName(),
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
-                        ? PROCEED : NOT_PROCEED,
+                            ? PROCEED : NOT_PROCEED,
                     caseData.getRespondent2().getPartyName()
-                );
-            }
-            case TWO_V_ONE: {
-                return format(
+            );
+            case TWO_V_ONE -> format(
                     "Claimant: %s has provided intention: %s. Claimant: %s has provided intention: %s.",
                     caseData.getApplicant1().getPartyName(),
                     YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()) ? PROCEED : NOT_PROCEED,
                     caseData.getApplicant2().getPartyName(),
                     YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()) ? PROCEED : NOT_PROCEED
-                );
-            }
-            default: {
-                return null;
-            }
-        }
+            );
+            default -> null;
+        };
     }
 }
