@@ -219,7 +219,7 @@ import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIM_WITNESS_STATEMENT_TEXT;
 
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
@@ -1027,7 +1027,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getText()).isEqualTo(SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT);
             assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getSdoStatementOfWitness())
-                .isEqualTo(SdoR2UiConstantSmallClaim.WITNESS_STATEMENT_TEXT);
+                .isEqualTo(SMALL_CLAIM_WITNESS_STATEMENT_TEXT);
             assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getIsRestrictWitness()).isEqualTo(NO);
             assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getIsRestrictPages()).isEqualTo(NO);
             assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getSdoR2SmallClaimsRestrictWitness()
@@ -1994,7 +1994,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                     "sdoR2FastTrackCreditHireDetails").extracting("input3")
-                .isEqualTo(CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK);
+                .isEqualTo(
+                    "Failure to comply with the above paragraphs providing for disclosure and witness evidence on the issues "
+                        + "of need and impecuniosity will result in the claimant being debarred from asserting need or "
+                        + "relying on impecuniosity as the case may be at the final hearing, save with permission of the "
+                        + "Trial Judge.");
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                     "sdoR2FastTrackCreditHireDetails").extracting("input4")
                 .isEqualTo(
@@ -2079,8 +2083,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input1")
                 .isEqualTo("Each party must upload to the Digital Portal copies of all documents which they wish the"
-                               + " court to consider when reaching its decision not less than 21 days before "
-                               + "the hearing.");
+                               + " court to consider when reaching its decision by 4pm on");
             assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input2")
                 .isEqualTo("The court may refuse to consider any document which has not been uploaded to the "
                                + "Digital Portal by the above date.");
@@ -2121,19 +2124,20 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                         claimant.""");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input2")
                 .isEqualTo("""
-                        The claimant must upload to the Digital Portal a witness statement addressing
-                        a) the need to hire a replacement vehicle; and
-                        b) impecuniosity""");
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date1")
+                        The Claimant’s witness statement must address, if relied upon, evidence in support of
+                        a) need to hire a replacement vehicle; and
+                        b) impecuniosity.""");
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date2")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input3")
-                .isEqualTo("A failure to comply with the paragraph above will result in the claimant being debarred "
-                               + "from asserting need or relying on impecuniosity as the case may be at the final "
-                               + "hearing, save with permission of the Trial Judge.");
+                .isEqualTo("Failure to comply with the above paragraphs providing for disclosure and witness evidence on the issues "
+                               + "of need and impecuniosity will result in the claimant being debarred from asserting need or "
+                               + "relying on impecuniosity as the case may be at the final hearing, save with permission of the "
+                               + "Trial Judge.");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input4")
                 .isEqualTo("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
                                + "later than 4pm on");
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date2")
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date3")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input5")
                 .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to"
