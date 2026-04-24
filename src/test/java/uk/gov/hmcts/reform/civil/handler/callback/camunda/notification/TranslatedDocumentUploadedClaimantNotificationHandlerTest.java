@@ -117,7 +117,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
         }
 
         @Test
-        void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenR2EnabledAndClaimIssuedInBilingual() {
+        void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenClaimIssuedInBilingual() {
             when(notificationsProperties.getNotifyLiPClaimantDefendantRespondedWelshLip()).thenReturn(
                 CLAIMANT_LIP_EMAIL_TEMPLATE_BILINGUAL);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -148,7 +148,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
         }
 
         @Test
-        void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenR2EnabledAndClaimIssuedInEnglish() {
+        void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenClaimIssuedInEnglish() {
             when(notificationsProperties.getNotifyLiPClaimantDefendantResponded()).thenReturn(
                 CLAIMANT_LIP_EMAIL_TEMPLATE_ENGLISH);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();

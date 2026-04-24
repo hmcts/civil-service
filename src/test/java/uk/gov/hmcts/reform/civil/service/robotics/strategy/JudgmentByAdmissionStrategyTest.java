@@ -243,7 +243,7 @@ class JudgmentByAdmissionStrategyTest {
     }
 
     @Test
-    void populatesClaimantInstalmentDetailsWhenLipEnabled() {
+    void populatesClaimantInstalmentDetailsForLipCase() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(31, 32);
         LocalDateTime responseDate = LocalDateTime.of(2024, 5, 1, 9, 0);

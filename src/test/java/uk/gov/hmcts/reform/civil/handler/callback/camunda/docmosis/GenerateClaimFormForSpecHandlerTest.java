@@ -561,7 +561,7 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotGenerateClaimForm_whenLipvLipFlagIsOnAndApplicantIsLip() {
+        void shouldNotGenerateClaimForm_whenApplicantIsLip() {
             documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                "Sealed Claim form",
                                                LocalDate.now().toString()));

@@ -486,7 +486,7 @@ class RoboticsNotificationServiceTest {
     }
 
     @Test
-    void shouldNotifyJudgementLiP_whenLipvsLiPEnabled() {
+    void shouldNotifyJudgementLiP_whenLipVsLip() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         caseData.setRespondent1Represented(NO);
@@ -521,7 +521,7 @@ class RoboticsNotificationServiceTest {
 
     @ParameterizedTest
     @CsvSource({"DEFAULT_JUDGEMENT_SPEC", "DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC"})
-    void shouldNotifyDefaultJudgementLiP_whenLipvsLiPEnabled(String camundaEvent) {
+    void shouldNotifyDefaultJudgementLiP_whenLipVsLip(String camundaEvent) {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         caseData.setRespondent1Represented(NO);
@@ -561,7 +561,7 @@ class RoboticsNotificationServiceTest {
     }
 
     @Test
-    void shouldNotifyJudgementByAdmissionLiP_whenLipvsLiPEnabled() {
+    void shouldNotifyJudgementByAdmissionLiP_whenLipVsLip() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         caseData.setRespondent1Represented(NO);

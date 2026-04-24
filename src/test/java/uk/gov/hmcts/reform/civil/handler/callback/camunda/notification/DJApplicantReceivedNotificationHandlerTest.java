@@ -178,7 +178,7 @@ class DJApplicantReceivedNotificationHandlerTest {
         }
 
         @Test
-        void shouldNotifyApplicantSolicitor_whenInvokedAndLiPvsLiPEnabled() {
+        void shouldNotifyApplicantSolicitor_whenInvokedForLiPvsLiP() {
             when(notificationsProperties.getApplicantLiPDefaultJudgmentRequested())
                 .thenReturn("test-template-requested-lip-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -207,7 +207,7 @@ class DJApplicantReceivedNotificationHandlerTest {
         }
 
         @Test
-        void shouldNotifyApplicantLip_whenInvokedAndLiPvsLiPEnabledAndBilingual() {
+        void shouldNotifyApplicantLip_whenInvokedForLiPvsLiPAndBilingual() {
             when(notificationsProperties.getApplicantLiPDefaultJudgmentRequestedBilingualTemplate())
                 .thenReturn("test-template-requested-lip-id-bilingual");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();

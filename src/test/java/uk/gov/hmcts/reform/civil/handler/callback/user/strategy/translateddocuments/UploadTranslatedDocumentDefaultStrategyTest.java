@@ -252,7 +252,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
-    void shouldUpdateBusinessProcess_WhenLipVsLipAndCcdState_In_Pending_Case_Issued_R2FlagEnabled() {
+    void shouldUpdateBusinessProcess_WhenLipVsLipAndCcdState_In_Pending_Case_Issued() {
         //Given
         CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued()

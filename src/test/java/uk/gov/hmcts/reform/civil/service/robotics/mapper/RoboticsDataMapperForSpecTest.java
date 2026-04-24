@@ -345,7 +345,7 @@ class RoboticsDataMapperForSpecTest {
     }
 
     @Test
-    void shouldSkipApplicantSolicitorWhenLipVlipEnabled() {
+    void shouldSkipApplicantSolicitorWhenLipVlip() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference("reference")
