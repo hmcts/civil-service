@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard;
 
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -11,7 +12,9 @@ import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,6 +25,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
+@Sql("/scripts/dashboardNotifications/record_notification_click.sql")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@SuppressWarnings("java:S1874")
 public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
 
     public static final String CCD_CASE_ID = "130";
@@ -33,10 +39,17 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
     @Autowired
     private DashboardNotificationsRepository dashboardNotificationsRepository;
 
+    @Autowired
+    private NotificationActionRepository notificationActionRepository;
+
+    @AfterEach
+    public void after() {
+        notificationActionRepository.deleteAll();
+        dashboardNotificationsRepository.deleteAll();
+    }
+
     @Test
     @SneakyThrows
-    @Sql("/scripts/dashboardNotifications/record_notification_click.sql")
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldRecordNotificationClick() {
         doPut(BEARER_TOKEN, null, NOTIFICATION_CLICK_END_POINT, NOTIFICATION_ID.toString())
             .andExpect(status().isOk());
@@ -44,26 +57,39 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
         Optional<DashboardNotificationsEntity> notification = dashboardNotificationsRepository.findById(NOTIFICATION_ID);
         assertThat(notification).isPresent();
         DashboardNotificationsEntity dashboardNotificationsEntity = notification.get();
-        NotificationActionEntity notificationAction = dashboardNotificationsEntity.getNotificationAction();
-        assertThat(notificationAction.getDashboardNotification().getId())
+        List<NotificationActionEntity> notificationActions = notificationActionRepository
+            .findByDashboardNotificationIdIn(List.of(NOTIFICATION_ID));
+        assertThat(notificationActions).isNotEmpty();
+        NotificationActionEntity latestAction = notificationActions.get(0);
+        assertThat(latestAction.getDashboardNotificationId())
             .isEqualTo(dashboardNotificationsEntity.getId());
-        assertThat(notificationAction.getActionPerformed()).isEqualTo(ACTION_PAERFORMED);
-        assertThat(notificationAction.getReference()).isEqualTo(CCD_CASE_ID);
+        assertThat(latestAction.getActionPerformed()).isEqualTo(ACTION_PAERFORMED);
+        assertThat(latestAction.getReference()).isEqualTo(CCD_CASE_ID);
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnOkWhenNotificationDoesNotExist() {
+        UUID randomUUID = UUID.randomUUID();
+        doPut(BEARER_TOKEN, null, NOTIFICATION_CLICK_END_POINT, randomUUID)
+            .andExpect(status().isOk());
+
+        Optional<DashboardNotificationsEntity> notification = dashboardNotificationsRepository.findById(randomUUID);
+        assertThat(notification).isNotPresent();
     }
 
     @Test
     @SneakyThrows
     void shouldReturnUnauthorisedWhenBearerTokenMissing() {
         when(userRequestAuthorizerMock.authorise(any())).thenReturn(null);
-        doDelete("", null, NOTIFICATION_CLICK_END_POINT, NOTIFICATION_ID.toString())
+        doPut("", null, NOTIFICATION_CLICK_END_POINT, UUID.randomUUID())
             .andExpect(status().isForbidden());
     }
 
     @Test
     @SneakyThrows
     void shouldReturnBadRequestWhenUuidNotInCorrectFormat() {
-
-        doDelete(BEARER_TOKEN, null, NOTIFICATION_CLICK_END_POINT, "126")
+        doPut(BEARER_TOKEN, null, NOTIFICATION_CLICK_END_POINT, "126")
             .andExpect(status().isBadRequest());
 
     }

@@ -20,7 +20,7 @@ RESOURCE_ROOT = REPO_ROOT / "src" / "main" / "resources"
 APPLICATION_YAML = RESOURCE_ROOT / "application.yaml"
 DASHBOARD_TASK_IDS_PATH = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civil' / 'handler' / 'callback' / 'camunda' / 'dashboardnotifications' / 'DashboardTaskIds.java'
 DASHBOARD_SCENARIOS_PATH = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civil' / 'handler' / 'callback' / 'camunda' / 'dashboardnotifications' / 'DashboardScenarios.java'
-TEMPLATE_DIR = REPO_ROOT / 'dashboard-notifications' / 'src' / 'main' / 'resources' / 'notification-templates'
+TEMPLATE_DIR = RESOURCE_ROOT / 'notification-templates'
 RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-service/master/"
 TEMPLATE_VIEWER_PATH = "dashboard-template.html"
 DIAGRAM_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/"
@@ -550,7 +550,7 @@ def load_dashboard_scenarios() -> Dict[str, str]:
     if not DASHBOARD_SCENARIOS_PATH.exists():
         return mapping
     text = DASHBOARD_SCENARIOS_PATH.read_text(encoding='utf-8')
-    pattern = re.compile(r"(SCENARIO_[A-Z0-9_]+)\s*\(\"([^\"]+)\"\)")
+    pattern = re.compile(r"(SCENARIO_[A-Z0-9_]+)\s*\(\s*\"([^\"]+)\"\s*\)")
     for const, value in pattern.findall(text):
         mapping[const] = value
     return mapping
@@ -684,34 +684,35 @@ def normalize_docmosis_title(title: Optional[str]) -> Optional[str]:
 def load_ccd_event_names(definition_root: Path) -> Dict[str, str]:
     if not definition_root or not definition_root.exists():
         return {}
-    case_event_root = definition_root / "CaseEvent"
-    if not case_event_root.exists():
+    case_event_dirs = [d for d in definition_root.rglob("CaseEvent") if d.is_dir()]
+    if not case_event_dirs:
         return {}
     names: Dict[str, tuple[int, str]] = {}
-    for path in sorted(case_event_root.rglob("*.json")):
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            continue
-        if not isinstance(data, list):
-            continue
-        priority = 2
-        path_str = str(path).replace("\\", "/")
-        if "/CaseEvent/User/" in path_str:
-            priority = 0
-        elif "/CaseEvent/Camunda/" in path_str:
-            priority = 1
-        for entry in data:
-            if not isinstance(entry, dict):
+    for case_event_root in case_event_dirs:
+        for path in sorted(case_event_root.rglob("*.json")):
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
                 continue
-            event_id = entry.get("ID")
-            name = entry.get("Name")
-            if not event_id or not name:
+            if not isinstance(data, list):
                 continue
-            existing = names.get(event_id)
-            if existing and existing[0] <= priority:
-                continue
-            names[event_id] = (priority, str(name))
+            priority = 2
+            path_str = str(path).replace("\\", "/")
+            if "/CaseEvent/User/" in path_str:
+                priority = 0
+            elif "/CaseEvent/Camunda/" in path_str:
+                priority = 1
+            for entry in data:
+                if not isinstance(entry, dict):
+                    continue
+                event_id = entry.get("ID")
+                name = entry.get("Name")
+                if not event_id or not name:
+                    continue
+                existing = names.get(event_id)
+                if existing and existing[0] <= priority:
+                    continue
+                names[event_id] = (priority, str(name))
     return {event_id: name for event_id, (_, name) in names.items()}
 
 
@@ -917,7 +918,14 @@ def scenario_names_for_class(index: SourceIndex,
     if base:
         dependencies.add(base)
     for simple_type in field_types(java_class).values():
-        if any(keyword in simple_type for keyword in ('ScenarioService', 'DashboardService', 'ScenarioHelper')):
+        dep_class = index.get(simple_type)
+        is_dashboard_dependency = dep_class and 'dashboardnotifications' in str(dep_class.path).lower()
+        if is_dashboard_dependency or any(keyword in simple_type for keyword in (
+            'ScenarioService',
+            'DashboardService',
+            'NotificationService',
+            'ScenarioHelper',
+        )):
             dependencies.add(simple_type)
     for dep in dependencies:
         scenarios |= scenario_names_for_class(index, dep, scenario_map, cache, visited)
@@ -1016,7 +1024,14 @@ def collect_dashboard_contributions(index: SourceIndex, service_tasks, start_eve
         args = split_arguments(super_match.group(1))
         if not args:
             continue
-        raw_task_id = args[0]
+        # DashboardTaskContributor supports:
+        #  - super(taskId, handlers...)
+        #  - super(caseType, taskId, handlers...)
+        task_id_index = 0
+        if len(args) > 1 and ('DashboardCaseType.' in args[0] or args[0].endswith(' caseType') or args[0] == 'caseType'):
+            task_id_index = 1
+        raw_task_id = args[task_id_index]
+        handler_args = args[task_id_index + 1:]
         task_id = raw_task_id
         literal = re.match(r'\"([^\"]+)\"', raw_task_id)
         if literal:
@@ -1025,7 +1040,10 @@ def collect_dashboard_contributions(index: SourceIndex, service_tasks, start_eve
             constant = re.match(r'.*\.([A-Za-z0-9_]+)', raw_task_id)
             if constant and constant.group(1) in task_ids_map:
                 task_id = task_ids_map[constant.group(1)]
-        for handler_var in args[1:]:
+            elif re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", raw_task_id):
+                # Skip wrapper contributors that just forward a runtime taskId variable.
+                continue
+        for handler_var in handler_args:
             handler_type = param_map.get(handler_var)
             if not handler_type:
                 continue
@@ -1423,7 +1441,7 @@ def render_combined_markdown(rows: List[Dict[str, object]], notify_service_id: O
         The table below lists every citizen-facing notification triggered from CCD events. It combines the
         Gov.Notify emails and dashboard notices, grouping them by the CCD events that kick off the relevant
         Camunda flow. Use the template column to jump straight to the Gov.Notify template or the dashboard
-        JSON housed in `dashboard-notifications`.
+        JSON housed in `src/main/resources/notification-templates`.
         \n**Tip:** To focus on a single CCD event, re-run the generator locally with `--ccd-event EVENT_ID`.
     """).strip()
     lines = [intro, ""]

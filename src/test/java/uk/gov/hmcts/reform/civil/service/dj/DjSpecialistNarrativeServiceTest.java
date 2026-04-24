@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.SdoDJR2TrialCreditHire;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPPI;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 
 import java.time.LocalDate;
@@ -24,6 +25,10 @@ class DjSpecialistNarrativeServiceTest {
     @Mock
     private DjBuildingDisputeDirectionsService buildingDisputeDirectionsService;
     @Mock
+    private DjHousingDisrepairDirectionsService housingDisrepairDirectionsService;
+    @Mock
+    private DjPpiDirectionsService ppiDirectionsService;
+    @Mock
     private DjClinicalDirectionsService clinicalDirectionsService;
     @Mock
     private DjRoadTrafficAccidentDirectionsService roadTrafficAccidentDirectionsService;
@@ -36,6 +41,8 @@ class DjSpecialistNarrativeServiceTest {
     void setUp() {
         service = new DjSpecialistNarrativeService(
             buildingDisputeDirectionsService,
+            housingDisrepairDirectionsService,
+            ppiDirectionsService,
             clinicalDirectionsService,
             roadTrafficAccidentDirectionsService,
             creditHireDirectionsService
@@ -83,7 +90,7 @@ class DjSpecialistNarrativeServiceTest {
         TrialRoadTrafficAccident expectedRta = new TrialRoadTrafficAccident();
         TrialHousingDisrepair expectedHousing = new TrialHousingDisrepair();
         when(roadTrafficAccidentDirectionsService.buildTrialRoadTrafficAccident()).thenReturn(expectedRta);
-        when(buildingDisputeDirectionsService.buildTrialHousingDisrepair()).thenReturn(expectedHousing);
+        when(housingDisrepairDirectionsService.buildTrialHousingDisrepair()).thenReturn(expectedHousing);
 
         TrialRoadTrafficAccident rta = service.buildTrialRoadTrafficAccident();
         TrialHousingDisrepair housing = service.buildTrialHousingDisrepair();
@@ -91,6 +98,28 @@ class DjSpecialistNarrativeServiceTest {
         assertThat(rta).isSameAs(expectedRta);
         assertThat(housing).isSameAs(expectedHousing);
         verify(roadTrafficAccidentDirectionsService).buildTrialRoadTrafficAccident();
-        verify(buildingDisputeDirectionsService).buildTrialHousingDisrepair();
+        verify(housingDisrepairDirectionsService).buildTrialHousingDisrepair();
+    }
+
+    @Test
+    void shouldBuildOtherRemedyHousingDisrepair() {
+        TrialHousingDisrepair expected = new TrialHousingDisrepair();
+        when(housingDisrepairDirectionsService.buildTrialHousingDisrepairOtherRemedy()).thenReturn(expected);
+
+        TrialHousingDisrepair housing = service.buildTrialHousingDisrepairOtherRemedy();
+
+        assertThat(housing).isSameAs(expected);
+        verify(housingDisrepairDirectionsService).buildTrialHousingDisrepairOtherRemedy();
+    }
+
+    @Test
+    void shouldBuildTrialPpi() {
+        TrialPPI expected = new TrialPPI();
+        when(ppiDirectionsService.buildTrialPPI()).thenReturn(expected);
+
+        TrialPPI ppi = service.buildTrialPPI();
+
+        assertThat(ppi).isSameAs(expected);
+        verify(ppiDirectionsService).buildTrialPPI();
     }
 }
