@@ -11,6 +11,7 @@ public enum CaseState {
     CASE_ISSUED("Case issued"),
     AWAITING_CASE_DETAILS_NOTIFICATION("Awaiting case details notofication"),
     AWAITING_RESPONDENT_ACKNOWLEDGEMENT("Awaiting respondent acknowledgement"),
+    JUDGMENT_REQUESTED("Judgment Requested"),
     CASE_DISMISSED("Case Dismissed"),
     AWAITING_APPLICANT_INTENTION("Awaiting applicant intention"),
     PROCEEDS_IN_HERITAGE_SYSTEM("Proceeds in heritage system"),
