@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.scheduler.common;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,25 +22,43 @@ public class ScheduledTaskRunner {
     private final ErrorCategorizer errorCategorizer;
     private final TelemetryService telemetryService;
 
+    @Value("${scheduler.circuitBreakerThreshold:5}")
+    private int circuitBreakerThreshold;
+
     public void run(ScheduledTaskEventConfiguration eventConfig,
                     ElasticSearchService searchService,
                     ScheduledTask scheduledTask) {
 
         List<Long> failedCases = new ArrayList<>();
+        int consecutiveFailures = 0;
+        boolean abortedEarly = false;
+        String abortReason = "";
+
         Set<CaseDetails> cases = searchService.getCases();
         jobStartedEvent(eventConfig, cases.size());
 
-        cases.forEach(caseDetails -> {
+        for (CaseDetails caseDetails : cases) {
             try {
                 scheduledTask.accept(caseDetails);
                 caseProcessedEvent(eventConfig, caseDetails.getId());
+                consecutiveFailures = 0;
             } catch (Exception e) {
                 failedCases.add(caseDetails.getId());
                 caseFailedEvent(eventConfig, caseDetails, e);
-            }
-        });
+                consecutiveFailures++;
 
-        jobCompletedEvent(eventConfig, cases, failedCases);
+                if (consecutiveFailures >= circuitBreakerThreshold) {
+                    abortedEarly = true;
+                    abortReason = e.getMessage();
+                    break;
+                }
+            }
+        }
+
+        if (abortedEarly) {
+            jobAbortedEvent(eventConfig, cases, failedCases, abortReason);
+        }
+        jobCompletedEvent(eventConfig, cases, failedCases, abortedEarly);
     }
 
     private void jobStartedEvent(ScheduledTaskEventConfiguration eventConfig, int casesSize) {
@@ -77,7 +96,8 @@ public class ScheduledTaskRunner {
 
     private void jobCompletedEvent(ScheduledTaskEventConfiguration eventConfig,
                                    Set<CaseDetails> cases,
-                                   List<Long> failedCases) {
+                                   List<Long> failedCases,
+                                   boolean abortedEarly) {
         telemetryService.trackEvent(
             eventConfig.getJobCompletedEvent(),
             Map.of(
@@ -85,7 +105,23 @@ public class ScheduledTaskRunner {
                 "totalCases", String.valueOf(cases.size()),
                 "succeededCases", String.valueOf(cases.size() - failedCases.size()),
                 "failedCases", String.valueOf(failedCases.size()),
-                "abortedEarly", "false"
+                "abortedEarly", String.valueOf(abortedEarly)
+            )
+        );
+    }
+
+    private void jobAbortedEvent(ScheduledTaskEventConfiguration eventConfig,
+                                 Set<CaseDetails> cases,
+                                 List<Long> failedCases,
+                                 String reason) {
+        telemetryService.trackEvent(
+            eventConfig.getJobAbortedEvent(),
+            Map.of(
+                "schedulerName", eventConfig.getSchedulerName(),
+                "totalCases", String.valueOf(cases.size()),
+                "succeededCases", String.valueOf(cases.size() - failedCases.size()),
+                "failedCases", String.valueOf(failedCases.size()),
+                "abortReason", reason != null ? reason : "Unknown"
             )
         );
     }

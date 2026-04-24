@@ -57,6 +57,7 @@ spring:
     baseline-on-migrate: true
 
 scheduler:
+  circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT10M}
   lockAtMostFor: ${LOCK_AT_MOST_FOR:PT20M}
   defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT30M}
