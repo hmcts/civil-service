@@ -80,6 +80,7 @@ withPipeline(type, product, component) {
   env.DMN_DEFINITION_BRANCH = dmnBranch
   env.WIREMOCK_MAPPINGS_BRANCH = wiremockMappingsBranch
   env.UNASSIGN_CASES = true
+  env.JAVA_TOOL_OPTIONS = "-Dhttps.protocols=TLSv1.2 -Djdk.tls.client.protocols=TLSv1.2"
 
   loadVaultSecrets(secrets)
 
@@ -243,6 +244,7 @@ def copyPreviousAllureHistory() {
 }
 
 def setPreviewUrls(String product, String component) {
+  env.JAVA_TOOL_OPTIONS = "-Dhttps.protocols=TLSv1.2 -Djdk.tls.client.protocols=TLSv1.2"
   env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
   env.CAMUNDA_BASE_URL = "https://camunda-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
   env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
@@ -309,6 +311,7 @@ def runStagingHighLevelDataSetup() {
 }
 
 def setStagingUrls() {
+  env.JAVA_TOOL_OPTIONS = "-Dhttps.protocols=TLSv1.2 -Djdk.tls.client.protocols=TLSv1.2"
   env.URL = "https://civil-service-xui-staging.aat.platform.hmcts.net"
   env.CIVIL_SERVICE_URL = "https://civil-service-staging.aat.platform.hmcts.net"
   env.CAMUNDA_BASE_URL = "https://civil-service-camunda-staging-aat.service.core-compute-aat.internal"
@@ -319,6 +322,7 @@ def setStagingUrls() {
 }
 
 def setAatIntegrationUrls() {
+  env.JAVA_TOOL_OPTIONS = "-Dhttps.protocols=TLSv1.2 -Djdk.tls.client.protocols=TLSv1.2"
   env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
   env.IDAM_TEST_SUPPORT_API_URL = "https://idam-testing-support-api.aat.platform.hmcts.net"
   env.PAYMENT_API_URL = "http://payment-api-aat.service.core-compute-aat.internal"
