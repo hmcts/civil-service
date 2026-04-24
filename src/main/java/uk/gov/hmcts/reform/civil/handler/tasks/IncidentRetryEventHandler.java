@@ -76,6 +76,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         AtomicInteger successRetries = new AtomicInteger();
         AtomicInteger failedRetries = new AtomicInteger();
         Set<String> caseIds = ConcurrentHashMap.newKeySet();
+        Set<String> trackedStuckCaseIds = ConcurrentHashMap.newKeySet();
         List<StuckCaseSummaryItem> stuckCasesForManualIntervention = Collections.synchronizedList(new ArrayList<>());
 
         processAllIncidents(
@@ -87,6 +88,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             successRetries,
             failedRetries,
             caseIds,
+            trackedStuckCaseIds,
             stuckCasesForManualIntervention
         );
 
@@ -106,6 +108,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
         String stuckCasesFromPastDays = externalTask.getVariable("stuckCasesFromPastDays");
         Set<CaseDetails> stuckCases = casesStuckCheckSearchService.getCases(stuckCasesFromPastDays != null ? stuckCasesFromPastDays : "7");
+        trackStuckCasesFromSearchResults(stuckCases, trackedStuckCaseIds);
 
         trackDailyStuckCasesSummary(
             incidentStartTime,
@@ -129,6 +132,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         AtomicInteger successRetries,
         AtomicInteger failedRetries,
         Set<String> caseIds,
+        Set<String> trackedStuckCaseIds,
         List<StuckCaseSummaryItem> stuckCasesForManualIntervention
     ) {
         int firstResult = 0;
@@ -166,6 +170,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                     successRetries,
                     failedRetries,
                     caseIds,
+                    trackedStuckCaseIds,
                     stuckCasesForManualIntervention
                 );
             }
@@ -181,6 +186,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         AtomicInteger successRetries,
         AtomicInteger failedRetries,
         Set<String> caseIds,
+        Set<String> trackedStuckCaseIds,
         List<StuckCaseSummaryItem> stuckCasesForManualIntervention
 
     ) {
@@ -197,6 +203,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                                                                                                    successRetries,
                                                                                                    failedRetries,
                                                                                                    caseIds,
+                                                                                                   trackedStuckCaseIds,
                                                                                                    stuckCasesForManualIntervention))
             ).get();
         } catch (InterruptedException ie) {
@@ -216,12 +223,19 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         AtomicInteger successRetries,
         AtomicInteger failedRetries,
         Set<String> caseIds,
+        Set<String> trackedStuckCaseIds,
         List<StuckCaseSummaryItem> stuckCasesForManualIntervention
     ) {
         totalRetries.incrementAndGet();
         try {
             log.info("HandleIncidentRetry: calling retryIncidentSafely {}", incident.getId());
-            if (retryIncidentSafely(incident, serviceAuthorization, caseIds, stuckCasesForManualIntervention)) {
+            if (retryIncidentSafely(
+                incident,
+                serviceAuthorization,
+                caseIds,
+                trackedStuckCaseIds,
+                stuckCasesForManualIntervention
+            )) {
                 successRetries.incrementAndGet();
                 log.info("Successfully retried incident {}: {}", incident.getId(), incident.getProcessInstanceId());
             } else {
@@ -277,6 +291,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private boolean retryIncidentSafely(IncidentDto incident,
                                         String serviceAuthorization,
                                         Set<String> caseIds,
+                                        Set<String> trackedStuckCaseIds,
                                         List<StuckCaseSummaryItem> stuckCasesForManualIntervention) {
         String processInstanceId = incident.getProcessInstanceId();
         Map<String, VariableValueDto> processVariables = fetchProcessVariables(processInstanceId, serviceAuthorization);
@@ -315,6 +330,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                     defaultIfBlank(processInstanceId),
                     defaultIfBlank(failedActivityId)
                 ));
+                trackedStuckCaseIds.add(incidentCaseId);
                 trackStuckCaseEvent(incident, incidentCaseId, stateId, lastEventId, "retry_failed", null);
                 return false;
             }
@@ -326,6 +342,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                     defaultIfBlank(processInstanceId),
                     defaultIfBlank(failedActivityId)
                 ));
+                trackedStuckCaseIds.add(incidentCaseId);
                 trackStuckCaseEvent(incident, incidentCaseId, stateId, lastEventId, "retry_validation_failed", null);
                 return false;
             }
@@ -344,6 +361,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 defaultIfBlank(processInstanceId),
                 defaultIfBlank(incident.getActivityId())
             ));
+            trackedStuckCaseIds.add(incidentCaseId);
             trackStuckCaseEvent(incident, incidentCaseId, stateId, lastEventId, "retry_failed_exception", e.getMessage());
             log.error(
                 "Error retrying incident {} (processInstanceId={}): {}",
@@ -491,6 +509,37 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
         caseTaskTrackingService.trackCaseTask(
             defaultIfBlank(caseId),
+            STUCK_CASE_EVENT_TYPE,
+            STUCK_CASE_EVENT_NAME,
+            additionalProperties
+        );
+    }
+
+    private void trackStuckCasesFromSearchResults(Set<CaseDetails> stuckCases, Set<String> trackedStuckCaseIds) {
+        stuckCases.stream()
+            .map(CaseDetails::getId)
+            .filter(Objects::nonNull)
+            .map(String::valueOf)
+            .sorted()
+            .filter(caseId -> trackedStuckCaseIds.add(caseId))
+            .forEach(this::trackStuckCaseSearchResultEvent);
+    }
+
+    private void trackStuckCaseSearchResultEvent(String caseId) {
+        Map<String, String> additionalProperties = new HashMap<>();
+        additionalProperties.put("processInstanceId", UNKNOWN);
+        additionalProperties.put("incidentId", UNKNOWN);
+        additionalProperties.put("incidentMessage", "Detected by CasesStuckCheckSearchService after incident retry processing");
+        additionalProperties.put(STATE_ID_VARIABLE, UNKNOWN);
+        additionalProperties.put("lastEventId", UNKNOWN);
+        additionalProperties.put("failedActivityId", UNKNOWN);
+        additionalProperties.put("errorLocation", "CasesStuckCheckSearchService");
+        additionalProperties.put("retryStatus", "stuck_case_search");
+        additionalProperties.put("retryExhausted", Boolean.FALSE.toString());
+        additionalProperties.put("jobId", UNKNOWN);
+
+        caseTaskTrackingService.trackCaseTask(
+            caseId,
             STUCK_CASE_EVENT_TYPE,
             STUCK_CASE_EVENT_NAME,
             additionalProperties

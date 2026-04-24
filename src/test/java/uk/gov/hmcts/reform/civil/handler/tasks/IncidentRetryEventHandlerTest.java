@@ -453,6 +453,40 @@ class IncidentRetryEventHandlerTest {
         );
     }
 
+    @Test
+    void shouldTrackIndividualEventsFromCasesStuckCheckResultsWhenNoRetriesFail() {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+            .thenReturn(List.of());
+        when(casesStuckCheckSearchService.getCases("7"))
+            .thenReturn(caseDetailsSet(1777022268539825L, 1777022272949457L));
+
+        handler.handleTask(externalTask);
+
+        verify(caseTaskTrackingService).trackCaseTask(
+            eq("1777022268539825"),
+            eq("incidentRetry"),
+            eq("StuckCaseDetected"),
+            argThat(properties -> "UNKNOWN".equals(properties.get("processInstanceId"))
+                && "UNKNOWN".equals(properties.get("incidentId"))
+                && "Detected by CasesStuckCheckSearchService after incident retry processing"
+                .equals(properties.get("incidentMessage"))
+                && "UNKNOWN".equals(properties.get("stateId"))
+                && "UNKNOWN".equals(properties.get("lastEventId"))
+                && "UNKNOWN".equals(properties.get("failedActivityId"))
+                && "CasesStuckCheckSearchService".equals(properties.get("errorLocation"))
+                && "stuck_case_search".equals(properties.get("retryStatus"))
+                && "false".equals(properties.get("retryExhausted"))
+                && "UNKNOWN".equals(properties.get("jobId")))
+        );
+        verify(caseTaskTrackingService).trackCaseTask(
+            eq("1777022272949457"),
+            eq("incidentRetry"),
+            eq("StuckCaseDetected"),
+            argThat(properties -> "stuck_case_search".equals(properties.get("retryStatus")))
+        );
+    }
+
     // Helper methods
     private ProcessInstanceDto newProcessInstance(String id) {
         ProcessInstanceDto pi = new ProcessInstanceDto();
