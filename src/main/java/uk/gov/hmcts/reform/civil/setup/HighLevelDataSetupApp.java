@@ -79,6 +79,7 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     }
 
     public static void main(String[] args) throws Throwable {
+        System.setProperty("jdk.tls.client.protocols", "TLSv1.2");
         main(HighLevelDataSetupApp.class, args);
     }
 
