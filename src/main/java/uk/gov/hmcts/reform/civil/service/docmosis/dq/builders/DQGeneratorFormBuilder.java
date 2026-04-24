@@ -348,9 +348,8 @@ public class DQGeneratorFormBuilder {
     }
 
     private FurtherInformation getFurtherInformation(DQ dq, CaseData caseData) {
-        String caseReference = caseData.getLegacyCaseReference();
         log.info("DQ document generation - Case: {}, Processing DQ type: {}",
-                 caseReference, dq.getClass().getSimpleName());
+                 caseData.getCcdCaseReference(), dq.getClass().getSimpleName());
 
         Optional<FurtherInformation> dqFurtherInformation = ofNullable(dq.getFurtherInformation());
 
@@ -358,7 +357,7 @@ public class DQGeneratorFormBuilder {
         Respondent1DQ respondent1dq = null;
         if (dq instanceof Respondent1DQ r1dq) {
             respondent1dq = r1dq;
-            log.info("DQ document generation - Case: {}, Processing as Respondent1DQ", caseReference);
+            log.info("DQ document generation - Case: {}, Processing as Respondent1DQ", caseData.getCcdCaseReference());
         }
         Optional<FutureApplications> r1dqFutureApplications = ofNullable(respondent1dq)
             .map(Respondent1DQ::getFutureApplications);
@@ -367,7 +366,7 @@ public class DQGeneratorFormBuilder {
         Applicant1DQ applicant1dq = null;
         if (dq instanceof Applicant1DQ a1dq) {
             applicant1dq = a1dq;
-            log.info("DQ document generation - Case: {}, Processing as Applicant1DQ", caseReference);
+            log.info("DQ document generation - Case: {}, Processing as Applicant1DQ", caseData.getCcdCaseReference());
         }
         Optional<FutureApplications> a1dqFutureApplications = ofNullable(applicant1dq)
             .map(Applicant1DQ::getApplicant1DQFutureApplications);
@@ -381,7 +380,7 @@ public class DQGeneratorFormBuilder {
                 .map(FurtherInformation::getFutureApplications)
         ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(YesOrNo.NO);
         log.info("DQ document generation - Case: {}, Future applications intention: {}",
-                 caseReference, wantMore);
+                 caseData.getCcdCaseReference(), wantMore);
 
         String whatMoreFor = NO.equals(wantMore) ? null :
             Stream.of(
@@ -393,7 +392,7 @@ public class DQGeneratorFormBuilder {
                     .map(FurtherInformation::getReasonForFutureApplications)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
         log.info("DQ document generation - Case: {}, Future applications reason: {}",
-                 caseReference, whatMoreFor != null ? "Present" : "Absent");
+                 caseData.getCcdCaseReference(), whatMoreFor != null ? "Present" : "Absent");
 
         String furtherJudgeInfo = Stream.of(
             Optional.ofNullable(caseData.getApplicantAdditionalInformationForJudge()),
@@ -402,7 +401,7 @@ public class DQGeneratorFormBuilder {
                 .map(FurtherInformation::getOtherInformationForJudge)
         ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
         log.info("DQ document generation - Case: {}, Additional judge information: {}",
-                 caseReference, furtherJudgeInfo != null ? "Present" : "Absent");
+                 caseData.getCcdCaseReference(), furtherJudgeInfo != null ? "Present" : "Absent");
 
         FurtherInformation furtherInformation = new FurtherInformation();
         furtherInformation.setFutureApplications(wantMore);

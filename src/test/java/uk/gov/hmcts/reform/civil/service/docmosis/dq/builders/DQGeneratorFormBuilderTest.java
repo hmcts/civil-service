@@ -250,4 +250,28 @@ class DQGeneratorFormBuilderTest {
         assertNotNull(result);
         assertNull(result.getStatementOfTruthText());
     }
+
+    @Test
+    void shouldPopulateFurtherInformationFromApplicant1DQForClaimantResponse() {
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .applicant1DQ()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicantAdditionalInformationForJudge("Additional info for judge from claimant")
+            .businessProcess(new uk.gov.hmcts.reform.civil.model.BusinessProcess()
+                .setCamundaEvent("CLAIMANT_RESPONSE_SPEC"))
+            .build();
+
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals("Additional info for judge from claimant",
+                     result.getFurtherInformation().getOtherInformationForJudge());
+    }
 }
