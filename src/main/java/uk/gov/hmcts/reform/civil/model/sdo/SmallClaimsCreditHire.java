@@ -21,8 +21,6 @@ public class SmallClaimsCreditHire {
     private String input7;
     private String input11;
     @Future(message = "The date entered must be in the future")
-    private LocalDate date1;
-    @Future(message = "The date entered must be in the future")
     private LocalDate date2;
     @Future(message = "The date entered must be in the future")
     private LocalDate date3;

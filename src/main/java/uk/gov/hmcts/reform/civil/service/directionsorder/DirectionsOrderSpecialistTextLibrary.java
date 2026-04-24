@@ -86,7 +86,7 @@ public final class DirectionsOrderSpecialistTextLibrary {
         "b)   The defendant has permission to rely on the written report of an expert surveyor "
             + "and if that report has not already been served then it must be served by 4pm";
     public static final String HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE =
-        "c)   Where the Defendant has served an expert report, the parties' expert "
+        "c)   Where the Defendant has served an expert report, the experts "
             + "shall liaise to seek to narrow the scope of any disagreement between them and shall, by 4pm";
     public static final String HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE =
         ", send to each party a joint statement setting out areas of agreement, "
@@ -199,19 +199,10 @@ public final class DirectionsOrderSpecialistTextLibrary {
         "The defendant's evidence is to be uploaded to the Digital Portal by 4pm on";
     public static final String CREDIT_HIRE_STATEMENT_PROMPT_SDO =
             """
-                    The claimant must upload to the Digital Portal a witness statement addressing
-                    a) the need to hire a replacement vehicle; and
-                    b) impecuniosity""";
-    public static final String CREDIT_HIRE_STATEMENT_PROMPT_SDO_FAST_TRACK =
-        """
-                The Claimant’s witness statement must address, if relied upon, evidence in support of
-                a) need to hire a replacement vehicle; and
-                b) impecuniosity.""";
+                    The Claimant’s witness statement must address, if relied upon, evidence in support of
+                    a) need to hire a replacement vehicle; and
+                    b) impecuniosity.""";
     public static final String CREDIT_HIRE_NON_COMPLIANCE_SDO =
-        "A failure to comply with the paragraph above will result in the claimant being debarred from asserting "
-            + "need or relying on impecuniosity as the case may be at the final hearing, "
-            + "save with permission of the Trial Judge.";
-    public static final String CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK =
         "Failure to comply with the above paragraphs providing for disclosure and witness evidence on the issues "
             + "of need and impecuniosity will result in the claimant being debarred from asserting need or relying on "
             + "impecuniosity as the case may be at the final hearing, save with permission of the Trial Judge.";
@@ -296,10 +287,12 @@ public final class DirectionsOrderSpecialistTextLibrary {
     /* Small claims – generic Digital Portal paragraphs */
     public static final String SMALL_CLAIMS_DOCUMENTS_UPLOAD =
         "Each party must upload to the Digital Portal copies of all documents which they wish the"
-            + " court to consider when reaching its decision not less than 21 days before the hearing.";
+            + " court to consider when reaching its decision by 4pm on";
     public static final String SMALL_CLAIMS_DOCUMENTS_WARNING =
         "The court may refuse to consider any document which has not been uploaded to the Digital "
             + "Portal by the above date.";
+    public static final String SMALL_CLAIM_WITNESS_STATEMENT_TEXT = "Each party must upload to the Digital Portal copies of all "
+        + "witness statements of the witnesses (including the parties themselves) upon whose evidence they intend to rely at the hearing by 4pm on";
     public static final String SMALL_CLAIMS_WITNESS_DEADLINE =
         "Witness statements shall be uploaded to the Digital Portal by 4pm on";
     public static final String SMALL_CLAIMS_WITNESS_LATE_WARNING =
