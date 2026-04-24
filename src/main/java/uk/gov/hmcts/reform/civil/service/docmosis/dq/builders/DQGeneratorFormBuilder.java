@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq.builders;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
@@ -66,6 +68,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPOND
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DQGeneratorFormBuilder {
@@ -345,34 +348,61 @@ public class DQGeneratorFormBuilder {
     }
 
     private FurtherInformation getFurtherInformation(DQ dq, CaseData caseData) {
+        String caseReference = caseData.getLegacyCaseReference();
+        log.info("DQ document generation - Case: {}, Processing DQ type: {}",
+                 caseReference, dq.getClass().getSimpleName());
+
         Optional<FurtherInformation> dqFurtherInformation = ofNullable(dq.getFurtherInformation());
+
+        // Handle Respondent1DQ
         Respondent1DQ respondent1dq = null;
         if (dq instanceof Respondent1DQ r1dq) {
             respondent1dq = r1dq;
+            log.info("DQ document generation - Case: {}, Processing as Respondent1DQ", caseReference);
         }
         Optional<FutureApplications> r1dqFutureApplications = ofNullable(respondent1dq)
             .map(Respondent1DQ::getFutureApplications);
 
+        // Handle Applicant1DQ
+        Applicant1DQ applicant1dq = null;
+        if (dq instanceof Applicant1DQ a1dq) {
+            applicant1dq = a1dq;
+            log.info("DQ document generation - Case: {}, Processing as Applicant1DQ", caseReference);
+        }
+        Optional<FutureApplications> a1dqFutureApplications = ofNullable(applicant1dq)
+            .map(Applicant1DQ::getApplicant1DQFutureApplications);
+
         YesOrNo wantMore = Stream.of(
             r1dqFutureApplications
+                .map(FutureApplications::getIntentionToMakeFutureApplications),
+            a1dqFutureApplications
                 .map(FutureApplications::getIntentionToMakeFutureApplications),
             dqFurtherInformation
                 .map(FurtherInformation::getFutureApplications)
         ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(YesOrNo.NO);
+        log.info("DQ document generation - Case: {}, Future applications intention: {}",
+                 caseReference, wantMore);
 
         String whatMoreFor = NO.equals(wantMore) ? null :
             Stream.of(
                 r1dqFutureApplications
                     .map(FutureApplications::getWhatWillFutureApplicationsBeMadeFor),
+                a1dqFutureApplications
+                    .map(FutureApplications::getWhatWillFutureApplicationsBeMadeFor),
                 dqFurtherInformation
                     .map(FurtherInformation::getReasonForFutureApplications)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
+        log.info("DQ document generation - Case: {}, Future applications reason: {}",
+                 caseReference, whatMoreFor != null ? "Present" : "Absent");
 
         String furtherJudgeInfo = Stream.of(
+            Optional.ofNullable(caseData.getApplicantAdditionalInformationForJudge()),
             Optional.ofNullable(caseData.getAdditionalInformationForJudge()),
             dqFurtherInformation
                 .map(FurtherInformation::getOtherInformationForJudge)
         ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
+        log.info("DQ document generation - Case: {}, Additional judge information: {}",
+                 caseReference, furtherJudgeInfo != null ? "Present" : "Absent");
 
         FurtherInformation furtherInformation = new FurtherInformation();
         furtherInformation.setFutureApplications(wantMore);
