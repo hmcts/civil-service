@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -47,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DefaultJudgementHandler extends CallbackHandler {
 
     public static final String NOT_VALID_DJ = "The Claim is not eligible for Default Judgment until %s";
@@ -67,6 +69,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showcertifystatement"), this::checkStatus,
+            callbackKey(MID, "abandonOtherRemedy"), this::abandonOtherRemedy,
             callbackKey(MID, "checkPreferredLocations"), this::getLocation,
             callbackKey(MID, "acceptCPR"), this::acceptCPR,
             callbackKey(MID, "HearingSupportRequirementsDJ"), this::validateDateValues,
@@ -188,6 +191,23 @@ public class DefaultJudgementHandler extends CallbackHandler {
         caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse abandonOtherRemedy(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+        var isOtherRemedyAbandoned = caseData.getIsOtherRemedyAbandoned();
+        if (YesOrNo.NO.equals(isOtherRemedyAbandoned)) {
+            errors.add("This feature is not available, please see guidance below");
+        } else if (YesOrNo.YES.equals(isOtherRemedyAbandoned)) {
+            caseData.setOtherRemedyAbandonedDate(LocalDate.now());
+        } else {
+            errors.add("Are you confirming that you are abandoning your request for an other remedy (e.g. injunction, rescission, declaration)?  is required");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 
