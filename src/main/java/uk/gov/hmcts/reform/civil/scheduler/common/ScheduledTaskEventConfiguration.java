@@ -10,6 +10,7 @@ public class ScheduledTaskEventConfiguration {
     String caseProcessedEvent;
     String caseFailedEvent;
     String jobCompletedEvent;
+    String jobAbortedEvent;
 
     public ScheduledTaskEventConfiguration(String schedulerName) {
         this.schedulerName = schedulerName;
@@ -17,5 +18,6 @@ public class ScheduledTaskEventConfiguration {
         this.caseProcessedEvent = schedulerName + "CaseProcessed";
         this.caseFailedEvent = schedulerName + "CaseFailed";
         this.jobCompletedEvent = schedulerName + "JobCompleted";
+        this.jobAbortedEvent = schedulerName + "JobAborted";
     }
 }
