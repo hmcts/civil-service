@@ -32,7 +32,7 @@ public class DjCreditHireDirectionsService {
             .setInput3(CREDIT_HIRE_STATEMENT_DEADLINE_DJ)
             .setDate1(deadlineService.nextWorkingDayInWeeks(8))
             .setInput4(CREDIT_HIRE_NON_COMPLIANCE_DJ)
-            .setDate2(deadlineService.nextWorkingDayInWeeks(10))
+            .setDate2(deadlineService.nextWorkingDayInWeeks(6))
             .setInput5(CREDIT_HIRE_PARTIES_LIAISE);
 
         return new SdoDJR2TrialCreditHire()

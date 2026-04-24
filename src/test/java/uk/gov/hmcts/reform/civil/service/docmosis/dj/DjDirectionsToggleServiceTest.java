@@ -36,7 +36,7 @@ class DjDirectionsToggleServiceTest {
     @Test
     void shouldDetectEmployerLiability() {
         assertThat(service.hasEmployerLiability(
-            List.of(CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsEmployersLiability)
+            List.of(CaseManagementOrderAdditional.ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_EMPLOYERS_LIABILITY)
         )).isTrue();
     }
 }

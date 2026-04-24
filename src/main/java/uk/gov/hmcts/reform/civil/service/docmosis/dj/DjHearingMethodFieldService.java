@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import static uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ.disposalHearingMethodInPerson;
+import static uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_IN_PERSON;
 
 /**
  * Encapsulates telephone/video organiser strings and "in person" guards for DJ templates.
@@ -43,6 +43,6 @@ public class DjHearingMethodFieldService {
     }
 
     public boolean isInPerson(DisposalHearingMethodDJ method) {
-        return method != null && method.equals(disposalHearingMethodInPerson);
+        return method != null && method.equals(DISPOSAL_HEARING_METHOD_IN_PERSON);
     }
 }

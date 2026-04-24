@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 
 import java.time.LocalDate;
@@ -36,19 +35,15 @@ class HearingDocumentDeadlineParamsBuilderTest {
     }
 
     @Test
-    void shouldReturnFastTrackDisclosureDate() {
+    void shouldReturnEmptyForFastTrackDisclosureDate() {
         CaseData caseData = mock(CaseData.class);
-        FastTrackDisclosureOfDocuments fastTrackDisclosure = mock(FastTrackDisclosureOfDocuments.class);
-        LocalDate expectedDate = LocalDate.of(2023, 10, 20);
 
         when(sdoCaseClassificationService.isSmallClaimsTrack(caseData)).thenReturn(false);
         when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
-        when(caseData.getFastTrackDisclosureOfDocuments()).thenReturn(fastTrackDisclosure);
-        when(fastTrackDisclosure.getDate3()).thenReturn(expectedDate);
 
         Optional<LocalDate> result = builder.getHearingDocumentDeadline(caseData);
 
-        assertThat(result).contains(expectedDate);
+        assertThat(result).isEmpty();
     }
 
     @Test

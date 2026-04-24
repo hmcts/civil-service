@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.validation;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
@@ -14,19 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import jakarta.validation.Validator;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Component
-@RequiredArgsConstructor
 public class UnavailableDateValidator implements
     ConstraintValidator<IsPresentOrEqualToOrLessThanOneYearInTheFuture, UnavailableDate> {
 
     private static final String DETAILS_OF_UNAVAILABLE_DATE_REQUIRED = "Details of unavailable date required";
-    private final Validator validator;
+    private static final String DATES_MUST_BE_WITHIN_NEXT_12_MONTHS = "Dates must be within the next 12 months.";
+    private static final String UNAVAILABLE_DATE_CANNOT_BE_PAST = "Unavailable Date cannot be past date";
+    private static final String FROM_DATE_SHOULD_BE_LESS_THAN_TO_DATE = "From Date should be less than To Date";
+    private static final String FIRST_PAYMENT_DATE_ERROR = "Date of first payment must be today or within the next 12 months";
 
     @Override
     public boolean isValid(UnavailableDate value, ConstraintValidatorContext context) {
@@ -115,44 +115,68 @@ public class UnavailableDateValidator implements
 
     private List<String> dateValidation(List<Element<UnavailableDate>> unavailableDate) {
         List<String> errors = new ArrayList<>();
-        unavailableDate.forEach(element -> {
-            UnavailableDate unavailableDateElement = element.getValue();
-            if (UnavailableDateType.SINGLE_DATE == unavailableDateElement.getUnavailableDateType()
-                && unavailableDateElement.getDate() == null) {
-                errors.add(DETAILS_OF_UNAVAILABLE_DATE_REQUIRED);
-            }
-            if (UnavailableDateType.DATE_RANGE == unavailableDateElement.getUnavailableDateType()) {
-                if (unavailableDateElement.getFromDate() == null
-                    || unavailableDateElement.getToDate() == null) {
-                    errors.add(DETAILS_OF_UNAVAILABLE_DATE_REQUIRED);
-                }
-            }
-            if (checkOneYearValidation(unavailableDateElement.getDate())
-                || checkOneYearValidation(unavailableDateElement.getFromDate())
-                || checkOneYearValidation(unavailableDateElement.getToDate())
-            ) {
-                errors.add("Dates must be within the next 12 months.");
-            } else if (checkPastDateValidation(unavailableDateElement.getDate())
-                ||
-                checkPastDateValidation(unavailableDateElement.getToDate())
-                ||
-                checkPastDateValidation(unavailableDateElement.getFromDate())) {
-                errors.add("Unavailable Date cannot be past date");
-            } else if (unavailableDateElement.getFromDate() != null
-                && unavailableDateElement.getToDate() != null
-                && unavailableDateElement.getFromDate()
-                .isAfter(unavailableDateElement.getToDate())) {
-                errors.add("From Date should be less than To Date");
-            }
-        });
+        unavailableDate.forEach(element -> validateUnavailableDate(errors, element.getValue()));
         return errors;
+    }
+
+    private void validateUnavailableDate(List<String> errors, UnavailableDate unavailableDate) {
+        addMissingDateError(errors, unavailableDate);
+        addDateRangeErrors(errors, unavailableDate);
+    }
+
+    private void addMissingDateError(List<String> errors, UnavailableDate unavailableDate) {
+        if (hasMissingDate(unavailableDate)) {
+            errors.add(DETAILS_OF_UNAVAILABLE_DATE_REQUIRED);
+        }
+    }
+
+    private void addDateRangeErrors(List<String> errors, UnavailableDate unavailableDate) {
+        if (hasDateBeyondOneYear(unavailableDate)) {
+            errors.add(DATES_MUST_BE_WITHIN_NEXT_12_MONTHS);
+        } else if (hasPastDate(unavailableDate)) {
+            errors.add(UNAVAILABLE_DATE_CANNOT_BE_PAST);
+        } else if (hasInvalidDateRangeOrder(unavailableDate)) {
+            errors.add(FROM_DATE_SHOULD_BE_LESS_THAN_TO_DATE);
+        }
+    }
+
+    private boolean hasMissingDate(UnavailableDate unavailableDate) {
+        return hasMissingSingleDate(unavailableDate) || hasMissingDateRange(unavailableDate);
+    }
+
+    private boolean hasMissingSingleDate(UnavailableDate unavailableDate) {
+        return UnavailableDateType.SINGLE_DATE == unavailableDate.getUnavailableDateType()
+            && unavailableDate.getDate() == null;
+    }
+
+    private boolean hasMissingDateRange(UnavailableDate unavailableDate) {
+        return UnavailableDateType.DATE_RANGE == unavailableDate.getUnavailableDateType()
+            && (unavailableDate.getFromDate() == null || unavailableDate.getToDate() == null);
+    }
+
+    private boolean hasDateBeyondOneYear(UnavailableDate unavailableDate) {
+        return checkOneYearValidation(unavailableDate.getDate())
+            || checkOneYearValidation(unavailableDate.getFromDate())
+            || checkOneYearValidation(unavailableDate.getToDate());
+    }
+
+    private boolean hasPastDate(UnavailableDate unavailableDate) {
+        return checkPastDateValidation(unavailableDate.getDate())
+            || checkPastDateValidation(unavailableDate.getToDate())
+            || checkPastDateValidation(unavailableDate.getFromDate());
+    }
+
+    private boolean hasInvalidDateRangeOrder(UnavailableDate unavailableDate) {
+        return unavailableDate.getFromDate() != null
+            && unavailableDate.getToDate() != null
+            && unavailableDate.getFromDate().isAfter(unavailableDate.getToDate());
     }
 
     public List<String> validateFuturePaymentDate(LocalDate paymentDate) {
         List<String> errors = new ArrayList<>();
 
         if (checkOneYearValidation(paymentDate) || checkPastDateValidation(paymentDate)) {
-            errors.add("Date of first payment must be today or within the next 12 months");
+            errors.add(FIRST_PAYMENT_DATE_ERROR);
         }
         return errors;
     }

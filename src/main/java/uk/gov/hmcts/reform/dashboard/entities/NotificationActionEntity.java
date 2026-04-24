@@ -1,21 +1,18 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.ToString;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @lombok.Data
 @lombok.NoArgsConstructor
@@ -47,9 +44,7 @@ public class NotificationActionEntity implements Serializable {
     @Schema(name = "created_at")
     private OffsetDateTime createdAt;
 
-    @ToString.Exclude
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "dashboard_notifications_id", referencedColumnName = "id")
+    @Column(name = "dashboard_notifications_id")
     @Schema(name = "dashboard_notifications_id")
-    private DashboardNotificationsEntity dashboardNotification;
+    private UUID dashboardNotificationId;
 }

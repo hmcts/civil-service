@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -36,22 +37,23 @@ public class Notification {
 
     private LocalDateTime deadline;
 
-    public static Notification from(DashboardNotificationsEntity dashboardNotificationsEntity) {
+    public static Notification from(DashboardNotificationsEntity entity, NotificationActionEntity latestAction) {
         Notification notification = new Notification(
-            dashboardNotificationsEntity.getId(),
-            dashboardNotificationsEntity.getTitleEn(),
-            dashboardNotificationsEntity.getTitleCy(),
-            dashboardNotificationsEntity.getDescriptionEn(),
-            dashboardNotificationsEntity.getDescriptionCy(),
-            dashboardNotificationsEntity.getTimeToLive(),
+            entity.getId(),
+            entity.getTitleEn(),
+            entity.getTitleCy(),
+            entity.getDescriptionEn(),
+            entity.getDescriptionCy(),
+            entity.getTimeToLive(),
             null,
-            dashboardNotificationsEntity.getParams(),
-            dashboardNotificationsEntity.getCreatedAt(),
-            dashboardNotificationsEntity.getDeadline()
+            entity.getParams(),
+            entity.getCreatedAt(),
+            entity.getDeadline()
         );
 
-        Optional.ofNullable(dashboardNotificationsEntity.getNotificationAction())
+        Optional.ofNullable(latestAction)
             .ifPresent(action -> notification.setNotificationAction(NotificationAction.from(action)));
+
         return notification;
     }
 }

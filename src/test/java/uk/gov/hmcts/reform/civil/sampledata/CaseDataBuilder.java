@@ -3005,7 +3005,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialSDOInPersonHearing() {
-        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodInPerson;
+        trialHearingMethodDJ = DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_IN_PERSON;
         return this;
     }
 
@@ -3016,7 +3016,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialSDOTelephoneHearing() {
-        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing;
+        trialHearingMethodDJ = DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_TELEPHONE_HEARING;
         return this;
     }
 
@@ -3027,7 +3027,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialSDOVideoHearing() {
-        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing;
+        trialHearingMethodDJ = DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_VIDEO_CONFERENCE_HEARING;
         return this;
     }
 
@@ -3127,7 +3127,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedDisposalSDOVideoCall() {
-        disposalHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing;
+        disposalHearingMethodDJ = DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_VIDEO_CONFERENCE_HEARING;
         return this;
     }
 
