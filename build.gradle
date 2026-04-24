@@ -271,7 +271,7 @@ tasks.register('highLevelDataSetup', JavaExec) {
   dependsOn buildCcdDefinitionsXls, camundaHighLevelDataSetup, loadCivilWiremockMappings
   mainClass.set("uk.gov.hmcts.reform.civil.setup.HighLevelDataSetupApp")
   classpath += sourceSets.main.runtimeClasspath
-  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED','-Djdk.tls.client.protocols=TLSv1.2']
 }
 
 def waitForCivilService = tasks.register('waitForCivilService', Exec) {
