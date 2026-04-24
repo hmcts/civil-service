@@ -11,8 +11,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 import uk.gov.hmcts.reform.civil.service.search.CasesStuckCheckSearchService;
 
@@ -54,6 +59,12 @@ class IncidentRetryEventHandlerTest {
 
     @Mock
     private CaseTaskTrackingService caseTaskTrackingService;
+
+    @Mock
+    private CoreCaseDataService coreCaseDataService;
+
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
 
     @InjectMocks
     private IncidentRetryEventHandler handler;
@@ -460,6 +471,8 @@ class IncidentRetryEventHandlerTest {
             .thenReturn(List.of());
         when(casesStuckCheckSearchService.getCases("7"))
             .thenReturn(caseDetailsSet(1777022268539825L, 1777022272949457L));
+        mockSearchCaseEnrichment("1777022268539825", "proc-search-1", "inc-search-1", "activity-search-1", "EVENT_1");
+        mockSearchCaseEnrichment("1777022272949457", "proc-search-2", "inc-search-2", "activity-search-2", "EVENT_2");
 
         handler.handleTask(externalTask);
 
@@ -467,13 +480,12 @@ class IncidentRetryEventHandlerTest {
             eq("1777022268539825"),
             eq("incidentRetry"),
             eq("StuckCaseDetected"),
-            argThat(properties -> "UNKNOWN".equals(properties.get("processInstanceId"))
-                && "UNKNOWN".equals(properties.get("incidentId"))
-                && "Detected by CasesStuckCheckSearchService after incident retry processing"
-                .equals(properties.get("incidentMessage"))
-                && "UNKNOWN".equals(properties.get("stateId"))
-                && "UNKNOWN".equals(properties.get("lastEventId"))
-                && "UNKNOWN".equals(properties.get("failedActivityId"))
+            argThat(properties -> "proc-search-1".equals(properties.get("processInstanceId"))
+                && "inc-search-1".equals(properties.get("incidentId"))
+                && "UNKNOWN".equals(properties.get("incidentMessage"))
+                && "CASE_PROGRESSION".equals(properties.get("stateId"))
+                && "EVENT_1".equals(properties.get("lastEventId"))
+                && "activity-search-1".equals(properties.get("failedActivityId"))
                 && "CasesStuckCheckSearchService".equals(properties.get("errorLocation"))
                 && "stuck_case_search".equals(properties.get("retryStatus"))
                 && "false".equals(properties.get("retryExhausted"))
@@ -483,7 +495,11 @@ class IncidentRetryEventHandlerTest {
             eq("1777022272949457"),
             eq("incidentRetry"),
             eq("StuckCaseDetected"),
-            argThat(properties -> "stuck_case_search".equals(properties.get("retryStatus")))
+            argThat(properties -> "proc-search-2".equals(properties.get("processInstanceId"))
+                && "inc-search-2".equals(properties.get("incidentId"))
+                && "EVENT_2".equals(properties.get("lastEventId"))
+                && "activity-search-2".equals(properties.get("failedActivityId"))
+                && "stuck_case_search".equals(properties.get("retryStatus")))
         );
     }
 
@@ -521,5 +537,29 @@ class IncidentRetryEventHandlerTest {
         return java.util.Arrays.stream(ids)
             .map(id -> CaseDetails.builder().id(id).build())
             .collect(java.util.stream.Collectors.toSet());
+    }
+
+    private void mockSearchCaseEnrichment(String caseId,
+                                          String processInstanceId,
+                                          String incidentId,
+                                          String activityId,
+                                          String camundaEvent) {
+        CaseDetails caseDetails = CaseDetails.builder().id(Long.valueOf(caseId)).build();
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(Long.valueOf(caseId))
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .businessProcess(new BusinessProcess()
+                .setProcessInstanceId(processInstanceId)
+                .setActivityId(activityId)
+                .setCamundaEvent(camundaEvent))
+            .build();
+        IncidentDto incident = newIncident(processInstanceId, incidentId, "job-" + incidentId);
+        incident.setActivityId(activityId);
+
+        when(coreCaseDataService.getCase(Long.valueOf(caseId))).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq(processInstanceId), any(), any(), anyInt()
+        )).thenReturn(List.of(incident));
     }
 }

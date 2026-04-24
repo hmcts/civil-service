@@ -10,8 +10,12 @@ import org.camunda.community.rest.client.model.VariableValueDto;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 import uk.gov.hmcts.reform.civil.service.search.CasesStuckCheckSearchService;
 
@@ -40,10 +44,22 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private record StuckCaseSummaryItem(String caseId, String incidentId, String processInstanceId, String failedActivityId) {
     }
 
+    private record StuckCaseSearchEnrichment(
+        String processInstanceId,
+        String incidentId,
+        String incidentMessage,
+        String stateId,
+        String lastEventId,
+        String failedActivityId
+    ) {
+    }
+
     private final CasesStuckCheckSearchService casesStuckCheckSearchService;
     private final CamundaRuntimeApi camundaRuntimeApi;
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseTaskTrackingService caseTaskTrackingService;
+    private final CoreCaseDataService coreCaseDataService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     private static final int MAX_THREADS = 10;
     private static final String CASE_ID_VARIABLE = "caseId";
@@ -108,7 +124,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
         String stuckCasesFromPastDays = externalTask.getVariable("stuckCasesFromPastDays");
         Set<CaseDetails> stuckCases = casesStuckCheckSearchService.getCases(stuckCasesFromPastDays != null ? stuckCasesFromPastDays : "7");
-        trackStuckCasesFromSearchResults(stuckCases, trackedStuckCaseIds);
+        trackStuckCasesFromSearchResults(stuckCases, trackedStuckCaseIds, serviceAuthorization);
 
         trackDailyStuckCasesSummary(
             incidentStartTime,
@@ -515,24 +531,27 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         );
     }
 
-    private void trackStuckCasesFromSearchResults(Set<CaseDetails> stuckCases, Set<String> trackedStuckCaseIds) {
+    private void trackStuckCasesFromSearchResults(Set<CaseDetails> stuckCases,
+                                                  Set<String> trackedStuckCaseIds,
+                                                  String serviceAuthorization) {
         stuckCases.stream()
             .map(CaseDetails::getId)
             .filter(Objects::nonNull)
             .map(String::valueOf)
             .sorted()
             .filter(caseId -> trackedStuckCaseIds.add(caseId))
-            .forEach(this::trackStuckCaseSearchResultEvent);
+            .forEach(caseId -> trackStuckCaseSearchResultEvent(caseId, serviceAuthorization));
     }
 
-    private void trackStuckCaseSearchResultEvent(String caseId) {
+    private void trackStuckCaseSearchResultEvent(String caseId, String serviceAuthorization) {
+        StuckCaseSearchEnrichment enrichment = enrichStuckCaseFromSearch(caseId, serviceAuthorization);
         Map<String, String> additionalProperties = new HashMap<>();
-        additionalProperties.put("processInstanceId", UNKNOWN);
-        additionalProperties.put("incidentId", UNKNOWN);
-        additionalProperties.put("incidentMessage", "Detected by CasesStuckCheckSearchService after incident retry processing");
-        additionalProperties.put(STATE_ID_VARIABLE, UNKNOWN);
-        additionalProperties.put("lastEventId", UNKNOWN);
-        additionalProperties.put("failedActivityId", UNKNOWN);
+        additionalProperties.put("processInstanceId", enrichment.processInstanceId());
+        additionalProperties.put("incidentId", enrichment.incidentId());
+        additionalProperties.put("incidentMessage", enrichment.incidentMessage());
+        additionalProperties.put(STATE_ID_VARIABLE, enrichment.stateId());
+        additionalProperties.put("lastEventId", enrichment.lastEventId());
+        additionalProperties.put("failedActivityId", enrichment.failedActivityId());
         additionalProperties.put("errorLocation", "CasesStuckCheckSearchService");
         additionalProperties.put("retryStatus", "stuck_case_search");
         additionalProperties.put("retryExhausted", Boolean.FALSE.toString());
@@ -544,6 +563,78 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             STUCK_CASE_EVENT_NAME,
             additionalProperties
         );
+    }
+
+    private StuckCaseSearchEnrichment enrichStuckCaseFromSearch(String caseId, String serviceAuthorization) {
+        try {
+            CaseDetails caseDetails = coreCaseDataService.getCase(Long.parseLong(caseId));
+            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+            BusinessProcess businessProcess = caseData.getBusinessProcess();
+
+            String processInstanceId = businessProcess != null
+                ? defaultIfBlank(businessProcess.getProcessInstanceId())
+                : UNKNOWN;
+            String failedActivityId = businessProcess != null
+                ? defaultIfBlank(businessProcess.getActivityId())
+                : UNKNOWN;
+            String lastEventId = businessProcess != null
+                ? defaultIfBlank(businessProcess.getCamundaEvent())
+                : UNKNOWN;
+            String stateId = caseData.getCcdState() != null ? caseData.getCcdState().name() : UNKNOWN;
+
+            if (UNKNOWN.equals(processInstanceId)) {
+                return new StuckCaseSearchEnrichment(
+                    UNKNOWN,
+                    UNKNOWN,
+                    "Detected by CasesStuckCheckSearchService after incident retry processing",
+                    stateId,
+                    lastEventId,
+                    failedActivityId
+                );
+            }
+
+            List<IncidentDto> incidents = camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+                serviceAuthorization,
+                true,
+                processInstanceId,
+                "incidentTimestamp",
+                "desc",
+                1
+            );
+
+            if (incidents.isEmpty()) {
+                return new StuckCaseSearchEnrichment(
+                    processInstanceId,
+                    UNKNOWN,
+                    "Detected by CasesStuckCheckSearchService after incident retry processing",
+                    stateId,
+                    lastEventId,
+                    failedActivityId
+                );
+            }
+
+            IncidentDto incident = incidents.get(0);
+            return new StuckCaseSearchEnrichment(
+                processInstanceId,
+                defaultIfBlank(incident.getId()),
+                defaultIfBlank(incident.getIncidentMessage()),
+                stateId,
+                lastEventId,
+                !UNKNOWN.equals(defaultIfBlank(incident.getActivityId()))
+                    ? defaultIfBlank(incident.getActivityId())
+                    : failedActivityId
+            );
+        } catch (Exception e) {
+            log.warn("Could not enrich stuck case {} from search results", caseId, e);
+            return new StuckCaseSearchEnrichment(
+                UNKNOWN,
+                UNKNOWN,
+                "Detected by CasesStuckCheckSearchService after incident retry processing",
+                UNKNOWN,
+                UNKNOWN,
+                UNKNOWN
+            );
+        }
     }
 
     private void trackDailyStuckCasesSummary(String incidentStartTime,
