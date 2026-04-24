@@ -9,6 +9,7 @@ import org.camunda.community.rest.client.model.ProcessInstanceDto;
 import org.camunda.community.rest.client.model.VariableValueDto;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
@@ -101,19 +102,20 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             caseIds
         );
 
+        log.info("Call cases stuck check search service to log cases being stuck in app insights");
+
+        String stuckCasesFromPastDays = externalTask.getVariable("stuckCasesFromPastDays");
+        Set<CaseDetails> stuckCases = casesStuckCheckSearchService.getCases(stuckCasesFromPastDays != null ? stuckCasesFromPastDays : "7");
+
         trackDailyStuckCasesSummary(
             incidentStartTime,
             incidentEndTime,
             totalRetries.get(),
             successRetries.get(),
             failedRetries.get(),
+            stuckCases,
             stuckCasesForManualIntervention
         );
-
-        log.info("Call cases stuck check search service to log cases being stuck in app insights");
-
-        String stuckCasesFromPastDays = externalTask.getVariable("stuckCasesFromPastDays");
-        casesStuckCheckSearchService.getCases(stuckCasesFromPastDays != null ? stuckCasesFromPastDays : "7");
 
         return new ExternalTaskData();
     }
@@ -500,13 +502,16 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                                              int totalRetries,
                                              int successRetries,
                                              int failedRetries,
+                                             Set<CaseDetails> stuckCases,
                                              List<StuckCaseSummaryItem> stuckCasesForManualIntervention) {
-        if (stuckCasesForManualIntervention.isEmpty()) {
+        if (stuckCases.isEmpty()) {
             return;
         }
 
-        List<String> failedCaseIds = stuckCasesForManualIntervention.stream()
-            .map(StuckCaseSummaryItem::caseId)
+        List<String> stuckCaseIds = stuckCases.stream()
+            .map(CaseDetails::getId)
+            .filter(Objects::nonNull)
+            .map(String::valueOf)
             .distinct()
             .sorted()
             .toList();
@@ -533,20 +538,20 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         additionalProperties.put("incidentStartTime", incidentStartTime);
         additionalProperties.put("incidentEndTime", incidentEndTime);
         additionalProperties.put("manualInterventionRequired", Boolean.TRUE.toString());
-        additionalProperties.put("stuckCaseCount", String.valueOf(failedCaseIds.size()));
+        additionalProperties.put("stuckCaseCount", String.valueOf(stuckCaseIds.size()));
         additionalProperties.put("failedIncidentCount", String.valueOf(failedIncidentIds.size()));
         additionalProperties.put("totalRetries", String.valueOf(totalRetries));
         additionalProperties.put("successRetries", String.valueOf(successRetries));
         additionalProperties.put("failedRetries", String.valueOf(failedRetries));
-        additionalProperties.put("caseIds", String.join(",", failedCaseIds));
+        additionalProperties.put("caseIds", String.join(",", stuckCaseIds));
         additionalProperties.put("incidentIds", String.join(",", failedIncidentIds));
         additionalProperties.put("processInstanceIds", String.join(",", failedProcessInstanceIds));
         additionalProperties.put("failedActivityIds", String.join(",", failedActivityIds));
 
         log.info(
             "Incident retry daily summary: Found {} stuck case(s) requiring manual intervention with ids {}",
-            failedCaseIds.size(),
-            failedCaseIds
+            stuckCaseIds.size(),
+            stuckCaseIds
         );
 
         caseTaskTrackingService.trackCaseTask(

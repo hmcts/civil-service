@@ -10,14 +10,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 import uk.gov.hmcts.reform.civil.service.search.CasesStuckCheckSearchService;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -75,6 +78,7 @@ class IncidentRetryEventHandlerTest {
 
         when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
             .thenReturn(List.of());
+        when(casesStuckCheckSearchService.getCases("8")).thenReturn(Collections.emptySet());
 
         handler.handleTask(externalTask);
 
@@ -88,6 +92,7 @@ class IncidentRetryEventHandlerTest {
 
         when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
             .thenReturn(List.of());
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(Collections.emptySet());
 
         handler.handleTask(externalTask);
 
@@ -104,6 +109,7 @@ class IncidentRetryEventHandlerTest {
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
         when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
         when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(Collections.emptySet());
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
@@ -127,6 +133,7 @@ class IncidentRetryEventHandlerTest {
         when(camundaRuntimeApi.queryProcessInstances(
             any(), eq(0), eq(50), any(), any(), anyMap()
         )).thenReturn(processInstances);
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(Collections.emptySet());
 
         for (ProcessInstanceDto pi : processInstances) {
             IncidentDto incident = newIncident(pi.getId(), "inc-" + pi.getId(), "job-" + pi.getId());
@@ -166,14 +173,16 @@ class IncidentRetryEventHandlerTest {
         incident.setIncidentMessage("422 - already processed"); // KEY FOR THIS TEST
 
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
-
-        when(externalTask.getVariable(any()))
-            .thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentMessageLike")).thenReturn(null);
+        when(externalTask.getVariable("stuckCasesFromPastDays")).thenReturn("7");
 
         // 1 process instance returned
         when(camundaRuntimeApi.queryProcessInstances(
             any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
             .thenReturn(List.of(pi));
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(Collections.emptySet());
 
         // Incident returned with message "already processed"
         doReturn(List.of(incident), List.of()).when(camundaRuntimeApi).getLatestOpenIncidentForProcessInstance(
@@ -209,6 +218,7 @@ class IncidentRetryEventHandlerTest {
         when(camundaRuntimeApi.queryProcessInstances(
             any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()
         )).thenReturn(List.of(pi));
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(Collections.emptySet());
 
         when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
             any(), anyBoolean(), eq(pi.getId()), any(), any(), anyInt()
@@ -232,6 +242,7 @@ class IncidentRetryEventHandlerTest {
         when(camundaRuntimeApi.queryProcessInstances(
             any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()
         )).thenReturn(List.of(pi));
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(caseDetailsSet(1777000000000001L));
 
         when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
             any(), anyBoolean(), eq(pi.getId()), any(), any(), anyInt()
@@ -275,7 +286,7 @@ class IncidentRetryEventHandlerTest {
                 && "1".equals(properties.get("totalRetries"))
                 && "0".equals(properties.get("successRetries"))
                 && "1".equals(properties.get("failedRetries"))
-                && "case-proc1".equals(properties.get("caseIds"))
+                && "1777000000000001".equals(properties.get("caseIds"))
                 && "inc1".equals(properties.get("incidentIds"))
                 && "proc1".equals(properties.get("processInstanceIds"))
                 && "activity1".equals(properties.get("failedActivityIds")))
@@ -294,6 +305,7 @@ class IncidentRetryEventHandlerTest {
         when(camundaRuntimeApi.queryProcessInstances(
             any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()
         )).thenReturn(List.of(pi));
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(caseDetailsSet(1777000000000001L));
 
         doReturn(List.of(incident), List.of(incident)).when(camundaRuntimeApi).getLatestOpenIncidentForProcessInstance(
             any(), anyBoolean(), eq(pi.getId()), any(), any(), anyInt()
@@ -321,7 +333,7 @@ class IncidentRetryEventHandlerTest {
             argThat(properties -> "1".equals(properties.get("stuckCaseCount"))
                 && "0".equals(properties.get("successRetries"))
                 && "1".equals(properties.get("failedRetries"))
-                && "case-proc1".equals(properties.get("caseIds")))
+                && "1777000000000001".equals(properties.get("caseIds")))
         );
     }
 
@@ -338,6 +350,7 @@ class IncidentRetryEventHandlerTest {
         when(camundaRuntimeApi.queryProcessInstances(
             any(), eq(0), eq(50), any(), any(), anyMap()
         )).thenReturn(processInstances);
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(caseDetailsSet(1777000000000001L, 1777000000000002L));
 
         IncidentDto incident1 = newIncident("proc1", "inc1", "job1");
         IncidentDto incident2 = newIncident("proc2", "inc2", "job2");
@@ -369,7 +382,7 @@ class IncidentRetryEventHandlerTest {
                 && "2".equals(properties.get("totalRetries"))
                 && "0".equals(properties.get("successRetries"))
                 && "2".equals(properties.get("failedRetries"))
-                && "case-proc1,case-proc2".equals(properties.get("caseIds"))
+                && "1777000000000001,1777000000000002".equals(properties.get("caseIds"))
                 && "inc1,inc2".equals(properties.get("incidentIds"))
                 && "proc1,proc2".equals(properties.get("processInstanceIds"))
                 && "activity1".equals(properties.get("failedActivityIds")))
@@ -383,6 +396,7 @@ class IncidentRetryEventHandlerTest {
         when(externalTask.getVariable("incidentEndTime")).thenReturn(null);
         when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
             .thenReturn(List.of()); // no instances, just to exit early
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(Collections.emptySet());
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
@@ -396,7 +410,11 @@ class IncidentRetryEventHandlerTest {
         IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
 
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
-        when(externalTask.getVariable(any())).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentMessageLike")).thenReturn(null);
+        when(externalTask.getVariable("stuckCasesFromPastDays")).thenReturn("7");
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(Collections.emptySet());
 
         when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
             .thenReturn(List.of(pi));
@@ -407,6 +425,32 @@ class IncidentRetryEventHandlerTest {
         handler.handleTask(externalTask);
 
         verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
+    }
+
+    @Test
+    void shouldTrackDailySummaryFromCasesStuckCheckResultsWhenNoRetriesFail() {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+            .thenReturn(List.of());
+        when(casesStuckCheckSearchService.getCases("7"))
+            .thenReturn(caseDetailsSet(1777022268539825L, 1777022272949457L));
+
+        handler.handleTask(externalTask);
+
+        verify(caseTaskTrackingService).trackCaseTask(
+            eq("MULTIPLE"),
+            eq("incidentRetryDailySummary"),
+            eq("StuckCasesDailyDigest"),
+            argThat(properties -> "2".equals(properties.get("stuckCaseCount"))
+                && "0".equals(properties.get("failedIncidentCount"))
+                && "0".equals(properties.get("totalRetries"))
+                && "0".equals(properties.get("successRetries"))
+                && "0".equals(properties.get("failedRetries"))
+                && "1777022268539825,1777022272949457".equals(properties.get("caseIds"))
+                && "".equals(properties.get("incidentIds"))
+                && "".equals(properties.get("processInstanceIds"))
+                && "".equals(properties.get("failedActivityIds")))
+        );
     }
 
     // Helper methods
@@ -437,5 +481,11 @@ class IncidentRetryEventHandlerTest {
         VariableValueDto variable = new VariableValueDto();
         variable.setValue(value);
         return variable;
+    }
+
+    private Set<CaseDetails> caseDetailsSet(Long... ids) {
+        return java.util.Arrays.stream(ids)
+            .map(id -> CaseDetails.builder().id(id).build())
+            .collect(java.util.stream.Collectors.toSet());
     }
 }
