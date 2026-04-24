@@ -57,12 +57,15 @@ spring:
     baseline-on-migrate: true
 
 scheduler:
+  lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT10M}
+  lockAtMostFor: ${LOCK_AT_MOST_FOR:PT20M}
+  defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT30M}
   judgement-buffer:
     cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 2 * * *}
     enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:true}
-    lockAtLeastFor: ${LOCK_AT_LEAST_FOR_JUDGEMENT_BUFFER:PT10M}
-    lockAtMostFor: ${LOCK_AT_MOST_FOR_JUDGEMENT_BUFFER:PT20M}
-    defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR_JUDGEMENT_BUFFER:PT30M}
+  defendant-response:
+    cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
+    enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:true}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}

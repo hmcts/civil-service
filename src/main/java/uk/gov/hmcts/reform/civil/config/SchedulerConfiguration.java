@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
 @EnableScheduling
-@EnableSchedulerLock(defaultLockAtMostFor = "${scheduler.judgement-buffer.defaultLockAtMostFor}")
+@EnableSchedulerLock(defaultLockAtMostFor = "${scheduler.defaultLockAtMostFor}")
 public class SchedulerConfiguration {
 
     @Bean
