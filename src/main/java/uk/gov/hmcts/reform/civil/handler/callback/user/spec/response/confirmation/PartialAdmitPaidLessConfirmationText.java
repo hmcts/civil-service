@@ -17,8 +17,10 @@ public class PartialAdmitPaidLessConfirmationText implements RespondToClaimConfi
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
+        if ((!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && !RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
+            || (NO.equals(caseData.getSpecDefenceAdmittedRequired())
+            && NO.equals(caseData.getSpecDefenceAdmitted2Required()))) {
             return Optional.empty();
         }
         BigDecimal howMuchWasPaid = (caseData.getResponseToClaim() != null ? caseData.getResponseToClaim().getHowMuchWasPaid() : null);
