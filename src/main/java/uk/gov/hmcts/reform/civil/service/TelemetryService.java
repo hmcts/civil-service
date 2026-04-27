@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import com.microsoft.applicationinsights.TelemetryClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -12,13 +13,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TelemetryService {
 
-    private final TelemetryClient telemetryClient;
+    private final ObjectProvider<TelemetryClient> telemetryClientProvider;
 
     public void trackEvent(String eventName, Map<String, String> properties) {
-        if (telemetryClient != null) {
-            telemetryClient.trackEvent(eventName, properties, null);
-        } else {
+        TelemetryClient telemetryClient = telemetryClientProvider.getIfAvailable();
+        if (telemetryClient == null) {
             log.debug("TelemetryClient not available, skipping event: {}", eventName);
+            return;
         }
+        telemetryClient.trackEvent(eventName, properties, null);
     }
 }

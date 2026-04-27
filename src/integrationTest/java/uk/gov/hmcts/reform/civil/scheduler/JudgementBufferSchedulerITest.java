@@ -5,10 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.issuejudgement.JudgementBufferScheduler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
@@ -39,7 +41,8 @@ public class JudgementBufferSchedulerITest extends BaseIntegrationTest {
     @Test
     void shouldExecuteJudgementBufferScheduler() {
         // Given
-        CaseDetails case1 = CaseDetails.builder().id(1L).build();
+        ReflectionTestUtils.setField(scheduler, "isSchedulerEnabled", true);
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         SearchResult searchResult = SearchResult.builder()
             .total(1)
             .cases(List.of(case1))
@@ -60,6 +63,7 @@ public class JudgementBufferSchedulerITest extends BaseIntegrationTest {
     @Test
     void shouldAcquireLockWhenJudgementBufferSchedulerRuns() throws Throwable {
         // Given
+        ReflectionTestUtils.setField(scheduler, "isSchedulerEnabled", true);
         SearchResult searchResult = SearchResult.builder()
             .total(0)
             .cases(List.of())
@@ -70,7 +74,6 @@ public class JudgementBufferSchedulerITest extends BaseIntegrationTest {
         scheduler.issueJudgement();
 
         // Then
-        // Verify that the lock provider was called to acquire a lock
         verify(lockProvider, atLeastOnce()).lock(any());
     }
 }

@@ -8,9 +8,9 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.DefendantResponseDeadlineCheckEvent;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTask;
 
-@Slf4j
 @Component
 @AllArgsConstructor
+@Slf4j
 public class DefendantResponseDeadlineTask implements ScheduledTask {
 
     private final ApplicationEventPublisher applicationEventPublisher;

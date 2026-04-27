@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
 
 @Component
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class DefendantResponseDeadlineScheduler {
 
     public static final String SCHEDULER_NAME = "DefendantResponseDeadline";
@@ -30,9 +30,10 @@ public class DefendantResponseDeadlineScheduler {
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     public void deadlineCheck() {
         if (isSchedulerEnabled) {
+            log.info("Running {} scheduler", SCHEDULER_NAME);
             scheduledTaskRunner.run(
                 new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-                searchService::getCases,
+                searchService,
                 defendantResponseDeadlineTask
             );
         }

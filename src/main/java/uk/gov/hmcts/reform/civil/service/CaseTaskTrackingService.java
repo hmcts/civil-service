@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.microsoft.applicationinsights.TelemetryClient;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -8,22 +11,25 @@ import java.util.Map;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class CaseTaskTrackingService {
 
-    private final TelemetryService telemetryService;
+    private final ObjectProvider<TelemetryClient> telemetryClientProvider;
 
     private final Map<String, String> recentErrors = new ConcurrentHashMap<>();
-
-    public CaseTaskTrackingService(TelemetryService telemetryService) {
-        this.telemetryService = telemetryService;
-    }
 
     public void trackCaseTask(String caseId,
                               String eventType,
                               String eventName,
                               Map<String, String> additionalProperties) {
+
+        TelemetryClient telemetryClient = telemetryClientProvider.getIfAvailable();
+        if (telemetryClient == null) {
+            log.debug("TelemetryClient not configured; skipping event tracking for {}", eventName);
+            return;
+        }
 
         log.info("tracking event for case {} with eventType {} and eventName {}", caseId, eventType, eventType);
 
@@ -35,7 +41,7 @@ public class CaseTaskTrackingService {
             properties.putAll(additionalProperties);
         }
 
-        telemetryService.trackEvent(eventName, properties);
+        telemetryClient.trackEvent(eventName, properties, null);
     }
 
     private String key(String caseId, String taskId) {

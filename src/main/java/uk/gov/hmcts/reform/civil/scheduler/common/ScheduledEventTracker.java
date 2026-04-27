@@ -51,22 +51,22 @@ public class ScheduledEventTracker {
 
     public void jobCompletedEvent(ScheduledTaskEventConfiguration eventConfig,
                                   Set<CaseDetails> cases,
-                                  List<Long> failedCases,
-                                  boolean abortedEarly) {
+                                  List<Long> succeededCases,
+                                  List<Long> failedCases) {
         telemetryService.trackEvent(
             eventConfig.getJobCompletedEvent(),
             Map.of(
                 "schedulerName", eventConfig.getSchedulerName(),
                 "totalCases", String.valueOf(cases.size()),
-                "succeededCases", String.valueOf(cases.size() - failedCases.size()),
-                "failedCases", String.valueOf(failedCases.size()),
-                "abortedEarly", String.valueOf(abortedEarly)
+                "succeededCases", String.valueOf(succeededCases.size()),
+                "failedCases", String.valueOf(failedCases.size())
             )
         );
     }
 
     public void jobAbortedEvent(ScheduledTaskEventConfiguration eventConfig,
                                 Set<CaseDetails> cases,
+                                List<Long> succeededCases,
                                 List<Long> failedCases,
                                 String reason) {
         telemetryService.trackEvent(
@@ -74,7 +74,7 @@ public class ScheduledEventTracker {
             Map.of(
                 "schedulerName", eventConfig.getSchedulerName(),
                 "totalCases", String.valueOf(cases.size()),
-                "succeededCases", String.valueOf(cases.size() - failedCases.size()),
+                "succeededCases", String.valueOf(succeededCases.size()),
                 "failedCases", String.valueOf(failedCases.size()),
                 "abortReason", reason != null ? reason : "Unknown"
             )

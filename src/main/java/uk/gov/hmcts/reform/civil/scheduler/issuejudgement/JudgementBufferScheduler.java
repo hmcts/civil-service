@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.JudgmentRequestedSearchService;
 
 @Component
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class JudgementBufferScheduler {
 
     public static final String SCHEDULER_NAME = "JudgementBuffer";
@@ -30,9 +30,10 @@ public class JudgementBufferScheduler {
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     public void issueJudgement() {
         if (isSchedulerEnabled) {
+            log.info("Running {} scheduler", SCHEDULER_NAME);
             scheduledTaskRunner.run(
                 new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-                searchService::getCases,
+                searchService,
                 judgementBufferScheduledTask
             );
         }

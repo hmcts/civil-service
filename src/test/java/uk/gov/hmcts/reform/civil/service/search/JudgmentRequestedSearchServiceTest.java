@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 class JudgmentRequestedSearchServiceTest extends ElasticSearchServiceTest {
@@ -22,7 +21,6 @@ class JudgmentRequestedSearchServiceTest extends ElasticSearchServiceTest {
     protected Query buildQuery(int fromValue) {
         LocalDate fortyEightHoursAgo = LocalDate.now().minusDays(2);
         BoolQueryBuilder query = boolQuery()
-            .must(matchQuery("data.activeJudgment.state", "REQUESTED"))
             .must(rangeQuery("data.activeJudgment.requestDate").lte(fortyEightHoursAgo));
 
         return new Query(query, List.of("reference"), fromValue);
