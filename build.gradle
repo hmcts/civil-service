@@ -447,7 +447,7 @@ dependencies {
     exclude group: 'junit', module: 'junit'
   }
 
-  runtimeOnly "com.sun.xml.bind:jaxb-impl:2.3.9"
+  runtimeOnly "com.sun.xml.bind:jaxb-impl:4.0.7"
   runtimeOnly "com.sun.activation:javax.activation:1.2.0"
 
   annotationProcessor "org.projectlombok:lombok:${versions.lombok}"
