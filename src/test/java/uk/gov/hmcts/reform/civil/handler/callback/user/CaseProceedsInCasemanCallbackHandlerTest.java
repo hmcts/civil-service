@@ -173,6 +173,7 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().getCaseDetailsBefore().setState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -189,6 +190,7 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().getCaseDetailsBefore().setState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
