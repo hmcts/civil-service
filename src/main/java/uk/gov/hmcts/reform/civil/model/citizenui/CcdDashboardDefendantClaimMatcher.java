@@ -74,7 +74,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayImmediately() {
-        if ((isClaimProceedInCaseMan()) || isCasedDiscontinued()) {
+        if (isClaimProceedInCaseMan() || isCasedDiscontinued()) {
             return false;
         }
         return hasResponseFullAdmit()
@@ -83,7 +83,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayBySetDate() {
-        if ((isClaimProceedInCaseMan()) || isCasedDiscontinued()) {
+        if (isClaimProceedInCaseMan() || isCasedDiscontinued()) {
             return false;
         }
         return hasResponseFullAdmit()
@@ -93,7 +93,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayByInstallments() {
-        if ((isClaimProceedInCaseMan()) || isCasedDiscontinued()) {
+        if (isClaimProceedInCaseMan() || isCasedDiscontinued()) {
             return false;
         }
         return hasResponseFullAdmit()
@@ -125,7 +125,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-        if ((isClaimProceedInCaseMan()) || isCasedDiscontinued()) {
+        if (isClaimProceedInCaseMan() || isCasedDiscontinued()) {
             return false;
         }
         return (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
@@ -136,7 +136,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isWaitingForClaimantToRespond() {
-        if ((isClaimProceedInCaseMan()) || isCasedDiscontinued()) {
+        if (isClaimProceedInCaseMan() || isCasedDiscontinued()) {
             return false;
         }
         return RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec()
@@ -205,7 +205,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithPartAdmit() {
-        if ((isClaimProceedInCaseMan()) || isCasedDiscontinued()) {
+        if (isClaimProceedInCaseMan() || isCasedDiscontinued()) {
             return false;
         }
         return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()
