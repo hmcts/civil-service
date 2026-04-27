@@ -171,6 +171,10 @@ static def isPreviewEnvironment() {
   System.getenv('ENVIRONMENT') == 'preview'
 }
 
+static def isHighLevelDataSetupEnvironment() {
+  System.getenv('ENVIRONMENT') in ['preview', 'aat']
+}
+
 static def isCamundaImportEnabled() {
   def camundaBaseUrl = System.getenv('CAMUNDA_BASE_URL')
   camundaBaseUrl != null && !camundaBaseUrl.trim().isEmpty()
@@ -186,7 +190,7 @@ static def isNightlyRun() {
 
 def pullLatestCivilCcdDefinitions = tasks.register('pullLatestCivilCcdDefinitions', Exec) {
   description = 'Pulls the civil CCD definition repository branch needed for data setup.'
-  onlyIf { !isCommonAatCcdSetupSkipped() }
+  onlyIf { isHighLevelDataSetupEnvironment() && !isCommonAatCcdSetupSkipped() }
   doFirst {
     commandLine './bin/pull-latest-civil-ccd-files.sh', dataSetupBranch('CCD_DEFINITION_BRANCH')
   }
@@ -194,7 +198,7 @@ def pullLatestCivilCcdDefinitions = tasks.register('pullLatestCivilCcdDefinition
 
 def pullLatestCivilCamundaDefinitions = tasks.register('pullLatestCivilCamundaDefinitions', Exec) {
   description = 'Pulls the civil Camunda BPMN definition repository branch needed for data setup.'
-  onlyIf { isCamundaImportEnabled() }
+  onlyIf { isHighLevelDataSetupEnvironment() && isCamundaImportEnabled() }
   doFirst {
     commandLine './bin/pull-latest-camunda-files.sh', dataSetupBranch('CAMUNDA_DEFINITION_BRANCH')
   }
@@ -202,7 +206,7 @@ def pullLatestCivilCamundaDefinitions = tasks.register('pullLatestCivilCamundaDe
 
 def pullLatestCivilWaDmnDefinitions = tasks.register('pullLatestCivilWaDmnDefinitions', Exec) {
   description = 'Pulls the civil WA DMN definition repository branch needed for data setup.'
-  onlyIf { isCamundaImportEnabled() }
+  onlyIf { isHighLevelDataSetupEnvironment() && isCamundaImportEnabled() }
   doFirst {
     commandLine './bin/pull-latest-dmn-files.sh', dataSetupBranch('DMN_DEFINITION_BRANCH')
   }
@@ -218,7 +222,7 @@ def pullLatestCivilWiremockMappings = tasks.register('pullLatestCivilWiremockMap
 
 def buildCcdDefinitionsXls = tasks.register('buildCcdDefinitionsXls', Exec) {
   description = 'Builds CCD XLS definitions.'
-  onlyIf { !isCommonAatCcdSetupSkipped() }
+  onlyIf { isHighLevelDataSetupEnvironment() && !isCommonAatCcdSetupSkipped() }
   dependsOn pullLatestCivilCcdDefinitions
   doFirst {
     def dataSetupEnvironment = System.getenv('ENVIRONMENT')
@@ -247,7 +251,7 @@ def buildCcdDefinitionsXls = tasks.register('buildCcdDefinitionsXls', Exec) {
 
 def camundaHighLevelDataSetup = tasks.register('camundaHighLevelDataSetup', JavaExec) {
   description = 'Imports civil Camunda BPMN and WA DMN definitions using the high-level data setup flow.'
-  onlyIf { isCamundaImportEnabled() }
+  onlyIf { isHighLevelDataSetupEnvironment() && isCamundaImportEnabled() }
   dependsOn pullLatestCivilCamundaDefinitions, pullLatestCivilWaDmnDefinitions
   mainClass.set("uk.gov.hmcts.reform.civil.setup.CamundaHighLevelDataSetupApp")
   classpath += sourceSets.main.runtimeClasspath
@@ -263,7 +267,7 @@ def loadCivilWiremockMappings = tasks.register('loadCivilWiremockMappings', Exec
 
 tasks.register('highLevelDataSetup', JavaExec) {
   description = 'Loads roles, CCD definitions, Camunda BPMNs, WA DMNs and preview WireMock mappings using the high-level data setup flow.'
-  onlyIf { !isCommonAatCcdSetupSkipped() }
+  onlyIf { isHighLevelDataSetupEnvironment() && !isCommonAatCcdSetupSkipped() }
   dependsOn buildCcdDefinitionsXls, camundaHighLevelDataSetup, loadCivilWiremockMappings
   mainClass.set("uk.gov.hmcts.reform.civil.setup.HighLevelDataSetupApp")
   classpath += sourceSets.main.runtimeClasspath
@@ -482,7 +486,7 @@ dependencies {
   implementation "com.github.hmcts:core-case-data-store-client:5.2.0"
   implementation "com.github.hmcts:document-management-client:7.0.1"
   implementation "com.github.hmcts:send-letter-client:5.1.1"
-  implementation "net.logstash.logback:logstash-logback-encoder:7.4"
+  implementation "net.logstash.logback:logstash-logback-encoder:9.0"
   implementation "uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE"
   implementation "com.github.hmcts:ccd-case-document-am-client:1.59.2"
   implementation "com.sendgrid:sendgrid-java:4.10.3"
