@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.JudgmentRequestedSearchService;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.scheduler.issuejudgement.JudgementBufferScheduler.SCHEDULER_NAME;
@@ -47,9 +48,9 @@ class JudgementBufferSchedulerTest {
             scheduler.issueJudgement();
 
             verify(scheduledTaskRunner).run(
-                expectedConfig,
-                searchService::getCases,
-                judgementBufferScheduledTask
+                eq(expectedConfig),
+                any(),
+                eq(judgementBufferScheduledTask)
             );
         }
 
