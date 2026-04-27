@@ -1,12 +1,15 @@
-package uk.gov.hmcts.reform.civil.scheduler.defendantresponse;
+package uk.gov.hmcts.reform.civil.scheduler;
 
+import net.javacrumbs.shedlock.core.LockProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.scheduler.defendantresponse.DefendantResponseDeadlineScheduler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
@@ -31,6 +34,9 @@ public class DefendantResponseDeadlineSchedulerITest extends BaseIntegrationTest
     @MockBean
     private TelemetryService telemetryService;
 
+    @SpyBean
+    private LockProvider lockProvider;
+
     @Test
     void shouldExecuteDefendantResponseDeadlineScheduler() {
         // Given
@@ -51,5 +57,22 @@ public class DefendantResponseDeadlineSchedulerITest extends BaseIntegrationTest
         verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineCaseProcessed"), anyMap());
         verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineJobCompleted"), anyMap());
+    }
+
+    @Test
+    void shouldAcquireLockWhenDefendantResponseDeadlineSchedulerRuns() throws Throwable {
+        // Given
+        SearchResult searchResult = SearchResult.builder()
+            .total(0)
+            .cases(List.of())
+            .build();
+        when(coreCaseDataService.searchCases(any(Query.class))).thenReturn(searchResult);
+
+        // When
+        scheduler.deadlineCheck();
+
+        // Then
+        // Verify that the lock provider was called to acquire a lock
+        verify(lockProvider, atLeastOnce()).lock(any());
     }
 }
