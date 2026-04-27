@@ -22,5 +22,8 @@ public enum CaseManagementOrderAdditional {
     ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_PERSONAL_INJURY,
 
     @JsonProperty("OrderTypeTrialAdditionalDirectionsRoadTrafficAccident")
-    ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_ROAD_TRAFFIC_ACCIDENT
+    ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_ROAD_TRAFFIC_ACCIDENT,
+
+    @JsonProperty("OrderTypeTrialAdditionalDirectionsPPI")
+    ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_PPI
 }
