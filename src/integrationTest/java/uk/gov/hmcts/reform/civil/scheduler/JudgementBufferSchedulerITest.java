@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.scheduler;
 
+import net.javacrumbs.shedlock.core.LockProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
@@ -31,6 +33,9 @@ public class JudgementBufferSchedulerITest extends BaseIntegrationTest {
     @MockBean
     private TelemetryService telemetryService;
 
+    @SpyBean
+    private LockProvider lockProvider;
+
     @Test
     void shouldExecuteJudgementBufferScheduler() {
         // Given
@@ -50,5 +55,22 @@ public class JudgementBufferSchedulerITest extends BaseIntegrationTest {
         verify(telemetryService).trackEvent(eq("JudgementBufferJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("JudgementBufferCaseProcessed"), anyMap());
         verify(telemetryService).trackEvent(eq("JudgementBufferJobCompleted"), anyMap());
+    }
+
+    @Test
+    void shouldAcquireLockWhenJudgementBufferSchedulerRuns() throws Throwable {
+        // Given
+        SearchResult searchResult = SearchResult.builder()
+            .total(0)
+            .cases(List.of())
+            .build();
+        when(coreCaseDataService.searchCases(any(Query.class))).thenReturn(searchResult);
+
+        // When
+        scheduler.issueJudgement();
+
+        // Then
+        // Verify that the lock provider was called to acquire a lock
+        verify(lockProvider, atLeastOnce()).lock(any());
     }
 }
