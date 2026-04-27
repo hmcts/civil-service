@@ -48,7 +48,7 @@ class DefendantResponseDeadlineSchedulerTest {
 
             verify(scheduledTaskRunner).run(
                 expectedConfig,
-                searchService,
+                searchService::getCases,
                 defendantResponseDeadlineTask
             );
         }

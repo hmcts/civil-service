@@ -32,7 +32,7 @@ public class DefendantResponseDeadlineScheduler {
         if (isSchedulerEnabled) {
             scheduledTaskRunner.run(
                 new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-                searchService,
+                searchService::getCases,
                 defendantResponseDeadlineTask
             );
         }
