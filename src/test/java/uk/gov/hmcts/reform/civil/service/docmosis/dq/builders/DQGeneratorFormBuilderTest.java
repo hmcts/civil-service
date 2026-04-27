@@ -274,4 +274,130 @@ class DQGeneratorFormBuilderTest {
         assertEquals("Additional info for judge from claimant",
                      result.getFurtherInformation().getOtherInformationForJudge());
     }
+
+    @Test
+    void shouldUseApplicantAdditionalInfoWhenApplicant1DQPresent() {
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .applicant1DQ()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicantAdditionalInformationForJudge("Claimant additional info")
+            .additionalInformationForJudge("Defendant additional info")
+            .businessProcess(new uk.gov.hmcts.reform.civil.model.BusinessProcess()
+                .setCamundaEvent("CLAIMANT_RESPONSE_SPEC"))
+            .build();
+
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals("Claimant additional info",
+                     result.getFurtherInformation().getOtherInformationForJudge());
+    }
+
+    @Test
+    void shouldUseRespondentAdditionalInfoWhenRespondent1DQPresent() {
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .respondent1DQ()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicantAdditionalInformationForJudge("Claimant additional info")
+            .additionalInformationForJudge("Defendant additional info")
+            .build();
+
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals("Defendant additional info",
+                     result.getFurtherInformation().getOtherInformationForJudge());
+    }
+
+    @Test
+    void shouldHandleNullCaseDataGracefully() {
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .applicant1DQ()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .businessProcess(new uk.gov.hmcts.reform.civil.model.BusinessProcess()
+                .setCamundaEvent("CLAIMANT_RESPONSE_SPEC"))
+            .build();
+
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertNull(result.getFurtherInformation().getOtherInformationForJudge());
+    }
+
+    @Test
+    void shouldUseApplicantFutureApplicationsWhenApplicant1DQPresent() {
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        uk.gov.hmcts.reform.civil.model.dq.FutureApplications futureApps =
+            new uk.gov.hmcts.reform.civil.model.dq.FutureApplications();
+        futureApps.setIntentionToMakeFutureApplications(YesOrNo.YES);
+        futureApps.setWhatWillFutureApplicationsBeMadeFor("Test application");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .applicant1DQ(new uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ()
+                .setApplicant1DQFutureApplications(futureApps))
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .businessProcess(new uk.gov.hmcts.reform.civil.model.BusinessProcess()
+                .setCamundaEvent("CLAIMANT_RESPONSE_SPEC"))
+            .build();
+
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals(YesOrNo.YES, result.getFurtherInformation().getFutureApplications());
+        assertEquals("Test application", result.getFurtherInformation().getReasonForFutureApplications());
+    }
+
+    @Test
+    void shouldUseRespondentFutureApplicationsWhenRespondent1DQPresent() {
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+
+        uk.gov.hmcts.reform.civil.model.dq.FutureApplications futureApps =
+            new uk.gov.hmcts.reform.civil.model.dq.FutureApplications();
+        futureApps.setIntentionToMakeFutureApplications(YesOrNo.YES);
+        futureApps.setWhatWillFutureApplicationsBeMadeFor("Defendant test application");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .respondent1DQ(new uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ()
+                .setRespondent1DQFutureApplications(futureApps))
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .build();
+
+        DirectionsQuestionnaireForm result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(caseData, DEFENDANT);
+
+        assertNotNull(result);
+        assertNotNull(result.getFurtherInformation());
+        assertEquals(YesOrNo.YES, result.getFurtherInformation().getFutureApplications());
+        assertEquals("Defendant test application", result.getFurtherInformation().getReasonForFutureApplications());
+    }
 }
