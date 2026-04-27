@@ -9,15 +9,12 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.service.TelemetryService;
 import uk.gov.hmcts.reform.civil.service.search.ElasticSearchService;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -34,10 +31,7 @@ class ScheduledTaskRunnerTest {
     private ScheduledTask scheduledTask;
 
     @Mock
-    private TelemetryService telemetryService;
-
-    @Mock
-    private ErrorCategorizer errorCategorizer;
+    private ScheduledEventTracker scheduledEventTracker;
 
     @InjectMocks
     private ScheduledTaskRunner scheduledTaskRunner;
@@ -52,39 +46,20 @@ class ScheduledTaskRunnerTest {
         when(searchService.getCases()).thenReturn(new LinkedHashSet<>(List.of(case1, case2)));
 
         // Throw exception for first case, succeed for second
-        doThrow(new RuntimeException("Lock conflict")).when(scheduledTask).accept(case1);
-        when(errorCategorizer.categorizeError(any())).thenReturn("lock conflict");
+        RuntimeException exception = new RuntimeException("Lock conflict");
+        doThrow(exception).when(scheduledTask).accept(case1);
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
 
-        scheduledTaskRunner.run(eventConfig, searchService, scheduledTask);
+        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
 
-        verify(telemetryService).trackEvent(eq("JudgmentBufferJobStarted"), eq(Map.of(
-            "schedulerName", "JudgmentBuffer",
-            "totalCases", "2"
-        )));
+        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig), eq(2));
 
-        verify(telemetryService).trackEvent(eq("JudgmentBufferCaseFailed"), eq(Map.of(
-            "schedulerName", "JudgmentBuffer",
-            "caseId", "1",
-            "status", "FAILURE",
-            "error", "Lock conflict",
-            "errorCategory", "lock conflict"
-        )));
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq(case1), eq(exception));
 
-        verify(telemetryService).trackEvent(eq("JudgmentBufferCaseProcessed"), eq(Map.of(
-            "schedulerName", "JudgmentBuffer",
-            "caseId", "2",
-            "status", "SUCCESS"
-        )));
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq(2L));
 
-        verify(telemetryService).trackEvent(eq("JudgmentBufferJobCompleted"), eq(Map.of(
-            "schedulerName", "JudgmentBuffer",
-            "totalCases", "2",
-            "succeededCases", "1",
-            "failedCases", "1",
-            "abortedEarly", "false"
-        )));
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(Set.of(case1, case2)), eq(List.of(1L)), eq(false));
     }
 
     @Test
@@ -100,33 +75,19 @@ class ScheduledTaskRunnerTest {
         // Set threshold to 2
         ReflectionTestUtils.setField(scheduledTaskRunner, "circuitBreakerThreshold", 2);
 
-        when(errorCategorizer.categorizeError(any())).thenReturn("generic error");
-
         // Fail first two cases
         doThrow(new RuntimeException("Error 1")).when(scheduledTask).accept(case1);
         doThrow(new RuntimeException("Error 2")).when(scheduledTask).accept(case2);
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
 
-        scheduledTaskRunner.run(eventConfig, searchService, scheduledTask);
+        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
 
         // Verify JobAborted event
-        verify(telemetryService).trackEvent(eq("JudgmentBufferJobAborted"), eq(Map.of(
-            "schedulerName", "JudgmentBuffer",
-            "totalCases", "4",
-            "succeededCases", "2",
-            "failedCases", "2",
-            "abortReason", "Error 2"
-        )));
+        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq(cases), eq(List.of(1L, 2L)), eq("Error 2"));
 
         // Verify JobCompleted event reflects abortedEarly=true
-        verify(telemetryService).trackEvent(eq("JudgmentBufferJobCompleted"), eq(Map.of(
-            "schedulerName", "JudgmentBuffer",
-            "totalCases", "4",
-            "succeededCases", "2",
-            "failedCases", "2",
-            "abortedEarly", "true"
-        )));
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases), eq(List.of(1L, 2L)), eq(true));
 
         // Verify case3 and case4 were NOT processed
         verify(scheduledTask).accept(case1);
@@ -145,42 +106,23 @@ class ScheduledTaskRunnerTest {
         // Set threshold to 2
         ReflectionTestUtils.setField(scheduledTaskRunner, "circuitBreakerThreshold", 2);
 
-        when(errorCategorizer.categorizeError(any())).thenReturn("generic error");
-
         // Fail first, succeed second, fail third
-        doThrow(new RuntimeException("Error 1")).when(scheduledTask).accept(case1);
+        RuntimeException error1 = new RuntimeException("Error 1");
+        doThrow(error1).when(scheduledTask).accept(case1);
         // case2 succeeds (default)
-        doThrow(new RuntimeException("Error 3")).when(scheduledTask).accept(case3);
+        RuntimeException error3 = new RuntimeException("Error 3");
+        doThrow(error3).when(scheduledTask).accept(case3);
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
 
-        scheduledTaskRunner.run(eventConfig, searchService, scheduledTask);
+        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
 
         // Verify JobCompleted event reflects abortedEarly=false
-        verify(telemetryService).trackEvent(eq("JudgmentBufferJobCompleted"), eq(Map.of(
-            "schedulerName", "JudgmentBuffer",
-            "totalCases", "3",
-            "succeededCases", "1",
-            "failedCases", "2",
-            "abortedEarly", "false"
-        )));
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases), eq(List.of(1L, 3L)), eq(false));
 
         // Verify caseFailedEvent was called for each failure
-        verify(telemetryService).trackEvent(eq("JudgmentBufferCaseFailed"), eq(Map.of(
-            "schedulerName", "JudgmentBuffer",
-            "caseId", "1",
-            "status", "FAILURE",
-            "error", "Error 1",
-            "errorCategory", "generic error"
-        )));
-
-        verify(telemetryService).trackEvent(eq("JudgmentBufferCaseFailed"), eq(Map.of(
-            "schedulerName", "JudgmentBuffer",
-            "caseId", "3",
-            "status", "FAILURE",
-            "error", "Error 3",
-            "errorCategory", "generic error"
-        )));
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq(case1), eq(error1));
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq(case3), eq(error3));
 
         // All cases should have been processed
         verify(scheduledTask).accept(case1);
