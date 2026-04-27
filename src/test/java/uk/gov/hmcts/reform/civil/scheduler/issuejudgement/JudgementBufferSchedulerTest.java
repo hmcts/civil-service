@@ -12,10 +12,8 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguratio
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.JudgmentRequestedSearchService;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.scheduler.issuejudgement.JudgementBufferScheduler.SCHEDULER_NAME;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,9 +46,9 @@ class JudgementBufferSchedulerTest {
             scheduler.issueJudgement();
 
             verify(scheduledTaskRunner).run(
-                eq(expectedConfig),
-                any(),
-                eq(judgementBufferScheduledTask)
+                expectedConfig,
+                searchService,
+                judgementBufferScheduledTask
             );
         }
 
@@ -60,8 +58,7 @@ class JudgementBufferSchedulerTest {
 
             scheduler.issueJudgement();
 
-            verify(searchService, never()).getCases();
-            verify(scheduledTaskRunner, never()).run(any(), any(), any());
+            verifyNoInteractions(scheduledTaskRunner);
         }
     }
 }

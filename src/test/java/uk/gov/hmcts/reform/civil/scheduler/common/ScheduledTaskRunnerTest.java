@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.search.ElasticSearchService;
 
 import java.util.Set;
@@ -18,6 +19,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,11 +40,10 @@ class ScheduledTaskRunnerTest {
 
     @Test
     void shouldEmitJudgmentBufferEvents_whenConfigurationProvided() {
-        // Set threshold to a high value to avoid accidental abort
         ReflectionTestUtils.setField(scheduledTaskRunner, "circuitBreakerThreshold", 5);
 
-        CaseDetails case1 = CaseDetails.builder().id(1L).build();
-        CaseDetails case2 = CaseDetails.builder().id(2L).build();
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
+        CaseDetails case2 = CaseDetailsBuilder.builder().id(2L).build();
         when(searchService.getCases()).thenReturn(new LinkedHashSet<>(List.of(case1, case2)));
 
         // Throw exception for first case, succeed for second
@@ -59,20 +60,18 @@ class ScheduledTaskRunnerTest {
 
         verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq(2L));
 
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(Set.of(case1, case2)), eq(List.of(1L)), eq(false));
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(Set.of(case1, case2)), eq(List.of(2L)), eq(List.of(1L)));
     }
 
     @Test
     void shouldAbortEarly_whenConsecutiveFailuresThresholdReached() {
-        // Use LinkedHashSet to ensure predictable iteration order
-        CaseDetails case1 = CaseDetails.builder().id(1L).build();
-        CaseDetails case2 = CaseDetails.builder().id(2L).build();
-        CaseDetails case3 = CaseDetails.builder().id(3L).build();
-        CaseDetails case4 = CaseDetails.builder().id(4L).build();
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
+        CaseDetails case2 = CaseDetailsBuilder.builder().id(2L).build();
+        CaseDetails case3 = CaseDetailsBuilder.builder().id(3L).build();
+        CaseDetails case4 = CaseDetailsBuilder.builder().id(4L).build();
         Set<CaseDetails> cases = new LinkedHashSet<>(List.of(case1, case2, case3, case4));
         when(searchService.getCases()).thenReturn(cases);
 
-        // Set threshold to 2
         ReflectionTestUtils.setField(scheduledTaskRunner, "circuitBreakerThreshold", 2);
 
         // Fail first two cases
@@ -83,27 +82,22 @@ class ScheduledTaskRunnerTest {
 
         scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
 
-        // Verify JobAborted event
-        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq(cases), eq(List.of(1L, 2L)), eq("Error 2"));
-
-        // Verify JobCompleted event reflects abortedEarly=true
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases), eq(List.of(1L, 2L)), eq(true));
+        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq(cases), eq(List.of()), eq(List.of(1L, 2L)), eq("Error 2"));
 
         // Verify case3 and case4 were NOT processed
         verify(scheduledTask).accept(case1);
         verify(scheduledTask).accept(case2);
-        // Verify no more interactions with scheduledTask
+        verifyNoMoreInteractions(scheduledTask);
     }
 
     @Test
     void shouldNotAbortEarly_whenFailuresAreNotConsecutive() {
-        CaseDetails case1 = CaseDetails.builder().id(1L).build();
-        CaseDetails case2 = CaseDetails.builder().id(2L).build();
-        CaseDetails case3 = CaseDetails.builder().id(3L).build();
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
+        CaseDetails case2 = CaseDetailsBuilder.builder().id(2L).build();
+        CaseDetails case3 = CaseDetailsBuilder.builder().id(3L).build();
         Set<CaseDetails> cases = new LinkedHashSet<>(List.of(case1, case2, case3));
         when(searchService.getCases()).thenReturn(cases);
 
-        // Set threshold to 2
         ReflectionTestUtils.setField(scheduledTaskRunner, "circuitBreakerThreshold", 2);
 
         // Fail first, succeed second, fail third
@@ -117,8 +111,7 @@ class ScheduledTaskRunnerTest {
 
         scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
 
-        // Verify JobCompleted event reflects abortedEarly=false
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases), eq(List.of(1L, 3L)), eq(false));
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases), eq(List.of(2L)), eq(List.of(1L, 3L)));
 
         // Verify caseFailedEvent was called for each failure
         verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq(case1), eq(error1));

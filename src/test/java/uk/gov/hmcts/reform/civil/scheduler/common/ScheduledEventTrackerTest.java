@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
 import java.util.List;
@@ -64,7 +65,7 @@ class ScheduledEventTrackerTest {
 
     @Test
     void shouldTrackCaseFailedEvent() {
-        CaseDetails caseDetails = CaseDetails.builder().id(456L).build();
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().id(456L).build();
         Exception exception = new RuntimeException("Test error");
         when(errorCategorizer.categorizeError(exception)).thenReturn("TestCategory");
 
@@ -85,13 +86,14 @@ class ScheduledEventTrackerTest {
     @Test
     void shouldTrackJobCompletedEvent() {
         Set<CaseDetails> cases = Set.of(
-            CaseDetails.builder().id(1L).build(),
-            CaseDetails.builder().id(2L).build(),
-            CaseDetails.builder().id(3L).build()
+            CaseDetailsBuilder.builder().id(1L).build(),
+            CaseDetailsBuilder.builder().id(2L).build(),
+            CaseDetailsBuilder.builder().id(3L).build()
         );
+        List<Long> succeededCases = List.of(1L, 3L);
         List<Long> failedCases = List.of(2L);
 
-        scheduledEventTracker.jobCompletedEvent(eventConfig, cases, failedCases, false);
+        scheduledEventTracker.jobCompletedEvent(eventConfig, cases, succeededCases, failedCases);
 
         verify(telemetryService).trackEvent(
             eq("TestSchedulerJobCompleted"),
@@ -99,8 +101,7 @@ class ScheduledEventTrackerTest {
                 "schedulerName", "TestScheduler",
                 "totalCases", "3",
                 "succeededCases", "2",
-                "failedCases", "1",
-                "abortedEarly", "false"
+                "failedCases", "1"
             ))
         );
     }
@@ -108,12 +109,13 @@ class ScheduledEventTrackerTest {
     @Test
     void shouldTrackJobAbortedEvent() {
         Set<CaseDetails> cases = Set.of(
-            CaseDetails.builder().id(1L).build(),
-            CaseDetails.builder().id(2L).build()
+            CaseDetailsBuilder.builder().id(1L).build(),
+            CaseDetailsBuilder.builder().id(2L).build()
         );
+        List<Long> succeededCases = List.of();
         List<Long> failedCases = List.of(1L, 2L);
 
-        scheduledEventTracker.jobAbortedEvent(eventConfig, cases, failedCases, "Aborted due to too many errors");
+        scheduledEventTracker.jobAbortedEvent(eventConfig, cases, succeededCases, failedCases, "Aborted due to too many errors");
 
         verify(telemetryService).trackEvent(
             eq("TestSchedulerJobAborted"),
@@ -130,9 +132,10 @@ class ScheduledEventTrackerTest {
     @Test
     void shouldTrackJobAbortedEventWithUnknownReason_whenReasonIsNull() {
         Set<CaseDetails> cases = Set.of();
+        List<Long> succeededCases = List.of();
         List<Long> failedCases = List.of();
 
-        scheduledEventTracker.jobAbortedEvent(eventConfig, cases, failedCases, null);
+        scheduledEventTracker.jobAbortedEvent(eventConfig, cases, succeededCases, failedCases, null);
 
         verify(telemetryService).trackEvent(
             eq("TestSchedulerJobAborted"),

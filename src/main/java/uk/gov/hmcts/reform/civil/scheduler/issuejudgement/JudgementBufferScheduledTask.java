@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTask;
 
-@Slf4j
 @Component
+@Slf4j
 public class JudgementBufferScheduledTask implements ScheduledTask {
 
     @Override

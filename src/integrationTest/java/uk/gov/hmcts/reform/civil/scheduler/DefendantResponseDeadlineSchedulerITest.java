@@ -5,12 +5,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.defendantresponse.DefendantResponseDeadlineScheduler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
 import java.util.List;
@@ -34,13 +38,19 @@ public class DefendantResponseDeadlineSchedulerITest extends BaseIntegrationTest
     @MockBean
     private TelemetryService telemetryService;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     @SpyBean
     private LockProvider lockProvider;
 
     @Test
+    @DirtiesContext
     void shouldExecuteDefendantResponseDeadlineScheduler() {
         // Given
-        CaseDetails case1 = CaseDetails.builder().id(1L).build();
+        ReflectionTestUtils.setField(scheduler, "isSchedulerEnabled", true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         SearchResult searchResult = SearchResult.builder()
             .total(1)
             .cases(List.of(case1))
@@ -60,8 +70,11 @@ public class DefendantResponseDeadlineSchedulerITest extends BaseIntegrationTest
     }
 
     @Test
+    @DirtiesContext
     void shouldAcquireLockWhenDefendantResponseDeadlineSchedulerRuns() throws Throwable {
         // Given
+        ReflectionTestUtils.setField(scheduler, "isSchedulerEnabled", true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         SearchResult searchResult = SearchResult.builder()
             .total(0)
             .cases(List.of())
@@ -72,7 +85,6 @@ public class DefendantResponseDeadlineSchedulerITest extends BaseIntegrationTest
         scheduler.deadlineCheck();
 
         // Then
-        // Verify that the lock provider was called to acquire a lock
         verify(lockProvider, atLeastOnce()).lock(any());
     }
 }
