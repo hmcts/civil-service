@@ -32,7 +32,7 @@ public class JudgementBufferScheduler {
         if (isSchedulerEnabled) {
             scheduledTaskRunner.run(
                 new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-                searchService,
+                searchService::getCases,
                 judgementBufferScheduledTask
             );
         }

@@ -48,7 +48,7 @@ class JudgementBufferSchedulerTest {
 
             verify(scheduledTaskRunner).run(
                 expectedConfig,
-                searchService,
+                searchService::getCases,
                 judgementBufferScheduledTask
             );
         }
