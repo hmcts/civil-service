@@ -5,11 +5,8 @@ import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.befta.dse.ccd.CcdEnvironment;
 import uk.gov.hmcts.befta.dse.ccd.CcdRoleConfig;
 import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
-import uk.gov.hmcts.befta.exception.ImportException;
 import uk.gov.hmcts.befta.util.BeftaUtils;
 
-import javax.crypto.AEADBadTagException;
-import javax.net.ssl.SSLException;
 import java.util.List;
 import java.util.Locale;
 
@@ -132,14 +129,6 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     @Override
     public void createRoleAssignments() {
         BeftaUtils.defaultLog("Will NOT create role assignments!");
-    }
-
-    @Override
-    protected boolean shouldTolerateDataSetupFailure(Throwable e) {
-        if (e instanceof ImportException importException) {
-            return importException.getHttpStatusCode() == 504;
-        }
-        return containsCause(e, SSLException.class) || containsCause(e, AEADBadTagException.class);
     }
 
     private static boolean containsCause(Throwable e, Class<? extends Throwable> causeType) {
