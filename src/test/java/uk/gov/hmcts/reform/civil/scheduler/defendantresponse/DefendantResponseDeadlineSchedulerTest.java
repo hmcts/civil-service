@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.scheduler.defendantresponse.DefendantResponseDeadlineScheduler.SCHEDULER_NAME;
@@ -47,9 +48,9 @@ class DefendantResponseDeadlineSchedulerTest {
             scheduler.deadlineCheck();
 
             verify(scheduledTaskRunner).run(
-                expectedConfig,
-                searchService::getCases,
-                defendantResponseDeadlineTask
+                eq(expectedConfig),
+                any(),
+                eq(defendantResponseDeadlineTask)
             );
         }
 
