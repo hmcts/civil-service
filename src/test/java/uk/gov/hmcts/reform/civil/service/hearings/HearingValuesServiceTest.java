@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.hearings;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,7 +63,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.util.Lists.emptyList;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -234,7 +234,7 @@ public class HearingValuesServiceTest {
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventIfPartyIdMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventIfPartyIdMissingFromApplicant1() {
         Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
@@ -274,7 +274,7 @@ public class HearingValuesServiceTest {
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventIfCaseFlagsMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventIfCaseFlagsMissingFromApplicant1() {
         Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
@@ -310,7 +310,7 @@ public class HearingValuesServiceTest {
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventIfUnavailableDatesMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventIfUnavailableDatesMissingFromApplicant1() {
         Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
@@ -346,7 +346,7 @@ public class HearingValuesServiceTest {
     }
 
     @Test
-    void shouldNotTriggerEventIfPartyIdCaseFlagsUnavailableDatesExistsForApplicant1() throws Exception {
+    void shouldNotTriggerEventIfPartyIdCaseFlagsUnavailableDatesExistsForApplicant1() {
         WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
         applicant1WelshLang.setCourt(Language.ENGLISH);
         UnavailableDate unavailableDate1 = new UnavailableDate();
@@ -433,9 +433,7 @@ public class HearingValuesServiceTest {
         doThrow(FeignException.GatewayTimeout.class)
             .when(caseDataService).triggerEvent(any(), any(), any());
 
-        assertThrows(FeignException.GatewayTimeout.class, () -> {
-            hearingValuesService.getValues(caseId, "auth");
-        });
+        assertThrows(FeignException.GatewayTimeout.class, () -> hearingValuesService.getValues(caseId, "auth"));
     }
 
     @NotNull
@@ -533,9 +531,7 @@ public class HearingValuesServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
             when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(false);
 
-            assertThrows(NotEarlyAdopterCourtException.class, () -> {
-                hearingValuesService.getValues(caseId, "auth");
-            });
+            assertThrows(NotEarlyAdopterCourtException.class, () -> hearingValuesService.getValues(caseId, "auth"));
         }
 
         @Test
@@ -775,6 +771,20 @@ public class HearingValuesServiceTest {
     private PartyDetailsModel buildExpectedIndividualPartyDetails(String partyId, String firstName, String lastName,
                                                                   String partyName, String partyRole,
                                                                   String email) {
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(partyId);
+        partyDetails.setPartyType(IND);
+        partyDetails.setPartyName(partyName);
+        partyDetails.setPartyRole(partyRole);
+        partyDetails.setIndividualDetails(buildExpectedIndividualDetails(firstName, lastName, email));
+        partyDetails.setOrganisationDetails(null);
+        partyDetails.setUnavailabilityDOW(null);
+        partyDetails.setUnavailabilityRanges(null);
+        partyDetails.setHearingSubChannel(null);
+        return partyDetails;
+    }
+
+    private IndividualDetailsModel buildExpectedIndividualDetails(String firstName, String lastName, String email) {
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
         IndividualDetailsModel individualDetails = new IndividualDetailsModel();
         individualDetails.setFirstName(firstName);
@@ -787,18 +797,7 @@ public class HearingValuesServiceTest {
         individualDetails.setHearingChannelPhone(List.of("0123456789"));
         individualDetails.setRelatedParties(emptyList());
         individualDetails.setCustodyStatus(null);
-
-        PartyDetailsModel partyDetails = new PartyDetailsModel();
-        partyDetails.setPartyID(partyId);
-        partyDetails.setPartyType(IND);
-        partyDetails.setPartyName(partyName);
-        partyDetails.setPartyRole(partyRole);
-        partyDetails.setIndividualDetails(individualDetails);
-        partyDetails.setOrganisationDetails(null);
-        partyDetails.setUnavailabilityDOW(null);
-        partyDetails.setUnavailabilityRanges(null);
-        partyDetails.setHearingSubChannel(null);
-        return partyDetails;
+        return individualDetails;
     }
 
     private PartyDetailsModel buildExpectedOrganisationPartyObject(String name,

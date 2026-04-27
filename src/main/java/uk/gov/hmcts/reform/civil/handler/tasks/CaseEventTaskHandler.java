@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -50,7 +49,6 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
-    private final FeatureToggleService featureToggleService;
     private final RoboticsEventTextFormatter textFormatter;
 
     @Override
@@ -63,28 +61,44 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
             CaseEvent caseEvent = ofNullable(variables.getCaseEvent())
                 .orElseThrow(() -> new InvalidCaseDataException("The caseEvent was not provided"));
             log.info("Start Event {} for caseId {} activityId {}", caseEvent, caseId, externalTask.getActivityId());
-            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
-            CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-            BusinessProcess businessProcess = startEventData.getBusinessProcess()
-                .updateActivityId(externalTask.getActivityId());
 
-            if (!businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
-                businessProcess.updateProcessInstanceId(externalTask.getProcessInstanceId());
-            }
+            CaseData data = processCaseEvent(externalTask, caseId, caseEvent);
 
-            String flowState = externalTask.getVariable(FLOW_STATE);
-            CaseDataContent caseDataContent = caseDataContent(
-                startEventResponse,
-                businessProcess,
-                flowState,
-                startEventData
-            );
-            log.info("Submit Event {} for caseId {}", startEventResponse.getEventId(), caseId);
-            var data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
             return new ExternalTaskData().setCaseData(data);
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
+    }
+
+    private CaseData processCaseEvent(ExternalTask externalTask, String caseId, CaseEvent caseEvent) {
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
+        CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+        BusinessProcess businessProcess = startEventData.getBusinessProcess();
+
+        if (isEventAlreadyProcessed(externalTask, businessProcess)) {
+            log.info("Event {} for caseId {} activityId {} is already processed",
+                     startEventResponse.getEventId(),
+                     caseId,
+                     externalTask.getActivityId());
+            return startEventData;
+        }
+
+        businessProcess.updateActivityId(externalTask.getActivityId());
+
+        if (!businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
+            businessProcess.updateProcessInstanceId(externalTask.getProcessInstanceId());
+        }
+
+        String flowState = externalTask.getVariable(FLOW_STATE);
+        CaseDataContent caseDataContent = caseDataContent(
+            startEventResponse,
+            businessProcess,
+            flowState,
+            startEventData
+        );
+
+        log.info("Submit Event {} for caseId {}", startEventResponse.getEventId(), caseId);
+        return coreCaseDataService.submitUpdate(caseId, caseDataContent);
     }
 
     @Override
@@ -168,7 +182,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         return null;
     }
 
-    private String getDescription(String eventId, Map data, String state, CaseData caseData) {
+    private String getDescription(String eventId, Map<String, Object> data, String state, CaseData caseData) {
         Object claimProceedsInCaseman = data.get("claimProceedsInCaseman");
         FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
 
@@ -231,30 +245,24 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     static final String NOT_PROCEED = "not proceed";
 
     private String getDescriptionFullDefenceProceed(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP: {
-                return format(
-                    "Claimant has provided intention: %s against defendant: %s and %s against defendant: %s",
-                    YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                        ? PROCEED : NOT_PROCEED,
-                    caseData.getRespondent1().getPartyName(),
-                    YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
-                        ? PROCEED : NOT_PROCEED,
-                    caseData.getRespondent2().getPartyName()
-                );
-            }
-            case TWO_V_ONE: {
-                return format(
-                    "Claimant: %s has provided intention: %s. Claimant: %s has provided intention: %s.",
-                    caseData.getApplicant1().getPartyName(),
-                    YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()) ? PROCEED : NOT_PROCEED,
-                    caseData.getApplicant2().getPartyName(),
-                    YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()) ? PROCEED : NOT_PROCEED
-                );
-            }
-            default: {
-                return null;
-            }
-        }
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP -> format(
+                "Claimant has provided intention: %s against defendant: %s and %s against defendant: %s",
+                YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                    ? PROCEED : NOT_PROCEED,
+                caseData.getRespondent1().getPartyName(),
+                YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
+                    ? PROCEED : NOT_PROCEED,
+                caseData.getRespondent2().getPartyName()
+            );
+            case TWO_V_ONE -> format(
+                "Claimant: %s has provided intention: %s. Claimant: %s has provided intention: %s.",
+                caseData.getApplicant1().getPartyName(),
+                YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()) ? PROCEED : NOT_PROCEED,
+                caseData.getApplicant2().getPartyName(),
+                YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()) ? PROCEED : NOT_PROCEED
+            );
+            default -> null;
+        };
     }
 }
