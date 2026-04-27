@@ -530,7 +530,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                 && caseData.isRespondent1NotRepresented()
                 && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             nextState = CaseState.JUDGMENT_REQUESTED.name();
-            caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
