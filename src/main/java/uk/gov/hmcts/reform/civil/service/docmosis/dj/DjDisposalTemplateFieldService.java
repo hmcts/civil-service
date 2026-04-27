@@ -25,9 +25,9 @@ public class DjDisposalTemplateFieldService {
             return null;
         }
         return switch (method) {
-            case disposalHearingMethodTelephoneHearing -> "by telephone";
-            case disposalHearingMethodInPerson -> "in person";
-            case disposalHearingMethodVideoConferenceHearing -> "by video conference";
+            case DISPOSAL_HEARING_METHOD_TELEPHONE_HEARING -> "by telephone";
+            case DISPOSAL_HEARING_METHOD_IN_PERSON -> "in person";
+            case DISPOSAL_HEARING_METHOD_VIDEO_CONFERENCE_HEARING -> "by video conference";
         };
     }
 

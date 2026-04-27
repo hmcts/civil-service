@@ -4,20 +4,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPPI;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.dj.DjBuildingDisputeDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjClinicalDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDeadlineService;
+import uk.gov.hmcts.reform.civil.service.dj.DjHousingDisrepairDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjTrialNarrativeService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -48,6 +51,9 @@ class DjTrialTemplateServiceTest {
     @Mock
     private DocumentHearingLocationHelper locationHelper;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     private DjTrialTemplateService service;
 
     @BeforeEach
@@ -61,6 +67,7 @@ class DjTrialTemplateServiceTest {
         service = new DjTrialTemplateService(
             userService,
             locationHelper,
+                featureToggleService,
                 authorisationFieldService,
                 bundleFieldService,
                 directionsToggleService,
@@ -74,6 +81,7 @@ class DjTrialTemplateServiceTest {
             .surname("Dredd")
             .roles(Collections.singletonList("judge"))
             .build());
+        when(featureToggleService.isOtherRemedyEnabled()).thenReturn(false);
     }
 
     @Test
@@ -87,9 +95,7 @@ class DjTrialTemplateServiceTest {
             .atStateSdoTrialDj()
             .build();
         DjDeadlineService witnessDeadlineService = Mockito.mock(DjDeadlineService.class);
-        when(witnessDeadlineService.nextWorkingDayInWeeks(anyInt()))
-            .thenAnswer(invocation -> LocalDate.of(2025, 2, 1)
-                .plusWeeks(invocation.getArgument(0, Integer.class)));
+
         DjTrialNarrativeService trialNarrativeService = new DjTrialNarrativeService(witnessDeadlineService);
         CaseData caseData = baseCase.toBuilder()
             .trialHearingWitnessOfFactDJ(trialNarrativeService.buildWitnessOfFact())
@@ -105,6 +111,7 @@ class DjTrialTemplateServiceTest {
         assertThat(result.getCaseNumber()).isEqualTo(caseData.getLegacyCaseReference());
         assertThat(result.getHearingLocation()).isEqualTo(location);
         assertThat(result.isHasTrialHearingWelshSectionDJ()).isFalse();
+        assertThat(result.isOtherRemedyEnabled()).isFalse();
         assertThat(result.getTrialHearingWitnessOfFactDJ().getInput8())
             .isEqualTo(SMALL_CLAIMS_WITNESS_DEADLINE);
         assertThat(result.getTrialHearingWitnessOfFactDJ().getInput9())
@@ -148,6 +155,8 @@ class DjTrialTemplateServiceTest {
                 CLINICAL_NOTES_DJ,
                 CLINICAL_BUNDLE_DJ
             );
+        assertThat(result.getTrialPPI()).isNotNull();
+        assertThat(result.isTrialPPIAddSection()).isTrue();
     }
 
     private CaseData trialCaseWithSpecialistSections(CaseData baseCase) {
@@ -157,12 +166,14 @@ class DjTrialTemplateServiceTest {
                 .plusWeeks(invocation.getArgument(0, Integer.class)));
 
         DjBuildingDisputeDirectionsService buildingService = new DjBuildingDisputeDirectionsService(deadlineService);
-        DjClinicalDirectionsService clinicalService = new DjClinicalDirectionsService(deadlineService);
+        DjHousingDisrepairDirectionsService housingService = new DjHousingDisrepairDirectionsService(deadlineService);
+        DjClinicalDirectionsService clinicalService = new DjClinicalDirectionsService();
 
         return baseCase.toBuilder()
             .trialBuildingDispute(buildingService.buildTrialBuildingDispute())
-            .trialHousingDisrepair(buildingService.buildTrialHousingDisrepair())
+            .trialHousingDisrepair(housingService.buildTrialHousingDisrepair())
             .trialClinicalNegligence(clinicalService.buildTrialClinicalNegligence())
+            .trialPPI(new TrialPPI().setPpiDate(LocalDate.now().plusDays(28)).setText("PPI text"))
             .build();
     }
 }

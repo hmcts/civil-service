@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TrialReadyRespondentNotificationHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(
@@ -101,6 +103,11 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
     }
 
     private Map<String, String> addPropertiesRep(CaseData caseData, boolean isFirst) {
+        log.info("hearingDate={}", caseData.getHearingDate());
+        log.info("ccdRef={}", caseData.getCcdCaseReference());
+        log.info("partyRefs={}", buildPartiesReferencesEmailSubject(caseData));
+        log.info("orgName={}", getLegalOrganizationNameForRespondent(caseData, isFirst, organisationService));
+        log.info("legacyRef={}", caseData.getLegacyCaseReference());
         HashMap<String, String> properties = new HashMap<>(Map.of(
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
