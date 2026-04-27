@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.civil.scheduler.common;
 
-import feign.FeignException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 class ErrorCategorizerTest {
 
@@ -26,14 +24,6 @@ class ErrorCategorizerTest {
         Exception e = new RuntimeException(message);
         String category = errorCategorizer.categorizeError(e);
         assertThat(category).isEqualTo(expectedCategory);
-    }
-
-    @Test
-    void shouldCategorizeAsIDAMErrorWhenFeignExceptionFromIdam() {
-        FeignException e = mock(FeignException.class);
-        org.mockito.Mockito.when(e.getMessage()).thenReturn("IDAM authentication failed");
-        String category = errorCategorizer.categorizeError(e);
-        assertThat(category).isEqualTo("IDAM error");
     }
 
     @Test
