@@ -313,6 +313,32 @@ public class InitiateGeneralApplicationServiceHelperTest {
     }
 
     @Test
+    void shouldThrowNullPointerExceptionWhenApplicantSolicitorHasNoCaseRole() {
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L)
+            .applicant1(createParty("Applicant1"))
+            .respondent1(createParty("Respondent1"))
+            .applicantSolicitor1UserDetails(createIdamUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT))
+            .applicant1OrganisationPolicy(organisationPolicy("123", APPLICANTSOLICITORONE.getFormattedName()))
+            .respondent1OrganisationPolicy(organisationPolicy("345", RESPONDENTSOLICITORONE.getFormattedName()))
+            .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+            .build();
+        GeneralApplication generalApplication = new GeneralApplication();
+        UserDetails userDetails = getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT);
+
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(List.of(
+                                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                                    .caseRole(null).build()
+                            )).build());
+
+        assertThrows(
+            NullPointerException.class,
+            () -> helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails, feesService)
+        );
+    }
+
+    @Test
     void shouldThrowExceptionIfApplicant1OrganisationPolicyIsNull() {
         GeneralApplication generalApplication = new GeneralApplication();
         CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L).build();

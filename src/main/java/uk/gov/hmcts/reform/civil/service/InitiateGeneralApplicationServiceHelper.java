@@ -465,10 +465,9 @@ public class InitiateGeneralApplicationServiceHelper {
         Optional<CaseAssignmentUserRole> applicantSol = userRoles.getCaseAssignmentUserRoles().stream()
             .filter(caseAssigned -> caseAssigned.getUserId().equals(userDetails.getId())).findFirst();
         return applicantSol
-            .map(CaseAssignmentUserRole::getCaseRole)
-            .map(caseRole -> resolveApplicantPartyData(
+            .map(applicantSolicitor -> resolveApplicantPartyData(
                 caseData,
-                caseRole,
+                Objects.requireNonNull(applicantSolicitor.getCaseRole()),
                 applicant1OrgCaseRole,
                 applicant2OrgCaseRole,
                 respondent1OrgCaseRole,
