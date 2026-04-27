@@ -3,14 +3,6 @@ set notifications_to_delete = '{"Notice.AAA6.ClaimIssue.Response.Await", "Notice
 where name = 'Scenario.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant';
 
 update dbs.scenario
-set notifications_to_delete = '{"Notice.AAA6.ClaimIssue.Response.Await", "Notice.AAA6.DefResponse.MoreTimeRequested.Defendant", "Notice.AAA6.ClaimIssue.HWF.PhonePayment"}'
-where name = 'Scenario.AAA6.DefResponse.MoreTimeRequested.Claimant';
-
-update dbs.scenario
-set notifications_to_delete = '{"Notice.AAA6.ClaimIssue.Response.Required", "Notice.AAA6.DefResponse.MoreTimeRequested.Claimant"}'
-where name = 'Scenario.AAA6.DefResponse.MoreTimeRequested.Defendant';
-
-update dbs.scenario
 set notifications_to_delete = '{"Notice.AAA6.ClaimIssue.Response.Required", "Notice.AAA6.DefResponse.MoreTimeRequested.Claimant", "Notice.AAA6.DefResponse.MoreTimeRequested.Defendant", "Notice.AAA6.DefResponse.ResponseTimeElapsed.Defendant"}'
 where name = 'Scenario.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Defendant';
 
