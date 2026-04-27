@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.microsoft.applicationinsights.TelemetryClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,13 +16,18 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class CaseTaskTrackingServiceTest {
 
     @Mock
-    private TelemetryService telemetryService;
+    private TelemetryClient telemetryClient;
+
+    @Mock
+    private ObjectProvider<TelemetryClient> telemetryClientProvider;
 
     @InjectMocks
     private CaseTaskTrackingService caseTaskTrackingService;
@@ -29,13 +36,14 @@ class CaseTaskTrackingServiceTest {
     @SuppressWarnings("unchecked")
     void trackCaseTask_withNullAdditionalProperties_shouldOnlyAddCaseAndEventProperties() {
         Map<String, String> additionalProperties = null;
+        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(telemetryClient);
         final String caseId = "111";
         final String eventType = "serviceBusMessage";
         final String eventName = "NotifyRobotics";
         caseTaskTrackingService.trackCaseTask(caseId, eventType, eventName, additionalProperties);
 
         ArgumentCaptor<Map<String, String>> propertiesCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(telemetryService).trackEvent(eq(eventName), propertiesCaptor.capture());
+        verify(telemetryClient).trackEvent(eq(eventName), propertiesCaptor.capture(), isNull());
 
         Map<String, String> capturedProperties = propertiesCaptor.getValue();
         assertEquals(2, capturedProperties.size());
@@ -53,10 +61,11 @@ class CaseTaskTrackingServiceTest {
         additionalProperties.put("someKey", "someValue");
         additionalProperties.put("anotherKey", "anotherValue");
 
+        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(telemetryClient);
         caseTaskTrackingService.trackCaseTask(caseId, eventType, eventName, additionalProperties);
 
         ArgumentCaptor<Map<String, String>> propertiesCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(telemetryService).trackEvent(eq(eventName), propertiesCaptor.capture());
+        verify(telemetryClient).trackEvent(eq(eventName), propertiesCaptor.capture(), isNull());
 
         Map<String, String> capturedProperties = propertiesCaptor.getValue();
         assertEquals(4, capturedProperties.size());
@@ -74,6 +83,7 @@ class CaseTaskTrackingServiceTest {
         additionalProperties.put("caseId", "OVERRIDDEN");
         additionalProperties.put("eventType", "OVERRIDE_TYPE");
         additionalProperties.put("extra", "x");
+        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(telemetryClient);
 
         String eventType = "originalType";
         String eventName = "EventWithOverrides";
@@ -81,7 +91,7 @@ class CaseTaskTrackingServiceTest {
         caseTaskTrackingService.trackCaseTask(caseId, eventType, eventName, additionalProperties);
 
         ArgumentCaptor<Map<String, String>> propertiesCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(telemetryService).trackEvent(eq(eventName), propertiesCaptor.capture());
+        verify(telemetryClient).trackEvent(eq(eventName), propertiesCaptor.capture(), isNull());
 
         Map<String, String> captured = propertiesCaptor.getValue();
         // size should be 3: caseId, eventType, extra (after overrides)
@@ -89,6 +99,15 @@ class CaseTaskTrackingServiceTest {
         assertEquals("OVERRIDDEN", captured.get("caseId"));
         assertEquals("OVERRIDE_TYPE", captured.get("eventType"));
         assertEquals("x", captured.get("extra"));
+    }
+
+    @Test
+    void trackCaseTask_whenTelemetryClientNotAvailable_skipsTracking() {
+        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(null);
+
+        caseTaskTrackingService.trackCaseTask("444", "type", "name", null);
+
+        verifyNoInteractions(telemetryClient);
     }
 
     @Test
