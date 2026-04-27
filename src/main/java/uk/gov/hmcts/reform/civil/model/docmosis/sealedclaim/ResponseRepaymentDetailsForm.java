@@ -237,7 +237,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
         log.info("caseData.getSpecDefenceAdmittedRequired() {}", caseData.getSpecDefenceAdmittedRequired());
         log.info("caseData.getRespondToAdmittedClaimOwingAmount2() {}", caseData.getRespondToAdmittedClaimOwingAmount2());
         log.info("caseData.getRespondToAdmittedClaimOwingAmount() {}", caseData.getRespondToAdmittedClaimOwingAmount());
-        if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
+        if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES || caseData.getSpecDefenceAdmitted2Required() == YesOrNo.YES) {
             alreadyPaid(caseData, data);
         } else {
             BigDecimal amountInPennies =
