@@ -7,15 +7,18 @@ import java.util.Optional;
 @Component
 public class ErrorCategorizer {
 
-    public String categorizeError(Exception e) {
+    public String categorizeError(Throwable e) {
         String message = Optional.ofNullable(e.getMessage()).orElse("").toLowerCase();
-        if (message.contains("lock") || message.contains("conflict")) {
-            return "lock conflict";
+        if (message.contains("lock") || message.contains("conflict") || message.contains("concurrency")) {
+            return "Lock conflict";
         }
-        if (message.contains("idam") || message.contains("timeout")) {
-            return "IDAM timeout";
+        if (message.contains("idam")) {
+            return "IDAM error";
         }
-        if (e.getClass().getName().contains("FeignException") || message.contains("ccd")) {
+        if (message.contains("timeout")) {
+            return "Timeout error";
+        }
+        if (message.contains("ccd")) {
             return "CCD error";
         }
         return "Other";

@@ -1,23 +1,24 @@
 package uk.gov.hmcts.reform.civil.scheduler.common;
 
+import feign.FeignException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 class ErrorCategorizerTest {
-
-    private static final String CCD_ERROR = "CCD error";
 
     private final ErrorCategorizer errorCategorizer = new ErrorCategorizer();
 
     @ParameterizedTest
     @CsvSource({
-        "Database lock exception, lock conflict",
-        "Version conflict detected, lock conflict",
-        "IDAM authentication failed, IDAM timeout",
-        "Connection timeout, IDAM timeout",
+        "Database lock exception, Lock conflict",
+        "Version conflict detected, Lock conflict",
+        "Deadlock found when trying to get lock, Lock conflict",
+        "IDAM authentication failed, IDAM error",
+        "Connection timeout, Timeout error",
         "CCD service unavailable, CCD error",
         "Some other error, Other"
     })
@@ -28,10 +29,11 @@ class ErrorCategorizerTest {
     }
 
     @Test
-    void shouldCategorizeAsCCDErrorWhenFeignException() {
-        Exception e = new CustomFeignException("Service error");
+    void shouldCategorizeAsIDAMErrorWhenFeignExceptionFromIdam() {
+        FeignException e = mock(FeignException.class);
+        org.mockito.Mockito.when(e.getMessage()).thenReturn("IDAM authentication failed");
         String category = errorCategorizer.categorizeError(e);
-        assertThat(category).isEqualTo(CCD_ERROR);
+        assertThat(category).isEqualTo("IDAM error");
     }
 
     @Test
@@ -45,12 +47,6 @@ class ErrorCategorizerTest {
     void shouldHandleCaseInsensitivity() {
         Exception e = new RuntimeException("LOCK obtained");
         String category = errorCategorizer.categorizeError(e);
-        assertThat(category).isEqualTo("lock conflict");
-    }
-
-    static class CustomFeignException extends RuntimeException {
-        public CustomFeignException(String message) {
-            super(message);
-        }
+        assertThat(category).isEqualTo("Lock conflict");
     }
 }
