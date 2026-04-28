@@ -15,6 +15,7 @@ public class JudgmentByAdmissionLiPDefendantLetter implements MappableObject {
 
     private Party defendant;
     private String claimantName;
+    private String ccdCaseReference;
     private String claimReferenceNumber;
     private String respondToClaimUrl;
     private String pin;

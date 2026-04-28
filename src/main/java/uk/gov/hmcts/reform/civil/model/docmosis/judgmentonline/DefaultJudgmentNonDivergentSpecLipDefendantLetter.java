@@ -21,6 +21,7 @@ public class DefaultJudgmentNonDivergentSpecLipDefendantLetter implements Mappab
     private Party defendant;
     private String claimantName;
     private String claimReferenceNumber;
+    private String ccdCaseReference;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)

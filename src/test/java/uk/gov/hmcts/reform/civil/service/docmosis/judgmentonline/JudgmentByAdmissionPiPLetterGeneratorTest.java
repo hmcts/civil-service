@@ -167,7 +167,7 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
-                CASE_DATA.getLegacyCaseReference(),
+                String.valueOf(CASE_DATA.getCcdCaseReference()),
                 CASE_DATA.getLegacyCaseReference(),
                 JUDGMENT_BY_ADMISSION_LETTER,
                 List.of(CASE_DATA.getRespondent1().getPartyName()),

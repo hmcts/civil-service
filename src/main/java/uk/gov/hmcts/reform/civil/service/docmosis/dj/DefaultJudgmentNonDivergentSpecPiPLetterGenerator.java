@@ -75,7 +75,7 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
         }
 
         List<String> recipients = getRecipientsList(caseData);
-        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+        bulkPrintService.printLetter(letterContent, String.valueOf(caseData.getCcdCaseReference()),
                                      caseData.getLegacyCaseReference(),
                                      DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF,
                                      recipients,
@@ -97,6 +97,7 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
     public DefaultJudgmentNonDivergentSpecLipDefendantLetter getTemplateData(CaseData caseData) {
         return new DefaultJudgmentNonDivergentSpecLipDefendantLetter()
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setClaimantName(getPartyNameWithLitigiousFriend(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend()))
             .setDefendant(caseData.getRespondent1())
             .setLetterIssueDate(LocalDate.now())

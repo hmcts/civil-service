@@ -101,7 +101,7 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
-                caseData.getLegacyCaseReference(),
+                String.valueOf(caseData.getCcdCaseReference()),
                 caseData.getLegacyCaseReference(),
                 SET_ASIDE_JUDGMENT_LETTER,
                 List.of(caseData.getRespondent1().getPartyName()),

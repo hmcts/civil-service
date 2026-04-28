@@ -122,7 +122,7 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
-                caseData.getLegacyCaseReference(),
+                caseData.getCcdCaseReference().toString(),
                 caseData.getLegacyCaseReference(),
                 SETTLE_CLAIM_PAID_IN_FULL_LETTER_STRING,
                 List.of(caseData.getRespondent1().getPartyName()),
@@ -188,7 +188,7 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
-                caseData.getLegacyCaseReference(),
+                caseData.getCcdCaseReference().toString(),
                 caseData.getLegacyCaseReference(),
                 SETTLE_CLAIM_PAID_IN_FULL_LETTER_STRING,
                 List.of(caseData.getRespondent1().getPartyName()),
