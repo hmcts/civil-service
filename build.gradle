@@ -160,7 +160,7 @@ tasks.register('fortifyScan', JavaExec) {
   description = 'Run fortify scan.'
   mainClass.set("uk.gov.hmcts.fortifyclient.FortifyClientMainApp")
   classpath += sourceSets.test.runtimeClasspath
-  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED','-Djdk.tls.client.protocols=TLSv1.2']
 }
 
 static def dataSetupBranch(String envName) {
@@ -255,7 +255,7 @@ def camundaHighLevelDataSetup = tasks.register('camundaHighLevelDataSetup', Java
   dependsOn pullLatestCivilCamundaDefinitions, pullLatestCivilWaDmnDefinitions
   mainClass.set("uk.gov.hmcts.reform.civil.setup.CamundaHighLevelDataSetupApp")
   classpath += sourceSets.main.runtimeClasspath
-  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED','-Djdk.tls.client.protocols=TLSv1.2']
 }
 
 def loadCivilWiremockMappings = tasks.register('loadCivilWiremockMappings', Exec) {
@@ -271,7 +271,7 @@ tasks.register('highLevelDataSetup', JavaExec) {
   dependsOn buildCcdDefinitionsXls, camundaHighLevelDataSetup, loadCivilWiremockMappings
   mainClass.set("uk.gov.hmcts.reform.civil.setup.HighLevelDataSetupApp")
   classpath += sourceSets.main.runtimeClasspath
-  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED','-Djdk.tls.client.protocols=TLSv1.2']
 }
 
 def waitForCivilService = tasks.register('waitForCivilService', Exec) {
