@@ -91,7 +91,7 @@ public class JudgmentByAdmissionPiPLetterGenerator {
 
     public JudgmentByAdmissionLiPDefendantLetter getTemplateData(CaseData caseData) {
         return new JudgmentByAdmissionLiPDefendantLetter()
-            .setCcdCaseReference(String.valueOf(caseData.getLegacyCaseReference()))
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
             .setClaimantName(caseData.getApplicant1().getPartyName())
             .setDefendant(caseData.getRespondent1())
