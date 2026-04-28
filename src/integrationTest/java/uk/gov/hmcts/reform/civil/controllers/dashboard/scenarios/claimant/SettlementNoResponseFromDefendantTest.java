@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,8 +28,6 @@ public class SettlementNoResponseFromDefendantTest extends DashboardBaseIntegrat
 
     @Autowired
     private SettlementNoResponseFromDefendantEventHandler handler;
-    @MockBean
-    private CoreCaseDataService coreCaseDataService;
 
     @Test
     void should_create_settlement_no_response_from_defendant() throws Exception {

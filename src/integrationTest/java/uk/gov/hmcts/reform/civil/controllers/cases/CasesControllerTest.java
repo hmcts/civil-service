@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.ExtendedDeadlineDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerCaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
@@ -101,8 +100,6 @@ public class CasesControllerTest extends BaseIntegrationTest {
                                           )));
     private static final String EVENT_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOi";
 
-    @MockBean
-    private CoreCaseDataService coreCaseDataService;
     @MockBean
     private GaCoreCaseDataService gaCoreCaseDataService;
     @MockBean

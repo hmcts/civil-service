@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.citizen.defendant.LipDefendantCaseAssignmentService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
@@ -39,8 +38,6 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     private AssignCaseService assignCaseService;
     @MockBean
     private LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
-    @MockBean
-    private CoreCaseDataService coreCaseDataService;
 
     @Test
     @SneakyThrows
