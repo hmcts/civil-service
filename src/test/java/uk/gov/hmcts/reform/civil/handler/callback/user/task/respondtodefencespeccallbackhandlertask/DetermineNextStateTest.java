@@ -106,7 +106,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldDetermineNextStateWhenCallbackIsVersion1(boolean postTranslation) {
 
-        BusinessProcess businessProcess = new BusinessProcess();
+        final BusinessProcess businessProcess = new BusinessProcess();
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateLipClaimantDoesNotSettle()
@@ -189,8 +189,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @Test
     void shouldSetStateAllFinalOrdersIssuedWhenApplicantAcceptedRepaymentPlan() {
 
-        BusinessProcess businessProcess = new BusinessProcess();
-
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
@@ -227,6 +225,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         String resultState;
         try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
             mock.when(LocalDateTime::now).thenReturn(now);
+            BusinessProcess businessProcess = new BusinessProcess();
             resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                        "", businessProcess);
         }
