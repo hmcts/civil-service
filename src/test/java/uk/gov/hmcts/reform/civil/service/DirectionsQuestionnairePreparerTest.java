@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -26,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
@@ -210,5 +212,80 @@ class DirectionsQuestionnairePreparerTest {
         verify(directionsQuestionnaireGenerator).generateDQFor1v2DiffSol(any(CaseData.class), eq(userToken), eq("ONE"));
         verify(directionsQuestionnaireGenerator).generateDQFor1v2DiffSol(any(CaseData.class), eq(userToken), eq("TWO"));
         assertEquals(2, result.getSystemGeneratedCaseDocuments().size());
+    }
+
+    @Test
+    void shouldPrepareDirectionsQuestionnaire_sameLegalRepSameResponseAsSingleResponse() {
+        // Given
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.ORGANISATION);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setRespondentResponseIsSame(YES);
+        caseData.setRespondent2SameLegalRepresentative(YES);
+        caseData.setRespondent1DQ(new Respondent1DQ());
+        caseData.setRespondent2DQ(new Respondent2DQ());
+        caseData.setRespondent1(respondent1);
+        caseData.setRespondent2(respondent2);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setDuplicateSystemGeneratedCaseDocs(new ArrayList<>());
+
+        String userToken = "userToken";
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentName("directionsQuestionnaire");
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), eq(userToken)))
+            .thenReturn(caseDocument);
+
+        // When
+        CaseData result = preparer.prepareDirectionsQuestionnaire(caseData, userToken);
+
+        // Then
+        verify(directionsQuestionnaireGenerator).generate(any(CaseData.class), eq(userToken));
+        verify(directionsQuestionnaireGenerator, never())
+            .generateDQFor1v2SingleSolDiffResponse(any(CaseData.class), any(String.class), any(String.class));
+        assertEquals(1, result.getSystemGeneratedCaseDocuments().size());
+    }
+
+    @Test
+    void shouldPrepareDirectionsQuestionnaire_differentLegalRepForRespondentTwoOnly() {
+        // Given
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.ORGANISATION);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setRespondent1ClaimResponseTypeForSpec(null);
+        caseData.setRespondent2ClaimResponseTypeForSpec(FULL_DEFENCE);
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setRespondent1DQ(new Respondent1DQ());
+        caseData.setRespondent2DQ(new Respondent2DQ());
+        caseData.setRespondent1(respondent1);
+        caseData.setRespondent2(respondent2);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+
+        Document document = new Document();
+        document.setDocumentUrl("documentUrl2");
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentName("directionsQuestionnaire2");
+        caseDocument.setDocumentLink(document);
+
+        String userToken = "userToken";
+        when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(any(CaseData.class), eq(userToken), eq("TWO")))
+            .thenReturn(Optional.of(caseDocument));
+
+        // When
+        CaseData result = preparer.prepareDirectionsQuestionnaire(caseData, userToken);
+
+        // Then
+        verify(directionsQuestionnaireGenerator, never())
+            .generateDQFor1v2DiffSol(any(CaseData.class), eq(userToken), eq("ONE"));
+        verify(directionsQuestionnaireGenerator)
+            .generateDQFor1v2DiffSol(any(CaseData.class), eq(userToken), eq("TWO"));
+        verify(assignCategoryId).assignCategoryIdToCaseDocument(caseDocument, DocCategory.DQ_DEF2.getValue());
+        assertThat(result.getRespondent2DocumentURL()).isEqualTo("documentUrl2");
+        assertThat(result.getSystemGeneratedCaseDocuments()).hasSize(1);
     }
 }
