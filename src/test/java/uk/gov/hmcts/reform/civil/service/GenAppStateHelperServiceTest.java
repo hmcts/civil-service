@@ -56,14 +56,9 @@ class GenAppStateHelperServiceTest {
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
-    private InitiateGeneralApplicationService genAppService;
 
     @MockBean
     private LocationService locationService;
-
-    @Autowired
-    private CaseDetailsConverter caseDetailsConverter;
 
     @MockBean
     private LocationReferenceDataService locationRefDataService;
@@ -343,13 +338,6 @@ class GenAppStateHelperServiceTest {
             return first.map(Element::getValue).orElse(null);
         }
 
-        private GeneralApplicationsDetails getGALocationDetailsFromUpdatedCaseData(CaseData caseData,
-                                                                           String gaCaseRef) {
-            Optional<Element<GeneralApplicationsDetails>> first = caseData.getClaimantGaAppDetails().stream()
-                .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
-            return first.map(Element::getValue).orElse(null);
-        }
-
         private GADetailsRespondentSol getGARespDetailsFromUpdatedCaseData(CaseData caseData,
                                                                            String gaCaseRef) {
             Optional<Element<GADetailsRespondentSol>> first = caseData.getRespondentSolGaAppDetails().stream()
@@ -501,6 +489,27 @@ class GenAppStateHelperServiceTest {
             service.triggerEvent(caseData, MAIN_CASE_CLOSED);
 
             verifyNoInteractions(coreCaseDataService);
+        }
+
+        @Test
+        void shouldSkipGeneralApplicationWithoutCaseLink_whenTriggeringEvent() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
+                                            true,
+                                            true,
+                                            true, true,
+                                            getOriginalStatusOfGeneralApplication()
+                );
+            caseData.getGeneralApplications().stream()
+                .filter(application -> "1234".equals(application.getValue().getCaseLink().getCaseReference()))
+                .findFirst()
+                .ifPresent(application -> application.getValue().setCaseLink(null));
+
+            boolean result = service.triggerEvent(caseData, MAIN_CASE_CLOSED);
+
+            assertThat(result).isTrue();
+            verify(coreCaseDataService, times(1)).triggerGeneralApplicationEvent(2345L, MAIN_CASE_CLOSED);
+            verifyNoMoreInteractions(coreCaseDataService);
         }
 
         private Map<String, String> getOriginalStatusOfGeneralApplication() {
