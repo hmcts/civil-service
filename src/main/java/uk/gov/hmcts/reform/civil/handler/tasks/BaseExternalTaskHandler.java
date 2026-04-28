@@ -13,9 +13,11 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.helpers.ExponentialRetryTimeoutHelper.calculateExponentialRetryTimeout;
 
@@ -90,6 +92,12 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
             );
             throw new CompleteTaskException(e);
         }
+    }
+
+    protected boolean isEventAlreadyProcessed(ExternalTask externalTask, BusinessProcess businessProcess) {
+        return businessProcess != null
+            && businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())
+            && Objects.equals(externalTask.getActivityId(), businessProcess.getActivityId());
     }
 
     @Recover
