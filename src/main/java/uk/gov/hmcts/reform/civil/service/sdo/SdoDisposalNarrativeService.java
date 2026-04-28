@@ -99,7 +99,7 @@ public class SdoDisposalNarrativeService {
     public void applyOrderWithoutHearing(CaseData caseData) {
         caseData.setDisposalOrderWithoutHearing(new DisposalOrderWithoutHearing()
                                                           .setInput(String.format(
-                                                              "%s %s.",
+                                                              "%s <b>%s</b>.",
                                                               ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE,
                                                               sdoDeadlineService.workingDaysFromNow(5).format(DEADLINE_FORMATTER)
                                                           )));

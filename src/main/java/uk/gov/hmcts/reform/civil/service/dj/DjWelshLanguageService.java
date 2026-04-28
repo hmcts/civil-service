@@ -24,7 +24,7 @@ public class DjWelshLanguageService {
 
     public String buildOrderMadeWithoutHearingText(LocalDate deadlineDate) {
         return String.format(
-            "%s %s.",
+            "%s <b>%s<b>.",
             ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE,
             deadlineDate.format(DEADLINE_FORMATTER)
         );

@@ -2170,7 +2170,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     "This order has been made without hearing. "
                         + "Each party has the right to apply to have this Order set aside or varied. "
                         + "Any such application must be received by the Court (together with the "
-                        + "appropriate fee) by 4pm on %s.",
+                        + "appropriate fee) by 4pm on <b>%s</b>.",
                     date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
                 ));
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText1")
