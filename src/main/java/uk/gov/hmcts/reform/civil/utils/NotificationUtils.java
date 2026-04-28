@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
+
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CLOSED;
@@ -51,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@Slf4j
 public class NotificationUtils {
 
     private NotificationUtils() {
@@ -216,6 +219,8 @@ public class NotificationUtils {
             Optional<Organisation> organisation = organisationService.findOrganisationById(id);
             if (organisation.isPresent()) {
                 legalOrganisationName = organisation.get().getName();
+            } else {
+                log.warn("Organisation not found for id: {}", id);
             }
         }
         return legalOrganisationName;
