@@ -347,6 +347,8 @@ def sonarExclusions = [
   "**/utils/**",
   "**/filters/**",
   "**/model/hearingvalues/**",
+  "**/config/AsyncHandlerConfiguration.java",
+  "**/config/HttpClientConfiguration.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java",
@@ -469,8 +471,8 @@ dependencies {
   implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0"
   implementation "org.postgresql:postgresql:42.7.10"
   implementation "jakarta.persistence:jakarta.persistence-api:3.1.0"
-  implementation "org.jdbi:jdbi3-sqlobject:3.52.1"
-  implementation "org.jdbi:jdbi3-spring:3.52.1"
+  implementation "org.jdbi:jdbi3-sqlobject:3.53.0"
+  implementation "org.jdbi:jdbi3-spring:3.53.0"
   implementation "org.flywaydb:flyway-core"
   implementation "org.flywaydb:flyway-database-postgresql:10.22.0"
   implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
@@ -481,7 +483,7 @@ dependencies {
   implementation "org.springframework.retry:spring-retry"
   implementation "com.github.hmcts.java-logging:logging:8.0.0"
   implementation "com.microsoft.azure:applicationinsights-web:3.7.8"
-  implementation "com.github.hmcts:befta-fw:9.2.4"
+  implementation "com.github.hmcts:befta-fw:9.2.6_CCD-7522"
   implementation "commons-lang:commons-lang:2.6"
   implementation "com.github.hmcts:core-case-data-store-client:5.2.0"
   implementation "com.github.hmcts:document-management-client:7.0.1"
