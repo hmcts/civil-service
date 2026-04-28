@@ -2886,6 +2886,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondToAdmittedClaim(respondToClaim);
             BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
             caseData.setTotalClaimAmount(totalClaimAmount);
+            caseData.setIsRespondent1(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             // When

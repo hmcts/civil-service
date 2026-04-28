@@ -756,7 +756,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean hasDefendantPaidTheAmountClaimed() {
         return SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
-            .equals(getDefenceRouteRequired());
+            .equals(getDefenceRouteRequired()) || SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
+                .equals(getDefenceRouteRequired2());
     }
 
     @JsonIgnore
@@ -777,7 +778,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isClaimBeingDisputed() {
         return SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
-            .equals(getDefenceRouteRequired());
+            .equals(getDefenceRouteRequired()) || SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
+                .equals(getDefenceRouteRequired2());
     }
 
     @JsonIgnore
@@ -1226,7 +1228,27 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public RespondToClaim getResponseToClaim() {
-        return getRespondToAdmittedClaim() != null ? getRespondToAdmittedClaim() : getRespondToClaim();
+        // Prefer respondent-specific admitted-claim when the relevant respondent flag is explicitly set to YES,
+        // but fall back safely to avoid returning null (some test journeys set only one of the admitted-claim fields).
+        if (YES.equals(getIsRespondent1())) {
+            if (getRespondToAdmittedClaim() != null) {
+                return getRespondToAdmittedClaim();
+            }
+            if (getRespondToClaim() != null) {
+                return getRespondToClaim();
+            }
+        }
+
+        if (YES.equals(getIsRespondent2())) {
+            if (getRespondToAdmittedClaim2() != null) {
+                return getRespondToAdmittedClaim2();
+            }
+            if (getRespondToClaim2() != null) {
+                return getRespondToClaim2();
+            }
+        }
+
+        return null;
     }
 
     @JsonIgnore

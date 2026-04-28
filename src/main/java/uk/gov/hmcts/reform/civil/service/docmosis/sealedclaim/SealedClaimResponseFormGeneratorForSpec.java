@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,9 +40,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V2_LR_ADMISSION_BULK;
@@ -57,10 +58,14 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     private final ReferenceNumberAndCourtDetailsPopulator referenceNumberPopulator;
     private final StatementOfTruthPopulator statementOfTruthPopulator;
 
+    private final ObjectMapper mapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule());
+
     @Override
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
         log.info("GetTemplateData for case ID {}", caseData.getCcdCaseReference());
         SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
+        log.info("CaseDate for case {}", safeWrite(caseData));
 
         referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, authorisation);
         statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
@@ -68,6 +73,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         addCarmMediationDetails(form, caseData);
         addRepaymentPlanDetails(form, caseData);
         handleRespondents(form, caseData);
+        log.info("caseData after handleRespondents {}", safeWrite(caseData));
 
         Optional.ofNullable(caseData.getSolicitorReferences()).ifPresent(form::setSolicitorReferences);
 
@@ -77,8 +83,18 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         handleTimeline(form, caseData);
         handleDefenceResponseDocument(form, caseData);
         handlePayments(caseData, form);
+        log.info("SealedClaimResponseFormForSpec form getTemplateData {}", safeWrite(form));
+        log.info("caseData before returning {}", safeWrite(caseData));
 
         return form;
+    }
+
+    private String safeWrite(Object obj) {
+        try {
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+        } catch (JsonProcessingException e) { // NOSONAR
+            return String.valueOf(obj);
+        }
     }
 
     private void handleRespondents(SealedClaimResponseFormForSpec form, CaseData caseData) {
@@ -106,16 +122,25 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     private void handleClaimResponse(SealedClaimResponseFormForSpec form, CaseData caseData) {
         if (isRespondent2(caseData) && !YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
+            log.info(
+                "isRespondent2(caseData) && !YesOrNo.YES.equals(caseData.getRespondentResponseIsSame()) {}",
+                caseData.getRespondent2ResponseDate()
+            );
             Optional.ofNullable(caseData.getRespondent2ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedValue)
                 .ifPresent(form::setDefendantResponse);
             form.setSubmittedOn(caseData.getRespondent2ResponseDate().toLocalDate());
         } else if (caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
+            log.info(
+                "caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame()) {}",
+                caseData.getRespondent1ResponseDate()
+            );
             Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedSingularValue)
                 .ifPresent(form::setDefendantResponse);
             form.setSubmittedOn(caseData.getRespondent1ResponseDate().toLocalDate());
         } else {
+            log.info("else block handleClaimResponse {}", caseData.getRespondent1ResponseDate());
             Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedValue)
                 .ifPresent(form::setDefendantResponse);
@@ -136,9 +161,14 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         if (caseData.getRespondent2() != null && isRespondent2(caseData)) {
             // respondent 2 answered last
             why = caseData.getDetailsOfWhyDoesYouDisputeTheClaim2();
+            log.info(
+                "caseData.getRespondent2() != null && isRespondent2(caseData) WHY **** {}",
+                caseData.getDetailsOfWhyDoesYouDisputeTheClaim2()
+            );
         } else {
             // single defendant or respondent 1 is the latest
             why = caseData.getDetailsOfWhyDoesYouDisputeTheClaim();
+            log.info("else WHY *** {}", caseData.getDetailsOfWhyDoesYouDisputeTheClaim());
         }
         form.setWhyDisputeTheClaim(why);
     }
@@ -168,13 +198,16 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private void handlePayments(CaseData caseData, SealedClaimResponseFormForSpec form) {
-        Stream.of(caseData.getRespondToClaim(), caseData.getRespondToAdmittedClaim())
-            .filter(Objects::nonNull)
-            .findFirst()
-            .ifPresent(response -> form
-                .setPoundsPaid(MonetaryConversions.penniesToPounds(response.getHowMuchWasPaid()).toString())
-                .setPaymentDate(response.getWhenWasThisAmountPaid())
-                .setPaymentMethod(getPaymentMethod(response)));
+        log.info("caseData.getRespondToClaim() {}", caseData.getRespondToClaim());
+        log.info("caseData.getRespondToClaim2() {}", caseData.getRespondToClaim2());
+        log.info("caseData.getRespondToAdmittedClaim() {}", caseData.getRespondToAdmittedClaim());
+        log.info("caseData.getRespondToAdmittedClaim2() {}", caseData.getRespondToAdmittedClaim2());
+        RespondToClaim respondToClaim = caseData.getResponseToClaim();
+        if (respondToClaim != null) {
+            form.setPoundsPaid(MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()).toString())
+                .setPaymentDate(respondToClaim.getWhenWasThisAmountPaid())
+                .setPaymentMethod(getPaymentMethod(respondToClaim));
+        }
     }
 
     private void addRepaymentPlanDetails(SealedClaimResponseFormForSpec form, CaseData caseData) {
@@ -402,7 +435,9 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     public CaseDocument generate(CaseData caseData, String authorization) {
         SealedClaimResponseFormForSpec templateData = getTemplateData(caseData, authorization);
+        log.info("templateData in generate {}", safeWrite(templateData));
         DocmosisTemplates docmosisTemplate = getTemplate(caseData);
+        log.info("docmosisTemplate in generate {}", docmosisTemplate);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData, docmosisTemplate

@@ -8,6 +8,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -98,6 +99,11 @@ class SealedClaimResponseFormGeneratorForSpecTest {
             .respondent1DQ(respondent1DQ)
             .respondent1ResponseDate(LocalDateTime.now())
             .build();
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setHowMuchWasPaid(new BigDecimal("100050"));
+        respondToClaim.setWhenWasThisAmountPaid(LocalDate.parse("2023-03-29"));
+        respondToClaim.setHowWasThisAmountPaid(PaymentMethod.OTHER);
+        base1v1.setRespondToClaim(respondToClaim);
         base1v1.setDetailsOfWhyDoesYouDisputeTheClaim("why-1v1");
 
         Party applicantOne1v2 = new Party();
@@ -160,6 +166,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
         base1v2LatestIsResp2.setSpecResponseTimelineOfEvents(List.of(timeline1));
         base1v2LatestIsResp2.setSpecResponseTimelineOfEvents2(List.of(timeline2));
         base1v2LatestIsResp2.setRespondToAdmittedClaim(respondToAdmittedClaim);
+        base1v2LatestIsResp2.setRespondToAdmittedClaim2(respondToClaim);
 
         // Minimal stubs for the two "populator" collaborators to keep this unit test atomic
         lenient().doAnswer(inv -> {
@@ -201,6 +208,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
 
     @Test
     void getTemplateData_1v2_latestIsRespondent2_usesResp2_fields_timeline2_and_resp2_def_doc() {
+        base1v2LatestIsResp2.setIsRespondent1(YesOrNo.YES);
         SealedClaimResponseFormForSpec dto = generator.getTemplateData(base1v2LatestIsResp2, AUTH);
 
         // populated by our stub
@@ -262,6 +270,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
         respondToClaim.setWhenWasThisAmountPaid(LocalDate.now().minusDays(3));
         CaseData withOther = base1v1;
         withOther.setRespondToClaim(respondToClaim);
+        withOther.setIsRespondent1(YesOrNo.YES);
 
         SealedClaimResponseFormForSpec dto = generator.getTemplateData(withOther, AUTH);
 

@@ -262,7 +262,7 @@ def setPreviewUrls(String product, String component) {
     env.PREVIEW_HMC_API_URL = wiremockUrl
     env.PREVIEW_RD_PROFESSIONAL_API_URL = wiremockUrl
     env.PREVIEW_RD_COMMONDATA_API_URL = "http://rd-commondata-api-aat.service.core-compute-aat.internal"
-    env.PREVIEW_DOCMOSIS_TORNADO_URL = wiremockUrl
+    env.PREVIEW_DOCMOSIS_TORNADO_URL = "https://docmosis.aat.platform.hmcts.net"
     env.PREVIEW_SEND_LETTER_URL = "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
     env.PREVIEW_FEES_API_URL = "http://fees-register-api-aat.service.core-compute-aat.internal"
     env.PREVIEW_CLAIM_STORE_URL = "http://cmc-claim-store-aat.service.core-compute-aat.internal"
