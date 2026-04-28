@@ -6,14 +6,10 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,20 +25,6 @@ class SdoFastTrackTemplateFieldServiceTest {
 
         assertThat(service.getMethodTelephoneHearingLabel(caseData)).isEqualTo("the claimant");
         assertThat(service.getMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the defendant");
-    }
-
-    @Test
-    void shouldDescribeTrialBundleSelections() {
-        CaseData caseData = CaseDataBuilder.builder().build();
-        FastTrackTrial trial = new FastTrackTrial();
-        trial.setType(List.of(FastTrackTrialBundleType.DOCUMENTS, FastTrackTrialBundleType.ELECTRONIC));
-        caseData.setFastTrackTrial(trial);
-
-        String expected = FastTrackTrialBundleType.DOCUMENTS.getLabel()
-            + " / "
-            + FastTrackTrialBundleType.ELECTRONIC.getLabel();
-
-        assertThat(service.getTrialBundleTypeText(caseData)).isEqualTo(expected);
     }
 
     @Test

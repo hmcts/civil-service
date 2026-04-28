@@ -33,7 +33,7 @@ public class HearingDocumentDeadlineParamsBuilder extends DashboardNotifications
             return Optional.empty();
         } else {
             return Optional.ofNullable(caseData.getDisposalHearingDisclosureOfDocuments())
-                .map(DisposalHearingDisclosureOfDocuments::getDate2);
+                .map(DisposalHearingDisclosureOfDocuments::getDate1);
         }
     }
 }

@@ -47,7 +47,6 @@ class SdoFastTrackTemplateServiceTest {
         when(templateFieldService.getMethodVideoConferenceHearingLabel(caseData)).thenReturn("defendant");
         when(templateFieldService.getAllocationSummary(caseData)).thenReturn("allocation text");
         when(templateFieldService.getHearingTimeLabel(caseData)).thenReturn("4 hours");
-        when(templateFieldService.getTrialBundleTypeText(caseData)).thenReturn("bundle text");
 
         LocationRefData location = new LocationRefData();
         location.setEpimmsId("123");

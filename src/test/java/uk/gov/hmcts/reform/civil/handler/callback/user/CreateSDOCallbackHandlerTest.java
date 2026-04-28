@@ -163,6 +163,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_PERMISSION_SDO;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.ADDENDUM_REPORT;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.APPLICATION_TO_RELY_DETAILS;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.CLAIMANT_PERMISSION_TO_RELY;
@@ -1793,6 +1796,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLossToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackCostsToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackTrialToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackTrialBundleToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackMethodToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocumentsToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactToggle").isNotNull();
@@ -1801,7 +1805,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingMethodToggle").isNotNull();
-            assertThat(response.getData()).extracting("disposalHearingBundleToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingClaimSettlingToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingCostsToggle").isNotNull();
             assertThat(response.getData()).extracting("smallClaimsHearingToggle").isNotNull();
@@ -1816,16 +1819,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + " and Directions questionnaires");
 
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("input1")
-                .isEqualTo("The parties shall serve on each other copies of the documents upon which reliance is "
-                               + "to be placed at the disposal hearing by 4pm on");
-            assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("input2")
-                .isEqualTo(
-                    "The parties must upload to the Digital Portal copies of those documents which they wish the "
-                        + "court to consider when deciding the amount of damages, by 4pm on");
+                .isEqualTo(DISPOSAL_DOCUMENTS_EXCHANGE);
 
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input3")
-                .isEqualTo("The claimant must upload to the Digital Portal copies of the witness statements"
-                               + " of all witnesses of fact on whose evidence reliance is to be placed by 4pm on");
+                .isEqualTo(DISPOSAL_WITNESS_UPLOAD);
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("date2")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input4")
@@ -1840,10 +1837,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "the 30-minute maximum time estimate for a disposal hearing.");
 
             assertThat(response.getData()).extracting("disposalHearingMedicalEvidence").extracting("input")
-                .isEqualTo("The claimant has permission to rely upon the written expert evidence already uploaded "
-                               + "to the Digital Portal with the particulars of claim and in addition has permission to"
-                               + " rely upon any associated correspondence or updating report which is uploaded"
-                               + " to the Digital Portal by 4pm on");
+                .isEqualTo(PERSONAL_INJURY_PERMISSION_SDO);
             assertThat(response.getData()).extracting("disposalHearingMedicalEvidence").extracting("date")
                 .isEqualTo(nextWorkingDayDate.toString());
 
@@ -1873,11 +1867,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("This claim will be listed for final disposal "
                                + "before a judge on the first available date after");
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearing").extracting("date")
-                .isEqualTo(LocalDate.now().plusWeeks(16).toString());
-
-            assertThat(response.getData()).extracting("disposalHearingBundle").extracting("input")
-                .isEqualTo("At least 7 days before the disposal hearing, "
-                               + "the claimant must file and serve");
+                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
 
             assertThat(response.getData()).extracting("disposalHearingNotes").extracting("input")
                 .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have"

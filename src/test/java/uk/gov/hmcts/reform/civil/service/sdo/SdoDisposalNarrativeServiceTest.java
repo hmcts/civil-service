@@ -13,9 +13,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.lenient;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_JUDGES_RECITAL_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_UPLOAD_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_SEND;
@@ -54,11 +52,9 @@ class SdoDisposalNarrativeServiceTest {
         service.applyWitnessOfFact(caseData);
 
         assertThat(caseData.getDisposalHearingDisclosureOfDocuments().getDate1())
-            .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(10));
+            .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(4));
         assertThat(caseData.getDisposalHearingDisclosureOfDocuments().getInput1())
             .isEqualTo(DISPOSAL_DOCUMENTS_EXCHANGE);
-        assertThat(caseData.getDisposalHearingDisclosureOfDocuments().getInput2())
-            .isEqualTo(DISPOSAL_DOCUMENTS_UPLOAD);
         assertThat(caseData.getDisposalHearingWitnessOfFact().getDate2())
             .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(4));
         assertThat(caseData.getDisposalHearingWitnessOfFact().getInput3())
@@ -97,11 +93,10 @@ class SdoDisposalNarrativeServiceTest {
     }
 
     @Test
-    void shouldPopulateSchedulesAndBundleUsingLibraryText() {
+    void shouldPopulateSchedulesUsingLibraryText() {
         CaseData caseData = CaseDataBuilder.builder().build();
 
         service.applySchedulesOfLoss(caseData);
-        service.applyBundle(caseData);
 
         assertThat(caseData.getDisposalHearingSchedulesOfLoss().getInput2())
             .isEqualTo(DISPOSAL_SCHEDULE_CLAIMANT_UPLOAD_SDO);
@@ -109,8 +104,6 @@ class SdoDisposalNarrativeServiceTest {
             .isEqualTo(DISPOSAL_SCHEDULE_COUNTER_SEND);
         assertThat(caseData.getDisposalHearingSchedulesOfLoss().getInput4())
             .isEqualTo(DISPOSAL_SCHEDULE_COUNTER_UPLOAD_SDO);
-        assertThat(caseData.getDisposalHearingBundle().getInput())
-            .isEqualTo(DISPOSAL_BUNDLE_REQUIREMENT);
     }
 
     @Test
@@ -120,8 +113,8 @@ class SdoDisposalNarrativeServiceTest {
         service.applyFinalDisposalHearing(caseData);
         service.applyHearingTime(caseData);
 
-        LocalDate expected = LocalDate.now().plusWeeks(16);
-        assertThat(caseData.getDisposalHearingFinalDisposalHearing().getDate()).isEqualTo(expected);
-        assertThat(caseData.getDisposalHearingHearingTime().getDateTo()).isEqualTo(expected);
+        assertThat(caseData.getDisposalHearingFinalDisposalHearing().getDate()).isEqualTo(LocalDate.now().plusWeeks(12));
+        assertThat(caseData.getDisposalHearingHearingTime().getDateFrom()).isEqualTo(LocalDate.now().plusWeeks(12));
+        assertThat(caseData.getDisposalHearingHearingTime().getDateTo()).isEqualTo(LocalDate.now().plusWeeks(16));
     }
 }

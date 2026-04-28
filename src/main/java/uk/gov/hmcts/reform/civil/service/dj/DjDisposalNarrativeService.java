@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.dj;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
@@ -13,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesO
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ;
@@ -51,7 +49,7 @@ public class DjDisposalNarrativeService {
             .setDate1(deadlineService.nextWorkingDayInWeeks(4))
             .setInput2(DISPOSAL_WITNESS_CPR32_6)
             .setInput3(DISPOSAL_WITNESS_CPR32_7_DEADLINE)
-            .setDate2(deadlineService.nextWorkingDayInWeeks(2))
+            .setDate2(deadlineService.nextWorkingDayInWeeks(9))
             .setInput4(DISPOSAL_WITNESS_TRIAL_NOTE_DJ);
     }
 
@@ -69,11 +67,11 @@ public class DjDisposalNarrativeService {
     public DisposalHearingSchedulesOfLossDJ buildSchedulesOfLoss() {
         return new DisposalHearingSchedulesOfLossDJ()
             .setInput1(DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ)
-            .setDate1(deadlineService.nextWorkingDayInWeeks(10))
+            .setDate1(deadlineService.nextWorkingDayInWeeks(8))
             .setInput2(DISPOSAL_SCHEDULE_COUNTER_SEND)
-            .setDate2(deadlineService.nextWorkingDayInWeeks(12))
+            .setDate2(deadlineService.nextWorkingDayInWeeks(10))
             .setInput3(DISPOSAL_SCHEDULE_COUNTER_UPLOAD_DJ)
-            .setDate3(deadlineService.nextWorkingDayInWeeks(12))
+            .setDate3(deadlineService.nextWorkingDayInWeeks(10))
             .setInputText4(DISPOSAL_SCHEDULE_FUTURE_LOSS);
     }
 
@@ -86,12 +84,7 @@ public class DjDisposalNarrativeService {
     public DisposalHearingFinalDisposalHearingTimeDJ buildFinalDisposalHearingTime() {
         return new DisposalHearingFinalDisposalHearingTimeDJ()
             .setInput(DISPOSAL_FINAL_HEARING_LISTING_DJ)
-            .setDate(deadlineService.weeksFromNow(16));
-    }
-
-    public DisposalHearingBundleDJ buildBundle() {
-        return new DisposalHearingBundleDJ()
-            .setInput(DISPOSAL_BUNDLE_REQUIREMENT);
+            .setDate(deadlineService.weeksFromNow(12));
     }
 
     public DisposalHearingNotesDJ buildNotes() {

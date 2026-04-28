@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
@@ -60,7 +59,6 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private  DisposalHearingQuestionsToExpertsDJ disposalHearingQuestionsToExpertsDJ;
     private  DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
-    private  DisposalHearingBundleDJ disposalHearingBundleDJ;
     private  DisposalHearingNotesDJ disposalHearingNotesDJ;
     private  List<Element<DisposalHearingAddNewDirectionsDJ>> disposalHearingAddNewDirectionsDJ;
     private  boolean hasNewDirections;
@@ -91,7 +89,6 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private  boolean disposalHearingQuestionsToExpertsDJAddSection;
     private  boolean disposalHearingSchedulesOfLossDJAddSection;
     private  boolean disposalHearingFinalDisposalHearingDJAddSection;
-    private  boolean disposalHearingBundleDJAddSection;
     private  boolean disposalHearingClaimSettlingAddSection;
     private  boolean disposalHearingCostsAddSection;
 

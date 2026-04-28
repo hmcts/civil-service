@@ -22,7 +22,6 @@ public class DjTrialTemplateService {
     private final DocumentHearingLocationHelper locationHelper;
     private final FeatureToggleService featureToggleService;
     private final DjAuthorisationFieldService authorisationFieldService;
-    private final DjBundleFieldService bundleFieldService;
     private final DjDirectionsToggleService directionsToggleService;
     private final DjPartyFieldService partyFieldService;
     private final DjHearingMethodFieldService hearingMethodFieldService;
@@ -48,7 +47,6 @@ public class DjTrialTemplateService {
             .setSdoDJR2TrialCreditHireAddSection(nonNull(caseData.getSdoDJR2TrialCreditHire()))
             .setSdoDJR2TrialCreditHireDetailsAddSection(trialTemplateFieldService.showCreditHireDetails(caseData))
             .setTrialHearingTrialDJ(caseData.getTrialHearingTrialDJ())
-            .setTypeBundleInfo(bundleFieldService.buildBundleInfo(caseData))
             .setTrialHearingTrialDJAddSection(directionsToggleService.isToggleEnabled(caseData.getTrialHearingTrialDJToggle()))
             .setTrialHearingNotesDJ(caseData.getTrialHearingNotesDJ())
             .setHasNewDirections(directionsToggleService.hasAdditionalDirections(caseData))

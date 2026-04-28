@@ -5,10 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -23,5 +21,4 @@ public class FastTrackTrial {
     private LocalDate date2;
     private String input2;
     private String input3;
-    private List<FastTrackTrialBundleType> type;
 }

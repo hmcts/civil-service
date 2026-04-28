@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -115,7 +114,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
@@ -548,7 +546,6 @@ public class CaseDataBuilder {
     private DynamicList hearingMethodValuesTrialHearingDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
-    private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
     private LocalDate hearingDueDate;
@@ -3076,15 +3073,11 @@ public class CaseDataBuilder {
                 + " insufficient, they must inform the court within "
                 + "7 days of the date of this order.")
             .setInput3(FAST_TRACK_TRIAL_BUNDLE_NOTICE + " ")
-            .setType(List.of(DisposalHearingBundleType.DOCUMENTS));
+            .setType(List.of("DOCUMENTS"));
         return this;
     }
 
     public CaseDataBuilder atStateClaimIssuedDisposalHearingInPerson() {
-        disposalHearingBundleDJ = new DisposalHearingBundleDJ()
-            .setInput("The claimant must lodge at court at least 7 "
-                + "days before the disposal")
-            .setType(List.of(DisposalHearingBundleType.DOCUMENTS));
         disposalHearingFinalDisposalHearingDJ = new DisposalHearingFinalDisposalHearingDJ()
             .setInput(DISPOSAL_FINAL_HEARING_LISTING_DJ)
             .setDate(LocalDate.now().plusWeeks(16))
@@ -7681,7 +7674,6 @@ public class CaseDataBuilder {
             .hearingMethodValuesTrialHearingDJ(hearingMethodValuesTrialHearingDJ)
             .disposalHearingMethodDJ(disposalHearingMethodDJ)
             .trialHearingMethodInPersonDJ(trialHearingMethodInPersonDJ)
-            .disposalHearingBundleDJ(disposalHearingBundleDJ)
             .disposalHearingFinalDisposalHearingDJ(disposalHearingFinalDisposalHearingDJ)
             .trialHearingTrialDJ(trialHearingTrialDJ)
             .disposalHearingJudgesRecitalDJ(disposalHearingJudgesRecitalDJ)
