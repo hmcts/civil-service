@@ -200,14 +200,16 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
         RespondToClaim respondToClaim = caseData.getResponseToClaim();
         log.info("caseData getIsRespondent1{}", caseData.getIsRespondent1());
         log.info("caseData getIsRespondent2{}", caseData.getIsRespondent2());
-        log.info("respondToClaim.getHowMuchWasPaid() {}", respondToClaim.getHowMuchWasPaid());
-        log.info("respondToClaim.getWhenWasThisAmountPaid() {}", respondToClaim.getWhenWasThisAmountPaid());
-        log.info("respondToClaim.getExplanationOnHowTheAmountWasPaid() {}", respondToClaim.getExplanationOnHowTheAmountWasPaid());
-        String howMuchWasPaidAsString = MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "";
-        data.setWhyReject("ALREADY_PAID")
-            .setHowMuchWasPaid(howMuchWasPaidAsString)
-            .setPaymentDate(respondToClaim.getWhenWasThisAmountPaid())
-            .setPaymentHow(respondToClaim.getExplanationOnHowTheAmountWasPaid());
+        log.info("respondToClaim.respondToClaim() {}", respondToClaim);
+        if (respondToClaim != null) {
+            log.info("respondToClaim.getWhenWasThisAmountPaid() {}", respondToClaim.getWhenWasThisAmountPaid());
+            log.info("respondToClaim.getExplanationOnHowTheAmountWasPaid() {}", respondToClaim.getExplanationOnHowTheAmountWasPaid());
+            String howMuchWasPaidAsString = MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "";
+            data.setWhyReject("ALREADY_PAID")
+                .setHowMuchWasPaid(howMuchWasPaidAsString)
+                .setPaymentDate(respondToClaim.getWhenWasThisAmountPaid())
+                .setPaymentHow(respondToClaim.getExplanationOnHowTheAmountWasPaid());
+        }
     }
 
     private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, ResponseRepaymentDetailsFormData data) {

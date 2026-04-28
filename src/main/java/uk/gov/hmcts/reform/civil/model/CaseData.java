@@ -1246,14 +1246,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
             }
         }
 
-        // If respondent flags are not set, fall back to whichever admitted-claim exists.
-        if (getRespondToAdmittedClaim() != null) {
-            return getRespondToAdmittedClaim();
-        }
-        if (getRespondToAdmittedClaim2() != null) {
-            return getRespondToAdmittedClaim2();
-        }
-        return getRespondToClaim();
+        return null;
     }
 
     @JsonIgnore

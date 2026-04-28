@@ -208,6 +208,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
 
     @Test
     void getTemplateData_1v2_latestIsRespondent2_usesResp2_fields_timeline2_and_resp2_def_doc() {
+        base1v2LatestIsResp2.setIsRespondent1(YesOrNo.YES);
         SealedClaimResponseFormForSpec dto = generator.getTemplateData(base1v2LatestIsResp2, AUTH);
 
         // populated by our stub
@@ -269,6 +270,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
         respondToClaim.setWhenWasThisAmountPaid(LocalDate.now().minusDays(3));
         CaseData withOther = base1v1;
         withOther.setRespondToClaim(respondToClaim);
+        withOther.setIsRespondent1(YesOrNo.YES);
 
         SealedClaimResponseFormForSpec dto = generator.getTemplateData(withOther, AUTH);
 
