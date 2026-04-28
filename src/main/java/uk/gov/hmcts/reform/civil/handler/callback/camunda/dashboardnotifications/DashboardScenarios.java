@@ -258,6 +258,9 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_DEFENDANT("Scenario.AAA6.ProofOfDebtPayment.Confirmation.Defendant"),
     SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_JBA_CLAIM_MOVES_OFFLINE_CLAIMANT("Scenario.AAA6.DefendantNoticeOfChange.JudgmentByAdmissionClaimMovesOffline.Claimant"),
 
+    SCENARIO_AAA6_MARK_PAID_IN_FULL_CLAIMANT("Scenario.AAA6.MarkPaidInFull.Confirmation.Claimant"),
+    SCENARIO_AAA6_MARK_PAID_IN_FULL_DEFENDANT("Scenario.AAA6.MarkPaidInFull.Confirmation.Defendant"),
+
     //General Application
     SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_NONURGENT_RESPONDENT("Scenario.AAA6.GeneralApps.NonUrgentApplicationMade.Respondent"),
     SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_URGENT_RESPONDENT("Scenario.AAA6.GeneralApps.UrgentApplicationMade.Respondent"),
