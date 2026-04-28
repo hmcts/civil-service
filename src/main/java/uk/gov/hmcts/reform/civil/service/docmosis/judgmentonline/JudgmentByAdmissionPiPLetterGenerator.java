@@ -73,7 +73,7 @@ public class JudgmentByAdmissionPiPLetterGenerator {
         }
 
         List<String> recipients = getRecipientsList(caseData);
-        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+        bulkPrintService.printLetter(letterContent, String.valueOf(caseData.getCcdCaseReference()),
                 caseData.getLegacyCaseReference(), JUDGMENT_BY_ADMISSION_LETTER, recipients, bulkPrintFileNames);
         return letterContent;
     }
@@ -91,6 +91,7 @@ public class JudgmentByAdmissionPiPLetterGenerator {
 
     public JudgmentByAdmissionLiPDefendantLetter getTemplateData(CaseData caseData) {
         return new JudgmentByAdmissionLiPDefendantLetter()
+            .setCcdCaseReference(String.valueOf(caseData.getLegacyCaseReference()))
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
             .setClaimantName(caseData.getApplicant1().getPartyName())
             .setDefendant(caseData.getRespondent1())

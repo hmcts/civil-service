@@ -20,6 +20,7 @@ public class RecordJudgmentDeterminationOfMeansLiPDefendantLetter implements Map
 
     private Party defendant;
     private String claimantName;
+    private String ccdCaseReference;
     private String claimReferenceNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)

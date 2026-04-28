@@ -18,6 +18,7 @@ import java.time.LocalDate;
 public class SettleClaimMarkedPaidInFullDefendantLiPLetter implements MappableObject {
 
     private String claimReferenceNumber;
+    private String ccdCaseReference;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate letterIssueDate;

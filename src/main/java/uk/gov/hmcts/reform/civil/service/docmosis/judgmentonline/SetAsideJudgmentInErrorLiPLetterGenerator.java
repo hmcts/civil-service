@@ -58,7 +58,7 @@ public class SetAsideJudgmentInErrorLiPLetterGenerator {
 
         List<String> recipients = getRecipientsList(caseData);
         List<String> bulkPrintFileNames = List.of(setAsideLetterCaseDocument.getDocumentLink().getDocumentFileName());
-        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+        bulkPrintService.printLetter(letterContent, String.valueOf(caseData.getCcdCaseReference()),
                 caseData.getLegacyCaseReference(), SET_ASIDE_JUDGMENT_LETTER, recipients, bulkPrintFileNames);
         return letterContent;
     }
@@ -77,6 +77,7 @@ public class SetAsideJudgmentInErrorLiPLetterGenerator {
     public SetAsideJudgmentInErrorLiPDefendantLetter getTemplateData(CaseData caseData) {
         return new SetAsideJudgmentInErrorLiPDefendantLetter()
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setClaimantName(caseData.getApplicant1().getPartyName())
             .setDefendant(caseData.getRespondent1())
             .setLetterIssueDate(LocalDate.now())

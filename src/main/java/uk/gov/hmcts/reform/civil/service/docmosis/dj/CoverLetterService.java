@@ -111,6 +111,7 @@ public class CoverLetterService {
 
     public JudgementCoverLetter buildTemplateData(Party party, LitigationFriend litigationFriend, CaseData caseData) {
         return new JudgementCoverLetter()
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setClaimNumber(caseData.getLegacyCaseReference())
             .setAddress(party.getPrimaryAddress())
             .setPartyName(PartyUtils.getPartyNameWithLitigiousFriend(party, litigationFriend));

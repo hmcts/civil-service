@@ -86,6 +86,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             .setCaseManagementLocation(caseManagementLocationText)
             .setHearingLocation(hearingLocation)
             .setCaseNumber(caseData.getCcdCaseReference())
+            .setLegacyNumber(caseData.getLegacyCaseReference())
             .setCreationDate(creationDate)
             .setCreationDateWelshText(isWelsh ? formatDateInWelsh(creationDate, true) : null)
             .setHearingType(getHearingTypeContentText(caseData, hearing, isWelsh))

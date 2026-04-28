@@ -69,7 +69,7 @@ public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
         List<String> recipients = getRecipientsList(caseData);
         List<String> bulkPrintFileNames = new ArrayList<>();
         bulkPrintFileNames.add(recordJudgmentDeterminationOfMeansLetterCaseDocument.getDocumentLink().getDocumentFileName());
-        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+        bulkPrintService.printLetter(letterContent, String.valueOf(caseData.getCcdCaseReference()),
                                      caseData.getLegacyCaseReference(), RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER,
                                      recipients, bulkPrintFileNames);
         return letterContent;
@@ -88,6 +88,7 @@ public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
 
     public RecordJudgmentDeterminationOfMeansLiPDefendantLetter getTemplateData(CaseData caseData) {
         return new RecordJudgmentDeterminationOfMeansLiPDefendantLetter()
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
             .setClaimantName(caseData.getApplicant1().getPartyName())
             .setDefendant(caseData.getRespondent1())

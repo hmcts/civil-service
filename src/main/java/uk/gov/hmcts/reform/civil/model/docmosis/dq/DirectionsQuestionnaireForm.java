@@ -37,6 +37,7 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
     private String caseName;
     private String referenceNumber;
+    private String ccdCaseReference;
     private SolicitorReferences solicitorReferences;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
