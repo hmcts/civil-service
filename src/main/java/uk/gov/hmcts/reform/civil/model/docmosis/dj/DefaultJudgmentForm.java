@@ -18,6 +18,7 @@ public class DefaultJudgmentForm implements MappableObject {
 
     /** Case reference number. */
     private String caseNumber;
+    private String ccdCaseReference;
 
     /** Applicant party information. */
     private List<Party> applicant;
@@ -61,6 +62,7 @@ public class DefaultJudgmentForm implements MappableObject {
     public DefaultJudgmentForm copy() {
         return new DefaultJudgmentForm()
             .setCaseNumber(this.caseNumber)
+            .setCcdCaseReference(this.ccdCaseReference)
             .setApplicant(this.applicant)
             .setApplicantDetails(this.applicantDetails)
             .setApplicantReference(this.applicantReference)

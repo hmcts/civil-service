@@ -46,6 +46,7 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
         DefaultJudgmentForm defaultJudgmentForm = new DefaultJudgmentForm();
         defaultJudgmentForm
             .setCaseNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(String.valueOf(caseData.getLegacyCaseReference()))
             .setFormText("No response,")
             .setApplicant(getApplicants(caseData))
             .setRespondent(getRespondentLROrLipDetails(caseData, partyType))

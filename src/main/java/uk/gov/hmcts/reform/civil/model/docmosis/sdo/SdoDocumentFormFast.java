@@ -46,6 +46,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private String judgeName;
     private LocalDate currentDate;
     private String caseNumber;
+    private String ccdCaseReference;
     private ClaimsTrack claimsTrack;
     private JudgementSum drawDirectionsOrder;
     private YesOrNo drawDirectionsOrderRequired;
