@@ -576,7 +576,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("disposalHearingOrderMadeWithoutHearingDJ").extracting("input")
-                .isEqualTo(String.format("%s %s.",
+                .isEqualTo(String.format("%s <b>%s</b>.",
                     ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE,
                     nextWorkingDayDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))));
 
@@ -593,7 +593,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE);
 
             assertThat(response.getData()).extracting("trialOrderMadeWithoutHearingDJ").extracting("input")
-                .isEqualTo(String.format("%s %s.",
+                .isEqualTo(String.format("%s <b>%s</b>.",
                     ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE,
                     date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))));
         }
