@@ -198,7 +198,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
     private Map<String, String> getNotificationDataMapSpec() {
         Map<String, String> properties = new HashMap<>(addCommonProperties());
         properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
-        properties.put("defendantName", "Mr. Sole Trader");
+        properties.put("defendantName", "Mr. Sole Trader T/A Sole Trader co");
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name");
         properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
         properties.put(CASEMAN_REF, "000DC001");

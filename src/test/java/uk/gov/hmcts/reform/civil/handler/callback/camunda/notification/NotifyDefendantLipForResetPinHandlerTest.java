@@ -114,7 +114,7 @@ public class NotifyDefendantLipForResetPinHandlerTest extends BaseCallbackHandle
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
-            RESPONDENT_NAME, "Mr. Sole Trader",
+            RESPONDENT_NAME, "Mr. Sole Trader T/A Sole Trader co",
             CLAIMANT_NAME, "Mr. John Rambo",
             ISSUED_ON, formatLocalDate(LocalDate.now(), DATE),
             RESPOND_URL, "dummy_respond_to_claim_url",

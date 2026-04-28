@@ -2810,7 +2810,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssued1v2AndOneDefendantDefaultJudgment() {
-        defendantDetails = new DynamicList().setValue(new DynamicListElement().setLabel("Mr. Sole Trader"));
+        defendantDetails = new DynamicList().setValue(new DynamicListElement().setLabel("Mr. Sole Trader T/A Sole Trader co"));
         return this;
     }
 

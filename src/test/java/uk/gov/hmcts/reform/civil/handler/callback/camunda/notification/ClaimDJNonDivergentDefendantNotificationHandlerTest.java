@@ -200,7 +200,7 @@ class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCallbackHa
         Map<String, String> map = new HashMap<>(addCommonProperties(false));
         map.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         map.put(LEGAL_ORG_NAME, "Test Org Name");
-        map.put(DEFENDANT_NAME_INTERIM, "Mr. Sole Trader and Mr. John Rambo");
+        map.put(DEFENDANT_NAME_INTERIM, "Mr. Sole Trader T/A Sole Trader co and Mr. John Rambo");
         map.put(CLAIMANT_NAME, "Mr. John Rambo");
         map.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
         map.put(CASEMAN_REF, caseData.getLegacyCaseReference());

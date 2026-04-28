@@ -18,7 +18,7 @@ class DirectionsOrderParticipantServiceTest {
 
         String result = service.buildApplicantVRespondentText(caseData);
 
-        assertThat(result).isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+        assertThat(result).isEqualTo("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co");
     }
 
     @Test
@@ -33,7 +33,7 @@ class DirectionsOrderParticipantServiceTest {
 
         String result = service.buildApplicantVRespondentText(caseData);
 
-        assertThat(result).isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. Jane Rambo");
+        assertThat(result).isEqualTo("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co and Mr. Jane Rambo");
     }
 
     @Test
@@ -45,6 +45,6 @@ class DirectionsOrderParticipantServiceTest {
 
         String result = service.buildApplicantVRespondentText(caseData);
 
-        assertThat(result).isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
+        assertThat(result).isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader T/A Sole Trader co");
     }
 }

@@ -112,7 +112,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         private static final String RESPONDENT_LR_EMAIL_TEMPLATE = "template-lr-id-respondent";
         private static final String RESPONDENT_EMAIL_ID = "sole.trader@email.com";
         private static final String REFERENCE_NUMBER = "claimant-confirms-to-proceed-respondent-notification-000DC001";
-        private static final String DEFENDANT = "Mr. Sole Trader";
+        private static final String DEFENDANT = "Mr. Sole Trader T/A Sole Trader co";
 
         @Test
         void shouldNotifyLipRespondent_whenInvoked() {

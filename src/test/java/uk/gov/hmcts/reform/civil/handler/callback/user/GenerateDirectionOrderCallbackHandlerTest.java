@@ -569,7 +569,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("finalOrderRepresentation")
                 .extracting("typeRepresentationComplex")
                 .extracting("typeRepresentationDefendantOneDynamic")
-                .isEqualTo("Mr. Sole Trader");
+                .isEqualTo("Mr. Sole Trader T/A Sole Trader co");
             assertThat(response.getData()).extracting("finalOrderRepresentation")
                 .extracting("typeRepresentationComplex")
                 .extracting("typeRepresentationDefendantTwoDynamic")
@@ -661,7 +661,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("finalOrderRepresentation")
                 .extracting("typeRepresentationComplex")
                 .extracting("typeRepresentationDefendantOneDynamic")
-                .isEqualTo("Mr. Sole Trader");
+                .isEqualTo("Mr. Sole Trader T/A Sole Trader co");
             assertThat(response.getData()).extracting("finalOrderRepresentation")
                 .extracting("typeRepresentationComplex")
                 .extracting("typeRepresentationDefendantTwoDynamic")
@@ -2332,7 +2332,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void should1v1Text_WhenSubmittedAndCase1v1() {
             // Given
             String confirmationHeader = format(HEADER, 1234);
-            String confirmationBody = format(BODY_1_V_1, "Mr. John Rambo", "Mr. Sole Trader");
+            String confirmationBody = format(BODY_1_V_1, "Mr. John Rambo", "Mr. Sole Trader T/A Sole Trader co");
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .ccdCaseReference(1234L)
@@ -2351,7 +2351,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void should1v2Text_WhenSubmittedAndCase1v2() {
             // Given
             String confirmationHeader = format(HEADER, 1234);
-            String confirmationBody = format(BODY_1_V_2, "Mr. John Rambo", "Mr. Sole Trader", "Mr. John Rambo");
+            String confirmationBody = format(BODY_1_V_2, "Mr. John Rambo", "Mr. Sole Trader T/A Sole Trader co", "Mr. John Rambo");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build().toBuilder()
                 .ccdCaseReference(1234L)
                 .build();
@@ -2369,7 +2369,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void should2v1Text_WhenSubmittedAndCase2v1() {
             // Given
             String confirmationHeader = format(HEADER, 1234);
-            String confirmationBody = format(BODY_2_V_1, "Mr. John Rambo", "Mr. Jason Rambo", "Mr. Sole Trader");
+            String confirmationBody = format(BODY_2_V_1, "Mr. John Rambo", "Mr. Jason Rambo", "Mr. Sole Trader T/A Sole Trader co");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build().toBuilder()
                 .ccdCaseReference(1234L)
                 .build();

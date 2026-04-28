@@ -533,8 +533,8 @@ public class PartyDetailsChangedUtilTest {
 
             PartyDetailsChange expectedNameChange = new PartyDetailsChange()
                 .setFieldName("Name")
-                .setPreviousValue("Jane Carver")
-                .setUpdatedValue("Jane Wilson")
+                .setPreviousValue("Jane Carver T/A Sole Trader co")
+                .setUpdatedValue("Jane Wilson T/A Sole Trader co")
                 ;
 
             assertEquals(List.of(expectedNameChange), changes);

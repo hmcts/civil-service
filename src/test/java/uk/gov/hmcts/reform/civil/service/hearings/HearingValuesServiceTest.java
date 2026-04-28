@@ -191,8 +191,8 @@ public class HearingValuesServiceTest {
         VocabularyModel vocabularyModel = new VocabularyModel();
         ServiceHearingValuesModel expected = new ServiceHearingValuesModel();
         expected.setHmctsServiceID("AAA7");
-        expected.setHmctsInternalCaseName("Mr. John Rambo v Mr. Sole Trader");
-        expected.setPublicCaseName("John Rambo v Sole Trader");
+        expected.setHmctsInternalCaseName("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co");
+        expected.setPublicCaseName("John Rambo v Sole Trader T/A Sole Trader co");
         expected.setCaseAdditionalSecurityFlag(false);
         expected.setCaseCategories(expectedCaseCategories);
         expected.setCaseDeepLink("http://localhost:3333/cases/case-details/1");
@@ -754,7 +754,7 @@ public class HearingValuesServiceTest {
             "res-1-party-id",
             "Sole",
             "Trader",
-            "Mr. Sole Trader",
+            "Mr. Sole Trader T/A Sole Trader co",
             "DEFE",
             "sole.trader@email.com"
         );

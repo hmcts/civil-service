@@ -666,7 +666,7 @@ class ManageContactInformationUtilsTest {
                     .setLastName(updated.getLastName())
                     .setPhone(updated.getPhoneNumber())
                     .setEmail(updated.getEmailAddress())
-                    
+
             );
 
             assertThat(unwrapElements(actual)).isEqualTo(expected);
@@ -1033,7 +1033,7 @@ class ManageContactInformationUtilsTest {
 
     private List<DynamicListElement> expectedDefendant1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
         List<DynamicListElement> list = new ArrayList<>();
-        list.add(dynamicElementFromCode("DEFENDANT_1", "DEFENDANT 1: Mr. Sole Trader"));
+        list.add(dynamicElementFromCode("DEFENDANT_1", "DEFENDANT 1: Mr. Sole Trader T/A Sole Trader co"));
         list.add(dynamicElementFromCode("DEFENDANT_1_LITIGATION_FRIEND", "DEFENDANT 1: Litigation Friend: Litigation Friend"));
         list.add(dynamicElementFromCode("DEFENDANT_1_LR_INDIVIDUALS", "DEFENDANT 1: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
@@ -1057,7 +1057,7 @@ class ManageContactInformationUtilsTest {
 
     private List<DynamicListElement> expectedDefendants1v2SameSolicitorOptions(boolean withExpertsAndWitnesses, boolean isAdmin) {
         List<DynamicListElement> list = new ArrayList<>();
-        list.add(dynamicElementFromCode("DEFENDANT_1", "DEFENDANT 1: Mr. Sole Trader"));
+        list.add(dynamicElementFromCode("DEFENDANT_1", "DEFENDANT 1: Mr. Sole Trader T/A Sole Trader co"));
         list.add(dynamicElementFromCode("DEFENDANT_1_LITIGATION_FRIEND", "DEFENDANT 1: Litigation Friend: Litigation Friend"));
         list.add(dynamicElementFromCode("DEFENDANT_2", "DEFENDANT 2: Mr. John Rambo"));
         list.add(dynamicElementFromCode("DEFENDANT_2_LITIGATION_FRIEND", "DEFENDANT 2: Litigation Friend: Litigation Friend"));
