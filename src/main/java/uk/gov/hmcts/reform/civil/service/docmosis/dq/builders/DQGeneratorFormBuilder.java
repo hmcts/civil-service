@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq.builders;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
@@ -34,7 +36,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
@@ -66,6 +67,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPOND
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DQGeneratorFormBuilder {
@@ -345,34 +347,91 @@ public class DQGeneratorFormBuilder {
     }
 
     private FurtherInformation getFurtherInformation(DQ dq, CaseData caseData) {
+        log.info("DQ document generation - Case: {}, Processing DQ type: {}",
+                 caseData.getCcdCaseReference(), dq.getClass().getSimpleName());
+
         Optional<FurtherInformation> dqFurtherInformation = ofNullable(dq.getFurtherInformation());
+
+        // Handle Respondent1DQ
         Respondent1DQ respondent1dq = null;
         if (dq instanceof Respondent1DQ r1dq) {
             respondent1dq = r1dq;
+            log.info("DQ document generation - Case: {}, Processing as Respondent1DQ", caseData.getCcdCaseReference());
         }
         Optional<FutureApplications> r1dqFutureApplications = ofNullable(respondent1dq)
             .map(Respondent1DQ::getFutureApplications);
 
-        YesOrNo wantMore = Stream.of(
-            r1dqFutureApplications
-                .map(FutureApplications::getIntentionToMakeFutureApplications),
-            dqFurtherInformation
+        // Handle Applicant1DQ
+        Applicant1DQ applicant1dq = null;
+        if (dq instanceof Applicant1DQ a1dq) {
+            applicant1dq = a1dq;
+            log.info("DQ document generation - Case: {}, Processing as Applicant1DQ", caseData.getCcdCaseReference());
+        }
+        Optional<FutureApplications> a1dqFutureApplications = ofNullable(applicant1dq)
+            .map(Applicant1DQ::getApplicant1DQFutureApplications);
+
+        YesOrNo wantMore = YesOrNo.NO;
+        if (applicant1dq != null) {
+            wantMore = a1dqFutureApplications
+                .map(FutureApplications::getIntentionToMakeFutureApplications)
+                .orElse(YesOrNo.NO);
+            log.info("DQ document generation - Case: {}, Using Applicant future applications intention: {}",
+                     caseData.getCcdCaseReference(), wantMore);
+        } else if (respondent1dq != null) {
+            wantMore = r1dqFutureApplications
+                .map(FutureApplications::getIntentionToMakeFutureApplications)
+                .orElse(YesOrNo.NO);
+            log.info("DQ document generation - Case: {}, Using Respondent future applications intention: {}",
+                     caseData.getCcdCaseReference(), wantMore);
+        } else {
+            wantMore = dqFurtherInformation
                 .map(FurtherInformation::getFutureApplications)
-        ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(YesOrNo.NO);
+                .orElse(YesOrNo.NO);
+            log.info("DQ document generation - Case: {}, Using DQ FurtherInformation future applications: {}",
+                     caseData.getCcdCaseReference(), wantMore);
+        }
 
-        String whatMoreFor = NO.equals(wantMore) ? null :
-            Stream.of(
-                r1dqFutureApplications
-                    .map(FutureApplications::getWhatWillFutureApplicationsBeMadeFor),
-                dqFurtherInformation
-                    .map(FurtherInformation::getReasonForFutureApplications)
-            ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
+        String whatMoreFor = null;
+        if (NO.equals(wantMore)) {
+            whatMoreFor = null;
+        } else if (applicant1dq != null) {
+            whatMoreFor = a1dqFutureApplications
+                .map(FutureApplications::getWhatWillFutureApplicationsBeMadeFor)
+                .orElse(null);
+            log.info("DQ document generation - Case: {}, Using Applicant future applications reason: {}",
+                     caseData.getCcdCaseReference(), whatMoreFor != null ? "Present" : "Absent");
+        } else if (respondent1dq != null) {
+            whatMoreFor = r1dqFutureApplications
+                .map(FutureApplications::getWhatWillFutureApplicationsBeMadeFor)
+                .orElse(null);
+            log.info("DQ document generation - Case: {}, Using Respondent future applications reason: {}",
+                     caseData.getCcdCaseReference(), whatMoreFor != null ? "Present" : "Absent");
+        } else {
+            whatMoreFor = dqFurtherInformation
+                .map(FurtherInformation::getReasonForFutureApplications)
+                .orElse(null);
+            log.info("DQ document generation - Case: {}, Using DQ FurtherInformation reason: {}",
+                     caseData.getCcdCaseReference(), whatMoreFor != null ? "Present" : "Absent");
+        }
 
-        String furtherJudgeInfo = Stream.of(
-            Optional.ofNullable(caseData.getAdditionalInformationForJudge()),
-            dqFurtherInformation
+        String furtherJudgeInfo = null;
+        if (applicant1dq != null && caseData != null) {
+            furtherJudgeInfo = caseData.getApplicantAdditionalInformationForJudge();
+            log.info("DQ document generation - Case: {}, Using Applicant additional info: {}",
+                     caseData.getCcdCaseReference(), furtherJudgeInfo != null ? "Present" : "Absent");
+        } else if (respondent1dq != null && caseData != null) {
+            furtherJudgeInfo = caseData.getAdditionalInformationForJudge();
+            log.info("DQ document generation - Case: {}, Using Respondent additional info: {}",
+                     caseData.getCcdCaseReference(), furtherJudgeInfo != null ? "Present" : "Absent");
+        }
+
+        if (furtherJudgeInfo == null) {
+            furtherJudgeInfo = dqFurtherInformation
                 .map(FurtherInformation::getOtherInformationForJudge)
-        ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
+                .orElse(null);
+            log.info("DQ document generation - Case: {}, Using DQ FurtherInformation: {}",
+                     caseData.getCcdCaseReference(), furtherJudgeInfo != null ? "Present" : "Absent");
+        }
 
         FurtherInformation furtherInformation = new FurtherInformation();
         furtherInformation.setFutureApplications(wantMore);
