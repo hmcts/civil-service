@@ -56,6 +56,18 @@ spring:
     table: schema_version
     baseline-on-migrate: true
 
+scheduler:
+  circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
+  lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
+  lockAtMostFor: ${LOCK_AT_MOST_FOR:PT5M}
+  defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT10M}
+  judgement-buffer:
+    cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 2 * * *}
+    enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:false}
+  defendant-response:
+    cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
+    enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
@@ -819,6 +831,18 @@ spring:
 
   main:
     lazy-initialization: true
+
+scheduler:
+  circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
+  lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
+  lockAtMostFor: ${LOCK_AT_MOST_FOR:PT5M}
+  defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT10M}
+  judgement-buffer:
+    cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 2 * * *}
+    enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:true}
+  defendant-response:
+    cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
+    enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:true}
 
 management:
   endpoints:
