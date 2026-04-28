@@ -365,7 +365,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCCJRequestPaymentDetails() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
                 .setCcjPaymentPaidSomeOption(YES)
                 .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))

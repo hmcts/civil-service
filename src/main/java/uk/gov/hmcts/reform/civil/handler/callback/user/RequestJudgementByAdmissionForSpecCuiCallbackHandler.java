@@ -144,7 +144,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         BusinessProcess businessProcess;
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         logCcjPaymentDetails(data);
-        CCJPaymentDetails ccjPaymentDetails = data.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+        CCJPaymentDetails ccjPaymentDetails = data.isLipvLipOneVOne()
             ? judgementService.buildJudgmentAmountSummaryDetails(data) :
             data.getCcjPaymentDetails();
 

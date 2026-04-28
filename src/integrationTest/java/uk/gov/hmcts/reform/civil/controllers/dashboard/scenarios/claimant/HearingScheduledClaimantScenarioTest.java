@@ -51,7 +51,6 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
         DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
@@ -133,7 +132,6 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
             .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(10)));
@@ -223,7 +221,6 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
         DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
@@ -297,7 +294,6 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
             .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(20000)));

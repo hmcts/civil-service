@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -42,8 +41,6 @@ class InitiateCoscDefendantDashboardServiceTest {
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
-    private FeatureToggleService featureToggleService;
-    @Mock
     private DashboardNotificationService dashboardNotificationService;
     @Mock
     private CoscDashboardHelper coscDashboardHelper;
@@ -66,7 +63,6 @@ class InitiateCoscDefendantDashboardServiceTest {
     void shouldRecordScenario_whenInvoked() {
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(false);
 
         parentCaseData.setRespondent1Represented(YesOrNo.NO);
@@ -91,7 +87,6 @@ class InitiateCoscDefendantDashboardServiceTest {
     void shouldRecordScenario_whenPaymentCompleted() {
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(false);
 
         CaseLink caseLink = new CaseLink();
@@ -131,7 +126,6 @@ class InitiateCoscDefendantDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenario_whenRespondentRepresented() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(false);
 
         parentCaseData.setRespondent1Represented(YesOrNo.YES);
@@ -144,20 +138,9 @@ class InitiateCoscDefendantDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenario_whenIsPaidInFull() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(true);
 
         parentCaseData.setRespondent1Represented(YesOrNo.NO);
-
-        initiateCoscDefendantDashboardService.notifyInitiateCosc(gaCaseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
-        verifyNoInteractions(dashboardNotificationService);
-    }
-
-    @Test
-    void shouldNotRecordScenario_whenLipVLipDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
         initiateCoscDefendantDashboardService.notifyInitiateCosc(gaCaseData, AUTH_TOKEN);
 

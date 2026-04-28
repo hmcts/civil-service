@@ -41,7 +41,6 @@ public class SdoLegalAdviserDefendantScenarioTest extends DashboardBaseIntegrati
         String caseId = "72014112268";
         DynamicListElement selectedCourt = new DynamicListElement().setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()

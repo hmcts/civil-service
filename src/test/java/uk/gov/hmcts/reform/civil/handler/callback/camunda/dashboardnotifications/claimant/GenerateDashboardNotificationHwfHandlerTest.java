@@ -47,7 +47,6 @@ class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHandlerTes
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test

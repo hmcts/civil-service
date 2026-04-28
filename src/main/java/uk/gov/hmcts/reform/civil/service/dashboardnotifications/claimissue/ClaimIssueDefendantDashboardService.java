@@ -36,21 +36,19 @@ public class ClaimIssueDefendantDashboardService extends DashboardScenarioServic
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
         Map<String, Boolean> scenarios = new HashMap<>();
-        if (featureToggleService.isLipVLipEnabled()) {
-            boolean isUnrepresented = caseData.isRespondent1NotRepresented();
-            if (isUnrepresented) {
-                scenarios.put(DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(), true);
+        boolean isUnrepresented = caseData.isRespondent1NotRepresented();
+        if (isUnrepresented) {
+            scenarios.put(DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(), true);
 
-                AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null);
-                if (AllocatedTrack.FAST_CLAIM.equals(allocatedTrack)) {
-                    scenarios.put(DashboardScenarios.SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario(), true);
-                }
+            AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null);
+            if (AllocatedTrack.FAST_CLAIM.equals(allocatedTrack)) {
+                scenarios.put(DashboardScenarios.SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario(), true);
             }
+        }
 
-            if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
-                scenarios.put(DashboardScenarios.SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(), true);
-                scenarios.put(DashboardScenarios.SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(), true);
-            }
+        if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
+            scenarios.put(DashboardScenarios.SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(), true);
+            scenarios.put(DashboardScenarios.SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(), true);
         }
         return scenarios;
     }

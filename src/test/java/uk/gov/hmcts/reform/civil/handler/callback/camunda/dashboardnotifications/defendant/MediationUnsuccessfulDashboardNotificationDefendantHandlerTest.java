@@ -79,7 +79,6 @@ class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest extends Bas
             params.put("ccdCaseReference", "123");
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
             CaseData caseData = CaseDataBuilder.builder().build();
@@ -103,7 +102,6 @@ class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest extends Bas
         @Test
         void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsGeneric() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             params.put("ccdCaseReference", "123");
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -134,7 +132,6 @@ class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest extends Bas
         @Test
         void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsDefendantNonAttendance() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             params.put("ccdCaseReference", "123");
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 

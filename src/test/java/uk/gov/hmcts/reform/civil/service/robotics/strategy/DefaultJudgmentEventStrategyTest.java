@@ -175,10 +175,9 @@ class DefaultJudgmentEventStrategyTest {
     }
 
     @Test
-    void populatesInstallmentDetailsFromClaimantPlanWhenLipEnabled() {
+    void populatesInstallmentDetailsFromClaimantPlanForLipCase() {
         LocalDateTime now = LocalDate.of(2024, 3, 5).atTime(9, 15);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         lenient().when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
         when(timelineHelper.now()).thenReturn(now);
         when(partyLookup.respondentId(0)).thenReturn("002");

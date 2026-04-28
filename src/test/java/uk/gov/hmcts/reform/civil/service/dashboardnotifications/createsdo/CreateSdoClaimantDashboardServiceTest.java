@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardTasksHelper;
@@ -53,8 +52,6 @@ class CreateSdoClaimantDashboardServiceTest {
     @Mock
     private CreateSdoDashboardDate createSdoDashboardDate;
     @Mock
-    private FeatureToggleService featureToggleService;
-    @Mock
     private DashboardNotificationHelper dashboardDecisionHelper;
     @Mock
     private DashboardTasksHelper dashboardTasksHelper;
@@ -76,7 +73,6 @@ class CreateSdoClaimantDashboardServiceTest {
         scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
 
         createSdoClaimantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
@@ -87,26 +83,6 @@ class CreateSdoClaimantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             new ScenarioRequestParams(scenarioParams)
         );
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
-    }
-
-    @Test
-    void shouldNotRecordScenarioInSDO_whenInvoked_ifLipVLipDisabled() {
-        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
-        caseData.setOrderSDODocumentDJCollection(List.of(
-            ElementUtils.element(new CaseDocument().setDocumentLink(
-                new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
-        caseData.setApplicant1Represented(YesOrNo.NO);
-
-        HashMap<String, Object> scenarioParams = new HashMap<>();
-        scenarioParams.put("orderDocument", "urlDirectionsOrder");
-
-        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        createSdoClaimantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
         verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
 
@@ -170,7 +146,6 @@ class CreateSdoClaimantDashboardServiceTest {
         scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
         when(dashboardDecisionHelper.isCarmApplicableCase(caseData)).thenReturn(true);
         when(dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData))
@@ -212,7 +187,6 @@ class CreateSdoClaimantDashboardServiceTest {
         scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
         when(dashboardDecisionHelper.isCarmApplicableCase(caseData)).thenReturn(true);
         when(dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData))
@@ -240,7 +214,6 @@ class CreateSdoClaimantDashboardServiceTest {
         scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
         when(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData)).thenReturn(true);
 
@@ -268,7 +241,6 @@ class CreateSdoClaimantDashboardServiceTest {
         caseData.setRespondent1Represented(YesOrNo.NO);
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
         when(dashboardDecisionHelper.isEligibleForReconsideration(caseData)).thenReturn(true);
 
@@ -295,7 +267,6 @@ class CreateSdoClaimantDashboardServiceTest {
         caseData.setApplicant1Represented(YesOrNo.NO);
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
         when(dashboardDecisionHelper.isEligibleForReconsideration(caseData)).thenReturn(true);
 
@@ -328,7 +299,6 @@ class CreateSdoClaimantDashboardServiceTest {
         caseData.setApplicant1Represented(YesOrNo.NO);
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
         when(dashboardDecisionHelper.isEligibleForReconsideration(caseData)).thenReturn(false);
         when(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData)).thenReturn(true);

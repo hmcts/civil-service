@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
@@ -38,7 +37,6 @@ public class GeneratePipLetterHandler extends CallbackHandler {
     private final PiPLetterGenerator pipLetterGenerator;
     private final BulkPrintService bulkPrintService;
     private final Time time;
-    private final FeatureToggleService featureToggleService;
     private static final List<CaseEvent> EVENTS = List.of(GENERATE_PIP_LETTER);
 
     @Override
@@ -98,7 +96,6 @@ public class GeneratePipLetterHandler extends CallbackHandler {
     }
 
     private boolean isBilingualForLipvsLip(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-                && caseData.isClaimantBilingual();
+        return caseData.isLipvLipOneVOne() && caseData.isClaimantBilingual();
     }
 }

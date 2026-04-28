@@ -102,7 +102,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
                     .changeOrganisationRequestField(false, false, "1234", null, REQUESTER_EMAIL)
                     .build().toBuilder().respondent1OrganisationIDCopy(null).build();
 
-                executeTest(caseData, RESPONDENT_ONE_ORG_POLICY);
+                executeTest(caseData, RESPONDENT_ONE_ORG_POLICY, "APPLY_NOC_DECISION_DEFENDANT_LIP");
             }
 
             @Test
@@ -212,9 +212,6 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
                 .build();
-
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
             executeTest(caseData, RESPONDENT_ONE_ORG_POLICY, "APPLY_NOC_DECISION_DEFENDANT_LIP");
         }
 

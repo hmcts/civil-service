@@ -86,9 +86,6 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_GEN_FOR_DEFENDANT.name()).build()
             ).build();
@@ -121,9 +118,6 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
             generalApplication.setGeneralAppType(gaApplicationType);
 
             List<Element<GeneralApplication>> gaApplications = wrapElements(generalApplication);
-
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-
             CaseDataLiP caseDataLiP = new CaseDataLiP();
             caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
 

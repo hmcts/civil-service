@@ -558,7 +558,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     }
 
     private CaseEvent getLipBusinessProcessEvent(CaseData caseData) {
-        if ((caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())
+        if ((caseData.isLipvLipOneVOne())
             || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData))) {
             if (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE;

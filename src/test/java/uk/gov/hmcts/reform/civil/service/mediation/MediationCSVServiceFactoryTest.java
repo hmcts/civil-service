@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,9 +24,6 @@ public class MediationCSVServiceFactoryTest {
 
     @MockBean
     private OrganisationService organisationService;
-
-    @MockBean
-    private FeatureToggleService toggleService;
 
     @Autowired
     private MediationCsvServiceFactory mediationCsvServiceFactory;
@@ -55,7 +51,6 @@ public class MediationCSVServiceFactoryTest {
     @Test
     void shouldReturnMediationCSVLipVLip_whenApplicantLip() {
         //Given
-        given(toggleService.isLipVLipEnabled()).willReturn(true);
         given(caseData.isApplicantLiP()).willReturn(true);
         //When
         MediationCSVService mediationCSVService = mediationCsvServiceFactory.getMediationCSVService(caseData);
@@ -63,4 +58,3 @@ public class MediationCSVServiceFactoryTest {
         assertThat(mediationCSVService).isInstanceOf(MediationCSVLipVLipService.class);
     }
 }
-

@@ -20,7 +20,6 @@ import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT;
@@ -50,7 +49,6 @@ class ClaimIssueClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_whenInvoked() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = new CaseDataBuilder().atStateTrialReadyCheck()
             .ccdCaseReference(123L)
             .build();
@@ -68,7 +66,6 @@ class ClaimIssueClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_whenFeePaymentOutcome() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
         feePaymentOutcomeDetails.setHwfFullRemissionGrantedForClaimIssue(YesOrNo.NO);
         CaseData caseData = new CaseDataBuilder().atStateTrialReadyCheck().hwfFeeType(FeeType.CLAIMISSUED)
@@ -95,7 +92,6 @@ class ClaimIssueClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_ForAddingApplicationsAndMessagesToTheCourtTask() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
         CaseData caseData = new CaseDataBuilder().atStateTrialReadyCheck()
             .ccdCaseReference(123L)
@@ -122,17 +118,5 @@ class ClaimIssueClaimantDashboardServiceTest {
             new ScenarioRequestParams(new HashMap<>())
         );
         verifyNoMoreInteractions(dashboardScenariosService);
-    }
-
-    @Test
-    void shouldNotRecordScenarios_whenFeatureToggleDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-        CaseData caseData = new CaseDataBuilder().atStateTrialReadyCheck()
-            .ccdCaseReference(123L)
-            .build();
-
-        service.notifyClaimIssue(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
     }
 }

@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
@@ -15,12 +14,9 @@ public class GenerateSpecDJFormReceivedDefendantEmailDTOGenerator extends Defend
 
     private static final String REFERENCE_TEMPLATE_REQUESTED = "default-judgment-respondent-requested-notification-%s";
     private final NotificationsProperties notificationsProperties;
-    private final FeatureToggleService featureToggleService;
 
-    public GenerateSpecDJFormReceivedDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties,
-                                                                FeatureToggleService featureToggleService) {
+    public GenerateSpecDJFormReceivedDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
         this.notificationsProperties = notificationsProperties;
-        this.featureToggleService = featureToggleService;
     }
 
     @Override
@@ -44,7 +40,7 @@ public class GenerateSpecDJFormReceivedDefendantEmailDTOGenerator extends Defend
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        boolean lipVlip = caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled();
+        boolean lipVlip = caseData.isLipvLipOneVOne();
         boolean lrvLip = caseData.isLRvLipOneVOne();
         return (lipVlip || lrvLip) && caseData.getRespondent1PartyEmail() != null;
     }

@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
@@ -45,18 +44,15 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
 
     private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
-    private final FeatureToggleService featureToggleService;
     private final RoboticsCaseDataSupport caseDataSupport;
 
     public RoboticsDataMapperForSpec(RoboticsAddressMapper addressMapper,
                                      EventHistoryMapper eventHistoryMapper,
                                      OrganisationService organisationService,
-                                     FeatureToggleService featureToggleService,
                                      RoboticsCaseDataSupport caseDataSupport) {
         super(addressMapper);
         this.eventHistoryMapper = eventHistoryMapper;
         this.organisationService = organisationService;
-        this.featureToggleService = featureToggleService;
         this.caseDataSupport = caseDataSupport;
     }
 
@@ -189,7 +185,7 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
     }
 
     private Solicitor buildApplicantSolicitor(CaseData caseData) {
-        if (featureToggleService.isLipVLipEnabled() && (caseData.isLipvLipOneVOne() || NO.equals(caseData.getApplicant1Represented()))) {
+        if ((caseData.isLipvLipOneVOne() || NO.equals(caseData.getApplicant1Represented()))) {
             return null;
         }
         Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());

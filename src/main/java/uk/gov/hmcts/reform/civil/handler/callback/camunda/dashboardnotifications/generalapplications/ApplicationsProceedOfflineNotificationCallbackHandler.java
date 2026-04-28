@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -43,7 +42,6 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
     private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationService dashboardNotificationService;
     private final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService featureToggleService;
     private static final String CLAIMANT = "Claimant";
     private static final String DEFENDANT = "Defendant";
 
@@ -55,9 +53,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isLipVLipEnabled()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForProceedOffline)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForProceedOffline);
     }
 
     @Override

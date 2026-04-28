@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -43,9 +42,6 @@ class StayLiftedClaimantDashboardServiceTest {
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @InjectMocks
     private StayLiftedClaimantDashboardService stayLiftedClaimantDashboardService;
 
@@ -70,24 +66,7 @@ class StayLiftedClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotRecordScenarios_whenLipVLipDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-        caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setPreStayState(IN_MEDIATION.toString());
-
-        stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
-
-        verify(dashboardScenariosService).reconfigureCaseDashboardNotifications(
-            any(), any(), eq("CLAIMANT")
-        );
-        verify(dashboardScenariosService, never()).recordScenarios(any(), any(), any(), any());
-    }
-
-    @Test
     void shouldRecordDefaultScenario_whenPreStayStateIsNotSpecial() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
@@ -102,7 +81,6 @@ class StayLiftedClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordExtraScenarios_forCaseProgression() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
@@ -118,7 +96,6 @@ class StayLiftedClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordExtraScenarios_forHearingReadiness_withFeeNotPaid() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
@@ -136,7 +113,6 @@ class StayLiftedClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordViewDocumentsAvailable_whenDocumentUploaded() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setApplicant1Represented(YesOrNo.NO);

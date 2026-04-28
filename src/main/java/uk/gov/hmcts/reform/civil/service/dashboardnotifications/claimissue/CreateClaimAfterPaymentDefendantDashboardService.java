@@ -65,8 +65,7 @@ public class CreateClaimAfterPaymentDefendantDashboardService extends DashboardS
     }
 
     private boolean isEligible(CaseData caseData) {
-        return featureToggleService.isLipVLipEnabled()
-            && featureToggleService.isDashboardEnabledForCase(caseData)
+        return featureToggleService.isDashboardEnabledForCase(caseData)
             && LipPredicate.caseContainsLiP.test(caseData)
             && caseData.isRespondent1NotRepresented();
     }

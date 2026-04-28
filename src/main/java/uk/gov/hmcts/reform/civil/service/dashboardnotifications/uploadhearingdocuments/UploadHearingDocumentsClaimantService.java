@@ -38,7 +38,6 @@ public class UploadHearingDocumentsClaimantService extends DashboardScenarioServ
     protected boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isApplicantNotRepresented()
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && featureToggleService.isLipVLipEnabled()
             && dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)
             && (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
             || featureToggleService.isWelshEnabledForMainCase());

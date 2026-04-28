@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
@@ -15,10 +14,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator extends D
 
     private final NotificationsProperties notificationsProperties;
 
-    private final FeatureToggleService featureToggleService;
-
-    protected ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties, FeatureToggleService featureToggleService) {
-        this.featureToggleService = featureToggleService;
+    protected ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
         this.notificationsProperties = notificationsProperties;
     }
 
@@ -26,7 +22,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator extends D
     protected String getEmailTemplateId(CaseData caseData) {
         if (caseData.isPartAdmitPayImmediatelyAccepted()) {
             return notificationsProperties.getNotifyRespondentLipPartAdmitPayImmediatelyAcceptedSpec();
-        } else if (featureToggleService.isLipVLipEnabled() && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
+        } else if (caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
             return caseData.isRespondentResponseBilingual()
                 ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
                 : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
@@ -43,7 +39,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator extends D
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         if (caseData.isPartAdmitPayImmediatelyAccepted()
-            || (featureToggleService.isLipVLipEnabled() && caseData.isClaimantDontWantToProceedWithFulLDefenceFD())) {
+            || (caseData.isClaimantDontWantToProceedWithFulLDefenceFD())) {
             properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
             properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         } else {
