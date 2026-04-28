@@ -756,7 +756,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean hasDefendantPaidTheAmountClaimed() {
         return SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
-            .equals(getDefenceRouteRequired());
+            .equals(getDefenceRouteRequired()) || SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
+                .equals(getDefenceRouteRequired2());
     }
 
     @JsonIgnore
@@ -777,7 +778,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isClaimBeingDisputed() {
         return SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
-            .equals(getDefenceRouteRequired());
+            .equals(getDefenceRouteRequired()) || SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
+                .equals(getDefenceRouteRequired2());
     }
 
     @JsonIgnore
