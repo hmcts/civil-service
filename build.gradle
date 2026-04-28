@@ -1,3 +1,6 @@
+import au.com.dius.pact.provider.gradle.Broker
+import au.com.dius.pact.provider.gradle.PactPublish
+
 plugins {
   id 'application'
   id 'checkstyle'
