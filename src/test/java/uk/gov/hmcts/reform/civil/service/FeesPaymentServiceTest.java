@@ -44,6 +44,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 
@@ -231,9 +232,9 @@ class FeesPaymentServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"Success", "Failed", "Pending", "Declined"})
+    @CsvSource({"Success", "Failed"})
     @SneakyThrows
-    void shouldReturnServiceRequestPaymentStatus(String status) {
+    void shouldReturnServiceRequestPaymentStatusAndUpdatePaymentStatus(String status) {
         PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
         when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
             .thenReturn(response);
@@ -246,6 +247,24 @@ class FeesPaymentServiceTest {
 
         assertThat(govPaymentRequestStatus).isEqualTo(expectedResponse(status));
         verify(paymentStatusRetryService, times(1)).updatePaymentStatus(any(), any(), any(CardPaymentStatusResponse.class));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"Initiated", "Pending", "Declined"})
+    @SneakyThrows
+    void shouldNotUpdatePaymentStatusIfStatusNotExpectedInCivilCCDDefinition(String status) {
+        PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
+        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
+            .thenReturn(response);
+        CardPaymentStatusResponse govPaymentRequestStatus = feesPaymentService.getGovPaymentRequestStatus(
+            HEARING,
+            "123",
+            "RC-1701-0909-0602-0418",
+            BEARER_TOKEN
+        );
+
+        assertThat(govPaymentRequestStatus).isEqualTo(expectedResponse(status));
+        verifyNoInteractions(paymentStatusRetryService);
     }
 
     @Test
