@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -96,6 +97,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = false)
 @Data
+@NoArgsConstructor
 public class CaseDataParent extends CaseDataCaseProgression implements MappableObject {
 
     private  SmallClaimMedicalLRspec applicantMPClaimMediationSpecRequired;
@@ -510,7 +512,9 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
             || applicant1AcceptPartAdmitPaymentPlanSpec == YesOrNo.YES;
     }
 
+    @JsonProperty("claimantUserDetails")
     private  IdamUserDetails claimantUserDetails;
+    @JsonProperty("defendantUserDetails")
     private  IdamUserDetails defendantUserDetails;
 
     private  ClaimProceedsInCasemanLR claimProceedsInCasemanLR;

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
@@ -112,6 +113,7 @@ import java.util.List;
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = false)
 @Data
+@NoArgsConstructor
 public class CivilCaseData extends BaseCaseData implements MappableObject {
 
     //default judgement SDO fields for trial/fast track

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -95,6 +96,7 @@ import static java.util.Optional.ofNullable;
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = false)
 @Data
+@NoArgsConstructor
 public class CaseDataCaseProgression extends CivilCaseData implements MappableObject {
 
     private  String notificationText;
