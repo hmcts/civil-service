@@ -30,7 +30,7 @@ class DjWelshLanguageServiceTest {
 
         String formattedDate = deadline.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         assertThat(result).isEqualTo(String.format(
-            "%s %s.",
+            "%s <b>%s</b>.",
             ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE,
             formattedDate
         ));
