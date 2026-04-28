@@ -17,13 +17,17 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RegistrationInformation;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
@@ -32,6 +36,9 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -45,6 +52,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -150,6 +158,66 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("READY");
             assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        }
+
+        @Test
+        void shouldClearJoCaseDataWhenMovingToAwaitingApplicantIntention() {
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("ENGLISH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .totalClaimAmount(BigDecimal.valueOf(5000))
+                .caseDataLip(caseDataLiP)
+                .build();
+            caseData.setActiveJudgment(new JudgmentDetails());
+            caseData.setDefaultJudgementOverallTotal(BigDecimal.TEN);
+            caseData.setJoDefendantName1("Defendant 1");
+            caseData.setJoDJCreatedDate(now);
+            caseData.setJoIsDisplayInJudgmentTab(YES);
+            caseData.setJoIsLiveJudgmentExists(YES);
+            caseData.setJoPaymentPlanSelected(PaymentPlanSelection.PAY_IMMEDIATELY);
+            caseData.setJoRepaymentAmount("100");
+            caseData.setJoRepaymentFrequency(PaymentFrequency.MONTHLY);
+            caseData.setJoRepaymentStartDate(now.toLocalDate());
+            caseData.setJoRepaymentSummaryObject("jo repayment summary");
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentConfirmationDecisionSpec(YES);
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            caseData.setRegistrationTypeRespondentOne(List.of(new Element<>(UUID.randomUUID(), new RegistrationInformation())));
+            caseData.setRepaymentDate(now.toLocalDate());
+            caseData.setRepaymentDue("repayment due");
+            caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
+            caseData.setRepaymentSuggestion("repayment suggestion");
+            caseData.setRepaymentSummaryObject("repayment summary");
+            caseData.setShowOldDJFixedCostsScreen(YES);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
+            assertThat(caseData.getActiveJudgment()).isNull();
+            assertThat(caseData.getDefaultJudgementOverallTotal()).isNull();
+            assertThat(caseData.getJoDefendantName1()).isNull();
+            assertThat(caseData.getJoDJCreatedDate()).isNull();
+            assertThat(caseData.getJoIsDisplayInJudgmentTab()).isNull();
+            assertThat(caseData.getJoIsLiveJudgmentExists()).isNull();
+            assertThat(caseData.getJoPaymentPlanSelected()).isNull();
+            assertThat(caseData.getJoRepaymentAmount()).isNull();
+            assertThat(caseData.getJoRepaymentFrequency()).isNull();
+            assertThat(caseData.getJoRepaymentStartDate()).isNull();
+            assertThat(caseData.getJoRepaymentSummaryObject()).isNull();
+            assertThat(caseData.getPartialPayment()).isNull();
+            assertThat(caseData.getPaymentConfirmationDecisionSpec()).isNull();
+            assertThat(caseData.getPaymentTypeSelection()).isNull();
+            assertThat(caseData.getRegistrationTypeRespondentOne()).isNull();
+            assertThat(caseData.getRepaymentDate()).isNull();
+            assertThat(caseData.getRepaymentDue()).isNull();
+            assertThat(caseData.getRepaymentFrequency()).isNull();
+            assertThat(caseData.getRepaymentSuggestion()).isNull();
+            assertThat(caseData.getRepaymentSummaryObject()).isNull();
+            assertThat(caseData.getShowOldDJFixedCostsScreen()).isNull();
         }
 
         @Test

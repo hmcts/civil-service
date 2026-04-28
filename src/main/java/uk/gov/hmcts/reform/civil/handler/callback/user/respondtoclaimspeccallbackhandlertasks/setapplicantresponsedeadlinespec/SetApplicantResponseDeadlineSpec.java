@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecUtils;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -275,6 +276,7 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
                 .build();
         }
 
+        JudgmentsOnlineHelper.clearJOCaseData(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
