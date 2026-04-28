@@ -123,7 +123,11 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        if (featureToggleService.isJudgmentBufferEnabled()
+            && caseData.isRespondent1NotRepresented()
+            && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            return format(JUDGMENT_REQUESTED_HEADER);
+        } else if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             return format(JUDGMENT_GRANTED_HEADER);
         } else if (caseData.isLRvLipOneVOne()
             || (caseData.getRespondent2() != null
@@ -137,7 +141,11 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getBody(CaseData caseData) {
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        if (featureToggleService.isJudgmentBufferEnabled()
+            && caseData.isRespondent1NotRepresented()
+            && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            return format(JUDGMENT_REQUESTED_LIP_CASE);
+        } else if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             return format(JUDGMENT_GRANTED, format(
                 CASES_CASE_DETAILS_CLAIM_DOCUMENTS,
                 caseData.getCcdCaseReference()
@@ -518,7 +526,11 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         ));
         String nextState;
 
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        if (featureToggleService.isJudgmentBufferEnabled()
+                && caseData.isRespondent1NotRepresented()
+                && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            nextState = CaseState.JUDGMENT_REQUESTED.name();
+        } else if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else {
@@ -552,6 +564,4 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
 }
-
-
 
