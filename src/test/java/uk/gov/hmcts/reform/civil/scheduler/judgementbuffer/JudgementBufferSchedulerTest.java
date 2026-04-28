@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.scheduler.issuejudgement;
+package uk.gov.hmcts.reform.civil.scheduler.judgementbuffer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.service.search.JudgmentRequestedSearchService;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static uk.gov.hmcts.reform.civil.scheduler.issuejudgement.JudgementBufferScheduler.SCHEDULER_NAME;
+import static uk.gov.hmcts.reform.civil.scheduler.judgementbuffer.JudgementBufferScheduler.SCHEDULER_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class JudgementBufferSchedulerTest {

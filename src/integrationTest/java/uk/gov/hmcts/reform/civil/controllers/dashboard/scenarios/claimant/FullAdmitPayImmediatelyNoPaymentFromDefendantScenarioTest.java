@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
@@ -13,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.math.BigDecimal;
@@ -28,8 +26,6 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends D
 
     @Autowired
     private FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandler handler;
-    @MockBean
-    private CoreCaseDataService coreCaseDataService;
 
     @Test
     void should_create_full_admit_pay_immediately_no_payment_scenario() throws Exception {

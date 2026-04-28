@@ -57,6 +57,7 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
 
         given(authTokenGenerator.generate()).willReturn("some arbitrary token");
         given(coreCaseDataApi.getCase(any(), any(), any())).willReturn(caseDetails);
+        given(coreCaseDataService.getCase(any())).willReturn(caseDetails);
         given(coreCaseDataApi.startEventForCaseWorker(any(), any(), any(), any(), any(), any(), any())).willReturn(startEventResponse);
         given(coreCaseDataApi.submitEventForCaseWorker(any(), any(), any(), any(), any(), any(), anyBoolean(), any())).willReturn(caseDetails);
     }
