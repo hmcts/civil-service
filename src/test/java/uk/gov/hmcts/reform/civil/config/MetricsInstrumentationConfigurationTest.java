@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.config;
 
 import com.microsoft.applicationinsights.TelemetryClient;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.core5.pool.PoolStats;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,8 +29,6 @@ class MetricsInstrumentationConfigurationTest {
     @Mock
     private ThreadPoolTaskExecutor asyncHandlerExecutor;
     @Mock
-    private PoolingHttpClientConnectionManager connectionManager5;
-    @Mock
     private org.apache.http.impl.conn.PoolingHttpClientConnectionManager connectionManager4;
     @Mock
     private AtomicLong asyncHandlerRejectedCount;
@@ -45,7 +41,6 @@ class MetricsInstrumentationConfigurationTest {
             telemetryClient,
             asyncHandlerExecutor,
             asyncHandlerRejectedCount,
-            connectionManager5,
             connectionManager4
         );
     }
@@ -54,7 +49,7 @@ class MetricsInstrumentationConfigurationTest {
     @SuppressWarnings({"unchecked", "java:S6068"})
     void shouldReportAsyncExecutorMetrics_WhenExecutorIsNotNull() {
         // Given
-        metricsConfiguration = new MetricsInstrumentationConfiguration(telemetryClient, asyncHandlerExecutor, asyncHandlerRejectedCount, null, null);
+        metricsConfiguration = new MetricsInstrumentationConfiguration(telemetryClient, asyncHandlerExecutor, asyncHandlerRejectedCount, null);
         ThreadPoolExecutor mockExecutor = mock(ThreadPoolExecutor.class);
         BlockingQueue<Runnable> mockQueue = mock(BlockingQueue.class);
         when(asyncHandlerExecutor.getActiveCount()).thenReturn(50);
@@ -77,32 +72,10 @@ class MetricsInstrumentationConfigurationTest {
     }
 
     @Test
-    @SuppressWarnings({"unchecked", "java:S6068"})
-    void shouldReportHttpClient5PoolMetrics() {
-        // Given
-        metricsConfiguration = new MetricsInstrumentationConfiguration(telemetryClient, null, null, connectionManager5, null);
-        PoolStats stats = mock(PoolStats.class);
-        when(stats.getLeased()).thenReturn(10);
-        when(stats.getAvailable()).thenReturn(5);
-        when(stats.getPending()).thenReturn(2);
-        when(stats.getMax()).thenReturn(25);
-        when(connectionManager5.getTotalStats()).thenReturn(stats);
-
-        // When
-        metricsConfiguration.reportMetrics();
-
-        // Then
-        verify(telemetryClient).trackMetric(eq("httpclient5.pool.leased"), eq(10.0));
-        verify(telemetryClient).trackMetric(eq("httpclient5.pool.available"), eq(5.0));
-        verify(telemetryClient).trackMetric(eq("httpclient5.pool.pending"), eq(2.0));
-        verify(telemetryClient).trackMetric(eq("httpclient5.pool.max"), eq(25.0));
-    }
-
-    @Test
-    @SuppressWarnings({"unchecked", "java:S6068"})
+    @SuppressWarnings({"java:S6068"})
     void shouldReportHttpClient4PoolMetrics() {
         // Given
-        metricsConfiguration = new MetricsInstrumentationConfiguration(telemetryClient, null, null, null, connectionManager4);
+        metricsConfiguration = new MetricsInstrumentationConfiguration(telemetryClient, null, null, connectionManager4);
         org.apache.http.pool.PoolStats stats = mock(org.apache.http.pool.PoolStats.class);
         when(stats.getLeased()).thenReturn(10);
         when(stats.getAvailable()).thenReturn(5);
@@ -114,30 +87,23 @@ class MetricsInstrumentationConfigurationTest {
         metricsConfiguration.reportMetrics();
 
         // Then
-        verify(telemetryClient).trackMetric(eq("httpclient4.pool.leased"), eq(10.0));
-        verify(telemetryClient).trackMetric(eq("httpclient4.pool.available"), eq(5.0));
-        verify(telemetryClient).trackMetric(eq("httpclient4.pool.pending"), eq(2.0));
-        verify(telemetryClient).trackMetric(eq("httpclient4.pool.max"), eq(25.0));
+        verify(telemetryClient).trackMetric(eq("httpclient.pool.leased"), eq(10.0));
+        verify(telemetryClient).trackMetric(eq("httpclient.pool.available"), eq(5.0));
+        verify(telemetryClient).trackMetric(eq("httpclient.pool.pending"), eq(2.0));
+        verify(telemetryClient).trackMetric(eq("httpclient.pool.max"), eq(25.0));
     }
 
     @Test
     @SuppressWarnings("unchecked")
     void shouldHandleZeroValuesGracefully_ToAvoidDivisionByZero() {
         // Given
-        metricsConfiguration = new MetricsInstrumentationConfiguration(telemetryClient, asyncHandlerExecutor, asyncHandlerRejectedCount, connectionManager5, null);
+        metricsConfiguration = new MetricsInstrumentationConfiguration(telemetryClient, asyncHandlerExecutor, asyncHandlerRejectedCount, null);
         ThreadPoolExecutor mockExecutor = mock(ThreadPoolExecutor.class);
         BlockingQueue<Runnable> mockQueue = mock(BlockingQueue.class);
         when(asyncHandlerExecutor.getThreadPoolExecutor()).thenReturn(mockExecutor);
         when(mockExecutor.getQueue()).thenReturn(mockQueue);
         when(mockQueue.size()).thenReturn(0);
         when(asyncHandlerRejectedCount.get()).thenReturn(0L);
-
-        PoolStats stats = mock(PoolStats.class);
-        when(stats.getLeased()).thenReturn(0);
-        when(stats.getAvailable()).thenReturn(0);
-        when(stats.getPending()).thenReturn(0);
-        when(stats.getMax()).thenReturn(0);
-        when(connectionManager5.getTotalStats()).thenReturn(stats);
 
         // When
         metricsConfiguration.reportMetrics();
@@ -149,7 +115,7 @@ class MetricsInstrumentationConfigurationTest {
     @Test
     void shouldHandleExceptionDuringMetricsReporting() {
         // Given
-        metricsConfiguration = new MetricsInstrumentationConfiguration(telemetryClient, asyncHandlerExecutor, null, null, null);
+        metricsConfiguration = new MetricsInstrumentationConfiguration(telemetryClient, asyncHandlerExecutor, null, null);
         when(asyncHandlerExecutor.getActiveCount()).thenThrow(new RuntimeException("executor error"));
 
         // When
@@ -162,7 +128,7 @@ class MetricsInstrumentationConfigurationTest {
     @Test
     void shouldHandleNullBeansGracefully() {
         // Given
-        metricsConfiguration = new MetricsInstrumentationConfiguration(telemetryClient, null, null, null, null);
+        metricsConfiguration = new MetricsInstrumentationConfiguration(telemetryClient, null, null, null);
 
         // When
         metricsConfiguration.reportMetrics();
