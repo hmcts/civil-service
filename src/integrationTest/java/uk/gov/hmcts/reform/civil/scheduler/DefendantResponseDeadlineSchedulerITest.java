@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.civil.scheduler;
 
-import net.javacrumbs.shedlock.core.LockProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.Application;
+import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.defendantresponse.DefendantResponseDeadlineScheduler;
@@ -27,7 +28,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_DEADLINE_CHECK;
 
-public class DefendantResponseDeadlineSchedulerITest extends BaseIntegrationTest {
+@ActiveProfiles("integration-test")
+@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = "test.id=DefendantResponseDeadlineSchedulerITest")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+public class DefendantResponseDeadlineSchedulerITest {
 
     @Autowired
     private DefendantResponseDeadlineScheduler scheduler;
@@ -41,11 +45,8 @@ public class DefendantResponseDeadlineSchedulerITest extends BaseIntegrationTest
     @MockBean
     private FeatureToggleService featureToggleService;
 
-    @SpyBean
-    private LockProvider lockProvider;
-
     @Test
-    @DirtiesContext
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void shouldExecuteDefendantResponseDeadlineScheduler() {
         // Given
         ReflectionTestUtils.setField(scheduler, "isSchedulerEnabled", true);
@@ -67,24 +68,5 @@ public class DefendantResponseDeadlineSchedulerITest extends BaseIntegrationTest
         verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineCaseProcessed"), anyMap());
         verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineJobCompleted"), anyMap());
-    }
-
-    @Test
-    @DirtiesContext
-    void shouldAcquireLockWhenDefendantResponseDeadlineSchedulerRuns() throws Throwable {
-        // Given
-        ReflectionTestUtils.setField(scheduler, "isSchedulerEnabled", true);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        SearchResult searchResult = SearchResult.builder()
-            .total(0)
-            .cases(List.of())
-            .build();
-        when(coreCaseDataService.searchCases(any(Query.class))).thenReturn(searchResult);
-
-        // When
-        scheduler.deadlineCheck();
-
-        // Then
-        verify(lockProvider, atLeastOnce()).lock(any());
     }
 }

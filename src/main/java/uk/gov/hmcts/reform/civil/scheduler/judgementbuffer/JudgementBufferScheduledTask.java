@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.scheduler.issuejudgement;
+package uk.gov.hmcts.reform.civil.scheduler.judgementbuffer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

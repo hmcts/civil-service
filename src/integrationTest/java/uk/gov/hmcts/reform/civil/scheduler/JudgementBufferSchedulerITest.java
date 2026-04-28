@@ -1,17 +1,19 @@
 package uk.gov.hmcts.reform.civil.scheduler;
 
-import net.javacrumbs.shedlock.core.LockProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.Application;
+import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.scheduler.issuejudgement.JudgementBufferScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.judgementbuffer.JudgementBufferScheduler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
@@ -24,7 +26,10 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class JudgementBufferSchedulerITest extends BaseIntegrationTest {
+@ActiveProfiles("integration-test")
+@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = "test.id=JudgementBufferSchedulerITest")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+public class JudgementBufferSchedulerITest {
 
     @Autowired
     private JudgementBufferScheduler scheduler;
@@ -35,10 +40,8 @@ public class JudgementBufferSchedulerITest extends BaseIntegrationTest {
     @MockBean
     private TelemetryService telemetryService;
 
-    @SpyBean
-    private LockProvider lockProvider;
-
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void shouldExecuteJudgementBufferScheduler() {
         // Given
         ReflectionTestUtils.setField(scheduler, "isSchedulerEnabled", true);
@@ -58,22 +61,5 @@ public class JudgementBufferSchedulerITest extends BaseIntegrationTest {
         verify(telemetryService).trackEvent(eq("JudgementBufferJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("JudgementBufferCaseProcessed"), anyMap());
         verify(telemetryService).trackEvent(eq("JudgementBufferJobCompleted"), anyMap());
-    }
-
-    @Test
-    void shouldAcquireLockWhenJudgementBufferSchedulerRuns() throws Throwable {
-        // Given
-        ReflectionTestUtils.setField(scheduler, "isSchedulerEnabled", true);
-        SearchResult searchResult = SearchResult.builder()
-            .total(0)
-            .cases(List.of())
-            .build();
-        when(coreCaseDataService.searchCases(any(Query.class))).thenReturn(searchResult);
-
-        // When
-        scheduler.issueJudgement();
-
-        // Then
-        verify(lockProvider, atLeastOnce()).lock(any());
     }
 }

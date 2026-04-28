@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
@@ -46,6 +47,7 @@ import java.util.stream.Stream;
 import static com.google.common.collect.ImmutableList.of;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
@@ -96,6 +98,9 @@ public abstract class BaseIntegrationTest {
     @MockBean
     public RequestAuthorizer<User> userRequestAuthorizerMock;
 
+    @MockBean
+    protected CoreCaseDataService coreCaseDataService;
+
     @Autowired
     protected ObjectMapper objectMapper;
 
@@ -104,6 +109,7 @@ public abstract class BaseIntegrationTest {
 
     @BeforeEach
     public void setUpBase() {
+        reset(coreCaseDataService);
         when(authorisationService.isServiceAuthorized(any())).thenReturn(true);
         when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
         when(userService.getUserInfo(anyString())).thenReturn(USER_INFO);
