@@ -141,15 +141,22 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
     private CallbackResponse validateDocumentDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
+
         UploadMediationDocumentsForm mediationForm = caseData.getUploadMediationDocumentsForm();
-        List<MediationDocumentsType> selectedDocumentTypes = mediationForm.getMediationDocumentsType();
-
-        if (selectedDocumentTypes.contains(NON_ATTENDANCE_STATEMENT) && mediationForm.getNonAttendanceStatementForm() != null) {
-            mediationForm.getNonAttendanceStatementForm().forEach(e -> validateDateIsNotInFuture(errors, e.getValue().getDocumentDate()));
-        }
-
-        if (selectedDocumentTypes.contains(REFERRED_DOCUMENTS) && mediationForm.getDocumentsReferredForm() != null) {
-            mediationForm.getDocumentsReferredForm().forEach(e -> validateDateIsNotInFuture(errors, e.getValue().getDocumentDate()));
+        if (mediationForm != null) {
+            List<MediationDocumentsType> selectedDocumentTypes = mediationForm.getMediationDocumentsType();
+            if (selectedDocumentTypes != null && selectedDocumentTypes.contains(NON_ATTENDANCE_STATEMENT) && mediationForm.getNonAttendanceStatementForm() != null) {
+                mediationForm.getNonAttendanceStatementForm().forEach(e -> validateDateIsNotInFuture(
+                    errors,
+                    e.getValue().getDocumentDate()
+                ));
+            }
+            if (selectedDocumentTypes != null && selectedDocumentTypes.contains(REFERRED_DOCUMENTS) && mediationForm.getDocumentsReferredForm() != null) {
+                mediationForm.getDocumentsReferredForm().forEach(e -> validateDateIsNotInFuture(
+                    errors,
+                    e.getValue().getDocumentDate()
+                ));
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

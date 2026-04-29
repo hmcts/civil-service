@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BundleFileNameHelperTest {
 
-    private CaseData caseData = CaseData.builder().ccdCaseReference(1L)
+    private final CaseData caseData = CaseData.builder().ccdCaseReference(1L)
             .documentWitnessStatement(getWitnessDocs())
             .documentWitnessSummary(getWitnessDocs())
             .documentHearsayNotice(getWitnessDocs())
@@ -132,7 +132,7 @@ public class BundleFileNameHelperTest {
         otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
                                                        .setDocumentUpload(new Document().setDocumentBinaryUrl("Test")
                                                                            .setDocumentFileName("Test"))
-                                                       .setTypeOfDocument(TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.getDisplayNames().get(0))
+                                                       .setTypeOfDocument(TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.getDisplayNames().getFirst())
                                                        .setDocumentIssuedDate(LocalDate.of(2023, 1, 12))));
         return otherEvidenceDocs;
     }

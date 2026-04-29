@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -94,8 +93,6 @@ class CaseEventTaskHandlerTest {
     private IStateFlowEngine stateFlowEngine;
     @Mock
     private CoreCaseDataService coreCaseDataService;
-    @Mock
-    private FeatureToggleService featureToggleService;
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @Spy
@@ -150,6 +147,48 @@ class CaseEventTaskHandlerTest {
             verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_EVENT);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
+        }
+    }
+
+    @Nested
+    class AlreadyProcessed {
+
+        @BeforeEach
+        void init() {
+            Map<String, Object> variables = Map.of(
+                "caseId", CASE_ID,
+                "caseEvent", NOTIFY_EVENT.name()
+            );
+
+            when(mockTask.getAllVariables()).thenReturn(variables);
+
+            when(mockTask.getTopicName()).thenReturn("test");
+            when(mockTask.getActivityId()).thenReturn("activityId");
+            when(mockTask.getProcessInstanceId()).thenReturn("processInstanceId");
+        }
+
+        @Test
+        void shouldNotTriggerCCDEvent_whenEventIsAlreadyProcessed() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.READY)
+                                     .setProcessInstanceId("processInstanceId")
+                                     .setActivityId("activityId"))
+                .build();
+
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+
+            when(stateFlowEngine.getStateFlow(any(CaseData.class)))
+                .thenReturn(new StateFlowDTO().setState(State.from("MAIN.DRAFT")).setFlags(Map.of()));
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_EVENT);
+            verify(coreCaseDataService, never()).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(eq(mockTask), any(VariableMap.class));
         }
     }
 
@@ -291,9 +330,8 @@ class CaseEventTaskHandlerTest {
                 getFlowFlags(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
             );
 
-            assertThrows(IllegalStateException.class, () -> {
-                getCaseData(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA);
-            });
+            assertThrows(IllegalStateException.class, () ->
+                getCaseData(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA));
         }
 
         @ParameterizedTest

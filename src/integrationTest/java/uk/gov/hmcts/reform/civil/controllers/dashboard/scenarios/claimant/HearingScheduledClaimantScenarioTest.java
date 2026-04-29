@@ -54,8 +54,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "8123456781";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
             .legacyCaseReference("reference")
@@ -142,8 +142,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
                             .setHearingId("HER1234")
                             .setHearingType("AAA7-TRI"));
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "8123456781";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
             .legacyCaseReference("reference")
@@ -226,8 +226,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "503206541654";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
             .legacyCaseReference("reference")
@@ -306,8 +306,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
                             .setHearingId("HER1234")
                             .setHearingType("AAA7-TRI"));
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         String caseId = "8123456781";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
             .legacyCaseReference("reference")

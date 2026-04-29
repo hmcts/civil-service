@@ -99,7 +99,7 @@ class LipDefendantCaseAssignmentServiceTest {
         );
         //Then
         verify(userService).getUserDetails(AUTHORIZATION);
-        verify(caseEventService).submitEventForClaim(refEq(params));
+        verify(caseEventService).submitEventForClaim(refEq(params), Boolean.TRUE.equals(refEq(true)));
     }
 
     @Test
@@ -148,7 +148,7 @@ class LipDefendantCaseAssignmentServiceTest {
         );
         //Then
         verify(userService).getUserDetails(AUTHORIZATION);
-        verify(caseEventService).submitEventForClaim(refEq(params));
+        verify(caseEventService).submitEventForClaim(refEq(params), Boolean.TRUE.equals(refEq(true)));
     }
 
     private DefendantPinToPostLRspec buildPin(String accessCode, LocalDate expiryDate) {

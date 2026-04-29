@@ -115,6 +115,30 @@ class CoreCaseUserServiceTest {
             );
         }
 
+        @Test
+        void shouldAssignCase_WhenRoleExistsButForDifferentUser() {
+            CaseAssignedUserRole existingRole = new CaseAssignedUserRole()
+                .setUserId(USER_ID2)
+                .setCaseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
+
+            CaseAssignedUserRolesResource resource = new CaseAssignedUserRolesResource()
+                .setCaseAssignedUserRoles(List.of(existingRole));
+
+            when(caseAccessDataStoreApi.getUserRoles(
+                CAA_USER_AUTH_TOKEN,
+                SERVICE_AUTH_TOKEN,
+                List.of(CASE_ID))
+            ).thenReturn(resource);
+
+            service.assignCase(CASE_ID, USER_ID, ORG_ID, CaseRole.APPLICANTSOLICITORONE);
+
+            verify(caseAccessDataStoreApi).addCaseUserRoles(
+                CAA_USER_AUTH_TOKEN,
+                SERVICE_AUTH_TOKEN,
+                getAddCaseAssignedUserRolesRequest(CaseRole.APPLICANTSOLICITORONE)
+            );
+        }
+
         private AddCaseAssignedUserRolesRequest getAddCaseAssignedUserRolesRequest(CaseRole caseRole) {
             CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation
                 = new CaseAssignedUserRoleWithOrganisation()

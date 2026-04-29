@@ -9,7 +9,10 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,11 +59,13 @@ public class MediationCasesSearchService extends ElasticSearchService {
      * @return caseDetails
      */
     public List<CaseDetails> getInMediationCases(boolean carmEnabled) {
+        String timeNow = ZonedDateTime.now(ZoneOffset.UTC).toString();
         if (carmEnabled) {
             SearchResult searchResult =
                 coreCaseDataService.searchMediationCases(queryInMediationCases(START_INDEX,
                                                                                carmEnabled, true,
-                                                                               null
+                                                                               null,
+                                                                               timeNow
                 ));
             log.info("mediation total found: {}", searchResult.getTotal());
             int pages = calculatePages(searchResult);
@@ -75,7 +80,8 @@ public class MediationCasesSearchService extends ElasticSearchService {
                         START_INDEX,
                         carmEnabled,
                         false,
-                        searchAfterValue
+                        searchAfterValue,
+                        timeNow
                     ));
                     logMediationCaseIds(caseDetails, String.valueOf(i));
                     caseDetails.addAll(result.getCases());
@@ -89,7 +95,8 @@ public class MediationCasesSearchService extends ElasticSearchService {
                 START_INDEX,
                 carmEnabled,
                 false,
-                null
+                null,
+                timeNow
             ));
             int pages = calculatePages(searchResult);
             List<CaseDetails> caseDetails = new ArrayList<>(searchResult.getCases());
@@ -98,7 +105,8 @@ public class MediationCasesSearchService extends ElasticSearchService {
                     i * ES_DEFAULT_SEARCH_LIMIT,
                     carmEnabled,
                     false,
-                    null
+                    null,
+                    timeNow
                 ));
                 caseDetails.addAll(result.getCases());
             }
@@ -108,12 +116,17 @@ public class MediationCasesSearchService extends ElasticSearchService {
     }
 
     @Override
-    Query query(int startIndex) {
-        return null;
+    Query query(int startIndex, String timeNow) {
+        return queryInMediationCases(startIndex, false, false, null, timeNow);
     }
 
     private Query queryInMediationCases(int startIndex, boolean carmEnabled, boolean initialSearch,
-                                String searchAfterValue) {
+                                        String searchAfterValue, String timeNow) {
+        log.info("Call to MediationCasesSearchService query with index {} and timeNow {}", startIndex, timeNow);
+
+        ZonedDateTime now = ZonedDateTime.parse(timeNow).withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime startOfToday = startOfDay(now.toLocalDate());
+        ZonedDateTime eightDaysAgo = startOfToday.minusDays(8);
 
         if (carmEnabled) {
             return new Query(
@@ -122,7 +135,7 @@ public class MediationCasesSearchService extends ElasticSearchService {
                     .must(beState(IN_MEDIATION))
                     .must(submittedDate(carmEnabled))
                     .must(rangeQuery("data.claimMovedToMediationOn")
-                              .gt("now-8d/d").lt("now/d"))
+                              .gt(eightDaysAgo.toString()).lt(startOfToday.toString()))
                     .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes")),
                 emptyList(),
                 startIndex,
@@ -137,11 +150,15 @@ public class MediationCasesSearchService extends ElasticSearchService {
                             .must(beState(IN_MEDIATION))
                             .must(submittedDate(carmEnabled))
                             .must(rangeQuery("data.claimMovedToMediationOn")
-                                      .gt("now-8d/d").lt("now/d")))
+                                      .gt(eightDaysAgo.toString()).lt(startOfToday.toString())))
                 .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes")),
             emptyList(),
             startIndex
         );
+    }
+
+    private ZonedDateTime startOfDay(LocalDate date) {
+        return date.atStartOfDay(ZoneOffset.UTC);
     }
 
     private void logMediationCaseIds(List<CaseDetails> caseDetails, String page) {

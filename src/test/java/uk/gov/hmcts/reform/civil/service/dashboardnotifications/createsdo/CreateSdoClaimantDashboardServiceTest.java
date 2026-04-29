@@ -85,7 +85,7 @@ class CreateSdoClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
@@ -184,7 +184,7 @@ class CreateSdoClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_WITHOUT_UPLOAD_FILES_CARM.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verifyNoInteractions(dashboardTasksHelper);
     }
@@ -226,7 +226,7 @@ class CreateSdoClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verifyNoInteractions(dashboardTasksHelper);
     }
@@ -250,7 +250,7 @@ class CreateSdoClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verifyNoInteractions(dashboardTasksHelper);
     }
@@ -278,7 +278,7 @@ class CreateSdoClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
@@ -305,14 +305,14 @@ class CreateSdoClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
@@ -339,14 +339,14 @@ class CreateSdoClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verifyNoInteractions(dashboardTasksHelper);
     }

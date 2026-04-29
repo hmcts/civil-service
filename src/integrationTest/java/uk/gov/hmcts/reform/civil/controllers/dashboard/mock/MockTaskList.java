@@ -17,467 +17,378 @@ public class MockTaskList {
 
     public static List<TaskList> getMediationTaskListMock(String role, String reference) {
         return List.of(
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy(
-                    "<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class=\"govuk-link\">Gweld cytundeb setlo o ran cyfryngu</a>")
-                .taskNameEn(
-                    "<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class=\"govuk-link\">View mediation settlement agreement</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.AVAILABLE.getName())
-                .currentStatusCy(TaskStatus.AVAILABLE.getWelshName())
-                .nextStatusEn(TaskStatus.AVAILABLE.getName())
-                .nextStatusCy(TaskStatus.AVAILABLE.getWelshName())
-                .taskOrder(5)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Uwchlwytho dogfennau cyfryngu</a>")
-                .taskNameEn("<a>Upload mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(6)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld dogfennau cyfryngu</a>")
-                .taskNameEn("<a>View mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(7)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld y gwrandawiad</a>")
-                .taskNameEn("<a>View hearings</a>")
-                .categoryCy("Gwrandawiad")
-                .categoryEn("Hearing")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(8)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Llwytho dogfennau'r gwrandawiad</a>")
-                .taskNameEn("<a>Upload hearing documents</a>")
-                .categoryCy("Gwrandawiad")
-                .categoryEn("Hearing")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(9)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Ychwanegu trefniadau'r treial</a>")
-                .taskNameEn("<a>Add the trial arrangements</a>")
-                .categoryCy("Gwrandawiad")
-                .categoryEn("Hearing")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(10)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Talu ffi'r gwrandawiad</a>")
-                .taskNameEn("<a>Pay the hearing fee</a>")
-                .categoryCy("Gwrandawiad")
-                .categoryEn("Hearing")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(11)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld y bwndel</a>")
-                .taskNameEn("<a>View the bundle</a>")
-                .categoryCy("Gwrandawiad")
-                .categoryEn("Hearing")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(12)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld y Dyfarniad</a>")
-                .taskNameEn("<a>View the judgment</a>")
-                .categoryCy("Dyfarniadau gan y llys")
-                .categoryEn("Judgment from the court")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(13)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld ceisiadau</a>")
-                .taskNameEn("<a>View applications</a>")
-                .categoryCy("Ceisiadau")
-                .categoryEn("Applications")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(14)
-                .build()
+            task(reference,
+                "<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class=\"govuk-link\">Gweld cytundeb setlo o ran cyfryngu</a>",
+                "<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class=\"govuk-link\">View mediation settlement agreement</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.AVAILABLE,
+                TaskStatus.AVAILABLE,
+                5),
+            task(reference,
+                "<a>Uwchlwytho dogfennau cyfryngu</a>",
+                "<a>Upload mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                6),
+            task(reference,
+                "<a>Gweld dogfennau cyfryngu</a>",
+                "<a>View mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                7),
+            task(reference,
+                "<a>Gweld y gwrandawiad</a>",
+                "<a>View hearings</a>",
+                "Gwrandawiad",
+                "Hearing",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                8),
+            task(reference,
+                "<a>Llwytho dogfennau'r gwrandawiad</a>",
+                "<a>Upload hearing documents</a>",
+                "Gwrandawiad",
+                "Hearing",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                9),
+            task(reference,
+                "<a>Ychwanegu trefniadau'r treial</a>",
+                "<a>Add the trial arrangements</a>",
+                "Gwrandawiad",
+                "Hearing",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                10),
+            task(reference,
+                "<a>Talu ffi'r gwrandawiad</a>",
+                "<a>Pay the hearing fee</a>",
+                "Gwrandawiad",
+                "Hearing",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                11),
+            task(reference,
+                "<a>Gweld y bwndel</a>",
+                "<a>View the bundle</a>",
+                "Gwrandawiad",
+                "Hearing",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                12),
+            task(reference,
+                "<a>Gweld y Dyfarniad</a>",
+                "<a>View the judgment</a>",
+                "Dyfarniadau gan y llys",
+                "Judgment from the court",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                13),
+            task(reference,
+                "<a>Gweld ceisiadau</a>",
+                "<a>View applications</a>",
+                "Ceisiadau",
+                "Applications",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                14)
         );
     }
 
     public static List<TaskList> getMediationTaskListMockWithoutPayHearing(String role, String reference) {
         return List.of(
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy(
-                    "<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class=\"govuk-link\">Gweld cytundeb setlo o ran cyfryngu</a>")
-                .taskNameEn(
-                    "<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class=\"govuk-link\">View mediation settlement agreement</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.AVAILABLE.getName())
-                .currentStatusCy(TaskStatus.AVAILABLE.getWelshName())
-                .nextStatusEn(TaskStatus.AVAILABLE.getName())
-                .nextStatusCy(TaskStatus.AVAILABLE.getWelshName())
-                .taskOrder(5)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Uwchlwytho dogfennau cyfryngu</a>")
-                .taskNameEn("<a>Upload mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(6)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld dogfennau cyfryngu</a>")
-                .taskNameEn("<a>View mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(7)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld y gwrandawiad</a>")
-                .taskNameEn("<a>View hearings</a>")
-                .categoryCy("Gwrandawiad")
-                .categoryEn("Hearing")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(8)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Llwytho dogfennau'r gwrandawiad</a>")
-                .taskNameEn("<a>Upload hearing documents</a>")
-                .categoryCy("Gwrandawiad")
-                .categoryEn("Hearing")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(9)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Ychwanegu trefniadau'r treial</a>")
-                .taskNameEn("<a>Add the trial arrangements</a>")
-                .categoryCy("Gwrandawiad")
-                .categoryEn("Hearing")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(10)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld y bwndel</a>")
-                .taskNameEn("<a>View the bundle</a>")
-                .categoryCy("Gwrandawiad")
-                .categoryEn("Hearing")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(12)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld y Dyfarniad</a>")
-                .taskNameEn("<a>View the judgment</a>")
-                .categoryCy("Dyfarniadau gan y llys")
-                .categoryEn("Judgment from the court")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(13)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Cadarnhewch eich bod wedi talu dyled dyfarniad (CCJ)</a>")
-                .taskNameEn("<a>Confirm you've paid a judgment (CCJ) debt</a>")
-                .categoryCy("Dyfarniadau gan y llys")
-                .categoryEn("Judgment from the court")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(14)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld ceisiadau</a>")
-                .taskNameEn("<a>View applications</a>")
-                .categoryCy("Ceisiadau")
-                .categoryEn("Applications")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(15)
-                .build()
+            task(reference,
+                "<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class=\"govuk-link\">Gweld cytundeb setlo o ran cyfryngu</a>",
+                "<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class=\"govuk-link\">View mediation settlement agreement</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.AVAILABLE,
+                TaskStatus.AVAILABLE,
+                5),
+            task(reference,
+                "<a>Uwchlwytho dogfennau cyfryngu</a>",
+                "<a>Upload mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                6),
+            task(reference,
+                "<a>Gweld dogfennau cyfryngu</a>",
+                "<a>View mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                7),
+            task(reference,
+                "<a>Gweld y gwrandawiad</a>",
+                "<a>View hearings</a>",
+                "Gwrandawiad",
+                "Hearing",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                8),
+            task(reference,
+                "<a>Llwytho dogfennau'r gwrandawiad</a>",
+                "<a>Upload hearing documents</a>",
+                "Gwrandawiad",
+                "Hearing",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                9),
+            task(reference,
+                "<a>Ychwanegu trefniadau'r treial</a>",
+                "<a>Add the trial arrangements</a>",
+                "Gwrandawiad",
+                "Hearing",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                10),
+            task(reference,
+                "<a>Gweld y bwndel</a>",
+                "<a>View the bundle</a>",
+                "Gwrandawiad",
+                "Hearing",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                12),
+            task(reference,
+                "<a>Gweld y Dyfarniad</a>",
+                "<a>View the judgment</a>",
+                "Dyfarniadau gan y llys",
+                "Judgment from the court",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                13),
+            task(reference,
+                "<a>Cadarnhewch eich bod wedi talu dyled dyfarniad (CCJ)</a>",
+                "<a>Confirm you've paid a judgment (CCJ) debt</a>",
+                "Dyfarniadau gan y llys",
+                "Judgment from the court",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                14),
+            task(reference,
+                "<a>Gweld ceisiadau</a>",
+                "<a>View applications</a>",
+                "Ceisiadau",
+                "Applications",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                15)
         );
     }
 
     public static List<TaskList> getMediationUnsuccessfulTaskListMock(String role, String reference) {
         return List.of(
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy(
-                    "<a>Gweld cytundeb setlo o ran cyfryngu</a>")
-                .taskNameEn(
-                    "<a>View mediation settlement agreement</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(5)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Uwchlwytho dogfennau cyfryngu</a>")
-                .taskNameEn("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.ACTION_NEEDED.getName())
-                .currentStatusCy(TaskStatus.ACTION_NEEDED.getWelshName())
-                .nextStatusEn(TaskStatus.ACTION_NEEDED.getName())
-                .nextStatusCy(TaskStatus.ACTION_NEEDED.getWelshName())
-                .taskOrder(6)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld dogfennau cyfryngu</a>")
-                .taskNameEn("<a>View mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
-                .currentStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
-                .nextStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
-                .nextStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
-                .taskOrder(7)
-                .build());
+            task(reference,
+                "<a>Gweld cytundeb setlo o ran cyfryngu</a>",
+                "<a>View mediation settlement agreement</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                5),
+            task(reference,
+                "<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Uwchlwytho dogfennau cyfryngu</a>",
+                "<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.ACTION_NEEDED,
+                TaskStatus.ACTION_NEEDED,
+                6),
+            task(reference,
+                "<a>Gweld dogfennau cyfryngu</a>",
+                "<a>View mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.NOT_AVAILABLE_YET,
+                TaskStatus.NOT_AVAILABLE_YET,
+                7)
+        );
     }
 
     public static List<TaskList> getUploadMediationTaskListMock(String role, String reference) {
+        OffsetDateTime now = OffsetDateTime.now();
+        UUID taskId = UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7");
         return List.of(
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Uwchlwytho dogfennau cyfryngu</a>")
-                .taskNameEn("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.IN_PROGRESS.getName())
-                .currentStatusCy(TaskStatus.IN_PROGRESS.getWelshName())
-                .nextStatusEn(TaskStatus.IN_PROGRESS.getName())
-                .nextStatusCy(TaskStatus.IN_PROGRESS.getWelshName())
-                .taskOrder(6)
-                .updatedAt(OffsetDateTime.now())
-                .createdAt(OffsetDateTime.now())
-                .id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7"))
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">Gweld dogfennau cyfryngu</a>")
-                .taskNameEn("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.AVAILABLE.getName())
-                .currentStatusCy(TaskStatus.AVAILABLE.getWelshName())
-                .nextStatusEn(TaskStatus.AVAILABLE.getName())
-                .nextStatusCy(TaskStatus.AVAILABLE.getWelshName())
-                .updatedAt(OffsetDateTime.now())
-                .createdAt(OffsetDateTime.now())
-                .id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7"))
-                .taskOrder(7)
-                .build());
+            task(reference,
+                "<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Uwchlwytho dogfennau cyfryngu</a>",
+                "<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.IN_PROGRESS,
+                TaskStatus.IN_PROGRESS,
+                6,
+                taskId,
+                now,
+                now),
+            task(reference,
+                "<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">Gweld dogfennau cyfryngu</a>",
+                "<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.AVAILABLE,
+                TaskStatus.AVAILABLE,
+                7,
+                taskId,
+                now,
+                now)
+        );
     }
 
     public static List<TaskList> getMediationUnsuccessfulTaskListViewMediationNotAvailableYetMock(String role, String reference) {
         return List.of(
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy(
-                    "<a>Gweld cytundeb setlo o ran cyfryngu</a>")
-                .taskNameEn(
-                    "<a>View mediation settlement agreement</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(5)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Uwchlwytho dogfennau cyfryngu</a>")
-                .taskNameEn("<a>Upload mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(6)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld dogfennau cyfryngu</a>")
-                .taskNameEn("<a>View mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
-                .currentStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
-                .nextStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
-                .nextStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
-                .taskOrder(7)
-                .build());
+            task(reference,
+                "<a>Gweld cytundeb setlo o ran cyfryngu</a>",
+                "<a>View mediation settlement agreement</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                5),
+            task(reference,
+                "<a>Uwchlwytho dogfennau cyfryngu</a>",
+                "<a>Upload mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                6),
+            task(reference,
+                "<a>Gweld dogfennau cyfryngu</a>",
+                "<a>View mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.NOT_AVAILABLE_YET,
+                TaskStatus.NOT_AVAILABLE_YET,
+                7)
+        );
     }
 
     public static List<TaskList> getMediationTaskListWithInactive(String role, String reference) {
         return List.of(
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy(
-                    "<a>Gweld cytundeb setlo o ran cyfryngu</a>")
-                .taskNameEn(
-                    "<a>View mediation settlement agreement</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(5)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Uwchlwytho dogfennau cyfryngu</a>")
-                .taskNameEn("<a>Upload mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(6)
-                .build(),
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a>Gweld dogfennau cyfryngu</a>")
-                .taskNameEn("<a>View mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(7)
-                .build()
+            task(reference,
+                "<a>Gweld cytundeb setlo o ran cyfryngu</a>",
+                "<a>View mediation settlement agreement</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                5),
+            task(reference,
+                "<a>Uwchlwytho dogfennau cyfryngu</a>",
+                "<a>Upload mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                6),
+            task(reference,
+                "<a>Gweld dogfennau cyfryngu</a>",
+                "<a>View mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.INACTIVE,
+                TaskStatus.INACTIVE,
+                7)
         );
     }
 
     public static List<TaskList> getUploadMediationTaskListViewMediationAvailableMock(String role, String reference) {
+        OffsetDateTime now = OffsetDateTime.now();
         return List.of(
-            TaskList.builder()
-                .reference(reference)
-                .taskNameCy("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">Gweld dogfennau cyfryngu</a>")
-                .taskNameEn("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>")
-                .categoryCy("Cyfryngu")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.AVAILABLE.getName())
-                .currentStatusCy(TaskStatus.AVAILABLE.getWelshName())
-                .nextStatusEn(TaskStatus.AVAILABLE.getName())
-                .nextStatusCy(TaskStatus.AVAILABLE.getWelshName())
-                .updatedAt(OffsetDateTime.now())
-                .createdAt(OffsetDateTime.now())
-                .id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7"))
-                .taskOrder(7)
-                .build());
+            task(reference,
+                "<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">Gweld dogfennau cyfryngu</a>",
+                "<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>",
+                "Cyfryngu",
+                "Mediation",
+                role,
+                TaskStatus.AVAILABLE,
+                TaskStatus.AVAILABLE,
+                7,
+                UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7"),
+                now,
+                now)
+        );
+    }
+
+    private static TaskList task(String reference,
+                                 String taskNameCy,
+                                 String taskNameEn,
+                                 String categoryCy,
+                                 String categoryEn,
+                                 String role,
+                                 TaskStatus currentStatus,
+                                 TaskStatus nextStatus,
+                                 int taskOrder) {
+        return task(reference, taskNameCy, taskNameEn, categoryCy, categoryEn, role, currentStatus, nextStatus, taskOrder, null, null, null);
+    }
+
+    private static TaskList task(String reference,
+                                 String taskNameCy,
+                                 String taskNameEn,
+                                 String categoryCy,
+                                 String categoryEn,
+                                 String role,
+                                 TaskStatus currentStatus,
+                                 TaskStatus nextStatus,
+                                 int taskOrder,
+                                 UUID id,
+                                 OffsetDateTime createdAt,
+                                 OffsetDateTime updatedAt) {
+        TaskList task = new TaskList();
+        task.setReference(reference);
+        task.setTaskNameCy(taskNameCy);
+        task.setTaskNameEn(taskNameEn);
+        task.setCategoryCy(categoryCy);
+        task.setCategoryEn(categoryEn);
+        task.setRole(role);
+        task.setCurrentStatusEn(currentStatus.getName());
+        task.setCurrentStatusCy(currentStatus.getWelshName());
+        task.setNextStatusEn(nextStatus.getName());
+        task.setNextStatusCy(nextStatus.getWelshName());
+        task.setTaskOrder(taskOrder);
+        task.setId(id);
+        task.setCreatedAt(createdAt);
+        task.setUpdatedAt(updatedAt);
+        return task;
     }
 }

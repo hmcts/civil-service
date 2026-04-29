@@ -86,21 +86,21 @@ public class DjLocationAndToggleService {
 
     private void applyDisposalSelection(CaseData.CaseDataBuilder<?, ?> builder, String label) {
         if (HearingMethod.IN_PERSON.getLabel().equals(label)) {
-            builder.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
+            builder.disposalHearingMethodDJ(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_IN_PERSON);
         } else if (HearingMethod.VIDEO.getLabel().equals(label)) {
-            builder.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
+            builder.disposalHearingMethodDJ(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_VIDEO_CONFERENCE_HEARING);
         } else if (HearingMethod.TELEPHONE.getLabel().equals(label)) {
-            builder.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+            builder.disposalHearingMethodDJ(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_TELEPHONE_HEARING);
         }
     }
 
     private void applyTrialSelection(CaseData.CaseDataBuilder<?, ?> builder, String label) {
         if (HearingMethod.IN_PERSON.getLabel().equals(label)) {
-            builder.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
+            builder.trialHearingMethodDJ(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_IN_PERSON);
         } else if (HearingMethod.VIDEO.getLabel().equals(label)) {
-            builder.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
+            builder.trialHearingMethodDJ(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_VIDEO_CONFERENCE_HEARING);
         } else if (HearingMethod.TELEPHONE.getLabel().equals(label)) {
-            builder.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+            builder.trialHearingMethodDJ(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_TELEPHONE_HEARING);
         }
     }
 

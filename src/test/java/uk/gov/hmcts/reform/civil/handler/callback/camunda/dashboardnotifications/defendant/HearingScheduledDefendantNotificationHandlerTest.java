@@ -81,8 +81,8 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
         caseData.setCcdCaseReference(1234L);
@@ -99,7 +99,7 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         recordScenarioForTrialArrangementsAndDocumentsUpload(caseData);
     }
@@ -110,8 +110,8 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
         locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
         caseData.setCcdCaseReference(1234L);
@@ -131,13 +131,13 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }

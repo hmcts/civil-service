@@ -117,6 +117,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "of the claim details.%n%n If notification of the claim is processed in the digital portal, the exact date "
         + "when you must notify the claim details will be provided when you first notify the Defendant legal "
         + "representative of the claim.";
+    private static final String PARTICULARS_OF_CLAIM = "particularsOfClaim";
 
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
@@ -728,15 +729,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private void assignParticularOfClaimCategoryIds(CaseData caseData) {
         if (YES.equals(caseData.getUploadParticularsOfClaim())) {
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
-                                                     Element::getValue, "particularsOfClaim");
+                                                          Element::getValue, PARTICULARS_OF_CLAIM
+            );
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getMedicalReport(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                     document -> document.getValue().getDocument(), PARTICULARS_OF_CLAIM
+            );
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                     document -> document.getValue().getDocument(), PARTICULARS_OF_CLAIM
+            );
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                     document -> document.getValue().getDocument(), PARTICULARS_OF_CLAIM
+            );
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getOther(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                     document -> document.getValue().getDocument(), PARTICULARS_OF_CLAIM
+            );
         }
     }
 }

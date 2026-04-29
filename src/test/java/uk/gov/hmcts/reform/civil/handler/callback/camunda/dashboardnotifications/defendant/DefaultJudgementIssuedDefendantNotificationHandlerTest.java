@@ -87,7 +87,7 @@ class DefaultJudgementIssuedDefendantNotificationHandlerTest extends BaseCallbac
             "BEARER_TOKEN",
             SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }

@@ -11,13 +11,12 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_INSPECTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_STANDARD_DJ;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_SCHEDULE_FUTURE_LOSS_DJ;
@@ -51,25 +50,19 @@ public class DjTrialNarrativeService {
     public TrialHearingDisclosureOfDocuments buildDisclosureOfDocuments() {
         return new TrialHearingDisclosureOfDocuments()
             .setInput1(FAST_TRACK_DISCLOSURE_STANDARD_DJ)
-            .setDate1(deadlineService.nextWorkingDayInWeeks(4))
+            .setDate1(deadlineService.nextWorkingDayInWeeks(2))
             .setInput2(FAST_TRACK_DISCLOSURE_INSPECTION)
-            .setDate2(deadlineService.nextWorkingDayInWeeks(6))
-            .setInput3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_DJ)
-            .setInput4(FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX)
-            .setInput5(FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE)
-            .setDate3(deadlineService.nextWorkingDayInWeeks(8));
+            .setDate2(deadlineService.nextWorkingDayInWeeks(3))
+            .setInput3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_DJ);
     }
 
     public TrialHearingDisclosureOfDocuments buildUpdatedDisclosureOfDocuments() {
         return new TrialHearingDisclosureOfDocuments()
             .setInput1(FAST_TRACK_DISCLOSURE_STANDARD_DJ)
-            .setDate1(deadlineService.nextWorkingDayInWeeks(4))
+            .setDate1(deadlineService.nextWorkingDayInWeeks(2))
             .setInput2(FAST_TRACK_DISCLOSURE_INSPECTION)
-            .setDate2(deadlineService.nextWorkingDayInWeeks(5))
-            .setInput3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_DJ)
-            .setInput4(FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX)
-            .setInput5(FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE)
-            .setDate3(deadlineService.nextWorkingDayInWeeks(8));
+            .setDate2(deadlineService.nextWorkingDayInWeeks(3))
+            .setInput3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_DJ);
     }
 
     public TrialHearingWitnessOfFact buildWitnessOfFact() {
@@ -82,16 +75,16 @@ public class DjTrialNarrativeService {
             .setInput6("10")
             .setInput7(WITNESS_PAGE_LIMIT_SUFFIX_DJ)
             .setInput8(SMALL_CLAIMS_WITNESS_DEADLINE)
-            .setDate1(deadlineService.nextWorkingDayInWeeks(8))
+            .setDate1(LocalDate.now().plusWeeks(5))
             .setInput9(SMALL_CLAIMS_WITNESS_LATE_WARNING);
     }
 
     public TrialHearingSchedulesOfLoss buildSchedulesOfLoss() {
         return new TrialHearingSchedulesOfLoss()
             .setInput1(FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD)
-            .setDate1(deadlineService.nextWorkingDayInWeeks(10))
+            .setDate1(deadlineService.nextWorkingDayInWeeks(12))
             .setInput2(FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD)
-            .setDate2(deadlineService.nextWorkingDayInWeeks(12))
+            .setDate2(deadlineService.nextWorkingDayInWeeks(14))
             .setInput3(FAST_TRACK_SCHEDULE_FUTURE_LOSS_DJ);
     }
 
@@ -109,8 +102,8 @@ public class DjTrialNarrativeService {
             .setHelpText1(FAST_TRACK_TRIAL_HEARING_HELP_TEXT)
             .setHelpText2(FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE)
             .setDateToToggle(DATE_TO_SHOW)
-            .setDate1(deadlineService.weeksFromNow(22))
-            .setDate2(deadlineService.weeksFromNow(30));
+            .setDate1(deadlineService.weeksFromNow(20))
+            .setDate2(deadlineService.weeksFromNow(29));
     }
 
     public TrialHearingNotes buildTrialHearingNotes() {

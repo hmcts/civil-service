@@ -18,8 +18,8 @@ public class CcdServiceBusMessage implements Serializable {
     private String caseId;
     private LocalDateTime eventTimestamp;
     private Boolean fromDlq;
-    private MessageState state;
-    private JsonNode messageProperties;
+    private transient MessageState state;
+    private transient JsonNode messageProperties;
     private String messageContent;
     private LocalDateTime received;
     private Integer deliveryCount;

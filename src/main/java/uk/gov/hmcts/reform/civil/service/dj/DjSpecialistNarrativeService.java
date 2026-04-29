@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.SdoDJR2TrialCreditHire;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPPI;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 
@@ -14,6 +15,8 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 public class DjSpecialistNarrativeService {
 
     private final DjBuildingDisputeDirectionsService buildingDisputeDirectionsService;
+    private final DjHousingDisrepairDirectionsService housingDisrepairDirectionsService;
+    private final DjPpiDirectionsService ppiDirectionsService;
     private final DjClinicalDirectionsService clinicalDirectionsService;
     private final DjRoadTrafficAccidentDirectionsService roadTrafficAccidentDirectionsService;
     private final DjCreditHireDirectionsService creditHireDirectionsService;
@@ -39,6 +42,14 @@ public class DjSpecialistNarrativeService {
     }
 
     public TrialHousingDisrepair buildTrialHousingDisrepair() {
-        return buildingDisputeDirectionsService.buildTrialHousingDisrepair();
+        return housingDisrepairDirectionsService.buildTrialHousingDisrepair();
+    }
+
+    public TrialHousingDisrepair buildTrialHousingDisrepairOtherRemedy() {
+        return housingDisrepairDirectionsService.buildTrialHousingDisrepairOtherRemedy();
+    }
+
+    public TrialPPI buildTrialPPI() {
+        return ppiDirectionsService.buildTrialPPI();
     }
 }

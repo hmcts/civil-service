@@ -61,7 +61,7 @@ class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_BUNDLE_UPDATED_TRIAL_READY_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -71,7 +71,7 @@ class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHandlerTe
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
             caseData.setDrawDirectionsOrderSmallClaims(NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_AMEND_RESTITCH_BUNDLE_CLAIMANT.name()).build()
@@ -86,7 +86,7 @@ class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_BUNDLE_UPDATED_TRIAL_READY_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

@@ -72,7 +72,7 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
                 "BEARER_TOKEN",
                 "Scenario.AAA6.EnglishDefResponse.BilingualFlagSet.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -101,7 +101,7 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
                 "BEARER_TOKEN",
                 "Scenario.AAA6.EnglishDefResponse.BilingualFlagSet.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -128,7 +128,7 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
                 "BEARER_TOKEN",
                 "Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -156,7 +156,7 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
                 "BEARER_TOKEN",
                 "Scenario.AAA6.DefResponse.BilingualFlagSet.WelshEnabled.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

@@ -47,8 +47,8 @@ class UpdatePartyWitnessTaskTest {
 
         CaseData caseData = CaseData.builder()
             .applicantWitnesses(List.of(
-                Element.<PartyFlagStructure>builder().value(witness1).build(),
-                Element.<PartyFlagStructure>builder().value(witness2).build()
+                new Element<PartyFlagStructure>().setValue(witness1),
+                new Element<PartyFlagStructure>().setValue(witness2)
             ))
             .build();
 
@@ -69,7 +69,7 @@ class UpdatePartyWitnessTaskTest {
         PartyFlagStructure witness = new PartyFlagStructure().setFirstName(null).setLastName("Smith");
 
         CaseData caseData = CaseData.builder()
-            .respondent1Witnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
+            .respondent1Witnesses(List.of(new Element<PartyFlagStructure>().setValue(witness)))
             .build();
 
         CaseReference ref = caseReference("12345");
@@ -85,7 +85,7 @@ class UpdatePartyWitnessTaskTest {
         PartyFlagStructure witness = new PartyFlagStructure().setFirstName("Bob").setLastName(null);
 
         CaseData caseData = CaseData.builder()
-            .respondent2Witnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
+            .respondent2Witnesses(List.of(new Element<PartyFlagStructure>().setValue(witness)))
             .build();
 
         CaseReference ref = caseReference("12345");
@@ -104,8 +104,8 @@ class UpdatePartyWitnessTaskTest {
         Witness dqWitness2 = new Witness().setFirstName("Jane").setLastName(null);
 
         List<Element<Witness>> dqElements = List.of(
-            Element.<Witness>builder().value(dqWitness1).build(),
-            Element.<Witness>builder().value(dqWitness2).build()
+            new Element<Witness>().setValue(dqWitness1),
+            new Element<Witness>().setValue(dqWitness2)
         );
 
         Witnesses dqWitnesses = new Witnesses().setDetails(dqElements);
@@ -140,7 +140,7 @@ class UpdatePartyWitnessTaskTest {
             ;
 
         CaseData caseData = CaseData.builder()
-            .applicantWitnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
+            .applicantWitnesses(List.of(new Element<PartyFlagStructure>().setValue(witness)))
             .build();
 
         CaseReference ref = caseReference("REF-1");
@@ -163,7 +163,7 @@ class UpdatePartyWitnessTaskTest {
             ;
 
         CaseData caseData = CaseData.builder()
-            .respondent1Witnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
+            .respondent1Witnesses(List.of(new Element<PartyFlagStructure>().setValue(witness)))
             .build();
 
         CaseReference ref = caseReference("REF-2");

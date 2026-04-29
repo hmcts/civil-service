@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDynamicListValueLabel;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getHearingTimeEstimateLabel;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getApplicant1NameWithLitigiousFriend;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +20,7 @@ public class DjTrialTemplateService {
 
     private final UserService userService;
     private final DocumentHearingLocationHelper locationHelper;
+    private final FeatureToggleService featureToggleService;
     private final DjAuthorisationFieldService authorisationFieldService;
     private final DjBundleFieldService bundleFieldService;
     private final DjDirectionsToggleService directionsToggleService;
@@ -34,6 +37,7 @@ public class DjTrialTemplateService {
             .setWrittenByJudge(writtenByJudge)
             .setJudgeNameTitle(caseData.getTrialHearingJudgesRecitalDJ().getJudgeNameTitle())
             .setCaseNumber(caseData.getLegacyCaseReference())
+            .setOtherRemedyEnabled(featureToggleService.isOtherRemedyEnabled())
             .setTrialBuildingDispute(caseData.getTrialBuildingDispute())
             .setTrialBuildingDisputeAddSection(nonNull(caseData.getTrialBuildingDispute()))
             .setTrialClinicalNegligence(caseData.getTrialClinicalNegligence())
@@ -77,12 +81,14 @@ public class DjTrialTemplateService {
             .setVideoConferenceOrganisedBy(hearingMethodFieldService.resolveVideoOrganisedBy(caseData))
             .setTrialHousingDisrepair(caseData.getTrialHousingDisrepair())
             .setTrialHousingDisrepairAddSection(nonNull(caseData.getTrialHousingDisrepair()))
+            .setTrialPPI(caseData.getTrialPPI())
+            .setTrialPPIAddSection(nonNull(caseData.getTrialPPI()))
             .setTrialHearingMethodInPersonAddSection(
                 hearingMethodFieldService.isInPerson(caseData.getTrialHearingMethodDJ()))
             .setTrialHearingLocation(trialHearingLocation)
             .setApplicant(partyFieldService.hasApplicantPartyName(caseData)
-                           ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
-            .setRespondent(partyFieldService.resolveRespondent(caseData).toUpperCase())
+                           ? getApplicant1NameWithLitigiousFriend(caseData, true) : null)
+            .setRespondent(partyFieldService.resolveRespondent(caseData))
             .setTrialHearingTimeDJ(caseData.getTrialHearingTimeDJ())
             .setDisposalHearingDateToToggle(trialTemplateFieldService.hasDateToToggle(caseData))
             .setTrialOrderMadeWithoutHearingDJ(caseData.getTrialOrderMadeWithoutHearingDJ())

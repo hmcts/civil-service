@@ -103,7 +103,7 @@ class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCallbackHa
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.CourtAgreesWithDef.Defendant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -135,7 +135,7 @@ class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCallbackHa
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -175,7 +175,7 @@ class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCallbackHa
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_COURT_AGREE_WITH_CLAIMANT_CCJ_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
     }

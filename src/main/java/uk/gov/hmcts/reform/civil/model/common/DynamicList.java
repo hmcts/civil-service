@@ -2,10 +2,9 @@ package uk.gov.hmcts.reform.civil.model.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.jackson.Jacksonized;
+import lombok.experimental.Accessors;
 
 import java.util.Comparator;
 import java.util.List;
@@ -17,10 +16,9 @@ import static java.util.stream.Collectors.toList;
  * Representation of a CCD Dynamic List which is then converted to a select dropdown list.
  */
 @Data
-@Jacksonized
-@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
+@Accessors(chain = true)
 public class DynamicList {
 
     /**
@@ -39,7 +37,7 @@ public class DynamicList {
             .map(DynamicListElement::dynamicElement)
             .toList();
 
-        return DynamicList.builder().listItems(items).value(DynamicListElement.EMPTY).build();
+        return new DynamicList().setListItems(items).setValue(DynamicListElement.EMPTY);
     }
 
     /**
@@ -71,7 +69,7 @@ public class DynamicList {
             items.sort(Comparator.comparing(DynamicListElement::getLabel));
         }
 
-        return DynamicList.builder().listItems(items).value(chosen).build();
+        return new DynamicList().setListItems(items).setValue(chosen);
     }
 
     /**
@@ -88,6 +86,6 @@ public class DynamicList {
     }
 
     public static DynamicList fromDynamicListElementList(List<DynamicListElement> list) {
-        return DynamicList.builder().listItems(list).value(DynamicListElement.EMPTY).build();
+        return new DynamicList().setListItems(list).setValue(DynamicListElement.EMPTY);
     }
 }

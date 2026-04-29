@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -11,7 +12,8 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM_SPEC;
-import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicants;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getPartyDetails;
 
 @Component
 public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase implements StandardDefaultJudgmentBuilder {
@@ -26,6 +28,7 @@ public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase i
 
     public DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
                                                       uk.gov.hmcts.reform.civil.model.Party respondent,
+                                                      LitigationFriend litigationFriend,
                                                       String event,
                                                       boolean addReferenceOfSecondRes) {
         BigDecimal debtAmount = event.equals(GENERATE_DJ_FORM_SPEC.name())
@@ -47,8 +50,8 @@ public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase i
         return new DefaultJudgmentForm()
             .setCaseNumber(caseData.getLegacyCaseReference())
             .setFormText("No response,")
-            .setApplicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
-            .setRespondent(getPartyDetails(respondent))
+            .setApplicant(getApplicants(caseData))
+            .setRespondent(getPartyDetails(litigationFriend, respondent))
             .setClaimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy())
             )
             .setDebt(debtAmount.toString())

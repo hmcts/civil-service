@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.common;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.jackson.Jacksonized;
+import lombok.experimental.Accessors;
 
 import java.util.UUID;
 
@@ -14,10 +13,9 @@ import java.util.UUID;
  * <p>There are two properties which map to the relevant items of an option html tag.
  */
 @Data
-@Jacksonized
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
+@Accessors(chain = true)
 public class DynamicListElement {
 
     public static final DynamicListElement EMPTY = new DynamicListElement();
@@ -33,16 +31,14 @@ public class DynamicListElement {
     private String label;
 
     public static DynamicListElement dynamicElement(String label) {
-        return DynamicListElement.builder()
-            .code(UUID.randomUUID().toString())
-            .label(label)
-            .build();
+        return new DynamicListElement()
+            .setCode(UUID.randomUUID().toString())
+            .setLabel(label);
     }
 
     public static DynamicListElement dynamicElementFromCode(String code, String label) {
-        return DynamicListElement.builder()
-            .code(code)
-            .label(label)
-            .build();
+        return new DynamicListElement()
+            .setCode(code)
+            .setLabel(label);
     }
 }

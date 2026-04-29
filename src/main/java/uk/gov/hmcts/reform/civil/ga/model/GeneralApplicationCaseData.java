@@ -372,6 +372,7 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private YesOrNo applicantBilingualLanguagePreference;
     private YesOrNo respondentBilingualLanguagePreference;
     private LocalDateTime generalAppSubmittedDateGAspec;
+    private  String nextState;
 
     public GeneralApplicationCaseData copy() {
         return new GeneralApplicationCaseData(this);
@@ -633,6 +634,7 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
         this.applicantBilingualLanguagePreference = other.applicantBilingualLanguagePreference;
         this.respondentBilingualLanguagePreference = other.respondentBilingualLanguagePreference;
         this.generalAppSubmittedDateGAspec = other.generalAppSubmittedDateGAspec;
+        this.nextState = other.nextState;
     }
 
     public GeneralApplicationCaseData ccdCaseType(String ccdCaseType) {

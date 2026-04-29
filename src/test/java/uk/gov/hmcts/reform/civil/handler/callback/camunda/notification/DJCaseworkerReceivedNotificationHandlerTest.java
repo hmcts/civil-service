@@ -92,11 +92,7 @@ class DJCaseworkerReceivedNotificationHandlerTest {
                 .totalClaimAmount(new BigDecimal(1000))
                 .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
                 .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("John Doe")
-                                                     .build())
-                                          .build())
+                .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("John Doe")))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -132,11 +128,7 @@ class DJCaseworkerReceivedNotificationHandlerTest {
                 .repaymentSuggestion("10000")
                 .repaymentFrequency(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)
                 .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("John Doe")
-                                                     .build())
-                                          .build())
+                .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("John Doe")))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 

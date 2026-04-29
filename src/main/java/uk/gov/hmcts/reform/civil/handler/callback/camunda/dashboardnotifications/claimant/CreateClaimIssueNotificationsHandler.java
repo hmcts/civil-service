@@ -56,22 +56,20 @@ public class CreateClaimIssueNotificationsHandler extends DashboardCallbackHandl
             authToken,
             DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+            new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
         );
         if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder()
-                    .params(mapper.mapCaseDataToParams(caseData)).build()
+                new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
             );
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder()
-                    .params(mapper.mapCaseDataToParams(caseData)).build()
+                new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
             );
         }
         if (caseData.isHWFTypeClaimIssued() && caseData.claimIssueFullRemissionNotGrantedHWF()) {
@@ -79,8 +77,7 @@ public class CreateClaimIssueNotificationsHandler extends DashboardCallbackHandl
                 authToken,
                 DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_PHONE_PAYMENT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder()
-                    .params(mapper.mapCaseDataToParams(caseData)).build()
+                new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();

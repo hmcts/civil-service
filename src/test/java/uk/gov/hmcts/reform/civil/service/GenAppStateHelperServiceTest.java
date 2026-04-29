@@ -56,14 +56,9 @@ class GenAppStateHelperServiceTest {
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
-    private InitiateGeneralApplicationService genAppService;
 
     @MockBean
     private LocationService locationService;
-
-    @Autowired
-    private CaseDetailsConverter caseDetailsConverter;
 
     @MockBean
     private LocationReferenceDataService locationRefDataService;
@@ -71,7 +66,7 @@ class GenAppStateHelperServiceTest {
     private static final String APPLICATION_CLOSED_TEXT = "Application Closed";
     private static final String APPLICATION_OFFLINE_TEXT = "Proceeds In Heritage";
     private static final String SET_DATE = "2022-08-31T22:50:11.2509019";
-    private static final String authToken = "Bearer TestAuthToken";
+    private static final String AUTH_TOKEN = "Bearer TestAuthToken";
 
     @Nested
     class StatusChangeInApplicationDetailsInClaim {
@@ -343,13 +338,6 @@ class GenAppStateHelperServiceTest {
             return first.map(Element::getValue).orElse(null);
         }
 
-        private GeneralApplicationsDetails getGALocationDetailsFromUpdatedCaseData(CaseData caseData,
-                                                                           String gaCaseRef) {
-            Optional<Element<GeneralApplicationsDetails>> first = caseData.getClaimantGaAppDetails().stream()
-                .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
-            return first.map(Element::getValue).orElse(null);
-        }
-
         private GADetailsRespondentSol getGARespDetailsFromUpdatedCaseData(CaseData caseData,
                                                                            String gaCaseRef) {
             Optional<Element<GADetailsRespondentSol>> first = caseData.getRespondentSolGaAppDetails().stream()
@@ -427,7 +415,7 @@ class GenAppStateHelperServiceTest {
             caseLocationCivil.setAddress("Prince William House, Peel Cross Road, Salford");
             caseLocationCivil.setPostcode("M5 4RR");
             Pair<CaseLocationCivil, Boolean> caseLocation = Pair.of(caseLocationCivil, false);
-            CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData, authToken);
+            CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData, AUTH_TOKEN);
 
             assertThat(getGADetailsFromUpdatedCaseData(updatedData, "1234")).isNotNull();
             assertThat(updatedData.getGeneralApplications().get(0).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
@@ -466,7 +454,7 @@ class GenAppStateHelperServiceTest {
                                             Map.of()
                 );
 
-            CaseData response = service.updateApplicationLocationDetailsInClaim(caseData, authToken);
+            CaseData response = service.updateApplicationLocationDetailsInClaim(caseData, AUTH_TOKEN);
 
             CaseData updatedData = mapper.convertValue(response, CaseData.class);
 
@@ -501,6 +489,27 @@ class GenAppStateHelperServiceTest {
             service.triggerEvent(caseData, MAIN_CASE_CLOSED);
 
             verifyNoInteractions(coreCaseDataService);
+        }
+
+        @Test
+        void shouldSkipGeneralApplicationWithoutCaseLink_whenTriggeringEvent() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
+                                            true,
+                                            true,
+                                            true, true,
+                                            getOriginalStatusOfGeneralApplication()
+                );
+            caseData.getGeneralApplications().stream()
+                .filter(application -> "1234".equals(application.getValue().getCaseLink().getCaseReference()))
+                .findFirst()
+                .ifPresent(application -> application.getValue().setCaseLink(null));
+
+            boolean result = service.triggerEvent(caseData, MAIN_CASE_CLOSED);
+
+            assertThat(result).isTrue();
+            verify(coreCaseDataService, times(1)).triggerGeneralApplicationEvent(2345L, MAIN_CASE_CLOSED);
+            verifyNoMoreInteractions(coreCaseDataService);
         }
 
         private Map<String, String> getOriginalStatusOfGeneralApplication() {

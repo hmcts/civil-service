@@ -20,7 +20,9 @@ public class ClaimantResponseNotAgreedRepaymentClaimantEmailDTOGenerator extends
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyClaimantLipTemplateManualDetermination();
+        return caseData.isClaimantBilingual()
+            ? notificationsProperties.getNotifyClaimantLipTemplateManualDeterminationForWelsh()
+            : notificationsProperties.getNotifyClaimantLipTemplateManualDetermination();
     }
 
     @Override

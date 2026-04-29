@@ -90,7 +90,7 @@ class NotifySetAsideJudgementDashboardNotificationHandlerTest {
             "BEARER_TOKEN",
             SCENARIO_AAA6_JUDGEMENTS_ONLINE_SET_ASIDE_ERROR_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

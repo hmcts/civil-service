@@ -52,7 +52,7 @@ class CourtOfficerOrderDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_DEFENDANT.getScenario(),
             "4567",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -66,7 +66,7 @@ class CourtOfficerOrderDefendantDashboardServiceTest {
 
         service.notifyCourtOfficerOrder(caseData, AUTH_TOKEN);
 
-        ScenarioRequestParams params = ScenarioRequestParams.builder().params(new HashMap<>()).build();
+        ScenarioRequestParams params = new ScenarioRequestParams(new HashMap<>());
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_DEFENDANT.getScenario(),

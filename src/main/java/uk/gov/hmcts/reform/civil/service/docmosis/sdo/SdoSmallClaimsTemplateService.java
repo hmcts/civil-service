@@ -18,6 +18,11 @@ import uk.gov.hmcts.reform.civil.service.sdo.SmallClaimsVariable;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getApplicant1NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getApplicant2NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getRespondent1NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getRespondent2NameWithLitigiousFriend;
+
 @Service
 @RequiredArgsConstructor
 public class SdoSmallClaimsTemplateService {
@@ -35,12 +40,16 @@ public class SdoSmallClaimsTemplateService {
         String authorisation
     ) {
         boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
-        boolean hasPpi = hasAdditionalDirection(caseData, SmallTrack.smallClaimPPI);
+        boolean hasPpi = hasAdditionalDirection(caseData, SmallTrack.SMALL_CLAIM_PPI);
         SdoDocumentFormSmall template = new SdoDocumentFormSmall()
             .setWrittenByJudge(isJudge)
             .setCurrentDate(LocalDate.now())
             .setJudgeName(judgeName)
             .setCaseNumber(caseData.getLegacyCaseReference())
+            .setApplicant1PartyName(getApplicant1NameWithLitigiousFriend(caseData))
+            .setApplicant2PartyName(getApplicant2NameWithLitigiousFriend(caseData))
+            .setRespondent1PartyName(getRespondent1NameWithLitigiousFriend(caseData))
+            .setRespondent2PartyName(getRespondent2NameWithLitigiousFriend(caseData))
             .setApplicant1(caseData.getApplicant1())
             .setHasApplicant2(caseClassificationService.hasApplicant2(caseData))
             .setApplicant2(caseData.getApplicant2())
@@ -51,10 +60,10 @@ public class SdoSmallClaimsTemplateService {
             .setDrawDirectionsOrder(caseData.getDrawDirectionsOrder())
             .setClaimsTrack(caseData.getClaimsTrack())
             .setSmallClaims(caseData.getSmallClaims())
-            .setHasCreditHire(hasAdditionalDirection(caseData, SmallTrack.smallClaimCreditHire))
-            .setHasHousingDisrepair(hasAdditionalDirection(caseData, SmallTrack.smallClaimHousingDisrepair))
+            .setHasCreditHire(hasAdditionalDirection(caseData, SmallTrack.SMALL_CLAIM_CREDIT_HIRE))
+            .setHasHousingDisrepair(hasAdditionalDirection(caseData, SmallTrack.SMALL_CLAIM_HOUSING_DISREPAIR))
             .setSmallClaimsHousingDisrepair(caseData.getSmallClaimsHousingDisrepair())
-            .setHasRoadTrafficAccident(hasAdditionalDirection(caseData, SmallTrack.smallClaimRoadTrafficAccident))
+            .setHasRoadTrafficAccident(hasAdditionalDirection(caseData, SmallTrack.SMALL_CLAIM_ROAD_TRAFFIC_ACCIDENT))
             .setHasPaymentProtectionInsurance(hasPpi)
             .setSmallClaimsPPI(hasPpi ? caseData.getSmallClaimsPPI() : null)
             .setSmallClaimsJudgesRecital(caseData.getSmallClaimsJudgesRecital())

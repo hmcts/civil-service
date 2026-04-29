@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.DIS;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.DRH;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.TRI;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getContentText;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getPluralTypeTextWelsh;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getTitleText;
 
 public class DocumentHearingTypeTest {
@@ -109,5 +110,15 @@ public class DocumentHearingTypeTest {
     })
     void shouldReturnExpectedContentTextWelsh(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
         assertEquals(expected, getContentText(hearingType, allocatedTrack, true));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "TRI, FAST_CLAIM, dreialon",
+        "TRI, SMALL_CLAIM, wrandawiadau",
+        "DIS, FAST_CLAIM, wrandawiadau"
+    })
+    void shouldReturnExpectedPluralTypeTextWelsh(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
+        assertEquals(expected, getPluralTypeTextWelsh(hearingType, allocatedTrack));
     }
 }

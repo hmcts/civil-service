@@ -61,7 +61,7 @@ class ClaimIssueClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }
@@ -82,13 +82,13 @@ class ClaimIssueClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIM_ISSUE_HWF_PHONE_PAYMENT.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }
@@ -107,19 +107,19 @@ class ClaimIssueClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }

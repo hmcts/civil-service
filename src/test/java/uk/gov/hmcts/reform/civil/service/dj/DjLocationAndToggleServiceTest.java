@@ -149,7 +149,7 @@ class DjLocationAndToggleServiceTest {
         CaseData result = service.applyHearingSelections(caseData, V_1);
 
         assertThat(result.getDisposalHearingMethodDJ())
-            .isEqualTo(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+            .isEqualTo(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_TELEPHONE_HEARING);
     }
 
     @Test
@@ -163,7 +163,7 @@ class DjLocationAndToggleServiceTest {
         CaseData result = service.applyHearingSelections(caseData, V_1);
 
         assertThat(result.getTrialHearingMethodDJ())
-            .isEqualTo(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
+            .isEqualTo(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_VIDEO_CONFERENCE_HEARING);
     }
 
     @Test
@@ -186,7 +186,7 @@ class DjLocationAndToggleServiceTest {
         CaseData result = service.applyHearingSelections(caseData, V_1);
 
         assertThat(result.getDisposalHearingMethodDJ())
-            .isEqualTo(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
+            .isEqualTo(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_IN_PERSON);
     }
 
     @Test
@@ -200,7 +200,7 @@ class DjLocationAndToggleServiceTest {
         CaseData result = service.applyHearingSelections(caseData, V_1);
 
         assertThat(result.getTrialHearingMethodDJ())
-            .isEqualTo(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+            .isEqualTo(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_TELEPHONE_HEARING);
     }
 
     @Test

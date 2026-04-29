@@ -62,7 +62,7 @@ class ClaimIssueDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }
@@ -82,13 +82,13 @@ class ClaimIssueDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }
@@ -109,25 +109,25 @@ class ClaimIssueDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }
@@ -176,13 +176,13 @@ class ClaimIssueDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(),
             "123",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
         verifyNoMoreInteractions(dashboardScenariosService);
     }

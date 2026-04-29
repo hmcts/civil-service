@@ -52,7 +52,7 @@ class DecisionOnRequestForReconsiderationDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_DEFENDANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 

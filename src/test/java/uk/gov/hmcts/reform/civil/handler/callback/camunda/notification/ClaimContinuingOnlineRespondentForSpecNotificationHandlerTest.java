@@ -34,6 +34,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
@@ -180,6 +182,15 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
                     .build()).build();
 
             handler.handle(params);
+
+            // When the 2nd defendant uses the same legal representative, we should not send to respondent2's solicitor email.
+            verify(notificationService).sendMail(
+                "respondentsolicitor@example.com",
+                "template-id",
+                getNotificationDataMap(),
+                "claim-continuing-online-notification-000DC001"
+            );
+            verifyNoMoreInteractions(notificationService);
         }
 
         @NotNull
@@ -228,6 +239,8 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
                 .build()).build();
 
         handler.handle(params);
+
+        verifyNoInteractions(notificationService);
     }
 
     @Test

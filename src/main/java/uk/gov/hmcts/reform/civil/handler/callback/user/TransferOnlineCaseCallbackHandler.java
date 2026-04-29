@@ -118,7 +118,9 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         });
 
         // Clear the list items to avoid large data payloads in the response
-        caseData.getTransferCourtLocationList().setListItems(null);
+        if (caseData.getTransferCourtLocationList() != null) {
+            caseData.getTransferCourtLocationList().setListItems(null);
+        }
         caseData.setBusinessProcess(BusinessProcess.ready(TRIGGER_TASK_RECONFIG_GA));
 
         return AboutToStartOrSubmitCallbackResponse.builder()

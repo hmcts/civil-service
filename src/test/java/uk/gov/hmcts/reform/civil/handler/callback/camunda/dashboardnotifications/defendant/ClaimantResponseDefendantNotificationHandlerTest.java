@@ -134,7 +134,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
 
         verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
@@ -173,7 +173,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -203,7 +203,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -240,7 +240,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -274,7 +274,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -303,7 +303,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -331,7 +331,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -366,7 +366,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -401,7 +401,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -429,7 +429,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -459,7 +459,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -495,7 +495,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -521,7 +521,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -553,7 +553,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -594,7 +594,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -617,7 +617,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -644,7 +644,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -676,13 +676,13 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -765,7 +765,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -791,7 +791,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -818,7 +818,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -846,7 +846,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -877,7 +877,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -904,7 +904,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -935,7 +935,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -962,7 +962,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -1015,7 +1015,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -1115,13 +1115,13 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -1153,7 +1153,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -1185,7 +1185,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -1267,7 +1267,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -1299,7 +1299,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -1331,7 +1331,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -1359,7 +1359,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -1531,7 +1531,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -1562,7 +1562,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }

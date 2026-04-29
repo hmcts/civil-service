@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -40,7 +41,7 @@ class OrderReviewObligationSearchServiceTest extends ElasticSearchServiceTest {
             .must(boolQuery()
                       .must(existsQuery("data.storedObligationData"))
                       .must(rangeQuery("data.storedObligationData.value.obligationDate")
-                                .lte(LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)))
+                                .lte(LocalDate.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)))
                       .must(termQuery("data.storedObligationData.value.obligationWATaskRaised", YesOrNo.NO))
                       .must(boolQuery()
                                 .minimumShouldMatch(1)

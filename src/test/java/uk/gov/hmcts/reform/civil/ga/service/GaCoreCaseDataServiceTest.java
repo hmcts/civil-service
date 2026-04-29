@@ -98,7 +98,11 @@ class GaCoreCaseDataServiceTest {
         private static final String USER_ID = "User1";
         private final GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
-            .caseManagementLocation(CaseLocationCivil.builder().region("1").baseLocation("12334").siteName("london").siteName("London SE1").postcode("SE1 1AA").build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setRegion("1")
+                                        .setBaseLocation("12334")
+                                        .setSiteName("London SE1")
+                                        .setPostcode("SE1 1AA"))
             .build();
         private final CaseDetails caseDetails = CaseDetailsBuilder.builder()
             .createdDate(LocalDateTime.now())
@@ -313,7 +317,7 @@ class GaCoreCaseDataServiceTest {
         @Test
         void shouldStartAndSubmitEvent_WhenCalled() {
 
-            GeneralApplication generalApplication = GeneralApplication.builder().build();
+            GeneralApplication generalApplication = new GeneralApplication();
 
             service.createGeneralAppCase(generalApplication.toMap(objectMapper));
 

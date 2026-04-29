@@ -85,7 +85,7 @@ class DefendantNotifyDiscontinuanceDashboardNotificationHandlerTest extends Base
             "BEARER_TOKEN",
             SCENARIO_AAA6_DISCONTINUE_NOTICE_OF_DISCONTINUE_ISSUED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

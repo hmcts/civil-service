@@ -120,6 +120,11 @@ public class SdoDocumentFormFast implements MappableObject {
     private boolean showPenalNotice;
     private String penalNoticeText;
 
+    private String applicant1PartyName;
+    private String applicant2PartyName;
+    private String respondent1PartyName;
+    private String respondent2PartyName;
+
     @SuppressWarnings("unused")
     public boolean getFastTrackMethodToggle() {
         // made mandatory in SNI-5142

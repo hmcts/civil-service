@@ -26,8 +26,7 @@ public class OtherPartyUploadedDocumentTest extends BaseIntegrationTest {
 
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>()).build(),
+               new ScenarioRequestParams(new HashMap<>()),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_OTHER_PARTY_UPLOADED_DOC_APPLICANT, caseId
         )
             .andExpect(status().isOk());

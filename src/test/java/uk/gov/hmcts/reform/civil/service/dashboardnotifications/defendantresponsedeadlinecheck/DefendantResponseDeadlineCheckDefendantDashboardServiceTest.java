@@ -49,7 +49,7 @@ class DefendantResponseDeadlineCheckDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_DEFENDANT_RESPONSE_DEADLINE_PASSED_DEFENDANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 }

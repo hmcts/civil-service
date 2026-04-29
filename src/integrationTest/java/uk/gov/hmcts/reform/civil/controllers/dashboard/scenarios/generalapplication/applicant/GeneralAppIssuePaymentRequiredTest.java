@@ -26,8 +26,7 @@ public class GeneralAppIssuePaymentRequiredTest extends BaseIntegrationTest {
 
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>()).build(),
+               new ScenarioRequestParams(new HashMap<>()),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_GA_ISSUE_FEE_REQUIRED, caseId
         )
             .andExpect(status().isOk());

@@ -54,7 +54,7 @@ public class ClaimantNocOnlineDashboardNotificationHandler extends CallbackHandl
         }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         ScenarioRequestParams params =
-            ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+            new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
 
         dashboardScenariosService.recordScenarios(
             authToken,

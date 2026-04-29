@@ -60,7 +60,7 @@ class CreateClaimAfterPaymentDefendantDashboardServiceTest {
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
 
-        ScenarioRequestParams params = ScenarioRequestParams.builder().params(new HashMap<>()).build();
+        ScenarioRequestParams params = new ScenarioRequestParams(new HashMap<>());
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),

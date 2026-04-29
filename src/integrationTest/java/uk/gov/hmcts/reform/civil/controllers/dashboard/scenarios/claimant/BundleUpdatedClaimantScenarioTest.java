@@ -68,7 +68,7 @@ public class BundleUpdatedClaimantScenarioTest extends DashboardBaseIntegrationT
         if (isFastTrack) {
             caseData = caseData.toBuilder().drawDirectionsOrderRequired(YesOrNo.YES)
                 .drawDirectionsOrderSmallClaims(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
+                .claimsTrack(ClaimsTrack.FAST_TRACK)
                 .orderType(OrderType.DECIDE_DAMAGES)
                 .build();
         }

@@ -44,34 +44,9 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
 
     @Override
     protected void sendNotificationToSolicitor(CaseData caseData, String recipient) {
-        String emailTemplate;
-        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
-            && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
-        ) {
-            if (featureToggleService.isJudgmentOnlineLive()) {
-                emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA();
-            } else {
-                emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
-            }
-        } else {
-            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
-                emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
-            } else if (caseData.isApplicant1NotRepresented()
-                && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-                if (caseData.isClaimantBilingual()) {
-                    emailTemplate =
-                        notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
-                } else {
-                    emailTemplate = notificationsProperties.getClaimantLipClaimUpdatedTemplate();
-                }
-            } else {
-                emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
-            }
-        }
         notificationService.sendMail(
             recipient,
-            emailTemplate,
+            getEmailTemplate(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -79,39 +54,23 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
-            && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-            caseData.getRespondent2ClaimResponseTypeForSpec()))
-        ) {
-            String shouldBePaidBy = caseData.getRespondToClaimAdmitPartLRspec()
-                .getWhenWillThisAmountBePaid().getDayOfMonth()
-                + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getMonth()
-                + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getYear();
-            HashMap<String, String> properties = new HashMap<>(Map.of(
-                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                WHEN_WILL_BE_PAID_IMMEDIATELY, shouldBePaidBy,
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CASEMAN_REF, caseData.getLegacyCaseReference()
-            ));
-            addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isPublicQueryManagementEnabled(caseData));
-            return properties;
+        HashMap<String, String> properties = new HashMap<>(Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+
+        if (isImmediateFullAdmission(caseData)) {
+            properties.put(WHEN_WILL_BE_PAID_IMMEDIATELY, formatImmediatePaymentDate(caseData));
         } else {
-            HashMap<String, String> properties = new HashMap<>(Map.of(
-                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
-                CASEMAN_REF, caseData.getLegacyCaseReference()
-            ));
-            addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isPublicQueryManagementEnabled(caseData));
-            return properties;
+            properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
         }
+
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private String getLegalOrganisationName(CaseData caseData) {
@@ -123,5 +82,35 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
         Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+    }
+
+    private String getEmailTemplate(CaseData caseData) {
+        if (isImmediateFullAdmission(caseData)) {
+            return featureToggleService.isJudgmentOnlineLive()
+                ? notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()
+                : notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
+        }
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
+            return notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
+        }
+        if (caseData.isApplicant1NotRepresented()
+            && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            return caseData.isClaimantBilingual()
+                ? notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()
+                : notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+        }
+        return notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+    }
+
+    private boolean isImmediateFullAdmission(CaseData caseData) {
+        return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+            && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
+    }
+
+    private String formatImmediatePaymentDate(CaseData caseData) {
+        return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getDayOfMonth()
+            + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getMonth()
+            + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getYear();
     }
 }

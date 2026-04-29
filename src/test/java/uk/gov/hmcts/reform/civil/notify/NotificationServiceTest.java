@@ -7,11 +7,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
+import uk.gov.service.notify.SendEmailResponse;
+
 import java.util.Map;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,9 +31,40 @@ class NotificationServiceTest {
     @Test
     void shouldCallNotificationClient_whenRequestsSendEmail() throws NotificationClientException {
         // Given
-        given(notificationClient.sendEmail(any(), any(), any(), any())).willCallRealMethod();
+        SendEmailResponse response = mock(SendEmailResponse.class);
+        given(notificationClient.sendEmail(any(), any(), any(), any())).willReturn(response);
+        given(response.getNotificationId()).willReturn(UUID.randomUUID());
+
         // When
         service.sendMail("email@email.com", "template", Map.of("param1", "param1"), "reference");
+        // Then
+        verify(notificationClient)
+            .sendEmail("template", "email@email.com", Map.of("param1", "param1"), "reference");
+    }
+
+    @Test
+    void shouldNotThrowException_whenSendEmailResponseIsNull() throws NotificationClientException {
+        // Given
+        given(notificationClient.sendEmail(any(), any(), any(), any())).willReturn(null);
+
+        // When
+        service.sendMail("email@email.com", "template", Map.of("param1", "param1"), "reference");
+
+        // Then
+        verify(notificationClient)
+            .sendEmail("template", "email@email.com", Map.of("param1", "param1"), "reference");
+    }
+
+    @Test
+    void shouldNotThrowException_whenSendEmailResponseNotificationIdIsNull() throws NotificationClientException {
+        // Given
+        SendEmailResponse response = mock(SendEmailResponse.class);
+        given(notificationClient.sendEmail(any(), any(), any(), any())).willReturn(response);
+        given(response.getNotificationId()).willReturn(null);
+
+        // When
+        service.sendMail("email@email.com", "template", Map.of("param1", "param1"), "reference");
+
         // Then
         verify(notificationClient)
             .sendEmail("template", "email@email.com", Map.of("param1", "param1"), "reference");

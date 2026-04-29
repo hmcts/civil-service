@@ -61,11 +61,7 @@ public class JudgmentsOnlineHelperTest {
             .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.YES)
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both Defendants")
-                                                 .build())
-                                      .build())
+            .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("Both Defendants")))
             .build();
         assertThat(isNonDivergentForDJ(caseData)).isTrue();
     }
@@ -79,11 +75,7 @@ public class JudgmentsOnlineHelperTest {
             .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.NO)
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("John Smith")
-                                                 .build())
-                                      .build())
+            .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("John Smith")))
             .build();
         assertThat(isNonDivergentForDJ(caseData)).isFalse();
     }

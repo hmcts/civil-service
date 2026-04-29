@@ -458,9 +458,8 @@ public class DashboardClaimInfoServiceTest {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
                             .defaultJudgmentDocuments(List.of(
-                                Element.<CaseDocument>builder()
-                                    .value(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
-                                               .setCreatedDatetime(LocalDateTime.now())).build()))
+                                new Element<CaseDocument>().setValue(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
+                                               .setCreatedDatetime(LocalDateTime.now()))))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",

@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -164,7 +165,9 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
             .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
             .flatMap(organisationService::findOrganisationById)
             .map(uk.gov.hmcts.reform.civil.prd.model.Organisation::getName)
-            .orElseGet(() -> caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
+            .orElseGet(() -> Optional.ofNullable(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
+                .map(StatementOfTruth::getName)
+                .orElse(null));
     }
 
     private boolean isSameRespondentSolicitor(CaseData caseData, String taskId) {

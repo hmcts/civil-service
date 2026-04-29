@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -23,10 +24,11 @@ public class NonImmediatePaymentTypeDefaultJudgmentFormBuilder extends DefaultJu
 
     public DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
                                                       uk.gov.hmcts.reform.civil.model.Party respondent,
+                                                      LitigationFriend litigationFriend,
                                                       String event,
                                                       boolean addReferenceOfSecondRes) {
 
-        return super.getDefaultJudgmentForm(caseData, respondent, event, addReferenceOfSecondRes)
+        return super.getDefaultJudgmentForm(caseData, respondent, litigationFriend, event, addReferenceOfSecondRes)
             .copy()
             .setPaymentPlan(caseData.getPaymentTypeSelection().name())
             .setPayByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null :

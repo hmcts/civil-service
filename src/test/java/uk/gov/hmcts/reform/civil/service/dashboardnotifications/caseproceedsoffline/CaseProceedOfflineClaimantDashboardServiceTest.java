@@ -98,7 +98,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
 
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            ScenarioRequestParams params = ScenarioRequestParams.builder().params(new HashMap<>()).build();
+            ScenarioRequestParams params = new ScenarioRequestParams(new HashMap<>());
             verify(dashboardScenariosService).recordScenarios(
                 eq(AUTH_TOKEN),
                 eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario()),

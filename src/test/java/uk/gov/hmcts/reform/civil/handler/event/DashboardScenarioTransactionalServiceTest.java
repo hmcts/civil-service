@@ -45,7 +45,7 @@ class DashboardScenarioTransactionalServiceTest {
         String bearerToken = "testBearerToken";
         String caseReference = "12345";
         DashboardScenarios scenario = DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT;
-        ScenarioRequestParams params = ScenarioRequestParams.builder().build();
+        ScenarioRequestParams params = new ScenarioRequestParams(null);
 
         TransactionTemplate transactionTemplate = mock(TransactionTemplate.class);
         when(transactionManager.getTransaction(any())).thenReturn(null);

@@ -100,7 +100,7 @@ class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallbackHandler
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -130,7 +130,7 @@ class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallbackHandler
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -159,7 +159,7 @@ class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallbackHandler
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

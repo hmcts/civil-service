@@ -132,7 +132,7 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         recordScenarioForTrialArrangementsAndDocumentsUpload(caseData);
         verifyNoMoreInteractions(dashboardScenariosService);
@@ -159,14 +159,14 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
 
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -205,14 +205,14 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
 
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
 
         verify(hearingFeesService).getFeeForHearingSmallClaims(new BigDecimal(100).setScale(2, RoundingMode.UNNECESSARY));
@@ -250,14 +250,14 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
 
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
 
         verify(hearingFeesService).getFeeForHearingSmallClaims(new BigDecimal(100).setScale(2, RoundingMode.UNNECESSARY));
@@ -268,14 +268,14 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
 
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -310,7 +310,7 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         recordScenarioForTrialArrangementsAndDocumentsUpload(caseData);
         verifyNoMoreInteractions(dashboardScenariosService);
@@ -345,7 +345,7 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         recordScenarioForTrialArrangementsAndDocumentsUpload(caseData);
         verifyNoMoreInteractions(dashboardScenariosService);
@@ -385,7 +385,7 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         recordScenarioForTrialArrangementsAndDocumentsUpload(caseData);
         verifyNoMoreInteractions(dashboardScenariosService);
@@ -423,13 +423,13 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(hearingFeesService).getFeeForHearingSmallClaims(new BigDecimal(100).setScale(2, RoundingMode.UNNECESSARY));
     }
@@ -481,13 +481,13 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService, never()).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         recordScenarioForTrialArrangementsAndDocumentsUpload(caseData);
     }

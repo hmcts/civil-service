@@ -86,7 +86,7 @@ class HearingFeePaidClaimantNotificationHandlerTest extends BaseCallbackHandlerT
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_HEARING_FEE_PAID_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -112,7 +112,7 @@ class HearingFeePaidClaimantNotificationHandlerTest extends BaseCallbackHandlerT
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_HEARING_FEE_PAID_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

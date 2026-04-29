@@ -40,8 +40,8 @@ public class DocUploadDashboardNotificationService {
                 caseData.getCcdCaseReference()
             );
             List<String> scenarios = getDashboardScenario(role, caseData, itsUploadAddlDocEvent);
-            ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
-                caseData)).build();
+            ScenarioRequestParams scenarioParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(
+                caseData));
 
             scenarios.forEach(scenario -> dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -57,8 +57,8 @@ public class DocUploadDashboardNotificationService {
         if ((role.equalsIgnoreCase(APPLICANT)
             || (isWithNoticeOrConsent(caseData) && role.equalsIgnoreCase(RESPONDENT)))) {
             String scenario = getResponseDashboardScenario(role, caseData);
-            ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
-                caseData)).build();
+            ScenarioRequestParams scenarioParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(
+                caseData));
             if (scenario != null) {
                 dashboardApiClient.recordScenario(
                     caseData.getCcdCaseReference().toString(),
@@ -82,8 +82,8 @@ public class DocUploadDashboardNotificationService {
     public void createOfflineResponseDashboardNotification(GeneralApplicationCaseData caseData, String role, String authToken) {
 
         String scenario = getResponseOfflineDashboardScenario(role, caseData, authToken);
-        ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
-            caseData)).build();
+        ScenarioRequestParams scenarioParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(
+            caseData));
         if (scenario != null) {
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),

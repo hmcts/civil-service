@@ -57,7 +57,7 @@ class ApplicationIssuedRespondentDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_NONURGENT_RESPONDENT.getScenario(),
             AUTH_TOKEN,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

@@ -116,7 +116,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     private final UploadEvidenceExpert uploadEvidenceDate = new UploadEvidenceExpert();
     private final UploadEvidenceWitness uploadEvidenceDate2 = new UploadEvidenceWitness();
     private final UploadEvidenceDocumentType uploadEvidenceDate3 = new UploadEvidenceDocumentType();
-    private static final String NotificationWhenBothDefendant = "\n"
+    private static final String NOTIFICATION_WHEN_BOTH_DEFENDANT = "\n"
         + "Both defendants - Disclosure list\n"
         + "Both defendants - Documents for disclosure\n"
         + "Both defendants - Documents referred to in the statement\n"
@@ -129,7 +129,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         + "Both defendants - Authorities\n"
         + "Both defendants - Costs\n"
         + "Both defendants - Documentary evidence for trial";
-    private static final String NotificationWhenDefendantTwo = "\n"
+    private static final String NOTIFICATION_WHEN_DEFENDANT_TWO = "\n"
         + "Defendant 2 - Disclosure list\n"
         + "Defendant 2 - Documents for disclosure\n"
         + "Defendant 2 - Documents referred to in the statement\n"
@@ -1654,7 +1654,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
             assertThat(updatedData.getDocumentCostsRes2().get(0).getValue()
                 .getDocumentUpload().getCategoryID()).isEqualTo(DocumentCategory.RESPONDENT_TWO_SCHEDULE_OF_COSTS.getCategoryId());
-            assertThat(updatedData.getNotificationText()).contains(NotificationWhenBothDefendant);
+            assertThat(updatedData.getNotificationText()).contains(NOTIFICATION_WHEN_BOTH_DEFENDANT);
         }
     }
 
@@ -1722,7 +1722,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCostsRes2().get(0).getValue()
             .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
-        assertThat(updatedData.getNotificationText()).isEqualTo(NotificationWhenDefendantTwo);
+        assertThat(updatedData.getNotificationText()).isEqualTo(NOTIFICATION_WHEN_DEFENDANT_TWO);
     }
 
     @Test

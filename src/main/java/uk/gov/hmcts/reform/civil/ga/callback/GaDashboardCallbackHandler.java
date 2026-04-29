@@ -52,8 +52,8 @@ public abstract class GaDashboardCallbackHandler extends CallbackHandler impleme
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String scenario = getScenario(caseData);
-        ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
-            caseData)).build();
+        ScenarioRequestParams scenarioParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(
+            caseData));
         log.info("Configure dashboard scenario for case id: {}", caseData.getCcdCaseReference());
 
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(callbackParams)) {

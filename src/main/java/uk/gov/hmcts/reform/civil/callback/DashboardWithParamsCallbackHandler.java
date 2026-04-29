@@ -45,8 +45,8 @@ public abstract class DashboardWithParamsCallbackHandler extends CallbackHandler
                 authToken,
                 scenario,
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
-                    caseData)).build()
+                new ScenarioRequestParams(mapper.mapCaseDataToParams(
+                    caseData))
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();

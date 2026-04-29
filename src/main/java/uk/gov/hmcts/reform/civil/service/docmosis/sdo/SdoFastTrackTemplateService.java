@@ -22,6 +22,10 @@ import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle.ADD;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getApplicant1NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getApplicant2NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getRespondent1NameWithLitigiousFriend;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getRespondent2NameWithLitigiousFriend;
 
 @Slf4j
 @Service
@@ -36,7 +40,7 @@ public class SdoFastTrackTemplateService {
 
     public SdoDocumentFormFast buildTemplate(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         boolean showBundleInfo = hasVariable(caseData, FastTrackVariable.TRIAL_BUNDLE_TOGGLE);
-        boolean hasPpi = hasDirection(caseData, FastTrack.fastClaimPPI);
+        boolean hasPpi = hasDirection(caseData, FastTrack.FAST_CLAIM_PPI);
         boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
 
         log.info("Building Fast Track SDO template for case: {}, other-remedy-enabled: {}",
@@ -48,6 +52,10 @@ public class SdoFastTrackTemplateService {
             .setJudgeName(judgeName)
             .setCaseNumber(caseData.getLegacyCaseReference())
             .setApplicant1(caseData.getApplicant1())
+            .setApplicant1PartyName(getApplicant1NameWithLitigiousFriend(caseData))
+            .setApplicant2PartyName(getApplicant2NameWithLitigiousFriend(caseData))
+            .setRespondent1PartyName(getRespondent1NameWithLitigiousFriend(caseData))
+            .setRespondent2PartyName(getRespondent2NameWithLitigiousFriend(caseData))
             .setHasApplicant2(caseClassificationService.hasApplicant2(caseData))
             .setApplicant2(caseData.getApplicant2())
             .setRespondent1(caseData.getRespondent1())
@@ -57,14 +65,14 @@ public class SdoFastTrackTemplateService {
             .setDrawDirectionsOrder(caseData.getDrawDirectionsOrder())
             .setClaimsTrack(caseData.getClaimsTrack())
             .setFastClaims(caseData.getFastClaims())
-            .setHasBuildingDispute(hasDirection(caseData, FastTrack.fastClaimBuildingDispute))
-            .setHasClinicalNegligence(hasDirection(caseData, FastTrack.fastClaimClinicalNegligence))
-            .setHasSdoR2CreditHire(hasDirection(caseData, FastTrack.fastClaimCreditHire))
+            .setHasBuildingDispute(hasDirection(caseData, FastTrack.FAST_CLAIM_BUILDING_DISPUTE))
+            .setHasClinicalNegligence(hasDirection(caseData, FastTrack.FAST_CLAIM_CLINICAL_NEGLIGENCE))
+            .setHasSdoR2CreditHire(hasDirection(caseData, FastTrack.FAST_CLAIM_CREDIT_HIRE))
             .setHasSdoR2CreditHireDetails(hasCreditHireDetails(caseData))
-            .setHasEmployersLiability(hasDirection(caseData, FastTrack.fastClaimEmployersLiability))
-            .setHasHousingDisrepair(hasDirection(caseData, FastTrack.fastClaimHousingDisrepair))
-            .setHasPersonalInjury(hasDirection(caseData, FastTrack.fastClaimPersonalInjury))
-            .setHasRoadTrafficAccident(hasDirection(caseData, FastTrack.fastClaimRoadTrafficAccident))
+            .setHasEmployersLiability(hasDirection(caseData, FastTrack.FAST_CLAIM_EMPLOYERS_LIABILITY))
+            .setHasHousingDisrepair(hasDirection(caseData, FastTrack.FAST_CLAIM_HOUSING_DISREPAIR))
+            .setHasPersonalInjury(hasDirection(caseData, FastTrack.FAST_CLAIM_PERSONAL_INJURY))
+            .setHasRoadTrafficAccident(hasDirection(caseData, FastTrack.FAST_CLAIM_ROAD_TRAFFIC_ACCIDENT))
             .setHasPaymentProtectionInsurance(hasPpi)
             .setFastTrackPPI(hasPpi ? caseData.getFastTrackPPI() : null)
             .setFastTrackJudgesRecital(caseData.getFastTrackJudgesRecital())

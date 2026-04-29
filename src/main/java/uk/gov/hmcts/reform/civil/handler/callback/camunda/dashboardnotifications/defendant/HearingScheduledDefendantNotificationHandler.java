@@ -74,7 +74,7 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
             log.info("HearingScheduledDefendantNotificationHandler: Recording hearing scheduled scenario for caseid: {}", caseId);
             dashboardScenariosService.recordScenarios(authToken,
                                               SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(), caseId,
-                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                                              new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
             );
 
             if (AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
@@ -82,7 +82,7 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
                 log.info("HearingScheduledDefendantNotificationHandler: Recording trial arrangements scenario for caseid: {}", caseId);
                 dashboardScenariosService.recordScenarios(authToken,
                                                   SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario(), caseId,
-                                                  ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                                                  new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
                 );
             }
 
@@ -90,7 +90,7 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
 
             dashboardScenariosService.recordScenarios(authToken,
                                               SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(), caseId,
-                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                                              new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
             );
         }
 

@@ -36,7 +36,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
             .respondent1Represented(YesOrNo.NO)
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .orderType(OrderType.DECIDE_DAMAGES)
             .build();
 
@@ -125,7 +125,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
             .respondent1Represented(YesOrNo.NO)
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .orderType(OrderType.DECIDE_DAMAGES)
             .build();
 

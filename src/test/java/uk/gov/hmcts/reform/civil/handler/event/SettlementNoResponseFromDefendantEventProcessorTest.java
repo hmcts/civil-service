@@ -70,7 +70,7 @@ class SettlementNoResponseFromDefendantEventProcessorTest {
             AUTH_TOKEN,
             DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_NO_RESPONSE_CLAIMANT,
             CASE_ID.toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 }

@@ -30,11 +30,11 @@ class DjDisposalTemplateFieldServiceTest {
 
     @Test
     void shouldRenderAttendanceLabels() {
-        assertThat(service.getAttendanceLabel(DisposalHearingMethodDJ.disposalHearingMethodInPerson))
+        assertThat(service.getAttendanceLabel(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_IN_PERSON))
             .isEqualTo("in person");
-        assertThat(service.getAttendanceLabel(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing))
+        assertThat(service.getAttendanceLabel(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_TELEPHONE_HEARING))
             .isEqualTo("by telephone");
-        assertThat(service.getAttendanceLabel(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing))
+        assertThat(service.getAttendanceLabel(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_VIDEO_CONFERENCE_HEARING))
             .isEqualTo("by video conference");
     }
 

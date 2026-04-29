@@ -112,7 +112,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -143,7 +143,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -177,7 +177,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -201,7 +201,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

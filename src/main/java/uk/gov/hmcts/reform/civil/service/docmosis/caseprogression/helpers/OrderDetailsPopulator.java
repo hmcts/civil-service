@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
 
@@ -29,13 +30,22 @@ public class OrderDetailsPopulator {
     }
 
     public JudgeFinalOrderForm populateAssistedOrderDetails(JudgeFinalOrderForm form, CaseData caseData) {
+        boolean showPenalNotice = nonNull(caseData.getAssistedOrderPenalNoticeToggle())
+            && !caseData.getAssistedOrderPenalNoticeToggle().isEmpty()
+            && caseData.getAssistedOrderPenalNoticeToggle().get(0).equals(FinalOrderToggle.SHOW);
+        String penalNoticeText = showPenalNotice && nonNull(caseData.getAssistedOrderPenalNoticeContent())
+            ? caseData.getAssistedOrderPenalNoticeContent()
+            : null;
+
         return form.setFinalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
             .setOrderMadeDate(orderMadeDateBuilder(caseData))
             .setRecordedToggle(nonNull(caseData.getFinalOrderRecitals()))
             .setRecordedText(nonNull(caseData.getFinalOrderRecitalsRecorded())
                               ? caseData.getFinalOrderRecitalsRecorded().getText() : "")
             .setOrderedText(caseData.getFinalOrderOrderedThatText())
-            .setFinalOrderJudgeHeardFrom(nonNull(caseData.getFinalOrderJudgeHeardFrom()));
+            .setFinalOrderJudgeHeardFrom(nonNull(caseData.getFinalOrderJudgeHeardFrom()))
+            .setShowPenalNotice(showPenalNotice)
+            .setPenalNoticeText(penalNoticeText);
     }
 
     public String orderMadeDateBuilder(CaseData caseData) {

@@ -4,6 +4,8 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -14,16 +16,27 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 @SuppressWarnings("unchecked")
 class ManageStayUpdateRequestedSearchServiceTest extends ElasticSearchServiceTest {
 
+    private String capturedTimeNow;
+
     @BeforeEach
     void setup() {
-        searchService = new ManageStayUpdateRequestedSearchService(coreCaseDataService);
+        searchService = new ManageStayUpdateRequestedSearchService(coreCaseDataService) {
+            @Override
+            public Query query(int startIndex, String timeNow) {
+                capturedTimeNow = timeNow;
+                return super.query(startIndex, timeNow);
+            }
+        };
     }
 
     protected Query buildQuery(int fromValue) {
+        ZonedDateTime cutoff = (capturedTimeNow != null
+            ? ZonedDateTime.parse(capturedTimeNow)
+            : ZonedDateTime.now(ZoneOffset.UTC)).minusDays(7);
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.manageStayUpdateRequestDate").lt("now-7d/d"))
+                        .must(rangeQuery("data.manageStayUpdateRequestDate").lt(cutoff))
                         .must(matchQuery("state", CASE_STAYED.toString()))
             );
         return new Query(query, List.of("reference"), fromValue);

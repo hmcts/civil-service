@@ -88,7 +88,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -123,7 +123,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             "BEARER_TOKEN",
             SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_DEF_PAYMENT_MISSED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -156,7 +156,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             "BEARER_TOKEN",
             SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -189,7 +189,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             "BEARER_TOKEN",
             SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }

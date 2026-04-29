@@ -100,7 +100,7 @@ class HwfOutcomeApplicantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             expectedScenario,
             AUTH_TOKEN,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }

@@ -119,7 +119,7 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             caseData.setTrialReadyApplicant(null);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
             caseData.setDrawDirectionsOrderSmallClaims(NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setOrderType(OrderType.DECIDE_DAMAGES);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -134,14 +134,14 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
 
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -167,13 +167,13 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -198,13 +198,13 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -231,13 +231,13 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardScenariosService, never()).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -262,13 +262,13 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -291,13 +291,13 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardScenariosService, never()).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -322,13 +322,13 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardScenariosService, never()).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -350,7 +350,7 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -379,7 +379,7 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_JBA_CLAIM_MOVES_OFFLINE_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

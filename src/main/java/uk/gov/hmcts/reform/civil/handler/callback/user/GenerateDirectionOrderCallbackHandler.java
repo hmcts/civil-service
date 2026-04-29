@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -109,6 +110,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private static final String WITHOUT_NOTICE_SELECTION_TEXT = "If you were not notified of the application before "
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
+    public static final String DEFAULT_PENAL_NOTICE = """
+        WARNING
+
+        [DEFENDANT] IF YOU DO NOT COMPLY WITH THIS ORDER YOU MAY BE HELD IN CONTEMPT OF COURT AND PUNISHED BY A FINE, \
+        IMPRISONMENT, CONFISCATION OF ASSETS OR OTHER PUNISHMENT UNDER THE LAW.
+
+        A penal notice against the [DEFENDANT] is attached to paragraph X below.""";
     public static final String HEADER = "## Your order has been issued \n ### Case number \n ### #%s";
     public static final String BODY_1_V_1 = """
     The order has been sent to:
@@ -151,6 +159,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String FUTURE_DATE_FROM_ERROR = "The date in Order made 'Date from' may not be later than the established date";
     public static final String FUTURE_DATE_TO_ERROR = "The date in Order made 'Date to' may not be later than the established date";
     public static final String DATE_FROM_AFTER_DATE_TO_ERROR = "The date in Order made 'Date from' may not be later than the 'Date to'";
+    public static final String PENAL_NOTICE_CONTENT_REQUIRED = "Field is required";
     private String defendantTwoPartyName;
     private String claimantTwoPartyName;
     public static final String APPEAL_NOTICE_DATE = "Appeal notice date";
@@ -168,7 +177,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::nullPreviousSelections,
+            callbackKey(ABOUT_TO_START), this::populateAndResetPreviousSelections,
             callbackKey(MID, "assign-track-toggle"), this::assignTrackToggle,
             callbackKey(MID, "populate-form-values"), this::populateFormValues,
             callbackKey(MID, "create-download-template-document"), this::generateTemplate,
@@ -183,12 +192,21 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
+
+    private void populatePenalNotice(final CaseData caseData) {
+        if (featureToggleService.isOtherRemedyEnabled()) {
+            caseData.setAssistedOrderPenalNoticeContent(DEFAULT_PENAL_NOTICE);
+        }
+    }
+
     // Final orders can be submitted multiple times, we want each one to be a "clean slate"
     // so we remove previously selected options from both Free form orders and assisted orders.
     // Exception is fields which we specifically prepopulate e.g. date fields, or specific text.
 
-    private CallbackResponse nullPreviousSelections(CallbackParams callbackParams) {
+    private CallbackResponse populateAndResetPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        populatePenalNotice(caseData);
         if (isJudicialReferral(callbackParams)
             && caseData.isLipCase()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -210,10 +228,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
 
         caseData.setFinalOrderFurtherHearingToggle(null);
-        return nullPreviousSelections(caseData);
+        return populateAndResetPreviousSelections(caseData);
     }
 
-    private CallbackResponse nullPreviousSelections(CaseData caseData) {
+    private CallbackResponse populateAndResetPreviousSelections(CaseData caseData) {
         caseData.setFinalOrderSelection(null);
         // Free form orders
         caseData.setFreeFormRecordedTextArea(null);
@@ -332,6 +350,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             checkFieldDate(caseData, errors);
             checkFurtherHearingOther(caseData, errors);
             checkFurtherHearingOtherAlternateLocation(caseData, errors);
+            checkPenalNoticeContent(caseData, errors);
         }
 
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
@@ -353,6 +372,16 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             && isNull(caseData.getFinalOrderFurtherHearingComplex()
                 .getLengthListOther())) {
             errors.add(FURTHER_HEARING_OTHER_EMPTY);
+        }
+    }
+
+    private void checkPenalNoticeContent(final CaseData caseData, final List<String> errors) {
+        if (nonNull(caseData.getAssistedOrderPenalNoticeToggle())
+            && !caseData.getAssistedOrderPenalNoticeToggle().isEmpty()
+            && caseData.getAssistedOrderPenalNoticeToggle().get(0).equals(SHOW)
+            && (caseData.getAssistedOrderPenalNoticeContent() == null
+                || caseData.getAssistedOrderPenalNoticeContent().isBlank())) {
+            errors.add(PENAL_NOTICE_CONTENT_REQUIRED);
         }
     }
 
@@ -399,6 +428,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         orderWithoutNotice.setWithoutNoticeSelectionDate(workingDayIndicator
             .getNextWorkingDay(LocalDate.now().plusDays(7)));
         caseData.setOrderWithoutNotice(orderWithoutNotice);
+        caseData.setAssistedOrderPenalNoticeContent(null);
     }
 
     private void populateDownloadTemplateOptions(CaseData caseData) {
@@ -427,20 +457,20 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private DynamicList populateCurrentHearingLocation(CaseData caseData, String authorisation) {
         LocationRefData locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
+        DynamicListElement currentLocation = new DynamicListElement()
+            .setCode("LOCATION_LIST")
+            .setLabel(locationRefData.getSiteName());
 
-        return DynamicList.builder().listItems(List.of(DynamicListElement.builder()
-                                   .code("LOCATION_LIST")
-                                   .label(locationRefData.getSiteName())
-                                   .build(),
-                                                       DynamicListElement.builder()
-                                   .code("OTHER_LOCATION")
-                                   .label("Other location")
-                                   .build()))
-            .value(DynamicListElement.builder()
-                       .code("LOCATION_LIST")
-                       .label(locationRefData.getSiteName())
-                       .build())
-            .build();
+        return new DynamicList()
+            .setListItems(List.of(
+                currentLocation,
+                new DynamicListElement()
+                    .setCode("OTHER_LOCATION")
+                    .setLabel("Other location")
+            ))
+            .setValue(new DynamicListElement()
+                .setCode("LOCATION_LIST")
+                .setLabel(locationRefData.getSiteName()));
     }
 
     private void populateFields(
@@ -453,13 +483,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         finalOrderDateHeardComplex.setSingleDateSelection(singleDateSelection);
         caseData.setFinalOrderDateHeardComplex(finalOrderDateHeardComplex);
 
-        ClaimantAndDefendantHeard typeRepresentationComplex = new ClaimantAndDefendantHeard();
-        typeRepresentationComplex.setTypeRepresentationClaimantOneDynamic(caseData.getApplicant1().getPartyName());
-        typeRepresentationComplex.setTypeRepresentationDefendantOneDynamic(caseData.getRespondent1().getPartyName());
-        typeRepresentationComplex.setTypeRepresentationDefendantTwoDynamic(defendantTwoPartyName);
-        typeRepresentationComplex.setTypeRepresentationClaimantTwoDynamic(claimantTwoPartyName);
-        FinalOrderRepresentation finalOrderRepresentation = new FinalOrderRepresentation();
-        finalOrderRepresentation.setTypeRepresentationComplex(typeRepresentationComplex);
+        FinalOrderRepresentation finalOrderRepresentation = getFinalOrderRepresentation(caseData);
         caseData.setFinalOrderRepresentation(finalOrderRepresentation);
 
         DatesFinalOrders datesToAvoidDateDropdown = new DatesFinalOrders();
@@ -520,6 +544,17 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseData.setFinalOrderAppealComplex(finalOrderAppealComplex);
 
         caseData.setFinalOrderGiveReasonsYesNo(NO);
+    }
+
+    private @NonNull FinalOrderRepresentation getFinalOrderRepresentation(final CaseData caseData) {
+        ClaimantAndDefendantHeard typeRepresentationComplex = new ClaimantAndDefendantHeard();
+        typeRepresentationComplex.setTypeRepresentationClaimantOneDynamic(caseData.getApplicant1().getPartyName());
+        typeRepresentationComplex.setTypeRepresentationDefendantOneDynamic(caseData.getRespondent1().getPartyName());
+        typeRepresentationComplex.setTypeRepresentationDefendantTwoDynamic(defendantTwoPartyName);
+        typeRepresentationComplex.setTypeRepresentationClaimantTwoDynamic(claimantTwoPartyName);
+        FinalOrderRepresentation finalOrderRepresentation = new FinalOrderRepresentation();
+        finalOrderRepresentation.setTypeRepresentationComplex(typeRepresentationComplex);
+        return finalOrderRepresentation;
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
@@ -700,7 +735,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
             caseData.setFinalOrderFurtherHearingToggle(null);
 
-            nullPreviousSelections(caseData);
+            populateAndResetPreviousSelections(caseData);
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
                 .build();
@@ -717,7 +752,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             caseData.setFinalOrderFurtherHearingToggle(null);
         }
 
-        nullPreviousSelections(caseData);
+        populateAndResetPreviousSelections(caseData);
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder()

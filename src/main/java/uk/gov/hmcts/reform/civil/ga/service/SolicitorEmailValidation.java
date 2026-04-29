@@ -27,12 +27,7 @@ public class SolicitorEmailValidation {
     private GASolicitorDetailsGAspec updateSolDetails(String updateEmail,
                                                       GASolicitorDetailsGAspec generalAppSolicitor) {
 
-        GASolicitorDetailsGAspec.GASolicitorDetailsGAspecBuilder gaSolicitorDetailsGAspecBuilder =
-            generalAppSolicitor.toBuilder();
-
-        gaSolicitorDetailsGAspecBuilder.email(updateEmail);
-
-        return gaSolicitorDetailsGAspecBuilder.build();
+        return generalAppSolicitor.copy().setEmail(updateEmail);
 
     }
 

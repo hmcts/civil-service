@@ -82,9 +82,9 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         caseData.setHearingNoticeList(HearingNoticeList.OTHER);
         caseData.setHearingNoticeListOther("hearing notice list other");
         caseData.setListingOrRelisting(ListingOrRelisting.LISTING);
-        caseData.setHearingLocation(DynamicList.builder().listItems(List.of(
-                DynamicListElement.builder().label("element 1").code("E0").build(),
-                DynamicListElement.builder().label("element 2").code("E1").build())).build());
+        caseData.setHearingLocation(new DynamicList().setListItems(List.of(
+                new DynamicListElement().setLabel("element 1").setCode("E0"),
+                new DynamicListElement().setLabel("element 2").setCode("E1"))));
         caseData.setChannel(HearingChannel.IN_PERSON);
         caseData.setHearingDate(LocalDate.now());
         caseData.setHearingTimeHourMinute("hearingTimeHourMinute");
@@ -259,16 +259,16 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         "SMALL_CLAIM,LISTING,SMALL_CLAIMS,PREPARE_FOR_HEARING_CONDUCT_HEARING,PREPARE_FOR_HEARING_CONDUCT_HEARING",
         "SMALL_CLAIM,LISTING,FAST_TRACK_TRIAL,DECISION_OUTCOME,DECISION_OUTCOME",
         "SMALL_CLAIM,LISTING,SMALL_CLAIMS,CASE_PROGRESSION,HEARING_READINESS",
-        "SMALL_CLAIM,LISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
-        "SMALL_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,HEARING_READINESS",
-        "SMALL_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
+        "SMALL_CLAIM,LISTING,OTHER,CASE_PROGRESSION,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "SMALL_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "SMALL_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,PREPARE_FOR_HEARING_CONDUCT_HEARING",
         "FAST_CLAIM,LISTING,SMALL_CLAIMS,HEARING_READINESS,HEARING_READINESS",
         "FAST_CLAIM,LISTING,SMALL_CLAIMS,PREPARE_FOR_HEARING_CONDUCT_HEARING,PREPARE_FOR_HEARING_CONDUCT_HEARING",
         "FAST_CLAIM,LISTING,FAST_TRACK_TRIAL,DECISION_OUTCOME,DECISION_OUTCOME",
         "FAST_CLAIM,LISTING,SMALL_CLAIMS,CASE_PROGRESSION,HEARING_READINESS",
-        "FAST_CLAIM,LISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
-        "FAST_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,HEARING_READINESS",
-        "FAST_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS"
+        "FAST_CLAIM,LISTING,OTHER,CASE_PROGRESSION,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "FAST_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "FAST_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,PREPARE_FOR_HEARING_CONDUCT_HEARING"
     })
     void shouldSetExpectedPostState_MintiEnabled_FastOrSmallTrack(String claimTrack, String listingType, String hearingNoticeType, String currentState, String expectedStateStr) {
         given(time.now()).willReturn(LocalDateTime.now());
@@ -303,16 +303,16 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         "MULTI_CLAIM,LISTING,SMALL_CLAIMS,PREPARE_FOR_HEARING_CONDUCT_HEARING,PREPARE_FOR_HEARING_CONDUCT_HEARING",
         "MULTI_CLAIM,LISTING,FAST_TRACK_TRIAL,DECISION_OUTCOME,HEARING_READINESS",
         "MULTI_CLAIM,LISTING,SMALL_CLAIMS,CASE_PROGRESSION,HEARING_READINESS",
-        "MULTI_CLAIM,LISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
-        "MULTI_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,HEARING_READINESS",
-        "MULTI_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
+        "MULTI_CLAIM,LISTING,OTHER,CASE_PROGRESSION,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "MULTI_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "MULTI_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,PREPARE_FOR_HEARING_CONDUCT_HEARING",
         "INTERMEDIATE_CLAIM,LISTING,SMALL_CLAIMS,HEARING_READINESS,HEARING_READINESS",
         "INTERMEDIATE_CLAIM,LISTING,SMALL_CLAIMS,PREPARE_FOR_HEARING_CONDUCT_HEARING,PREPARE_FOR_HEARING_CONDUCT_HEARING",
         "INTERMEDIATE_CLAIM,LISTING,FAST_TRACK_TRIAL,DECISION_OUTCOME,HEARING_READINESS",
         "INTERMEDIATE_CLAIM,LISTING,SMALL_CLAIMS,CASE_PROGRESSION,HEARING_READINESS",
-        "INTERMEDIATE_CLAIM,LISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
-        "INTERMEDIATE_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,HEARING_READINESS",
-        "INTERMEDIATE_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS"
+        "INTERMEDIATE_CLAIM,LISTING,OTHER,CASE_PROGRESSION,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "INTERMEDIATE_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "INTERMEDIATE_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,PREPARE_FOR_HEARING_CONDUCT_HEARING"
     })
     void shouldSetExpectedPostState_MintiEnabled_MultiOrIntermediate(String claimTrack, String listingType, String hearingNoticeType,
                                                                      String currentState, String expectedStateStr) {
@@ -375,9 +375,9 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-        caseData.setHearingLocation(DynamicList.builder().listItems(List.of(
-                DynamicListElement.builder().label("element 1").code("E0").build(),
-                DynamicListElement.builder().label("element 2").code("E1").build())).build());
+        caseData.setHearingLocation(new DynamicList().setListItems(List.of(
+                new DynamicListElement().setLabel("element 1").setCode("E0"),
+                new DynamicListElement().setLabel("element 2").setCode("E1"))));
         caseData.setAddRespondent2(NO);
         caseData.setHearingNoticeList(HearingNoticeList.SMALL_CLAIMS);
         caseData.setListingOrRelisting(ListingOrRelisting.LISTING);
@@ -681,13 +681,13 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldNotGetHearingFee_shouldRecalculateHearingDueDate_whenAboutToSubmitRelisting() {
+    void shouldNotGetHearingFee_shouldRecalculateHearingDueDate_whenAboutToSubmitlisting() {
         given(time.now()).willReturn(LocalDateTime.now());
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setHearingNoticeList(HearingNoticeList.SMALL_CLAIMS);
-        caseData.setListingOrRelisting(ListingOrRelisting.RELISTING);
+        caseData.setListingOrRelisting(ListingOrRelisting.LISTING);
         caseData.setHearingDate(time.now().toLocalDate().plusWeeks(5));
         caseData.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
         caseData.setTotalClaimAmount(new BigDecimal(12300));

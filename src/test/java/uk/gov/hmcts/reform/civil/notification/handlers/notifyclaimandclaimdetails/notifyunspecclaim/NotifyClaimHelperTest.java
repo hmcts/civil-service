@@ -55,8 +55,8 @@ class NotifyClaimHelperTest {
     void shouldReturnTrueWhenDefendantNameMatches() {
         String targetDefendant = "Defendant One";
 
-        DynamicListElement selected = DynamicListElement.builder().label(targetDefendant).build();
-        DynamicList list = DynamicList.builder().value(selected).build();
+        DynamicListElement selected = new DynamicListElement().setLabel(targetDefendant);
+        DynamicList list = new DynamicList().setValue(selected);
 
         CaseData caseData = CaseData.builder()
             .defendantSolicitorNotifyClaimOptions(list)
@@ -69,8 +69,8 @@ class NotifyClaimHelperTest {
 
     @Test
     void shouldReturnTrueWhenBothDefendantsSelected() {
-        DynamicListElement selected = DynamicListElement.builder().label("Both").build();
-        DynamicList list = DynamicList.builder().value(selected).build();
+        DynamicListElement selected = new DynamicListElement().setLabel("Both");
+        DynamicList list = new DynamicList().setValue(selected);
 
         CaseData caseData = CaseData.builder()
             .defendantSolicitorNotifyClaimOptions(list)

@@ -139,10 +139,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             .build().copy().isMultiParty(NO)
             .generalAppDetailsOfOrder("order test")
             .locationName("County Court Money Centre")
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("Ccmcc")
-                                        .region("4")
-                                        .siteName("County Court Money Centre").build()).build();
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("Ccmcc").setRegion("4").setSiteName("County Court Money Centre")).build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-finalOrder-form-values");
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -177,9 +174,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             .claimant1PartyName("Mr. John Rambo")
             .defendant1PartyName("Mr. Sole Trader")
             .isMultiParty(NO)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("Ccmcc")
-                                        .region("4")
-                                        .siteName("County Court Money Centre").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("Ccmcc").setRegion("4").setSiteName("County Court Money Centre"))
             .generalAppDetailsOfOrder("order test").build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-finalOrder-form-values");
         // When
@@ -256,9 +251,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             .defendant1PartyName("Mr. Sole Trader")
             .defendant2PartyName("Mr. Sole Trader Defendant2")
             .isMultiParty(YES)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("Ccmcc")
-                                        .region("4")
-                                        .siteName("County Court Money Centre").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("Ccmcc").setRegion("4").setSiteName("County Court Money Centre"))
             .generalAppDetailsOfOrder("order test").build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-finalOrder-form-values");
         // When

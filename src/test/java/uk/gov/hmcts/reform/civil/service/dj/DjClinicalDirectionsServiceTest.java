@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.dj;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
@@ -11,8 +10,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.lenient;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_BUNDLE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_DOCUMENTS_HEADING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_NOTES_DJ;
@@ -25,17 +23,11 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 @ExtendWith(MockitoExtension.class)
 class DjClinicalDirectionsServiceTest {
 
-    @Mock
-    private DjDeadlineService deadlineService;
-
     private DjClinicalDirectionsService service;
 
     @BeforeEach
     void setUp() {
-        service = new DjClinicalDirectionsService(deadlineService);
-        lenient().when(deadlineService.nextWorkingDayInWeeks(anyInt()))
-            .thenAnswer(invocation -> LocalDate.of(2025, 8, 1)
-                .plusWeeks(invocation.getArgument(0, Integer.class)));
+        service = new DjClinicalDirectionsService();
     }
 
     @Test
@@ -52,8 +44,8 @@ class DjClinicalDirectionsServiceTest {
     void shouldBuildPersonalInjuryWithExpectedDates() {
         TrialPersonalInjury injury = service.buildTrialPersonalInjury();
 
-        assertThat(injury.getDate1()).isEqualTo(LocalDate.of(2025, 8, 1).plusWeeks(4));
-        assertThat(injury.getDate2()).isEqualTo(LocalDate.of(2025, 8, 1).plusWeeks(8));
+        assertNull(injury.getDate1());
+        assertThat(injury.getDate2()).isEqualTo(LocalDate.now().plusWeeks(7));
         assertThat(injury.getInput1()).isEqualTo(PERSONAL_INJURY_PERMISSION_DJ);
         assertThat(injury.getInput2()).isEqualTo(PERSONAL_INJURY_QUESTIONS);
         assertThat(injury.getInput3()).isEqualTo(PERSONAL_INJURY_ANSWERS);

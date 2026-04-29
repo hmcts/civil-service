@@ -26,8 +26,7 @@ public class GeneralApplicationHwfInvalidReferenceScenarioTest extends BaseInteg
 
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>()).build(),
+               new ScenarioRequestParams(new HashMap<>()),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_GA_HWF_INVALID_REF_REQ, caseId
         )
             .andExpect(status().isOk());

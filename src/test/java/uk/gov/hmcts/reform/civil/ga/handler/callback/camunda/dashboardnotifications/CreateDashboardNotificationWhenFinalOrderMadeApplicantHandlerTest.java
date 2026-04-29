@@ -73,7 +73,7 @@ class CreateDashboardNotificationWhenFinalOrderMadeApplicantHandlerTest extends 
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

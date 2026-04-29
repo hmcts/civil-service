@@ -49,7 +49,7 @@ class UploadHearingDocumentsDefendantServiceTest {
     void setup() {
         HashMap<String, Object> params = new HashMap<>();
         params.put("ccdCaseReference", CASE_ID.toString());
-        scenarioRequestParams = ScenarioRequestParams.builder().params(params).build();
+        scenarioRequestParams = new ScenarioRequestParams(params);
         when(mapper.mapCaseDataToParams(any())).thenReturn(params);
     }
 

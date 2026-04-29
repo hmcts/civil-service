@@ -88,7 +88,7 @@ class DefendantSignSettlementAgreementDashboardNotificationHandlerTest extends B
             "BEARER_TOKEN",
             SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -119,7 +119,7 @@ class DefendantSignSettlementAgreementDashboardNotificationHandlerTest extends B
             "BEARER_TOKEN",
             SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_ACCEPTED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }

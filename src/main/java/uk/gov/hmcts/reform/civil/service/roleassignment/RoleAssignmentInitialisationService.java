@@ -30,6 +30,7 @@ public class RoleAssignmentInitialisationService {
     private static final String HEARINGS_SYSTEM_USER_REFERENCE = "civil-hearings-system-user";
     private static final String CASE_ALLOCATOR_SYSTEM_USER_REFERENCE = "civil-case-allocator-system-user";
     private static final String SYSTEM_USER_PROCESS = "civil-system-user";
+    private static final String CIVIL = "CIVIL";
 
     private final SystemUpdateUserConfiguration systemUserConfig;
     private final RoleAssignmentsService roleAssignmentService;
@@ -79,7 +80,7 @@ public class RoleAssignmentInitialisationService {
 
         RoleAssignmentRequest request = new RoleAssignmentRequest()
             .setRoleRequest(roleRequest)
-            .setRequestedRoles(createAllocatedSystemRoles(userId, "CIVIL", "GENERALAPPLICATION"));
+            .setRequestedRoles(createAllocatedSystemRoles(userId, CIVIL, "GENERALAPPLICATION"));
 
         roleAssignmentService.assignUserRoles(userId, userAuth, request);
         log.info("Assigned case allocator roles successfully");
@@ -94,7 +95,7 @@ public class RoleAssignmentInitialisationService {
             .setGrantType(GrantType.STANDARD)
             .setRoleCategory(RoleCategory.SYSTEM)
             .setRoleName(roleName)
-            .setAttributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
+            .setAttributes(Map.of("jurisdiction", CIVIL, "caseType", CIVIL))
             .setReadOnly(false)).toList();
     }
 
@@ -107,7 +108,7 @@ public class RoleAssignmentInitialisationService {
             .setGrantType(GrantType.STANDARD)
             .setRoleCategory(RoleCategory.SYSTEM)
             .setRoleName("case-allocator")
-            .setAttributes(Map.of("jurisdiction", "CIVIL", "caseType", caseType))
+            .setAttributes(Map.of("jurisdiction", CIVIL, "caseType", caseType))
             .setReadOnly(false)).toList();
     }
 

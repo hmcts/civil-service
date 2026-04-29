@@ -47,8 +47,8 @@ class UpdatePartyExpertsTaskTest {
 
         CaseData caseData = CaseData.builder()
             .applicantExperts(List.of(
-                Element.<PartyFlagStructure>builder().value(expert1).build(),
-                Element.<PartyFlagStructure>builder().value(expert2).build()
+                new Element<PartyFlagStructure>().setValue(expert1),
+                new Element<PartyFlagStructure>().setValue(expert2)
             ))
             .build();
 
@@ -69,7 +69,7 @@ class UpdatePartyExpertsTaskTest {
         PartyFlagStructure expert = new PartyFlagStructure().setFirstName(null).setLastName("Smith");
 
         CaseData caseData = CaseData.builder()
-            .respondent1Experts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
+            .respondent1Experts(List.of(new Element<PartyFlagStructure>().setValue(expert)))
             .build();
 
         CaseReference ref = caseReference("123");
@@ -86,7 +86,7 @@ class UpdatePartyExpertsTaskTest {
         PartyFlagStructure expert = new PartyFlagStructure().setFirstName("Bob").setLastName(null);
 
         CaseData caseData = CaseData.builder()
-            .respondent2Experts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
+            .respondent2Experts(List.of(new Element<PartyFlagStructure>().setValue(expert)))
             .build();
 
         CaseReference ref = caseReference("123");
@@ -104,8 +104,8 @@ class UpdatePartyExpertsTaskTest {
         Expert expert2 = new Expert().setFirstName("Jane").setLastName(null);
 
         List<Element<Expert>> dqExpertElements = List.of(
-            Element.<Expert>builder().value(expert1).build(),
-            Element.<Expert>builder().value(expert2).build()
+            new Element<Expert>().setValue(expert1),
+            new Element<Expert>().setValue(expert2)
         );
         Experts dqExperts = new Experts().setDetails(dqExpertElements);
 
@@ -140,7 +140,7 @@ class UpdatePartyExpertsTaskTest {
             ;
 
         CaseData caseData = CaseData.builder()
-            .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
+            .applicantExperts(List.of(new Element<PartyFlagStructure>().setValue(expert)))
             .build();
 
         CaseReference ref = caseReference("111");
@@ -160,7 +160,7 @@ class UpdatePartyExpertsTaskTest {
             ;
 
         CaseData caseData = CaseData.builder()
-            .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
+            .applicantExperts(List.of(new Element<PartyFlagStructure>().setValue(expert)))
             .build();
 
         CaseReference ref = caseReference("12345");

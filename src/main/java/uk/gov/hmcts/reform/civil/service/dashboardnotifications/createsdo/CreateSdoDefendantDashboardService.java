@@ -84,8 +84,6 @@ public class CreateSdoDefendantDashboardService extends DashboardScenarioService
                 createSdoDashboardDate.getDateWithoutBankHolidays(LocalDateTime.now()));
         }
 
-        return ScenarioRequestParams.builder()
-            .params(mapper.mapCaseDataToParams(caseData))
-            .build();
+        return new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
     }
 }

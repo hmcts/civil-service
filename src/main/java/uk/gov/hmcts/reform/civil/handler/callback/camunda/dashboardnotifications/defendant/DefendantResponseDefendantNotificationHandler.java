@@ -5,11 +5,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT;
@@ -58,9 +60,10 @@ public class DefendantResponseDefendantNotificationHandler extends DashboardCall
         }
 
         if (caseData.isPayBySetDate()) {
-            return caseData.getRespondent1().isCompanyOROrganisation()
-                ? SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_DEFENDANT.getScenario()
-                : SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario();
+            return Optional.ofNullable(caseData.getRespondent1())
+                .filter(Party::isCompanyOROrganisation)
+                .map(respondent -> SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_DEFENDANT.getScenario())
+                .orElse(SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario());
         }
 
         if (isAlreadyPaid(caseData)) {
@@ -81,9 +84,10 @@ public class DefendantResponseDefendantNotificationHandler extends DashboardCall
         }
 
         if (isPayByInstallments(caseData)) {
-            return caseData.getRespondent1().isCompanyOROrganisation()
-                ? SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT.getScenario()
-                : SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_DEFENDANT.getScenario();
+            return Optional.ofNullable(caseData.getRespondent1())
+                .filter(Party::isCompanyOROrganisation)
+                .map(respondent -> SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT.getScenario())
+                .orElse(SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_DEFENDANT.getScenario());
         }
 
         if (isFullDefenceFullDisputeMediation(caseData)) {

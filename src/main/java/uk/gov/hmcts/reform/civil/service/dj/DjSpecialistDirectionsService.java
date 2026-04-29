@@ -3,14 +3,15 @@ package uk.gov.hmcts.reform.civil.service.dj;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @Service
 @RequiredArgsConstructor
 public class DjSpecialistDirectionsService {
 
     private final DjSpecialistNarrativeService narrativeService;
+    private final FeatureToggleService featureToggleService;
 
     public void populateSpecialistDirections(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         caseDataBuilder.trialBuildingDispute(narrativeService.buildTrialBuildingDispute());
@@ -21,7 +22,12 @@ public class DjSpecialistDirectionsService {
         TrialRoadTrafficAccident roadTrafficAccident = narrativeService.buildTrialRoadTrafficAccident();
         caseDataBuilder.trialRoadTrafficAccident(roadTrafficAccident);
 
-        TrialHousingDisrepair housingDisrepair = narrativeService.buildTrialHousingDisrepair();
-        caseDataBuilder.trialHousingDisrepair(housingDisrepair);
+        if (featureToggleService.isOtherRemedyEnabled()) {
+            caseDataBuilder.trialHousingDisrepair(narrativeService.buildTrialHousingDisrepairOtherRemedy());
+            caseDataBuilder.trialPPI(narrativeService.buildTrialPPI());
+        } else {
+            caseDataBuilder.trialHousingDisrepair(narrativeService.buildTrialHousingDisrepair());
+            caseDataBuilder.trialPPI(null);
+        }
     }
 }

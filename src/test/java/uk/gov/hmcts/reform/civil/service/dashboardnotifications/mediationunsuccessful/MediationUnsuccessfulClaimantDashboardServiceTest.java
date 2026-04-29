@@ -62,7 +62,7 @@ class MediationUnsuccessfulClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_CLAIMANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -82,7 +82,7 @@ class MediationUnsuccessfulClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -102,7 +102,7 @@ class MediationUnsuccessfulClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIMANT_MEDIATION_WHEN_DEFENDANT_NOT_CONTACTABLE.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -122,7 +122,7 @@ class MediationUnsuccessfulClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 

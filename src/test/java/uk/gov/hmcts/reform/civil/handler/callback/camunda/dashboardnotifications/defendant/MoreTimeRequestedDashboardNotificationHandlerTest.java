@@ -84,7 +84,7 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
             "BEARER_TOKEN",
             SCENARIO_AAA6_DEFRESPONSE_MORETIMEREQUESTED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

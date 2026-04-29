@@ -18,6 +18,9 @@ import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelectio
 @Component
 public class CcjParamsBuilder extends DashboardNotificationsParamsBuilder {
 
+    private static final String CCJ_PAYMENT_MESSAGE_EN = "ccjPaymentMessageEn";
+    private static final String CCJ_PAYMENT_MESSAGE_CY = "ccjPaymentMessageCy";
+
     @Override
     public void addParams(CaseData caseData, HashMap<String, Object> params) {
         if (nonNull(caseData.getActiveJudgment())
@@ -37,18 +40,18 @@ public class CcjParamsBuilder extends DashboardNotificationsParamsBuilder {
 
         if (caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IN_INSTALMENTS)) {
             JudgmentInstalmentDetails instalmentDetails = judgmentDetails.getInstalmentDetails();
-            params.put("ccjPaymentMessageEn", getStringPaymentMessage(instalmentDetails));
-            params.put("ccjPaymentMessageCy", getStringPaymentMessageInWelsh(instalmentDetails));
+            params.put(CCJ_PAYMENT_MESSAGE_EN, getStringPaymentMessage(instalmentDetails));
+            params.put(CCJ_PAYMENT_MESSAGE_CY, getStringPaymentMessageInWelsh(instalmentDetails));
         } else if (caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IMMEDIATELY)) {
-            params.put("ccjPaymentMessageEn", "immediately");
-            params.put("ccjPaymentMessageCy", "ar unwaith");
+            params.put(CCJ_PAYMENT_MESSAGE_EN, "immediately");
+            params.put(CCJ_PAYMENT_MESSAGE_CY, "ar unwaith");
         } else {
             params.put(
-                "ccjPaymentMessageEn",
+                CCJ_PAYMENT_MESSAGE_EN,
                 "by " + DateUtils.formatDate(judgmentDetails.getPaymentPlan().getPaymentDeadlineDate())
             );
             params.put(
-                "ccjPaymentMessageCy",
+                CCJ_PAYMENT_MESSAGE_CY,
                 "erbyn " + DateUtils.formatDateInWelsh(judgmentDetails.getPaymentPlan().getPaymentDeadlineDate(), false)
             );
         }

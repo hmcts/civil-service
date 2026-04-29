@@ -1,19 +1,5 @@
 package uk.gov.hmcts.reform.civil.ga.service.dashboardnotifications.applicationresponded;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
-import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-
-import java.util.List;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -23,19 +9,31 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
+import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+
+import java.util.List;
+
 @ExtendWith(MockitoExtension.class)
 class ApplicationRespondedDashboardServiceTest {
 
     private static final String AUTH_TOKEN = "auth-token";
 
-    @Mock
-    private DocUploadDashboardNotificationService dashboardNotificationService;
+    @Mock private DocUploadDashboardNotificationService dashboardNotificationService;
 
-    @Mock
-    private GaForLipService gaForLipService;
+    @Mock private GaForLipService gaForLipService;
 
-    @InjectMocks
-    private ApplicationRespondedDashboardService service;
+    @InjectMocks private ApplicationRespondedDashboardService service;
 
     @Test
     void shouldCreateResponseNotificationsForLipAppAndRespWhenNotVaryPaymentTerms() {
@@ -48,7 +46,8 @@ class ApplicationRespondedDashboardServiceTest {
     }
 
     @Test
-    void shouldCreateResponseNotificationOnlyForApplicantWhenNotVaryPaymentTermsAndOnlyApplicantLip() {
+    void
+            shouldCreateResponseNotificationOnlyForApplicantWhenNotVaryPaymentTermsAndOnlyApplicantLip() {
         GeneralApplicationCaseData caseData = buildCase(false);
         givenLipFlags(true, false);
 
@@ -58,7 +57,8 @@ class ApplicationRespondedDashboardServiceTest {
     }
 
     @Test
-    void shouldCreateResponseNotificationOnlyForRespondentWhenNotVaryPaymentTermsAndOnlyRespondentLip() {
+    void
+            shouldCreateResponseNotificationOnlyForRespondentWhenNotVaryPaymentTermsAndOnlyRespondentLip() {
         GeneralApplicationCaseData caseData = buildCase(false);
         givenLipFlags(false, true);
 
@@ -98,7 +98,8 @@ class ApplicationRespondedDashboardServiceTest {
     }
 
     @Test
-    void shouldCreateOfflineNotificationOnlyForRespondentWhenVaryPaymentTermsAndOnlyRespondentLip() {
+    void
+            shouldCreateOfflineNotificationOnlyForRespondentWhenVaryPaymentTermsAndOnlyRespondentLip() {
         GeneralApplicationCaseData caseData = buildCase(true);
         givenLipFlags(false, true);
 
@@ -124,52 +125,46 @@ class ApplicationRespondedDashboardServiceTest {
 
     private GeneralApplicationCaseData buildCase(boolean varyPaymentTerms) {
         return new GeneralApplicationCaseData()
-            .parentClaimantIsApplicant(varyPaymentTerms ? YesOrNo.NO : YesOrNo.YES)
-            .generalAppType(GAApplicationType.builder()
-                                .types(List.of(varyPaymentTerms
-                                                   ? GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT
-                                                   : GeneralApplicationTypes.SUMMARY_JUDGEMENT))
-                                .build())
-            .build();
+                .parentClaimantIsApplicant(varyPaymentTerms ? YesOrNo.NO : YesOrNo.YES)
+                .generalAppType(
+                        new GAApplicationType()
+                                .setTypes(
+                                        List.of(
+                                                varyPaymentTerms
+                                                        ? GeneralApplicationTypes
+                                                                .VARY_PAYMENT_TERMS_OF_JUDGMENT
+                                                        : GeneralApplicationTypes
+                                                                .SUMMARY_JUDGEMENT)))
+                .build();
     }
 
-    private void verifyResponseNotifications(GeneralApplicationCaseData caseData,
-                                             boolean expectApplicant,
-                                             boolean expectRespondent) {
+    private void verifyResponseNotifications(
+            GeneralApplicationCaseData caseData,
+            boolean expectApplicant,
+            boolean expectRespondent) {
         verify(dashboardNotificationService, times(expectApplicant ? 1 : 0))
-            .createResponseDashboardNotification(
-                caseData,
-                DocUploadDashboardNotificationService.APPLICANT,
-                AUTH_TOKEN
-            );
+                .createResponseDashboardNotification(
+                        caseData, DocUploadDashboardNotificationService.APPLICANT, AUTH_TOKEN);
         verify(dashboardNotificationService, times(expectRespondent ? 1 : 0))
-            .createResponseDashboardNotification(
-                caseData,
-                DocUploadDashboardNotificationService.RESPONDENT,
-                AUTH_TOKEN
-            );
+                .createResponseDashboardNotification(
+                        caseData, DocUploadDashboardNotificationService.RESPONDENT, AUTH_TOKEN);
         verify(dashboardNotificationService, never())
-            .createOfflineResponseDashboardNotification(any(), any(), anyString());
+                .createOfflineResponseDashboardNotification(any(), any(), anyString());
         verifyNoMoreInteractions(dashboardNotificationService);
     }
 
-    private void verifyOfflineNotifications(GeneralApplicationCaseData caseData,
-                                            boolean expectApplicant,
-                                            boolean expectRespondent) {
+    private void verifyOfflineNotifications(
+            GeneralApplicationCaseData caseData,
+            boolean expectApplicant,
+            boolean expectRespondent) {
         verify(dashboardNotificationService, times(expectApplicant ? 1 : 0))
-            .createOfflineResponseDashboardNotification(
-                caseData,
-                DocUploadDashboardNotificationService.APPLICANT,
-                AUTH_TOKEN
-            );
+                .createOfflineResponseDashboardNotification(
+                        caseData, DocUploadDashboardNotificationService.APPLICANT, AUTH_TOKEN);
         verify(dashboardNotificationService, times(expectRespondent ? 1 : 0))
-            .createOfflineResponseDashboardNotification(
-                caseData,
-                DocUploadDashboardNotificationService.RESPONDENT,
-                AUTH_TOKEN
-            );
+                .createOfflineResponseDashboardNotification(
+                        caseData, DocUploadDashboardNotificationService.RESPONDENT, AUTH_TOKEN);
         verify(dashboardNotificationService, never())
-            .createResponseDashboardNotification(any(), any(), anyString());
+                .createResponseDashboardNotification(any(), any(), anyString());
         verifyNoMoreInteractions(dashboardNotificationService);
     }
 }

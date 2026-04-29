@@ -63,7 +63,7 @@ class DismissCaseDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_DISMISS_CASE_DEFENDANT.getScenario(),
             "8888",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -82,7 +82,7 @@ class DismissCaseDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT.getScenario(),
             "8888",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 }

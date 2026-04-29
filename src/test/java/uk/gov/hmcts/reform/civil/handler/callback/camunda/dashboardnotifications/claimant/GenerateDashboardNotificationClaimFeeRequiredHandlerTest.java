@@ -70,7 +70,7 @@ class GenerateDashboardNotificationClaimFeeRequiredHandlerTest extends BaseCallb
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimIssue.ClaimFee.Required",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 
@@ -91,13 +91,13 @@ class GenerateDashboardNotificationClaimFeeRequiredHandlerTest extends BaseCallb
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimIssue.ClaimFee.Required",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimIssue.Claimant.FastTrack",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         }
 

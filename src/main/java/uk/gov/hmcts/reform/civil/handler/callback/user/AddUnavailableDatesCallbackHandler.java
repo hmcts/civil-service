@@ -119,7 +119,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             }
             case TWO_V_ONE: {
                 dynamicListOptions.add("Claimants");
-                dynamicListOptions.add("Defendant");
+                dynamicListOptions.add(defendant);
                 break;
             }
             default: {

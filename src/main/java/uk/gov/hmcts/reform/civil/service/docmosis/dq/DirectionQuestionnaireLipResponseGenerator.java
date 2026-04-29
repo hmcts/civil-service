@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.RespondentTemplateForDQGenerator;
 
-import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LIP_RESPONSE;
@@ -65,13 +64,5 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
             return dqLipResponse;
         }
         return super.getTemplateId(caseData);
-    }
-
-    protected List<Party> getApplicants(CaseData caseData) {
-        return List.of(Party.toLipParty(caseData.getApplicant1()));
-    }
-
-    protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
-        return List.of(Party.toLipParty(caseData.getRespondent1()));
     }
 }

@@ -10,12 +10,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
@@ -206,10 +209,11 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
         if (!AWAITING_APPLICATION_PAYMENT.equals(data.getCcdState())) {
             return false;
         }
-        return Optional.ofNullable(data.getGeneralAppHelpWithFees())
-            .map(HelpWithFees::getHelpWithFee)
-            .map(hwf -> hwf == NO)
-            .orElse(true);
+        return Optional.ofNullable(data.getGeneralAppPBADetails())
+            .map(GeneralApplicationPbaDetails::getPaymentDetails)
+            .map(PaymentDetails::getStatus)
+            .filter(PaymentStatus.SUCCESS::equals)
+            .isPresent();
     }
 
     private boolean isLipPaymentViaHelpWithFees(GeneralApplicationCaseData data) {

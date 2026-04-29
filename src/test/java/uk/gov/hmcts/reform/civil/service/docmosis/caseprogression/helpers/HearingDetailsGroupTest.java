@@ -168,22 +168,16 @@ public class HearingDetailsGroupTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderFurtherHearingToggle(toggleList)
             .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()
-                                                 .setHearingLocationList(DynamicList
-                                                                                    .builder().value(DynamicListElement
-                                                                                                         .builder()
-                                                                                                         .code("LOCATION_LIST")
-                                                                                                         .build())
-                                                                                    .build()))
+                                                 .setHearingLocationList(new DynamicList()
+                                                                            .setValue(new DynamicListElement()
+                                                                                          .setCode("LOCATION_LIST"))))
             .build();
         CaseData caseDataWhenFalse = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderFurtherHearingToggle(toggleList)
             .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()
-                                                 .setHearingLocationList(DynamicList
-                                                                                    .builder().value(DynamicListElement
-                                                                                                         .builder()
-                                                                                                         .code("OTHER_LOCATION")
-                                                                                                         .build())
-                                                                                    .build()))
+                                                 .setHearingLocationList(new DynamicList()
+                                                                            .setValue(new DynamicListElement()
+                                                                                          .setCode("OTHER_LOCATION"))))
             .build();
         Boolean response = hearingDetailsPopulator.isDefaultCourt(caseData);
         Boolean responseFalse = hearingDetailsPopulator.isDefaultCourt(caseDataWhenFalse);

@@ -18,6 +18,8 @@ import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralAppl
 @Service
 public class CaseDetailsConverter {
 
+    private static final String CCD_CASE_REFERENCE = "ccdCaseReference";
+    private static final String CCD_STATE = "ccdState";
     private final ObjectMapper objectMapper;
 
     public CaseDetailsConverter(ObjectMapper objectMapper) {
@@ -35,9 +37,9 @@ public class CaseDetailsConverter {
 
     public CaseData toCaseData(CaseDetails caseDetails) {
         Map<String, Object> data = new HashMap<>(caseDetails.getData());
-        data.put("ccdCaseReference", caseDetails.getId());
+        data.put(CCD_CASE_REFERENCE, caseDetails.getId());
         if (caseDetails.getState() != null) {
-            data.put("ccdState", CaseState.valueOf(caseDetails.getState()));
+            data.put(CCD_STATE, CaseState.valueOf(caseDetails.getState()));
         }
 
         return objectMapper.convertValue(data, CaseData.class);
@@ -49,9 +51,9 @@ public class CaseDetailsConverter {
 
     public GeneralApplicationCaseData toGeneralApplicationCaseData(CaseDetails caseDetails) {
         final Map<String, Object> data = new HashMap<>(caseDetails.getData());
-        data.put("ccdCaseReference", caseDetails.getId());
+        data.put(CCD_CASE_REFERENCE, caseDetails.getId());
         if (caseDetails.getState() != null) {
-            data.put("ccdState", CaseState.valueOf(caseDetails.getState()));
+            data.put(CCD_STATE, CaseState.valueOf(caseDetails.getState()));
         }
         if (caseDetails.getCreatedDate() != null) {
             data.put("createdDate", caseDetails.getCreatedDate());
@@ -62,7 +64,7 @@ public class CaseDetailsConverter {
     public CaseData toGACaseData(CaseDetails caseDetails) {
         Map<String, Object> data = new HashMap<>(caseDetails.getData());
         data.remove("hwfFeeType");
-        data.put("ccdCaseReference", caseDetails.getId());
+        data.put(CCD_CASE_REFERENCE, caseDetails.getId());
 
         return objectMapper.convertValue(data, CaseData.class);
     }

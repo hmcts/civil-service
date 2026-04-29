@@ -91,8 +91,7 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
             authToken,
             dashboardScenarios.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder()
-                .params(mapper.mapCaseDataToParams(caseData)).build()
+            new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
         );
     }
 

@@ -654,7 +654,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
                 assertThat(responseData.getCosNotifyClaimDefendant1()
-                               .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
+                               .getCosSenderStatementOfTruthLabel()).contains("CERTIFIED");
                 assertThat(response.getData())
                     .containsEntry(
                         "claimDetailsNotificationDeadline",
@@ -687,7 +687,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
                 assertThat(responseData.getCosNotifyClaimDefendant2()
-                               .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
+                               .getCosSenderStatementOfTruthLabel()).contains("CERTIFIED");
 
                 assertThat(response.getData())
                     .containsEntry("claimDetailsNotificationDeadline", expectedDeadline.format(ISO_DATE_TIME));

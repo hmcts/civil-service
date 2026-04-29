@@ -34,9 +34,7 @@ class NotificationPredicateTest {
         @Test
         void should_return_true_for_hasClaimNotifiedToBoth_when_date_present_and_notify_options_is_both() {
             when(caseData.getClaimNotificationDate()).thenReturn(LocalDateTime.now());
-            DynamicList claimNotifyOptions = DynamicList.builder()
-                .value(DynamicListElement.builder().label("Both").build())
-                .build();
+            DynamicList claimNotifyOptions = new DynamicList().setValue(new DynamicListElement().setLabel("Both"));
             when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(claimNotifyOptions);
             assertTrue(NotificationPredicate.hasClaimNotifiedToBoth.test(caseData));
         }
@@ -44,9 +42,7 @@ class NotificationPredicateTest {
         @Test
         void should_return_false_for_hasClaimNotifiedToBoth_when_date_present_and_notify_options_not_both() {
             when(caseData.getClaimNotificationDate()).thenReturn(LocalDateTime.now());
-            DynamicList claimNotifyOptions = DynamicList.builder()
-                .value(DynamicListElement.builder().label("Solicitor 1").build())
-                .build();
+            DynamicList claimNotifyOptions = new DynamicList().setValue(new DynamicListElement().setLabel("Solicitor 1"));
             when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(claimNotifyOptions);
             assertFalse(NotificationPredicate.hasClaimNotifiedToBoth.test(caseData));
         }
@@ -71,9 +67,7 @@ class NotificationPredicateTest {
         @Test
         void should_return_true_for_hasClaimDetailsNotifiedToBoth_when_date_present_and_notify_options_is_both() {
             when(caseData.getClaimDetailsNotificationDate()).thenReturn(LocalDateTime.now());
-            DynamicList detailsNotifyOptions = DynamicList.builder()
-                .value(DynamicListElement.builder().label("Both").build())
-                .build();
+            DynamicList detailsNotifyOptions = new DynamicList().setValue(new DynamicListElement().setLabel("Both"));
             when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(detailsNotifyOptions);
             assertTrue(NotificationPredicate.hasClaimDetailsNotifiedToBoth.test(caseData));
         }
@@ -81,9 +75,7 @@ class NotificationPredicateTest {
         @Test
         void should_return_false_for_hasClaimDetailsNotifiedToBoth_when_date_present_and_notify_options_not_both() {
             when(caseData.getClaimDetailsNotificationDate()).thenReturn(LocalDateTime.now());
-            DynamicList detailsNotifyOptions = DynamicList.builder()
-                .value(DynamicListElement.builder().label("Solicitor 1").build())
-                .build();
+            DynamicList detailsNotifyOptions = new DynamicList().setValue(new DynamicListElement().setLabel("Solicitor 1"));
             when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(detailsNotifyOptions);
             assertFalse(NotificationPredicate.hasClaimDetailsNotifiedToBoth.test(caseData));
         }

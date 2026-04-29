@@ -55,7 +55,7 @@ class EvidenceUploadedClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_CLAIMANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -72,7 +72,7 @@ class EvidenceUploadedClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_CLAIMANT.getScenario(),
             "5678",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -89,7 +89,7 @@ class EvidenceUploadedClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_CLAIMANT.getScenario(),
             "9012",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 

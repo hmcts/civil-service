@@ -32,8 +32,7 @@ public class UploadHearingDocumentsDefendantScenarioTest extends DashboardBaseIn
 
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        DynamicListElement selectedCourt = new DynamicListElement().setCode("00002").setLabel("court 2 - 2 address - Y02 7RB");
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()

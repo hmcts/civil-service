@@ -635,8 +635,8 @@ class ManageContactInformationUtilsTest {
                 .setEmailAddress(existing.getEmail());
 
             UUID uuid = UUID.randomUUID();
-            List<Element<PartyFlagStructure>> existingList = List.of(Element.<PartyFlagStructure>builder().id(uuid).value(existing).build());
-            List<Element<UpdatePartyDetailsForm>>  updatedList = List.of(Element.<UpdatePartyDetailsForm>builder().id(uuid).value(updated).build());
+            List<Element<PartyFlagStructure>> existingList = List.of(new Element<PartyFlagStructure>().setId(uuid).setValue(existing));
+            List<Element<UpdatePartyDetailsForm>>  updatedList = List.of(new Element<UpdatePartyDetailsForm>().setId(uuid).setValue(updated));
 
             List<Element<PartyFlagStructure>> actual = mapFormDataToIndividualsData(existingList, updatedList);
 
@@ -656,7 +656,7 @@ class ManageContactInformationUtilsTest {
             UUID uuid = UUID.randomUUID();
 
             List<Element<PartyFlagStructure>> existingList = List.of();
-            List<Element<UpdatePartyDetailsForm>>  updatedList = List.of(Element.<UpdatePartyDetailsForm>builder().id(uuid).value(updated).build());
+            List<Element<UpdatePartyDetailsForm>>  updatedList = List.of(new Element<UpdatePartyDetailsForm>().setId(uuid).setValue(updated));
 
             List<Element<PartyFlagStructure>> actual = mapFormDataToIndividualsData(existingList, updatedList);
 

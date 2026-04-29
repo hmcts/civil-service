@@ -27,8 +27,7 @@ public class GeneralAppCompleteScenarioTest extends BaseIntegrationTest {
 
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>()).build(),
+               new ScenarioRequestParams(new HashMap<>()),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_GA_COMPLETE, caseId
         )
             .andExpect(status().isOk());

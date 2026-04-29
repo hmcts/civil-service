@@ -90,7 +90,7 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -117,13 +117,13 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -150,25 +150,25 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
             "BEARER_TOKEN",
             SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
 
     }

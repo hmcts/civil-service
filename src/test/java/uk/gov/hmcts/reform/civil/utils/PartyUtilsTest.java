@@ -968,7 +968,7 @@ class PartyUtilsTest {
             Witness witness = new Witness();
             witness.setPartyID(partyId);
             witness.setFirstName(firstName);
-            Element<Witness> witnessElement = Element.<Witness>builder().id(elementId).value(witness).build();
+            Element<Witness> witnessElement = new Element<Witness>().setId(elementId).setValue(witness);
             Witnesses witnesses = new Witnesses();
             witnesses.setDetails(List.of(witnessElement));
             return witnesses;
@@ -982,7 +982,7 @@ class PartyUtilsTest {
             Expert expert = new Expert();
             expert.setPartyID(partyId);
             expert.setFirstName(firstName);
-            Element<Expert> expertElement = Element.<Expert>builder().id(elementId).value(expert).build();
+            Element<Expert> expertElement = new Element<Expert>().setId(elementId).setValue(expert);
             Experts experts = new Experts();
             experts.setDetails(List.of(expertElement));
             return experts;

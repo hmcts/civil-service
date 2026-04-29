@@ -49,15 +49,13 @@ public class MessageTaskCategoryCallbackHandler extends DashboardCallbackHandler
             authToken,
             SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder()
-                .params(mapper.mapCaseDataToParams(caseData)).build()
+            new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
         );
         dashboardScenariosService.recordScenarios(
             authToken,
             SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder()
-                .params(mapper.mapCaseDataToParams(caseData)).build()
+            new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData))
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }

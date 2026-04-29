@@ -51,7 +51,7 @@ class DjNonDivergentClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT.getScenario(),
             "1594901956117591",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.handleadmitpartofclaimtests;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,10 +18,6 @@ class SpecDisputesOrPartAdmissionCaseUpdaterTest {
 
     @InjectMocks
     private SpecDisputesOrPartAdmissionCaseUpdater updater;
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void shouldSetSpecDisputesOrPartAdmissionToNoWhenConditionsAreNotMet() {

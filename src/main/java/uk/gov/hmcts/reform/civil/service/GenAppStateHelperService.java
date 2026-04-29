@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
 import static java.lang.Long.parseLong;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -33,7 +34,6 @@ public class GenAppStateHelperService {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final InitiateGeneralApplicationService genAppService;
     private final LocationService locationService;
 
     private final ObjectMapper objectMapper;
@@ -78,81 +78,95 @@ public class GenAppStateHelperService {
     }
 
     public CaseData updateApplicationLocationDetailsInClaim(CaseData caseData, String authToken) {
-
-        if (!Collections.isEmpty(caseData.getGeneralApplications())) {
-            List<GeneralApplication> genApps = new ArrayList<>();
-            CaseData finalCaseData = caseData;
-            LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(finalCaseData.getCaseManagementLocation().getBaseLocation(), authToken);
-            caseData.getGeneralApplications().forEach(generalApplicationElement -> {
-                GeneralApplication generalApplication = generalApplicationElement.getValue();
-                generalApplication.getCaseManagementLocation().setBaseLocation(finalCaseData.getCaseManagementLocation().getBaseLocation());
-                generalApplication.getCaseManagementLocation().setRegion(finalCaseData.getCaseManagementLocation().getRegion());
-                generalApplication.getCaseManagementLocation().setSiteName(locationDetails.getSiteName());
-                generalApplication.getCaseManagementLocation().setAddress(locationDetails.getCourtAddress());
-                generalApplication.getCaseManagementLocation().setPostcode(locationDetails.getPostcode());
-                Map<String, Object> genAppMap = generalApplication.toMap(objectMapper);
-                genAppMap.put("isCcmccLocation", YesOrNo.NO);
-                generalApplication = objectMapper.convertValue(genAppMap, GeneralApplication.class);
-                genApps.add((generalApplication));
-            });
-            caseData.setGeneralApplications(wrapElements(genApps));
+        if (Collections.isEmpty(caseData.getGeneralApplications())) {
+            return caseData;
         }
+
+        LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(
+            caseData.getCaseManagementLocation().getBaseLocation(),
+            authToken
+        );
+        caseData.setGeneralApplications(wrapElements(buildUpdatedGeneralApplications(caseData, locationDetails)));
         return caseData;
     }
 
     public CaseData updateApplicationDetailsInClaim(CaseData caseData,
                                                      String updatedState, RequiredState gaFlow) {
-        List<Element<GeneralApplicationsDetails>> gaDetails = caseData.getClaimantGaAppDetails();
-        List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection = caseData.getGaDetailsMasterCollection();
-
         Map<Long, GeneralApplication> generalApplicationMap = getLatestStatusOfGeneralApplication(caseData);
-        /*
-        * Master GA collection for Judge, case worker, legal adviser etc..
-        * */
-        if (!isEmpty(gaDetailsMasterCollection) && !isEmpty(generalApplicationMap)) {
-            gaDetailsMasterCollection.forEach(gaMasterColl -> {
-                if (applicationFilterCriteria(gaMasterColl.getValue(), generalApplicationMap, gaFlow)) {
-                    gaMasterColl.getValue().setCaseState(updatedState);
-                }
-            });
-        }
-        /*
-        * Claimant GA Collection
-        * */
-        if (!isEmpty(gaDetails)  && !isEmpty(generalApplicationMap)) {
-            gaDetails.forEach(gaDetails1 -> {
-                if (applicationFilterCriteria(gaDetails1.getValue(), generalApplicationMap, gaFlow)) {
-                    gaDetails1.getValue().setCaseState(updatedState);
-                }
-            });
+        if (isEmpty(generalApplicationMap)) {
+            return caseData;
         }
 
-        /*
-        * Respondent one GA collection
-        * */
-        List<Element<GADetailsRespondentSol>> respondentSpecficGADetails = caseData.getRespondentSolGaAppDetails();
-
-        if (!isEmpty(respondentSpecficGADetails)  && !isEmpty(generalApplicationMap)) {
-            respondentSpecficGADetails.forEach(respondentSolElement -> {
-                if (applicationFilterCriteria(respondentSolElement.getValue(), generalApplicationMap, gaFlow)) {
-                    respondentSolElement.getValue().setCaseState(updatedState);
-                }
-            });
-        }
-
-        /*
-        * Respondent two GA collection
-        * */
-        List<Element<GADetailsRespondentSol>> respondentTwoGADetails = caseData.getRespondentSolTwoGaAppDetails();
-
-        if (!isEmpty(respondentTwoGADetails)  && !isEmpty(generalApplicationMap)) {
-            respondentTwoGADetails.forEach(respondentTwoSolElement -> {
-                if (applicationFilterCriteria(respondentTwoSolElement.getValue(), generalApplicationMap, gaFlow)) {
-                    respondentTwoSolElement.getValue().setCaseState(updatedState);
-                }
-            });
-        }
+        updateGeneralApplicationCollection(caseData.getGaDetailsMasterCollection(), generalApplicationMap, gaFlow, updatedState);
+        updateGeneralApplicationCollection(caseData.getClaimantGaAppDetails(), generalApplicationMap, gaFlow, updatedState);
+        updateRespondentApplicationCollection(caseData.getRespondentSolGaAppDetails(), generalApplicationMap, gaFlow, updatedState);
+        updateRespondentApplicationCollection(caseData.getRespondentSolTwoGaAppDetails(), generalApplicationMap, gaFlow, updatedState);
         return caseData;
+    }
+
+    private List<GeneralApplication> buildUpdatedGeneralApplications(CaseData caseData, LocationRefData locationDetails) {
+        List<GeneralApplication> generalApplications = new ArrayList<>();
+        caseData.getGeneralApplications().forEach(generalApplicationElement ->
+            generalApplications.add(updateGeneralApplicationLocation(caseData, locationDetails, generalApplicationElement.getValue()))
+        );
+        return generalApplications;
+    }
+
+    private GeneralApplication updateGeneralApplicationLocation(CaseData caseData,
+                                                                LocationRefData locationDetails,
+                                                                GeneralApplication generalApplication) {
+        generalApplication.getCaseManagementLocation().setBaseLocation(caseData.getCaseManagementLocation().getBaseLocation());
+        generalApplication.getCaseManagementLocation().setRegion(caseData.getCaseManagementLocation().getRegion());
+        generalApplication.getCaseManagementLocation().setSiteName(locationDetails.getSiteName());
+        generalApplication.getCaseManagementLocation().setAddress(locationDetails.getCourtAddress());
+        generalApplication.getCaseManagementLocation().setPostcode(locationDetails.getPostcode());
+        Map<String, Object> genAppMap = generalApplication.toMap(objectMapper);
+        genAppMap.put("isCcmccLocation", YesOrNo.NO);
+        return objectMapper.convertValue(genAppMap, GeneralApplication.class);
+    }
+
+    private void updateGeneralApplicationCollection(List<Element<GeneralApplicationsDetails>> applications,
+                                                    Map<Long, GeneralApplication> generalApplicationMap,
+                                                    RequiredState gaFlow,
+                                                    String updatedState) {
+        updateCollectionState(
+            applications,
+            generalApplicationMap,
+            gaFlow,
+            updatedState,
+            this::applicationFilterCriteria,
+            GeneralApplicationsDetails::setCaseState
+        );
+    }
+
+    private void updateRespondentApplicationCollection(List<Element<GADetailsRespondentSol>> applications,
+                                                       Map<Long, GeneralApplication> generalApplicationMap,
+                                                       RequiredState gaFlow,
+                                                       String updatedState) {
+        updateCollectionState(
+            applications,
+            generalApplicationMap,
+            gaFlow,
+            updatedState,
+            this::applicationFilterCriteria,
+            GADetailsRespondentSol::setCaseState
+        );
+    }
+
+    private <T> void updateCollectionState(List<Element<T>> applications,
+                                           Map<Long, GeneralApplication> generalApplicationMap,
+                                           RequiredState gaFlow,
+                                           String updatedState,
+                                           TriPredicate<T, Map<Long, GeneralApplication>, RequiredState> filterCriteria,
+                                           BiConsumer<T, String> stateUpdater) {
+        if (isEmpty(applications)) {
+            return;
+        }
+        applications.forEach(application -> {
+            if (filterCriteria.test(application.getValue(), generalApplicationMap, gaFlow)) {
+                stateUpdater.accept(application.getValue(), updatedState);
+            }
+        });
     }
 
     private boolean applicationFilterCriteria(GeneralApplicationsDetails gaDetails,
@@ -213,6 +227,11 @@ public class GenAppStateHelperService {
             }
         }
         return latestStatus;
+    }
+
+    @FunctionalInterface
+    private interface TriPredicate<T, U, V> {
+        boolean test(T value, U other, V third);
     }
 
 }

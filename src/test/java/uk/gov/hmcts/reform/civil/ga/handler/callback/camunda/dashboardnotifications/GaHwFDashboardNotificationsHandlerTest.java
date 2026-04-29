@@ -86,7 +86,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_REJECTED_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -114,7 +114,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_REJECTED_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -142,7 +142,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_PARTIAL_REMISSION_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -170,7 +170,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_MORE_INFORMATION_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -194,7 +194,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_INVALID_REFERENCE_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -218,7 +218,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_INVALID_REFERENCE_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

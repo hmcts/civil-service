@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
@@ -13,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -111,18 +115,32 @@ public class HearingDetailsMapper {
     public static String getListingComments(CaseData caseData) {
         String comments = getAllActiveFlags(caseData).stream()
             .flatMap(flags -> flags.getDetails().stream())
-            .filter(flag -> flag.getValue() != null && flag.getValue().getFlagCode().equals(AUDIO_VIDEO_EVIDENCE_FLAG))
-            .map(flag -> String.format(flag.getValue().getFlagComment() == null ? "%s, " : "%s: %s, ", flag.getValue().getName(), flag.getValue().getFlagComment()))
+            .filter(HearingDetailsMapper::isAudioVideoEvidenceFlag)
+            .map(HearingDetailsMapper::formatListingComment)
             .reduce("", String::concat)
-            .replaceAll("\n", " ")
+            .replace("\n", " ")
             .replaceAll("\\s+", " ");
 
-        if (comments != null && !comments.isEmpty()) {
-            String refactoredComment = comments.substring(0, comments.length() - 2);
-            return refactoredComment.length() > 200 ? refactoredComment.substring(0, 200) : refactoredComment;
+        return normaliseListingComments(comments);
+    }
+
+    private static boolean isAudioVideoEvidenceFlag(Element<FlagDetail> flag) {
+        return flag.getValue() != null && flag.getValue().getFlagCode().equals(AUDIO_VIDEO_EVIDENCE_FLAG);
+    }
+
+    private static String formatListingComment(Element<FlagDetail> flag) {
+        return String.format(flag.getValue().getFlagComment() == null ? "%s, " : "%s: %s, ",
+                             flag.getValue().getName(),
+                             flag.getValue().getFlagComment());
+    }
+
+    private static String normaliseListingComments(String comments) {
+        if (comments.isEmpty()) {
+            return null;
         }
 
-        return null;
+        String refactoredComment = comments.substring(0, comments.length() - 2);
+        return refactoredComment.length() > 200 ? refactoredComment.substring(0, 200) : refactoredComment;
     }
 
     public static String getHearingRequester() {
@@ -155,23 +173,52 @@ public class HearingDetailsMapper {
             log.info("Hearing method codes are not available for hmctsServiceId {} caseId {}", hmctsServiceId, caseData.getCcdCaseReference());
             return null;
         }
-        if (caseData.getSdoR2SmallClaimsHearing() != null && caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing() != null) {
-            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())));
-        } else if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getMethodOfHearing() != null) {
-            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getSdoR2Trial().getMethodOfHearing())));
-        } else if (caseData.getHearingMethodValuesFastTrack() != null) {
-            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesFastTrack())));
-        } else if (caseData.getHearingMethodValuesDisposalHearing() != null) {
-            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesDisposalHearing())));
-        } else if (caseData.getHearingMethodValuesDisposalHearingDJ() != null) {
-            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesDisposalHearingDJ())));
-        } else if (caseData.getHearingMethodValuesTrialHearingDJ() != null) {
-            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesTrialHearingDJ())));
-        } else if (caseData.getHearingMethodValuesSmallClaims() != null) {
-            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesSmallClaims())));
-        } else {
-            return null;
+        DynamicList hearingMethod = resolveHearingMethod(caseData);
+        return hearingMethod != null ? List.of(hearingMethodCode.get(getDynamicListValue(hearingMethod))) : null;
+    }
+
+    private static DynamicList resolveHearingMethod(CaseData caseData) {
+        DynamicList hearingMethod = getSdoR2SmallClaimsHearingMethod(caseData);
+        if (hearingMethod != null) {
+            return hearingMethod;
         }
+        hearingMethod = getSdoR2TrialHearingMethod(caseData);
+        if (hearingMethod != null) {
+            return hearingMethod;
+        }
+        return getFirstAvailableHearingMethod(caseData);
+    }
+
+    private static DynamicList getSdoR2SmallClaimsHearingMethod(CaseData caseData) {
+        return caseData.getSdoR2SmallClaimsHearing() != null
+            ? caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing()
+            : null;
+    }
+
+    private static DynamicList getSdoR2TrialHearingMethod(CaseData caseData) {
+        return caseData.getSdoR2Trial() != null
+            ? caseData.getSdoR2Trial().getMethodOfHearing()
+            : null;
+    }
+
+    private static DynamicList getFirstAvailableHearingMethod(CaseData caseData) {
+        return firstAvailableHearingMethod(List.of(
+            caseData::getHearingMethodValuesFastTrack,
+            caseData::getHearingMethodValuesDisposalHearing,
+            caseData::getHearingMethodValuesDisposalHearingDJ,
+            caseData::getHearingMethodValuesTrialHearingDJ,
+            caseData::getHearingMethodValuesSmallClaims
+        ));
+    }
+
+    private static DynamicList firstAvailableHearingMethod(List<Supplier<DynamicList>> hearingMethodSuppliers) {
+        for (Supplier<DynamicList> supplier : hearingMethodSuppliers) {
+            DynamicList hearingMethod = supplier.get();
+            if (hearingMethod != null) {
+                return hearingMethod;
+            }
+        }
+        return null;
     }
 
 }

@@ -74,7 +74,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     private static final String TEMPLATE_ID_LIP_WELSH = "template-id-lip-welsh";
     private static final String TEMPLATE_PUBLIC_LIP_ID = "template-public-lip-id";
     private static final String TEMPLATE_PUBLIC_WELSH_LIP_ID = "template-public-welsh-lip-id";
-    private static final String TEMPLATE_PUBLIC_lR_ID = "template-public-lr-id";
+    private static final String TEMPLATE_PUBLIC_LR_ID = "template-public-lr-id";
     @Mock
     private NotificationService notificationService;
     @Mock
@@ -229,7 +229,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             when(organisationService.findOrganisationById(any()))
                 .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getQueryResponseReceived()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_lR_ID);
+            when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_LR_ID);
             when(notificationsProperties.getQueryLipWelshPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_WELSH_LIP_ID);
             when(notificationsProperties.getQueryLipPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_LIP_ID);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -260,7 +260,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "applicant@email.com",
-                TEMPLATE_PUBLIC_lR_ID,
+                TEMPLATE_PUBLIC_LR_ID,
                 getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
@@ -282,7 +282,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "respondent1@email.com",
-                TEMPLATE_PUBLIC_lR_ID,
+                TEMPLATE_PUBLIC_LR_ID,
                 getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
@@ -304,7 +304,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "respondent2@email.com",
-                TEMPLATE_PUBLIC_lR_ID,
+                TEMPLATE_PUBLIC_LR_ID,
                 getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
@@ -326,7 +326,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "applicant@email.com",
-                TEMPLATE_PUBLIC_lR_ID,
+                TEMPLATE_PUBLIC_LR_ID,
                 getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
@@ -348,7 +348,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "respondent1@email.com",
-                TEMPLATE_PUBLIC_lR_ID,
+                TEMPLATE_PUBLIC_LR_ID,
                 getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
@@ -370,7 +370,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "respondent2@email.com",
-                TEMPLATE_PUBLIC_lR_ID,
+                TEMPLATE_PUBLIC_LR_ID,
                 getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );

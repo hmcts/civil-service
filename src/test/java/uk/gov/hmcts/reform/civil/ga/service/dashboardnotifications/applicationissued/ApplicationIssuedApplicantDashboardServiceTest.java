@@ -56,7 +56,7 @@ class ApplicationIssuedApplicantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
             AUTH_TOKEN,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 
@@ -77,7 +77,7 @@ class ApplicationIssuedApplicantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_GENERAL_APPS_APPLICATION_FEE_REQUIRED_APPLICANT.getScenario(),
             AUTH_TOKEN,
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 

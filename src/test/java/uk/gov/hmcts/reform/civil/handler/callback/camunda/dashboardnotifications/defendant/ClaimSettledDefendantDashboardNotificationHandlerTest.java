@@ -110,7 +110,7 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -148,7 +148,7 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

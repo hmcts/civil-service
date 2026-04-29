@@ -73,13 +73,13 @@ class CertificateGeneratedDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_PROCESSED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -107,13 +107,13 @@ class CertificateGeneratedDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_PROCESSED_DEFENDANT.getScenario(),
             parentCaseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
             parentCaseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -154,13 +154,13 @@ class CertificateGeneratedDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_PROCESSED_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 

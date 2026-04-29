@@ -75,9 +75,7 @@ abstract class ClaimantResponseDashboardServiceBase extends DashboardScenarioSer
             return;
         }
         String caseId = String.valueOf(caseData.getCcdCaseReference());
-        ScenarioRequestParams notificationParams = ScenarioRequestParams.builder()
-            .params(mapper.mapCaseDataToParams(caseData))
-            .build();
+        ScenarioRequestParams notificationParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
         dashboardScenariosService.recordScenarios(
             authToken,
             scenario,

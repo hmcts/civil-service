@@ -72,7 +72,7 @@ class ClaimantCCJResponseNotificationHandlerTest extends BaseCallbackHandlerTest
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

@@ -26,10 +26,7 @@ public final class PartyDataMigrationUtils {
         return Optional.ofNullable(elements)
             .orElse(Collections.emptyList())
             .stream()
-            .map(element -> Element.<T>builder()
-                .id(element.getId())
-                .value(transformer.apply(element.getValue()))
-                .build())
+            .map(element -> new Element<T>().setId(element.getId()).setValue(transformer.apply(element.getValue())))
             .toList();
     }
 

@@ -82,7 +82,7 @@ class TrialArrangementsNotifyOtherPartyNotificationHandlerTest extends BaseCallb
                 "BEARER_TOKEN",
                 expectedScenario,
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

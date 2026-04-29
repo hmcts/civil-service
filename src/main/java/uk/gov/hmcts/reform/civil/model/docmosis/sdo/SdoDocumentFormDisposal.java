@@ -87,6 +87,10 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private boolean disposalHearingCostsToggle;
     private boolean writtenByJudge;
     private boolean hasDisposalWelshToggle;
+    private String applicant1PartyName;
+    private String applicant2PartyName;
+    private String respondent1PartyName;
+    private String respondent2PartyName;
 
     @SuppressWarnings("unused")
     public boolean getDisposalHearingMethodToggle() {

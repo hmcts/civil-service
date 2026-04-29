@@ -95,12 +95,11 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         .respondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode(PIN))
         .submittedDate(LocalDateTime.now())
         .systemGeneratedCaseDocuments(List.of(
-            Element.<CaseDocument>builder()
-                .value(new CaseDocument().setDocumentType(DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT)
+            new Element<CaseDocument>().setValue(new CaseDocument().setDocumentType(DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT)
                            .setDocumentName("DefendantJBA.pdf")
                            .setDocumentLink(new Document().setDocumentFileName("DefendantJBA.pdf").setDocumentBinaryUrl(
                                "Binary/url").setDocumentUrl("url"))
-                           .setCreatedDatetime(LocalDateTime.now())).build()))
+                           .setCreatedDatetime(LocalDateTime.now()))))
         .build();
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
 

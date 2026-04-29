@@ -146,7 +146,9 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         log.info("Found {} case references to process", caseReferences.size());
 
         String state = externalTask.getVariable("state");
-        asyncCaseMigrationService.migrateCasesAsync(task, caseReferences, state);
+
+        String isGACase = externalTask.getVariable("isGACase");
+        asyncCaseMigrationService.migrateCasesAsync(task, caseReferences, state, isGACase != null);
 
         return new ExternalTaskData();
     }

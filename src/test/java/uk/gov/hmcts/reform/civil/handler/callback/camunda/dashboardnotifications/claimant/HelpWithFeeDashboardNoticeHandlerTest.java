@@ -84,7 +84,7 @@ class HelpWithFeeDashboardNoticeHandlerTest extends BaseCallbackHandlerTest {
             "BEARER_TOKEN",
             DashboardScenarios.SCENARIO_AAA6_CP_HEARING_FEE_HELP_WITH_FEE_APPLIED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
+            new ScenarioRequestParams(params)
         );
     }
 }

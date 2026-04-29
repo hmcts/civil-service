@@ -71,7 +71,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -98,7 +98,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
 
         }
@@ -123,7 +123,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
 
         }
@@ -151,13 +151,13 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_FULL_REMISSION_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -184,13 +184,13 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_FEE_PAID_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -218,13 +218,13 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPS_HWF_FEE_PAID_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

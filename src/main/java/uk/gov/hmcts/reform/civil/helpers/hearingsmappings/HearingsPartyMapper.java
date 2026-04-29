@@ -95,159 +95,46 @@ public class HearingsPartyMapper {
     }
 
     private static void addRespondent2Objects(CaseData caseData, OrganisationService organisationService, List<PartyDetailsModel> parties) {
-
-        if (YES.equals(caseData.getAddRespondent2())) {
-
-            // respondent 2
-            parties.add(getDetailsForPartyObject(caseData.getRespondent2(), DEFENDANT_ROLE.getPartyRoleValue()));
-
-            // respondent 2 org individuals for COMPANY/ORG PartyType
-            if (caseData.getRespondent2().isCompanyOROrganisation() && caseData.getRespondent2OrgIndividuals() != null) {
-                parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent2OrgIndividuals()));
-            }
-
-            // respondent 2 solicitor
-            if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-                && caseData.getRespondent2OrganisationPolicy().getOrganisation() != null) {
-                parties.add(getDetailsForSolicitorOrganisation(
-                    caseData.getRespondent2OrganisationPolicy(),
-                    organisationService
-                ));
-            }
-
-            // 1v2 Same sol and defs file different response
-            // or 1v2 diff sol
-            // only def 2 files full defence
-            if (((ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-                && NO.equals(caseData.getDefendantSingleResponseToBothClaimants()))
-                || ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData)))
-                && (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                ? caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
-                : FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()))) {
-
-                // respondent 2 expert
-                if (caseData.getRespondent2Experts() != null
-                    && !caseData.getRespondent2Experts().isEmpty()) {
-                    parties.addAll(getDetailsFor(EXPERT_ROLE, caseData.getRespondent2Experts()));
-                }
-
-                // respondent 2 witness
-                if (caseData.getRespondent2Witnesses() != null
-                    && !caseData.getRespondent2Witnesses().isEmpty()) {
-                    parties.addAll(getDetailsFor(WITNESS_ROLE, caseData.getRespondent2Witnesses()));
-                }
-            }
-
-            // respondent 2 lit friend
-            if (caseData.getRespondent2LitigationFriend() != null) {
-                parties.add(getDetailsForLitigationFriendObject(caseData.getRespondent2LitigationFriend()));
-            }
+        if (!YES.equals(caseData.getAddRespondent2())) {
+            return;
         }
+
+        parties.add(getDetailsForPartyObject(caseData.getRespondent2(), DEFENDANT_ROLE.getPartyRoleValue()));
+        addOrganisationIndividuals(parties, DEFENDANT_ROLE, caseData.getRespondent2(), caseData.getRespondent2OrgIndividuals());
+        addRespondent2Solicitor(caseData, organisationService, parties);
+        if (shouldAddRespondent2ExpertsAndWitnesses(caseData)) {
+            addExpertsAndWitnesses(parties, caseData.getRespondent2Experts(), caseData.getRespondent2Witnesses());
+        }
+        addLitigationFriend(parties, caseData.getRespondent2LitigationFriend());
     }
 
     private static void addRespondent1Objects(CaseData caseData, OrganisationService organisationService, List<PartyDetailsModel> parties) {
-        // respondent 1
         parties.add(getDetailsForPartyObject(caseData.getRespondent1(), DEFENDANT_ROLE.getPartyRoleValue()));
-
-        // respondent 1 org individuals for COMPANY/ORG PartyType
-        if (caseData.getRespondent1().isCompanyOROrganisation() && caseData.getRespondent1OrgIndividuals() != null) {
-            parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent1OrgIndividuals()));
-        }
-
-        // respondent 1 solicitor
-        if (caseData.getRespondent1OrganisationPolicy().getOrganisation() != null) {
-            parties.add(getDetailsForSolicitorOrganisation(
-                caseData.getRespondent1OrganisationPolicy(),
-                organisationService
-            ));
-        }
-
-        // respondent 1 expert
-        if (caseData.getRespondent1Experts() != null
-            && !caseData.getRespondent1Experts().isEmpty()) {
-            parties.addAll(getDetailsFor(EXPERT_ROLE, caseData.getRespondent1Experts()));
-        }
-
-        // respondent 1 witness
-        if (caseData.getRespondent1Witnesses() != null
-            && !caseData.getRespondent1Witnesses().isEmpty()) {
-            parties.addAll(getDetailsFor(WITNESS_ROLE, caseData.getRespondent1Witnesses()));
-        }
-
-        // respondent 1 lit friend
-        if (caseData.getRespondent1LitigationFriend() != null) {
-            parties.add(getDetailsForLitigationFriendObject(caseData.getRespondent1LitigationFriend()));
-        }
+        addOrganisationIndividuals(parties, DEFENDANT_ROLE, caseData.getRespondent1(), caseData.getRespondent1OrgIndividuals());
+        addSolicitorOrganisation(parties, caseData.getRespondent1OrganisationPolicy(), organisationService);
+        addExpertsAndWitnesses(parties, caseData.getRespondent1Experts(), caseData.getRespondent1Witnesses());
+        addLitigationFriend(parties, caseData.getRespondent1LitigationFriend());
     }
 
     private static void addApplicant2Objects(CaseData caseData, List<PartyDetailsModel> parties) {
         if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
-
-            // applicant 2
             parties.add(getDetailsForPartyObject(caseData.getApplicant2(), CLAIMANT_ROLE.getPartyRoleValue()));
-
-            // applicant 2 org individuals for COMPANY/ORG PartyType
-            if (caseData.getApplicant2().isCompanyOROrganisation() && caseData.getApplicant2OrgIndividuals() != null) {
-                parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant2OrgIndividuals()));
+            addOrganisationIndividuals(parties, CLAIMANT_ROLE, caseData.getApplicant2(), caseData.getApplicant2OrgIndividuals());
+            if (shouldAddApplicant2ExpertsAndWitnesses(caseData)) {
+                addExpertsAndWitnesses(parties, caseData.getApplicantExperts(), caseData.getApplicantWitnesses());
             }
-
-            // 2v1 claimant response - if different response and app 2 proceeds
-            if (YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
-                && NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()) && caseData.getApplicant2DQ() != null) {
-                // applicant 2 expert
-                if (caseData.getApplicantExperts() != null
-                    && !caseData.getApplicantExperts().isEmpty()) {
-                    parties.addAll(getDetailsFor(EXPERT_ROLE, caseData.getApplicantExperts()));
-                }
-                // applicant 2 witness
-                if (caseData.getApplicantWitnesses() != null
-                    && !caseData.getApplicantWitnesses().isEmpty()) {
-                    parties.addAll(getDetailsFor(WITNESS_ROLE, caseData.getApplicantWitnesses()));
-                }
-            }
-
-            // applicant 2 lit friend
-            if (caseData.getApplicant2LitigationFriend() != null) {
-                parties.add(getDetailsForLitigationFriendObject(caseData.getApplicant2LitigationFriend()));
-            }
+            addLitigationFriend(parties, caseData.getApplicant2LitigationFriend());
         }
     }
 
     private static void addApplicant1Objects(CaseData caseData, OrganisationService organisationService, List<PartyDetailsModel> parties) {
-        // applicant 1
         parties.add(getDetailsForPartyObject(caseData.getApplicant1(), CLAIMANT_ROLE.getPartyRoleValue()));
-
-        // applicant 1 org individuals for COMPANY/ORG PartyType
-        if (caseData.getApplicant1().isCompanyOROrganisation() && caseData.getApplicant1OrgIndividuals() != null) {
-            parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant1OrgIndividuals()));
-        }
-
-        // applicant 1 solicitor
-        if (caseData.getApplicant1OrganisationPolicy().getOrganisation() != null) {
-            parties.add(getDetailsForSolicitorOrganisation(
-                caseData.getApplicant1OrganisationPolicy(),
-                organisationService
-            ));
-        }
-
+        addOrganisationIndividuals(parties, CLAIMANT_ROLE, caseData.getApplicant1(), caseData.getApplicant1OrgIndividuals());
+        addSolicitorOrganisation(parties, caseData.getApplicant1OrganisationPolicy(), organisationService);
         if (caseData.getApplicant1DQ() != null) {
-            // applicant 1 expert
-            if (caseData.getApplicantExperts() != null
-                && !caseData.getApplicantExperts().isEmpty()) {
-                parties.addAll(getDetailsFor(EXPERT_ROLE, caseData.getApplicantExperts()));
-            }
-
-            // applicant 1 witness
-            if (caseData.getApplicantWitnesses() != null
-                && !caseData.getApplicantWitnesses().isEmpty()) {
-                parties.addAll(getDetailsFor(WITNESS_ROLE, caseData.getApplicantWitnesses()));
-            }
+            addExpertsAndWitnesses(parties, caseData.getApplicantExperts(), caseData.getApplicantWitnesses());
         }
-
-        // applicant 1 lit friend
-        if (caseData.getApplicant1LitigationFriend() != null) {
-            parties.add(getDetailsForLitigationFriendObject(caseData.getApplicant1LitigationFriend()));
-        }
+        addLitigationFriend(parties, caseData.getApplicant1LitigationFriend());
     }
 
     private static PartyDetailsModel getDetailsForPartyObject(Party party, String partyRole) {
@@ -323,6 +210,70 @@ public class HearingsPartyMapper {
             null);
     }
 
+    private static void addOrganisationIndividuals(List<PartyDetailsModel> parties,
+                                                   PartyRole partyRole,
+                                                   Party party,
+                                                   List<Element<PartyFlagStructure>> hearingIndividuals) {
+        if (party.isCompanyOROrganisation() && hearingIndividuals != null) {
+            parties.addAll(getDetailsFor(partyRole, hearingIndividuals));
+        }
+    }
+
+    private static void addSolicitorOrganisation(List<PartyDetailsModel> parties,
+                                                 OrganisationPolicy organisationPolicy,
+                                                 OrganisationService organisationService) {
+        if (organisationPolicy.getOrganisation() != null) {
+            parties.add(getDetailsForSolicitorOrganisation(organisationPolicy, organisationService));
+        }
+    }
+
+    private static void addExpertsAndWitnesses(List<PartyDetailsModel> parties,
+                                               List<Element<PartyFlagStructure>> experts,
+                                               List<Element<PartyFlagStructure>> witnesses) {
+        if (experts != null && !experts.isEmpty()) {
+            parties.addAll(getDetailsFor(EXPERT_ROLE, experts));
+        }
+        if (witnesses != null && !witnesses.isEmpty()) {
+            parties.addAll(getDetailsFor(WITNESS_ROLE, witnesses));
+        }
+    }
+
+    private static void addLitigationFriend(List<PartyDetailsModel> parties, LitigationFriend litigationFriend) {
+        if (litigationFriend != null) {
+            parties.add(getDetailsForLitigationFriendObject(litigationFriend));
+        }
+    }
+
+    private static boolean shouldAddApplicant2ExpertsAndWitnesses(CaseData caseData) {
+        return YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
+            && NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            && caseData.getApplicant2DQ() != null;
+    }
+
+    private static void addRespondent2Solicitor(CaseData caseData,
+                                                OrganisationService organisationService,
+                                                List<PartyDetailsModel> parties) {
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+            addSolicitorOrganisation(parties, caseData.getRespondent2OrganisationPolicy(), organisationService);
+        }
+    }
+
+    private static boolean shouldAddRespondent2ExpertsAndWitnesses(CaseData caseData) {
+        return isRespondent2RepresentationEligible(caseData) && isRespondent2FullDefence(caseData);
+    }
+
+    private static boolean isRespondent2RepresentationEligible(CaseData caseData) {
+        return (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            && NO.equals(caseData.getDefendantSingleResponseToBothClaimants()))
+            || ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
+    }
+
+    private static boolean isRespondent2FullDefence(CaseData caseData) {
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            ? caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            : FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType());
+    }
+
     @SuppressWarnings("java:S107")
     public static PartyDetailsModel buildIndividualPartyObject(String partyId, String firstName, String lastName,
                                                                String partyName, String partyRole,
@@ -346,20 +297,14 @@ public class HearingsPartyMapper {
         individualDetails.setCustodyStatus(getCustodyStatus(flagDetails));
         individualDetails.setOtherReasonableAdjustmentDetails(getOtherReasonableAdjustmentDetails(flagDetails));
 
-        List<UnavailabilityRangeModel> unavailabilityRanges = null;
-        if (unavailableDates != null) {
-            unavailabilityRanges = unwrapElements(unavailableDates).stream()
-                .map(date -> mapUnAvailableDateToRange(date))
-                .toList();
-        }
-
-        PartyDetailsModel partyDetails = new PartyDetailsModel();
-        partyDetails.setPartyID(partyId);
-        partyDetails.setPartyType(IND);
-        partyDetails.setPartyName(partyName);
-        partyDetails.setPartyRole(partyRole);
+        PartyDetailsModel partyDetails = buildBasePartyDetails(
+            partyId,
+            IND,
+            partyName,
+            partyRole,
+            unavailableDates
+        );
         partyDetails.setIndividualDetails(individualDetails);
-        partyDetails.setUnavailabilityRanges(unavailabilityRanges);
 
         return partyDetails;
     }
@@ -373,25 +318,42 @@ public class HearingsPartyMapper {
         organisationDetails.setOrganisationType(ORG.getLabel());
         organisationDetails.setCftOrganisationID(cftOrganisationID);
 
-        List<UnavailabilityRangeModel> unavailabilityRanges = null;
-        if (unavailableDates != null) {
-            unavailabilityRanges = unwrapElements(unavailableDates).stream()
-                .map(date -> mapUnAvailableDateToRange(date))
-                .toList();
-        }
-
-        PartyDetailsModel partyDetails = new PartyDetailsModel();
-        partyDetails.setPartyID(partyId);
-        partyDetails.setPartyType(ORG);
-        partyDetails.setPartyName(name);
-        partyDetails.setPartyRole(partyRole);
+        PartyDetailsModel partyDetails = buildBasePartyDetails(
+            partyId,
+            ORG,
+            name,
+            partyRole,
+            unavailableDates
+        );
         partyDetails.setOrganisationDetails(organisationDetails);
-        partyDetails.setUnavailabilityRanges(unavailabilityRanges);
 
         return partyDetails;
     }
 
     static final String DATE_STRING = "yyyy-MM-dd";
+
+    private static PartyDetailsModel buildBasePartyDetails(String partyId,
+                                                           uk.gov.hmcts.reform.civil.enums.hearing.PartyType partyType,
+                                                           String partyName,
+                                                           String partyRole,
+                                                           List<Element<UnavailableDate>> unavailableDates) {
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(partyId);
+        partyDetails.setPartyType(partyType);
+        partyDetails.setPartyName(partyName);
+        partyDetails.setPartyRole(partyRole);
+        partyDetails.setUnavailabilityRanges(getUnavailabilityRanges(unavailableDates));
+        return partyDetails;
+    }
+
+    private static List<UnavailabilityRangeModel> getUnavailabilityRanges(List<Element<UnavailableDate>> unavailableDates) {
+        if (unavailableDates == null) {
+            return null;
+        }
+        return unwrapElements(unavailableDates).stream()
+            .map(HearingsPartyMapper::mapUnAvailableDateToRange)
+            .toList();
+    }
 
     private static UnavailabilityRangeModel mapUnAvailableDateToRange(UnavailableDate date) {
         String unavailableFrom = SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()

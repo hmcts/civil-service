@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,21 +43,23 @@ public class GetTaskListControllerTest extends BaseIntegrationTest {
         ZonedDateTime zdt = date.atZone(ZoneId.of("Etc/UTC"));
         OffsetDateTime odt = zdt.toOffsetDateTime();
 
-        List<TaskList> taskList = new ArrayList<>();
-        taskList.add(TaskList.builder().id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e8"))
-                         .taskNameCy("task_name_cy").taskNameEn("task_name_en")
-                         .taskOrder(0)
-                         .categoryCy("category_cy").categoryEn("category_en")
-                         .role("defendant")
-                         .currentStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
-                         .currentStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
-                         .nextStatusEn(TaskStatus.IN_PROGRESS.getName())
-                         .nextStatusCy(TaskStatus.IN_PROGRESS.getWelshName())
-                         .hintTextCy("hint_text_cy").hintTextEn(
-                "hint_text_en").reference("124")
-                         .updatedBy("Test").createdAt(odt).build()
-        );
-
-        return taskList;
+        TaskList taskListItem = new TaskList();
+        taskListItem.setId(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e8"));
+        taskListItem.setTaskNameCy("task_name_cy");
+        taskListItem.setTaskNameEn("task_name_en");
+        taskListItem.setTaskOrder(0);
+        taskListItem.setCategoryCy("category_cy");
+        taskListItem.setCategoryEn("category_en");
+        taskListItem.setRole("defendant");
+        taskListItem.setCurrentStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName());
+        taskListItem.setCurrentStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName());
+        taskListItem.setNextStatusEn(TaskStatus.IN_PROGRESS.getName());
+        taskListItem.setNextStatusCy(TaskStatus.IN_PROGRESS.getWelshName());
+        taskListItem.setHintTextCy("hint_text_cy");
+        taskListItem.setHintTextEn("hint_text_en");
+        taskListItem.setReference("124");
+        taskListItem.setUpdatedBy("Test");
+        taskListItem.setCreatedAt(odt);
+        return List.of(taskListItem);
     }
 }

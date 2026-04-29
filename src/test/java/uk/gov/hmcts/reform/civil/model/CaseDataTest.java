@@ -1061,7 +1061,7 @@ class CaseDataTest {
         @Test
         void shouldReturnNull_whenHearingLocationValueIsNull() {
             CaseData caseData = CaseData.builder()
-                .hearingLocation(DynamicList.builder().value(DynamicListElement.EMPTY).build()).build();
+                .hearingLocation(new DynamicList().setValue(DynamicListElement.EMPTY)).build();
             String actual = caseData.getHearingLocationText();
 
             assertNull(actual);
@@ -1070,8 +1070,8 @@ class CaseDataTest {
         @Test
         void shouldExpectedString_whenHearingLocationValueLabelIsNotNull() {
             CaseData caseData = CaseData.builder()
-                .hearingLocation(DynamicList.builder().value(
-                    DynamicListElement.dynamicElement("label")).build()).build();
+                .hearingLocation(new DynamicList().setValue(
+                    DynamicListElement.dynamicElement("label"))).build();
             String actual = caseData.getHearingLocationText();
 
             assertEquals("label", actual);

@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
@@ -276,6 +277,32 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData()).isNotNull();
+        }
+
+        @Test
+        void shouldPersistRoleMetadataOnCreatedBy() {
+            CaseMessage latestMessage = new CaseMessage();
+            latestMessage.setId(QUERY_ID);
+            latestMessage.setCreatedOn(NOW);
+
+            CaseQueriesCollection caseQueriesCollection = new CaseQueriesCollection();
+            caseQueriesCollection.setCaseMessages(wrapElements(latestMessage));
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(CASE_ID);
+            caseData.setQueries(caseQueriesCollection);
+
+            when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(APPLICANTSOLICITORONE.name()));
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+
+            String expectedCreatedBy = CaseQueriesUtil.buildCreatedByWithRoleMetadata(
+                USER_ID,
+                List.of(APPLICANTSOLICITORONE.name())
+            );
+            assertThat(caseData.getQueries().latest().getCreatedBy()).isEqualTo(expectedCreatedBy);
         }
 
         @Test

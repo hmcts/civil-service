@@ -76,6 +76,6 @@ public class LipDefendantCaseAssignmentService {
                                                  .setAuthorisation(authorisation)
                                                  .setCaseId(caseId)
                                                  .setUpdates(data)
-                                                 .setEvent(ASSIGN_LIP_DEFENDANT));
+                                                 .setEvent(ASSIGN_LIP_DEFENDANT), true);
     }
 }

@@ -80,23 +80,23 @@ public final class DirectionsOrderSpecialistTextLibrary {
             + "relevant columns in response completed by 4pm on";
 
     public static final String HOUSING_DISREPAIR_CLAUSE_A =
-        "a)   The Claimant has permission to rely on the written expert surveying report uploaded to the Portal "
-            + "with the Particulars of Claim.";
+        "a)   The claimant has permission to rely on the written report of an expert surveyor as uploaded to the portal "
+            + "with the particulars of claim.";
     public static final String HOUSING_DISREPAIR_CLAUSE_B =
-        "b)   The Defendant has permission to rely on the written report of an expert surveyor "
-            + "and if that report has not already been [served/uploaded] then it must be served by 4pm";
+        "b)   The defendant has permission to rely on the written report of an expert surveyor "
+            + "and if that report has not already been served then it must be served by 4pm";
     public static final String HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE =
-        "c)   Where the Defendant has served an expert report, the parties' experts "
-            + "shall liaise to seek to narrow the scope of disagreement between them and shall, by 4pm";
+        "c)   Where the Defendant has served an expert report, the experts "
+            + "shall liaise to seek to narrow the scope of any disagreement between them and shall, by 4pm";
     public static final String HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE =
-        ", serve on each party a joint statement setting out areas of agreement, "
+        ", send to each party a joint statement setting out areas of agreement, "
             + "areas of disagreement and brief reasons for any areas of disagreement.";
     public static final String HOUSING_DISREPAIR_CLAUSE_D =
         "d)   The claimant shall upload the joint statement by no later than 7 days of service "
             + "of the same in accordance with paragraph c.";
     public static final String HOUSING_DISREPAIR_CLAUSE_E =
-        "e)   Any party seeking to rely on oral expert evidence must make an application for "
-            + "permission within 14 days of the submission of the above.";
+        "e)   Any party seeking permission to rely on oral expert evidence must make an application "
+            + "within 14 days of the uploading of the joint statement.";
 
     /* Fast track & DJ – disclosure, schedules, and bundle text */
     public static final String FAST_TRACK_DISCLOSURE_STANDARD_SDO =
@@ -199,13 +199,13 @@ public final class DirectionsOrderSpecialistTextLibrary {
         "The defendant's evidence is to be uploaded to the Digital Portal by 4pm on";
     public static final String CREDIT_HIRE_STATEMENT_PROMPT_SDO =
             """
-                    The claimant must upload to the Digital Portal a witness statement addressing
-                    a) the need to hire a replacement vehicle; and
-                    b) impecuniosity""";
+                    The Claimant’s witness statement must address, if relied upon, evidence in support of
+                    a) need to hire a replacement vehicle; and
+                    b) impecuniosity.""";
     public static final String CREDIT_HIRE_NON_COMPLIANCE_SDO =
-        "A failure to comply with the paragraph above will result in the claimant being debarred from asserting "
-            + "need or relying on impecuniosity as the case may be at the final hearing, "
-            + "save with permission of the Trial Judge.";
+        "Failure to comply with the above paragraphs providing for disclosure and witness evidence on the issues "
+            + "of need and impecuniosity will result in the claimant being debarred from asserting need or relying on "
+            + "impecuniosity as the case may be at the final hearing, save with permission of the Trial Judge.";
     public static final String CREDIT_HIRE_PARTIES_LIAISE =
         "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no later than 4pm on";
     public static final String CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO =
@@ -241,7 +241,7 @@ public final class DirectionsOrderSpecialistTextLibrary {
     public static final String CREDIT_HIRE_STATEMENT_DEADLINE_DJ =
         "This statement must be uploaded to the Digital Portal by 4pm on";
     public static final String CREDIT_HIRE_NON_COMPLIANCE_DJ =
-        "A failure to comply will result in the claimant being "
+        "Failure to comply will result in the claimant being "
             + "debarred from asserting need or relying on impecuniosity "
             + "as the case may be at the final hearing, unless they "
             + "have the permission of the trial Judge.";
@@ -261,10 +261,8 @@ public final class DirectionsOrderSpecialistTextLibrary {
     public static final String PERSONAL_INJURY_PERMISSION_DJ =
         "The claimant has permission to rely upon the written "
             + "expert evidence already uploaded to the Digital"
-            + " Portal with the particulars of claim and in addition "
-            + "has permission to rely upon any associated "
-            + "correspondence or updating report which is uploaded "
-            + "to the Digital Portal by 4pm on";
+            + " Portal with the particulars of claim";
+
     public static final String PERSONAL_INJURY_QUESTIONS =
         "Any questions which are to be addressed to an expert must be sent to the expert directly "
             + "and uploaded to the Digital Portal by 4pm on";
@@ -289,10 +287,12 @@ public final class DirectionsOrderSpecialistTextLibrary {
     /* Small claims – generic Digital Portal paragraphs */
     public static final String SMALL_CLAIMS_DOCUMENTS_UPLOAD =
         "Each party must upload to the Digital Portal copies of all documents which they wish the"
-            + " court to consider when reaching its decision not less than 21 days before the hearing.";
+            + " court to consider when reaching its decision by 4pm on";
     public static final String SMALL_CLAIMS_DOCUMENTS_WARNING =
         "The court may refuse to consider any document which has not been uploaded to the Digital "
             + "Portal by the above date.";
+    public static final String SMALL_CLAIM_WITNESS_STATEMENT_TEXT = "Each party must upload to the Digital Portal copies of all "
+        + "witness statements of the witnesses (including the parties themselves) upon whose evidence they intend to rely at the hearing by 4pm on";
     public static final String SMALL_CLAIMS_WITNESS_DEADLINE =
         "Witness statements shall be uploaded to the Digital Portal by 4pm on";
     public static final String SMALL_CLAIMS_WITNESS_LATE_WARNING =

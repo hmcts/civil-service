@@ -36,10 +36,7 @@ class CourtLocationUtilsTest {
 
     @Test
     void shouldFindPreferredLocationData_whenLocationDataMatches() {
-        locationList.setValue(DynamicListElement.builder()
-                                  .code(locationList.getListItems().get(0).getCode())
-                                  .label(locationList.getListItems().get(0).getLabel())
-                                  .build());
+        locationList.setValue(new DynamicListElement().setCode(locationList.getListItems().get(0).getCode()).setLabel(locationList.getListItems().get(0).getLabel()));
 
         assertThat(courtLocationUtils.findPreferredLocationData(locations, locationList)).isEqualTo(locationA);
     }
@@ -51,10 +48,7 @@ class CourtLocationUtilsTest {
 
     @Test
     void shouldReturnNull_WhenNoLocationsProvided() {
-        locationList.setValue(DynamicListElement.builder()
-                                  .code(locationList.getListItems().get(0).getCode())
-                                  .label(locationList.getListItems().get(0).getLabel())
-                                  .build());
+        locationList.setValue(new DynamicListElement().setCode(locationList.getListItems().get(0).getCode()).setLabel(locationList.getListItems().get(0).getLabel()));
 
         assertThat(courtLocationUtils.findPreferredLocationData(null, locationList)).isEqualTo(null);
     }

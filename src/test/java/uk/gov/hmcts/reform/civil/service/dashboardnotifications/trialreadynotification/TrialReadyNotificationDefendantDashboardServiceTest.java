@@ -49,7 +49,7 @@ class TrialReadyNotificationDefendantDashboardServiceTest {
         caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setCcdCaseReference(1234L);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setTrialReadyRespondent1(null);
 
         when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
@@ -60,7 +60,7 @@ class TrialReadyNotificationDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_DEFENDANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 
@@ -70,7 +70,7 @@ class TrialReadyNotificationDefendantDashboardServiceTest {
         caseData.setRespondent1Represented(YesOrNo.YES);
         caseData.setCcdCaseReference(1234L);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setTrialReadyRespondent1(null);
 
         service.notifyTrialReadyNotification(caseData, AUTH_TOKEN);
@@ -100,7 +100,7 @@ class TrialReadyNotificationDefendantDashboardServiceTest {
         caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setCcdCaseReference(1234L);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
         when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);

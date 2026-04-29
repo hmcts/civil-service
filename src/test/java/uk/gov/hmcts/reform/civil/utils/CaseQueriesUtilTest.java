@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -34,6 +35,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -299,6 +301,44 @@ class CaseQueriesUtilTest {
     }
 
     @Test
+    void shouldReturnPersistedRole_whenUserNoLongerHasCaseRole() {
+        CaseMessage applicantMsg = new CaseMessage();
+        applicantMsg.setId("4");
+        applicantMsg.setCreatedBy("user" + CaseQueriesUtil.ROLE_METADATA_DELIMITER
+            + CaseRole.APPLICANTSOLICITORONE.getFormattedName());
+        CaseQueriesCollection queries = new CaseQueriesCollection();
+        queries.setCaseMessages(wrapElements(applicantMsg));
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1L);
+        caseData.setQueries(queries);
+
+        List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "4");
+
+        assertThat(roles).containsExactly(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
+        verifyNoInteractions(coreCaseUserService);
+    }
+
+    @Test
+    void shouldPreferPersistedRoleEvenWhenUserStillHasMultipleRoles() {
+        CaseMessage respondentMsg = new CaseMessage();
+        respondentMsg.setId("5");
+        respondentMsg.setCreatedBy("user" + CaseQueriesUtil.ROLE_METADATA_DELIMITER
+            + CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
+        CaseQueriesCollection queries = new CaseQueriesCollection();
+        queries.setCaseMessages(wrapElements(respondentMsg));
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1L);
+        caseData.setQueries(queries);
+
+        List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "5");
+
+        assertThat(roles).containsExactly(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
+        verifyNoInteractions(coreCaseUserService);
+    }
+
+    @Test
     void shouldUpdateApplicantSolicitorQueries_WhenRoleIsApplicantSolicitor() {
         List<String> roles = List.of("APPLICANTSOLICITORONE");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
@@ -512,12 +552,14 @@ class CaseQueriesUtilTest {
         respondent2Queries.setCaseMessages(respondent2Messages);
         caseData.setQmRespondentSolicitor2Queries(respondent2Queries);
 
-        CaseQueriesUtil.logMigrationSuccess(caseData);
+        assertDoesNotThrow(() -> CaseQueriesUtil.logMigrationSuccess(caseData));
     }
 
     @Test
     void shouldNotError_whenNoOldQueriesExistWhileLoggingMigrationSuccess() {
-        CaseQueriesUtil.logMigrationSuccess(CaseDataBuilder.builder().build());
+        assertDoesNotThrow(() ->
+                               CaseQueriesUtil.logMigrationSuccess(CaseDataBuilder.builder().build())
+        );
     }
 
     private CaseDataLiP respondentResponseWithLanguagePreference(String languagePreference) {

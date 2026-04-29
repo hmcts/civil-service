@@ -16,7 +16,7 @@ class DjHearingMethodFieldServiceTest {
     @Test
     void shouldResolveTelephoneFromDisposal() {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .disposalHearingMethodTelephoneHearingDJ(HearingMethodTelephoneHearingDJ.telephoneTheCourt)
+            .disposalHearingMethodTelephoneHearingDJ(HearingMethodTelephoneHearingDJ.TELEPHONE_THE_COURT)
             .build();
 
         assertThat(service.resolveTelephoneOrganisedBy(caseData)).isEqualTo("the court");
@@ -25,7 +25,7 @@ class DjHearingMethodFieldServiceTest {
     @Test
     void shouldFallbackToTrialTelephone() {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .trialHearingMethodTelephoneHearingDJ(HearingMethodTelephoneHearingDJ.telephoneTheDefendant)
+            .trialHearingMethodTelephoneHearingDJ(HearingMethodTelephoneHearingDJ.TELEPHONE_THE_DEFENDANT)
             .build();
 
         assertThat(service.resolveTelephoneOrganisedBy(caseData)).isEqualTo("the defendant");
@@ -34,7 +34,7 @@ class DjHearingMethodFieldServiceTest {
     @Test
     void shouldResolveVideoFromDisposal() {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .disposalHearingMethodVideoConferenceHearingDJ(HearingMethodVideoConferenceDJ.videoTheCourt)
+            .disposalHearingMethodVideoConferenceHearingDJ(HearingMethodVideoConferenceDJ.VIDEO_THE_COURT)
             .build();
 
         assertThat(service.resolveVideoOrganisedBy(caseData)).isEqualTo("the court");
@@ -43,7 +43,7 @@ class DjHearingMethodFieldServiceTest {
     @Test
     void shouldFallbackToTrialVideo() {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .trialHearingMethodVideoConferenceHearingDJ(HearingMethodVideoConferenceDJ.videoTheDefendant)
+            .trialHearingMethodVideoConferenceHearingDJ(HearingMethodVideoConferenceDJ.VIDEO_THE_DEFENDANT)
             .build();
 
         assertThat(service.resolveVideoOrganisedBy(caseData)).isEqualTo("the defendant");
@@ -51,7 +51,7 @@ class DjHearingMethodFieldServiceTest {
 
     @Test
     void shouldDetectInPerson() {
-        assertThat(service.isInPerson(DisposalHearingMethodDJ.disposalHearingMethodInPerson)).isTrue();
-        assertThat(service.isInPerson(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing)).isFalse();
+        assertThat(service.isInPerson(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_IN_PERSON)).isTrue();
+        assertThat(service.isInPerson(DisposalHearingMethodDJ.DISPOSAL_HEARING_METHOD_TELEPHONE_HEARING)).isFalse();
     }
 }

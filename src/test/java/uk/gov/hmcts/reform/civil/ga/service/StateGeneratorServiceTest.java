@@ -105,8 +105,8 @@ public class StateGeneratorServiceTest {
                                            .setDirectionsText("test")
                                            .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING))
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.YES).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.YES))
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
             .applicationIsCloaked(YesOrNo.NO)
             .build();
 
@@ -164,8 +164,8 @@ public class StateGeneratorServiceTest {
                                            .setMakeAnOrder(APPROVE_OR_EDIT))
             .parentClaimantIsApplicant(YesOrNo.YES)
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
-            .generalAppType(GAApplicationType.builder()
-                                .types(applicationTypeJudgement()).build())
+            .generalAppType(new GAApplicationType()
+                                .setTypes(applicationTypeJudgement()))
             .build();
         CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);
         assertThat(caseState).isEqualTo(PROCEEDS_IN_HERITAGE);
@@ -178,8 +178,8 @@ public class StateGeneratorServiceTest {
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                            .setMakeAnOrder(APPROVE_OR_EDIT))
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.NO))
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
             .applicationIsCloaked(YesOrNo.YES)
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .build();
@@ -196,7 +196,7 @@ public class StateGeneratorServiceTest {
             .judicialDecision(new GAJudicialDecision(FREE_FORM_ORDER))
             .orderOnCourtInitiative(new FreeFormOrderValues().setOnInitiativeSelectionDate(LocalDate.now())
                                         .setOnInitiativeSelectionTextArea("test"))
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.NO))
             .generalAppDetailsOfOrder("order test")
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .build();
@@ -211,8 +211,8 @@ public class StateGeneratorServiceTest {
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                            .setMakeAnOrder(APPROVE_OR_EDIT))
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.NO))
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .applicationIsCloaked(YesOrNo.NO)
             .build();
@@ -228,8 +228,8 @@ public class StateGeneratorServiceTest {
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                            .setDirectionsText("test")
                                            .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING))
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.NO))
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .applicationIsCloaked(YesOrNo.NO)
             .build();
@@ -242,9 +242,8 @@ public class StateGeneratorServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .judicialDecisionWithUncloakRequestForInformationApplication(SEND_APP_TO_OTHER_PARTY,
                                                                          NO, YesOrNo.NO)
-            .generalAppType(GAApplicationType.builder()
-                    .types(singletonList(SET_ASIDE_JUDGEMENT))
-                    .build()).build();
+            .generalAppType(new GAApplicationType()
+                    .setTypes(singletonList(SET_ASIDE_JUDGEMENT))).build();
 
         when(judicialDecisionHelper.isApplicationUncloakedWithAdditionalFee(any())).thenReturn(true);
 
@@ -293,8 +292,8 @@ public class StateGeneratorServiceTest {
                                                                     )
                                       )
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
             .build();
 
         when(judicialDecisionHelper.isApplicationUncloakedWithAdditionalFee(any())).thenReturn(true);
@@ -342,6 +341,17 @@ public class StateGeneratorServiceTest {
         assertThat(caseState).isEqualTo(AWAITING_RESPONDENT_RESPONSE);
     }
 
+    @Test
+    void shouldReturnCurrentStateWhenJudicialDecisionIsMissing() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
+            .build();
+
+        CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);
+
+        assertThat(caseState).isEqualTo(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION);
+    }
+
     private List<GeneralApplicationTypes> applicationTypeJudgement() {
         return List.of(
             GeneralApplicationTypes.STRIKE_OUT
@@ -351,8 +361,8 @@ public class StateGeneratorServiceTest {
     private List<Element<GASolicitorDetailsGAspec>> getRespondentSolicitors() {
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email("test@gmail.com").organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
         respondentSols.add(element(respondent1));
 
@@ -363,15 +373,13 @@ public class StateGeneratorServiceTest {
         List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
         respondentsResponses
             .add(element(new GARespondentResponse()
-                             .setGaHearingDetails(GAHearingDetails.builder()
-                                                   .vulnerabilityQuestionsYesOrNo(YES)
-                                                   .vulnerabilityQuestion("dummy")
-                                                   .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                                   .hearingDuration(GAHearingDuration.HOUR_1)
-                                                   .build())
+                             .setGaHearingDetails(new GAHearingDetails()
+                                                   .setVulnerabilityQuestionsYesOrNo(YES)
+                                                   .setVulnerabilityQuestion("dummy")
+                                                   .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                                                   .setHearingDuration(GAHearingDuration.HOUR_1))
                              ));
 
         return respondentsResponses;
     }
 }
-

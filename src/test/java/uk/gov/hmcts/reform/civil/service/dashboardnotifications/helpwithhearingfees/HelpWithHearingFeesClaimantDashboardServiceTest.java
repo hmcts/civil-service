@@ -52,7 +52,7 @@ class HelpWithHearingFeesClaimantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_HEARING_FEE_HELP_WITH_FEE_APPLIED_CLAIMANT.getScenario(),
             "1234",
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            new ScenarioRequestParams(new HashMap<>())
         );
     }
 

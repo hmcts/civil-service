@@ -8,8 +8,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 
 import java.time.LocalDate;
 
@@ -44,26 +44,23 @@ class DjTrialNarrativeServiceTest {
 
     @Test
     void shouldBuildDisclosureOfDocumentsWithExpectedDates() {
-        LocalDate fourWeeks = LocalDate.of(2025, 1, 1);
-        LocalDate sixWeeks = LocalDate.of(2025, 1, 8);
-        LocalDate eightWeeks = LocalDate.of(2025, 1, 15);
-        when(deadlineService.nextWorkingDayInWeeks(4)).thenReturn(fourWeeks);
-        when(deadlineService.nextWorkingDayInWeeks(6)).thenReturn(sixWeeks);
-        when(deadlineService.nextWorkingDayInWeeks(8)).thenReturn(eightWeeks);
+        LocalDate twoWeeks = LocalDate.of(2025, 1, 1);
+        LocalDate threeWeeks = LocalDate.of(2025, 1, 8);
+        when(deadlineService.nextWorkingDayInWeeks(2)).thenReturn(twoWeeks);
+        when(deadlineService.nextWorkingDayInWeeks(3)).thenReturn(threeWeeks);
 
         TrialHearingDisclosureOfDocuments result = service.buildDisclosureOfDocuments();
 
-        assertThat(result.getDate1()).isEqualTo(fourWeeks);
-        assertThat(result.getDate2()).isEqualTo(sixWeeks);
-        assertThat(result.getDate3()).isEqualTo(eightWeeks);
+        assertThat(result.getDate1()).isEqualTo(twoWeeks);
+        assertThat(result.getDate2()).isEqualTo(threeWeeks);
     }
 
     @Test
     void shouldBuildTrialHearingTimeWithToggleDefaults() {
         LocalDate twentyTwoWeeks = LocalDate.of(2025, 6, 1);
         LocalDate thirtyWeeks = LocalDate.of(2025, 7, 27);
-        when(deadlineService.weeksFromNow(22)).thenReturn(twentyTwoWeeks);
-        when(deadlineService.weeksFromNow(30)).thenReturn(thirtyWeeks);
+        when(deadlineService.weeksFromNow(20)).thenReturn(twentyTwoWeeks);
+        when(deadlineService.weeksFromNow(29)).thenReturn(thirtyWeeks);
 
         TrialHearingTimeDJ result = service.buildTrialHearingTime();
 
@@ -85,13 +82,10 @@ class DjTrialNarrativeServiceTest {
 
     @Test
     void shouldBuildWitnessOfFactWithSharedText() {
-        LocalDate eightWeeks = LocalDate.of(2025, 3, 1);
-        when(deadlineService.nextWorkingDayInWeeks(8)).thenReturn(eightWeeks);
-
         TrialHearingWitnessOfFact result = service.buildWitnessOfFact();
 
         assertThat(result.getInput1()).isEqualTo(TRIAL_WITNESS_STATEMENT_UPLOAD_NOTICE);
         assertThat(result.getInput9()).isEqualTo(SMALL_CLAIMS_WITNESS_LATE_WARNING);
-        assertThat(result.getDate1()).isEqualTo(eightWeeks);
+        assertThat(result.getDate1()).isEqualTo(LocalDate.now().plusWeeks(5));
     }
 }

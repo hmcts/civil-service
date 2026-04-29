@@ -86,7 +86,7 @@ class DefendantResponseDeadlineDashboardNotificationHandlerTest extends BaseCall
                 "BEARER_TOKEN",
                 "Scenario.AAA6.DefResponse.ResponseTimeElapsed.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 

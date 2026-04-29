@@ -83,7 +83,7 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
             "BEARER_TOKEN",
             DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_DEFENDANT.getScenario(),
             caseId,
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 
@@ -123,13 +123,13 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
             "BEARER_TOKEN",
             DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_DEFENDANT.getScenario(),
             caseId,
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT.getScenario(),
             caseId,
-            ScenarioRequestParams.builder().params(scenarioParams).build()
+            new ScenarioRequestParams(scenarioParams)
         );
     }
 }

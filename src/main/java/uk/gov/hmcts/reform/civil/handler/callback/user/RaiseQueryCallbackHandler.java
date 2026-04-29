@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildCreatedByWithRoleMetadata;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.clearOldQueryCollections;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.logMigrationSuccess;
@@ -97,15 +98,20 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        List<String> roles = retrieveUserCaseRoles(
+        String userToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        UserInfo userInfo = userService.getUserInfo(userToken);
+        List<String> roles = coreCaseUserService.getUserCaseRoles(
             caseData.getCcdCaseReference().toString(),
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
+            userInfo.getUid()
         );
 
         CaseMessage latestCaseMessage = caseData.getQueries().latest();
         if (nonNull(caseData.getQueries()) && caseData.getQueries().messageThread(latestCaseMessage).size() % 2 == 0) {
             return AboutToStartOrSubmitCallbackResponse.builder().errors(List.of(FOLLOW_UPS_ERROR)).build();
+        }
+
+        if (latestCaseMessage != null) {
+            latestCaseMessage.setCreatedBy(buildCreatedByWithRoleMetadata(userInfo.getUid(), roles));
         }
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
@@ -125,11 +131,6 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     private CallbackResponse submitted(CallbackParams callbackParams) {
         logMigrationSuccess(callbackParams.getCaseDataBefore());
         return emptySubmittedCallbackResponse(callbackParams);
-    }
-
-    private List<String> retrieveUserCaseRoles(String caseReference, String userToken) {
-        UserInfo userInfo = userService.getUserInfo(userToken);
-        return coreCaseUserService.getUserCaseRoles(caseReference, userInfo.getUid());
     }
 
 }

@@ -90,7 +90,7 @@ class NoCHelperTest {
             .hearingDueDate(LocalDate.of(2024, 5, 20))
             .hearingTimeHourMinute("10:30")
             .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)))
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("Court A").build()).build())
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("Court A")))
             .hearingFeePaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
             .build();
     }

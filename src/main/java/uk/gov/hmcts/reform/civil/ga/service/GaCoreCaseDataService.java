@@ -373,12 +373,12 @@ public class GaCoreCaseDataService {
             );
 
             LocationRefData locationRefData = byEpimmsId.get(0);
-            CaseLocationCivil newCmLocation = CaseLocationCivil.builder()
-                .region(region)
-                .postcode(locationRefData.getPostcode())
-                .address(locationRefData.getCourtAddress())
-                .siteName(locationRefData.getSiteName())
-                .baseLocation(epimdsId).build();
+            CaseLocationCivil newCmLocation = new CaseLocationCivil()
+                .setRegion(region)
+                .setPostcode(locationRefData.getPostcode())
+                .setAddress(locationRefData.getCourtAddress())
+                .setSiteName(locationRefData.getSiteName())
+                .setBaseLocation(epimdsId);
             payload.put("caseManagementLocation", newCmLocation);
         }
 

@@ -150,15 +150,14 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
     }
 
     private List<Element<UnavailableDate>> getUnavailableTestDates() {
-        return List.of(Element.<UnavailableDate>builder().id(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba"))
-                           .value(new UnavailableDate()
+        return List.of(new Element<UnavailableDate>().setId(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba")).setValue(new UnavailableDate()
                                       .setWho("who")
                                       .setDate(LocalDate.of(2020, 1, 1))
                                       .setFromDate(LocalDate.of(2020, 1, 1))
                                       .setToDate(LocalDate.of(2020, 1, 1))
                                       .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
                                       .setEventAdded("eventAdd")
-                                      .setDateAdded(LocalDate.of(2020, 1, 1))).build());
+                                      .setDateAdded(LocalDate.of(2020, 1, 1))));
     }
 
     private Address getTestAddress(String rua) {
@@ -174,16 +173,13 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
     }
 
     private Element<BundlingRequestDocument> getTestElement() {
-        return Element.<BundlingRequestDocument>builder()
-            .id(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba"))
-            .value(new BundlingRequestDocument()
+        return new Element<BundlingRequestDocument>().setId(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba")).setValue(new BundlingRequestDocument()
                        .setDocumentFileName("docFileName")
                        .setDocumentLink(new DocumentLink()
                                          .setDocumentBinaryUrl("binaryUrl")
                                          .setDocumentFilename("docFileName")
                                          .setDocumentUrl("docURL"))
-                       .setDocumentType("testDocType"))
-            .build();
+                       .setDocumentType("testDocType"));
     }
 
     static DslPart buildBundleCreateResponseDsl() {

@@ -1,10 +1,22 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.caseproceedsoffline;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -18,42 +30,31 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
-
 @ExtendWith(MockitoExtension.class)
 class ApplicationsProceedOfflineDashboardServiceTest {
 
-    @Mock
-    private DashboardScenariosService dashboardScenariosService;
-    @Mock
-    private DashboardNotificationService dashboardNotificationService;
-    @Mock
-    private DashboardNotificationsParamsMapper mapper;
+    @Mock private DashboardScenariosService dashboardScenariosService;
+    @Mock private DashboardNotificationService dashboardNotificationService;
+    @Mock private DashboardNotificationsParamsMapper mapper;
 
     private TestDashboardService dashboardService;
 
     private static CaseData baseCaseData() {
         List<Element<GeneralApplication>> generalApplications =
-            wrapElements(GeneralApplication.builder().build());
+                wrapElements(new GeneralApplication());
 
         return CaseDataBuilder.builder().build().toBuilder()
-            .ccdCaseReference(1234L)
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .generalApplications(generalApplications)
-            .build();
+                .ccdCaseReference(1234L)
+                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .generalApplications(generalApplications)
+                .build();
     }
 
     @BeforeEach
     void setup() {
-        dashboardService = new TestDashboardService(dashboardScenariosService, dashboardNotificationService, mapper);
+        dashboardService =
+                new TestDashboardService(
+                        dashboardScenariosService, dashboardNotificationService, mapper);
     }
 
     @Test
@@ -66,18 +67,20 @@ class ApplicationsProceedOfflineDashboardServiceTest {
         dashboardService.notify(caseData, "auth");
 
         verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("1234", "Claimant");
-        verify(dashboardScenariosService).recordScenarios(
-            eq("auth"),
-            eq(SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario()),
-            eq("1234"),
-            any(ScenarioRequestParams.class)
-        );
-        verify(dashboardScenariosService, never()).recordScenarios(
-            eq("auth"),
-            eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario()),
-            any(),
-            any()
-        );
+        verify(dashboardScenariosService)
+                .recordScenarios(
+                        eq("auth"),
+                        eq(
+                                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT
+                                        .getScenario()),
+                        eq("1234"),
+                        any(ScenarioRequestParams.class));
+        verify(dashboardScenariosService, never())
+                .recordScenarios(
+                        eq("auth"),
+                        eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario()),
+                        any(),
+                        any());
     }
 
     @Test
@@ -89,18 +92,20 @@ class ApplicationsProceedOfflineDashboardServiceTest {
 
         dashboardService.notify(caseData, "auth");
 
-        verify(dashboardScenariosService).recordScenarios(
-            eq("auth"),
-            eq(SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario()),
-            eq("1234"),
-            any(ScenarioRequestParams.class)
-        );
-        verify(dashboardScenariosService).recordScenarios(
-            eq("auth"),
-            eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario()),
-            eq("1234"),
-            any(ScenarioRequestParams.class)
-        );
+        verify(dashboardScenariosService)
+                .recordScenarios(
+                        eq("auth"),
+                        eq(
+                                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT
+                                        .getScenario()),
+                        eq("1234"),
+                        any(ScenarioRequestParams.class));
+        verify(dashboardScenariosService)
+                .recordScenarios(
+                        eq("auth"),
+                        eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario()),
+                        eq("1234"),
+                        any(ScenarioRequestParams.class));
     }
 
     @Test
@@ -116,9 +121,8 @@ class ApplicationsProceedOfflineDashboardServiceTest {
 
     @Test
     void shouldSkipWhenStateNotProceedingOffline() {
-        CaseData caseData = baseCaseData().toBuilder()
-            .ccdState(CaseState.JUDICIAL_REFERRAL)
-            .build();
+        CaseData caseData =
+                baseCaseData().toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
         dashboardService.lip = true;
 
         dashboardService.notify(caseData, "auth");
@@ -136,9 +140,10 @@ class ApplicationsProceedOfflineDashboardServiceTest {
         boolean lip = true;
         List<String> applicationStates = List.of();
 
-        TestDashboardService(DashboardScenariosService dashboardScenariosService,
-                             DashboardNotificationService dashboardNotificationService,
-                             DashboardNotificationsParamsMapper mapper) {
+        TestDashboardService(
+                DashboardScenariosService dashboardScenariosService,
+                DashboardNotificationService dashboardNotificationService,
+                DashboardNotificationsParamsMapper mapper) {
             super(dashboardScenariosService, dashboardNotificationService, mapper);
         }
 
@@ -149,7 +154,8 @@ class ApplicationsProceedOfflineDashboardServiceTest {
 
         @Override
         protected String inactiveScenarioId() {
-            return SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario();
+            return SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT
+                    .getScenario();
         }
 
         @Override
