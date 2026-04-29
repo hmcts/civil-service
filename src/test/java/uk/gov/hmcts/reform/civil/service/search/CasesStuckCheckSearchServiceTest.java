@@ -35,7 +35,7 @@ class CasesStuckCheckSearchServiceTest {
         String queryStr = query.toString().replaceAll("\\s+", ""); // remove all spaces
 
         assertThat(queryStr).contains(
-            "\"to\":\"" + timeNow + "\"",
+            "\"lt\":\"" + timeNow + "\"",
             "\"from\":0",
             "\"_source\":[\"reference\"]",
             "now-7d",
