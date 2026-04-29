@@ -602,7 +602,11 @@ bundle:
 
 http:
   client:
-    readTimeout: ${REST_TEMPLATE_TIMEOUT:30000}
+    connectTimeout: ${HTTP_CONNECT_TIMEOUT:5000}
+    requestTimeout: ${HTTP_REQUEST_TIMEOUT:10000}
+    readTimeout: ${HTTP_READ_TIMEOUT:30000}
+    maxPerRoute: ${HTTP_MAX_PER_ROUTE:5}
+    maxTotal: ${HTTP_MAX_TOTAL:25}
 
 court-location:
   specified-claim:
