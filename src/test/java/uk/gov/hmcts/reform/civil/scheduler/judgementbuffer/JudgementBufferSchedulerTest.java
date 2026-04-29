@@ -1,19 +1,16 @@
 package uk.gov.hmcts.reform.civil.scheduler.judgementbuffer;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.JudgmentRequestedSearchService;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.scheduler.judgementbuffer.JudgementBufferScheduler.SCHEDULER_NAME;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,11 +31,6 @@ class JudgementBufferSchedulerTest {
     @Nested
     class Execute {
 
-        @BeforeEach
-        void setup() {
-            ReflectionTestUtils.setField(scheduler, "isSchedulerEnabled", true);
-        }
-
         @Test
         void shouldRunTaskRunner_whenSchedulerIsEnabled() {
             ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
@@ -50,15 +42,6 @@ class JudgementBufferSchedulerTest {
                 searchService,
                 judgementBufferScheduledTask
             );
-        }
-
-        @Test
-        void shouldNotExecute_whenSchedulerIsDisabled() {
-            ReflectionTestUtils.setField(scheduler, "isSchedulerEnabled", false);
-
-            scheduler.issueJudgement();
-
-            verifyNoInteractions(scheduledTaskRunner);
         }
     }
 }

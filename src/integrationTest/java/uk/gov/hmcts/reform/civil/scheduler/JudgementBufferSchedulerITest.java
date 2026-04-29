@@ -6,7 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.Application;
@@ -27,7 +26,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
-@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = "test.id=JudgementBufferSchedulerITest")
+@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
+    "test.id=JudgementBufferSchedulerITest",
+    "scheduler.judgement-buffer.enabled=true"
+})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class JudgementBufferSchedulerITest {
 
@@ -44,7 +46,6 @@ public class JudgementBufferSchedulerITest {
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void shouldExecuteJudgementBufferScheduler() {
         // Given
-        ReflectionTestUtils.setField(scheduler, "isSchedulerEnabled", true);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         SearchResult searchResult = SearchResult.builder()
             .total(1)
