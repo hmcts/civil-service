@@ -29,7 +29,8 @@ def versions = [
   camunda           : '7.20.0',
   testcontainers    : '1.21.4',
   pdfbox            : '3.0.7',
-  tika              : '3.3.0'
+  tika              : '3.3.0',
+  flyway            : '12.5.0'
 ]
 
 allprojects {
@@ -473,8 +474,8 @@ dependencies {
   implementation "jakarta.persistence:jakarta.persistence-api:3.1.0"
   implementation "org.jdbi:jdbi3-sqlobject:3.53.0"
   implementation "org.jdbi:jdbi3-spring:3.53.0"
-  implementation "org.flywaydb:flyway-core"
-  implementation "org.flywaydb:flyway-database-postgresql:12.5.0"
+  implementation "org.flywaydb:flyway-core:${versions.flyway}"
+  implementation "org.flywaydb:flyway-database-postgresql:${versions.flyway}"
   implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
   implementation "org.springframework.cloud:spring-cloud-openfeign-core"
   implementation "com.github.hmcts:service-auth-provider-java-client:4.1.2"
