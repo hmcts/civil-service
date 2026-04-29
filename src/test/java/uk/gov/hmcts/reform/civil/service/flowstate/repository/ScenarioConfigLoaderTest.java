@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ScenarioConfigLoaderTest {
 
     private final ResourceLoader resourceLoader = new DefaultResourceLoader();
+    private static final String NO_ONGOING_BP_ALLOWED_EVENTS_FILE = "no-ongoing-bp-allowed-events.yml";
 
     @Test
     void parsesKnownState_fromUnspecFile() {
@@ -48,5 +49,37 @@ class ScenarioConfigLoaderTest {
     void whitelist_missingFile_returnsEmptySet() {
         var loader = new ScenarioConfigLoader(resourceLoader);
         assertThat(loader.getWhitelist()).isNotNull();
+    }
+
+    @Test
+    void parsesNoOngoingBusinessProcessAllowedEvents() {
+        var loader = new ScenarioConfigLoader(resourceLoader);
+
+        Set<CaseEvent> events = loader.getNoOngoingBPAllowedEvents(NO_ONGOING_BP_ALLOWED_EVENTS_FILE);
+
+        assertThat(events).contains(
+            CaseEvent.UPDATE_CASE_DATA,
+            CaseEvent.REMOVE_DOCUMENT,
+            CaseEvent.SERVICE_REQUEST_RECEIVED
+        );
+    }
+
+    @Test
+    void noOngoingBusinessProcessAllowedEvents_missingFile_returnsEmptySet() {
+        var loader = new ScenarioConfigLoader(resourceLoader);
+
+        Set<CaseEvent> events = loader.getNoOngoingBPAllowedEvents("missing-no-ongoing-bp-allowed-events.yml");
+
+        assertThat(events).isEmpty();
+    }
+
+    @Test
+    void invalidEventName_inNoOngoingBusinessProcessAllowedEventsFile_throwsHelpfulException() {
+        var loader = new ScenarioConfigLoader(resourceLoader);
+
+        assertThatThrownBy(() -> loader.getNoOngoingBPAllowedEvents("invalid-no-ongoing-bp-allowed-events.yml"))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("Failed to load event config")
+            .hasRootCauseMessage("Unknown CaseEvent 'NOT_A_REAL_EVENT'");
     }
 }
