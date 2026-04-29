@@ -70,7 +70,11 @@ java:
     EM_CCD_ORCHESTRATOR_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SOME_ENV_VARIABLE: true
-    REST_TEMPLATE_TIMEOUT: 30000
+    HTTP_CONNECT_TIMEOUT: 5000
+    HTTP_REQUEST_TIMEOUT: 10000
+    HTTP_READ_TIMEOUT: 30000
+    HTTP_CLIENT_MAX_PER_ROUTE: 5
+    HTTP_CLIENT_MAX_TOTAL: 25
     POLLING_EVENT_EMITTER_ENABLED: false
     WA_TOGGLE: Prod
     HMC_HEARINGS_TOPIC_NAMESPACE: 'hmc-servicebus-{{ .Values.global.environment }}'
