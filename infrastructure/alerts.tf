@@ -131,8 +131,8 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "scheduler_job_not_run
         | where timestamp > ago(26h)
       QUERY
     time_aggregation_method = "Count"
-    threshold               = try(each.value.threshold, null)
-    operator                = "GreaterThan"
+    threshold               = 1
+    operator                = "LessThan"
 
     failing_periods {
       minimum_failing_periods_to_trigger_alert = 1
