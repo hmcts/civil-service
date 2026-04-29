@@ -11,7 +11,7 @@ class CamundaProcessIdentifierTest {
     void shouldContainAllExpectedEnumValues() {
         CamundaProcessIdentifier[] values = CamundaProcessIdentifier.values();
 
-        assertThat(values).hasSize(68)
+        assertThat(values).hasSize(71)
             .contains(
                 CamundaProcessIdentifier.ClaimDismissedNotifyParties,
                 CamundaProcessIdentifier.ClaimantConfirmProceedNotifyParties,
@@ -69,13 +69,20 @@ class CamundaProcessIdentifierTest {
                 CamundaProcessIdentifier.BundleCreationNotify,
                 CamundaProcessIdentifier.CreateSDONotify,
                 CamundaProcessIdentifier.RaiseQueryNotifier,
+                CamundaProcessIdentifier.JudgmentByAdmissionNotifier,
+                CamundaProcessIdentifier.TrialReadyNotificationNotifier,
                 CamundaProcessIdentifier.OtherPartyQueryRaisedNotifier,
+                CamundaProcessIdentifier.RespondToQueryNotifier,
+                CamundaProcessIdentifier.OtherPartyQueryResponseNotifier,
                 CamundaProcessIdentifier.NotifyLipGenericTemplateNotifier,
                 CamundaProcessIdentifier.NotifyLipResetPinNotifier,
                 CamundaProcessIdentifier.GenerateSpecDJFormNotifier,
                 CamundaProcessIdentifier.NotifyDecisionOnReconsiderationRequestNotifier,
                 CamundaProcessIdentifier.SettleClaimPaidInFullNotificationNotifier,
                 CamundaProcessIdentifier.ClaimantResponsePartAdmitPayImmediatelyNotifier,
+                CamundaProcessIdentifier.NotifyDefendantClaimantSettleTheClaimNotify,
+                CamundaProcessIdentifier.TranslatedDocumentUploadedNotifyParties,
+                CamundaProcessIdentifier.STANDARD_DIRECTION_ORDER_DJ_NOTIFY_PARTIES,
                 CamundaProcessIdentifier.DJ_NON_DIVERGENT_NOTIFIER
         );
     }
@@ -107,6 +114,6 @@ class CamundaProcessIdentifierTest {
 
         assertThat(values)
             .satisfies(v -> assertThat(v[0]).isEqualTo(CamundaProcessIdentifier.ClaimDismissedNotifyParties))
-            .satisfies(v -> assertThat(v[67]).isEqualTo(CamundaProcessIdentifier.DJ_NON_DIVERGENT_NOTIFIER));
+            .satisfies(v -> assertThat(v[70]).isEqualTo(CamundaProcessIdentifier.DJ_NON_DIVERGENT_NOTIFIER));
     }
 }

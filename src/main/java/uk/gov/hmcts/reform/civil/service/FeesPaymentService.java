@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -93,20 +94,22 @@ public class FeesPaymentService {
                         .setErrorDescription(h.getErrorMessage()));
         }
 
-        CardPaymentStatusResponse builtResponse = response;
-        try {
-            paymentStatusRetryService.updatePaymentStatus(feeType, caseReference, builtResponse);
+        log.info("Payment status is {} for case {} and fee type {}", paymentStatus, caseReference, feeType);
 
-        } catch (Exception e) {
-            log.error(
+        if (PaymentStatus.isValid(paymentStatus)) {
+            try {
+                paymentStatusRetryService.updatePaymentStatus(feeType, caseReference, response);
+            } catch (Exception e) {
+                log.error(
                     "Update payment status failed for claim [{}] with fee type [{}]. Error: {}",
                     caseReference,
                     feeType,
                     e.getMessage(),
                     e
-            );
+                );
+            }
         }
 
-        return builtResponse;
+        return response;
     }
 }

@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -98,53 +99,13 @@ public class GeneralAppFeesService {
     }
 
     public Fee getFeeForGA(GeneralApplicationCaseData caseData) {
-        Fee result = new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE));
-        int typeSize = caseData.getGeneralAppType().getTypes().size();
-        if (CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), VARY_TYPES)) {
-            //only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected
-            typeSize--;
-            result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), MISCELLANEOUS, OTHER);
-        }
-        if (typeSize > 0
-            && CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), SD_CONSENT_TYPES)) {
-            typeSize--;
-            Fee sdConsentFeeForGA = getFeeForGA(feesConfiguration.getConsentedOrWithoutNoticeKeyword(), null, null);
-            if (sdConsentFeeForGA.getCalculatedAmountInPence()
-                .compareTo(result.getCalculatedAmountInPence()) < 0) {
-                result = sdConsentFeeForGA;
-            }
-        }
-        if (typeSize > 0
-            && CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), SET_ASIDE)
-            && caseData.getGeneralAppRespondentAgreement() != null
-            && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
-            String feeKeyword;
-            if (caseData.getGeneralAppInformOtherParty() != null
-                && NO.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice())) {
-                feeKeyword = feesConfiguration.getConsentedOrWithoutNoticeKeyword();
-            } else {
-                feeKeyword = feesConfiguration.getWithNoticeKeyword();
-            }
-            typeSize--;
-            Fee setAsideFeeForGA = getFeeForGA(feeKeyword, null, null);
-            if (setAsideFeeForGA.getCalculatedAmountInPence()
-                .compareTo(result.getCalculatedAmountInPence()) < 0) {
-                result = setAsideFeeForGA;
-            }
-        }
-        if (isUpdateCoScGATypeSize(typeSize, caseData.getGeneralAppType().getTypes())) {
-            typeSize--;
-            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), MISCELLANEOUS, OTHER);
-            result = getCoScFeeResult(result, certOfSatisfactionOrCancel);
-        }
-        if (typeSize > 0) {
-            Fee defaultFee = getDefaultFee(caseData);
-            if (defaultFee.getCalculatedAmountInPence()
-                .compareTo(result.getCalculatedAmountInPence()) < 0) {
-                result = defaultFee;
-            }
-        }
-        return result;
+        List<GeneralApplicationTypes> types = caseData.getGeneralAppType().getTypes();
+        FeeCalculationState calculationState = initialCalculationState(types);
+        calculationState = applyVaryFee(calculationState, types);
+        calculationState = applySettlementByConsentFee(calculationState, types);
+        calculationState = applyCaseDataSetAsideFee(calculationState, caseData, types);
+        calculationState = applyCertificateOfSatisfactionFee(calculationState, types);
+        return applyDefaultCaseDataFee(calculationState, caseData);
     }
 
     public Fee getFeeForGA(GeneralApplication generalApplication, LocalDate hearingScheduledDate) {
@@ -157,51 +118,12 @@ public class GeneralAppFeesService {
     }
 
     private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
-        Fee result = new Fee();
-        result.setCalculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE));
-        int typeSize = types.size();
-        if (CollectionUtils.containsAny(types, VARY_TYPES)) {
-            //only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected
-            typeSize--;
-            result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), MISCELLANEOUS, OTHER);
-        }
-        if (typeSize > 0
-            && CollectionUtils.containsAny(types, SD_CONSENT_TYPES)) {
-            typeSize--;
-            Fee sdConsentFeeForGA = getFeeForGA(feesConfiguration.getConsentedOrWithoutNoticeKeyword(), null, null);
-            if (sdConsentFeeForGA.getCalculatedAmountInPence()
-                .compareTo(result.getCalculatedAmountInPence()) < 0) {
-                result = sdConsentFeeForGA;
-            }
-        }
-        if (typeSize > 0
-            && CollectionUtils.containsAny(types, SET_ASIDE) && Boolean.FALSE.equals(respondentAgreed)) {
-            String feeKeyword;
-            if (Boolean.FALSE.equals(informOtherParty)) {
-                feeKeyword = feesConfiguration.getConsentedOrWithoutNoticeKeyword();
-            } else {
-                feeKeyword = feesConfiguration.getWithNoticeKeyword();
-            }
-            typeSize--;
-            Fee setAsideFeeForGA = getFeeForGA(feeKeyword, null, null);
-            if (setAsideFeeForGA.getCalculatedAmountInPence()
-                .compareTo(result.getCalculatedAmountInPence()) < 0) {
-                result = setAsideFeeForGA;
-            }
-        }
-        if (isUpdateCoScGATypeSize(typeSize, types)) {
-            typeSize--;
-            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), MISCELLANEOUS, OTHER);
-            result = getCoScFeeResult(result, certOfSatisfactionOrCancel);
-        }
-        if (typeSize > 0) {
-            Fee defaultFee = getDefaultFee(types, respondentAgreed, informOtherParty, hearingScheduledDate);
-            if (defaultFee.getCalculatedAmountInPence()
-                .compareTo(result.getCalculatedAmountInPence()) < 0) {
-                result = defaultFee;
-            }
-        }
-        return result;
+        FeeCalculationState calculationState = initialCalculationState(types);
+        calculationState = applyVaryFee(calculationState, types);
+        calculationState = applySettlementByConsentFee(calculationState, types);
+        calculationState = applyListSetAsideFee(calculationState, types, respondentAgreed, informOtherParty);
+        calculationState = applyCertificateOfSatisfactionFee(calculationState, types);
+        return applyDefaultListFee(calculationState, types, respondentAgreed, informOtherParty, hearingScheduledDate);
     }
 
     public Fee getFeeForGA(String keyword, String event, String service) {
@@ -227,7 +149,7 @@ public class GeneralAppFeesService {
                 Optional.ofNullable(feeLookupResponseDto).map(FeeLookupResponseDto::getFeeAmount).orElse(null)
             );
         } catch (Exception e) {
-            log.error("Fee Service Lookup Failed - " + e.getMessage(), e);
+            log.error("Fee Service Lookup Failed - {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
         if (feeLookupResponseDto == null || feeLookupResponseDto.getFeeAmount() == null) {
@@ -355,5 +277,132 @@ public class GeneralAppFeesService {
             return certOfSatisfactionOrCancel;
         }
         return existingResult;
+    }
+
+    private FeeCalculationState initialCalculationState(List<GeneralApplicationTypes> types) {
+        return new FeeCalculationState(createMaxFee(), types.size());
+    }
+
+    private FeeCalculationState applyVaryFee(FeeCalculationState calculationState, List<GeneralApplicationTypes> types) {
+        if (!CollectionUtils.containsAny(types, VARY_TYPES)) {
+            return calculationState;
+        }
+        // only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected
+        return calculationState.withFeeAndRemainingTypes(
+            getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), MISCELLANEOUS, OTHER),
+            calculationState.remainingTypes() - 1
+        );
+    }
+
+    private FeeCalculationState applySettlementByConsentFee(FeeCalculationState calculationState,
+                                                            List<GeneralApplicationTypes> types) {
+        if (calculationState.remainingTypes() <= 0 || !CollectionUtils.containsAny(types, SD_CONSENT_TYPES)) {
+            return calculationState;
+        }
+        return applyCandidateFee(
+            calculationState,
+            getFeeForGA(feesConfiguration.getConsentedOrWithoutNoticeKeyword(), null, null)
+        );
+    }
+
+    private FeeCalculationState applyCaseDataSetAsideFee(FeeCalculationState calculationState,
+                                                         GeneralApplicationCaseData caseData,
+                                                         List<GeneralApplicationTypes> types) {
+        if (!shouldApplyCaseDataSetAsideFee(calculationState.remainingTypes(), caseData, types)) {
+            return calculationState;
+        }
+        return applyCandidateFee(
+            calculationState,
+            getFeeForGA(getSetAsideKeyword(caseData), null, null)
+        );
+    }
+
+    private boolean shouldApplyCaseDataSetAsideFee(int remainingTypes,
+                                                   GeneralApplicationCaseData caseData,
+                                                   List<GeneralApplicationTypes> types) {
+        return remainingTypes > 0
+            && CollectionUtils.containsAny(types, SET_ASIDE)
+            && caseData.getGeneralAppRespondentAgreement() != null
+            && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed());
+    }
+
+    private String getSetAsideKeyword(GeneralApplicationCaseData caseData) {
+        return caseData.getGeneralAppInformOtherParty() != null
+            && NO.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice())
+            ? feesConfiguration.getConsentedOrWithoutNoticeKeyword()
+            : feesConfiguration.getWithNoticeKeyword();
+    }
+
+    private FeeCalculationState applyListSetAsideFee(FeeCalculationState calculationState,
+                                                     List<GeneralApplicationTypes> types,
+                                                     Boolean respondentAgreed,
+                                                     Boolean informOtherParty) {
+        if (!shouldApplyListSetAsideFee(calculationState.remainingTypes(), types, respondentAgreed)) {
+            return calculationState;
+        }
+        String feeKeyword = Boolean.FALSE.equals(informOtherParty)
+            ? feesConfiguration.getConsentedOrWithoutNoticeKeyword()
+            : feesConfiguration.getWithNoticeKeyword();
+        return applyCandidateFee(calculationState, getFeeForGA(feeKeyword, null, null));
+    }
+
+    private boolean shouldApplyListSetAsideFee(int remainingTypes,
+                                               List<GeneralApplicationTypes> types,
+                                               Boolean respondentAgreed) {
+        return remainingTypes > 0
+            && CollectionUtils.containsAny(types, SET_ASIDE)
+            && Boolean.FALSE.equals(respondentAgreed);
+    }
+
+    private FeeCalculationState applyCertificateOfSatisfactionFee(FeeCalculationState calculationState,
+                                                                  List<GeneralApplicationTypes> types) {
+        if (!isUpdateCoScGATypeSize(calculationState.remainingTypes(), types)) {
+            return calculationState;
+        }
+        return applyCandidateFee(
+            calculationState,
+            getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), MISCELLANEOUS, OTHER)
+        );
+    }
+
+    private Fee applyDefaultCaseDataFee(FeeCalculationState calculationState, GeneralApplicationCaseData caseData) {
+        return applyDefaultFee(calculationState, () -> getDefaultFee(caseData));
+    }
+
+    private Fee applyDefaultListFee(FeeCalculationState calculationState,
+                                    List<GeneralApplicationTypes> types,
+                                    Boolean respondentAgreed,
+                                    Boolean informOtherParty,
+                                    LocalDate hearingScheduledDate) {
+        return applyDefaultFee(
+            calculationState,
+            () -> getDefaultFee(types, respondentAgreed, informOtherParty, hearingScheduledDate)
+        );
+    }
+
+    private Fee applyDefaultFee(FeeCalculationState calculationState, Supplier<Fee> defaultFeeSupplier) {
+        if (calculationState.remainingTypes() <= 0) {
+            return calculationState.fee();
+        }
+        return getCoScFeeResult(calculationState.fee(), defaultFeeSupplier.get());
+    }
+
+    private FeeCalculationState applyCandidateFee(FeeCalculationState calculationState, Fee candidateFee) {
+        return calculationState.withFeeAndRemainingTypes(
+            getCoScFeeResult(calculationState.fee(), candidateFee),
+            calculationState.remainingTypes() - 1
+        );
+    }
+
+    private Fee createMaxFee() {
+        Fee fee = new Fee();
+        fee.setCalculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE));
+        return fee;
+    }
+
+    private record FeeCalculationState(Fee fee, int remainingTypes) {
+        private FeeCalculationState withFeeAndRemainingTypes(Fee updatedFee, int updatedRemainingTypes) {
+            return new FeeCalculationState(updatedFee, updatedRemainingTypes);
+        }
     }
 }

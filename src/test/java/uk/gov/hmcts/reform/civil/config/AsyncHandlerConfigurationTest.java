@@ -2,11 +2,16 @@ package uk.gov.hmcts.reform.civil.config;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 class AsyncHandlerConfigurationTest {
 
@@ -30,7 +35,8 @@ class AsyncHandlerConfigurationTest {
     void shouldCheckPresenceOfBeansAndConfiguration_WhenAsyncHandlerConfigurationIsLoaded() {
         context.run(it -> {
             assertThat(it).hasSingleBean(Executor.class);
-            var asyncHandlerBean = it.getBean("asyncHandlerExecutor");
+            assertThat(it).hasBean("asyncHandlerRejectedCount");
+            var asyncHandlerBean = it.getBean("asyncHandlerExecutor", ThreadPoolTaskExecutor.class);
 
             assertThat(asyncHandlerBean).extracting("queueCapacity")
                     .isEqualTo(QUEUE_SIZE);
@@ -38,6 +44,23 @@ class AsyncHandlerConfigurationTest {
                 .isEqualTo(CORE_POOL_SIZE);
             assertThat(asyncHandlerBean).extracting("maxPoolSize")
                 .isEqualTo(MAX_POOL_SIZE);
+        });
+    }
+
+    @Test
+    void shouldIncrementRejectedCountAndThrowException_WhenTaskIsRejected() {
+        context.run(it -> {
+            ThreadPoolTaskExecutor executor = it.getBean("asyncHandlerExecutor", ThreadPoolTaskExecutor.class);
+            AtomicLong rejectedCount = it.getBean("asyncHandlerRejectedCount", AtomicLong.class);
+
+            assertThat(rejectedCount.get()).isZero();
+
+            Runnable runnable = mock(Runnable.class);
+            assertThatThrownBy(() -> executor.getThreadPoolExecutor().getRejectedExecutionHandler().rejectedExecution(runnable, executor.getThreadPoolExecutor()))
+                .isInstanceOf(RejectedExecutionException.class)
+                .hasMessageContaining("rejected from");
+
+            assertThat(rejectedCount.get()).isEqualTo(1L);
         });
     }
 }
