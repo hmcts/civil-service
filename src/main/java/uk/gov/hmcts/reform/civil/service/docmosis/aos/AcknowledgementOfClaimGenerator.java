@@ -64,7 +64,7 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
         return new AcknowledgementOfClaimForm(
             "[userImage:courtseal.PNG]",
             DocmosisTemplateDataUtils.toCaseName.apply(caseData),
-            String.valueOf(caseData.getLegacyCaseReference()),
+            String.valueOf(caseData.getCcdCaseReference()),
             caseData.getLegacyCaseReference(),
             DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData),
             caseData.getIssueDate(),
