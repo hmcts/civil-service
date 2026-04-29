@@ -179,6 +179,7 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
             caseData.setNextDeadline(newDeadline.toLocalDate());
         } else if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             caseData.setRespondent2TimeExtensionDate(time.now());
+            caseData.setBusinessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE_SPEC));
             caseData.setRespondent2ResponseDeadline(newDeadline);
             caseData.setNextDeadline(deadlinesCalculator.nextDeadline(
                 Arrays.asList(newDeadline, caseData.getRespondent1ResponseDeadline())).toLocalDate());
