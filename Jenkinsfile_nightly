@@ -167,7 +167,7 @@ withNightlyPipeline(type, product, component) {
   env.AAC_API_URL = aacApiUrl
   env.UNASSIGN_CASES = true
   overrideVaultEnvironments([
-  'aat': params.ENVIRONMENT
+   'aat': params.ENVIRONMENT == 'preview' ? 'aat' : params.ENVIRONMENT
   ])
   loadVaultSecrets(secrets)
 
