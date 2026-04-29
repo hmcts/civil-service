@@ -165,8 +165,6 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         LocalDateTime newDeadline = deadlinesCalculator.calculateFirstWorkingDay(agreedExtension)
             .atTime(END_OF_BUSINESS_DAY);
 
-        caseData.setIsRespondent1(null);
-
         if (caseData.getRespondent2SameLegalRepresentative() != null
             && caseData.getRespondent2SameLegalRepresentative() == YES) {
 
