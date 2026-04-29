@@ -79,6 +79,12 @@ public abstract class DashboardScenarioService {
             });
     }
 
+    protected void reconfigureDashboardNotifications(CaseData caseData, String roleType) {
+        String uniqueCaseIdentifier = resolveCaseReference(caseData);
+        ScenarioRequestParams scenarioParams = scenarioRequestParamsFrom(caseData);
+        dashboardScenariosService.reconfigureCaseDashboardNotifications(uniqueCaseIdentifier, scenarioParams, roleType);
+    }
+
     private String resolveCaseReference(CaseData caseData) {
         if (caseData != null && caseData.getCcdCaseReference() != null) {
             return caseData.getCcdCaseReference().toString();

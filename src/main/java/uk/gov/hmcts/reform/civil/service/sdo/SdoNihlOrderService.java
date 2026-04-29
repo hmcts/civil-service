@@ -53,9 +53,9 @@ public class SdoNihlOrderService {
 
         SdoR2DisclosureOfDocuments disclosureOfDocuments = new SdoR2DisclosureOfDocuments();
         disclosureOfDocuments.setStandardDisclosureTxt(SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE);
-        disclosureOfDocuments.setStandardDisclosureDate(sdoDeadlineService.calendarDaysFromNow(28));
+        disclosureOfDocuments.setStandardDisclosureDate(sdoDeadlineService.nextWorkingDayFromNowWeeks(2));
         disclosureOfDocuments.setInspectionTxt(SdoR2UiConstantFastTrack.INSPECTION);
-        disclosureOfDocuments.setInspectionDate(sdoDeadlineService.calendarDaysFromNow(42));
+        disclosureOfDocuments.setInspectionDate(sdoDeadlineService.nextWorkingDayFromNowWeeks(3));
         disclosureOfDocuments.setRequestsWillBeCompiledLabel(SdoR2UiConstantFastTrack.REQUEST_COMPILED_WITH);
         caseData.setSdoR2DisclosureOfDocuments(disclosureOfDocuments);
 
@@ -64,9 +64,9 @@ public class SdoNihlOrderService {
         SdoR2ScheduleOfLoss scheduleOfLoss = new SdoR2ScheduleOfLoss();
         scheduleOfLoss.setSdoR2ScheduleOfLossClaimantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT);
         scheduleOfLoss.setIsClaimForPecuniaryLoss(NO);
-        scheduleOfLoss.setSdoR2ScheduleOfLossClaimantDate(sdoDeadlineService.calendarDaysFromNow(364));
+        scheduleOfLoss.setSdoR2ScheduleOfLossClaimantDate(sdoDeadlineService.nextWorkingDayFromNowWeeks(12));
         scheduleOfLoss.setSdoR2ScheduleOfLossDefendantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_DEFENDANT);
-        scheduleOfLoss.setSdoR2ScheduleOfLossDefendantDate(sdoDeadlineService.calendarDaysFromNow(378));
+        scheduleOfLoss.setSdoR2ScheduleOfLossDefendantDate(sdoDeadlineService.nextWorkingDayFromNowWeeks(14));
         scheduleOfLoss.setSdoR2ScheduleOfLossPecuniaryLossTxt(SdoR2UiConstantFastTrack.PECUNIARY_LOSS);
         caseData.setSdoR2ScheduleOfLoss(scheduleOfLoss);
 

@@ -59,7 +59,6 @@ public class JudicialNotificationService implements NotificationDataGA {
     private final GaForLipService gaForLipService;
 
     private final SolicitorEmailValidation solicitorEmailValidation;
-    private final JudicialDecisionHelper judicialDecisionHelper;
 
     private final FeatureToggleService featureToggleService;
     private final NotificationsSignatureConfiguration configuration;
@@ -96,14 +95,22 @@ public class JudicialNotificationService implements NotificationDataGA {
             case REQUEST_FOR_INFORMATION:
                 caseData = applicationRequestForInformation(caseData, civilCaseData, solicitorType);
                 break;
-            default:
             case NON_CRITERION:
+            default:
         }
         return caseData;
     }
 
     @Override
     public Map<String, String> addProperties(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData) {
+        addBaseProperties(caseData);
+        updateLipProperties(caseData);
+        addAllFooterItems(caseData, mainCaseData, customProps, configuration,
+                           featureToggleService.isPublicQueryManagementEnabledGa(caseData));
+        return customProps;
+    }
+
+    private void addBaseProperties(GeneralApplicationCaseData caseData) {
         customProps.put(
             GENAPP_REFERENCE,
             String.valueOf(Objects.requireNonNull(caseData.getCcdCaseReference()))
@@ -120,23 +127,30 @@ public class JudicialNotificationService implements NotificationDataGA {
             GA_APPLICATION_TYPE,
             Objects.requireNonNull(requiredGAType(caseData))
         );
+    }
 
-        if (gaForLipService.isGaForLip(caseData)) {
-            String caseTitle = JudicialFinalDecisionHandler.getAllPartyNames(caseData);
-            customProps.put(
-                CASE_TITLE,
-                Objects.requireNonNull(caseTitle)
-            );
+    private void updateLipProperties(GeneralApplicationCaseData caseData) {
+        if (!gaForLipService.isGaForLip(caseData)) {
+            clearLipProperties();
+            return;
         }
+        updateLipApplicantProperties(caseData);
+        updateLipRespondentProperties(caseData);
+        updateCaseTitle(caseData);
+    }
+
+    private void updateLipApplicantProperties(GeneralApplicationCaseData caseData) {
         if (gaForLipService.isLipApp(caseData)) {
             String isLipAppName = caseData.getApplicantPartyName();
-
             customProps.put(GA_LIP_APPLICANT_NAME, Objects.requireNonNull(isLipAppName));
             customProps.remove(GA_LIP_RESP_NAME);
+            return;
         }
+        customProps.remove(GA_LIP_APPLICANT_NAME);
+    }
 
-        if (gaForLipService.isLipResp(caseData)
-            && isRespondentNotificationMakeDecisionEvent(caseData)) {
+    private void updateLipRespondentProperties(GeneralApplicationCaseData caseData) {
+        if (gaForLipService.isLipResp(caseData) && isRespondentNotificationMakeDecisionEvent(caseData)) {
             String isLipRespondentName =
                 caseData.getParentClaimantIsApplicant() == NO ? caseData.getClaimant1PartyName() :
                     caseData.getDefendant1PartyName();
@@ -145,21 +159,22 @@ public class JudicialNotificationService implements NotificationDataGA {
                 Objects.requireNonNull(isLipRespondentName)
             );
             customProps.remove(GA_LIP_APPLICANT_NAME);
+            return;
         }
+        customProps.remove(GA_LIP_RESP_NAME);
+    }
 
-        if (gaForLipService.isGaForLip(caseData)) {
-            String caseTitle = JudicialFinalDecisionHandler.getAllPartyNames(caseData);
-            customProps.put(
-                CASE_TITLE,
-                Objects.requireNonNull(caseTitle));
-        } else {
-            customProps.remove(GA_LIP_APPLICANT_NAME);
-            customProps.remove(GA_LIP_RESP_NAME);
-            customProps.remove(CASE_TITLE);
-        }
-        addAllFooterItems(caseData, mainCaseData, customProps, configuration,
-                           featureToggleService.isPublicQueryManagementEnabledGa(caseData));
-        return customProps;
+    private void updateCaseTitle(GeneralApplicationCaseData caseData) {
+        String caseTitle = JudicialFinalDecisionHandler.getAllPartyNames(caseData);
+        customProps.put(
+            CASE_TITLE,
+            Objects.requireNonNull(caseTitle));
+    }
+
+    private void clearLipProperties() {
+        customProps.remove(GA_LIP_APPLICANT_NAME);
+        customProps.remove(GA_LIP_RESP_NAME);
+        customProps.remove(CASE_TITLE);
     }
 
     private void sendNotificationForJudicialDecision(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String recipient, String template)
@@ -176,9 +191,9 @@ public class JudicialNotificationService implements NotificationDataGA {
     }
 
     private void concurrentWrittenRepNotification(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String solicitorType) {
-        var concurrentDateText = Optional.ofNullable(caseData
+        var concurrentDateText = caseData
                                                          .getJudicialDecisionMakeAnOrderForWrittenRepresentations()
-                                                         .getWrittenConcurrentRepresentationsBy()).orElse(null);
+                                                         .getWrittenConcurrentRepresentationsBy();
         customProps.put(
             GA_JUDICIAL_CONCURRENT_DATE_TEXT,
             Objects.nonNull(concurrentDateText)
@@ -227,9 +242,8 @@ public class JudicialNotificationService implements NotificationDataGA {
 
     private void sequentialWrittenRepNotification(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String solicitorType) {
 
-        var sequentialDateTextRespondent = Optional
-            .ofNullable(caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations()
-                            .getSequentialApplicantMustRespondWithin()).orElse(null);
+        var sequentialDateTextRespondent = caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations()
+                        .getSequentialApplicantMustRespondWithin();
 
         customProps.put(
             GA_JUDICIAL_SEQUENTIAL_DATE_TEXT_RESPONDENT,
@@ -267,56 +281,67 @@ public class JudicialNotificationService implements NotificationDataGA {
     }
 
     private GeneralApplicationCaseData applicationRequestForInformation(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String solicitorType) {
-
-        if (solicitorType.equals(RESPONDENT)
-            && (caseData.getCcdState().equals(APPLICATION_ADD_PAYMENT))) {
-
-            // Send notification to respondent if payment is made
-            caseData = addDeadlineForMoreInformationUncloakedApplication(caseData);
-            var requestForInformationDeadline = caseData.getGeneralAppNotificationDeadlineDate();
-
-            customProps.put(
-                GA_NOTIFICATION_DEADLINE,
-                Objects.nonNull(requestForInformationDeadline)
-                    ? DateFormatHelper
-                    .formatLocalDateTime(requestForInformationDeadline, DATE) : null);
-
-            if (areRespondentSolicitorsPresent(caseData)) {
-                String template = notificationProperties.getGeneralApplicationRespondentEmailTemplate();
-                if (useGaForLipRespondentTemplate(caseData)) {
-                    template = getLiPRespondentTemplate(caseData);
-                }
-                sendEmailToRespondent(
-                    caseData,
-                    mainCaseData,
-                    template
-                );
-            }
-            customProps.remove(GA_NOTIFICATION_DEADLINE);
-
-        } else if ((isSendUncloakAdditionalFeeEmailForWithoutNotice(caseData)
-            || isSendUncloakAdditionalFeeEmailConsentOrder(caseData))
-            && caseData.getJudicialDecisionRequestMoreInfo().getRequestMoreInfoOption() == SEND_APP_TO_OTHER_PARTY) {
-            // Send notification to applicant only if it's without notice application
-            if (solicitorType.equals(APPLICANT)) {
-                String appSolicitorEmail = caseData.getGeneralAppApplnSolicitor().getEmail();
-
-                String template = notificationProperties.getJudgeUncloakApplicationEmailTemplate();
-                if (useGaForLipApplicantTemplate(caseData)) {
-                    template = getLiPApplicantTemplate(caseData);
-                }
-                sendNotificationForJudicialDecision(
-                    caseData,
-                    mainCaseData,
-                    appSolicitorEmail,
-                        template
-                );
-            }
-        } else {
-            // send notification to applicant and respondent if it's with notice application
-            sendToBoth(caseData, mainCaseData, solicitorType);
+        if (isRespondentAdditionalPaymentNotification(caseData, solicitorType)) {
+            return sendRespondentAdditionalPaymentNotification(caseData, mainCaseData);
         }
+
+        if (shouldNotifyApplicantOnly(caseData)) {
+            sendApplicantUncloakNotification(caseData, mainCaseData, solicitorType);
+            return caseData;
+        }
+
+        sendToBoth(caseData, mainCaseData, solicitorType);
         return caseData;
+    }
+
+    private boolean isRespondentAdditionalPaymentNotification(GeneralApplicationCaseData caseData, String solicitorType) {
+        return RESPONDENT.equals(solicitorType) && caseData.getCcdState().equals(APPLICATION_ADD_PAYMENT);
+    }
+
+    private GeneralApplicationCaseData sendRespondentAdditionalPaymentNotification(GeneralApplicationCaseData caseData,
+                                                                                   GeneralApplicationCaseData mainCaseData) {
+        caseData = addDeadlineForMoreInformationUncloakedApplication(caseData);
+        LocalDateTime requestForInformationDeadline = caseData.getGeneralAppNotificationDeadlineDate();
+        customProps.put(
+            GA_NOTIFICATION_DEADLINE,
+            Objects.nonNull(requestForInformationDeadline)
+                ? DateFormatHelper.formatLocalDateTime(requestForInformationDeadline, DATE) : null
+        );
+
+        if (areRespondentSolicitorsPresent(caseData)) {
+            sendEmailToRespondent(caseData, mainCaseData, getAdditionalPaymentRespondentTemplate(caseData));
+        }
+        customProps.remove(GA_NOTIFICATION_DEADLINE);
+        return caseData;
+    }
+
+    private String getAdditionalPaymentRespondentTemplate(GeneralApplicationCaseData caseData) {
+        return useGaForLipRespondentTemplate(caseData)
+            ? getLiPRespondentTemplate(caseData)
+            : notificationProperties.getGeneralApplicationRespondentEmailTemplate();
+    }
+
+    private boolean shouldNotifyApplicantOnly(GeneralApplicationCaseData caseData) {
+        return (isSendUncloakAdditionalFeeEmailForWithoutNotice(caseData)
+            || isSendUncloakAdditionalFeeEmailConsentOrder(caseData))
+            && caseData.getJudicialDecisionRequestMoreInfo().getRequestMoreInfoOption() == SEND_APP_TO_OTHER_PARTY;
+    }
+
+    private void sendApplicantUncloakNotification(GeneralApplicationCaseData caseData,
+                                                  GeneralApplicationCaseData mainCaseData,
+                                                  String solicitorType) {
+        if (!APPLICANT.equals(solicitorType)) {
+            return;
+        }
+
+        sendNotificationForJudicialDecision(
+            caseData,
+            mainCaseData,
+            caseData.getGeneralAppApplnSolicitor().getEmail(),
+            useGaForLipApplicantTemplate(caseData)
+                ? getLiPApplicantTemplate(caseData)
+                : notificationProperties.getJudgeUncloakApplicationEmailTemplate()
+        );
     }
 
     private void sendToBoth(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String solicitorType) {
@@ -346,93 +371,60 @@ public class JudicialNotificationService implements NotificationDataGA {
         customProps.remove(GA_REQUEST_FOR_INFORMATION_DEADLINE);
     }
 
-    private GeneralApplicationCaseData applicationRequestForInformationCloak(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String solicitorType) {
-
-        if (solicitorType.equals(APPLICANT)) {
-            addCustomPropsForRespondDeadline(caseData.getJudicialDecisionRequestMoreInfo()
-                                                 .getJudgeRequestMoreInfoByDate());
-            sendNotificationForJudicialDecision(
-                caseData,
-                mainCaseData,
-                caseData.getGeneralAppApplnSolicitor().getEmail(),
-                useGaForLipApplicantTemplate(caseData) ? getLiPApplicantTemplate(caseData)
-                    : notificationProperties.getJudgeRequestForInformationApplicantEmailTemplate()
-            );
-
-            customProps.remove(GA_REQUEST_FOR_INFORMATION_DEADLINE);
-        }
-
-        return caseData;
+    private void applicationApprovedNotification(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String solicitorType) {
+        sendApprovedNotificationToRespondent(caseData, mainCaseData, solicitorType);
+        sendApprovedNotificationToApplicant(caseData, mainCaseData, solicitorType);
     }
 
-    private void applicationApprovedNotification(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String solicitorType) {
-
-        if (solicitorType.equals(RESPONDENT)) {
-            boolean sendEmailToDefendant = areRespondentSolicitorsPresent(caseData);
-
-            if (sendEmailToDefendant) {
-                if (useDamageTemplate(caseData)) {
-                    sendEmailToRespondent(
-                        caseData,
-                        mainCaseData,
-                        notificationProperties.getJudgeApproveOrderToStrikeOutDamages()
-                    );
-                } else if (useOcmcTemplate(caseData)) {
-                    sendEmailToRespondent(
-                        caseData,
-                        mainCaseData,
-                        notificationProperties.getJudgeApproveOrderToStrikeOutOCMC()
-                    );
-                } else if (useGaForLipRespondentTemplate(caseData)) {
-                    sendEmailToRespondent(
-                        caseData,
-                        mainCaseData,
-                        getLiPRespondentTemplate(caseData)
-                    );
-                } else {
-                    sendEmailToRespondent(
-                        caseData,
-                        mainCaseData,
-                        notificationProperties.getJudgeForApproveRespondentEmailTemplate()
-                    );
-                }
-            }
+    private void sendApprovedNotificationToRespondent(GeneralApplicationCaseData caseData,
+                                                      GeneralApplicationCaseData mainCaseData,
+                                                      String solicitorType) {
+        if (!RESPONDENT.equals(solicitorType) || !areRespondentSolicitorsPresent(caseData)) {
+            return;
         }
 
-        if (solicitorType.equals(APPLICANT)) {
-            String appSolicitorEmail = caseData.getGeneralAppApplnSolicitor().getEmail();
+        sendEmailToRespondent(caseData, mainCaseData, getApprovedRespondentTemplate(caseData));
+    }
 
-            if (useDamageTemplate(caseData)) {
-                sendNotificationForJudicialDecision(
-                    caseData,
-                    mainCaseData,
-                    appSolicitorEmail,
-                    notificationProperties.getJudgeApproveOrderToStrikeOutDamages()
-                );
-            } else if (useOcmcTemplate(caseData)) {
-                sendNotificationForJudicialDecision(
-                    caseData,
-                    mainCaseData,
-                    appSolicitorEmail,
-                    notificationProperties.getJudgeApproveOrderToStrikeOutOCMC()
-                );
-            } else if (useGaForLipApplicantTemplate(caseData)) {
-                sendNotificationForJudicialDecision(
-                    caseData,
-                    mainCaseData,
-                    appSolicitorEmail,
-                    getLiPApplicantTemplate(caseData)
-                );
-            } else {
-                sendNotificationForJudicialDecision(
-                    caseData,
-                    mainCaseData,
-                    appSolicitorEmail,
-                    notificationProperties.getJudgeForApprovedCaseApplicantEmailTemplate()
-                );
-            }
+    private void sendApprovedNotificationToApplicant(GeneralApplicationCaseData caseData,
+                                                     GeneralApplicationCaseData mainCaseData,
+                                                     String solicitorType) {
+        if (!APPLICANT.equals(solicitorType)) {
+            return;
         }
 
+        sendNotificationForJudicialDecision(
+            caseData,
+            mainCaseData,
+            caseData.getGeneralAppApplnSolicitor().getEmail(),
+            getApprovedApplicantTemplate(caseData)
+        );
+    }
+
+    private String getApprovedRespondentTemplate(GeneralApplicationCaseData caseData) {
+        if (useDamageTemplate(caseData)) {
+            return notificationProperties.getJudgeApproveOrderToStrikeOutDamages();
+        }
+        if (useOcmcTemplate(caseData)) {
+            return notificationProperties.getJudgeApproveOrderToStrikeOutOCMC();
+        }
+        if (useGaForLipRespondentTemplate(caseData)) {
+            return getLiPRespondentTemplate(caseData);
+        }
+        return notificationProperties.getJudgeForApproveRespondentEmailTemplate();
+    }
+
+    private String getApprovedApplicantTemplate(GeneralApplicationCaseData caseData) {
+        if (useDamageTemplate(caseData)) {
+            return notificationProperties.getJudgeApproveOrderToStrikeOutDamages();
+        }
+        if (useOcmcTemplate(caseData)) {
+            return notificationProperties.getJudgeApproveOrderToStrikeOutOCMC();
+        }
+        if (useGaForLipApplicantTemplate(caseData)) {
+            return getLiPApplicantTemplate(caseData);
+        }
+        return notificationProperties.getJudgeForApprovedCaseApplicantEmailTemplate();
     }
 
     private void applicationListForHearing(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String solicitorType) {
@@ -545,59 +537,6 @@ public class JudicialNotificationService implements NotificationDataGA {
         }
     }
 
-    private void judgeApprovedOrderApplicationCloak(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String solicitorType) {
-
-        if (solicitorType.equals(APPLICANT)) {
-            String appSolicitorEmail = caseData.getGeneralAppApplnSolicitor().getEmail();
-            if (useDamageTemplate(caseData)) {
-                sendNotificationForJudicialDecision(caseData,
-                                                    mainCaseData,
-                                                    appSolicitorEmail,
-                                                    notificationProperties.getJudgeApproveOrderToStrikeOutDamages());
-            } else if (useOcmcTemplate(caseData)) {
-                sendNotificationForJudicialDecision(caseData,
-                                                    mainCaseData,
-                                                    appSolicitorEmail,
-                                                    notificationProperties.getJudgeApproveOrderToStrikeOutOCMC());
-            } else if (useGaForLipApplicantTemplate(caseData)) {
-                sendNotificationForJudicialDecision(caseData,
-                                                    mainCaseData,
-                                                    appSolicitorEmail,
-                                                    notificationProperties.getLipGeneralAppApplicantEmailTemplate());
-            } else {
-                sendNotificationForJudicialDecision(caseData,
-                                                    mainCaseData,
-                                                    appSolicitorEmail,
-                                                    notificationProperties
-                                                        .getJudgeForApprovedCaseApplicantEmailTemplate());
-            }
-        }
-    }
-
-    private void judgeDismissedOrderApplicationCloak(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String solicitorType) {
-        if (solicitorType.equals(APPLICANT)) {
-            sendNotificationForJudicialDecision(
-                caseData,
-                mainCaseData,
-                caseData.getGeneralAppApplnSolicitor().getEmail(),
-                useGaForLipApplicantTemplate(caseData) ? notificationProperties.getLipGeneralAppApplicantEmailTemplate()
-                    : notificationProperties.getJudgeDismissesOrderApplicantEmailTemplate()
-            );
-        }
-    }
-
-    private void applicationDirectionOrderCloak(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String solicitorType) {
-        if (solicitorType.equals(APPLICANT)) {
-            sendNotificationForJudicialDecision(
-                caseData,
-                mainCaseData,
-                caseData.getGeneralAppApplnSolicitor().getEmail(),
-                useGaForLipApplicantTemplate(caseData) ? notificationProperties.getLipGeneralAppApplicantEmailTemplate()
-                    : notificationProperties.getJudgeForDirectionOrderApplicantEmailTemplate()
-            );
-        }
-    }
-
     private void sendEmailToRespondent(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String notificationProperties) {
         caseData.getGeneralAppRespondentSolicitors().forEach(
             respondentSolicitor -> sendNotificationForJudicialDecision(caseData,
@@ -620,11 +559,7 @@ public class JudicialNotificationService implements NotificationDataGA {
     }
 
     private String getSolicitorReferences(String emailPartyReference) {
-        if (emailPartyReference != null) {
-            return emailPartyReference;
-        } else {
-            return EMPTY_SOLICITOR_REFERENCES_1V1;
-        }
+        return Objects.requireNonNullElse(emailPartyReference, EMPTY_SOLICITOR_REFERENCES_1V1);
     }
 
     private  void addCustomPropsForRespondDeadline(LocalDate requestForInformationDeadline) {

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.RuntimeService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +48,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -133,7 +133,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
                                                              Address.fromContactInformation(getOrganisation()
                                                                                                 .get()
                                                                                                 .getContactInformation()
-                                                                                                .get(0)),
+                                                                                                .getFirst()),
                                                              "claimant",
                                                              "BEARER_TOKEN",
                                                              false);
@@ -142,7 +142,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
                                                              Address.fromContactInformation(getOrganisation()
                                                                                                 .get()
                                                                                                 .getContactInformation()
-                                                                                                .get(0)),
+                                                                                                .getFirst()),
                                                              "defendant",
                                                              "BEARER_TOKEN",
                                                              false);
@@ -151,6 +151,64 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getApplicant1NoticeOfDiscontinueCWViewDoc()).isNotNull();
             assertThat(updatedData.getRespondent1NoticeOfDiscontinueCWViewDoc()).isNotNull();
+        }
+
+        @Test
+        void shouldGenerateNoticeOfDiscontinueDocForCW_whenCourtPermissionRequired_1vs2() {
+            when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString(), anyBoolean()))
+                .thenReturn(getCaseDocument());
+            Optional<uk.gov.hmcts.reform.civil.prd.model.Organisation> organisation = getOrganisationWithoutName();
+            when(organisationService.findOrganisationById(anyString())).thenReturn(organisation);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1(getRespondent1PartyDetails());
+            caseData.setRespondent2(getRespondent2PartyDetails());
+            caseData.setApplicant1(getApplicant1PartyDetails());
+            caseData.setAddRespondent2(YesOrNo.YES);
+            caseData.setRespondent2SameLegalRepresentative(YesOrNo.NO);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.YES);
+            caseData.setIsPermissionGranted(SettleDiscontinueYesOrNoList.YES);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            StatementOfTruth respondent1StatementOfTruth = new StatementOfTruth();
+            respondent1StatementOfTruth.setName("Signer 2 Name");
+            caseData.setRespondent1DQ(new Respondent1DQ().setRespondent1DQStatementOfTruth(respondent1StatementOfTruth));
+            StatementOfTruth respondent2StatementOfTruth = new StatementOfTruth();
+            respondent2StatementOfTruth.setName("Signer 3 Name");
+            caseData.setRespondent2DQ(new Respondent2DQ().setRespondent2DQStatementOfTruth(respondent2StatementOfTruth));
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+            caseData.setBusinessProcess(businessProcess);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            if (organisation.isPresent()) {
+                Address address = Address.fromContactInformation(organisation.get().getContactInformation().getFirst());
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "Signer Name",
+                                                             address,
+                                                             "claimant",
+                                                             "BEARER_TOKEN",
+                                                             false);
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "Signer 2 Name",
+                                                             address,
+                                                             "defendant1",
+                                                             "BEARER_TOKEN",
+                                                             false);
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "Signer 3 Name",
+                                                             address,
+                                                             "defendant2",
+                                                             "BEARER_TOKEN",
+                                                             false);
+            }
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getApplicant1NoticeOfDiscontinueCWViewDoc()).isNotNull();
+            assertThat(updatedData.getRespondent1NoticeOfDiscontinueCWViewDoc()).isNotNull();
+            assertThat(updatedData.getRespondent2NoticeOfDiscontinueCWViewDoc()).isNotNull();
         }
 
         @Test
@@ -189,7 +247,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
                                                              Address.fromContactInformation(getOrganisation()
                                                                                                 .get()
                                                                                                 .getContactInformation()
-                                                                                                .get(0)),
+                                                                                                .getFirst()),
                                                              "claimant",
                                                              "BEARER_TOKEN",
                                                              false);
@@ -198,7 +256,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
                                                              Address.fromContactInformation(getOrganisation()
                                                                                                 .get()
                                                                                                 .getContactInformation()
-                                                                                                .get(0)),
+                                                                                                .getFirst()),
                                                              "defendant1",
                                                              "BEARER_TOKEN",
                                                              false);
@@ -207,7 +265,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
                                                              Address.fromContactInformation(getOrganisation()
                                                                                                 .get()
                                                                                                 .getContactInformation()
-                                                                                                .get(0)),
+                                                                                                .getFirst()),
                                                              "defendant2",
                                                              "BEARER_TOKEN",
                                                              false);
@@ -242,7 +300,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
                                                              Address.fromContactInformation(getOrganisation()
                                                                                                 .get()
                                                                                                 .getContactInformation()
-                                                                                                .get(0)),
+                                                                                                .getFirst()),
                                                              "claimant",
                                                              "BEARER_TOKEN",
                                                              false);
@@ -251,7 +309,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
                                                              Address.fromContactInformation(getOrganisation()
                                                                                                 .get()
                                                                                                 .getContactInformation()
-                                                                                                .get(0)),
+                                                                                                .getFirst()),
                                                              "defendant",
                                                              "BEARER_TOKEN",
                                                              false);
@@ -290,7 +348,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
                                                              Address.fromContactInformation(getOrganisation()
                                                                                                 .get()
                                                                                                 .getContactInformation()
-                                                                                                .get(0)),
+                                                                                                .getFirst()),
                                                              "claimant",
                                                              "BEARER_TOKEN", false);
                 verify(formGenerator, times(1)).generateDocs(caseData,
@@ -445,8 +503,38 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         List<Element<CaseDocument>> translatedDocuments = updatedData.getPreTranslationDocuments();
-        assertEquals(1, translatedDocuments.size());
-        assertEquals(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE, updatedData.getPreTranslationDocumentType());
+        Assertions.assertEquals(1, translatedDocuments.size());
+        Assertions.assertEquals(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE, updatedData.getPreTranslationDocumentType());
+    }
+
+    @Test
+    void shouldUpdateWelshEnabledCamundaVariable_whenWelshConditionsAreMet() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        when(formGenerator.generateDocs(
+            any(CaseData.class),
+            anyString(), any(Address.class), anyString(), anyString(), anyBoolean()
+        )).thenReturn(getCaseDocument());
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setRespondent1(getRespondent1PartyDetails());
+        caseData.setApplicant1(getApplicant1PartyDetails());
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+        caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+        RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+        respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        caseData.setBusinessProcess(businessProcess);
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
+
+        handler.handle(params);
+
+        verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "WELSH_ENABLED", true);
     }
 
     @Test

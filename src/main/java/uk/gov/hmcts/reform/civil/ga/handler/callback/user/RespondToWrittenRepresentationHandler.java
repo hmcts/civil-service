@@ -46,6 +46,8 @@ import static uk.gov.hmcts.reform.civil.ga.utils.DocUploadUtils.RESPONDENT_ONE;
 @RequiredArgsConstructor
 public class RespondToWrittenRepresentationHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
+    private static final String WRITTEN_REPRESENTATION = "Written representation";
+
     private final ObjectMapper objectMapper;
     private final CaseDetailsConverter caseDetailsConverter;
     private final IdamClient idamClient;
@@ -65,75 +67,159 @@ public class RespondToWrittenRepresentationHandler extends CallbackHandler imple
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
-
-        GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String userId = idamClient.getUserInfo(authToken).getUid();
+        SubmissionContext submissionContext = buildSubmissionContext(callbackParams);
+        GeneralApplicationCaseData caseData = submissionContext.caseData();
         GeneralApplicationCaseData caseDataBuilder = caseData.copy();
-        String role = DocUploadUtils.getUserRole(caseData, userId);
-        List<Element<Document>> responseDocumentToBeAdded = caseData.getGeneralAppWrittenRepUpload();
-        if (Objects.isNull(responseDocumentToBeAdded)) {
-            responseDocumentToBeAdded = new ArrayList<>();
-        }
-        boolean translationRequired = false;
-        PreTranslationGaDocumentType waDocumentType = null;
-        if (Objects.nonNull(caseData.getGeneralAppWrittenRepText())) {
-            if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
-                translationRequired = true;
-                waDocumentType = WRITTEN_REPS_RESPONSE_DOC;
-            }
-            CaseDocument caseDocument = respondToWrittenRepresentation.generate(caseData,
-                                                                                callbackParams.getParams().get(
-                                                                                    BEARER_TOKEN).toString(), role
-            );
-            responseDocumentToBeAdded.add(ElementUtils.element(caseDocument.getDocumentLink()));
-        }
-        caseDataBuilder.preTranslationGaDocumentType(waDocumentType);
-        if (!translationRequired) {
-            DocUploadUtils.addDocumentToAddl(
-                caseData,
-                caseDataBuilder,
-                responseDocumentToBeAdded,
-                role,
-                CaseEvent.RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION,
-                false
-            );
-        } else {
-            DocUploadUtils.addDocumentToPreTranslation(
-                caseData,
-                caseDataBuilder,
-                responseDocumentToBeAdded,
-                role,
-                CaseEvent.RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION
-            );
-        }
-        if (featureToggleService.isGaForWelshEnabled()) {
-            DocUploadUtils.setRespondedValues(caseDataBuilder, role);
-        }
-        caseDataBuilder.generalAppWrittenRepUpload(Collections.emptyList());
-        caseDataBuilder.generalAppWrittenRepText(null);
-        caseDataBuilder.businessProcess(BusinessProcess.readyGa(RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION)).build();
-        GeneralApplicationCaseData updatedCaseData = caseDataBuilder.build();
+        List<Element<Document>> responseDocuments = getResponseDocuments(caseData);
+        TranslationState translationState = appendGeneratedWrittenRepresentation(
+            caseData,
+            responseDocuments,
+            submissionContext.authToken(),
+            submissionContext.role()
+        );
 
-        // Generate Dashboard Notification for Lip Party
-        if (gaForLipService.isGaForLip(caseData)) {
-            log.info("General dashboard notification for Lip party for caseId: {}", caseData.getCcdCaseReference());
-            boolean sendDashboardNotificationToOtherParty =
-                !(translationRequired || DocUploadUtils.uploadedDocumentAwaitingTranslation(caseData, role, "Written representation"));
-            if (sendDashboardNotificationToOtherParty) {
-                docUploadDashboardNotificationService.createDashboardNotification(caseData, role, authToken, false);
-            }
-            if (role.equals(APPLICANT) || sendDashboardNotificationToOtherParty) {
-                docUploadDashboardNotificationService.createResponseDashboardNotification(caseData, "APPLICANT", authToken);
-            }
-            if (role.equals(RESPONDENT_ONE) || sendDashboardNotificationToOtherParty) {
-                docUploadDashboardNotificationService.createResponseDashboardNotification(caseData, "RESPONDENT", authToken);
-            }
-        }
+        caseDataBuilder.preTranslationGaDocumentType(translationState.documentType());
+        storeResponseDocuments(
+            caseData,
+            caseDataBuilder,
+            responseDocuments,
+            submissionContext.role(),
+            translationState.translationRequired()
+        );
+        updateResponseFlags(caseDataBuilder, submissionContext.role());
+        GeneralApplicationCaseData updatedCaseData = buildUpdatedCaseData(caseDataBuilder);
+
+        sendLipNotifications(
+            caseData,
+            submissionContext.role(),
+            submissionContext.authToken(),
+            translationState.translationRequired()
+        );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
+    }
+
+    private SubmissionContext buildSubmissionContext(CallbackParams callbackParams) {
+        GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(
+            callbackParams.getRequest().getCaseDetails()
+        );
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String userId = idamClient.getUserInfo(authToken).getUid();
+        String role = DocUploadUtils.getUserRole(caseData, userId);
+        return new SubmissionContext(caseData, authToken, role);
+    }
+
+    private List<Element<Document>> getResponseDocuments(GeneralApplicationCaseData caseData) {
+        return Objects.nonNull(caseData.getGeneralAppWrittenRepUpload())
+            ? caseData.getGeneralAppWrittenRepUpload() : new ArrayList<>();
+    }
+
+    private TranslationState appendGeneratedWrittenRepresentation(GeneralApplicationCaseData caseData,
+                                                                  List<Element<Document>> responseDocuments,
+                                                                  String authToken,
+                                                                  String role) {
+        boolean hasGeneratedWrittenRepresentation = hasGeneratedWrittenRepresentation(caseData);
+        boolean translationRequired = false;
+        PreTranslationGaDocumentType documentType = null;
+
+        if (hasGeneratedWrittenRepresentation) {
+            translationRequired = isTranslationRequired(caseData);
+            documentType = translationRequired ? WRITTEN_REPS_RESPONSE_DOC : null;
+        }
+
+        if (hasGeneratedWrittenRepresentation) {
+            CaseDocument caseDocument = respondToWrittenRepresentation.generate(caseData, authToken, role);
+            responseDocuments.add(ElementUtils.element(caseDocument.getDocumentLink()));
+        }
+
+        return new TranslationState(translationRequired, documentType);
+    }
+
+    private boolean hasGeneratedWrittenRepresentation(GeneralApplicationCaseData caseData) {
+        return Objects.nonNull(caseData.getGeneralAppWrittenRepText());
+    }
+
+    private boolean isTranslationRequired(GeneralApplicationCaseData caseData) {
+        return featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual();
+    }
+
+    private void storeResponseDocuments(GeneralApplicationCaseData caseData,
+                                        GeneralApplicationCaseData caseDataBuilder,
+                                        List<Element<Document>> responseDocuments,
+                                        String role,
+                                        boolean translationRequired) {
+        if (!translationRequired) {
+            DocUploadUtils.addDocumentToAddl(
+                caseData,
+                caseDataBuilder,
+                responseDocuments,
+                role,
+                CaseEvent.RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION,
+                false
+            );
+            return;
+        }
+
+        DocUploadUtils.addDocumentToPreTranslation(
+            caseData,
+            caseDataBuilder,
+            responseDocuments,
+            role,
+            CaseEvent.RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION
+        );
+    }
+
+    private void updateResponseFlags(GeneralApplicationCaseData caseDataBuilder, String role) {
+        if (featureToggleService.isGaForWelshEnabled()) {
+            DocUploadUtils.setRespondedValues(caseDataBuilder, role);
+        }
+    }
+
+    private GeneralApplicationCaseData buildUpdatedCaseData(GeneralApplicationCaseData caseDataBuilder) {
+        caseDataBuilder.generalAppWrittenRepUpload(Collections.emptyList());
+        caseDataBuilder.generalAppWrittenRepText(null);
+        caseDataBuilder.businessProcess(BusinessProcess.readyGa(RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION)).build();
+        return caseDataBuilder.build();
+    }
+
+    private void sendLipNotifications(GeneralApplicationCaseData caseData,
+                                      String role,
+                                      String authToken,
+                                      boolean translationRequired) {
+        if (!gaForLipService.isGaForLip(caseData)) {
+            return;
+        }
+
+        log.info("General dashboard notification for Lip party for caseId: {}", caseData.getCcdCaseReference());
+        boolean sendDashboardNotificationToOtherParty = shouldSendDashboardNotificationToOtherParty(
+            caseData,
+            role,
+            translationRequired
+        );
+        if (sendDashboardNotificationToOtherParty) {
+            docUploadDashboardNotificationService.createDashboardNotification(caseData, role, authToken, false);
+        }
+        if (role.equals(APPLICANT) || sendDashboardNotificationToOtherParty) {
+            docUploadDashboardNotificationService.createResponseDashboardNotification(caseData, "APPLICANT", authToken);
+        }
+        if (role.equals(RESPONDENT_ONE) || sendDashboardNotificationToOtherParty) {
+            docUploadDashboardNotificationService.createResponseDashboardNotification(caseData, "RESPONDENT", authToken);
+        }
+    }
+
+    private boolean shouldSendDashboardNotificationToOtherParty(GeneralApplicationCaseData caseData,
+                                                                String role,
+                                                                boolean translationRequired) {
+        return !(translationRequired
+            || DocUploadUtils.uploadedDocumentAwaitingTranslation(caseData, role, WRITTEN_REPRESENTATION));
+    }
+
+    private record TranslationState(boolean translationRequired, PreTranslationGaDocumentType documentType) {
+    }
+
+    private record SubmissionContext(GeneralApplicationCaseData caseData, String authToken, String role) {
     }
 
     @Override

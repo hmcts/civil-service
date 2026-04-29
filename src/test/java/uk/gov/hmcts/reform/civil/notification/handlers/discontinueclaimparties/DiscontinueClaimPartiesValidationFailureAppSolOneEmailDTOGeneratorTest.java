@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -96,5 +97,22 @@ public class DiscontinueClaimPartiesValidationFailureAppSolOneEmailDTOGeneratorT
             .build();
 
         assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotifyReturnFalse_whenConfirmOrderGivesPermissionIsNull() {
+        CaseData caseData = CaseData.builder().build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldNotifyReturnFalse_whenApplicantIsLipEvenIfPermissionIsNo() {
+        CaseData caseData = CaseData.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .confirmOrderGivesPermission(ConfirmOrderGivesPermission.NO)
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
     }
 }

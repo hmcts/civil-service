@@ -101,8 +101,8 @@ public class SdoTrackDefaultsService {
     }
 
     private void initialiseTrackDefaults(CaseData caseData) {
-        caseData.setSmallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
-        caseData.setFastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
+        caseData.setSmallClaimsMethod(SmallClaimsMethod.SMALL_CLAIMS_METHOD_IN_PERSON);
+        caseData.setFastTrackMethod(FastTrackMethod.FAST_TRACK_METHOD_IN_PERSON);
     }
 
     private SdoR2WelshLanguageUsage buildWelshLanguageUsage() {

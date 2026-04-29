@@ -84,7 +84,7 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
             caseData.setDrawDirectionsOrderSmallClaims(NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1.name()).build()
@@ -138,7 +138,7 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
             caseData.setDrawDirectionsOrderSmallClaims(NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1.name()).build()

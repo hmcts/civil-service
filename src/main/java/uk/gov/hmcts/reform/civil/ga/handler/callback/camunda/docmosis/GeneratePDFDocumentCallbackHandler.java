@@ -109,554 +109,495 @@ public class GeneratePDFDocumentCallbackHandler extends CallbackHandler implemen
     }
 
     private CallbackResponse createPDFDocument(CallbackParams callbackParams) {
-
-        /*
-         * Setting up the CategoryID for Order documents will be covered under CIV-8316
-         * as it has dependency on CIV-7926.
-         *
-         * Uncomment the assignCategoryID code for setting up the categoryID after CIV-7926 is merged in Civil repo
-         * */
-
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Create PDF document for case: {}", caseData.getCcdCaseReference());
+        GenerationContext context = buildGenerationContext(callbackParams, caseData);
+        GenerationResult generationResult = generateDecisionDocuments(context);
 
-        GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData().build();
-        if (gaForLipService.isGaForLip(caseData)) {
-            civilCaseData = caseDetailsConverter
-                .toGeneralApplicationCaseData(coreCaseDataService
-                                .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
-
-        }
-
-        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
-        CaseDocument decision = null;
-        CaseDocument postJudgeOrderToLipApplicant = null;
-        CaseDocument postJudgeOrderToLipRespondent = null;
-        if (Objects.nonNull(caseData.getApproveConsentOrder())) {
-            decision = consentOrderGenerator.generate(
-                caseDataBuilder.build(),
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            );
-
-            List<Element<CaseDocument>> consentOrderDocumentList =
-                ofNullable(caseData.getConsentOrderDocument()).orElse(newArrayList());
-
-            consentOrderDocumentList.addAll(wrapElements(decision));
-
-            assignCategoryId.assignCategoryIdToCollection(consentOrderDocumentList,
-                                                          document -> document.getValue().getDocumentLink(),
-                                                          AssignCategoryId.ORDER_DOCUMENTS);
-            caseDataBuilder.consentOrderDocument(consentOrderDocumentList);
-        } else if (Objects.nonNull(caseData.getFinalOrderSelection())) {
-            if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
-                decision = freeFormOrderGenerator.generate(
-                        caseDataBuilder.build(),
-                        callbackParams.getParams().get(BEARER_TOKEN).toString()
-                );
-
-                /*
-                 * Generate Judge Request for Information order document with LIP Applicant Post Address
-                 * */
-                if (gaForLipService.isLipApp(caseData)
-                    && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-
-                    postJudgeOrderToLipApplicant = generateFreeFormSendLetterDocForApplicant(
-                        civilCaseData,
-                        caseData,
-                        callbackParams.getParams().get(BEARER_TOKEN).toString());
-                }
-
-                /*
-                 * Generate Judge Request for Information order document with LIP Respondent Post Address
-                 * */
-                if (gaForLipService.isLipResp(caseData)
-                    && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-
-                    postJudgeOrderToLipRespondent = generateFreeFormSendLetterDocForRespondent(
-                        civilCaseData,
-                        caseData,
-                        callbackParams.getParams().get(BEARER_TOKEN).toString());
-                }
-
-            } else if (caseData.getFinalOrderSelection().equals(ASSISTED_ORDER)) {
-
-                decision = assistedOrderFormGenerator.generate(
-                        caseDataBuilder.build(),
-                        callbackParams.getParams().get(BEARER_TOKEN).toString()
-                );
-
-                /*
-                 * Generate Judge Request for Information order document with LIP Applicant Post Address
-                 * */
-                if (gaForLipService.isLipApp(caseData)
-                    && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                    postJudgeOrderToLipApplicant = assistedOrderFormGenerator.generate(
-                        civilCaseData,
-                        caseData,
-                        callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                        FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT
-                    );
-                }
-
-                /*
-                 * Generate Judge Request for Information order document with LIP Respondent Post Address
-                 * */
-                if (gaForLipService.isLipResp(caseData)
-                    && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                    postJudgeOrderToLipRespondent = assistedOrderFormGenerator.generate(
-                        civilCaseData,
-                        caseData,
-                        callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                        FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT
-                    );
-                }
-            }
-            if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
-                setPreTranslationDocument(
-                    caseData,
-                    caseDataBuilder,
-                    decision,
-                    PreTranslationGaDocumentType.FINAL_ORDER_DOC
-                );
-            } else {
-                List<Element<CaseDocument>> newGeneralOrderDocumentList =
-                    ofNullable(caseData.getGeneralOrderDocument()).orElse(newArrayList());
-
-                newGeneralOrderDocumentList.addAll(wrapElements(decision));
-
-                assignCategoryId.assignCategoryIdToCollection(
-                    newGeneralOrderDocumentList,
-                    document -> document.getValue().getDocumentLink(),
-                    AssignCategoryId.ORDER_DOCUMENTS
-                );
-                caseDataBuilder.generalOrderDocument(newGeneralOrderDocumentList);
-            }
-        } else if (isGeneralOrder(caseData)) {
-            decision = generalOrderGenerator.generate(
-                caseDataBuilder.build(),
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            );
-
-            /*
-             * Generate Judge Request for Information order document with LIP Applicant Post Address
-             * */
-            if (gaForLipService.isLipApp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipApplicant = generalOrderGenerator.generate(civilCaseData,
-                    caseDataBuilder.build(),
-                    callbackParams.getParams().get(BEARER_TOKEN).toString(), FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT
-                );
-            }
-
-            /*
-             * Generate Judge Request for Information order document with LIP Respondent Post Address
-             * */
-            if (gaForLipService.isLipResp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipRespondent = generalOrderGenerator
-                    .generate(civilCaseData,
-                              caseDataBuilder.build(),
-                              callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                              FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT
-                );
-            }
-            if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
-                setPreTranslationDocument(
-                    caseData,
-                    caseDataBuilder,
-                    decision,
-                    PreTranslationGaDocumentType.GENERAL_ORDER_DOC
-                );
-            } else {
-
-                assignCategoryId.assignCategoryIdToCaseDocument(
-                    decision,
-                    AssignCategoryId.ORDER_DOCUMENTS
-                );
-
-                caseDataBuilder.generalOrderDocument(wrapElements(decision));
-            }
-        } else if (isDirectionOrder(caseData)) {
-            decision = directionOrderGenerator.generate(
-                caseDataBuilder.build(),
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            );
-
-            /*
-             * Generate Judge Request for Information order document with LIP Applicant Post Address
-             * */
-            if (gaForLipService.isLipApp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipApplicant = directionOrderGenerator
-                    .generate(civilCaseData,
-                              caseDataBuilder.build(),
-                              callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                              FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT
-                );
-            }
-
-            /*
-             * Generate Judge Request for Information order document with LIP Respondent Post Address
-             * if GA is with notice
-             * */
-            if (gaForLipService.isLipResp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipRespondent = directionOrderGenerator
-                    .generate(civilCaseData,
-                              caseDataBuilder.build(),
-                              callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                              FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT
-                    );
-            }
-
-            if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
-                setPreTranslationDocument(
-                    caseData,
-                    caseDataBuilder,
-                    decision,
-                    PreTranslationGaDocumentType.DIRECTIONS_ORDER_DOC
-                );
-            } else {
-                List<Element<CaseDocument>> newDirectionOrderDocumentList =
-                    ofNullable(caseData.getDirectionOrderDocument()).orElse(newArrayList());
-
-                newDirectionOrderDocumentList.addAll(wrapElements(decision));
-
-                assignCategoryId.assignCategoryIdToCollection(
-                    newDirectionOrderDocumentList,
-                    document -> document.getValue().getDocumentLink(),
-                    AssignCategoryId.ORDER_DOCUMENTS
-                );
-                caseDataBuilder.directionOrderDocument(newDirectionOrderDocumentList);
-            }
-
-        } else if (isDismissalOrder(caseData)) {
-            decision = dismissalOrderGenerator.generate(
-                caseDataBuilder.build(),
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            );
-
-            /*
-             * Generate Judge Request for Information order document with LIP Applicant Post Address
-             * if GA is with notice
-             * */
-            if (gaForLipService.isLipApp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipApplicant = dismissalOrderGenerator
-                    .generate(civilCaseData,
-                              caseDataBuilder.build(),
-                              callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                              FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT
-                );
-            }
-
-            /*
-             * Generate Judge Request for Information order document with LIP Respondent Post Address
-             * */
-            if (gaForLipService.isLipResp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipRespondent = dismissalOrderGenerator
-                    .generate(civilCaseData,
-                              caseDataBuilder.build(),
-                              callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                              FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT
-                    );
-            }
-            if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
-                setPreTranslationDocument(
-                    caseData,
-                    caseDataBuilder,
-                    decision,
-                    PreTranslationGaDocumentType.DISMISSAL_ORDER_DOC
-                );
-            } else {
-                assignCategoryId.assignCategoryIdToCaseDocument(decision,
-                                                                AssignCategoryId.ORDER_DOCUMENTS);
-
-                caseDataBuilder.dismissalOrderDocument(wrapElements(decision));
-            }
-
-        } else if (isHearingOrder(caseData)) {
-            decision = hearingOrderGenerator.generate(
-                caseDataBuilder.build(),
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            );
-
-            /*
-             * Generate Judge Request for Information order document with LIP Applicant Post Address
-             * */
-            if (gaForLipService.isLipApp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipApplicant = hearingOrderGenerator
-                    .generate(civilCaseData,
-                              caseDataBuilder.build(),
-                              callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                              FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT);
-            }
-
-            /*
-             * Generate Judge Request for Information order document with LIP Respondent Post Address
-             * if GA is with notice
-             * */
-            if (gaForLipService.isLipResp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipRespondent = hearingOrderGenerator
-                    .generate(civilCaseData,
-                              caseDataBuilder.build(),
-                              callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                              FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT
-                    );
-            }
-
-            if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
-                setPreTranslationDocument(
-                    caseData,
-                    caseDataBuilder,
-                    decision,
-                    PreTranslationGaDocumentType.HEARING_ORDER_DOC
-                );
-            } else {
-
-                assignCategoryId.assignCategoryIdToCaseDocument(
-                    decision,
-                    AssignCategoryId.APPLICATIONS
-                );
-                caseDataBuilder.hearingOrderDocument(wrapElements(decision));
-            }
-        } else if (isWrittenRepSeqOrder(caseData)) {
-            decision = writtenRepresentationSequentialOrderGenerator.generate(
-                    caseDataBuilder.build(),
-                    callbackParams.getParams().get(BEARER_TOKEN).toString()
-                );
-
-            /*
-             * Generate Judge Request for Information order document with LIP Applicant Post Address
-             * if GA is with notice
-             * */
-            if (gaForLipService.isLipApp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipApplicant = writtenRepresentationSequentialOrderGenerator
-                    .generate(civilCaseData,
-                              caseDataBuilder.build(),
-                              callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                              FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT
-                );
-            }
-
-            /*
-             * Generate Judge Request for Information order document with LIP Respondent Post Address
-             * */
-            if (gaForLipService.isLipResp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipRespondent = writtenRepresentationSequentialOrderGenerator
-                    .generate(civilCaseData,
-                              caseDataBuilder.build(),
-                              callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                              FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT
-                    );
-            }
-            if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
-                setPreTranslationDocument(
-                    caseData,
-                    caseDataBuilder,
-                    decision,
-                    PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC
-                );
-            } else {
-                List<Element<CaseDocument>> newWrittenRepSequentialDocumentList =
-                    ofNullable(caseData.getWrittenRepSequentialDocument()).orElse(newArrayList());
-
-                newWrittenRepSequentialDocumentList.addAll(wrapElements(decision));
-
-                assignCategoryId.assignCategoryIdToCollection(
-                    newWrittenRepSequentialDocumentList,
-                    document -> document.getValue().getDocumentLink(),
-                    AssignCategoryId.APPLICATIONS
-                );
-                caseDataBuilder.writtenRepSequentialDocument(newWrittenRepSequentialDocumentList);
-            }
-        } else if (isWrittenRepConOrder(caseData)) {
-            decision = writtenRepresentationConcurrentOrderGenerator.generate(
-                caseDataBuilder.build(),
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            );
-
-            /*
-             * Generate Judge Request for Information order document with LIP Applicant Post Address
-             * */
-            if (gaForLipService.isLipApp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipApplicant = writtenRepresentationConcurrentOrderGenerator
-                    .generate(civilCaseData,
-                              caseDataBuilder.build(),
-                              callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                              FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT);
-            }
-
-            /*
-             * Generate Judge Request for Information order document with LIP Respondent Post Address
-             * */
-            if (gaForLipService.isLipResp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipRespondent = writtenRepresentationConcurrentOrderGenerator
-                    .generate(civilCaseData,
-                              caseDataBuilder.build(),
-                              callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                              FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT
-                    );
-            }
-
-            if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
-                setPreTranslationDocument(
-                    caseData,
-                    caseDataBuilder,
-                    decision,
-                    PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC
-                );
-            } else {
-                List<Element<CaseDocument>> newWrittenRepConcurrentDocumentList =
-                    ofNullable(caseData.getWrittenRepConcurrentDocument()).orElse(newArrayList());
-
-                newWrittenRepConcurrentDocumentList.addAll(wrapElements(decision));
-                assignCategoryId.assignCategoryIdToCollection(
-                    newWrittenRepConcurrentDocumentList,
-                    document -> document.getValue().getDocumentLink(),
-                    AssignCategoryId.APPLICATIONS
-                );
-
-                caseDataBuilder.writtenRepConcurrentDocument(newWrittenRepConcurrentDocumentList);
-            }
-
-        } else if (isRequestMoreInfo(caseData) || isRequestMoreInfoAndSendAppToOtherParty(caseData)) {
-            GAJudgeRequestMoreInfoOption gaJudgeRequestMoreInfoOption = Optional.ofNullable(caseData.getJudicialDecisionRequestMoreInfo()).map(
-                GAJudicialRequestMoreInfo::getRequestMoreInfoOption).orElse(null);
-            decision = requestForInformationGenerator.generate(
-                caseDataBuilder.build(),
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            );
-
-            if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()
-                && gaJudgeRequestMoreInfoOption != GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY) {
-                setPreTranslationDocument(
-                    caseData,
-                    caseDataBuilder,
-                    decision,
-                    PreTranslationGaDocumentType.REQUEST_MORE_INFORMATION_ORDER_DOC
-                );
-            } else {
-                List<Element<CaseDocument>> newRequestForInfoDocumentList =
-                    ofNullable(caseData.getRequestForInformationDocument()).orElse(newArrayList());
-
-                newRequestForInfoDocumentList.addAll(wrapElements(decision));
-
-                assignCategoryId.assignCategoryIdToCollection(
-                    newRequestForInfoDocumentList,
-                    document -> document.getValue().getDocumentLink(),
-                    AssignCategoryId.APPLICATIONS
-                );
-                caseDataBuilder.requestForInformationDocument(newRequestForInfoDocumentList);
-            }
-            /*
-            * Generate Judge Request for Information order document with LIP Applicant Post Address
-            * */
-
-            if (gaForLipService.isLipApp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipApplicant = requestForInformationGenerator.generate(
-                    civilCaseData,
-                    caseData,
-                    callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                    FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT
-                );
-            }
-
-            /*
-             * Generate Judge Request for Information order document with LIP Respondent Post Address
-             * */
-            if (gaForLipService.isLipResp(caseData)
-                && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-                postJudgeOrderToLipRespondent = requestForInformationGenerator.generate(
-                    civilCaseData,
-                    caseData,
-                    callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                    FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT
-                );
-            }
-
-        } else if (Objects.nonNull(caseData.getJudicialDecision())) {
-            if (caseData.getJudicialDecision().getDecision().equals(GAJudgeDecisionOption.FREE_FORM_ORDER)) {
-
-                /*
-                 * Generate Judge Request for Information order document with LIP Respondent Post Address
-                 * */
-                if (gaForLipService.isLipResp(caseData)
-                    && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-
-                    postJudgeOrderToLipRespondent = generateFreeFormSendLetterDocForRespondent(
-                        civilCaseData,
-                        caseData,
-                        callbackParams.getParams().get(BEARER_TOKEN).toString());
-                }
-
-                /*
-                 * Generate Judge Request for Information order document with LIP Applicant Post Address
-                 * */
-                if (gaForLipService.isLipApp(caseData)
-                    && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
-
-                    postJudgeOrderToLipApplicant = generateFreeFormSendLetterDocForApplicant(
-                        civilCaseData,
-                        caseData,
-                        callbackParams.getParams().get(BEARER_TOKEN).toString());
-                }
-
-                List<Element<CaseDocument>> documentList =
-                    ofNullable(caseData.getGeneralOrderDocument()).orElse(newArrayList());
-
-                decision = freeFormOrderGenerator.generate(
-                    caseDataBuilder.build(),
-                    callbackParams.getParams().get(BEARER_TOKEN).toString()
-                );
-                if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
-                    setPreTranslationDocument(
-                        caseData,
-                        caseDataBuilder,
-                        decision,
-                        PreTranslationGaDocumentType.GENERAL_ORDER_DOC
-                    );
-                } else {
-                    documentList.addAll(wrapElements(decision));
-                    assignCategoryId.assignCategoryIdToCollection(
-                        documentList,
-                        document -> document.getValue().getDocumentLink(),
-                        AssignCategoryId.ORDER_DOCUMENTS
-                    );
-                    caseDataBuilder.generalOrderDocument(documentList);
-                }
-            }
-        }
-
-        /*
-        * Send Judge order document to Lip Applicant
-        * */
-        if (printServiceEnabled.equals("true") && Objects.nonNull(postJudgeOrderToLipApplicant)) {
-            sendJudgeFinalOrderPrintService(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                postJudgeOrderToLipApplicant, caseData, civilCaseData, FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT);
-        }
-
-        /*
-         * Send Judge order document to Lip Respondent
-         * */
-        if (printServiceEnabled.equals("true") && Objects.nonNull(postJudgeOrderToLipRespondent)) {
-            sendJudgeFinalOrderPrintService(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                postJudgeOrderToLipRespondent, caseData, civilCaseData, FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT);
-        }
+        sendPrintIfEnabled(context, generationResult.postJudgeOrderToLipApplicant(), FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT);
+        sendPrintIfEnabled(context, generationResult.postJudgeOrderToLipRespondent(), FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(context.caseDataBuilder().build().toMap(objectMapper))
             .build();
+    }
+
+    private GenerationContext buildGenerationContext(CallbackParams callbackParams, GeneralApplicationCaseData caseData) {
+        return new GenerationContext(
+            caseData,
+            getCivilCaseData(caseData),
+            caseData.copy(),
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+    }
+
+    private GeneralApplicationCaseData getCivilCaseData(GeneralApplicationCaseData caseData) {
+        if (!gaForLipService.isGaForLip(caseData)) {
+            return new GeneralApplicationCaseData().build();
+        }
+        return caseDetailsConverter.toGeneralApplicationCaseData(
+            coreCaseDataService.getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference()))
+        );
+    }
+
+    private GenerationResult generateDecisionDocuments(GenerationContext context) {
+        return handlePreDecisionOrders(context)
+            .or(() -> handleMakeOrderDecisions(context))
+            .or(() -> handleHearingAndRepresentationOrders(context))
+            .or(() -> handleInformationAndFreeFormOrders(context))
+            .orElseGet(GenerationResult::empty);
+    }
+
+    private Optional<GenerationResult> handlePreDecisionOrders(GenerationContext context) {
+        GeneralApplicationCaseData caseData = context.caseData();
+        if (Objects.nonNull(caseData.getApproveConsentOrder())) {
+            return Optional.of(handleConsentOrder(context));
+        }
+        if (Objects.nonNull(caseData.getFinalOrderSelection())) {
+            return Optional.of(handleFinalOrder(context));
+        }
+        return Optional.empty();
+    }
+
+    private Optional<GenerationResult> handleMakeOrderDecisions(GenerationContext context) {
+        GeneralApplicationCaseData caseData = context.caseData();
+        if (isGeneralOrder(caseData)) {
+            return Optional.of(handleGeneralOrder(context));
+        }
+        if (isDirectionOrder(caseData)) {
+            return Optional.of(handleDirectionOrder(context));
+        }
+        if (isDismissalOrder(caseData)) {
+            return Optional.of(handleDismissalOrder(context));
+        }
+        return Optional.empty();
+    }
+
+    private Optional<GenerationResult> handleHearingAndRepresentationOrders(GenerationContext context) {
+        GeneralApplicationCaseData caseData = context.caseData();
+        if (isHearingOrder(caseData)) {
+            return Optional.of(handleHearingOrder(context));
+        }
+        if (isWrittenRepSeqOrder(caseData)) {
+            return Optional.of(handleWrittenRepSequentialOrder(context));
+        }
+        if (isWrittenRepConOrder(caseData)) {
+            return Optional.of(handleWrittenRepConcurrentOrder(context));
+        }
+        return Optional.empty();
+    }
+
+    private Optional<GenerationResult> handleInformationAndFreeFormOrders(GenerationContext context) {
+        GeneralApplicationCaseData caseData = context.caseData();
+        if (isRequestMoreInfo(caseData) || isRequestMoreInfoAndSendAppToOtherParty(caseData)) {
+            return Optional.of(handleRequestMoreInfoOrder(context));
+        }
+        if (isJudicialFreeFormOrder(caseData)) {
+            return Optional.of(handleJudicialFreeFormOrder(context));
+        }
+        return Optional.empty();
+    }
+
+    private GenerationResult handleConsentOrder(GenerationContext context) {
+        CaseDocument decision = consentOrderGenerator.generate(context.caseDataBuilder().build(), context.authorisation());
+        context.caseDataBuilder().consentOrderDocument(
+            appendDocument(context.caseData().getConsentOrderDocument(), decision, AssignCategoryId.ORDER_DOCUMENTS)
+        );
+        return GenerationResult.empty();
+    }
+
+    private GenerationResult handleFinalOrder(GenerationContext context) {
+        if (FREE_FORM_ORDER.equals(context.caseData().getFinalOrderSelection())) {
+            return handleFreeFormFinalOrder(context);
+        }
+        if (ASSISTED_ORDER.equals(context.caseData().getFinalOrderSelection())) {
+            return handleAssistedFinalOrder(context);
+        }
+        return GenerationResult.empty();
+    }
+
+    private GenerationResult handleFreeFormFinalOrder(GenerationContext context) {
+        CaseDocument decision = freeFormOrderGenerator.generate(context.caseDataBuilder().build(), context.authorisation());
+        CaseDocument postJudgeOrderToLipApplicant = generateFreeFormLipApplicantDocument(context);
+        CaseDocument postJudgeOrderToLipRespondent = generateFreeFormLipRespondentDocument(context);
+        storeFinalOrderDocument(context, decision);
+        return new GenerationResult(postJudgeOrderToLipApplicant, postJudgeOrderToLipRespondent);
+    }
+
+    private GenerationResult handleAssistedFinalOrder(GenerationContext context) {
+        CaseDocument decision = assistedOrderFormGenerator.generate(context.caseDataBuilder().build(), context.authorisation());
+        CaseDocument postJudgeOrderToLipApplicant = generateLipApplicantDocument(
+            context,
+            context.caseData(),
+                assistedOrderFormGenerator::generate
+        );
+        CaseDocument postJudgeOrderToLipRespondent = generateLipRespondentDocument(
+            context,
+            context.caseData(),
+                assistedOrderFormGenerator::generate
+        );
+        storeFinalOrderDocument(context, decision);
+        return new GenerationResult(postJudgeOrderToLipApplicant, postJudgeOrderToLipRespondent);
+    }
+
+    private void storeFinalOrderDocument(GenerationContext context, CaseDocument decision) {
+        if (isWelshBilingual(context.caseData())) {
+            setPreTranslationDocument(
+                context.caseData(),
+                context.caseDataBuilder(),
+                decision,
+                PreTranslationGaDocumentType.FINAL_ORDER_DOC
+            );
+            return;
+        }
+        context.caseDataBuilder().generalOrderDocument(
+            appendDocument(context.caseData().getGeneralOrderDocument(), decision, AssignCategoryId.ORDER_DOCUMENTS)
+        );
+    }
+
+    private GenerationResult handleGeneralOrder(GenerationContext context) {
+        GeneralApplicationCaseData caseDataBuilder = context.caseDataBuilder().build();
+        CaseDocument decision = generalOrderGenerator.generate(caseDataBuilder, context.authorisation());
+        CaseDocument postJudgeOrderToLipApplicant = generateLipApplicantDocument(
+            context,
+            caseDataBuilder,
+                generalOrderGenerator::generate
+        );
+        CaseDocument postJudgeOrderToLipRespondent = generateLipRespondentDocument(
+            context,
+            caseDataBuilder,
+                generalOrderGenerator::generate
+        );
+        storeGeneralOrderDocument(context, decision);
+        return new GenerationResult(postJudgeOrderToLipApplicant, postJudgeOrderToLipRespondent);
+    }
+
+    private void storeGeneralOrderDocument(GenerationContext context, CaseDocument decision) {
+        if (isWelshBilingual(context.caseData())) {
+            setPreTranslationDocument(
+                context.caseData(),
+                context.caseDataBuilder(),
+                decision,
+                PreTranslationGaDocumentType.GENERAL_ORDER_DOC
+            );
+            return;
+        }
+        context.caseDataBuilder().generalOrderDocument(wrapDocument(decision, AssignCategoryId.ORDER_DOCUMENTS));
+    }
+
+    private GenerationResult handleDirectionOrder(GenerationContext context) {
+        GeneralApplicationCaseData caseDataBuilder = context.caseDataBuilder().build();
+        CaseDocument decision = directionOrderGenerator.generate(caseDataBuilder, context.authorisation());
+        CaseDocument postJudgeOrderToLipApplicant = generateLipApplicantDocument(
+            context,
+            caseDataBuilder,
+                directionOrderGenerator::generate
+        );
+        CaseDocument postJudgeOrderToLipRespondent = generateLipRespondentDocument(
+            context,
+            caseDataBuilder,
+                directionOrderGenerator::generate
+        );
+        storeDirectionOrderDocument(context, decision);
+        return new GenerationResult(postJudgeOrderToLipApplicant, postJudgeOrderToLipRespondent);
+    }
+
+    private void storeDirectionOrderDocument(GenerationContext context, CaseDocument decision) {
+        if (isWelshBilingual(context.caseData())) {
+            setPreTranslationDocument(
+                context.caseData(),
+                context.caseDataBuilder(),
+                decision,
+                PreTranslationGaDocumentType.DIRECTIONS_ORDER_DOC
+            );
+            return;
+        }
+        context.caseDataBuilder().directionOrderDocument(
+            appendDocument(context.caseData().getDirectionOrderDocument(), decision, AssignCategoryId.ORDER_DOCUMENTS)
+        );
+    }
+
+    private GenerationResult handleDismissalOrder(GenerationContext context) {
+        GeneralApplicationCaseData caseDataBuilder = context.caseDataBuilder().build();
+        CaseDocument decision = dismissalOrderGenerator.generate(caseDataBuilder, context.authorisation());
+        CaseDocument postJudgeOrderToLipApplicant = generateLipApplicantDocument(
+            context,
+            caseDataBuilder,
+                dismissalOrderGenerator::generate
+        );
+        CaseDocument postJudgeOrderToLipRespondent = generateLipRespondentDocument(
+            context,
+            caseDataBuilder,
+                dismissalOrderGenerator::generate
+        );
+        storeDismissalOrderDocument(context, decision);
+        return new GenerationResult(postJudgeOrderToLipApplicant, postJudgeOrderToLipRespondent);
+    }
+
+    private void storeDismissalOrderDocument(GenerationContext context, CaseDocument decision) {
+        if (isWelshBilingual(context.caseData())) {
+            setPreTranslationDocument(
+                context.caseData(),
+                context.caseDataBuilder(),
+                decision,
+                PreTranslationGaDocumentType.DISMISSAL_ORDER_DOC
+            );
+            return;
+        }
+        context.caseDataBuilder().dismissalOrderDocument(wrapDocument(decision, AssignCategoryId.ORDER_DOCUMENTS));
+    }
+
+    private GenerationResult handleHearingOrder(GenerationContext context) {
+        GeneralApplicationCaseData caseDataBuilder = context.caseDataBuilder().build();
+        CaseDocument decision = hearingOrderGenerator.generate(caseDataBuilder, context.authorisation());
+        CaseDocument postJudgeOrderToLipApplicant = generateLipApplicantDocument(
+            context,
+            caseDataBuilder,
+                hearingOrderGenerator::generate
+        );
+        CaseDocument postJudgeOrderToLipRespondent = generateLipRespondentDocument(
+            context,
+            caseDataBuilder,
+                hearingOrderGenerator::generate
+        );
+        storeHearingOrderDocument(context, decision);
+        return new GenerationResult(postJudgeOrderToLipApplicant, postJudgeOrderToLipRespondent);
+    }
+
+    private void storeHearingOrderDocument(GenerationContext context, CaseDocument decision) {
+        if (isWelshBilingual(context.caseData())) {
+            setPreTranslationDocument(
+                context.caseData(),
+                context.caseDataBuilder(),
+                decision,
+                PreTranslationGaDocumentType.HEARING_ORDER_DOC
+            );
+            return;
+        }
+        context.caseDataBuilder().hearingOrderDocument(wrapDocument(decision, AssignCategoryId.APPLICATIONS));
+    }
+
+    private GenerationResult handleWrittenRepSequentialOrder(GenerationContext context) {
+        GeneralApplicationCaseData caseDataBuilder = context.caseDataBuilder().build();
+        CaseDocument decision = writtenRepresentationSequentialOrderGenerator.generate(caseDataBuilder, context.authorisation());
+        CaseDocument postJudgeOrderToLipApplicant = generateLipApplicantDocument(
+            context,
+            caseDataBuilder,
+                writtenRepresentationSequentialOrderGenerator::generate
+        );
+        CaseDocument postJudgeOrderToLipRespondent = generateLipRespondentDocument(
+            context,
+            caseDataBuilder,
+                writtenRepresentationSequentialOrderGenerator::generate
+        );
+        storeWrittenRepSequentialDocument(context, decision);
+        return new GenerationResult(postJudgeOrderToLipApplicant, postJudgeOrderToLipRespondent);
+    }
+
+    private void storeWrittenRepSequentialDocument(GenerationContext context, CaseDocument decision) {
+        if (isWelshBilingual(context.caseData())) {
+            setPreTranslationDocument(
+                context.caseData(),
+                context.caseDataBuilder(),
+                decision,
+                PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC
+            );
+            return;
+        }
+        context.caseDataBuilder().writtenRepSequentialDocument(
+            appendDocument(context.caseData().getWrittenRepSequentialDocument(), decision, AssignCategoryId.APPLICATIONS)
+        );
+    }
+
+    private GenerationResult handleWrittenRepConcurrentOrder(GenerationContext context) {
+        GeneralApplicationCaseData caseDataBuilder = context.caseDataBuilder().build();
+        CaseDocument decision = writtenRepresentationConcurrentOrderGenerator.generate(caseDataBuilder, context.authorisation());
+        CaseDocument postJudgeOrderToLipApplicant = generateLipApplicantDocument(
+            context,
+            caseDataBuilder,
+                writtenRepresentationConcurrentOrderGenerator::generate
+        );
+        CaseDocument postJudgeOrderToLipRespondent = generateLipRespondentDocument(
+            context,
+            caseDataBuilder,
+                writtenRepresentationConcurrentOrderGenerator::generate
+        );
+        storeWrittenRepConcurrentDocument(context, decision);
+        return new GenerationResult(postJudgeOrderToLipApplicant, postJudgeOrderToLipRespondent);
+    }
+
+    private void storeWrittenRepConcurrentDocument(GenerationContext context, CaseDocument decision) {
+        if (isWelshBilingual(context.caseData())) {
+            setPreTranslationDocument(
+                context.caseData(),
+                context.caseDataBuilder(),
+                decision,
+                PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC
+            );
+            return;
+        }
+        context.caseDataBuilder().writtenRepConcurrentDocument(
+            appendDocument(context.caseData().getWrittenRepConcurrentDocument(), decision, AssignCategoryId.APPLICATIONS)
+        );
+    }
+
+    private GenerationResult handleRequestMoreInfoOrder(GenerationContext context) {
+        CaseDocument decision = requestForInformationGenerator.generate(context.caseDataBuilder().build(), context.authorisation());
+        CaseDocument postJudgeOrderToLipApplicant = generateLipApplicantDocument(
+            context,
+            context.caseData(),
+                requestForInformationGenerator::generate
+        );
+        CaseDocument postJudgeOrderToLipRespondent = generateLipRespondentDocument(
+            context,
+            context.caseData(),
+                requestForInformationGenerator::generate
+        );
+        storeRequestForInformationDocument(context, decision);
+        return new GenerationResult(postJudgeOrderToLipApplicant, postJudgeOrderToLipRespondent);
+    }
+
+    private void storeRequestForInformationDocument(GenerationContext context, CaseDocument decision) {
+        GAJudgeRequestMoreInfoOption requestMoreInfoOption = getRequestMoreInfoOption(context.caseData());
+        if (isWelshBilingual(context.caseData())
+            && requestMoreInfoOption != GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY) {
+            setPreTranslationDocument(
+                context.caseData(),
+                context.caseDataBuilder(),
+                decision,
+                PreTranslationGaDocumentType.REQUEST_MORE_INFORMATION_ORDER_DOC
+            );
+            return;
+        }
+        context.caseDataBuilder().requestForInformationDocument(
+            appendDocument(context.caseData().getRequestForInformationDocument(), decision, AssignCategoryId.APPLICATIONS)
+        );
+    }
+
+    private GenerationResult handleJudicialFreeFormOrder(GenerationContext context) {
+        CaseDocument postJudgeOrderToLipRespondent = generateFreeFormLipRespondentDocument(context);
+        CaseDocument postJudgeOrderToLipApplicant = generateFreeFormLipApplicantDocument(context);
+        CaseDocument decision = freeFormOrderGenerator.generate(context.caseDataBuilder().build(), context.authorisation());
+        storeJudicialFreeFormOrderDocument(context, decision);
+        return new GenerationResult(postJudgeOrderToLipApplicant, postJudgeOrderToLipRespondent);
+    }
+
+    private void storeJudicialFreeFormOrderDocument(GenerationContext context, CaseDocument decision) {
+        if (isWelshBilingual(context.caseData())) {
+            setPreTranslationDocument(
+                context.caseData(),
+                context.caseDataBuilder(),
+                decision,
+                PreTranslationGaDocumentType.GENERAL_ORDER_DOC
+            );
+            return;
+        }
+        context.caseDataBuilder().generalOrderDocument(
+            appendDocument(context.caseData().getGeneralOrderDocument(), decision, AssignCategoryId.ORDER_DOCUMENTS)
+        );
+    }
+
+    private List<Element<CaseDocument>> appendDocument(List<Element<CaseDocument>> documents,
+                                                       CaseDocument decision,
+                                                       String categoryId) {
+        List<Element<CaseDocument>> updatedDocuments = ofNullable(documents).orElse(newArrayList());
+        updatedDocuments.addAll(wrapElements(decision));
+        assignCategoryId.assignCategoryIdToCollection(
+            updatedDocuments,
+            document -> document.getValue().getDocumentLink(),
+            categoryId
+        );
+        return updatedDocuments;
+    }
+
+    private List<Element<CaseDocument>> wrapDocument(CaseDocument decision, String categoryId) {
+        assignCategoryId.assignCategoryIdToCaseDocument(decision, categoryId);
+        return wrapElements(decision);
+    }
+
+    private boolean isJudicialFreeFormOrder(GeneralApplicationCaseData caseData) {
+        return Objects.nonNull(caseData.getJudicialDecision())
+            && caseData.getJudicialDecision().getDecision().equals(GAJudgeDecisionOption.FREE_FORM_ORDER);
+    }
+
+    private boolean isWelshBilingual(GeneralApplicationCaseData caseData) {
+        return featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual();
+    }
+
+    private CaseDocument generateFreeFormLipApplicantDocument(GenerationContext context) {
+        if (shouldGenerateLipPost(context.caseData()) || !gaForLipService.isLipApp(context.caseData())) {
+            return null;
+        }
+        return generateFreeFormSendLetterDocForApplicant(
+            context.civilCaseData(),
+            context.caseData(),
+            context.authorisation()
+        );
+    }
+
+    private CaseDocument generateFreeFormLipRespondentDocument(GenerationContext context) {
+        if (shouldGenerateLipPost(context.caseData()) || !gaForLipService.isLipResp(context.caseData())) {
+            return null;
+        }
+        return generateFreeFormSendLetterDocForRespondent(
+            context.civilCaseData(),
+            context.caseData(),
+            context.authorisation()
+        );
+    }
+
+    private CaseDocument generateLipApplicantDocument(GenerationContext context,
+                                                      GeneralApplicationCaseData sourceCaseData,
+                                                      PostOrderGenerator generator) {
+        if (shouldGenerateLipPost(context.caseData()) || !gaForLipService.isLipApp(context.caseData())) {
+            return null;
+        }
+        return generator.generate(
+            context.civilCaseData(),
+            sourceCaseData,
+            context.authorisation(),
+            FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT
+        );
+    }
+
+    private CaseDocument generateLipRespondentDocument(GenerationContext context,
+                                                       GeneralApplicationCaseData sourceCaseData,
+                                                       PostOrderGenerator generator) {
+        if (shouldGenerateLipPost(context.caseData()) || !gaForLipService.isLipResp(context.caseData())) {
+            return null;
+        }
+        return generator.generate(
+            context.civilCaseData(),
+            sourceCaseData,
+            context.authorisation(),
+            FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT
+        );
+    }
+
+    private boolean shouldGenerateLipPost(GeneralApplicationCaseData caseData) {
+        return featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual();
+    }
+
+    private GAJudgeRequestMoreInfoOption getRequestMoreInfoOption(GeneralApplicationCaseData caseData) {
+        return Optional.ofNullable(caseData.getJudicialDecisionRequestMoreInfo())
+            .map(GAJudicialRequestMoreInfo::getRequestMoreInfoOption)
+            .orElse(null);
+    }
+
+    private void sendPrintIfEnabled(GenerationContext context, CaseDocument decision, FlowFlag lipUserType) {
+        if (isPrintServiceEnabled() && Objects.nonNull(decision)) {
+            sendJudgeFinalOrderPrintService(
+                context.authorisation(),
+                decision,
+                context.caseData(),
+                context.civilCaseData(),
+                lipUserType
+            );
+        }
+    }
+
+    private boolean isPrintServiceEnabled() {
+        return "true".equals(printServiceEnabled);
     }
 
     private void setPreTranslationDocument(GeneralApplicationCaseData caseData, GeneralApplicationCaseData caseDataBuilder,
@@ -768,5 +709,26 @@ public class GeneratePDFDocumentCallbackHandler extends CallbackHandler implemen
         return caseData.getJudicialDecision().getDecision().equals(MAKE_AN_ORDER)
                 && caseData.getJudicialDecisionMakeOrder().getOrderText() != null
                 && caseData.getJudicialDecisionMakeOrder().getMakeAnOrder().equals(APPROVE_OR_EDIT);
+    }
+
+    @FunctionalInterface
+    private interface PostOrderGenerator {
+        CaseDocument generate(GeneralApplicationCaseData civilCaseData,
+                              GeneralApplicationCaseData caseData,
+                              String authorisation,
+                              FlowFlag flowFlag);
+    }
+
+    private record GenerationContext(GeneralApplicationCaseData caseData,
+                                     GeneralApplicationCaseData civilCaseData,
+                                     GeneralApplicationCaseData caseDataBuilder,
+                                     String authorisation) {
+    }
+
+    private record GenerationResult(CaseDocument postJudgeOrderToLipApplicant,
+                                    CaseDocument postJudgeOrderToLipRespondent) {
+        private static GenerationResult empty() {
+            return new GenerationResult(null, null);
+        }
     }
 }

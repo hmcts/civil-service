@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption;
@@ -57,6 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -199,6 +201,10 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(generalOrderGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
+            verify(assignCategoryId).assignCategoryIdToCaseDocument(
+                PDFBuilder.GENERAL_ORDER_DOCUMENT,
+                AssignCategoryId.ORDER_DOCUMENTS
+            );
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
@@ -218,13 +224,45 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
             verify(generalOrderGenerator, times(2))
                 .generate(any(GeneralApplicationCaseData.class), any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"), any(FlowFlag.class));
             verify(sendFinalOrderPrintService, times(2))
                 .sendJudgeFinalOrderToPrintForLIP(eq("BEARER_TOKEN"), any(Document.class),
                                                   any(GeneralApplicationCaseData.class), any(GeneralApplicationCaseData.class), any(FlowFlag.class));
+        }
+
+        @Test
+        void shouldFetchParentCivilCaseData_whenGaForLipPrintIsTriggered() {
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
+                .isGaApplicantLip(YesOrNo.YES)
+                .applicationIsUncloakedOnce(YesOrNo.YES)
+                .isGaRespondentOneLip(YesOrNo.YES)
+                .build();
+            CaseDetails parentCaseDetails = CaseDetails.builder().build();
+            GeneralApplicationCaseData parentCivilCaseData = new GeneralApplicationCaseData().build();
+
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            when(coreCaseDataService.getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())))
+                .thenReturn(parentCaseDetails);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(parentCaseDetails)).thenReturn(parentCivilCaseData);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+
+            verify(coreCaseDataService).getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference()));
+            verify(caseDetailsConverter).toGeneralApplicationCaseData(parentCaseDetails);
+            verify(sendFinalOrderPrintService, times(2))
+                .sendJudgeFinalOrderToPrintForLIP(
+                    eq("BEARER_TOKEN"),
+                    any(Document.class),
+                    same(caseData),
+                    same(parentCivilCaseData),
+                    any(FlowFlag.class)
+                );
         }
 
         @Test
@@ -256,7 +294,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
             verify(directionOrderGenerator, times(2))
                 .generate(any(GeneralApplicationCaseData.class), any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"), any(FlowFlag.class));
@@ -315,7 +353,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
             verify(dismissalOrderGenerator, times(2))
                 .generate(any(GeneralApplicationCaseData.class), any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"), any(FlowFlag.class));
@@ -333,11 +371,11 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            handler.handle(params);
 
             verify(dismissalOrderGenerator, times(1))
                 .generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
@@ -379,7 +417,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
             verify(freeFormOrderGenerator, times(2))
                 .generate(any(GeneralApplicationCaseData.class), any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"), any(FlowFlag.class));
@@ -438,7 +476,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
             verify(hearingOrderGenerator, times(2))
                 .generate(any(GeneralApplicationCaseData.class), any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"), any(FlowFlag.class));
@@ -462,7 +500,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
             verify(writtenRepresentationSequentailOrderGenerator, times(2))
                 .generate(any(GeneralApplicationCaseData.class), any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"), any(FlowFlag.class));
@@ -528,7 +566,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            handler.handle(params);
             verify(writtenRepresentationConcurrentOrderGenerator, times(2))
                 .generate(any(GeneralApplicationCaseData.class), any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"), any(FlowFlag.class));
             verify(sendFinalOrderPrintService, times(2))
@@ -591,7 +629,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
             verify(requestForInformationGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
 
@@ -637,7 +675,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            handler.handle(params);
             verify(requestForInformationGenerator, times(2))
                 .generate(any(GeneralApplicationCaseData.class), any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"), any(FlowFlag.class));
             verify(sendFinalOrderPrintService, times(2))
@@ -763,6 +801,37 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isEqualTo(PDFBuilder.GENERAL_ORDER_DOCUMENT);
             assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
             verifyNoInteractions(sendFinalOrderPrintService);
+        }
+
+        @Test
+        void shouldPrintGenerateAssistedFinalOrderDocument() {
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
+                .build()
+                .copy()
+                .finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+                .isGaApplicantLip(YesOrNo.YES)
+                .applicationIsUncloakedOnce(YesOrNo.YES)
+                .isGaRespondentOneLip(YesOrNo.YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verify(assistedOrderFormGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
+            verify(assistedOrderFormGenerator, times(2))
+                .generate(any(GeneralApplicationCaseData.class), any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"), any(FlowFlag.class));
+            verify(sendFinalOrderPrintService, times(2))
+                .sendJudgeFinalOrderToPrintForLIP(eq("BEARER_TOKEN"), any(Document.class),
+                                                  any(GeneralApplicationCaseData.class), any(GeneralApplicationCaseData.class), any(FlowFlag.class));
+
+            GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
+
+            assertThat(updatedData.getGeneralOrderDocument().getFirst().getValue())
+                .isEqualTo(PDFBuilder.GENERAL_ORDER_DOCUMENT);
+            assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
         }
 
         @Test
@@ -1166,10 +1235,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
             assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo("CreatePDFDocument");
         }
     }

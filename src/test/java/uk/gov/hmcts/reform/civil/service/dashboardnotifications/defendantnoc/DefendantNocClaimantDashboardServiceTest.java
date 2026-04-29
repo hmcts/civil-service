@@ -265,7 +265,7 @@ class DefendantNocClaimantDashboardServiceTest {
         caseData.setCcdCaseReference(1234L);
         caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
@@ -305,7 +305,7 @@ class DefendantNocClaimantDashboardServiceTest {
         caseData.setCcdCaseReference(1234L);
         caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+        caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
         caseData.setHearingFeePaymentDetails(paymentDetails);
         when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(false);
 

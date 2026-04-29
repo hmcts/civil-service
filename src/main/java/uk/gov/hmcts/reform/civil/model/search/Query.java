@@ -17,7 +17,7 @@ public class Query {
     private String searchAfterValue;
 
     public Query(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex) {
-        this(queryBuilder, dataToReturn, startIndex, false);
+        this(queryBuilder, dataToReturn, startIndex, true);
     }
 
     public Query(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex, boolean sortByReferenceAsc) {

@@ -133,4 +133,33 @@ public class JudicialTimeEstimateHelperTest {
 
         assertThat(timeEstimate).isEqualTo("45 minutes");
     }
+
+    @Test
+    void whenJudgeSpecifiesSingleDayHourAndMinute_ShouldGetSingularHearingEstimateText() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+        caseData = caseData.copy()
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setJudicialTimeEstimate(GAHearingDuration.OTHER)
+                                        .setJudicialTimeEstimateDays("1")
+                                        .setJudicialTimeEstimateHours("1")
+                                        .setJudicialTimeEstimateMinutes("1"))
+            .build();
+
+        String timeEstimate = timeEstimateHelper.getEstimatedHearingLength(caseData);
+
+        assertThat(timeEstimate).isEqualTo("1 day, 1 hour and 1 minute");
+    }
+
+    @Test
+    void whenJudgeSpecifiesOtherWithNoCustomTimeFields_ShouldGetZeroMinutesEstimateText() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+        caseData = caseData.copy()
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setJudicialTimeEstimate(GAHearingDuration.OTHER))
+            .build();
+
+        String timeEstimate = timeEstimateHelper.getEstimatedHearingLength(caseData);
+
+        assertThat(timeEstimate).isEqualTo("0 minutes");
+    }
 }

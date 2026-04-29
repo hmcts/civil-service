@@ -40,7 +40,7 @@ public class SdoFastTrackTemplateService {
 
     public SdoDocumentFormFast buildTemplate(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         boolean showBundleInfo = hasVariable(caseData, FastTrackVariable.TRIAL_BUNDLE_TOGGLE);
-        boolean hasPpi = hasDirection(caseData, FastTrack.fastClaimPPI);
+        boolean hasPpi = hasDirection(caseData, FastTrack.FAST_CLAIM_PPI);
         boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
 
         log.info("Building Fast Track SDO template for case: {}, other-remedy-enabled: {}",
@@ -65,14 +65,14 @@ public class SdoFastTrackTemplateService {
             .setDrawDirectionsOrder(caseData.getDrawDirectionsOrder())
             .setClaimsTrack(caseData.getClaimsTrack())
             .setFastClaims(caseData.getFastClaims())
-            .setHasBuildingDispute(hasDirection(caseData, FastTrack.fastClaimBuildingDispute))
-            .setHasClinicalNegligence(hasDirection(caseData, FastTrack.fastClaimClinicalNegligence))
-            .setHasSdoR2CreditHire(hasDirection(caseData, FastTrack.fastClaimCreditHire))
+            .setHasBuildingDispute(hasDirection(caseData, FastTrack.FAST_CLAIM_BUILDING_DISPUTE))
+            .setHasClinicalNegligence(hasDirection(caseData, FastTrack.FAST_CLAIM_CLINICAL_NEGLIGENCE))
+            .setHasSdoR2CreditHire(hasDirection(caseData, FastTrack.FAST_CLAIM_CREDIT_HIRE))
             .setHasSdoR2CreditHireDetails(hasCreditHireDetails(caseData))
-            .setHasEmployersLiability(hasDirection(caseData, FastTrack.fastClaimEmployersLiability))
-            .setHasHousingDisrepair(hasDirection(caseData, FastTrack.fastClaimHousingDisrepair))
-            .setHasPersonalInjury(hasDirection(caseData, FastTrack.fastClaimPersonalInjury))
-            .setHasRoadTrafficAccident(hasDirection(caseData, FastTrack.fastClaimRoadTrafficAccident))
+            .setHasEmployersLiability(hasDirection(caseData, FastTrack.FAST_CLAIM_EMPLOYERS_LIABILITY))
+            .setHasHousingDisrepair(hasDirection(caseData, FastTrack.FAST_CLAIM_HOUSING_DISREPAIR))
+            .setHasPersonalInjury(hasDirection(caseData, FastTrack.FAST_CLAIM_PERSONAL_INJURY))
+            .setHasRoadTrafficAccident(hasDirection(caseData, FastTrack.FAST_CLAIM_ROAD_TRAFFIC_ACCIDENT))
             .setHasPaymentProtectionInsurance(hasPpi)
             .setFastTrackPPI(hasPpi ? caseData.getFastTrackPPI() : null)
             .setFastTrackJudgesRecital(caseData.getFastTrackJudgesRecital())

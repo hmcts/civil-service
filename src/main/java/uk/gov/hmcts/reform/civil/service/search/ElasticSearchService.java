@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.math.BigDecimal;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,12 +25,13 @@ public abstract class ElasticSearchService {
     protected final CoreCaseDataService coreCaseDataService;
 
     public Set<CaseDetails> getCases() {
-        SearchResult searchResult = coreCaseDataService.searchCases(query(START_INDEX));
+        String timeNow = ZonedDateTime.now(ZoneOffset.UTC).toString();
+        SearchResult searchResult = coreCaseDataService.searchCases(query(START_INDEX, timeNow));
         int pages = calculatePages(searchResult);
         Set<CaseDetails> caseDetails = new HashSet<>(searchResult.getCases());
 
         for (int i = 1; i < pages; i++) {
-            SearchResult result = coreCaseDataService.searchCases(query(i * ES_DEFAULT_SEARCH_LIMIT));
+            SearchResult result = coreCaseDataService.searchCases(query(i * ES_DEFAULT_SEARCH_LIMIT, timeNow));
             caseDetails.addAll(result.getCases());
         }
 
@@ -38,7 +41,7 @@ public abstract class ElasticSearchService {
         return caseDetails;
     }
 
-    abstract Query query(int startIndex);
+    abstract Query query(int startIndex, String timeNow);
 
     protected int calculatePages(SearchResult searchResult) {
         log.info("Initially search service found {} case(s) ", searchResult.getTotal());

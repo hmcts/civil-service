@@ -326,7 +326,7 @@ class DashboardClaimStatusFactoryTest {
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .systemGeneratedCaseDocuments(List.of(new Element<CaseDocument>().setValue(sdoDocument)))
             .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .build();
         if (toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())) {
             checkStatus(caseData, eventHistory,

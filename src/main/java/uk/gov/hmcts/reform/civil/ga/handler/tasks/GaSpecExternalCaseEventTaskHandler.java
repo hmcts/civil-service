@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
@@ -19,6 +21,8 @@ import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 
 import java.util.Map;
+
+import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
 @Component
@@ -33,17 +37,34 @@ public class GaSpecExternalCaseEventTaskHandler extends BaseExternalTaskHandler 
     public ExternalTaskData handleTask(ExternalTask externalTask) {
 
         ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
-        String caseId = variables.getCaseId();
-        StartEventResponse startEventResponse = coreCaseDataService.startGaUpdate(caseId,
-                                                variables.getCaseEvent());
-        log.info("Started GA update event for case ID: {} with event: {}", caseId, variables.getCaseEvent());
-        GeneralApplicationCaseData startEventData = caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails());
-        BusinessProcess businessProcess = startEventData
-            .getBusinessProcess().copy()
-            .setActivityId(externalTask.getActivityId());
-        CaseDataContent caseDataContent = gaCaseDataContent(startEventResponse, businessProcess);
-        var caseData = coreCaseDataService.submitGaUpdate(caseId, caseDataContent);
+        String caseId = ofNullable(variables.getCaseId())
+            .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
+        CaseEvent caseEvent = ofNullable(variables.getCaseEvent())
+            .orElseThrow(() -> new InvalidCaseDataException("The caseEvent was not provided"));
+        log.info("Start GA Event {} for caseId {} activityId {}", caseEvent, caseId, externalTask.getActivityId());
+
+        GeneralApplicationCaseData caseData = processCaseEvent(externalTask, caseId, caseEvent);
+
         return new ExternalTaskData().setParentCaseData(caseData);
+    }
+
+    private GeneralApplicationCaseData processCaseEvent(ExternalTask externalTask, String caseId, CaseEvent caseEvent) {
+        StartEventResponse startEventResponse = coreCaseDataService.startGaUpdate(caseId, caseEvent);
+
+        GeneralApplicationCaseData startEventData = caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails());
+        BusinessProcess businessProcess = startEventData.getBusinessProcess().copy();
+
+        if (isEventAlreadyProcessed(externalTask, businessProcess)) {
+            log.info("GA Event {} for caseId {} activityId {} is already processed",
+                     startEventResponse.getEventId(),
+                     caseId,
+                     externalTask.getActivityId());
+            return startEventData;
+        }
+
+        businessProcess.setActivityId(externalTask.getActivityId());
+        CaseDataContent caseDataContent = gaCaseDataContent(startEventResponse, businessProcess);
+        return coreCaseDataService.submitGaUpdate(caseId, caseDataContent);
     }
 
     @Override

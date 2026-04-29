@@ -29,21 +29,23 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
         this.featureToggleService = featureToggleService;
     }
 
-    public Query query(int startIndex) {
+    @Override
+    public Query query(int startIndex, String timeNow) {
+        log.info("Call to TakeCaseOfflineSearchService query with index {} and timeNow {}", startIndex, timeNow);
         if (featureToggleService.isWelshEnabledForMainCase()) {
             Query query = new Query(
                 boolQuery()
                     .minimumShouldMatch(1)
                     .should(boolQuery()
-                                .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
+                                .must(rangeQuery("data.applicant1ResponseDeadline").lt(timeNow))
                                 .must(beState(AWAITING_APPLICANT_INTENTION))
                                 .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
                                 .mustNot(existsQuery("data.applicant1ResponseDate")))
                     .should(boolQuery()
-                                .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
+                                .must(rangeQuery("data.addLegalRepDeadlineRes1").lt(timeNow))
                                 .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
                     .should(boolQuery()
-                                .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
+                                .must(rangeQuery("data.addLegalRepDeadlineRes2").lt(timeNow))
                                 .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
                 List.of("reference"),
                 startIndex
@@ -55,14 +57,14 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
                 boolQuery()
                     .minimumShouldMatch(1)
                     .should(boolQuery()
-                                .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
+                                .must(rangeQuery("data.applicant1ResponseDeadline").lt(timeNow))
                                 .must(beState(AWAITING_APPLICANT_INTENTION))
                                 .mustNot(matchQuery("data.isMintiLipCase", "Yes")))
                     .should(boolQuery()
-                                .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
+                                .must(rangeQuery("data.addLegalRepDeadlineRes1").lt(timeNow))
                                 .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
                     .should(boolQuery()
-                                .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
+                                .must(rangeQuery("data.addLegalRepDeadlineRes2").lt(timeNow))
                                 .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
                 List.of("reference"),
                 startIndex

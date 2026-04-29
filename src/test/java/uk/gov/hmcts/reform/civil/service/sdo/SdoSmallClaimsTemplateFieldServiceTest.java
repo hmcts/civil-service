@@ -41,8 +41,8 @@ class SdoSmallClaimsTemplateFieldServiceTest {
     @Test
     void shouldReturnMethodLabels() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setSmallClaimsMethodTelephoneHearing(SmallClaimsMethodTelephoneHearing.telephoneTheClaimant);
-        caseData.setSmallClaimsMethodVideoConferenceHearing(SmallClaimsMethodVideoConferenceHearing.videoTheDefendant);
+        caseData.setSmallClaimsMethodTelephoneHearing(SmallClaimsMethodTelephoneHearing.TELEPHONE_THE_CLAIMANT);
+        caseData.setSmallClaimsMethodVideoConferenceHearing(SmallClaimsMethodVideoConferenceHearing.VIDEO_THE_DEFENDANT);
 
         assertThat(service.getMethodTelephoneHearingLabel(caseData)).isEqualTo("the claimant");
         assertThat(service.getMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the defendant");

@@ -208,7 +208,7 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .finalOrderDocumentCollection(List.of(ElementUtils.element(

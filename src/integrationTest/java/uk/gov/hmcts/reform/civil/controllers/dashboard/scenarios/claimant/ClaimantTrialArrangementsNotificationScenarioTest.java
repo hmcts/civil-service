@@ -33,7 +33,7 @@ public class ClaimantTrialArrangementsNotificationScenarioTest extends Dashboard
             .applicant1Represented(NO)
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .orderType(OrderType.DECIDE_DAMAGES)
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDate(LocalDate.of(2024, 04, 1))

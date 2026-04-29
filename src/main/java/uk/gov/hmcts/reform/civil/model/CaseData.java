@@ -135,6 +135,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  CaseState ccdState;
     private  CaseState previousCCDState;
     private  String preStayState;
+    private  LocalDate caseStayDate;
     private  String manageStayOption;
     private  LocalDate manageStayUpdateRequestDate;
     private  GAApplicationType generalAppType;
@@ -343,6 +344,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  YesOrNo bundleError;
     private  String bundleEvent;
     private  YesOrNo fullAdmitNoPaymentSchedulerProcessed;
+    private  YesOrNo isOtherRemedyAbandoned;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private  LocalDate otherRemedyAbandonedDate;
 
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
@@ -670,6 +675,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  String  claimDeclarationDescription;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private  YesOrNo isHumanRightsActIssues;
+
+    private  String defendantEmailAddress;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

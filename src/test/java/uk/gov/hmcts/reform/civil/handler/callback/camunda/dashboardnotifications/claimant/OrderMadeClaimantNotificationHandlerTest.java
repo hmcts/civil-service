@@ -565,7 +565,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
         void shouldRecordScenarioClaimantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
             caseData.setApplicant1Represented(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -591,7 +591,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
         void shouldRecordScenarioClaimantFinalOrderFastTrackTrialReady_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
             caseData.setApplicant1Represented(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
             caseData.setTrialReadyApplicant(YesOrNo.YES);
 

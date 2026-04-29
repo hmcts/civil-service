@@ -30,7 +30,7 @@ public class BundleCreationDefendantScenarioTest extends DashboardBaseIntegratio
             .respondent1Represented(YesOrNo.NO)
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .orderType(OrderType.DECIDE_DAMAGES)
             .build();
 
@@ -103,7 +103,7 @@ public class BundleCreationDefendantScenarioTest extends DashboardBaseIntegratio
             .respondent1Represented(YesOrNo.NO)
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .orderType(OrderType.DECIDE_DAMAGES)
             .build();
 
