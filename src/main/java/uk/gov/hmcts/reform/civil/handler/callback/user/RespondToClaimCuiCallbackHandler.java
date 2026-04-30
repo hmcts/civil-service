@@ -119,6 +119,9 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
         if (!needsTranslating) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
+        } else if (isJudgmentRequestedCase(callbackParams.getCaseData(), callbackParams)) {
+            // Keep translated judgment-requested cases in the respondent acknowledgement stage.
+            responseBuilder.state(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
         }
 
         if (caseFlagsLoggingEnabled) {
@@ -189,5 +192,10 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             caseData.setDefendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
         }
         return caseData;
+    }
+
+    private boolean isJudgmentRequestedCase(CaseData caseData, CallbackParams callbackParams) {
+        return CaseState.JUDGMENT_REQUESTED.equals(caseData.getCcdState())
+            || CaseState.JUDGMENT_REQUESTED.name().equals(callbackParams.getRequest().getCaseDetails().getState());
     }
 }
