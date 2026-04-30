@@ -28,6 +28,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -113,7 +114,7 @@ public class HmcDataUtils {
                     HearingDay datesFromHearingDay = new HearingDay()
                         .setHearingStartDateTime(convertFromUTC(hearingDay.getHearingStartDateTime()))
                         .setHearingEndDateTime(convertFromUTC(hearingDay.getHearingEndDateTime()));
-                    if (!serviceData.getHearingLocation().equals(hearingDay.getHearingVenueId())
+                    if (!Objects.equals(serviceData.getHearingLocation(), hearingDay.getHearingVenueId())
                         || !serviceData.getDays().contains(datesFromHearingDay)) {
                         return true;
                     }
