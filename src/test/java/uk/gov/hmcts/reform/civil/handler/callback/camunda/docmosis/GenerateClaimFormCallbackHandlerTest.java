@@ -60,7 +60,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private ObjectMapper mapper;
-    @Mock
+    @InjectMocks
     private AssignCategoryId assignCategoryId;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";

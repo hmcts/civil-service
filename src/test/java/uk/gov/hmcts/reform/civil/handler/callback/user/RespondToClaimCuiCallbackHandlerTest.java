@@ -119,6 +119,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
+            ReflectionTestUtils.setField(handler, "caseFlagsLoggingEnabled", false);
             now = LocalDateTime.now();
             given(time.now()).willReturn(now);
             given(deadlinesCalculator.calculateApplicantResponseDeadline(any())).willReturn(respondToDeadline);
