@@ -21,7 +21,7 @@ class JudgmentRequestedSearchServiceTest extends ElasticSearchServiceTest {
     protected Query buildQuery(int fromValue) {
         LocalDate fortyEightHoursAgo = LocalDate.now().minusDays(2);
         BoolQueryBuilder query = boolQuery()
-            .must(rangeQuery("data.activeJudgment.requestDate").lte(fortyEightHoursAgo));
+            .must(rangeQuery("data.activeJudgment.requestDate").lt(fortyEightHoursAgo));
 
         return new Query(query, List.of("reference"), fromValue);
     }
