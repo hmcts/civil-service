@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -80,15 +81,19 @@ public class GaFeesPaymentService {
                 .ifPresent(h -> response.setErrorCode(h.getErrorCode()).setErrorDescription(h.getErrorMessage()));
         }
 
-        try {
-            updatePaymentStatusService.updatePaymentStatus(caseReference, response);
-        } catch (Exception e) {
-            log.error(
-                "Update general application payment status failed for claim [{}]. Error: {}",
-                caseReference,
-                e.getMessage(),
-                e
-            );
+        log.info("Payment status is {} for GA case {}", paymentStatus, caseReference);
+
+        if (PaymentStatus.isValid(paymentStatus)) {
+            try {
+                updatePaymentStatusService.updatePaymentStatus(caseReference, response);
+            } catch (Exception e) {
+                log.error(
+                    "Update general application payment status failed for claim [{}]. Error: {}",
+                    caseReference,
+                    e.getMessage(),
+                    e
+                );
+            }
         }
 
         return response;
