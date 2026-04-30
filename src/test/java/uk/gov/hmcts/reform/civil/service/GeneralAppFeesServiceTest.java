@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -40,6 +41,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SET_ASIDE_JUDGEMENT;
@@ -272,6 +274,44 @@ class GeneralAppFeesServiceTest {
         assertThat(feeDto).isEqualTo(FEE_PENCE);
         assertThat(keywordCaptor.getValue())
             .hasToString(CERT_OF_SATISFACTION_OR_CANCEL);
+    }
+
+    @Test
+    void shouldIdentifyAndReturnFreeFeeForEligibleGeneralApplication() {
+        GeneralApplication generalApplication = getFeeGeneralApplication(
+            List.of(GeneralApplicationTypes.ADJOURN_HEARING),
+            YesOrNo.YES,
+                LocalDate.now().plusDays(15)
+        );
+
+        assertThat(generalAppFeesService.isFreeGa(generalApplication)).isTrue();
+        assertThat(generalAppFeesService.getFeeForGA(
+            generalApplication,
+            generalApplication.getGeneralAppHearingDate().getHearingScheduledDate())
+        ).isEqualTo(FEE_PENCE_0);
+        assertThat(generalAppFeesService.isFreeGa(
+            getFeeGeneralApplication(
+                List.of(GeneralApplicationTypes.ADJOURN_HEARING),
+                YesOrNo.NO,
+                    LocalDate.now().plusDays(15)
+            ))
+        ).isFalse();
+        verifyNoInteractions(feesApiClient);
+    }
+
+    @Test
+    void shouldWrapExceptionWhenFeeLookupFails() {
+        when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
+        when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
+        when(feesConfiguration.getChannel()).thenReturn(DEFAULT_CHANNEL);
+        when(feesApiClient.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+            .thenThrow(new IllegalStateException("fee lookup failed"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> generalAppFeesService.getFeeForGA("keyword", "event", "service"));
+
+        assertThat(exception).hasCauseInstanceOf(IllegalStateException.class);
+        assertThat(exception.getCause()).hasMessage("fee lookup failed");
     }
 
     @Nested
@@ -657,6 +697,23 @@ class GeneralAppFeesServiceTest {
             caseData.setGeneralAppHearingDate(hearingDate);
         }
         return caseData;
+    }
+
+    private GeneralApplication getFeeGeneralApplication(List<GeneralApplicationTypes> types,
+                                                        YesOrNo hasAgreed,
+                                                        LocalDate hearingScheduledDate) {
+        GeneralApplication generalApplication = new GeneralApplication();
+        generalApplication.setGeneralAppType(new GAApplicationType().setTypes(types));
+        if (Objects.nonNull(hasAgreed)) {
+            generalApplication.setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(hasAgreed));
+        }
+        generalApplication.setGeneralAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO));
+        if (Objects.nonNull(hearingScheduledDate)) {
+            GAHearingDateGAspec hearingDate = new GAHearingDateGAspec();
+            hearingDate.setHearingScheduledDate(hearingScheduledDate);
+            generalApplication.setGeneralAppHearingDate(hearingDate);
+        }
+        return generalApplication;
     }
 
     private GeneralApplicationCaseData getFeeCaseGeneralApplication(List<GeneralApplicationTypes> types, YesOrNo hasAgreed,
