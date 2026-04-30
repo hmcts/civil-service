@@ -5,7 +5,7 @@ data "azurerm_key_vault_secret" "civil-service-alert-slack-email" {
 }
 
 locals {
-  civil_service_alert_slack_email      = length(data.azurerm_key_vault_secret.civil-service-alert-slack-email) > 0 ? data.azurerm_key_vault_secret.civil-service-alert-slack-email[0].value : null
+  civil_service_alert_slack_email = length(data.azurerm_key_vault_secret.civil-service-alert-slack-email) > 0 ? data.azurerm_key_vault_secret.civil-service-alert-slack-email[0].value : null
 }
 
 resource "azurerm_monitor_action_group" "civil-service-action-group" {
@@ -27,10 +27,10 @@ resource "azurerm_monitor_action_group" "civil-service-action-group" {
 
 module "scheduler-aborted-alerts" {
   for_each = var.monitor_scheduler_alerts
-  source = "git@github.com:hmcts/cnp-module-metric-alert"
+  source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
 
-  app_insights_name = module.application_insights.name
+  app_insights_name  = module.application_insights.name
   resourcegroup_name = "civil-service-${var.env}"
 
   alert_name = "${each.key}JobAborted"
@@ -42,22 +42,22 @@ module "scheduler-aborted-alerts" {
         | project timestamp, name, properties.abortReason
       AIQ
 
-  custom_email_subject = "Warning: The scheduler ${each.key} in ${var.env} has aborted."
-  frequency_in_minutes = try(each.value.frequency_in_minutes, 30)
-  time_window_in_minutes = try(each.value.time_window_in_minutes, 30)
-  severity_level = 3
-  action_group_name = values(azurerm_monitor_action_group.civil-service-action-group)[0].name
+  custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has aborted."
+  frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
+  time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
+  severity_level             = 3
+  action_group_name          = values(azurerm_monitor_action_group.civil-service-action-group)[0].name
   trigger_threshold_operator = "GreaterThan"
-  trigger_threshold = 0
-  common_tags = var.common_tags
+  trigger_threshold          = 0
+  common_tags                = var.common_tags
 }
 
 module "scheduler-high-failure-rate-alerts" {
   for_each = var.monitor_scheduler_alerts
-  source = "git@github.com:hmcts/cnp-module-metric-alert"
+  source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
 
-  app_insights_name = module.application_insights.name
+  app_insights_name  = module.application_insights.name
   resourcegroup_name = "civil-service-${var.env}"
 
   alert_name = "${each.key}HighFailureRate"
@@ -72,22 +72,22 @@ module "scheduler-high-failure-rate-alerts" {
         | where failureRate > 0.2
       AIQ
 
-  custom_email_subject = "Warning: The scheduler ${each.key} in ${var.env} has a high failure rate."
-  frequency_in_minutes = try(each.value.frequency_in_minutes, 30)
-  time_window_in_minutes = try(each.value.time_window_in_minutes, 30)
-  severity_level = 3
-  action_group_name = values(azurerm_monitor_action_group.civil-service-action-group)[0].name
+  custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has a high failure rate."
+  frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
+  time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
+  severity_level             = 3
+  action_group_name          = values(azurerm_monitor_action_group.civil-service-action-group)[0].name
   trigger_threshold_operator = "GreaterThan"
-  trigger_threshold = 0
-  common_tags = var.common_tags
+  trigger_threshold          = 0
+  common_tags                = var.common_tags
 }
 
 module "scheduler-job-not-run-alerts" {
   for_each = var.monitor_scheduler_alerts
-  source = "git@github.com:hmcts/cnp-module-metric-alert"
+  source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
 
-  app_insights_name = module.application_insights.name
+  app_insights_name  = module.application_insights.name
   resourcegroup_name = "civil-service-${var.env}"
 
   alert_name = "${each.key}JobNotRun"
@@ -99,12 +99,12 @@ module "scheduler-job-not-run-alerts" {
         | where timestamp > ago(26h)
       AIQ
 
-  custom_email_subject = "Warning: The scheduler ${each.key} in ${var.env} has not run in the last 26 hours."
-  frequency_in_minutes = try(each.value.frequency_in_minutes, 30)
-  time_window_in_minutes = try(each.value.time_window_in_minutes, 30)
-  severity_level = 3
-  action_group_name = values(azurerm_monitor_action_group.civil-service-action-group)[0].name
+  custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has not run in the last 26 hours."
+  frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
+  time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
+  severity_level             = 3
+  action_group_name          = values(azurerm_monitor_action_group.civil-service-action-group)[0].name
   trigger_threshold_operator = "LessThan"
-  trigger_threshold = 1
-  common_tags = var.common_tags
+  trigger_threshold          = 1
+  common_tags                = var.common_tags
 }
