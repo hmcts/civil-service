@@ -148,4 +148,43 @@ class ScheduledEventTrackerTest {
             ))
         );
     }
+
+    @Test
+    void shouldTrackJobCompletedNoCasesEvent() {
+        scheduledEventTracker.jobCompletedNoCasesEvent(eventConfig);
+
+        verify(telemetryService).trackEvent(
+            eq("TestSchedulerJobCompleted"),
+            eq(Map.of(
+                "schedulerName", "TestScheduler",
+                "totalCases", "0"
+            ))
+        );
+    }
+
+    @Test
+    void shouldTrackSimpleJobAbortedEvent() {
+        scheduledEventTracker.jobAbortedEvent(eventConfig, "Error reason");
+
+        verify(telemetryService).trackEvent(
+            eq("TestSchedulerJobAborted"),
+            eq(Map.of(
+                "schedulerName", "TestScheduler",
+                "abortReason", "Error reason"
+            ))
+        );
+    }
+
+    @Test
+    void shouldTrackSimpleJobAbortedEventWithUnknownReason_whenReasonIsNull() {
+        scheduledEventTracker.jobAbortedEvent(eventConfig, null);
+
+        verify(telemetryService).trackEvent(
+            eq("TestSchedulerJobAborted"),
+            eq(Map.of(
+                "schedulerName", "TestScheduler",
+                "abortReason", "Unknown"
+            ))
+        );
+    }
 }

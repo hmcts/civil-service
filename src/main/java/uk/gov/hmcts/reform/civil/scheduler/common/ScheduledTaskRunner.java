@@ -2,14 +2,13 @@ package uk.gov.hmcts.reform.civil.scheduler.common;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -21,61 +20,55 @@ import java.util.function.Supplier;
 public class ScheduledTaskRunner {
 
     private final ScheduledEventTracker eventTracker;
-
-    @Value("${scheduler.circuitBreakerThreshold:5}")
-    private int circuitBreakerThreshold;
+    private final ScheduledTaskProcessor scheduledTaskProcessor;
 
     public void run(ScheduledTaskEventConfiguration eventConfig,
                     Supplier<Set<CaseDetails>> caseDetailsSupplier,
                     Consumer<CaseDetails> scheduledTask) {
 
-        List<Long> succeededCases = new ArrayList<>();
-        List<Long> failedCases = new ArrayList<>();
-        int consecutiveFailures = 0;
-        boolean abortedEarly = false;
-        String abortReason = "";
+        final Set<CaseDetails> cases;
+        try {
+            cases = Optional.ofNullable(caseDetailsSupplier.get())
+                .orElse(Collections.emptySet());
+        } catch (Exception e) {
+            eventTracker.jobAbortedEvent(eventConfig, e.getMessage());
+            log.error("Scheduled task aborted due to error during case retrieval: {}", eventConfig.getSchedulerName(), e);
+            return;
+        }
 
-        Set<CaseDetails> cases = caseDetailsSupplier.get();
+        if (cases.isEmpty()) {
+            eventTracker.jobStartedEvent(eventConfig, 0);
+            eventTracker.jobCompletedNoCasesEvent(eventConfig);
+            log.info("Scheduled task completed: {}, totalCases: 0", eventConfig.getSchedulerName());
+        } else {
+            processCaseDetails(eventConfig, scheduledTask, cases);
+        }
+    }
+
+    private void processCaseDetails(ScheduledTaskEventConfiguration eventConfig, Consumer<CaseDetails> scheduledTask, Set<CaseDetails> cases) {
         eventTracker.jobStartedEvent(eventConfig, cases.size());
         log.info("Running scheduled task: {}, totalCases: {}", eventConfig.getSchedulerName(), cases.size());
 
-        for (CaseDetails caseDetails : cases) {
-            try {
-                scheduledTask.accept(caseDetails);
-                eventTracker.caseProcessedEvent(eventConfig, caseDetails.getId());
-                succeededCases.add(caseDetails.getId());
-                consecutiveFailures = 0;
-            } catch (Exception e) {
-                failedCases.add(caseDetails.getId());
-                eventTracker.caseFailedEvent(eventConfig, caseDetails, e);
-                consecutiveFailures++;
+        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, cases);
 
-                if (consecutiveFailures >= circuitBreakerThreshold) {
-                    abortedEarly = true;
-                    abortReason = e.getMessage();
-                    break;
-                }
-            }
-        }
-
-        if (abortedEarly) {
-            eventTracker.jobAbortedEvent(eventConfig, cases, succeededCases, failedCases, abortReason);
+        if (outcome.abortedEarly()) {
+            eventTracker.jobAbortedEvent(eventConfig, cases, outcome.succeededCases(), outcome.failedCases(), outcome.abortReason());
             log.info(
                 "Scheduled task aborted: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortReason: {}",
                 eventConfig.getSchedulerName(),
                 cases.size(),
-                succeededCases.size(),
-                failedCases.size(),
-                abortReason
+                outcome.succeededCases().size(),
+                outcome.failedCases().size(),
+                outcome.abortReason()
             );
         } else {
-            eventTracker.jobCompletedEvent(eventConfig, cases, succeededCases, failedCases);
+            eventTracker.jobCompletedEvent(eventConfig, cases, outcome.succeededCases(), outcome.failedCases());
             log.info(
                 "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}",
                 eventConfig.getSchedulerName(),
                 cases.size(),
-                succeededCases.size(),
-                failedCases.size()
+                outcome.succeededCases().size(),
+                outcome.failedCases().size()
             );
         }
     }

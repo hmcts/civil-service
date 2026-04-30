@@ -64,6 +64,16 @@ public class ScheduledEventTracker {
         );
     }
 
+    public void jobCompletedNoCasesEvent(ScheduledTaskEventConfiguration eventConfig) {
+        telemetryService.trackEvent(
+            eventConfig.getJobCompletedEvent(),
+            Map.of(
+                "schedulerName", eventConfig.getSchedulerName(),
+                "totalCases", String.valueOf(0)
+            )
+        );
+    }
+
     public void jobAbortedEvent(ScheduledTaskEventConfiguration eventConfig,
                                 Set<CaseDetails> cases,
                                 List<Long> succeededCases,
@@ -76,6 +86,16 @@ public class ScheduledEventTracker {
                 "totalCases", String.valueOf(cases.size()),
                 "succeededCases", String.valueOf(succeededCases.size()),
                 "failedCases", String.valueOf(failedCases.size()),
+                "abortReason", reason != null ? reason : "Unknown"
+            )
+        );
+    }
+
+    public void jobAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String reason) {
+        telemetryService.trackEvent(
+            eventConfig.getJobAbortedEvent(),
+            Map.of(
+                "schedulerName", eventConfig.getSchedulerName(),
                 "abortReason", reason != null ? reason : "Unknown"
             )
         );
