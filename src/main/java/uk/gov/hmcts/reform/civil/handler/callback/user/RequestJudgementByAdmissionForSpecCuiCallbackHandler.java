@@ -148,6 +148,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             ? judgementService.buildJudgmentAmountSummaryDetails(data) :
             data.getCcjPaymentDetails();
 
+        log.info("isJudgmentOnlineLive: {}", featureToggleService.isJudgmentOnlineLive());
+        log.info("isOneVOne: {}", isOneVOne(data));
+        log.info("isPayImmediately: {}", data.isPayImmediately());
         if (featureToggleService.isJudgmentOnlineLive()
             && (isOneVOne(data))
             && data.isPayImmediately()) {
