@@ -26,7 +26,7 @@ public class JudgmentRequestedSearchService extends ElasticSearchService {
                  startIndex, fortyEightHoursAgo);
         return new Query(
             boolQuery()
-                .must(rangeQuery("data.activeJudgment.requestDate").lte(fortyEightHoursAgo)),
+                .must(rangeQuery("data.activeJudgment.requestDate").lt(fortyEightHoursAgo)),
             List.of("reference"),
             startIndex
         );
