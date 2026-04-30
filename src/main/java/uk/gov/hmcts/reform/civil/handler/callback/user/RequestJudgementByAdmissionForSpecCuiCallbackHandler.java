@@ -140,17 +140,14 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     }
 
     private CallbackResponse updateBusinessProcessToReady(CallbackParams callbackParams) {
-        String nextState;
-        BusinessProcess businessProcess;
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         logCcjPaymentDetails(data);
-        CCJPaymentDetails ccjPaymentDetails = data.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-            ? judgementService.buildJudgmentAmountSummaryDetails(data) :
-            data.getCcjPaymentDetails();
 
         log.info("isJudgmentOnlineLive: {}", featureToggleService.isJudgmentOnlineLive());
         log.info("isOneVOne: {}", isOneVOne(data));
         log.info("isPayImmediately: {}", data.isPayImmediately());
+        String nextState;
+        BusinessProcess businessProcess;
         if (featureToggleService.isJudgmentOnlineLive()
             && (isOneVOne(data))
             && data.isPayImmediately()) {
@@ -161,6 +158,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             businessProcess = BusinessProcess.ready(REQUEST_JUDGEMENT_ADMISSION_SPEC);
         }
 
+        CCJPaymentDetails ccjPaymentDetails = data.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+            ? judgementService.buildJudgmentAmountSummaryDetails(data) :
+            data.getCcjPaymentDetails();
         data.setBusinessProcess(businessProcess);
         data.setCcjPaymentDetails(ccjPaymentDetails);
 
