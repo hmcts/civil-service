@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=JudgementBufferSchedulerITest",
-    "scheduler.judgement-buffer.enabled=true"
+    "scheduler.judgementBuffer.enabled=true"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class JudgementBufferSchedulerITest {

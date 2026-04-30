@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_DE
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=DefendantResponseDeadlineSchedulerITest",
-    "scheduler.defendant-response.enabled=true"
+    "scheduler.defendantResponse.enabled=true"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class DefendantResponseDeadlineSchedulerITest {

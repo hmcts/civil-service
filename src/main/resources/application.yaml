@@ -61,10 +61,10 @@ scheduler:
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
   lockAtMostFor: ${LOCK_AT_MOST_FOR:PT5M}
   defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT10M}
-  judgement-buffer:
+  judgementBuffer:
     cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 2 * * *}
     enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:false}
-  defendant-response:
+  defendantResponse:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
 

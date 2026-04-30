@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.service.search.JudgmentRequestedSearchService;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.judgement-buffer", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "scheduler.judgementBuffer", name = "enabled", havingValue = "true")
 public class JudgementBufferScheduler {
 
     public static final String SCHEDULER_NAME = "JudgementBuffer";
@@ -22,7 +22,7 @@ public class JudgementBufferScheduler {
     private final ScheduledTaskRunner scheduledTaskRunner;
     private final JudgementBufferScheduledTask judgementBufferScheduledTask;
 
-    @Scheduled(cron = "${scheduler.judgement-buffer.cronExpression}")
+    @Scheduled(cron = "${scheduler.judgementBuffer.cronExpression}")
     @SchedulerLock(name = "JudgementBufferScheduler_issueJudgement",
         lockAtMostFor = "${scheduler.lockAtMostFor}",
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
