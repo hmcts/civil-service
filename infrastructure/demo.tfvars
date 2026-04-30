@@ -11,13 +11,13 @@ monitor_action_group = {
 
 monitor_scheduler_alerts = {
   "JudgementBuffer" = {
-    frequency_in_minutes              = 60
-    time_window_in_minutes            = 60
-    enabled                           = true
+    frequency_in_minutes   = 60
+    time_window_in_minutes = 60
+    enabled                = true
   }
   "DefendantResponseDeadline" = {
-    frequency_in_minutes              = 60
-    time_window_in_minutes            = 60
-    enabled                           = true
+    frequency_in_minutes   = 60
+    time_window_in_minutes = 60
+    enabled                = true
   }
 }
