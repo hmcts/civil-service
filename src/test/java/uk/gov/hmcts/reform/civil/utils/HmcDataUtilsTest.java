@@ -208,6 +208,26 @@ class HmcDataUtilsTest {
         assertTrue(result);
     }
 
+    @Test
+    void hearingDataChanged_WhenHearingLocationIsNull_ReturnsTrue() {
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse()
+                                 .setHearingDaySchedule(List.of(new uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule()
+                                                                   .setHearingVenueId("Venue A")
+                                                                   .setHearingStartDateTime(LocalDateTime.now())
+                                                                   .setHearingEndDateTime(LocalDateTime.now().plusHours(1)))));
+        PartiesNotifiedResponse partiesNotified = new PartiesNotifiedResponse()
+            .setServiceData(new PartiesNotifiedServiceData()
+                             .setDays(List.of(new HearingDay()
+                                               .setHearingStartDateTime(LocalDateTime.now())
+                                               .setHearingEndDateTime(LocalDateTime.now().plusHours(1))))
+                             .setHearingLocation(null)); // NULL location
+
+        boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
+
+        assertTrue(result);
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText(Boolean isWelsh) {

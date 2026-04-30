@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -316,6 +317,32 @@ class HearingNoticeSchedulerEventHandlerTest {
         );
         verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
         verifyNoInteractions(messageCorrelationBuilder);
+    }
+
+    @Test
+    void shouldAcknowledgeHearingWithoutNotice_whenHearingIsListedAndPartiesNotifiedIsNullAndCaseStateIsDisallowed() {
+        when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(
+            createHearing(ListAssistCaseStatus.LISTED));
+        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString())).thenReturn(
+            new PartiesNotifiedResponses());
+
+        CaseDetails mockCaseDetails = CaseDetails.builder()
+            .id(Long.parseLong(CASE_ID))
+            .state("CLOSED")
+            .build();
+
+        when(coreCaseDataService.getCase(Long.parseLong(CASE_ID))).thenReturn(mockCaseDetails);
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(hearingsService, times(1)).updatePartiesNotifiedResponse(
+            eq(AUTH_TOKEN),
+            eq(HEARING_ID),
+            eq(VERSION),
+            eq(RECEIVED_DATETIME),
+            eq(new PartiesNotified().setServiceData(new PartiesNotifiedServiceData()))
+        );
+        verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
     }
 
     @Test
