@@ -311,4 +311,18 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isOtherRemedyEnabled()).isEqualTo(toggleStat);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenLinkDefendantTestingEnabled(Boolean toggleStat) {
+        givenToggle("link-defendant-testing-enabled", toggleStat);
+        assertThat(featureToggleService.isLinkDefendantTestingEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenJudgmentBufferEnabled(Boolean toggleStat) {
+        givenToggle("judgment-buffer", toggleStat);
+        assertThat(featureToggleService.isJudgmentBufferEnabled()).isEqualTo(toggleStat);
+    }
 }

@@ -19,11 +19,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_WRITTEN_REPRESE
 import static uk.gov.hmcts.reform.civil.enums.CaseState.LISTING_FOR_A_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.ORDER_MADE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE;
-import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption.FREE_FORM_ORDER;
-import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption.LIST_FOR_A_HEARING;
-import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption.MAKE_AN_ORDER;
-import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS;
-import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption.REQUEST_MORE_INFO;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption.GIVE_DIRECTIONS_WITHOUT_HEARING;
@@ -39,37 +34,50 @@ public class StateGeneratorService {
 
     public CaseState getCaseStateForEndJudgeBusinessProcess(GeneralApplicationCaseData data) {
         log.info("Starting getCaseStateForEndJudgeBusinessProcess for Case ID: {}", data.getCcdCaseReference());
-        GAJudgeDecisionOption decision;
-        if (data.getJudicialDecision() != null) {
-            decision = data.getJudicialDecision().getDecision();
-        } else {
-            decision = null;
-        }
         if (isCaseDismissed(data)) {
             return APPLICATION_DISMISSED;
-        } else if (decision == MAKE_AN_ORDER && data.getJudicialDecisionMakeOrder()
-            .getMakeAnOrder().equals(GIVE_DIRECTIONS_WITHOUT_HEARING)) {
-            return AWAITING_DIRECTIONS_ORDER_DOCS;
-        } else if (decision == REQUEST_MORE_INFO) {
-
-            return getNewStateForRequestMoreInfo(data);
-
-        } else if (decision == MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS) {
-            return AWAITING_WRITTEN_REPRESENTATIONS;
-        } else if (decision == LIST_FOR_A_HEARING) {
-            return  LISTING_FOR_A_HEARING;
-        } else if (decision == MAKE_AN_ORDER && data.getJudicialDecisionMakeOrder() != null
-            && APPROVE_OR_EDIT.equals(data.getJudicialDecisionMakeOrder().getMakeAnOrder())) {
-            if (YesOrNo.YES.equals(data.getParentClaimantIsApplicant())
-                && data.getGeneralAppType().getTypes().contains(STRIKE_OUT)) {
-                return PROCEEDS_IN_HERITAGE;
-            } else {
-                return ORDER_MADE;
-            }
-        } else if (data.getApproveConsentOrder() != null || decision == FREE_FORM_ORDER) {
+        }
+        if (data.getApproveConsentOrder() != null) {
             return ORDER_MADE;
         }
+        GAJudgeDecisionOption decision = getDecision(data);
+        if (decision == null) {
+            return data.getCcdState();
+        }
+        return switch (decision) {
+            case REQUEST_MORE_INFO -> getNewStateForRequestMoreInfo(data);
+            case MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS -> AWAITING_WRITTEN_REPRESENTATIONS;
+            case LIST_FOR_A_HEARING -> LISTING_FOR_A_HEARING;
+            case MAKE_AN_ORDER -> getMakeAnOrderState(data);
+            case FREE_FORM_ORDER -> ORDER_MADE;
+        };
+    }
+
+    private GAJudgeDecisionOption getDecision(GeneralApplicationCaseData data) {
+        return data.getJudicialDecision() != null ? data.getJudicialDecision().getDecision() : null;
+    }
+
+    private boolean isDirectionsWithoutHearing(GeneralApplicationCaseData data) {
+        return data.getJudicialDecisionMakeOrder() != null && GIVE_DIRECTIONS_WITHOUT_HEARING.equals(data.getJudicialDecisionMakeOrder().getMakeAnOrder());
+    }
+
+    private boolean isApproveOrEditOrder(GeneralApplicationCaseData data) {
+        return data.getJudicialDecisionMakeOrder() != null && APPROVE_OR_EDIT.equals(data.getJudicialDecisionMakeOrder().getMakeAnOrder());
+    }
+
+    private CaseState getMakeAnOrderState(GeneralApplicationCaseData data) {
+        if (isDirectionsWithoutHearing(data)) {
+            return AWAITING_DIRECTIONS_ORDER_DOCS;
+        }
+        if (isApproveOrEditOrder(data)) {
+            return shouldProceedInHeritage(data) ? PROCEEDS_IN_HERITAGE : ORDER_MADE;
+        }
         return data.getCcdState();
+    }
+
+    private boolean shouldProceedInHeritage(GeneralApplicationCaseData data) {
+        return YesOrNo.YES.equals(data.getParentClaimantIsApplicant())
+            && data.getGeneralAppType().getTypes().contains(STRIKE_OUT);
     }
 
     private boolean isCaseDismissed(GeneralApplicationCaseData caseData) {

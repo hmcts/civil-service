@@ -125,7 +125,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private PaymentDateService paymentDateService;
 
-    private static final String courtLocation = "Site 1 - Adr 1 - AAA 111";
+    private static final String COURT_LOCATION = "Site 1 - Adr 1 - AAA 111";
     private static final String LIVERPOOL_SITE_NAME = "Liverpool Civil and Family Court";
 
     @BeforeEach
@@ -222,8 +222,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .setResponseCourtCode("court1")
                         .setCaseLocation(
                             new CaseLocationCivil()
-                                .setRegion(courtLocation)
-                                .setBaseLocation(courtLocation)
+                                .setRegion(COURT_LOCATION)
+                                .setBaseLocation(COURT_LOCATION)
                         )
                 )
                 .setApplicant1DQHearing(new Hearing()
@@ -238,8 +238,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .setRespondent1DQRequestedCourt(new RequestedCourt()
                                                  .setResponseCourtCode("court2")
                                                  .setCaseLocation(new CaseLocationCivil()
-                                                                      .setRegion(courtLocation)
-                                                                      .setBaseLocation(courtLocation)));
+                                                                      .setRegion(COURT_LOCATION)
+                                                                      .setBaseLocation(COURT_LOCATION)));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
             caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(NO);

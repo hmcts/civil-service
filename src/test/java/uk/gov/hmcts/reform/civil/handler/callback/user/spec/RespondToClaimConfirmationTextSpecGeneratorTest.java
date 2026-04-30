@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.CounterClaimConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitAlreadyPaidConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitSetDateConfirmationText;
@@ -14,11 +16,13 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.RepayPlanConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.SpecResponse1v2DivergentText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.SpecResponse2v1DifferentText;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -26,18 +30,152 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+
 /**
  * config for testing implementations of RespondToClaimConfirmationTextSpecGenerator.
  */
-public class RespondToClaimConfirmationTextSpecGeneratorTest
-    implements CaseDataToTextGeneratorTest
-    .CaseDataToTextGeneratorIntentionConfig<RespondToClaimConfirmationTextSpecGenerator> {
+class RespondToClaimConfirmationTextSpecGeneratorTest
+        implements CaseDataToTextGeneratorTest
+        .CaseDataToTextGeneratorIntentionConfig<RespondToClaimConfirmationTextSpecGenerator> {
+
+    @Test
+    void shouldGenerateCounterClaimConfirmationText() {
+        CaseData caseData = getCounterClaim();
+
+        assertThat(new CounterClaimConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+                assertThat(text)
+                        .contains("You've chosen to counterclaim - this means your defence cannot continue online.")
+                        .contains("Download form N9B")
+        );
+    }
+
+    @Test
+    void shouldGeneratePartialAdmissionSetDateConfirmationText() {
+        CaseData caseData = getPartialAdmitSetDate();
+        String applicantName = caseData.getApplicant1().getPartyName();
+        String paymentDate = DateFormatHelper.formatLocalDate(
+                caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(),
+                DATE
+        );
+
+        assertThat(new PartialAdmitSetDateConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+                assertThat(text)
+                        .contains("You believe you owe &#163;" + caseData.getRespondToAdmittedClaimOwingAmountPounds())
+                        .contains(applicantName)
+                        .contains("your offer to pay by " + paymentDate)
+                        .contains(String.format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference()))
+                        .contains("The court will decide how you must pay")
+        );
+    }
+
+    @Test
+    void shouldGenerateTextForDifferentResponsesPerClaimant() {
+        CaseData caseData = get2v1DifferentResponseCase().getFirst();
+
+        assertThat(new SpecResponse2v1DifferentText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+                assertThat(text)
+                        .contains("The defendant has chosen different responses for each claimant and the claim cannot continue online.")
+                        .contains("Download form N9A")
+                        .contains("Download form N9B")
+                        .contains("County Court Business Centre")
+        );
+    }
+
+    @Test
+    void shouldGenerateCounterClaimConfirmationTextWhenBothResponsesAreTheSame() {
+        CaseData caseData = getCounterClaim();
+        caseData.setRespondent2(new Party());
+        caseData.setRespondentResponseIsSame(YesOrNo.YES);
+
+        assertThat(new CounterClaimConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+                assertThat(text).contains("Download form N9B")
+        );
+    }
+
+    @Test
+    void shouldGenerateCounterClaimConfirmationTextWhenSecondRespondentAlsoCounterclaims() {
+        CaseData caseData = getCounterClaim();
+        caseData.setRespondent2(new Party());
+        caseData.setRespondentResponseIsSame(YesOrNo.NO);
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM);
+
+        assertThat(new CounterClaimConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+                assertThat(text).contains("Download form N9B")
+        );
+    }
+
+    @Test
+    void shouldReturnEmptyForDifferentResponsesPerClaimantWhenSingleResponseProvided() {
+        CaseData caseData = get2v1DifferentResponseCase().getFirst();
+        caseData.setDefendantSingleResponseToBothClaimants(YesOrNo.YES);
+
+        assertThat(new SpecResponse2v1DifferentText().generateTextFor(caseData, null)).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyForDifferentResponsesPerClaimantWhenResponsesMatch() {
+        Party applicant1 = new Party();
+        Party applicant2 = new Party();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1(applicant1);
+        caseData.setApplicant2(applicant2);
+        caseData.setClaimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setClaimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+
+        assertThat(new SpecResponse2v1DifferentText().generateTextFor(caseData, null)).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyForPartialAdmissionSetDateWhenRequiredFieldIsMissing() {
+        CaseData caseData = getPartialAdmitSetDate();
+        caseData.setTotalClaimAmount(null);
+
+        assertThat(new PartialAdmitSetDateConfirmationText().generateTextFor(caseData, null)).isEmpty();
+    }
+
+    @Test
+    void shouldGeneratePartialAdmissionSetDateTextForBilingualMultiClaimantMediationCase() {
+        CaseData caseData = getPartialAdmitSetDate();
+        caseData.setApplicant1(new PartyBuilder().individual("Alice").build());
+        caseData.setApplicant2(new PartyBuilder().company().build());
+        caseData.setClaimantBilingualLanguagePreference(Language.WELSH.toString());
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
+
+        assertThat(new PartialAdmitSetDateConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+                assertThat(text)
+                        .contains("Mr. Alice Rambo and Company ltd")
+                        .contains("We will let you know when the claimant responds.")
+                        .contains("accept your offer")
+                        .contains("We'll ask if they want to try mediation.")
+                        .contains("If they do not want to try mediation the court will review the case for the full amount of &#163;"
+                                + caseData.getTotalClaimAmount())
+        );
+    }
+
+    @Test
+    void shouldGeneratePartialAdmissionSetDateTextForRepresentedApplicantNameEndingWithS() {
+        Party applicant1 = new Party();
+        applicant1.setType(Party.Type.COMPANY);
+        applicant1.setCompanyName("Evans");
+        applicant1.setPartyName("Evans");
+        CaseData caseData = getPartialAdmitSetDate();
+        caseData.setApplicant1(applicant1);
+        caseData.setTotalClaimAmount(caseData.getRespondToAdmittedClaimOwingAmountPounds());
+
+        assertThat(new PartialAdmitSetDateConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+                assertThat(text)
+                        .contains("Contact Evans' legal representative if you need details on how to pay.")
+                        .doesNotContain("and your explanation of why you do not owe the full amount.")
+        );
+    }
 
     private CaseData getFullAdmitAlreadyPaidCase() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .totalClaimAmount(BigDecimal.valueOf(1000)).build();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .totalClaimAmount(BigDecimal.valueOf(1000)).build();
         caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.YES);
         return caseData;
     }
@@ -51,13 +189,13 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
         LocalDate whenWillPay = LocalDate.now().plusMonths(1);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .respondToAdmittedClaimOwingAmountPounds(admitted)
-            .totalClaimAmount(admitted.multiply(BigDecimal.valueOf(2)))
-            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
-            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES).build();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .respondToAdmittedClaimOwingAmountPounds(admitted)
+                .totalClaimAmount(admitted.multiply(BigDecimal.valueOf(2)))
+                .respondent1Represented(isLipVLR ? YesOrNo.YES : YesOrNo.NO)
+                .applicant1Represented(isLipVLR ? YesOrNo.NO : YesOrNo.YES).build();
         RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
         respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
         caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
@@ -72,14 +210,14 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
         BigDecimal admitted = BigDecimal.valueOf(1000);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToAdmittedClaimOwingAmountPounds(admitted)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
-            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
-            .build();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondToAdmittedClaimOwingAmountPounds(admitted)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .respondent1Represented(isLipVLR ? YesOrNo.YES : YesOrNo.NO)
+                .applicant1Represented(isLipVLR ? YesOrNo.NO : YesOrNo.YES)
+                .build();
         RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
         respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
         caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
@@ -90,12 +228,12 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
         BigDecimal admitted = BigDecimal.valueOf(1000);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .applicant1Represented(YesOrNo.NO)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .respondToAdmittedClaimOwingAmountPounds(admitted).build();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .applicant1Represented(YesOrNo.NO)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .respondToAdmittedClaimOwingAmountPounds(admitted).build();
         RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
         respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
         caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
@@ -104,23 +242,23 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
 
     private CaseData getFullAdmitRepayPlan() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .applicant1Represented(YesOrNo.YES)
-            .defenceAdmitPartPaymentTimeRouteRequired(
-                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN).build();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .applicant1Represented(YesOrNo.YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(
+                        RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN).build();
         caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
         return caseData;
     }
 
     private CaseData getFullAdmitRepayPlanLiPvLr() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .applicant1Represented(YesOrNo.NO)
-            .defenceAdmitPartPaymentTimeRouteRequired(
-                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-            .build();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .applicant1Represented(YesOrNo.NO)
+                .defenceAdmitPartPaymentTimeRouteRequired(
+                        RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                .build();
         caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
         return caseData;
     }
@@ -131,23 +269,23 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
 
     private CaseData getPartialAdmitRepayPlan(boolean isLipVLR) {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(
-                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
-            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
-            .build();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(
+                        RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                .respondent1Represented(isLipVLR ? YesOrNo.YES : YesOrNo.NO)
+                .applicant1Represented(isLipVLR ? YesOrNo.NO : YesOrNo.YES)
+                .build();
         caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
         return caseData;
     }
 
     private CaseData getFullAdmitAlreadyPaid() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
         caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.YES);
         return caseData;
 
@@ -156,12 +294,12 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
     private CaseData getFullAdmitPayBySetDate() {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .applicant1Represented(YesOrNo.YES)
-            .defenceAdmitPartPaymentTimeRouteRequired(
-                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE).build();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .applicant1Represented(YesOrNo.YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(
+                        RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE).build();
         RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
         respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
         caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
@@ -172,12 +310,12 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
     private CaseData getFullAdmitPayBySetDateLipVLr() {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .applicant1Represented(YesOrNo.NO)
-            .defenceAdmitPartPaymentTimeRouteRequired(
-                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE).build();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .applicant1Represented(YesOrNo.NO)
+                .defenceAdmitPartPaymentTimeRouteRequired(
+                        RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE).build();
         caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
         RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
         respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
@@ -189,12 +327,12 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
         BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
         BigDecimal howMuchWasPaid = new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount));
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .totalClaimAmount(totalClaimAmount)
-            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
-            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
-            .build();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .totalClaimAmount(totalClaimAmount)
+                .respondent1Represented(isLipVLR ? YesOrNo.YES : YesOrNo.NO)
+                .applicant1Represented(isLipVLR ? YesOrNo.NO : YesOrNo.YES)
+                .build();
         RespondToClaim respondToClaim = new RespondToClaim();
         respondToClaim.setHowMuchWasPaid(howMuchWasPaid);
         caseData.setRespondToAdmittedClaim(respondToClaim);
@@ -214,12 +352,12 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
         BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
         BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .totalClaimAmount(totalClaimAmount)
-            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
-            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
-            .build();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .totalClaimAmount(totalClaimAmount)
+                .respondent1Represented(isLipVLR ? YesOrNo.YES : YesOrNo.NO)
+                .applicant1Represented(isLipVLR ? YesOrNo.NO : YesOrNo.YES)
+                .build();
         caseData.setSpecDefenceAdmittedRequired(YesOrNo.YES);
         RespondToClaim respondToClaim = new RespondToClaim();
         respondToClaim.setHowMuchWasPaid(howMuchWasPaid);
@@ -229,9 +367,9 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
 
     private CaseData getCounterClaim() {
         return CaseDataBuilder.builder()
-            .atStateRespondentCounterClaim()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-            .build();
+                .atStateRespondentCounterClaim()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                .build();
     }
 
     @Override
@@ -284,33 +422,33 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
 
     @Override
     public List<Pair<CaseData,
-        Class<? extends RespondToClaimConfirmationTextSpecGenerator>>> getCasesToExpectedImplementation() {
+            Class<? extends RespondToClaimConfirmationTextSpecGenerator>>> getCasesToExpectedImplementation() {
         List<Pair<CaseData, Class<? extends RespondToClaimConfirmationTextSpecGenerator>>> list = new ArrayList<>(
-            List.of(
-                Pair.of(getFullAdmitAlreadyPaidCase(), FullAdmitAlreadyPaidConfirmationText.class),
-                Pair.of(getPartialAdmitSetDate(), PartialAdmitSetDateConfirmationText.class),
-                Pair.of(getPartialAdmitSetDate(true), PartialAdmitSetDateConfirmationText.class),
-                Pair.of(getPartialAdmitPayImmediately(), PartialAdmitPayImmediatelyConfirmationText.class),
-                Pair.of(getPartialAdmitPayImmediately(true), PartialAdmitPayImmediatelyConfirmationText.class),
-                Pair.of(getFullAdmitRepayPlan(), RepayPlanConfirmationText.class),
-                Pair.of(getPartialAdmitRepayPlan(), RepayPlanConfirmationText.class),
-                Pair.of(getPartialAdmitRepayPlan(true), RepayPlanConfirmationText.class),
-                Pair.of(getFullAdmitAlreadyPaid(), FullAdmitAlreadyPaidConfirmationText.class),
-                Pair.of(getFullAdmitPayBySetDate(), FullAdmitSetDateConfirmationText.class),
-                Pair.of(getPartialAdmitPayFull(), PartialAdmitPaidFullConfirmationText.class),
-                Pair.of(getPartialAdmitPayFull(true), PartialAdmitPaidFullConfirmationText.class),
-                Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class),
-                Pair.of(getPartialAdmitPayLess(true), PartialAdmitPaidLessConfirmationText.class),
-                Pair.of(getCounterClaim(), CounterClaimConfirmationText.class),
-                Pair.of(getFullAdmitPayImmediately(), PartialAdmitPayImmediatelyConfirmationText.class),
-                Pair.of(getFullAdmitRepayPlanLiPvLr(), RepayPlanConfirmationText.class),
-                Pair.of(getFullAdmitPayBySetDateLipVLr(), FullAdmitSetDateConfirmationText.class)
-            ));
+                List.of(
+                        Pair.of(getFullAdmitAlreadyPaidCase(), FullAdmitAlreadyPaidConfirmationText.class),
+                        Pair.of(getPartialAdmitSetDate(), PartialAdmitSetDateConfirmationText.class),
+                        Pair.of(getPartialAdmitSetDate(true), PartialAdmitSetDateConfirmationText.class),
+                        Pair.of(getPartialAdmitPayImmediately(), PartialAdmitPayImmediatelyConfirmationText.class),
+                        Pair.of(getPartialAdmitPayImmediately(true), PartialAdmitPayImmediatelyConfirmationText.class),
+                        Pair.of(getFullAdmitRepayPlan(), RepayPlanConfirmationText.class),
+                        Pair.of(getPartialAdmitRepayPlan(), RepayPlanConfirmationText.class),
+                        Pair.of(getPartialAdmitRepayPlan(true), RepayPlanConfirmationText.class),
+                        Pair.of(getFullAdmitAlreadyPaid(), FullAdmitAlreadyPaidConfirmationText.class),
+                        Pair.of(getFullAdmitPayBySetDate(), FullAdmitSetDateConfirmationText.class),
+                        Pair.of(getPartialAdmitPayFull(), PartialAdmitPaidFullConfirmationText.class),
+                        Pair.of(getPartialAdmitPayFull(true), PartialAdmitPaidFullConfirmationText.class),
+                        Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class),
+                        Pair.of(getPartialAdmitPayLess(true), PartialAdmitPaidLessConfirmationText.class),
+                        Pair.of(getCounterClaim(), CounterClaimConfirmationText.class),
+                        Pair.of(getFullAdmitPayImmediately(), PartialAdmitPayImmediatelyConfirmationText.class),
+                        Pair.of(getFullAdmitRepayPlanLiPvLr(), RepayPlanConfirmationText.class),
+                        Pair.of(getFullAdmitPayBySetDateLipVLr(), FullAdmitSetDateConfirmationText.class)
+                ));
         get2v1DifferentResponseCase().forEach(caseData -> list.add(
-            Pair.of(caseData, SpecResponse2v1DifferentText.class))
+                Pair.of(caseData, SpecResponse2v1DifferentText.class))
         );
         get1v2DivergentResponseCase().forEach(caseData -> list.add(
-            Pair.of(caseData, SpecResponse1v2DivergentText.class)
+                Pair.of(caseData, SpecResponse1v2DivergentText.class)
         ));
         return list;
     }

@@ -35,8 +35,6 @@ import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType.DOCUM
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_INSPECTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_STANDARD_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_SCHEDULE_FUTURE_LOSS_SDO;
@@ -79,12 +77,10 @@ public class SdoFastTrackNarrativeService {
     private void applyDisclosureOfDocuments(CaseData caseData) {
         caseData.setFastTrackDisclosureOfDocuments((new FastTrackDisclosureOfDocuments())
                                                        .setInput1(FAST_TRACK_DISCLOSURE_STANDARD_SDO)
-                                                       .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
+                                                       .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(2))
                                                        .setInput2(FAST_TRACK_DISCLOSURE_INSPECTION)
-                                                       .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(6))
-                                                       .setInput3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_SDO)
-                                                       .setInput4(FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX + " " + FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE)
-                                                       .setDate3(sdoDeadlineService.nextWorkingDayFromNowWeeks(8)));
+                                                       .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(3))
+                                                       .setInput3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_SDO));
     }
 
     private void applyWitnessesOfFact(CaseData caseData) {
@@ -94,9 +90,9 @@ public class SdoFastTrackNarrativeService {
     private void applySchedulesOfLoss(CaseData caseData) {
         caseData.setFastTrackSchedulesOfLoss(new FastTrackSchedulesOfLoss()
                                                          .setInput1(FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD)
-                                                         .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
+                                                         .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(12))
                                                          .setInput2(FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD)
-                                                         .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(12))
+                                                         .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(14))
                                                          .setInput3(FAST_TRACK_SCHEDULE_FUTURE_LOSS_SDO));
     }
 
@@ -113,8 +109,8 @@ public class SdoFastTrackNarrativeService {
     }
 
     private void applyHearingTime(CaseData caseData) {
-        LocalDate trialStart = calendarWeeksFromNow(TRIAL_WINDOW_START_WEEKS);
-        LocalDate trialEnd = calendarWeeksFromNow(TRIAL_WINDOW_END_WEEKS);
+        LocalDate trialStart = calendarWeeksFromNow(20);
+        LocalDate trialEnd = calendarWeeksFromNow(29);
         caseData.setFastTrackHearingTime(new FastTrackHearingTime()
                                                  .setDateFrom(trialStart)
                                                  .setDateTo(trialEnd)
@@ -162,7 +158,7 @@ public class SdoFastTrackNarrativeService {
         witnessOfFact.setSdoR2RestrictWitness(restrictWitness);
         witnessOfFact.setSdoRestrictPages(restrictPages);
         witnessOfFact.setSdoWitnessDeadline(DEADLINE);
-        witnessOfFact.setSdoWitnessDeadlineDate(sdoDeadlineService.calendarDaysFromNow(70));
+        witnessOfFact.setSdoWitnessDeadlineDate(LocalDate.now().plusWeeks(5));
         witnessOfFact.setSdoWitnessDeadlineText(DEADLINE_EVIDENCE);
         return witnessOfFact;
     }

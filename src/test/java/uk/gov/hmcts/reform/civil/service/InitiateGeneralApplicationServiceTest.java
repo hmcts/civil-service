@@ -31,11 +31,13 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -58,6 +60,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
@@ -96,7 +101,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder {
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
-    private static final String authToken = "Bearer TestAuthToken";
+    private static final String AUTH_TOKEN = "Bearer TestAuthToken";
     private static final LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
     private static final Applicant1DQ applicant1DQ;
     private static final Respondent1DQ respondent1DQ;
@@ -740,7 +745,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .thenReturn(CaseAssignmentUserRolesResource.builder()
                             .caseAssignmentUserRoles(onlyApplicantSolicitorAssigned()).build());
 
-        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, authToken);
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, AUTH_TOKEN);
         assertTrue(result);
     }
 
@@ -758,7 +763,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .thenReturn(CaseAssignmentUserRolesResource.builder()
                             .caseAssignmentUserRoles(applicant1Respondent2SolAssigned()).build());
 
-        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, authToken);
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, AUTH_TOKEN);
 
         assertFalse(result);
     }
@@ -1195,6 +1200,124 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         assertThat(result.getClaimDismissedDeadline().toLocalDate())
             .isEqualTo(LocalDateTime.now().plusMonths(36).toLocalDate());
+    }
+
+    @Nested
+    class DeadlineCalculationTests {
+
+        @Test
+        void shouldCallCalculateDeadlineWith4Days_whenNonUrgentApplicationWithNotice() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build())
+                .toBuilder()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement()
+                    .setGeneralAppUrgency(NO))
+                .generalAppInformOtherParty(new GAInformOtherParty()
+                    .setIsWithNotice(YES))
+                .build();
+            when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+            service.buildCaseData(caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), new CallbackParams().toString());
+
+            verify(calc).calculateApplicantResponseDeadlineWithWeekendCheck(any(LocalDateTime.class), eq(4));
+        }
+
+        @Test
+        void shouldCallCalculateDeadlineWith5Days_whenUrgentApplicationWithNotice() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build())
+                .toBuilder()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement()
+                    .setGeneralAppUrgency(YES)
+                    .setReasonsForUrgency("Urgent reasons"))
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement()
+                    .setHasAgreed(NO))
+                .generalAppInformOtherParty(new GAInformOtherParty()
+                    .setIsWithNotice(YES))
+                .build();
+            when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+            service.buildCaseData(caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), new CallbackParams().toString());
+
+            verify(calc).calculateApplicantResponseDeadline(any(LocalDateTime.class), eq(5));
+            verify(calc, never()).calculateApplicantResponseDeadlineWithWeekendCheck(any(LocalDateTime.class), anyInt());
+        }
+
+        @Test
+        void shouldCallCalculateDeadlineWith5Days_whenNonUrgentApplicationWithoutNotice() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build())
+                .toBuilder()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement()
+                    .setGeneralAppUrgency(NO))
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement()
+                    .setHasAgreed(NO))
+                .generalAppInformOtherParty(new GAInformOtherParty()
+                    .setIsWithNotice(NO)
+                    .setReasonsForWithoutNotice("Reasons"))
+                .build();
+            when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+            service.buildCaseData(caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), new CallbackParams().toString());
+
+            verify(calc).calculateApplicantResponseDeadline(any(LocalDateTime.class), eq(5));
+            verify(calc, never()).calculateApplicantResponseDeadlineWithWeekendCheck(any(LocalDateTime.class), anyInt());
+        }
+
+        @Test
+        void shouldSetDeadline_whenNonUrgentApplicationWithNotice() {
+            LocalDateTime expectedDeadline = LocalDateTime.of(2022, 3, 1, 16, 0);
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build())
+                .toBuilder()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement()
+                    .setGeneralAppUrgency(NO))
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement()
+                    .setHasAgreed(NO))
+                .generalAppInformOtherParty(new GAInformOtherParty()
+                    .setIsWithNotice(YES))
+                .build();
+            when(calc.calculateApplicantResponseDeadlineWithWeekendCheck(any(LocalDateTime.class), eq(4)))
+                .thenReturn(expectedDeadline);
+            when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+            CaseData result = service.buildCaseData(caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), new CallbackParams().toString());
+
+            assertThat(result.getGeneralApplications()).isNotEmpty();
+            assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppDateDeadline())
+                .isEqualTo(expectedDeadline);
+        }
+
+        @Test
+        void shouldSetDeadline_whenUrgentApplication() {
+            LocalDateTime expectedDeadline = LocalDateTime.of(2022, 3, 1, 16, 0);
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build())
+                .toBuilder()
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement()
+                    .setGeneralAppUrgency(YES)
+                    .setReasonsForUrgency("Urgent"))
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement()
+                    .setHasAgreed(NO))
+                .generalAppInformOtherParty(new GAInformOtherParty()
+                    .setIsWithNotice(YES))
+                .build();
+            when(calc.calculateApplicantResponseDeadline(any(LocalDateTime.class), eq(5)))
+                .thenReturn(expectedDeadline);
+            when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+            CaseData result = service.buildCaseData(caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), new CallbackParams().toString());
+
+            assertThat(result.getGeneralApplications()).isNotEmpty();
+            assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppDateDeadline())
+                .isEqualTo(expectedDeadline);
+        }
+
     }
 
     private void assertCaseDateEntries(CaseData caseData) {

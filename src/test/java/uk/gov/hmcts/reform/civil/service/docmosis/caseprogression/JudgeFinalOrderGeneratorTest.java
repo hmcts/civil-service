@@ -109,16 +109,16 @@ class JudgeFinalOrderGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String DATE_FORMAT = "dd/MM/yyyy";
-    private static final String fileFreeForm = format(FREE_FORM_ORDER_PDF.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
-    private static final String assistedForm = format(ASSISTED_ORDER_PDF.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
+    private static final String FILE_FREE_FORM = format(FREE_FORM_ORDER_PDF.getDocumentTitle(), formatLocalDate(LocalDate.now(), DATE_FORMAT));
+    private static final String ASSISTED_FORM = format(ASSISTED_ORDER_PDF.getDocumentTitle(), formatLocalDate(LocalDate.now(), DATE_FORMAT));
     private static final CaseLocationCivil caseManagementLocation = new CaseLocationCivil().setBaseLocation("000000");
     List<FinalOrderToggle> toggleList = new ArrayList<FinalOrderToggle>(Arrays.asList(FinalOrderToggle.SHOW));
     private static final CaseDocument FREE_FROM_ORDER = CaseDocumentBuilder.builder()
-        .documentName(fileFreeForm)
+        .documentName(FILE_FREE_FORM)
         .documentType(JUDGE_FINAL_ORDER)
         .build();
     private static final CaseDocument ASSISTED_FROM_ORDER = CaseDocumentBuilder.builder()
-        .documentName(assistedForm)
+        .documentName(ASSISTED_FORM)
         .documentType(JUDGE_FINAL_ORDER)
         .build();
     @MockBean
@@ -181,7 +181,7 @@ class JudgeFinalOrderGeneratorTest {
     void shouldThrowException_whenBaseCourtLocationNotFound() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_FREE_FORM, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenThrow(IllegalArgumentException.class);
 
@@ -198,7 +198,7 @@ class JudgeFinalOrderGeneratorTest {
         LocalDate appealDate = LocalDate.now();
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_FREE_FORM, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(new JudgeFinalOrderForm().setInitiativeDate(appealDate));
@@ -210,7 +210,7 @@ class JudgeFinalOrderGeneratorTest {
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_FREE_FORM, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
@@ -218,7 +218,7 @@ class JudgeFinalOrderGeneratorTest {
         LocalDate appealDate = LocalDate.now();
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_FREE_FORM, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(new JudgeFinalOrderForm().setInitiativeDate(appealDate));
@@ -231,7 +231,7 @@ class JudgeFinalOrderGeneratorTest {
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_FREE_FORM, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
@@ -239,7 +239,7 @@ class JudgeFinalOrderGeneratorTest {
         LocalDate appealDate = LocalDate.now();
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_FREE_FORM, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(new JudgeFinalOrderForm().setInitiativeDate(appealDate));
@@ -253,7 +253,7 @@ class JudgeFinalOrderGeneratorTest {
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_FREE_FORM, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
@@ -261,7 +261,7 @@ class JudgeFinalOrderGeneratorTest {
         LocalDate appealDate = LocalDate.now();
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_FREE_FORM, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(new JudgeFinalOrderForm().setInitiativeDate(appealDate));
@@ -282,7 +282,7 @@ class JudgeFinalOrderGeneratorTest {
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_FREE_FORM, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
@@ -290,7 +290,7 @@ class JudgeFinalOrderGeneratorTest {
         LocalDate appealDate = LocalDate.now();
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_FREE_FORM, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(new JudgeFinalOrderForm().setInitiativeDate(appealDate));
@@ -312,7 +312,7 @@ class JudgeFinalOrderGeneratorTest {
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_FREE_FORM, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
@@ -321,7 +321,7 @@ class JudgeFinalOrderGeneratorTest {
         LocalDate appealDate = LocalDate.now();
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(ASSISTED_FORM, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(ASSISTED_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
@@ -361,7 +361,7 @@ class JudgeFinalOrderGeneratorTest {
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
         //Then: It should generate assisted order document
         assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(ASSISTED_FORM, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
@@ -370,7 +370,7 @@ class JudgeFinalOrderGeneratorTest {
         LocalDate appealDate = LocalDate.now();
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(ASSISTED_FORM, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(ASSISTED_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
@@ -426,7 +426,7 @@ class JudgeFinalOrderGeneratorTest {
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
         //Then: It should generate assisted order document
         assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(ASSISTED_FORM, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
@@ -435,7 +435,7 @@ class JudgeFinalOrderGeneratorTest {
         LocalDate appealDate = LocalDate.now();
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(ASSISTED_FORM, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(ASSISTED_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
@@ -505,7 +505,7 @@ class JudgeFinalOrderGeneratorTest {
         //Then: It should generate assisted order document
         assertNotNull(caseDocument);
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER));
+            .uploadDocument(BEARER_TOKEN, new PDF(ASSISTED_FORM, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test

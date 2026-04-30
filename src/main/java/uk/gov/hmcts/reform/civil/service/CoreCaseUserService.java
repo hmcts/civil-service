@@ -138,6 +138,6 @@ public class CoreCaseUserService {
             .anyMatch(c ->
                           caseRole.getFormattedName().equals(c.getCaseRole())
                               && userId.equals(c.getUserId())
-        );
+            );
     }
 }

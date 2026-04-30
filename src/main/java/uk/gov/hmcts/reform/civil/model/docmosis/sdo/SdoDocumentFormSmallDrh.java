@@ -64,4 +64,9 @@ public class SdoDocumentFormSmallDrh implements MappableObject {
     private LocationRefData caseManagementLocation;
     private String welshLanguageDescription;
     private String sdoR2SmallClaimMediationSectionInput;
+
+    private String applicant1PartyName;
+    private String applicant2PartyName;
+    private String respondent1PartyName;
+    private String respondent2PartyName;
 }

@@ -153,7 +153,7 @@ class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHand
     void shouldRecordScenarioClaimantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setIsFinalOrder(YesOrNo.YES);
 

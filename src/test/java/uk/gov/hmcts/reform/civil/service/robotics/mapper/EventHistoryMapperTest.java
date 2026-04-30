@@ -7180,7 +7180,7 @@ class EventHistoryMapperTest {
                 Event expectedDefenceFiled =
                         new Event() {
                             {
-                                setEventSequence(3);
+                                setEventSequence(5);
                                 setEventCode("50");
                                 setDateReceived(caseData.getRespondent1ResponseDate());
                                 setLitigiousPartyID("002");
@@ -7189,7 +7189,7 @@ class EventHistoryMapperTest {
                 Event expectedRespondentDQ =
                         new Event() {
                             {
-                                setEventSequence(4);
+                                setEventSequence(6);
                                 setEventCode("197");
                                 setDateReceived(caseData.getRespondent1ResponseDate());
                                 setLitigiousPartyID("002");
@@ -7210,7 +7210,7 @@ class EventHistoryMapperTest {
                 Event expectedApplicant2DQ =
                         new Event() {
                             {
-                                setEventSequence(6);
+                                setEventSequence(7);
                                 setEventCode("197");
                                 setDateReceived(caseData.getApplicant2ResponseDate());
                                 setLitigiousPartyID("004");
@@ -7274,6 +7274,31 @@ class EventHistoryMapperTest {
                                                 });
                                     }
                                 });
+
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory)
+                    .extracting("defenceFiled")
+                    .asInstanceOf(list(Object.class))
+                    .containsExactly(expectedDefenceFiled);
+                assertThat(eventHistory)
+                    .extracting("directionsQuestionnaireFiled")
+                    .asInstanceOf(list(Object.class))
+                    .containsExactlyInAnyOrder(expectedRespondentDQ, expectedApplicant2DQ);
+
+                assertThat(eventHistory.getMiscellaneous())
+                    .extracting(Event::getEventDetailsText)
+                    .contains(
+                        expectedMiscText1,
+                        expectedMiscText2
+                    );
+
+                assertEmptyEvents(
+                    eventHistory,
+                    "receiptOfAdmission",
+                    "receiptOfPartAdmission",
+                    "consentExtensionFilingDefence");
             }
         }
     }
@@ -9028,7 +9053,7 @@ class EventHistoryMapperTest {
             Event expectedDefenceFiled =
                     new Event() {
                         {
-                            setEventSequence(4);
+                            setEventSequence(6);
                             setEventCode("50");
                             setDateReceived(caseData.getRespondent1ResponseDate());
                             setLitigiousPartyID("002");
@@ -9037,7 +9062,7 @@ class EventHistoryMapperTest {
             Event expectedDirectionsQuestionnaireFiled =
                     new Event() {
                         {
-                            setEventSequence(5);
+                            setEventSequence(7);
                             setEventCode("197");
                             setDateReceived(caseData.getRespondent1ResponseDate());
                             setLitigiousPartyID("002");
@@ -9086,7 +9111,7 @@ class EventHistoryMapperTest {
             Event expectedAcknowledgementOfServiceReceived =
                     new Event() {
                         {
-                            setEventSequence(2);
+                            setEventSequence(4);
                             setEventCode("38");
                             setDateReceived(caseData.getRespondent1AcknowledgeNotificationDate());
                             setLitigiousPartyID("002");
@@ -9106,7 +9131,7 @@ class EventHistoryMapperTest {
             Event expectedConsentExtensionFilingDefence =
                     new Event() {
                         {
-                            setEventSequence(3);
+                            setEventSequence(5);
                             setEventCode("45");
                             setDateReceived(caseData.getRespondent1TimeExtensionDate());
                             setLitigiousPartyID("002");
@@ -9130,19 +9155,27 @@ class EventHistoryMapperTest {
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
-            // TODO Tobe done as part of RPA release
-            /*
-            assertThat(eventHistory).isNotNull();
-            assertThat(eventHistory).extracting("defenceFiled").asInstanceOf(list(Object.class))
-                    .containsExactly(expectedDefenceFiled);
-            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asInstanceOf(list(Object.class))
-                    .containsExactly(expectedDirectionsQuestionnaireFiled);
-            assertThat(eventHistory).extracting("miscellaneous").asInstanceOf(list(Object.class))
-                    .containsExactly(expectedMiscellaneousEvents.getFirst(), expectedMiscellaneousEvents.get(1));
-            assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asInstanceOf(list(Object.class))
-                    .containsExactly(expectedAcknowledgementOfServiceReceived);
-            assertThat(eventHistory).extracting("consentExtensionFilingDefence").asInstanceOf(list(Object.class))
-                    .containsExactly(expectedConsentExtensionFilingDefence);
+            assertThat(eventHistory.getDefenceFiled())
+                .containsExactly(expectedDefenceFiled);
+
+            assertThat(eventHistory.getDirectionsQuestionnaireFiled())
+                .containsExactly(expectedDirectionsQuestionnaireFiled);
+
+            assertThat(eventHistory.getMiscellaneous())
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("eventSequence")
+                .extracting(Event::getEventDetailsText)
+                .containsExactly(
+                    "Claim issued in CCD.",
+                    "Claimant has notified defendant.",
+                    "Claim details notified.",
+                    detailsText
+                );
+
+            assertThat(eventHistory.getAcknowledgementOfServiceReceived())
+                .containsExactly(expectedAcknowledgementOfServiceReceived);
+
+            assertThat(eventHistory.getConsentExtensionFilingDefence())
+                .containsExactly(expectedConsentExtensionFilingDefence);
 
             assertEmptyEvents(
                     eventHistory,
@@ -9150,7 +9183,6 @@ class EventHistoryMapperTest {
                     "receiptOfPartAdmission",
                     "replyToDefence"
             );
-            */
         }
     }
 

@@ -56,21 +56,21 @@ class SdoFastTrackNarrativeServiceTest {
             .isEqualTo(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA);
         assertThat(caseData.getFastTrackDisclosureOfDocuments())
             .extracting(FastTrackDisclosureOfDocuments::getInput1, FastTrackDisclosureOfDocuments::getDate1)
-            .containsExactly(FAST_TRACK_DISCLOSURE_STANDARD_SDO, workingDayBase.plusWeeks(4));
+            .containsExactly(FAST_TRACK_DISCLOSURE_STANDARD_SDO, workingDayBase.plusWeeks(2));
         assertThat(caseData.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineDate())
-            .isEqualTo(calendarBase.plusDays(70));
+            .isEqualTo(LocalDate.now().plusWeeks(5));
         assertThat(caseData.getFastTrackSchedulesOfLoss())
             .extracting(
                 FastTrackSchedulesOfLoss::getDate1,
                 FastTrackSchedulesOfLoss::getDate2
             )
-            .containsExactly(workingDayBase.plusWeeks(10), workingDayBase.plusWeeks(12));
+            .containsExactly(workingDayBase.plusWeeks(12), workingDayBase.plusWeeks(14));
         assertThat(caseData.getFastTrackTrial())
             .extracting(FastTrackTrial::getDate1, FastTrackTrial::getDate2)
             .containsExactly(calendarBase.plusDays(22 * 7), calendarBase.plusDays(30 * 7));
         assertThat(caseData.getFastTrackHearingTime())
             .extracting(FastTrackHearingTime::getDateFrom, FastTrackHearingTime::getDateTo)
-            .containsExactly(calendarBase.plusDays(22 * 7), calendarBase.plusDays(30 * 7));
+            .containsExactly(calendarBase.plusDays(20 * 7), calendarBase.plusDays(29 * 7));
         assertThat(caseData.getFastTrackNotes().getDate())
             .isEqualTo(workingDayBase.plusWeeks(1));
     }

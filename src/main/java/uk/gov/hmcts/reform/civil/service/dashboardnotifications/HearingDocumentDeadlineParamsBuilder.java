@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
@@ -31,8 +30,7 @@ public class HearingDocumentDeadlineParamsBuilder extends DashboardNotifications
         if (sdoCaseClassificationService.isSmallClaimsTrack(caseData)) {
             return Optional.empty();
         } else if (sdoCaseClassificationService.isFastTrack(caseData)) {
-            return Optional.ofNullable(caseData.getFastTrackDisclosureOfDocuments())
-                .map(FastTrackDisclosureOfDocuments::getDate3);
+            return Optional.empty();
         } else {
             return Optional.ofNullable(caseData.getDisposalHearingDisclosureOfDocuments())
                 .map(DisposalHearingDisclosureOfDocuments::getDate2);

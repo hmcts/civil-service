@@ -34,12 +34,6 @@ public abstract class DefaultJudgmentFormBuilderBase {
                 .setPrimaryAddress(AddressUtils.getAddress(o.getContactInformation().get(0))))).orElse(null);
     }
 
-    protected Party getPartyDetails(uk.gov.hmcts.reform.civil.model.Party party) {
-        return new Party()
-            .setName(party.getPartyName())
-            .setPrimaryAddress(party.getPrimaryAddress());
-    }
-
     protected BigDecimal getClaimFee(CaseData caseData) {
         return judgmentAmountsCalculator.getClaimFee(caseData);
     }

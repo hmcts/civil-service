@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
@@ -14,6 +17,8 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,6 +28,8 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,6 +40,7 @@ public class MediationCasesSearchServiceTest {
     private static final LocalDateTime CARM_DATE = LocalDateTime.of(2024, 11, 5,
                                                                     7, 28, 35
     );
+    private static final ZonedDateTime FIXED_NOW = ZonedDateTime.of(2024, 6, 1, 12, 0, 0, 0, ZoneOffset.UTC);
 
     @Captor
     private ArgumentCaptor<Query> queryCaptor;
@@ -42,6 +50,19 @@ public class MediationCasesSearchServiceTest {
 
     @InjectMocks
     private MediationCasesSearchService searchService;
+
+    private MockedStatic<ZonedDateTime> zonedDateTimeMock;
+
+    @BeforeEach
+    void setup() {
+        zonedDateTimeMock = mockStatic(ZonedDateTime.class, CALLS_REAL_METHODS);
+        zonedDateTimeMock.when(() -> ZonedDateTime.now(ZoneOffset.UTC)).thenReturn(FIXED_NOW);
+    }
+
+    @AfterEach
+    void tearDown() {
+        zonedDateTimeMock.close();
+    }
 
     protected Query buildQuery(int fromValue) {
         return null;
@@ -131,13 +152,15 @@ public class MediationCasesSearchServiceTest {
                                           boolean initialSearch,
                                           String searchAfterValue) {
 
+        ZonedDateTime startOfToday = FIXED_NOW.toLocalDate().atStartOfDay(ZoneOffset.UTC);
+        ZonedDateTime eightDaysAgo = startOfToday.minusDays(8);
         if (carmEnabled) {
             BoolQueryBuilder query = boolQuery()
                 .must(matchAllQuery())
                 .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
                 .must(boolQuery().must(rangeQuery("data.submittedDate").gte(CARM_DATE)))
                 .must(rangeQuery("data.claimMovedToMediationOn")
-                          .gt("now-8d/d").lt("now/d"))
+                          .gt(eightDaysAgo.toString()).lt(startOfToday.toString()))
                 .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes"));
             return new Query(query, Collections.emptyList(), fromValue, initialSearch, searchAfterValue);
         } else {
@@ -147,7 +170,7 @@ public class MediationCasesSearchServiceTest {
                             .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
                             .must(boolQuery().must(rangeQuery("data.submittedDate").lt(CARM_DATE)))
                             .must(rangeQuery("data.claimMovedToMediationOn")
-                                      .gt("now-8d/d").lt("now/d")))
+                                      .gt(eightDaysAgo.toString()).lt(startOfToday.toString())))
                 .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes"));
 
             return new Query(query, Collections.emptyList(), fromValue);

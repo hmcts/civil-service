@@ -119,7 +119,7 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             caseData.setTrialReadyApplicant(null);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
             caseData.setDrawDirectionsOrderSmallClaims(NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
             caseData.setOrderType(OrderType.DECIDE_DAMAGES);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

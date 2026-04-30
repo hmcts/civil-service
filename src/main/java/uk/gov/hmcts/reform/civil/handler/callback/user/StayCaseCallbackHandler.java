@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +68,7 @@ public class StayCaseCallbackHandler extends CallbackHandler {
         caseData.setHearingNoticeListOther(null);
         caseData.setHearingDueDate(null);
         caseData.setHearingNoticeList(null);
+        caseData.setCaseStayDate(LocalDate.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))

@@ -170,7 +170,7 @@ class DirectionsQuestionnaireLipGeneratorTest {
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
         //Then
-        assertThat(form.getHearingLipSupportRequirements().isEmpty());
+        assertThat(form.getHearingLipSupportRequirements()).isEmpty();
     }
 
     @Test

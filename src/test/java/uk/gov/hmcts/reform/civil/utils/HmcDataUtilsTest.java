@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.HearingIndividual;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
@@ -37,7 +38,6 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceDa
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -207,6 +207,26 @@ class HmcDataUtilsTest {
         assertTrue(result);
     }
 
+    @Test
+    void hearingDataChanged_WhenHearingLocationIsNull_ReturnsTrue() {
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse()
+                                 .setHearingDaySchedule(List.of(new uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule()
+                                                                   .setHearingVenueId("Venue A")
+                                                                   .setHearingStartDateTime(LocalDateTime.now())
+                                                                   .setHearingEndDateTime(LocalDateTime.now().plusHours(1)))));
+        PartiesNotifiedResponse partiesNotified = new PartiesNotifiedResponse()
+            .setServiceData(new PartiesNotifiedServiceData()
+                             .setDays(List.of(new HearingDay()
+                                               .setHearingStartDateTime(LocalDateTime.now())
+                                               .setHearingEndDateTime(LocalDateTime.now().plusHours(1))))
+                             .setHearingLocation(null)); // NULL location
+
+        boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
+
+        assertTrue(result);
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void getHearingDaysText(Boolean isWelsh) {
@@ -239,10 +259,6 @@ class HmcDataUtilsTest {
         );
     }
 
-    @Test
-    void getTitle() {
-    }
-
     @Nested
     class GetHearingStartDay {
 
@@ -264,7 +280,12 @@ class HmcDataUtilsTest {
                                     LocalDateTime.of(2023, 01, 02, 0, 0, 0))
                         )));
 
-            assertEquals(HmcDataUtils.getHearingStartDay(hearing), expected);
+            var result = HmcDataUtils.getHearingStartDay(hearing);
+
+            assertEquals(
+                LocalDateTime.of(2023, 1, 1, 0, 0),
+                result.getHearingStartDateTime()
+            );
         }
 
         @Test
@@ -852,15 +873,19 @@ class HmcDataUtilsTest {
     void getTotalHearingDurationText_whenDuration1Day5Hours(Boolean isWelsh) {
         var hearingDay1 = new HearingDaySchedule()
             .setHearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
-            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 0));
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0));
+
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 24, 15, 0));
 
         HearingGetResponse hearing = new HearingGetResponse()
             .setHearingResponse(new HearingResponse().setHearingDaySchedule(
-                List.of(hearingDay1)));
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, isWelsh ? "5 awr" : "5 hours");
+        assertEquals(result, isWelsh ? "1 diwrnod a 5 awr" : "1 day and 5 hours");
     }
 
     @ParameterizedTest
@@ -1304,7 +1329,8 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedTitle(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().allocatedTrack(allocatedTrack).build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setAllocatedTrack(allocatedTrack);
 
             String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing, false);
 
@@ -1320,7 +1346,7 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedTitle_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+            CaseData caseData = CaseDataBuilder.builder().responseClaimTrack(allocatedTrack.name()).build();
 
             String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing, false);
 
@@ -1336,7 +1362,7 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedTitleWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+            CaseData caseData = CaseDataBuilder.builder().responseClaimTrack(allocatedTrack.name()).build();
 
             String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing, true);
 
@@ -1356,7 +1382,8 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedText_unspecClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().allocatedTrack(allocatedTrack).build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setAllocatedTrack(allocatedTrack);
 
             String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, false);
 
@@ -1372,7 +1399,7 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedText_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+            CaseData caseData = CaseDataBuilder.builder().responseClaimTrack(allocatedTrack.name()).build();
 
             String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, false);
 
@@ -1388,7 +1415,7 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedTextWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+            CaseData caseData = CaseDataBuilder.builder().responseClaimTrack(allocatedTrack.name()).build();
 
             String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, true);
 
@@ -1404,7 +1431,7 @@ class HmcDataUtilsTest {
         })
         void shouldReturnExpectedPluralTextWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
-            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+            CaseData caseData = CaseDataBuilder.builder().responseClaimTrack(allocatedTrack.name()).build();
 
             String actual = HmcDataUtils.getPluralHearingTypeTextWelsh(caseData, hearing);
 
@@ -1603,9 +1630,11 @@ class HmcDataUtilsTest {
         return new CaseHearing()
             .setHearingId(Long.valueOf(hearingId))
             .setHearingRequestDateTime(hearingRequestTime)
-            .setHearingDaySchedule(startTimes.stream().map(startTime -> new HearingDaySchedule().setHearingStartDateTime(
-                startTime)).collect(
-                Collectors.toList()));
+            .setHearingDaySchedule(
+                startTimes.stream()
+                    .map(startTime -> new HearingDaySchedule().setHearingStartDateTime(startTime))
+                    .toList()
+            );
     }
 
     @Nested
@@ -1614,7 +1643,7 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenApplicant1DQIsNull() {
             // Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1DQ(null)
                 .build();
 
@@ -1630,7 +1659,7 @@ class HmcDataUtilsTest {
             // Given
             Applicant1DQ applicant1DQ = new Applicant1DQ()
                 .setApplicant1DQLanguage(null);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1DQ(applicant1DQ)
                 .build();
 
@@ -1648,7 +1677,7 @@ class HmcDataUtilsTest {
                 .setDocuments(Language.ENGLISH);
             Applicant1DQ applicant1DQ = new Applicant1DQ()
                 .setApplicant1DQLanguage(req);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1DQ(applicant1DQ)
                 .build();
 
@@ -1666,7 +1695,7 @@ class HmcDataUtilsTest {
                 .setDocuments(Language.WELSH);
             Applicant1DQ applicant1DQ = new Applicant1DQ()
                 .setApplicant1DQLanguage(req);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1DQ(applicant1DQ)
                 .build();
 
@@ -1684,7 +1713,7 @@ class HmcDataUtilsTest {
                 .setDocuments(Language.BOTH);
             Applicant1DQ applicant1DQ = new Applicant1DQ()
                 .setApplicant1DQLanguage(req);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1DQ(applicant1DQ)
                 .build();
 
@@ -1702,7 +1731,7 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenRespondent1DQIsNull() {
             // Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(null)
                 .build();
 
@@ -1718,7 +1747,7 @@ class HmcDataUtilsTest {
             // Given
             Respondent1DQ respondent1DQ = new Respondent1DQ()
                 .setRespondent1DQLanguage(null);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .build();
 
@@ -1736,7 +1765,7 @@ class HmcDataUtilsTest {
                 .setDocuments(Language.ENGLISH);
             Respondent1DQ respondent1DQ = new Respondent1DQ()
                 .setRespondent1DQLanguage(req);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .build();
 
@@ -1754,7 +1783,7 @@ class HmcDataUtilsTest {
                 .setDocuments(Language.WELSH);
             Respondent1DQ respondent1DQ = new Respondent1DQ()
                 .setRespondent1DQLanguage(req);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .build();
 
@@ -1772,7 +1801,7 @@ class HmcDataUtilsTest {
                 .setDocuments(Language.BOTH);
             Respondent1DQ respondent1DQ = new Respondent1DQ()
                 .setRespondent1DQLanguage(req);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .build();
 
@@ -1790,7 +1819,7 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenApplicantNoRepAndClaimantBilingual() {
             // Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1Represented(YesOrNo.NO)
                 // -> isClaimantBilingual() = true
                 .claimantBilingualLanguagePreference(Language.WELSH.toString())
@@ -1812,7 +1841,7 @@ class HmcDataUtilsTest {
             Applicant1DQ dq = new Applicant1DQ()
                 .setApplicant1DQLanguage(req);
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1Represented(YesOrNo.NO)
                 // -> isClaimantBilingual() = false (ej: ENGLISH)
                 .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
@@ -1835,11 +1864,10 @@ class HmcDataUtilsTest {
                 .setRespondent1LiPResponse(new RespondentLiPResponse()
                                             .setRespondent1ResponseLanguage("BOTH"));
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1Represented(YesOrNo.YES)
-                .respondent1Represented(YesOrNo.NO)
-                .caseDataLiP(caseDataLiP)
-                .build();
+                .respondent1Represented(YesOrNo.NO).build();
+            caseData.setCaseDataLiP(caseDataLiP);
 
             // When
             boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
@@ -1861,12 +1889,11 @@ class HmcDataUtilsTest {
                 .setRespondent1LiPResponse(new RespondentLiPResponse()
                                             .setRespondent1ResponseLanguage("ENGLISH"));
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1Represented(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
-                .respondent1DQ(respondent1DQ)
-                .caseDataLiP(caseDataLiP)
-                .build();
+                .respondent1DQ(respondent1DQ).build();
+            caseData.setCaseDataLiP(caseDataLiP);
 
             // When
             boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
@@ -1879,7 +1906,7 @@ class HmcDataUtilsTest {
         void shouldReturnFalse_whenApplicantYesRepAndRespondentYesRep() {
             // Given
             // Ninguno es NO => toda la expresión OR se evalúa a false
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1Represented(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.YES)
                 .build();
@@ -1898,13 +1925,12 @@ class HmcDataUtilsTest {
                 .setRespondent1LiPResponse(new RespondentLiPResponse()
                                             .setRespondent1ResponseLanguage("ENGLISH"));
 
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .applicant1Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference(Language.ENGLISH.toString()) // => false
-                .respondent1Represented(YesOrNo.NO)
-                .caseDataLiP(caseDataLiP)
-                // Sin Applicant1DQ ni Respondent1DQ que establezcan WELSH o BOTH
-                .build();
+                .respondent1Represented(YesOrNo.NO).build();
+            caseData.setCaseDataLiP(caseDataLiP);
+            // Sin Applicant1DQ ni Respondent1DQ que establezcan WELSH o BOTH
 
             // When
             boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);

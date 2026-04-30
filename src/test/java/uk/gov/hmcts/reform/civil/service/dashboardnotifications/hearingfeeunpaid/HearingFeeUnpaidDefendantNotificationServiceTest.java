@@ -55,7 +55,7 @@ class HearingFeeUnpaidDefendantNotificationServiceTest {
         caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setCcdCaseReference(1234L);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setTrialReadyRespondent1(null);
 
         when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
@@ -77,7 +77,7 @@ class HearingFeeUnpaidDefendantNotificationServiceTest {
         caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setCcdCaseReference(1234L);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
         service.notifyHearingFeeUnpaid(caseData, AUTH_TOKEN);
@@ -119,7 +119,7 @@ class HearingFeeUnpaidDefendantNotificationServiceTest {
         caseData.setRespondent1Represented(YesOrNo.YES);
         caseData.setCcdCaseReference(1234L);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setTrialReadyRespondent1(null);
 
         when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);

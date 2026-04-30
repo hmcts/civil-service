@@ -22,7 +22,7 @@ class SdoCaseClassificationServiceTest {
     void shouldDetectSmallClaimsTrack() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+        caseData.setClaimsTrack(ClaimsTrack.SMALL_CLAIMS_TRACK);
 
         assertThat(service.isSmallClaimsTrack(caseData)).isTrue();
     }
@@ -40,7 +40,7 @@ class SdoCaseClassificationServiceTest {
     void shouldDetectFastTrack() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
 
         assertThat(service.isFastTrack(caseData)).isTrue();
     }
@@ -59,7 +59,7 @@ class SdoCaseClassificationServiceTest {
     void shouldDetectNihlFastTrack() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setFastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss));
+        caseData.setFastClaims(List.of(FastTrack.FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS));
 
         assertThat(service.isNihlFastTrack(caseData)).isTrue();
     }
@@ -69,7 +69,7 @@ class SdoCaseClassificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
         caseData.setTrialAdditionalDirectionsForFastTrack(
-            List.of(FastTrack.fastClaimNoiseInducedHearingLoss)
+            List.of(FastTrack.FAST_CLAIM_NOISE_INDUCED_HEARING_LOSS)
         );
 
         assertThat(service.isNihlFastTrack(caseData)).isTrue();
@@ -79,7 +79,7 @@ class SdoCaseClassificationServiceTest {
     void shouldDetectDrhSmallClaim() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
+        caseData.setSmallClaims(List.of(SmallTrack.SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING));
 
         assertThat(service.isDrhSmallClaim(caseData)).isTrue();
     }
@@ -89,7 +89,7 @@ class SdoCaseClassificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
         caseData.setDrawDirectionsOrderSmallClaimsAdditionalDirections(
-            List.of(SmallTrack.smallClaimDisputeResolutionHearing)
+            List.of(SmallTrack.SMALL_CLAIM_DISPUTE_RESOLUTION_HEARING)
         );
 
         assertThat(service.isDrhSmallClaim(caseData)).isTrue();

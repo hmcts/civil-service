@@ -12,23 +12,32 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 class CaseDismissedSearchServiceTest extends ElasticSearchServiceTest {
 
+    private String capturedTimeNow;
+
     @BeforeEach
     void setup() {
-        searchService = new CaseDismissedSearchService(coreCaseDataService);
+        searchService = new CaseDismissedSearchService(coreCaseDataService) {
+            @Override
+            public Query query(int startIndex, String timeNow) {
+                capturedTimeNow = timeNow;
+                return super.query(startIndex, timeNow);
+            }
+        };
     }
 
     @Override
     protected Query buildQuery(int fromValue) {
+        String timeNow = capturedTimeNow != null ? capturedTimeNow : "now";
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.claimDetailsNotificationDeadline").lt("now"))
+                        .must(rangeQuery("data.claimDetailsNotificationDeadline").lt(timeNow))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_CASE_DETAILS_NOTIFICATION"))))
             .should(boolQuery()
-                        .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
+                        .must(rangeQuery("data.claimNotificationDeadline").lt(timeNow))
                         .must(boolQuery().must(matchQuery("state", "CASE_ISSUED"))))
             .should(boolQuery()
-                        .must(rangeQuery("data.claimDismissedDeadline").lt("now"))
+                        .must(rangeQuery("data.claimDismissedDeadline").lt(timeNow))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))));
 
         return new Query(query, List.of("reference"), fromValue);

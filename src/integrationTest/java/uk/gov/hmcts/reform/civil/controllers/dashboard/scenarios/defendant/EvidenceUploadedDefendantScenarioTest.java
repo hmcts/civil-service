@@ -36,7 +36,7 @@ public class EvidenceUploadedDefendantScenarioTest extends DashboardBaseIntegrat
             .caseDocumentUploadDateRes(LocalDateTime.now())
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .orderType(OrderType.DECIDE_DAMAGES)
             .build();
 
@@ -71,7 +71,7 @@ public class EvidenceUploadedDefendantScenarioTest extends DashboardBaseIntegrat
             .respondent1Represented(NO)
             .drawDirectionsOrderRequired(YesOrNo.YES)
             .drawDirectionsOrderSmallClaims(NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .claimsTrack(ClaimsTrack.FAST_TRACK)
             .orderType(OrderType.DECIDE_DAMAGES)
             .build();
 

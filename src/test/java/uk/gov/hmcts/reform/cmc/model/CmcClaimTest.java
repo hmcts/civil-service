@@ -31,14 +31,14 @@ public class CmcClaimTest {
         CmcClaim cmcClaim = new CmcClaim()
             .setClaimData(new ClaimData().setClaimants(Arrays.asList(new CmcParty().setName(NAME))));
         String claimantName = cmcClaim.getClaimantName();
-        assert (claimantName).equals(NAME);
+        assertThat(claimantName).isEqualTo(NAME);
     }
 
     @Test
     void shouldReturnEmptyStringWhenClaimantDoesNotExist() {
         CmcClaim cmcClaim = new CmcClaim().setClaimData(new ClaimData().setClaimants(Collections.emptyList()));
         String claimantName = cmcClaim.getClaimantName();
-        assert (claimantName).equals("");
+        assertThat(claimantName).isEqualTo("");
     }
 
     @Test
@@ -46,14 +46,14 @@ public class CmcClaimTest {
         CmcClaim cmcClaim = new CmcClaim()
             .setClaimData(new ClaimData().setDefendants(Arrays.asList(new CmcParty().setName(NAME))));
         String defendantName = cmcClaim.getDefendantName();
-        assert (defendantName).equals(NAME);
+        assertThat(defendantName).isEqualTo(NAME);
     }
 
     @Test
     void shouldReturnEmptyStringWhenDefendantDoesNotExist() {
         CmcClaim cmcClaim = new CmcClaim().setClaimData(new ClaimData().setDefendants(Collections.emptyList()));
         String defendantName = cmcClaim.getDefendantName();
-        assert (defendantName).equals("");
+        assertThat(defendantName).isEqualTo("");
     }
 
     @Test

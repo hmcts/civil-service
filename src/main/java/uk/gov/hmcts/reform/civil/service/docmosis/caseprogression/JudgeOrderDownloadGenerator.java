@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.BLANK
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.BLANK_TEMPLATE_BEFORE_HEARING_DOCX;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FIX_DATE_CCMC_DOCX;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FIX_DATE_CMC_DOCX;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameWithLitigiousFriend;
 
 @Service
 public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFinalOrderForm> {
@@ -136,10 +137,10 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
             .setJudgeNameTitle(userDetails.getFullName())
             .setCourtName(caseManagementLocationDetails.getExternalShortName())
             .setCaseNumber(nonNull(caseData.getCcdCaseReference()) ? caseData.getCcdCaseReference().toString() : null)
-            .setClaimant1Name(caseData.getApplicant1().getPartyName())
-            .setClaimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
-            .setDefendant1Name(caseData.getRespondent1().getPartyName())
-            .setDefendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
+            .setClaimant1Name(getPartyNameWithLitigiousFriend(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend()))
+            .setClaimant2Name(getPartyNameWithLitigiousFriend(caseData.getApplicant2(), caseData.getApplicant2LitigationFriend()))
+            .setDefendant1Name(getPartyNameWithLitigiousFriend(caseData.getRespondent1(), caseData.getRespondent1LitigationFriend()))
+            .setDefendant2Name(getPartyNameWithLitigiousFriend(caseData.getRespondent2(), caseData.getRespondent2LitigationFriend()))
             .setClaimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
             .setDefendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
             .setDateNowPlus7(LocalDate.now().plusDays(7).format(formatter));

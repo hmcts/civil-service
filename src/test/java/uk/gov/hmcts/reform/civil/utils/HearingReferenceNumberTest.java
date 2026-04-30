@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber.generateHearingReference;
 
 public class HearingReferenceNumberTest {
@@ -11,6 +11,7 @@ public class HearingReferenceNumberTest {
     void shouldGenerateHearingReferenceNumber() {
         String result = generateHearingReference();
 
-        Assertions.assertThat(result.equals("000HN001"));
+        assertThat(result).isNotNull();
+        assertThat(result).matches("\\d{3}HN\\d{3}");
     }
 }
