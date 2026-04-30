@@ -11,23 +11,13 @@ monitor_action_group = {
 
 monitor_scheduler_alerts = {
   "JudgementBuffer" = {
-    threshold                         = 0
-    severity                          = 2
-    evaluation_frequency              = "PT1H"
-    window_duration                   = "PT1H"
-    auto_mitigation_enabled           = true
-    workspace_alerts_storage_enabled  = false
+    frequency_in_minutes              = 60
+    time_window_in_minutes            = 60
     enabled                           = true
-    skip_query_validation             = true
   }
   "DefendantResponseDeadline" = {
-    threshold                         = 0
-    severity                          = 2
-    evaluation_frequency              = "PT1H"
-    window_duration                   = "PT1H"
-    auto_mitigation_enabled           = true
-    workspace_alerts_storage_enabled  = false
+    frequency_in_minutes              = 60
+    time_window_in_minutes            = 60
     enabled                           = true
-    skip_query_validation             = true
   }
 }

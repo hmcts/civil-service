@@ -5,14 +5,13 @@ data "azurerm_key_vault_secret" "civil-service-alert-slack-email" {
 }
 
 locals {
-  alerts_resource_group_name = "${var.product}-${var.component}-alerts-${var.env}"
   civil_service_alert_slack_email      = length(data.azurerm_key_vault_secret.civil-service-alert-slack-email) > 0 ? data.azurerm_key_vault_secret.civil-service-alert-slack-email[0].value : null
 }
 
 resource "azurerm_monitor_action_group" "civil-service-action-group" {
   for_each            = var.monitor_action_group
   name                = each.key
-  resource_group_name = local.alerts_resource_group_name
+  resource_group_name = "civil-service-${var.env}"
   short_name          = try(each.value.short_name, null)
   tags                = var.common_tags
 
@@ -26,121 +25,86 @@ resource "azurerm_monitor_action_group" "civil-service-action-group" {
   }
 }
 
-resource "azurerm_monitor_scheduled_query_rules_alert_v2" "scheduler_aborted_alerts" {
-  for_each                          = var.monitor_scheduler_alerts
+module "scheduler-aborted-alerts" {
+  for_each = var.monitor_scheduler_alerts
+  source = "git@github.com:hmcts/cnp-module-metric-alert"
+  location = var.location
 
-  name                              = "${each.key}JobAborted"
-  display_name                      = "${each.key}JobAborted"
-  description                       = "The scheduler ${each.key} in ${var.env} has aborted."
+  app_insights_name = module.application_insights.name
+  resourcegroup_name = "civil-service-${var.env}"
 
-  resource_group_name               = local.alerts_resource_group_name
-  location                          = var.location
-  evaluation_frequency              = try(each.value.evaluation_frequency, null)
-  window_duration                   = try(each.value.window_duration, null)
-  scopes                            = [module.application_insights.id]
-  severity                          = try(each.value.severity, null)
-  auto_mitigation_enabled           = try(each.value.auto_mitigation_enabled, null)
-  workspace_alerts_storage_enabled  = try(each.value.workspace_alerts_storage_enabled, null)
-  enabled                           = try(each.value.enabled, null)
-  skip_query_validation             = try(each.value.skip_query_validation, null)
-  tags                              = var.common_tags
+  alert_name = "${each.key}JobAborted"
+  alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has aborted."
 
-  criteria {
-    query                   = <<-QUERY
+  app_insights_query = <<-AIQ
       customEvents
         | where name == "${each.key}JobAborted"
         | project timestamp, name, properties.abortReason
-      QUERY
-    time_aggregation_method = "Count"
-    threshold               = try(each.value.threshold, null)
-    operator                = "GreaterThan"
+      AIQ
 
-    failing_periods {
-      minimum_failing_periods_to_trigger_alert = 1
-      number_of_evaluation_periods             = 1
-    }
-  }
-
-  action {
-    action_groups = [azurerm_monitor_action_group.civil-service-action-group["aat-civil-service-slack-alert"].id]
-  }
+  custom_email_subject = "Warning: The scheduler ${each.key} in ${var.env} has aborted."
+  frequency_in_minutes = try(each.value.frequency_in_minutes, 30)
+  time_window_in_minutes = try(each.value.time_window_in_minutes, 30)
+  severity_level = 3
+  action_group_name = values(azurerm_monitor_action_group.civil-service-action-group)[0].name
+  trigger_threshold_operator = "GreaterThan"
+  trigger_threshold = 0
+  common_tags = var.common_tags
 }
 
-resource "azurerm_monitor_scheduled_query_rules_alert_v2" "scheduler_high_failure_rate_alerts" {
-  for_each                          = var.monitor_scheduler_alerts
+module "scheduler-high-failure-rate-alerts" {
+  for_each = var.monitor_scheduler_alerts
+  source = "git@github.com:hmcts/cnp-module-metric-alert"
+  location = var.location
 
-  name                              = "${each.key}HighFailureRate"
-  display_name                      = "${each.key}HighFailureRate"
-  description                       = "The scheduler ${each.key} in ${var.env} has a high failure rate."
+  app_insights_name = module.application_insights.name
+  resourcegroup_name = "civil-service-${var.env}"
 
-  resource_group_name               = local.alerts_resource_group_name
-  location                          = var.location
-  evaluation_frequency              = try(each.value.evaluation_frequency, null)
-  window_duration                   = try(each.value.window_duration, null)
-  scopes                            = [module.application_insights.id]
-  severity                          = try(each.value.severity, null)
-  auto_mitigation_enabled           = try(each.value.auto_mitigation_enabled, null)
-  workspace_alerts_storage_enabled  = try(each.value.workspace_alerts_storage_enabled, null)
-  enabled                           = try(each.value.enabled, null)
-  skip_query_validation             = try(each.value.skip_query_validation, null)
-  tags                              = var.common_tags
+  alert_name = "${each.key}HighFailureRate"
+  alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has a high failure rate."
 
-  criteria {
-    query                   = <<-QUERY
+  app_insights_query = <<-AIQ
       customEvents
         | where name in ("${each.key}JobCompleted", "${each.key}JobAborted")
         | extend cases = toint(tostring(properties.totalCases))
         | extend failed = toint(tostring(properties.failedCases))
         | extend failureRate = failed * 1.0 / cases
         | where failureRate > 0.2
-      QUERY
-    time_aggregation_method = "Count"
-    threshold = try(each.value.threshold, null)
-    operator                = "GreaterThan"
+      AIQ
 
-    failing_periods {
-      minimum_failing_periods_to_trigger_alert = 1
-      number_of_evaluation_periods             = 1
-    }
-  }
+  custom_email_subject = "Warning: The scheduler ${each.key} in ${var.env} has a high failure rate."
+  frequency_in_minutes = try(each.value.frequency_in_minutes, 30)
+  time_window_in_minutes = try(each.value.time_window_in_minutes, 30)
+  severity_level = 3
+  action_group_name = values(azurerm_monitor_action_group.civil-service-action-group)[0].name
+  trigger_threshold_operator = "GreaterThan"
+  trigger_threshold = 0
+  common_tags = var.common_tags
 }
 
-resource "azurerm_monitor_scheduled_query_rules_alert_v2" "scheduler_job_not_run_alerts" {
-  for_each                          = var.monitor_scheduler_alerts
+module "scheduler-job-not-run-alerts" {
+  for_each = var.monitor_scheduler_alerts
+  source = "git@github.com:hmcts/cnp-module-metric-alert"
+  location = var.location
 
-  name                              = "${each.key}JobNotRun"
-  display_name                      = "${each.key}JobNotRun"
-  description                       = "The scheduler ${each.key} in ${var.env} has not run in the last 26 hours."
+  app_insights_name = module.application_insights.name
+  resourcegroup_name = "civil-service-${var.env}"
 
-  resource_group_name               = local.alerts_resource_group_name
-  location                          = var.location
-  evaluation_frequency              = try(each.value.evaluation_frequency, null)
-  window_duration                   = try(each.value.window_duration, null)
-  scopes                            = [module.application_insights.id]
-  severity                          = try(each.value.severity, null)
-  auto_mitigation_enabled           = try(each.value.auto_mitigation_enabled, null)
-  workspace_alerts_storage_enabled  = try(each.value.workspace_alerts_storage_enabled, null)
-  enabled                           = try(each.value.enabled, null)
-  skip_query_validation             = try(each.value.skip_query_validation, null)
-  tags                              = var.common_tags
+  alert_name = "${each.key}JobNotRun"
+  alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has not run in the last 26 hours."
 
-  criteria {
-    query                   = <<-QUERY
+  app_insights_query = <<-AIQ
       customEvents
         | where name == "${each.key}JobStarted"
         | where timestamp > ago(26h)
-      QUERY
-    time_aggregation_method = "Count"
-    threshold               = 1
-    operator                = "LessThan"
+      AIQ
 
-    failing_periods {
-      minimum_failing_periods_to_trigger_alert = 1
-      number_of_evaluation_periods             = 1
-    }
-  }
-
-  action {
-    action_groups = [azurerm_monitor_action_group.civil-service-action-group["aat-civil-service-slack-alert"].id]
-  }
+  custom_email_subject = "Warning: The scheduler ${each.key} in ${var.env} has not run in the last 26 hours."
+  frequency_in_minutes = try(each.value.frequency_in_minutes, 30)
+  time_window_in_minutes = try(each.value.time_window_in_minutes, 30)
+  severity_level = 3
+  action_group_name = values(azurerm_monitor_action_group.civil-service-action-group)[0].name
+  trigger_threshold_operator = "LessThan"
+  trigger_threshold = 1
+  common_tags = var.common_tags
 }
