@@ -58,6 +58,18 @@ properties([
                                             'https://manage-case-assignment-civil-citizen-ui-pr-{PR_NUMBER}.preview.platform.hmcts.net',
                                           ],
       description: 'The URL of case assignment service'),
+    string(name: 'PLAYWRIGHT_WORKERS', defaultValue: '8',
+      description: 'Number of workers for playwright'),
+    string(name: 'PLAYWRIGHT_RETRIES', defaultValue: '1',
+      description: 'Number of times playwright will retry tests'),
+    string(name: 'PLAYWRIGHT_EXUI_RETRIES', defaultValue: '1',
+      description: 'Number of times playwright tests will retry exui events'),
+    choice(name: 'PLAYWRIGHT_TEST_SPEED', choices: ['fast', 'medium', 'slow'],
+      description: 'Speed playwright performs actions, can be set to \'fast\', \'medium\' or \'slow\''),
+    choice(name: 'PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS', choices: ['false', 'true'],
+      description: 'Runs accessibility tests for playwright during test execution'),
+    choice(name: 'PLAYWRIGHT_RUN_SETUP', choices: ['true', 'false'],
+      description: 'Runs setup projects before functional test suite'),
     string(name: 'WAIT_FOR_TIMEOUT_MS',
       defaultValue: '120000',
       description: 'Functional tests waitForTimeout value'),
@@ -83,13 +95,40 @@ static Map<String, Object> secret(String secretName, String envVariable) {
   ]
 }
 
-def copyPrevFailedAndNotExecutedTestFilesJson() {
+void publishBootstrapReport() {
+    publishHTML([
+            allowMissing: true,
+            alwaysLinkToLastBuild: true,
+            keepAll: true,
+            reportDir: 'playwright-allure-bootstrap-report',
+            reportFiles: 'index.html',
+            reportName: 'Playwright Allure Bootstrap Report'
+        ])
+    sh "cp -r ./playwright-allure-bootstrap-report/history/  ./allure-bootstrap-history"
+    archiveArtifacts artifacts: 'allure-bootstrap-history/**', fingerprint: true
+  }
+
+  void publishFunctionalReport() {
+    publishHTML([
+            allowMissing: true,
+            alwaysLinkToLastBuild: true,
+            keepAll: true,
+            reportDir: 'playwright-allure-functional-report',
+            reportFiles: 'index.html',
+            reportName: 'Playwright Allure Functional Report'
+        ])
+    sh "cp -r ./playwright-allure-functional-report/history/  ./allure-functional-history"
+    archiveArtifacts artifacts: 'allure-functional-history/**', fingerprint: true
+  }
+
+def copyPreviousHistory(historyDir, resultsDir) {
   def buildFound = false
   def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
   def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
-      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "test-results/functional/testFilesReport.json"
+      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "**/${historyDir}/**", target: "${resultsDir}"
+      sh "mv ${resultsDir}/${historyDir} ${resultsDir}/history"
       buildFound = true
     } catch (Exception error) {
       echo "artifact not found: " + error.toString()
@@ -123,6 +162,21 @@ def copyPreviousAllureHistory() {
   }
 }
 
+def copyPrevFailedAndNotExecutedTestFilesJson() {
+  def buildFound = false
+  def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
+  def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
+  while (!buildFound && buildNumber > minBuildNumber) {
+    try {
+      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "test-results/functional/testFilesReport.json"
+      buildFound = true
+    } catch (Exception error) {
+      echo "artifact not found: " + error.toString()
+      buildNumber--
+    }
+  }
+}
+
 def secrets = [
   'civil-${env}': [
     secret('microservicekey-civil-service', 'S2S_SECRET'),
@@ -137,6 +191,14 @@ withNightlyPipeline(type, product, component) {
   env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
   env.FORCE_GREEN_BUILD=params.FORCE_GREEN_BUILD
   env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES=params.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES
+  env.PLAYWRIGHT_WORKERS=params.PLAYWRIGHT_WORKERS
+  env.PLAYWRIGHT_RETRIES=params.PLAYWRIGHT_RETRIES
+  env.PLAYWRIGHT_EXUI_RETRIES=params.PLAYWRIGHT_EXUI_RETRIES
+  env.PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS=params.PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS
+  env.PLAYWRIGHT_RUN_SETUP=params.PLAYWRIGHT_RUN_SETUP
+  env.PLAYWRIGHT_UNASSIGN_CASES = true
+  env.PLAYWRIGHT_TEST_SPEED=params.PLAYWRIGHT_TEST_SPEED
+
   def prNumber = params.PR_NUMBER?.trim()
   def resolvePreviewUrl = { String value, String paramName ->
     if (value?.contains('{PR_NUMBER}')) {
@@ -171,49 +233,115 @@ withNightlyPipeline(type, product, component) {
   ])
   loadVaultSecrets(secrets)
 
-  boolean forceGreenBuild = env.FORCE_GREEN_BUILD.toBoolean()
-  boolean runPrevFailedAndNotExecutedTestFiles = env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES.toBoolean()
+  boolean playwrightSetupPassed = true
+  boolean flowInterrupted = false
+  boolean forceGreenBuild = env.FORCE_GREEN_BUILD.toBoolean();
+  boolean runPrevFailedAndNotExecutedTestFiles = env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES.toBoolean();
+  boolean playwrightRunSetup = env.PLAYWRIGHT_RUN_SETUP.toBoolean();
 
-  //enableMutationTest()
   if(!runPrevFailedAndNotExecutedTestFiles && !forceGreenBuild) {
-    enableFortifyScan()
-
-    afterAlways('fortify-scan') {
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    }
-  }
-  //enableSecurityScan()
-
-  enableFullFunctionalTest(200)
-
-  if(!forceGreenBuild) {
     afterAlways('DependencyCheckNightly') {
-      sh """
-        ./bin/pull-latest-civil-ccd-files.sh ${ccdBranch}
-      """
-      yarnBuilder.yarn('install-dependencies')
-    }
+      stage('Playwright test setup') {
+        try {
+          yarnBuilder.yarn('test:playwright:setup:install')
+          if(playwrightRunSetup) {
+            yarnBuilder.yarn('test:playwright:setup:civil-service-nightly:ci')
+          }
+        } catch (Exception error) {
+          if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
+            flowInterrupted = true
+          }
+          if(playwrightRunSetup) {
+            playwrightSetupPassed=false
+          }
+          unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
+        } finally {
+          if(playwrightRunSetup) {
+            yarnBuilder.yarn('test:playwright:bootstrap:generate-report')
+          }
+        }
+      }
 
-    before('fullFunctionalTest') {
-      copyPreviousAllureHistory()
-      if(runPrevFailedAndNotExecutedTestFiles) {
-        copyPrevFailedAndNotExecutedTestFilesJson()
+      stage('Playwright full functional test') {
+        try {
+          if(flowInterrupted) {
+            throw new org.jenkinsci.plugins.workflow.steps.FlowInterruptedException()
+          }
+          if(playwrightSetupPassed) {
+            yarnBuilder.yarn('test:playwright:civil-service-nightly:ci')
+          }
+        } catch (Exception error) {
+          if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
+            flowInterrupted = true
+          }
+          unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
+        } finally {
+          if(playwrightSetupPassed) {
+            copyPreviousHistory('allure-functional-history', 'playwright-allure-functional-results');
+            sh 'cp playwright-categories.json playwright-allure-functional-results/categories.json'
+            yarnBuilder.yarn('test:playwright:functional:generate-report')
+            publishFunctionalReport()
+          }
+        }
+      }
+
+      if(playwrightRunSetup) {
+        stage('Playwright test teardown') {
+          try {
+            yarnBuilder.yarn('test:playwright:teardown:civil-service-nightly:ci')
+          } catch (Exception error) {
+            unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
+          } finally {
+            copyPreviousHistory('allure-bootstrap-history', 'playwright-allure-bootstrap-results');
+            sh 'cp playwright-categories.json playwright-allure-bootstrap-results/categories.json'
+            yarnBuilder.yarn('test:playwright:bootstrap:generate-report')
+            publishBootstrapReport()
+          }
+        }
       }
     }
-
-    afterAlways('fullFunctionalTest') {
-      steps.sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
-      publishHTML([
-        allowMissing: false,
-        alwaysLinkToLastBuild: true,
-        keepAll: true,
-        reportDir: 'test-results/functional/allure-report',
-        reportFiles: 'index.html',
-        reportName: 'Nightly E2E Allure Report'
-      ])
-      archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
-      env.TESTS_FOR_ACCESSIBILITY = false
-    }
   }
-}
+
+//   //enableMutationTest()
+//   if(!runPrevFailedAndNotExecutedTestFiles && !forceGreenBuild) {
+//     enableFortifyScan()
+
+//     afterAlways('fortify-scan') {
+//       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+//     }
+//   }
+//   //enableSecurityScan()
+
+//   enableFullFunctionalTest(200)
+
+//   if(!forceGreenBuild) {
+//     afterAlways('DependencyCheckNightly') {
+//       sh """
+//         ./bin/pull-latest-civil-ccd-files.sh ${ccdBranch}
+//       """
+//       yarnBuilder.yarn('install-dependencies')
+//     }
+
+//     before('fullFunctionalTest') {
+//       copyPreviousAllureHistory()
+//       if(runPrevFailedAndNotExecutedTestFiles) {
+//         copyPrevFailedAndNotExecutedTestFilesJson()
+//       }
+//     }
+
+//     afterAlways('fullFunctionalTest') {
+//       steps.sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
+//       publishHTML([
+//         allowMissing: false,
+//         alwaysLinkToLastBuild: true,
+//         keepAll: true,
+//         reportDir: 'test-results/functional/allure-report',
+//         reportFiles: 'index.html',
+//         reportName: 'Nightly E2E Allure Report'
+//       ])
+//       archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
+//       env.TESTS_FOR_ACCESSIBILITY = false
+//     }
+//   }
+// }
 
