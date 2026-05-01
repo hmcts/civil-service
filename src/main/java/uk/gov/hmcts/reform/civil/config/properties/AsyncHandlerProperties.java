@@ -12,4 +12,7 @@ public class AsyncHandlerProperties {
     protected int corePoolSize;
     protected int maxPoolSize;
     protected int queueCapacity;
+    protected long lockDuration;
+    protected int eventDispatchDelay;
+    protected int maxRetries;
 }

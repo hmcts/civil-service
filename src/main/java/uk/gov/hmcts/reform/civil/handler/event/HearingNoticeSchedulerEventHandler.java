@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVars;
@@ -44,6 +45,7 @@ public class HearingNoticeSchedulerEventHandler {
     private final RuntimeService runtimeService;
     private final ObjectMapper mapper;
     private final CoreCaseDataService coreCaseDataService;
+    private final AsyncHandlerProperties asyncHandlerProperties;
     static final CaseState[] DISALLOWED_CASE_STATES = {
         CASE_SETTLED,
         PROCEEDS_IN_HERITAGE_SYSTEM,
@@ -57,7 +59,7 @@ public class HearingNoticeSchedulerEventHandler {
     @Async("asyncHandlerExecutor")
     @EventListener
     public void handle(HearingNoticeSchedulerTaskEvent event) {
-        int maxRetries = 3;
+        int maxRetries = asyncHandlerProperties.getMaxRetries();
         for (int i = 0; i < maxRetries; i++) {
             String hearingId = event.getHearingId();
             try {

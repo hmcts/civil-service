@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVars;
@@ -77,6 +78,9 @@ class HearingNoticeSchedulerEventHandlerTest {
     @Mock
     private CoreCaseDataService coreCaseDataService;
 
+    @Mock
+    private AsyncHandlerProperties asyncHandlerProperties;
+
     @InjectMocks
     private HearingNoticeSchedulerEventHandler handler;
 
@@ -101,6 +105,7 @@ class HearingNoticeSchedulerEventHandlerTest {
         when(userConfig.getUserName()).thenReturn("");
         when(userConfig.getPassword()).thenReturn("");
         when(coreCaseDataService.getCase(anyLong())).thenReturn(mock(CaseDetails.class));
+        when(asyncHandlerProperties.getMaxRetries()).thenReturn(2);
     }
 
     @Test
@@ -350,7 +355,7 @@ class HearingNoticeSchedulerEventHandlerTest {
 
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
-        verify(hearingsService, times(3)).getHearingResponse(anyString(), anyString());
+        verify(hearingsService, times(2)).getHearingResponse(anyString(), anyString());
         verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
     }
 
