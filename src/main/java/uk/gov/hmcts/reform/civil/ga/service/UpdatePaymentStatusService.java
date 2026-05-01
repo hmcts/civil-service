@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -30,7 +31,7 @@ public class UpdatePaymentStatusService {
     private final GaCoreCaseDataService gaCoreCaseDataService;
     private final ObjectMapper objectMapper;
 
-    @Retryable(value = CaseDataUpdateException.class, maxAttempts = 3, backoff = @Backoff(delay = 500))
+    @Retryable(retryFor = CaseDataUpdateException.class, noRetryFor = IllegalArgumentException.class, backoff = @Backoff(delay = 500))
     public void updatePaymentStatus(String caseReference, CardPaymentStatusResponse cardPaymentStatusResponse) {
         log.info("Starting updatePaymentStatus for caseReference: {}", caseReference);
         log.debug("CardPaymentStatusResponse received: {}", cardPaymentStatusResponse);
@@ -42,9 +43,25 @@ public class UpdatePaymentStatusService {
 
             log.info("Creating event for updated payment status on caseReference: {}", caseReference);
             createEvent(caseData, caseReference);
+        } catch (IllegalArgumentException ex) {
+            throw ex;
         } catch (Exception ex) {
-            throw new CaseDataUpdateException();
+            throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
+    }
+
+    @Recover
+    public void recover(CaseDataUpdateException ex, String caseReference, CardPaymentStatusResponse cardPaymentStatusResponse) {
+        String status = cardPaymentStatusResponse != null ? cardPaymentStatusResponse.getStatus() : "N/A";
+        String errorCode = cardPaymentStatusResponse != null ? cardPaymentStatusResponse.getErrorCode() : "N/A";
+
+        log.error(
+            "GA Payment status update failed after retries for case {}. Status: {}, ErrorCode: {}",
+            caseReference,
+            status,
+            errorCode,
+            ex
+        );
     }
 
     private void createEvent(GeneralApplicationCaseData caseData, String caseReference) {
@@ -89,7 +106,7 @@ public class UpdatePaymentStatusService {
             : pbaDetails.copy();
 
         PaymentDetails paymentDetails = new PaymentDetails()
-            .setStatus(PaymentStatus.valueOf(cardPaymentStatusResponse.getStatus().toUpperCase()))
+            .setStatus(PaymentStatus.resolvePaymentStatus(cardPaymentStatusResponse.getStatus()))
             .setReference(cardPaymentStatusResponse.getPaymentReference())
             .setErrorCode(cardPaymentStatusResponse.getErrorCode())
             .setErrorMessage(cardPaymentStatusResponse.getErrorDescription())
