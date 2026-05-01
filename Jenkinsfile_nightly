@@ -239,6 +239,15 @@ withNightlyPipeline(type, product, component) {
   boolean runPrevFailedAndNotExecutedTestFiles = env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES.toBoolean();
   boolean playwrightRunSetup = env.PLAYWRIGHT_RUN_SETUP.toBoolean();
 
+  if(!forceGreenBuild) {
+    afterAlways('DependencyCheckNightly') {
+      sh """
+        ./bin/pull-latest-civil-ccd-files.sh ${ccdBranch}
+      """
+      yarnBuilder.yarn('install-dependencies')
+    }
+  }
+
   if(!runPrevFailedAndNotExecutedTestFiles && !forceGreenBuild) {
     afterAlways('DependencyCheckNightly') {
       stage('Playwright test setup') {
@@ -314,13 +323,7 @@ withNightlyPipeline(type, product, component) {
 
 //   enableFullFunctionalTest(200)
 
-//   if(!forceGreenBuild) {
-//     afterAlways('DependencyCheckNightly') {
-//       sh """
-//         ./bin/pull-latest-civil-ccd-files.sh ${ccdBranch}
-//       """
-//       yarnBuilder.yarn('install-dependencies')
-//     }
+  // if(!forceGreenBuild) {
 
 //     before('fullFunctionalTest') {
 //       copyPreviousAllureHistory()
