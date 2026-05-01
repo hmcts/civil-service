@@ -319,6 +319,32 @@ class HearingNoticeSchedulerEventHandlerTest {
     }
 
     @Test
+    void shouldAcknowledgeHearingWithoutNotice_whenHearingIsListedAndPartiesNotifiedIsNullAndCaseStateIsDisallowed() {
+        when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(
+            createHearing(ListAssistCaseStatus.LISTED));
+        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString())).thenReturn(
+            new PartiesNotifiedResponses());
+
+        CaseDetails mockCaseDetails = CaseDetails.builder()
+            .id(Long.parseLong(CASE_ID))
+            .state("CLOSED")
+            .build();
+
+        when(coreCaseDataService.getCase(Long.parseLong(CASE_ID))).thenReturn(mockCaseDetails);
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(hearingsService, times(1)).updatePartiesNotifiedResponse(
+            AUTH_TOKEN,
+            HEARING_ID,
+            VERSION,
+            RECEIVED_DATETIME,
+            new PartiesNotified().setServiceData(new PartiesNotifiedServiceData())
+        );
+        verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
+    }
+
+    @Test
     void shouldAttemptToCallHmcApiThreeTimes_whenGetHearingThrowsException() {
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenThrow(HmcException.class);
 

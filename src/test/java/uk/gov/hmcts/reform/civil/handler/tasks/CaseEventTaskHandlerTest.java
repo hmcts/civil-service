@@ -220,6 +220,34 @@ class CaseEventTaskHandlerTest {
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
         }
+
+        @Test
+        void shouldFailBeforeSubmit_whenFlowStateIsMissing() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.READY)
+                                     .setProcessInstanceId("processInstanceId"))
+                .build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+
+            when(mockTask.getVariable(FLOW_STATE)).thenReturn(null);
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
+                .thenReturn(StartEventResponse.builder()
+                                .caseDetails(caseDetails)
+                                .eventId(NOTIFY_EVENT.name())
+                                .build());
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService, never()).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).handleFailure(
+                eq(mockTask),
+                eq("Mapper conversion failed due to incompatible types"),
+                anyString(),
+                eq(0),
+                eq(1000L)
+            );
+        }
     }
 
     @Nested
@@ -458,6 +486,87 @@ class CaseEventTaskHandlerTest {
                 FLOW_FLAGS, getFlowFlags(TAKEN_OFFLINE_BY_STAFF),
                 FLOW_STATE, TAKEN_OFFLINE_BY_STAFF.fullName()
             ));
+        }
+
+        @ParameterizedTest
+        @EnumSource(
+            value = ReasonForProceedingOnPaper.class,
+            names = {"APPLICATION", "JUDGEMENT_REQUEST", "DEFENDANT_DOES_NOT_CONSENT", "CASE_SETTLED"})
+        void shouldHaveCorrectDescription_whenClaimIsHandedOfflineForStandardReasons(ReasonForProceedingOnPaper reason) {
+            Map<String, Object> vars = Map.of(
+                "caseId", CASE_ID,
+                "caseEvent", PROCEEDS_IN_HERITAGE_SYSTEM.name()
+            );
+            VariableMap variables = Variables.createVariables();
+            variables.putAll(vars);
+            variables.putValue(FLOW_STATE, TAKEN_OFFLINE_BY_STAFF.fullName());
+            variables.putValue(FLOW_FLAGS, getFlowFlags(TAKEN_OFFLINE_BY_STAFF));
+
+            when(mockTask.getVariable(FLOW_STATE)).thenReturn(TAKEN_OFFLINE_BY_STAFF.fullName());
+            when(mockTask.getTopicName()).thenReturn("test");
+            when(mockTask.getActivityId()).thenReturn("activityId");
+            when(mockTask.getAllVariables()).thenReturn(variables);
+
+            CaseData caseData = getCaseData(TAKEN_OFFLINE_BY_STAFF);
+            caseData.getClaimProceedsInCaseman().setReason(reason);
+            caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+
+            when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                .thenReturn(caseData);
+
+            when(stateFlowEngine.getStateFlow(caseData))
+                .thenReturn(new StateFlowDTO()
+                    .setState(State.from(TAKEN_OFFLINE_BY_STAFF.fullName()))
+                    .setFlags(getFlowFlags(TAKEN_OFFLINE_BY_STAFF)));
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            Event event = caseDataContentArgumentCaptor.getValue().getEvent();
+            assertThat(event.getDescription()).isEqualTo(getExpectedOfflineDescription(reason));
+        }
+
+        @Test
+        void shouldHaveCorrectDescription_whenClaimIsHandedOfflineForOtherReason() {
+            Map<String, Object> vars = Map.of(
+                "caseId", CASE_ID,
+                "caseEvent", PROCEEDS_IN_HERITAGE_SYSTEM.name()
+            );
+            VariableMap variables = Variables.createVariables();
+            variables.putAll(vars);
+            variables.putValue(FLOW_STATE, TAKEN_OFFLINE_BY_STAFF.fullName());
+            variables.putValue(FLOW_FLAGS, getFlowFlags(TAKEN_OFFLINE_BY_STAFF));
+
+            when(mockTask.getVariable(FLOW_STATE)).thenReturn(TAKEN_OFFLINE_BY_STAFF.fullName());
+            when(mockTask.getTopicName()).thenReturn("test");
+            when(mockTask.getActivityId()).thenReturn("activityId");
+            when(mockTask.getAllVariables()).thenReturn(variables);
+
+            CaseData caseData = getCaseData(TAKEN_OFFLINE_BY_STAFF);
+            caseData.getClaimProceedsInCaseman()
+                .setReason(ReasonForProceedingOnPaper.OTHER)
+                .setOther("Manual APPLICATION reason");
+            caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+
+            when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                .thenReturn(caseData);
+
+            when(stateFlowEngine.getStateFlow(caseData))
+                .thenReturn(new StateFlowDTO()
+                    .setState(State.from(TAKEN_OFFLINE_BY_STAFF.fullName()))
+                    .setFlags(getFlowFlags(TAKEN_OFFLINE_BY_STAFF)));
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            Event event = caseDataContentArgumentCaptor.getValue().getEvent();
+            assertThat(event.getDescription()).isEqualTo("Other: Manual APPLICATION reason}");
         }
 
         @Test
@@ -914,6 +1023,16 @@ class CaseEventTaskHandlerTest {
             expectedFlags.put(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false);
             expectedFlags.put(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false);
             return expectedFlags;
+        }
+
+        private String getExpectedOfflineDescription(ReasonForProceedingOnPaper reason) {
+            return switch (reason) {
+                case APPLICATION -> "Application.";
+                case CASE_SETTLED -> "Case settled.";
+                case DEFENDANT_DOES_NOT_CONSENT -> "Defendant does not consent to accept service.";
+                case JUDGEMENT_REQUEST -> "Judgement request.";
+                default -> throw new IllegalStateException("Unexpected reason " + reason);
+            };
         }
 
         private CaseData getCaseData(FlowState.Main state) {
