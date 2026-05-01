@@ -80,6 +80,8 @@ withPipeline(type, product, component) {
   env.DMN_DEFINITION_BRANCH = dmnBranch
   env.WIREMOCK_MAPPINGS_BRANCH = wiremockMappingsBranch
   env.UNASSIGN_CASES = true
+  env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
+  env.BEFTA_RETRY_MAX_DELAY = "1000"
 
   loadVaultSecrets(secrets)
 
