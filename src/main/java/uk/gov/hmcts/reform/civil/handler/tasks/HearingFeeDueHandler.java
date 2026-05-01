@@ -39,34 +39,7 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
 
         cases.forEach(caseDetails -> {
             try {
-                CaseDetails detailsWithData = coreCaseDataService.getCase(caseDetails.getId());
-                CaseData caseData = caseDetailsConverter.toCaseData(detailsWithData);
-                PaymentDetails hearingFeePaymentDetails = caseData.getHearingFeePaymentDetails();
-
-                if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-                    if (caseData.getHearingDueDate() == null) {
-                        log.info("Publishing NoHearingFeeDueEvent current case status {}, Case Id {}",
-                                 caseDetails.getState(), caseDetails.getId());
-                        applicationEventPublisher.publishEvent(new NoHearingFeeDueEvent(caseDetails.getId()));
-                    } else {
-                        if ((hearingFeePaymentDetails != null
-                            && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
-                            && caseData.getHearingDueDate().isBefore(LocalDate.now())
-                            || caseData.hearingFeePaymentDoneWithHWF()) {
-                            log.info("Publishing HearingFeePaidEvent current case status {}, Case Id {}",
-                                     caseDetails.getState(), caseDetails.getId());
-                            applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
-                        } else if ((hearingFeePaymentDetails == null
-                            || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED)
-                            && caseData.getHearingDueDate().isBefore(LocalDate.now())) {
-                            log.info("Publishing HearingFeeUnpaidEvent current case status {}, Case Id {}",
-                                     caseDetails.getState(), caseDetails.getId());
-                            applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
-                        }
-                    }
-                } else {
-                    preMultiIntermediateClaimLogic(caseDetails, hearingFeePaymentDetails, caseData);
-                }
+                processCase(caseDetails);
             } catch (Exception e) {
                 //Continue for other cases if there is some error in some cases, as we don't want
                 // to stop processing other valid cases because error happened in some.
@@ -77,20 +50,91 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
         return new ExternalTaskData();
     }
 
-    private void preMultiIntermediateClaimLogic(CaseDetails caseDetails, PaymentDetails hearingFeePaymentDetails, CaseData caseData) {
-        if ((hearingFeePaymentDetails != null
-            && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
-            && caseData.getHearingDueDate().isBefore(LocalDate.now())
-            || caseData.hearingFeePaymentDoneWithHWF()) {
-            log.info("preMultiIntermediateClaimLogic publishing HearingFeePaidEvent current case status {}, Case Id {}",
-                     caseDetails.getState(), caseDetails.getId());
-            applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
-        } else if ((hearingFeePaymentDetails == null
-            || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED)
-            && caseData.getHearingDueDate().isBefore(LocalDate.now())) {
-            log.info("preMultiIntermediateClaimLogic publishing HearingFeeUnpaidEvent current case status {}, Case Id {}",
-                     caseDetails.getState(), caseDetails.getId());
-            applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
+    private void processCase(CaseDetails caseDetails) {
+        CaseDetails detailsWithData = coreCaseDataService.getCase(caseDetails.getId());
+        CaseData caseData = caseDetailsConverter.toCaseData(detailsWithData);
+        PaymentDetails hearingFeePaymentDetails = caseData.getHearingFeePaymentDetails();
+
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            processMultiOrIntermediateCase(caseDetails, caseData, hearingFeePaymentDetails);
+            return;
         }
+
+        preMultiIntermediateClaimLogic(caseDetails, hearingFeePaymentDetails, caseData);
+    }
+
+    private void processMultiOrIntermediateCase(
+        CaseDetails caseDetails,
+        CaseData caseData,
+        PaymentDetails hearingFeePaymentDetails
+    ) {
+        if (caseData.getHearingDueDate() == null) {
+            publishNoHearingFeeDueEvent(caseDetails);
+            return;
+        }
+
+        publishFeeEvents(caseDetails, hearingFeePaymentDetails, caseData, false);
+    }
+
+    private void preMultiIntermediateClaimLogic(CaseDetails caseDetails, PaymentDetails hearingFeePaymentDetails, CaseData caseData) {
+        publishFeeEvents(caseDetails, hearingFeePaymentDetails, caseData, true);
+    }
+
+    private void publishFeeEvents(
+        CaseDetails caseDetails,
+        PaymentDetails hearingFeePaymentDetails,
+        CaseData caseData,
+        boolean isPreMultiIntermediate
+    ) {
+        if (isHearingFeePaid(hearingFeePaymentDetails, caseData)) {
+            publishHearingFeePaidEvent(caseDetails, isPreMultiIntermediate);
+        } else if (isHearingFeeUnpaid(hearingFeePaymentDetails, caseData)) {
+            publishHearingFeeUnpaidEvent(caseDetails, isPreMultiIntermediate);
+        }
+    }
+
+    private boolean isHearingFeePaid(PaymentDetails hearingFeePaymentDetails, CaseData caseData) {
+        return isSuccessfulPaymentBeforeDueDate(hearingFeePaymentDetails, caseData) || caseData.hearingFeePaymentDoneWithHWF();
+    }
+
+    private boolean isSuccessfulPaymentBeforeDueDate(PaymentDetails hearingFeePaymentDetails, CaseData caseData) {
+        return hearingFeePaymentDetails != null
+            && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS
+            && caseData.getHearingDueDate().isBefore(LocalDate.now());
+    }
+
+    private boolean isHearingFeeUnpaid(PaymentDetails hearingFeePaymentDetails, CaseData caseData) {
+        return (hearingFeePaymentDetails == null || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED)
+            && caseData.getHearingDueDate().isBefore(LocalDate.now());
+    }
+
+    private void publishNoHearingFeeDueEvent(CaseDetails caseDetails) {
+        log.info("Publishing NoHearingFeeDueEvent current case status {}, Case Id {}",
+                 caseDetails.getState(), caseDetails.getId());
+        applicationEventPublisher.publishEvent(new NoHearingFeeDueEvent(caseDetails.getId()));
+    }
+
+    private void publishHearingFeePaidEvent(CaseDetails caseDetails, boolean isPreMultiIntermediate) {
+        if (log.isInfoEnabled()) {
+            log.info(
+                "{}HearingFeePaidEvent current case status {}, Case Id {}",
+                isPreMultiIntermediate ? "preMultiIntermediateClaimLogic publishing " : "Publishing ",
+                caseDetails.getState(),
+                caseDetails.getId()
+            );
+        }
+        applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
+    }
+
+    private void publishHearingFeeUnpaidEvent(CaseDetails caseDetails, boolean isPreMultiIntermediate) {
+        if (log.isInfoEnabled()) {
+            log.info(
+                "{}HearingFeeUnpaidEvent current case status {}, Case Id {}",
+                isPreMultiIntermediate ? "preMultiIntermediateClaimLogic publishing " : "Publishing ",
+                caseDetails.getState(),
+                caseDetails.getId()
+            );
+        }
+        applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
     }
 }
