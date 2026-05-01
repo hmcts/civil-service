@@ -3,8 +3,7 @@ package uk.gov.hmcts.reform.civil.config;
 import com.microsoft.applicationinsights.TelemetryClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.core5.pool.PoolStats;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -19,12 +18,11 @@ public class MetricsInstrumentationConfiguration {
     private final TelemetryClient telemetryClient;
     private final ThreadPoolTaskExecutor asyncHandlerExecutor;
     private final AtomicLong asyncHandlerRejectedCount;
-    private final PoolingHttpClientConnectionManager connectionManager5;
-    private final org.apache.http.impl.conn.PoolingHttpClientConnectionManager connectionManager4;
+    private final PoolingHttpClientConnectionManager connectionManager4;
 
     private final AtomicLong lastCompletedCount = new AtomicLong(0);
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRateString = "${metrics.report.rate:300000}")
     public void reportMetrics() {
         try {
             reportAsyncExecutorMetrics();
@@ -53,21 +51,16 @@ public class MetricsInstrumentationConfiguration {
     }
 
     private void reportHttpClientPoolMetrics() {
-        if (connectionManager5 != null) {
-            PoolStats stats = connectionManager5.getTotalStats();
-            reportPoolStats("httpclient5", stats.getLeased(), stats.getAvailable(), stats.getPending(), stats.getMax());
-        }
-
         if (connectionManager4 != null) {
             org.apache.http.pool.PoolStats stats = connectionManager4.getTotalStats();
-            reportPoolStats("httpclient4", stats.getLeased(), stats.getAvailable(), stats.getPending(), stats.getMax());
+            reportPoolStats(stats.getLeased(), stats.getAvailable(), stats.getPending(), stats.getMax());
         }
     }
 
-    private void reportPoolStats(String prefix, int leased, int available, int pending, int max) {
-        telemetryClient.trackMetric(prefix + ".pool.leased", leased);
-        telemetryClient.trackMetric(prefix + ".pool.available", available);
-        telemetryClient.trackMetric(prefix + ".pool.pending", pending);
-        telemetryClient.trackMetric(prefix + ".pool.max", max);
+    private void reportPoolStats(int leased, int available, int pending, int max) {
+        telemetryClient.trackMetric("httpclient.pool.leased", leased);
+        telemetryClient.trackMetric("httpclient.pool.available", available);
+        telemetryClient.trackMetric("httpclient.pool.pending", pending);
+        telemetryClient.trackMetric("httpclient.pool.max", max);
     }
 }
