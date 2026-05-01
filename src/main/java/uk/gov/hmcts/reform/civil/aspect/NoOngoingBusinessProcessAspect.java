@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -59,11 +60,19 @@ public class NoOngoingBusinessProcessAspect {
             stateHistoryBuilder.append(", ");
         });
 
+        BusinessProcess bp = caseData.getBusinessProcess();
         try {
             log.info(
-                "{} is not allowed on the case {} due to ongoing business process, current FlowState: {}, stateFlowHistory: {}",
+                "{} is not allowed on the case {} due to ongoing business process "
+                    + "[camundaEvent={}, processInstanceId={}, activityId={}, status={}, readyOn={}], "
+                    + "current FlowState: {}, stateFlowHistory: {}",
                 caseEvent.name(),
                 caseData.getCcdCaseReference(),
+                bp != null ? bp.getCamundaEvent() : null,
+                bp != null ? bp.getProcessInstanceId() : null,
+                bp != null ? bp.getActivityId() : null,
+                bp != null ? bp.getStatus() : null,
+                bp != null ? bp.getReadyOn() : null,
                 FlowState.fromFullName(stateFlow.getState().getName()),
                 stateHistoryBuilder
             );
@@ -91,10 +100,16 @@ public class NoOngoingBusinessProcessAspect {
             return joinPoint.proceed();
         }
 
+        BusinessProcess bp = caseData.getBusinessProcess();
         log.info(
-            "{} is not allowed on the case {} due to ongoing business process",
+            "{} is not allowed on the case {} due to ongoing business process "
+                + "[camundaEvent={}, processInstanceId={}, activityId={}, status={}]",
             caseEvent.name(),
-            caseData.getCcdCaseReference()
+            caseData.getCcdCaseReference(),
+            bp != null ? bp.getCamundaEvent() : null,
+            bp != null ? bp.getProcessInstanceId() : null,
+            bp != null ? bp.getActivityId() : null,
+            bp != null ? bp.getStatus() : null
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
