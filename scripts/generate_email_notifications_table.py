@@ -88,7 +88,7 @@ class JavaClass:
         pattern = re.compile(rf"(?:public|protected)\s+{re.escape(class_name)}\s*\((.*?)\)\s*\{{", re.S)
         match = pattern.search(self.text)
         if not match:
-            return []
+            return self._lombok_constructor_params()
         params_block = match.group(1).strip()
         if not params_block:
             return []
@@ -105,6 +105,27 @@ class JavaClass:
                 depth = max(depth - 1, 0)
         if current:
             params.append(''.join(current).strip())
+        return params
+
+    def _lombok_constructor_params(self) -> List[str]:
+        has_all_args = re.search(r"@AllArgsConstructor\b", self.text) is not None
+        has_required_args = re.search(r"@RequiredArgsConstructor\b", self.text) is not None
+        if not (has_all_args or has_required_args):
+            return []
+        params = []
+        for match in re.finditer(
+            r"(?P<mods>(?:(?:private|protected|public|static|final|transient|volatile)\s+)+)"
+            r"(?P<type>[A-Za-z0-9_<>,\s]+?)\s+(?P<name>\w+)\s*(?:=|;)",
+            self.text
+        ):
+            mods = match.group('mods')
+            if 'static' in mods:
+                continue
+            if has_required_args and not has_all_args and 'final' not in mods:
+                continue
+            type_str = match.group('type').strip()
+            name = match.group('name')
+            params.append(f"{type_str} {name}")
         return params
 
 
@@ -285,16 +306,19 @@ def load_helper_templates(index: SourceIndex, class_name: str, method: str, cach
     if not java_class:
         cache[cache_key] = set()
         return set()
-    pattern = re.compile(rf"(?:public|protected|private)\s+[^{{]*{re.escape(method)}\s*\([^)]*\)\s*\{{", re.S)
-    match = pattern.search(java_class.text)
-    if not match:
+    pattern = re.compile(rf"(?:public|protected|private)\s+[^{{;]*\b{re.escape(method)}\s*\([^)]*\)[^{{;]*\{{", re.S)
+    templates: Set[str] = set()
+    found_any = False
+    for match in pattern.finditer(java_class.text):
+        found_any = True
+        body = extract_block(java_class.text, match.end() - 1)
+        templates.update(NOTIFICATION_GETTER_RE.findall(body))
+        for inner in re.findall(r"\b([a-z][A-Za-z0-9_]*)\s*\(", body):
+            if inner != method:
+                templates.update(load_helper_templates(index, class_name, inner, cache, seen))
+    if not found_any:
         cache[cache_key] = set()
         return set()
-    body = extract_block(java_class.text, match.end() - 1)
-    templates = set(NOTIFICATION_GETTER_RE.findall(body))
-    for inner in re.findall(r"(get[A-Za-z0-9_]+)\s*\(", body):
-        if inner != method:
-            templates.update(load_helper_templates(index, class_name, inner, cache, seen))
     cache[cache_key] = templates
     return templates
 
@@ -312,7 +336,7 @@ def collect_templates(index: SourceIndex, class_name: str, notifications: Dict[s
     templates = set(NOTIFICATION_GETTER_RE.findall(java_class.text))
     helper_fields = {name: field_type.split('<')[-1].replace('>', '') for field_type, name in FIELD_DEF_RE.findall(java_class.text)}
     helper_cache = {}
-    for var_name, method in re.findall(r"(\w+)\.(get[A-Za-z0-9_]+)\s*\(", java_class.text):
+    for var_name, method in re.findall(r"(\w+)\.([a-z][A-Za-z0-9_]*)\s*\(", java_class.text):
         helper_class = helper_fields.get(var_name)
         if helper_class:
             templates.update(load_helper_templates(index, helper_class, method, helper_cache, set()))
@@ -439,17 +463,16 @@ def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
     notification_data_cache: Dict[str, bool] = {}
     callback_handler_cache: Dict[str, bool] = {}
     for class_name, java_class in index.classes.items():
-        if '/handler/callback/camunda/notification/' not in str(java_class.path):
-            continue
         if re.search(r'abstract\s+class\s+' + re.escape(class_name), java_class.text):
             continue
         if not extends_callback_handler(index, class_name, callback_handler_cache):
             continue
-        if not extends_notification_data(index, class_name, notification_data_cache):
+        templates = collect_templates(index, class_name, notifications)
+        is_notification_data = extends_notification_data(index, class_name, notification_data_cache)
+        if not is_notification_data and not templates:
             continue
         events = extract_case_events_including_base(index, class_name)
         task_ids = extract_task_ids_including_base(index, class_name) or ['UNKNOWN']
-        templates = collect_templates(index, class_name, notifications)
         if not templates:
             templates = [{"id": None, "name": None}]
         party = infer_party_from_class(java_class)
@@ -479,6 +502,71 @@ def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
                     "ccd_events": ccd_display or ['—'],
                     "ccd_event_ids": ccd_ids
                 })
+    discovered_classes = {row['handler'] for row in rows}
+    rows.extend(_collect_helper_service_rows(
+        index, notifications, discovered_classes,
+        service_tasks, case_event_map, start_events, start_event_labels, start_event_file_map
+    ))
+    return rows
+
+
+def _collect_helper_service_rows(index, notifications, discovered_classes,
+                                 service_tasks, case_event_map, start_events, start_event_labels, start_event_file_map):
+    rows = []
+    case_event_ref_re = re.compile(r"CaseEvent\.([A-Z][A-Z0-9_]+)")
+    for class_name, java_class in index.classes.items():
+        if class_name in discovered_classes:
+            continue
+        if 'implements NotificationData' not in java_class.text:
+            continue
+        if 'extends CallbackHandler' in java_class.text or 'extends Notifier' in java_class.text:
+            continue
+        templates = collect_templates(index, class_name, notifications)
+        if not templates:
+            continue
+        events: List[str] = []
+        seen_events: Set[str] = set()
+        for caller_name, caller in index.classes.items():
+            if caller_name == class_name:
+                continue
+            if class_name not in caller.text:
+                continue
+            for ev in case_event_ref_re.findall(caller.text):
+                if ev not in seen_events:
+                    seen_events.add(ev)
+                    events.append(ev)
+        bpmn_files: List[str] = []
+        ccd_display: List[str] = []
+        ccd_ids: List[str] = []
+        for ev in events:
+            files, displays, ids = lookup_bpmn(ev, service_tasks, start_events, start_event_labels)
+            for f in files:
+                if f not in bpmn_files:
+                    bpmn_files.append(f)
+            for d in displays:
+                if d not in ccd_display:
+                    ccd_display.append(d)
+            for i in ids:
+                if i not in ccd_ids:
+                    ccd_ids.append(i)
+        bpmn_files, ccd_display, ccd_ids = augment_with_case_events(
+            events, case_event_map, start_events, start_event_labels, start_event_file_map,
+            bpmn_files, ccd_display, ccd_ids, include_events=True
+        )
+        party = infer_party_from_class(java_class)
+        for tpl in templates:
+            rows.append({
+                "event": class_name,
+                "handler": class_name,
+                "aggregator": '—',
+                "party": party,
+                "generator": class_name,
+                "template_id": tpl['id'] or '—',
+                "template_name": tpl.get('name'),
+                "bpmn_files": bpmn_files or ['—'],
+                "ccd_events": ccd_display or ['—'],
+                "ccd_event_ids": ccd_ids
+            })
     return rows
 
 
