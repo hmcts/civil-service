@@ -56,7 +56,10 @@ class AsyncHandlerConfigurationTest {
             assertThat(rejectedCount.get()).isZero();
 
             Runnable runnable = mock(Runnable.class);
-            assertThatThrownBy(() -> executor.getThreadPoolExecutor().getRejectedExecutionHandler().rejectedExecution(runnable, executor.getThreadPoolExecutor()))
+            var threadPoolExecutor = executor.getThreadPoolExecutor();
+            var rejectedExecutionHandler = threadPoolExecutor.getRejectedExecutionHandler();
+
+            assertThatThrownBy(() -> rejectedExecutionHandler.rejectedExecution(runnable, threadPoolExecutor))
                 .isInstanceOf(RejectedExecutionException.class)
                 .hasMessageContaining("rejected from");
 

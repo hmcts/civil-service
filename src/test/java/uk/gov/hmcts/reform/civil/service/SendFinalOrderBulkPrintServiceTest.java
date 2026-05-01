@@ -140,7 +140,13 @@ class SendFinalOrderBulkPrintServiceTest {
         // given
         Party respondent1 = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(respondent1, JUDGE_FINAL_ORDER, true);
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(coverLetterAppendService.makeDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
@@ -155,7 +161,13 @@ class SendFinalOrderBulkPrintServiceTest {
         // given
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, JUDGE_FINAL_ORDER, true);
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(coverLetterAppendService.makeDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
@@ -237,7 +249,13 @@ class SendFinalOrderBulkPrintServiceTest {
         // given
         Party claimant = new PartyBuilder().individual().build();
         CaseData caseData = buildCaseDataForTranslatedOrder(claimant);
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(coverLetterAppendService.makeDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
@@ -252,7 +270,13 @@ class SendFinalOrderBulkPrintServiceTest {
         // given
         Party defendant = new PartyBuilder().individual().build();
         CaseData caseData = buildCaseDataForTranslatedOrder(defendant);
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(coverLetterAppendService.makeDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
@@ -306,7 +330,13 @@ class SendFinalOrderBulkPrintServiceTest {
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, FINAL_ORDER_TRANSLATED_DOCUMENT, true);
         caseData.setClaimantBilingualLanguagePreference("WELSH");
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(coverLetterAppendService.makeDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
@@ -327,7 +357,13 @@ class SendFinalOrderBulkPrintServiceTest {
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant);
         caseData.setClaimantBilingualLanguagePreference("BOTH");
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(coverLetterAppendService.makeDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
