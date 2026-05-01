@@ -1,9 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Supplier;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +25,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextForma
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
