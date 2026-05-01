@@ -343,5 +343,5 @@ withNightlyPipeline(type, product, component) {
 //       env.TESTS_FOR_ACCESSIBILITY = false
 //     }
 //   }
-// }
+}
 
