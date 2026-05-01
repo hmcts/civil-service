@@ -1650,7 +1650,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPreferBufferFlowAndSetCreatedDate_whenJudgmentBufferAndJudgmentOnlineAreBothEnabledForNonDivergentLipvLr() {
-            var createdDate = LocalDateTime.of(2024, 1, 15, 10, 30);
 
             Flags respondent1Flags = new Flags();
             respondent1Flags.setPartyName("respondent1name");
@@ -1667,6 +1666,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             caseDataBefore.setRespondent1DetailsForClaimDetailsTab(respondent);
             caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
             caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
+
+            var createdDate = LocalDateTime.of(2024, 1, 15, 10, 30);
 
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
             when(time.now()).thenReturn(createdDate);
