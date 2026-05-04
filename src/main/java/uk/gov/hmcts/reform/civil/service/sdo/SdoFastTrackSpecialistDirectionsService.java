@@ -29,9 +29,9 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DEFENDANT_UPLOAD_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DISCLOSURE_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_PARTIES_LIAISE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_SDO_FAST_TRACK;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_A;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_B;
@@ -118,9 +118,9 @@ public class SdoFastTrackSpecialistDirectionsService {
     private FastTrackCreditHire buildFastTrackCreditHire() {
         return new FastTrackCreditHire()
             .setInput1(CREDIT_HIRE_DISCLOSURE_SDO)
-            .setInput2(CREDIT_HIRE_STATEMENT_PROMPT_SDO_FAST_TRACK)
+            .setInput2(CREDIT_HIRE_STATEMENT_PROMPT_SDO)
             .setDate1(deadlineService.nextWorkingDayFromNowWeeks(4))
-            .setInput3(CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK)
+            .setInput3(CREDIT_HIRE_NON_COMPLIANCE_SDO)
             .setInput4(CREDIT_HIRE_PARTIES_LIAISE)
             .setDate2(deadlineService.nextWorkingDayFromNowWeeks(6))
             .setInput5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY)
@@ -133,9 +133,9 @@ public class SdoFastTrackSpecialistDirectionsService {
 
     private SdoR2FastTrackCreditHireDetails buildCreditHireDetails() {
         SdoR2FastTrackCreditHireDetails creditHireDetails = new SdoR2FastTrackCreditHireDetails();
-        creditHireDetails.setInput2(CREDIT_HIRE_STATEMENT_PROMPT_SDO_FAST_TRACK);
+        creditHireDetails.setInput2(CREDIT_HIRE_STATEMENT_PROMPT_SDO);
         creditHireDetails.setDate1(deadlineService.nextWorkingDayFromNowWeeks(4));
-        creditHireDetails.setInput3(CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK);
+        creditHireDetails.setInput3(CREDIT_HIRE_NON_COMPLIANCE_SDO);
         creditHireDetails.setInput4(CREDIT_HIRE_PARTIES_LIAISE);
         creditHireDetails.setDate2(deadlineService.nextWorkingDayFromNowWeeks(6));
         return creditHireDetails;

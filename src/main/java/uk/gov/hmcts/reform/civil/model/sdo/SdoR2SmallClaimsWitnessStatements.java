@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.civil.model.sdo;
 
+import jakarta.validation.constraints.Future;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -16,4 +19,7 @@ public class SdoR2SmallClaimsWitnessStatements {
     private YesOrNo isRestrictWitness;
     private YesOrNo isRestrictPages;
     private String text;
+
+    @Future(message = "The date entered must be in the future")
+    private LocalDate deadlineDate;
 }
