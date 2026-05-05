@@ -75,28 +75,28 @@ public class HearingNoticeSchedulerEventHandler {
         int requestedHearingVersion = hearing.getRequestDetails().getVersionNumber().intValue();
         log.info("Processing hearing id: [{}] status: [{}] and requested version: [{}]", hearingId, hearingStatus, requestedHearingVersion);
 
+        PartiesNotifiedResponse partiesNotified = null;
         if (hearingStatus.equals(ListAssistCaseStatus.LISTED)) {
-            PartiesNotifiedResponse partiesNotified = getLatestPartiesNotifiedResponse(hearingId);
+
             String caseReference = hearing.getCaseDetails().getCaseRef();
             CaseDetails caseDetails = coreCaseDataService.getCase(Long.parseLong(caseReference));
+            partiesNotified = getLatestPartiesNotifiedResponse(hearingId);
 
             boolean stateNotAllowedToGenerateHearingNotice = isNotAllowedState(caseDetails.getState(), caseReference);
-
-            if (!stateNotAllowedToGenerateHearingNotice
-                && HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
-                log.info("Dispatching hearing notice task for hearing [{}].",
-                        hearingId);
+            if (!stateNotAllowedToGenerateHearingNotice && HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
+                log.info("Dispatching hearing notice task for hearing [{}].", hearingId);
                 triggerHearingNoticeEvent(new HearingNoticeMessageVars()
                         .setHearingId(hearingId)
                         .setCaseId(caseReference)
                         .setTriggeredViaScheduler(true));
-
-            } else {
-                notifyHmc(hearingId, hearing, partiesNotified.getServiceData());
+                return;
             }
-        } else {
-            notifyHmc(hearingId, hearing, new PartiesNotifiedServiceData());
         }
+
+        PartiesNotifiedServiceData serviceData = (partiesNotified != null && partiesNotified.getServiceData() != null)
+            ? partiesNotified.getServiceData()
+            : new PartiesNotifiedServiceData();
+        notifyHmc(hearingId, hearing, serviceData);
     }
 
     private static boolean isNotAllowedState(String state, String caseReferene) {
