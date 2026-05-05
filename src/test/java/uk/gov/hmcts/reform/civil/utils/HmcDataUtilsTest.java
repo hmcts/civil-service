@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceDa
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -202,6 +201,26 @@ class HmcDataUtilsTest {
     void hearingDataChanged_WhenPartiesNotifiedServiceDataIsNull_ReturnsTrue() {
         HearingGetResponse hearing = new HearingGetResponse();
         PartiesNotifiedResponse partiesNotified = new PartiesNotifiedResponse();
+
+        boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void hearingDataChanged_WhenHearingLocationIsNull_ReturnsTrue() {
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse()
+                                 .setHearingDaySchedule(List.of(new uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule()
+                                                                   .setHearingVenueId("Venue A")
+                                                                   .setHearingStartDateTime(LocalDateTime.now())
+                                                                   .setHearingEndDateTime(LocalDateTime.now().plusHours(1)))));
+        PartiesNotifiedResponse partiesNotified = new PartiesNotifiedResponse()
+            .setServiceData(new PartiesNotifiedServiceData()
+                             .setDays(List.of(new HearingDay()
+                                               .setHearingStartDateTime(LocalDateTime.now())
+                                               .setHearingEndDateTime(LocalDateTime.now().plusHours(1))))
+                             .setHearingLocation(null)); // NULL location
 
         boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
 
@@ -854,15 +873,19 @@ class HmcDataUtilsTest {
     void getTotalHearingDurationText_whenDuration1Day5Hours(Boolean isWelsh) {
         var hearingDay1 = new HearingDaySchedule()
             .setHearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
-            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 0));
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0));
+
+        var hearingDay2 = new HearingDaySchedule()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 10, 24, 15, 0));
 
         HearingGetResponse hearing = new HearingGetResponse()
             .setHearingResponse(new HearingResponse().setHearingDaySchedule(
-                List.of(hearingDay1)));
+                List.of(hearingDay1, hearingDay2)));
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, isWelsh ? "5 awr" : "5 hours");
+        assertEquals(result, isWelsh ? "1 diwrnod a 5 awr" : "1 day and 5 hours");
     }
 
     @ParameterizedTest
@@ -1552,14 +1575,34 @@ class HmcDataUtilsTest {
             HearingGetResponse hearing = buildHearing(
                 List.of(HearingIndividual.attendingHearingByVideo("Jason", "Wells"),
                         HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                        HearingIndividual.attendingHearingByVideo("Michael", "Carver"),
+                        HearingIndividual.attendingHearingByVideoTeams("Michael", "Carver"),
                         HearingIndividual.attendingHearingByPhone("Jenny", "Harper"),
-                        HearingIndividual.attendingHearingByVideo("Jack", "Crawley")
+                        HearingIndividual.attendingHearingByGenericVideo("Jack", "Crawley")
                 ));
 
             String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
 
             assertEquals("Jason Wells\nMichael Carver\nJack Crawley", actual);
+        }
+
+        @Test
+        void shouldReturnVideoTeamsAttendee() {
+            HearingGetResponse hearing = buildHearing(
+                List.of(HearingIndividual.attendingHearingByVideoTeams("Jason", "Wells")));
+
+            String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
+
+            assertEquals("Jason Wells", actual);
+        }
+
+        @Test
+        void shouldReturnGenericVideoAttendee() {
+            HearingGetResponse hearing = buildHearing(
+                List.of(HearingIndividual.attendingHearingByGenericVideo("Jason", "Wells")));
+
+            String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
+
+            assertEquals("Jason Wells", actual);
         }
 
         @Test
@@ -1607,9 +1650,11 @@ class HmcDataUtilsTest {
         return new CaseHearing()
             .setHearingId(Long.valueOf(hearingId))
             .setHearingRequestDateTime(hearingRequestTime)
-            .setHearingDaySchedule(startTimes.stream().map(startTime -> new HearingDaySchedule().setHearingStartDateTime(
-                startTime)).collect(
-                Collectors.toList()));
+            .setHearingDaySchedule(
+                startTimes.stream()
+                    .map(startTime -> new HearingDaySchedule().setHearingStartDateTime(startTime))
+                    .toList()
+            );
     }
 
     @Nested
