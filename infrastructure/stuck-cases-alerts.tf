@@ -33,9 +33,9 @@ module "stuck_cases_alerts" {
   app_insights_name  = module.application_insights.name
   resourcegroup_name = azurerm_resource_group.rg.name
 
-  alert_name = each.key
-  alert_desc = "Triggers when stuck cases requiring manual intervention are detected in ${var.env}."
-  app_insights_query = <<-AIQ
+  alert_name                 = each.key
+  alert_desc                 = "Triggers when stuck cases requiring manual intervention are detected in ${var.env}."
+  app_insights_query         = <<-AIQ
       customEvents
       | where name == "StuckCasesDailyDigest"
       | where tostring(customDimensions.manualInterventionRequired) == "true"
