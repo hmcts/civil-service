@@ -27,13 +27,15 @@ jobs:
           python-version: '3.x'
 
       - name: Install diagram dependencies
-        run: npm install -g @mermaid-js/mermaid-cli
+        run: npm install -g @mermaid-js/mermaid-cli@11.14.0 --ignore-scripts
 
       - name: Generate database diagram
         run: python3 scripts/generate_database_diagram.py
 
       - name: Render diagram
-        run: npx mmdc -i docs/database_diagram.mmd -o docs/database_diagram.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
+        env:
+          PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
+        run: mmdc -i docs/database_diagram.mmd -o docs/database_diagram.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
 
       - name: Commit updates
         run: |
