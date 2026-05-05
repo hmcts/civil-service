@@ -1575,14 +1575,34 @@ class HmcDataUtilsTest {
             HearingGetResponse hearing = buildHearing(
                 List.of(HearingIndividual.attendingHearingByVideo("Jason", "Wells"),
                         HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                        HearingIndividual.attendingHearingByVideo("Michael", "Carver"),
+                        HearingIndividual.attendingHearingByVideoTeams("Michael", "Carver"),
                         HearingIndividual.attendingHearingByPhone("Jenny", "Harper"),
-                        HearingIndividual.attendingHearingByVideo("Jack", "Crawley")
+                        HearingIndividual.attendingHearingByGenericVideo("Jack", "Crawley")
                 ));
 
             String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
 
             assertEquals("Jason Wells\nMichael Carver\nJack Crawley", actual);
+        }
+
+        @Test
+        void shouldReturnVideoTeamsAttendee() {
+            HearingGetResponse hearing = buildHearing(
+                List.of(HearingIndividual.attendingHearingByVideoTeams("Jason", "Wells")));
+
+            String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
+
+            assertEquals("Jason Wells", actual);
+        }
+
+        @Test
+        void shouldReturnGenericVideoAttendee() {
+            HearingGetResponse hearing = buildHearing(
+                List.of(HearingIndividual.attendingHearingByGenericVideo("Jason", "Wells")));
+
+            String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
+
+            assertEquals("Jason Wells", actual);
         }
 
         @Test
