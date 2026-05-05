@@ -60,7 +60,13 @@ class SendSDOBulkPrintServiceTest {
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForDefendantLIP() {
         Party respondent1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithSDOOrder(respondent1);
-        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
@@ -72,7 +78,13 @@ class SendSDOBulkPrintServiceTest {
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForClaimantLIP() {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithSDOOrder(applicant1);
-        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
@@ -90,7 +102,13 @@ class SendSDOBulkPrintServiceTest {
         caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
         caseData.setCaseDataLiP(caseDataLiP);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
@@ -111,7 +129,13 @@ class SendSDOBulkPrintServiceTest {
         caseDataLiP2.setRespondent1LiPResponse(respondentLiPResponse2);
         caseData.setCaseDataLiP(caseDataLiP2);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
@@ -132,7 +156,13 @@ class SendSDOBulkPrintServiceTest {
         caseDataLiP3.setRespondent1LiPResponse(respondentLiPResponse3);
         caseData.setCaseDataLiP(caseDataLiP3);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
@@ -149,7 +179,13 @@ class SendSDOBulkPrintServiceTest {
         CaseData caseData = createCaseDataWithSDOOrder(applicant1);
         caseData.setClaimantBilingualLanguagePreference("WELSH");
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
@@ -166,7 +202,13 @@ class SendSDOBulkPrintServiceTest {
         CaseData caseData = createCaseDataWithTranslatedSDOOrder(applicant1);
         caseData.setClaimantBilingualLanguagePreference("WELSH");
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
@@ -183,7 +225,13 @@ class SendSDOBulkPrintServiceTest {
         CaseData caseData = createCaseDataWithEnglishAndTranslatedSDOOrder(applicant1);
         caseData.setClaimantBilingualLanguagePreference("BOTH");
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            any(CaseDocument[].class)
+        ))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
