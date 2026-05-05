@@ -59,6 +59,9 @@ DOCMOSIS_TEMPLATE_RE = re.compile(r"DocmosisTemplates\.([A-Z0-9_]+)")
 DOCMOSIS_STATIC_IMPORT_RE = re.compile(r"import\s+static\s+[^;]*DocmosisTemplates\.([A-Z0-9_]+);")
 DOCMOSIS_TITLE_PREFIX_RE = re.compile(r"^(?:%s[_-]*)+")
 DOCMOSIS_TITLE_SUFFIX_RE = re.compile(r"([_-]*%s)+(?=\.pdf$|$)")
+BUSINESS_PROCESS_READY_RE = re.compile(r"BusinessProcess\s*\.\s*ready\s*\(\s*(?:[A-Za-z0-9_]+\.)?([A-Z][A-Z0-9_]+)\s*\)")
+SET_CAMUNDA_EVENT_ENUM_RE = re.compile(r"setCamundaEvent\s*\(\s*(?:[A-Za-z0-9_]+\.)?([A-Z][A-Z0-9_]+)\s*\.\s*name\s*\(\s*\)\s*\)")
+CAMUNDA_EVENT_BUILDER_RE = re.compile(r"\.camundaEvent\s*\(\s*(?:[A-Za-z0-9_]+\.)?([A-Z][A-Z0-9_]+)\s*\.\s*name\s*\(\s*\)\s*\)")
 
 BASE_PARTY_DESC = {
     "AppSolOneEmailDTOGenerator": "Applicant solicitor (LR)",
@@ -938,6 +941,136 @@ def build_class_dependency_map(index: SourceIndex) -> Dict[str, Set[str]]:
     return deps
 
 
+def build_subclass_map(index: SourceIndex) -> Dict[str, Set[str]]:
+    mapping: Dict[str, Set[str]] = {}
+    for class_name, java_class in index.classes.items():
+        base = java_class.base_class()
+        if base:
+            mapping.setdefault(base, set()).add(class_name)
+    return mapping
+
+
+def build_reverse_dependency_map(index: SourceIndex) -> Dict[str, Set[str]]:
+    reverse: Dict[str, Set[str]] = {}
+    for class_name, java_class in index.classes.items():
+        params = constructor_param_map(java_class, class_name)
+        fields = field_types(java_class)
+        for type_name in set(params.values()) | set(fields.values()):
+            if type_name and type_name in index.classes and type_name != class_name:
+                reverse.setdefault(type_name, set()).add(class_name)
+    return reverse
+
+
+SUPER_EVENTS_LIST_RE = re.compile(
+    r"(?:List\.of|Collections\.singletonList|singletonList|Arrays\.asList|asList|of)\s*\((?P<body>[^()]*)\)"
+)
+EVENTS_FIELD_RE = re.compile(
+    r"\b(?:final|static)\s+(?:final|static)?\s*List<\s*CaseEvent\s*>\s+(?:[A-Za-z0-9_]*EVENTS|[A-Za-z0-9_]*events)\s*=\s*"
+    r"(?:List\.of|Collections\.singletonList|singletonList|Arrays\.asList|asList|of)\s*\((?P<body>[^()]*)\)\s*;",
+    re.S
+)
+CASE_EVENT_REF_RE = re.compile(r"(?:CaseEvent\.)?([A-Z][A-Z0-9_]+)")
+
+
+def extract_case_events_from_super_call(java_class: JavaClass, class_name: str) -> List[str]:
+    pattern = re.compile(rf"(?:public|protected)\s+{re.escape(class_name)}\s*\([^)]*\)\s*\{{", re.S)
+    match = pattern.search(java_class.text)
+    if not match:
+        return []
+    body = extract_block(java_class.text, match.end() - 1)
+    super_match = re.search(r"super\s*\((?P<args>.*?)\)\s*;", body, re.S)
+    if not super_match:
+        return []
+    args = super_match.group('args')
+    events: List[str] = []
+    for list_match in SUPER_EVENTS_LIST_RE.finditer(args):
+        for token in split_arguments(list_match.group('body')):
+            token = token.strip()
+            if not token:
+                continue
+            ref = CASE_EVENT_REF_RE.fullmatch(token.split('.')[-1])
+            if ref:
+                events.append(ref.group(1))
+    return events
+
+
+def extract_case_events_from_field(java_class: JavaClass) -> List[str]:
+    events: List[str] = []
+    for match in EVENTS_FIELD_RE.finditer(java_class.text):
+        for token in split_arguments(match.group('body')):
+            token = token.strip()
+            if not token:
+                continue
+            ref = CASE_EVENT_REF_RE.fullmatch(token.split('.')[-1])
+            if ref:
+                events.append(ref.group(1))
+    return events
+
+
+def extract_case_events_thoroughly(index: SourceIndex, class_name: str) -> List[str]:
+    events = list(extract_case_events_including_base(index, class_name))
+    java_class = index.get(class_name)
+    if java_class:
+        for ev in extract_case_events_from_super_call(java_class, class_name):
+            if ev not in events:
+                events.append(ev)
+        for ev in extract_case_events_from_field(java_class):
+            if ev not in events:
+                events.append(ev)
+    return events
+
+
+def index_business_process_origins(index: SourceIndex) -> Dict[str, Set[str]]:
+    """Map BPMN message names (set via BusinessProcess.ready / camundaEvent) to the
+    originating user-facing CCD events whose handlers ultimately fire them."""
+    direct_messages: Dict[str, Set[str]] = {}
+    for class_name, java_class in index.classes.items():
+        messages: Set[str] = set()
+        messages.update(BUSINESS_PROCESS_READY_RE.findall(java_class.text))
+        messages.update(SET_CAMUNDA_EVENT_ENUM_RE.findall(java_class.text))
+        messages.update(CAMUNDA_EVENT_BUILDER_RE.findall(java_class.text))
+        if messages:
+            direct_messages[class_name] = messages
+
+    subclass_map = build_subclass_map(index)
+    reverse_deps = build_reverse_dependency_map(index)
+    callback_handler_cache: Dict[str, bool] = {}
+    origins: Dict[str, Set[str]] = {}
+
+    def collect_originating_events(start_class: str) -> Set[str]:
+        events: Set[str] = set()
+        seen: Set[str] = set()
+        queue: List[str] = [start_class]
+        while queue:
+            current = queue.pop(0)
+            if current in seen:
+                continue
+            seen.add(current)
+            java_class = index.get(current)
+            if not java_class:
+                continue
+            is_abstract = bool(re.search(r'abstract\s+class\s+' + re.escape(current), java_class.text))
+            if not is_abstract and extends_callback_handler(index, current, callback_handler_cache):
+                for ev in extract_case_events_thoroughly(index, current):
+                    if ev:
+                        events.add(ev)
+            for sub in subclass_map.get(current, set()):
+                if sub not in seen:
+                    queue.append(sub)
+            for caller in reverse_deps.get(current, set()):
+                if caller not in seen:
+                    queue.append(caller)
+        return events
+
+    for class_name, messages in direct_messages.items():
+        events = collect_originating_events(class_name)
+        if not events:
+            continue
+        for message in messages:
+            origins.setdefault(message, set()).update(events)
+    return origins
+
+
 def build_interface_implementations(index: SourceIndex) -> Dict[str, Set[str]]:
     mapping: Dict[str, Set[str]] = {}
     for class_name, java_class in index.classes.items():
@@ -1498,6 +1631,30 @@ def combine_rows(email_rows: List[Dict[str, object]],
     return combined
 
 
+def augment_rows_with_originating_events(rows: List[Dict[str, object]],
+                                         origins: Dict[str, Set[str]]) -> List[Dict[str, object]]:
+    if not origins:
+        return rows
+    for row in rows:
+        ids: List[str] = list(row.get('ccd_event_ids') or [])
+        labels: List[str] = list(row.get('ccd_events') or [])
+        seen_ids = set(ids)
+        added = []
+        for trigger_id in list(ids):
+            for origin in sorted(origins.get(trigger_id, set())):
+                if origin in seen_ids:
+                    continue
+                seen_ids.add(origin)
+                added.append(origin)
+        if added:
+            ids.extend(added)
+            for origin in added:
+                labels.append(origin)
+            row['ccd_event_ids'] = ids
+            row['ccd_events'] = labels
+    return rows
+
+
 def normalize_ccd_event_labels(rows: List[Dict[str, object]], ccd_event_names: Dict[str, str]) -> List[Dict[str, object]]:
     if not ccd_event_names:
         return rows
@@ -1763,6 +1920,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     docmosis_rows = build_docmosis_rows(index, service_tasks, start_events, start_event_labels, case_event_map,
                                         start_event_file_map, docmosis_template_map, ccd_event_names)
     combined_rows = combine_rows(email_rows, dashboard_rows, docmosis_rows)
+    business_process_origins = index_business_process_origins(index)
+    combined_rows = augment_rows_with_originating_events(combined_rows, business_process_origins)
     combined_rows = normalize_ccd_event_labels(combined_rows, ccd_event_names)
     filtered_rows = filter_rows_by_ccd_event(combined_rows, args.ccd_event_filters)
     markdown_parts = ["# Notification matrix", render_combined_markdown(filtered_rows, args.notify_service_id)]
