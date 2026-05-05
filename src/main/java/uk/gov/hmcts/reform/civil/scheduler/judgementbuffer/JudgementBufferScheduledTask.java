@@ -12,5 +12,6 @@ public class JudgementBufferScheduledTask implements ScheduledTask {
     @Override
     public void accept(CaseDetails caseDetails) {
         log.info("JudgementBufferScheduledTask::accept case {}", caseDetails.getId());
+        //Add logic to publish event for judgement buffer
     }
 }
