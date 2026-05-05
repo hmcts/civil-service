@@ -90,6 +90,31 @@ class HearingFeeDueHandlerTest {
         verify(externalTaskService).complete(mockTask, null);
     }
 
+    @Test
+    void shouldEmitNoHearingFeeDueEvent_whenCasesFoundNoFeeDueWithHwfOnMultiTrack() {
+        long caseId = 1L;
+        CaseData caseData = new CaseDataBuilder().atStateNoHearingFeeDue()
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                          .setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES))
+            .build();
+        caseData.setHearingHelpFeesReferenceNumber("HWF-111-111");
+
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(caseData).build());
+
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(searchService.getCases()).thenReturn(caseDetails);
+        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
+        when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verify(applicationEventPublisher).publishEvent(new NoHearingFeeDueEvent(caseId));
+        verify(applicationEventPublisher, never()).publishEvent(any(HearingFeePaidEvent.class));
+        verify(externalTaskService).complete(mockTask, null);
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid(boolean toggle) {
@@ -206,8 +231,6 @@ class HearingFeeDueHandlerTest {
             new CaseDetailsBuilder().id(otherId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
-
-        String errorMessage = "there was an error";
 
         handler.execute(mockTask, externalTaskService);
 
