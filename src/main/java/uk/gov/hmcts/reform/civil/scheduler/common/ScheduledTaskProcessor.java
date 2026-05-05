@@ -31,15 +31,16 @@ public class ScheduledTaskProcessor {
         String abortReason = "";
 
         for (CaseDetails caseDetails : cases) {
+            Long caseId = caseDetails.getId();
             try {
                 scheduledTask.accept(caseDetails);
-                eventTracker.caseProcessedEvent(eventConfig, caseDetails.getId());
-                succeededCases.add(caseDetails.getId());
+                eventTracker.caseProcessedEvent(eventConfig, caseId);
+                succeededCases.add(caseId);
                 consecutiveFailures = 0;
             } catch (Exception e) {
-                failedCases.add(caseDetails.getId());
-                eventTracker.caseFailedEvent(eventConfig, caseDetails, e);
-                log.error("Error processing case {}: {}", caseDetails.getId(), e.getMessage(), e);
+                failedCases.add(caseId);
+                eventTracker.caseFailedEvent(eventConfig, caseId, e);
+                log.error("Error processing case {}: {}", caseId, e.getMessage(), e);
                 consecutiveFailures++;
 
                 if (consecutiveFailures >= circuitBreakerThreshold) {

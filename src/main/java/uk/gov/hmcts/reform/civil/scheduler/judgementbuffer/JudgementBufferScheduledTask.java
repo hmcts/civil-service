@@ -11,6 +11,6 @@ public class JudgementBufferScheduledTask implements ScheduledTask {
 
     @Override
     public void accept(CaseDetails caseDetails) {
-        log.info("Processing case {}", caseDetails.getId());
+        log.info("JudgementBufferScheduledTask::accept case {}", caseDetails.getId());
     }
 }

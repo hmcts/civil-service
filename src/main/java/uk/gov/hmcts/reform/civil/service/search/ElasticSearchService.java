@@ -13,13 +13,12 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static java.math.RoundingMode.UP;
 
 @RequiredArgsConstructor
 @Slf4j
-public abstract class ElasticSearchService implements Supplier<Set<CaseDetails>> {
+public abstract class ElasticSearchService {
 
     protected static final int START_INDEX = 0;
     protected static final int ES_DEFAULT_SEARCH_LIMIT = 10;
@@ -40,10 +39,6 @@ public abstract class ElasticSearchService implements Supplier<Set<CaseDetails>>
         log.info("Found {} case(s) with ids {}", ids.size(), ids);
 
         return caseDetails;
-    }
-
-    public Set<CaseDetails> get() {
-        return getCases();
     }
 
     abstract Query query(int startIndex, String timeNow);

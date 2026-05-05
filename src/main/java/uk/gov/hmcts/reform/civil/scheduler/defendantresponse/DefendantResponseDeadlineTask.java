@@ -16,7 +16,8 @@ public class DefendantResponseDeadlineTask implements ScheduledTask {
 
     @Override
     public void accept(CaseDetails caseDetails) {
-        //TODO: Add logic to publish event for defendant response deadline check
+        log.info("DefendantResponseDeadlineTask::accept case {}", caseDetails.getId());
+        //Add logic to publish event for defendant response deadline check, for example,
         //applicationEventPublisher.publishEvent(new DefendantResponseDeadlineCheckEvent(caseDetails.getId()));
     }
 }

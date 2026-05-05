@@ -52,7 +52,7 @@ public class ScheduledTaskRunner {
         ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, cases);
 
         if (outcome.abortedEarly()) {
-            eventTracker.jobAbortedEvent(eventConfig, cases, outcome.succeededCases(), outcome.failedCases(), outcome.abortReason());
+            eventTracker.jobAbortedEvent(eventConfig, cases.size(), outcome.succeededCases().size(), outcome.failedCases().size(), outcome.abortReason());
             log.info(
                 "Scheduled task aborted: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortReason: {}",
                 eventConfig.getSchedulerName(),
@@ -62,7 +62,7 @@ public class ScheduledTaskRunner {
                 outcome.abortReason()
             );
         } else {
-            eventTracker.jobCompletedEvent(eventConfig, cases, outcome.succeededCases(), outcome.failedCases());
+            eventTracker.jobCompletedEvent(eventConfig, cases.size(), outcome.succeededCases().size(), outcome.failedCases().size());
             log.info(
                 "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}",
                 eventConfig.getSchedulerName(),

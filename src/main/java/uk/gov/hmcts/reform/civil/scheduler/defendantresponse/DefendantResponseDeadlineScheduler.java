@@ -30,7 +30,7 @@ public class DefendantResponseDeadlineScheduler {
         log.info("Running {} scheduler", SCHEDULER_NAME);
         scheduledTaskRunner.run(
             new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-            searchService,
+            searchService::getCases,
             defendantResponseDeadlineTask
         );
     }

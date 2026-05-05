@@ -9,6 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 
+import java.util.function.Supplier;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -29,6 +31,7 @@ class JudgementBufferSchedulerTest {
     @Nested
     class Execute {
 
+        @SuppressWarnings("unchecked")
         @Test
         void shouldRunTaskRunner_whenSchedulerIsEnabled() {
             ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
@@ -37,7 +40,7 @@ class JudgementBufferSchedulerTest {
 
             verify(scheduledTaskRunner).run(
                 eq(expectedConfig),
-                any(),
+                any(Supplier.class),
                 eq(judgementBufferScheduledTask)
             );
         }

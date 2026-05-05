@@ -79,7 +79,7 @@ class ScheduledTaskRunnerTest {
 
         verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig), eq(1));
         verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), eq(cases));
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases), eq(List.of(1L)), eq(List.of()));
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases.size()), eq(1), eq(0));
     }
 
     @Test
@@ -99,7 +99,7 @@ class ScheduledTaskRunnerTest {
 
         scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
 
-        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq(cases), eq(List.of()), eq(List.of(1L, 2L)), eq("Error 2"));
+        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq(cases.size()), eq(0), eq(2), eq("Error 2"));
     }
 
     @Test
@@ -118,6 +118,6 @@ class ScheduledTaskRunnerTest {
 
         scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
 
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases), eq(List.of(2L)), eq(List.of(1L, 3L)));
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases.size()), eq(1), eq(2));
     }
 }

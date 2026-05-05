@@ -9,6 +9,10 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguratio
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
 
+import java.util.function.Supplier;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.scheduler.defendantresponse.DefendantResponseDeadlineScheduler.SCHEDULER_NAME;
 
@@ -27,6 +31,7 @@ class DefendantResponseDeadlineSchedulerTest {
     @InjectMocks
     private DefendantResponseDeadlineScheduler scheduler;
 
+    @SuppressWarnings("unchecked")
     @Test
     void shouldRunTaskRunner_whenDeadlineCheckIsCalled() {
         ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
@@ -34,9 +39,9 @@ class DefendantResponseDeadlineSchedulerTest {
         scheduler.deadlineCheck();
 
         verify(scheduledTaskRunner).run(
-            expectedConfig,
-            searchService,
-            defendantResponseDeadlineTask
+            eq(expectedConfig),
+            any(Supplier.class),
+            eq(defendantResponseDeadlineTask)
         );
     }
 }

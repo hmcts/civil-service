@@ -84,8 +84,8 @@ class ScheduledTaskProcessorTest {
         verify(scheduledTask).accept(case1);
         verify(scheduledTask).accept(case2);
 
-        verify(scheduledEventTracker).caseFailedEvent(eventConfig, case1, error1);
-        verify(scheduledEventTracker).caseFailedEvent(eventConfig, case2, error2);
+        verify(scheduledEventTracker).caseFailedEvent(eventConfig, 1L, error1);
+        verify(scheduledEventTracker).caseFailedEvent(eventConfig, 2L, error2);
         verifyNoMoreInteractions(scheduledEventTracker);
     }
 }
