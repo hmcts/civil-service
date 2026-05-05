@@ -5,9 +5,7 @@ data "azurerm_key_vault_secret" "civil_service_alert_slack_email" {
 }
 
 locals {
-  civil_service_alert_slack_email = length(data.azurerm_key_vault_secret.civil_service_alert_slack_email) > 0
-    ? data.azurerm_key_vault_secret.civil_service_alert_slack_email[0].value
-    : null
+  civil_service_alert_slack_email = length(data.azurerm_key_vault_secret.civil_service_alert_slack_email) > 0 ? data.azurerm_key_vault_secret.civil_service_alert_slack_email[0].value : null
 }
 
 resource "azurerm_monitor_action_group" "civil_service_action_group" {
