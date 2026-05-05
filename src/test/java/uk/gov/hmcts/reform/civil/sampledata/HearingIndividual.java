@@ -13,7 +13,9 @@ import java.util.UUID;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.INTER;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.NA;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.TELCVP;
+import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VID;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
+import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDTEAMS;
 
 @NoArgsConstructor
 @Accessors(chain = true)
@@ -59,6 +61,14 @@ public class HearingIndividual {
 
     public static HearingIndividual attendingHearingByVideo(String firstName, String lastName) {
         return attendingHearingBy(firstName, lastName, VIDCVP);
+    }
+
+    public static HearingIndividual attendingHearingByVideoTeams(String firstName, String lastName) {
+        return attendingHearingBy(firstName, lastName, VIDTEAMS);
+    }
+
+    public static HearingIndividual attendingHearingByGenericVideo(String firstName, String lastName) {
+        return attendingHearingBy(firstName, lastName, VID);
     }
 
     public static HearingIndividual nonAttending(String firstName, String lastName) {
