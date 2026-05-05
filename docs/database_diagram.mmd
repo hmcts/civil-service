@@ -1,0 +1,73 @@
+%% Auto-generated from Flyway migrations; edit src/main/resources/db/migration instead.
+erDiagram
+  dbs_dashboard_notifications {
+    uuid id PK "not null"
+    integer notification_action_id FK "nullable"
+    varchar reference "nullable"
+    varchar notification_name "nullable"
+    varchar citizen_role "nullable"
+    varchar title_en "nullable"
+    varchar title_cy "nullable"
+    varchar description_en "nullable"
+    varchar description_cy "nullable"
+    jsonb message_params "nullable"
+    varchar created_by "nullable"
+    timestamp created_at "nullable"
+    varchar updated_by "nullable"
+    timestamp updated_on "nullable"
+    timestamp deadline "nullable"
+    varchar time_to_live "nullable"
+  }
+
+  dbs_notification_action {
+    bigint id PK "not null"
+    uuid dashboard_notifications_id FK "nullable"
+    character_varying reference "nullable"
+    character_varying action_performed "nullable"
+    character_varying created_by "nullable"
+    timestamp created_at "nullable"
+  }
+
+  dbs_scenario {
+    bigint id PK "not null"
+    character_varying name "nullable"
+    varchar_array notifications_to_delete "nullable"
+    jsonb notifications_to_create "nullable"
+    timestamp created_at "nullable"
+  }
+
+  dbs_task_item_template {
+    bigint id PK "not null"
+    character_varying task_name_en "nullable"
+    character_varying hint_text_en "nullable"
+    character_varying category_en "nullable"
+    character_varying task_name_cy "nullable"
+    character_varying hint_text_cy "nullable"
+    character_varying category_cy "nullable"
+    character_varying scenario_name "nullable"
+    character_varying template_name "nullable"
+    int_array task_status_sequence "nullable"
+    character_varying role "nullable"
+    int task_order "nullable"
+    timestamp created_at "nullable"
+  }
+
+  dbs_task_list {
+    uuid id PK "not null"
+    bigint task_item_template_id FK "not null"
+    character_varying reference "nullable"
+    int current_status "nullable"
+    int next_status "nullable"
+    character_varying task_name_en "nullable"
+    character_varying hint_text_en "nullable"
+    character_varying task_name_cy "nullable"
+    character_varying hint_text_cy "nullable"
+    jsonb message_params "nullable"
+    timestamp created_at "nullable"
+    timestamp updated_at "nullable"
+    character_varying updated_by "nullable"
+  }
+
+  dbs_notification_action ||--o{ dbs_dashboard_notifications : "fk_dbs_dashboard_notifications_notification_action_id"
+  dbs_dashboard_notifications ||--o{ dbs_notification_action : "fk_dashboard_notifications_id"
+  dbs_task_item_template ||--o{ dbs_task_list : "fk_task_list_task_item_template"
