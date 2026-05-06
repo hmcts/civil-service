@@ -15,7 +15,6 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 public class CarmDisabledRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "mediation-update-defendant-two-notification-%s";
-    private static final String DEFENDANTS_TEXT = "'s claim against you";
 
     private final NotificationsProperties notificationsProperties;
 

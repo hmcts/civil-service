@@ -11,6 +11,8 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @AllArgsConstructor
 public abstract class RespSolOneEmailDTOGenerator extends EmailDTOGenerator {
 
+    protected static final String DEFENDANTS_TEXT = "'s claim against you";
+
     protected final OrganisationService organisationService;
 
     @Override

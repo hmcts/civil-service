@@ -19,7 +19,6 @@ public class CarmRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator
 
     private static final String REFERENCE_TEMPLATE = "mediation-update-defendant-notification-LR-%s";
     private final NotificationsProperties notificationsProperties;
-    private static final String DEFENDANTS_TEXT = "'s claim against you";
 
     public CarmRespSolTwoEmailDTOGenerator(OrganisationService organisationService,
                                            NotificationsProperties notificationsProperties) {
