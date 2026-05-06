@@ -108,6 +108,7 @@ class CarmDisabledRespSolTwoEmailDTOGeneratorTest {
             .respondent2Represented(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .addRespondent2(YesOrNo.YES)
+            .respondent2(new Party().setType(Party.Type.INDIVIDUAL))
             .build();
 
         boolean shouldNotify = generator.getShouldNotify(caseData);
@@ -133,6 +134,7 @@ class CarmDisabledRespSolTwoEmailDTOGeneratorTest {
             .respondent2Represented(YesOrNo.NO)
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .addRespondent2(YesOrNo.YES)
+            .respondent2(new Party().setType(Party.Type.INDIVIDUAL))
             .build();
 
         boolean shouldNotify = generator.getShouldNotify(caseData);
