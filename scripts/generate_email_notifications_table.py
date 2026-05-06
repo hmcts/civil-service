@@ -21,6 +21,7 @@ APPLICATION_YAML = RESOURCE_ROOT / "application.yaml"
 DASHBOARD_TASK_IDS_PATH = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civil' / 'handler' / 'callback' / 'camunda' / 'dashboardnotifications' / 'DashboardTaskIds.java'
 DASHBOARD_SCENARIOS_PATH = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civil' / 'handler' / 'callback' / 'camunda' / 'dashboardnotifications' / 'DashboardScenarios.java'
 TEMPLATE_DIR = RESOURCE_ROOT / 'notification-templates'
+MIGRATION_DIR = RESOURCE_ROOT / 'db' / 'migration'
 RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-service/master/"
 TEMPLATE_VIEWER_PATH = "dashboard-template.html"
 DIAGRAM_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/"
@@ -647,6 +648,149 @@ def load_dashboard_scenarios() -> Dict[str, str]:
     return mapping
 
 
+SCENARIO_INSERT_RE = re.compile(
+    r"INSERT\s+INTO\s+dbs\.scenario\s*\([^)]*\)\s*VALUES\s*(?P<body>.*?);",
+    re.IGNORECASE | re.DOTALL,
+)
+SCENARIO_UPDATE_CREATE_RE = re.compile(
+    r"UPDATE\s+dbs\.scenario\s+SET\s+notifications_to_create\s*=\s*"
+    r"'(?P<value>(?:[^']|'')*)'\s+WHERE\s+name\s*=\s*'(?P<name>[^']+)'\s*;",
+    re.IGNORECASE | re.DOTALL,
+)
+NOTICE_REF_RE = re.compile(r"Notice\.[A-Za-z0-9._-]+")
+
+
+def _iter_sql_value_tuples(values_block: str):
+    """Yield each top-level (...) tuple body from a VALUES block, string- and paren-aware."""
+    depth = 0
+    in_str = False
+    buf: List[str] = []
+    i = 0
+    n = len(values_block)
+    while i < n:
+        c = values_block[i]
+        if in_str:
+            if c == "'":
+                if i + 1 < n and values_block[i + 1] == "'":
+                    buf.append("''")
+                    i += 2
+                    continue
+                in_str = False
+            buf.append(c)
+            i += 1
+            continue
+        if c == "'":
+            in_str = True
+            buf.append(c)
+        elif c == '(':
+            depth += 1
+            if depth == 1:
+                buf = []
+            else:
+                buf.append(c)
+        elif c == ')':
+            depth -= 1
+            if depth == 0:
+                yield ''.join(buf)
+                buf = []
+            else:
+                buf.append(c)
+        elif depth > 0:
+            buf.append(c)
+        i += 1
+
+
+def _split_sql_tuple_fields(tuple_text: str) -> List[str]:
+    """Split a SQL tuple body by top-level commas, string- and bracket-aware."""
+    depth = 0
+    in_str = False
+    fields: List[str] = []
+    cur: List[str] = []
+    i = 0
+    n = len(tuple_text)
+    while i < n:
+        c = tuple_text[i]
+        if in_str:
+            if c == "'":
+                if i + 1 < n and tuple_text[i + 1] == "'":
+                    cur.append("''")
+                    i += 2
+                    continue
+                in_str = False
+            cur.append(c)
+            i += 1
+            continue
+        if c == "'":
+            in_str = True
+            cur.append(c)
+        elif c in '({[':
+            depth += 1
+            cur.append(c)
+        elif c in ')}]':
+            depth -= 1
+            cur.append(c)
+        elif c == ',' and depth == 0:
+            fields.append(''.join(cur).strip())
+            cur = []
+        else:
+            cur.append(c)
+        i += 1
+    if cur:
+        fields.append(''.join(cur).strip())
+    return fields
+
+
+def load_scenario_template_map() -> Dict[str, List[str]]:
+    """Map dashboard scenario names to the Notice templates they create.
+
+    Source of truth is the Flyway migration SQL (`db/migration/*.sql`). We parse
+    `INSERT INTO dbs.scenario` tuples and `UPDATE dbs.scenario SET
+    notifications_to_create = ...` statements in filename order so that later
+    migrations override earlier ones, matching how Flyway applies them at runtime.
+    """
+    mapping: Dict[str, List[str]] = {}
+    if not MIGRATION_DIR.exists():
+        return mapping
+    for path in sorted(MIGRATION_DIR.glob('*.sql')):
+        try:
+            text = path.read_text(encoding='utf-8')
+        except OSError:
+            continue
+        for insert_match in SCENARIO_INSERT_RE.finditer(text):
+            for tuple_body in _iter_sql_value_tuples(insert_match.group('body')):
+                fields = _split_sql_tuple_fields(tuple_body)
+                if len(fields) < 3:
+                    continue
+                name = fields[0].strip()
+                if not (name.startswith("'") and name.endswith("'")):
+                    continue
+                scenario_name = name[1:-1].replace("''", "'")
+                if not scenario_name.startswith('Scenario.'):
+                    continue
+                create_field = fields[2]
+                notices = NOTICE_REF_RE.findall(create_field)
+                # Preserve order, deduplicate.
+                seen = set()
+                unique: List[str] = []
+                for notice in notices:
+                    if notice not in seen:
+                        seen.add(notice)
+                        unique.append(notice)
+                mapping[scenario_name] = unique
+        for update_match in SCENARIO_UPDATE_CREATE_RE.finditer(text):
+            scenario_name = update_match.group('name')
+            value = update_match.group('value').replace("''", "'")
+            notices = NOTICE_REF_RE.findall(value)
+            seen = set()
+            unique = []
+            for notice in notices:
+                if notice not in seen:
+                    seen.add(notice)
+                    unique.append(notice)
+            mapping[scenario_name] = unique
+    return mapping
+
+
 def load_docmosis_templates() -> Dict[str, Dict[str, str]]:
     path = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civil' / 'service' / 'docmosis' / 'DocmosisTemplates.java'
     if not path.exists():
@@ -1155,21 +1299,41 @@ def scenario_names_for_class(index: SourceIndex,
     return scenarios
 
 
-def template_links_for_scenarios(scenarios: Set[str], template_map: Dict[str, Dict[str, str]]) -> List[Dict[str, str]]:
+def template_links_for_scenarios(scenarios: Set[str],
+                                 template_map: Dict[str, Dict[str, str]],
+                                 scenario_template_map: Optional[Dict[str, List[str]]] = None
+                                 ) -> List[Dict[str, str]]:
     if not scenarios:
         return []
-    links = []
-    for scenario in sorted(filter(None, scenarios)):
-        if not scenario.startswith('Scenario.'):
-            continue
-        template_name = 'Notice.' + scenario.split('Scenario.', 1)[1]
+    links: List[Dict[str, str]] = []
+    seen: Set[str] = set()
+
+    def add_template(template_name: str) -> None:
+        if template_name in seen:
+            return
+        seen.add(template_name)
         template_entry = template_map.get(template_name)
         if template_entry:
             links.append({
                 'label': template_name,
                 'path': template_entry['path'],
-                'preview': template_entry['content']
+                'preview': template_entry['content'],
             })
+        else:
+            links.append({'label': template_name})
+
+    for scenario in sorted(filter(None, scenarios)):
+        if not scenario.startswith('Scenario.'):
+            continue
+        migration_templates = scenario_template_map.get(scenario) if scenario_template_map else None
+        if migration_templates is not None:
+            for template_name in migration_templates:
+                add_template(template_name)
+            continue
+        # Fallback when the scenario was not found in the migration map (e.g. brand-new
+        # scenario with no migration committed yet): keep the legacy 1:1 derivation.
+        derived = 'Notice.' + scenario.split('Scenario.', 1)[1]
+        add_template(derived)
     if not links:
         links.append({'label': 'No template — task list only'})
     return links
@@ -1232,7 +1396,9 @@ def split_arguments(arg_text: str) -> List[str]:
 
 def collect_dashboard_contributions(index: SourceIndex, service_tasks, start_events,
                                     start_event_labels, scenario_map: Dict[str, str],
-                                    template_map: Dict[str, str], scenario_cache: Dict[str, Set[str]]) -> List[Dict[str, object]]:
+                                    template_map: Dict[str, str], scenario_cache: Dict[str, Set[str]],
+                                    scenario_template_map: Optional[Dict[str, List[str]]] = None
+                                    ) -> List[Dict[str, object]]:
     task_ids_map = load_dashboard_task_ids()
     rows = []
     for class_name, java_class in index.classes.items():
@@ -1273,7 +1439,7 @@ def collect_dashboard_contributions(index: SourceIndex, service_tasks, start_eve
             service = find_dashboard_service(handler_class)
             bpmn_files, ccd_display, ccd_ids = lookup_bpmn(task_id, service_tasks, start_events, start_event_labels)
             scenarios = scenario_names_for_class(index, handler_type, scenario_map, scenario_cache)
-            templates = template_links_for_scenarios(scenarios, template_map)
+            templates = template_links_for_scenarios(scenarios, template_map, scenario_template_map)
             rows.append({
                 'framework': 'DashboardNotificationHandler',
                 'camunda_task': task_id,
@@ -1367,7 +1533,9 @@ def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_eve
                                     start_event_labels, case_event_map, start_event_file_map,
                                     scenario_map: Dict[str, str],
                                     template_map: Dict[str, Dict[str, str]],
-                                    scenario_cache: Dict[str, Set[str]]) -> List[Dict[str, object]]:
+                                    scenario_cache: Dict[str, Set[str]],
+                                    scenario_template_map: Optional[Dict[str, List[str]]] = None
+                                    ) -> List[Dict[str, object]]:
     rows = []
     inheritance_cache: Dict[str, bool] = {}
     for class_name, java_class in index.classes.items():
@@ -1390,7 +1558,7 @@ def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_eve
             bpmn_files, ccd_display, ccd_ids
         )
         scenarios = scenario_names_for_class(index, class_name, scenario_map, scenario_cache)
-        templates = template_links_for_scenarios(scenarios, template_map)
+        templates = template_links_for_scenarios(scenarios, template_map, scenario_template_map)
         rows.append({
             'framework': framework,
             'camunda_task': task_id,
@@ -1406,13 +1574,15 @@ def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_eve
 
 def build_dashboard_rows(index: SourceIndex, service_tasks, start_events, start_event_labels,
                          case_event_map, start_event_file_map,
-                         scenario_map: Dict[str, str], template_map: Dict[str, Dict[str, str]]):
+                         scenario_map: Dict[str, str], template_map: Dict[str, Dict[str, str]],
+                         scenario_template_map: Optional[Dict[str, List[str]]] = None):
     scenario_cache: Dict[str, Set[str]] = {}
     contribution_rows = collect_dashboard_contributions(
-        index, service_tasks, start_events, start_event_labels, scenario_map, template_map, scenario_cache)
+        index, service_tasks, start_events, start_event_labels, scenario_map, template_map, scenario_cache,
+        scenario_template_map)
     callback_rows = collect_dashboard_callback_rows(
         index, service_tasks, start_events, start_event_labels, case_event_map, start_event_file_map,
-        scenario_map, template_map, scenario_cache)
+        scenario_map, template_map, scenario_cache, scenario_template_map)
     all_rows = contribution_rows + callback_rows
     return sorted(all_rows, key=lambda row: (row['camunda_task'], row['framework'], row['handler']))
 
@@ -1907,6 +2077,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     service_tasks, start_events, start_event_labels, case_event_map, start_event_file_map = index_bpmn(camunda_root)
     scenario_map = load_dashboard_scenarios()
     template_map = load_template_paths()
+    scenario_template_map = load_scenario_template_map()
     ccd_root = Path(args.ccd_definition_root) if args.ccd_definition_root else None
     ga_root = Path(args.ga_ccd_definition_root) if args.ga_ccd_definition_root else None
     civil_event_names = load_ccd_event_names(ccd_root) if ccd_root else {}
@@ -1915,7 +2086,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     email_rows = build_email_rows(index, notifications, camunda_root, service_tasks, start_events, start_event_labels,
                                   case_event_map, start_event_file_map)
     dashboard_rows = build_dashboard_rows(index, service_tasks, start_events, start_event_labels, case_event_map,
-                                          start_event_file_map, scenario_map, template_map)
+                                          start_event_file_map, scenario_map, template_map, scenario_template_map)
     docmosis_template_map = load_docmosis_templates()
     docmosis_rows = build_docmosis_rows(index, service_tasks, start_events, start_event_labels, case_event_map,
                                         start_event_file_map, docmosis_template_map, ccd_event_names)
