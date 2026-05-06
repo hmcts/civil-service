@@ -78,6 +78,7 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
                             .setIndividualFirstName("Bob")
                             .setIndividualLastName("Jones")
                             .setIndividualTitle("Mr"))
+            .addApplicant2(YesOrNo.YES)
             .respondent1Represented(YesOrNo.YES)
             .applicant1Represented(YesOrNo.YES)
             .build();
