@@ -7,13 +7,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
-import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
-import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
+import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -95,7 +95,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
 
             }
         } catch (Exception exception) {
-            log.error("Error in GAJudgeRevisitTaskHandler::fireEventForStateChange:  {}", exception.getMessage(), exception);
+            log.error("Error in GAJudgeRevisitTaskHandler::fireEventForStateChange: " + exception);
         }
     }
 
@@ -107,7 +107,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
         try {
             coreCaseDataService.triggerEvent(caseId, DELETE_CLAIMANT_WRITTEN_REPS_NOTIFICATION);
         } catch (Exception exception) {
-            log.error("Error in GAJudgeRevisitTaskHandler::fireEventForDeleteClaimantNotification:  {}", exception.getMessage(), exception);
+            log.error("Error in GAJudgeRevisitTaskHandler::fireEventForDeleteClaimantNotification: " + exception);
         }
     }
 
@@ -119,7 +119,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
         try {
             coreCaseDataService.triggerEvent(caseId, DELETE_DEFENDANT_WRITTEN_REPS_NOTIFICATION);
         } catch (Exception exception) {
-            log.error("Error in GAJudgeRevisitTaskHandler::fireEventForDeleteDefendantNotification: {}", exception.getMessage(), exception);
+            log.error("Error in GAJudgeRevisitTaskHandler::fireEventForDeleteDefendantNotification: " + exception);
         }
     }
 
@@ -135,7 +135,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
                 coreCaseDataService.triggerEvent(caseId, UPDATE_RESPONDENT_TASK_LIST_GA);
             }
         } catch (Exception exception) {
-            log.error("Error in GAJudgeRevisitTaskHandler::fireEventForUpdatingTaskList: {} ", exception.getMessage(),  exception);
+            log.error("Error in GAJudgeRevisitTaskHandler::fireEventForUpdatingClaimantTaskList: " + exception);
         }
     }
 
@@ -154,7 +154,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
                                                           .getJudicialDecisionMakeAnOrderForWrittenRepresentations()
                                                           .getSequentialApplicantMustRespondWithin()));
                 } catch (Exception e) {
-                    log.error("Error GAJudgeRevisitTaskHandler::filterForClaimantWrittenRepExpired : {}", e.getMessage(), e);
+                    log.error("Error GAJudgeRevisitTaskHandler::getWrittenRepCaseReadyToJudgeRevisit : " + e);
                 }
                 return false;
             }).toList();
@@ -175,7 +175,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
                                                           .getJudicialDecisionMakeAnOrderForWrittenRepresentations()
                                                           .getWrittenSequentailRepresentationsBy()) >= 0);
                 } catch (Exception e) {
-                    log.error("Error GAJudgeRevisitTaskHandler::filterForDefendantWrittenRepExpired : {}", e.getMessage(), e);
+                    log.error("Error GAJudgeRevisitTaskHandler::getWrittenRepCaseReadyToJudgeRevisit : " + e);
                 }
                 return false;
             }).toList();
@@ -194,7 +194,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
                                                           .getJudicialDecisionMakeOrder()
                                                           .getDirectionsResponseByDate()));
                 } catch (Exception e) {
-                    log.error("Error GAJudgeRevisitTaskHandler::getDirectionOrderCaseReadyToJudgeRevisit : {}", e.getMessage(), e);
+                    log.error("Error GAJudgeRevisitTaskHandler::getDirectionOrderCaseReadyToJudgeRevisit : " + e);
                 }
                 return false;
             }).toList();
@@ -214,7 +214,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
                                                           .getJudicialDecisionRequestMoreInfo()
                                                           .getJudgeRequestMoreInfoByDate()));
                 } catch (Exception e) {
-                    log.error("GAJudgeRevisitTaskHandler::getRequestForInformationCaseReadyToJudgeRevisit failed: {}", e.getMessage(), e);
+                    log.error("GAJudgeRevisitTaskHandler failed: " + e);
                 }
                 return false;
             })
