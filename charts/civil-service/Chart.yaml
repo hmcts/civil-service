@@ -2,7 +2,7 @@ apiVersion: v2
 description: A Helm chart for civil-service App
 name: civil-service
 home: https://github.com/hmcts/civil-service
-version: 0.0.101
+version: 0.0.102
 maintainers:
   - name: HMCTS Civil team
 
@@ -15,7 +15,7 @@ dependencies:
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd.enabled
   - name: xui-webapp
-    version: 1.0.43
+    version: 1.0.44
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: xui-webapp.enabled
   - name: idam-pr
@@ -27,7 +27,7 @@ dependencies:
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: camunda-bpm.enabled
   - name: aac-manage-case-assignment
-    version: 0.2.24
+    version: 0.2.25
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: aac-manage-case-assignment.enabled
   - name: wiremock
