@@ -15,7 +15,6 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_TWO;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.MediationSuccessfulNotifyParties;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
 public class CarmRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
@@ -59,25 +58,6 @@ public class CarmRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        String partyName = caseData.getApplicant1().getPartyName();
-
-        if (isTwoVOne(caseData)) {
-            partyName = String.format("%s and %s", partyName, caseData.getApplicant2().getPartyName());
-            properties.putAll(Map.of(
-                    CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
-                            true, organisationService),
-                    CLAIMANT_NAME_ONE, caseData.getApplicant1().getPartyName(),
-                    CLAIMANT_NAME_TWO, caseData.getApplicant2().getPartyName(),
-                    PARTY_NAME, partyName + DEFENDANTS_TEXT
-            ));
-        } else {
-            properties.putAll(Map.of(
-                    CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
-                            true, organisationService),
-                    CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
-                    PARTY_NAME, partyName + DEFENDANTS_TEXT
-            ));
-        }
-        return properties;
+        return buildDefendantNotificationProperties(properties, caseData);
     }
 }

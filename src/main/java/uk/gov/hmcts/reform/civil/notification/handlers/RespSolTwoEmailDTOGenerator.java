@@ -29,6 +29,16 @@ public abstract class RespSolTwoEmailDTOGenerator extends EmailDTOGenerator {
         return properties;
     }
 
+    protected Map<String, String> buildDefendantTwoNotificationProperties(Map<String, String> properties, CaseData caseData) {
+        properties.putAll(Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                false, organisationService),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            PARTY_NAME, caseData.getApplicant1().getPartyName() + DEFENDANTS_TEXT
+        ));
+        return properties;
+    }
+
     public Boolean getShouldNotify(CaseData caseData) {
         return isOneVTwoTwoLegalRep(caseData) && !caseData.isRespondent2LiP();
     }

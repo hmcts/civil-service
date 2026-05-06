@@ -12,7 +12,6 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_TWO;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.MediationSuccessfulNotifyParties;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
 public class CarmRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
@@ -51,12 +50,6 @@ public class CarmRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.putAll(Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
-                                                                             false, organisationService),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
-            PARTY_NAME, caseData.getApplicant1().getPartyName() + DEFENDANTS_TEXT
-        ));
-        return properties;
+        return buildDefendantTwoNotificationProperties(properties, caseData);
     }
 }
