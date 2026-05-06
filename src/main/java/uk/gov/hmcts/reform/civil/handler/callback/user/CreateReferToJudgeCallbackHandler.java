@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -35,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
@@ -64,6 +66,8 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
     private CallbackResponse submitReferToJudge(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData.setIsReferToJudgeClaim(YesOrNo.YES);
+        log.info("Submitting ReferToJudge caseData.getEventDescription(): {}", caseData.getEventDescription());
+        log.info("Submitting ReferToJudge caseData.getAdditionalInformation(): {}", caseData.getAdditionalInformation());
 
         if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             locationHelper.getClaimantRequestedCourt(caseData)
