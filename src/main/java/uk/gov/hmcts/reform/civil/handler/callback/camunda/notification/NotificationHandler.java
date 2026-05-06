@@ -65,6 +65,13 @@ public class NotificationHandler extends CallbackHandler {
         final String taskId = caseData.getBusinessProcess().getActivityId();
         final Notifier notifier = notifierFactory.getNotifier(taskId);
 
+        if (notifier == null) {
+            throw new IllegalStateException(
+                "No Notifier registered for taskId '" + taskId + "' (caseId: "
+                    + caseData.getCcdCaseReference() + "). "
+                    + "Check the BPMN caseEvent/activityId and Notifier#getTaskId mappings.");
+        }
+
         final String summary = notifier.notifyParties(caseData, NOTIFY_EVENT.toString(), taskId);
 
         caseData.setNotificationSummary(summary);
