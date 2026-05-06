@@ -17,4 +17,6 @@ public class DisposalHearingDisclosureOfDocuments {
     private String input1;
     @Future(message = "The date entered must be in the future")
     private LocalDate date1;
+    private String input2;
+    private LocalDate date2;
 }

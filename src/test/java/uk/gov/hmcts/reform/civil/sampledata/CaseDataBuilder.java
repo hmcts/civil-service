@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -3073,7 +3074,7 @@ public class CaseDataBuilder {
                 + " insufficient, they must inform the court within "
                 + "7 days of the date of this order.")
             .setInput3(FAST_TRACK_TRIAL_BUNDLE_NOTICE + " ")
-            .setType(List.of("DOCUMENTS"));
+            .setType(List.of(DisposalHearingBundleType.DOCUMENTS));
         return this;
     }
 

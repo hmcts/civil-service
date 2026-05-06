@@ -120,6 +120,7 @@ public class DjLocationAndToggleService {
         builder.disposalHearingSchedulesOfLossDJToggle(DEFAULT_TOGGLE);
         builder.disposalHearingStandardDisposalOrderDJToggle(DEFAULT_TOGGLE);
         builder.disposalHearingFinalDisposalHearingDJToggle(DEFAULT_TOGGLE);
+        builder.disposalHearingBundleDJToggle(DEFAULT_TOGGLE);
         builder.disposalHearingClaimSettlingDJToggle(DEFAULT_TOGGLE);
         builder.disposalHearingCostsDJToggle(DEFAULT_TOGGLE);
         return builder.build();

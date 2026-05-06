@@ -6,22 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 
-import jakarta.validation.constraints.Future;
-import java.time.LocalDate;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class TrialHearingTrial {
+public class DisposalHearingBundleDJ {
 
-    private String input1;
-    @Future(message = "The date entered must be in the future")
-    private LocalDate date1;
-    @Future(message = "The date entered must be in the future")
-    private LocalDate date2;
-    private String input2;
-    private String input3;
+    private String input;
     private List<DisposalHearingBundleType> type;
 }
