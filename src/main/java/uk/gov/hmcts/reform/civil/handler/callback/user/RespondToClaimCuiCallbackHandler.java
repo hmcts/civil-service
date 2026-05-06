@@ -148,6 +148,12 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             responseDate
         ) : null;
 
+        log.info(
+            "case id: {}, applicantDeadline: {}",
+            callbackParams.getRequest().getCaseDetails().getId(),
+            applicantDeadline
+        );
+
         caseData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI));
         caseData.setRespondent1ResponseDate(responseDate);
         caseData.setRespondent1GeneratedResponseDocument(dummyDocument);
