@@ -68,11 +68,11 @@ public class NoOngoingBusinessProcessAspect {
                     + "current FlowState: {}, stateFlowHistory: {}",
                 caseEvent.name(),
                 caseData.getCcdCaseReference(),
-                bp != null ? bp.getCamundaEvent() : null,
-                bp != null ? bp.getProcessInstanceId() : null,
-                bp != null ? bp.getActivityId() : null,
-                bp != null ? bp.getStatus() : null,
-                bp != null ? bp.getReadyOn() : null,
+                bp.getCamundaEvent(),
+                bp.getProcessInstanceId(),
+                bp.getActivityId(),
+                bp.getStatus(),
+                bp.getReadyOn(),
                 FlowState.fromFullName(stateFlow.getState().getName()),
                 stateHistoryBuilder
             );
@@ -106,10 +106,10 @@ public class NoOngoingBusinessProcessAspect {
                 + "[camundaEvent={}, processInstanceId={}, activityId={}, status={}]",
             caseEvent.name(),
             caseData.getCcdCaseReference(),
-            bp != null ? bp.getCamundaEvent() : null,
-            bp != null ? bp.getProcessInstanceId() : null,
-            bp != null ? bp.getActivityId() : null,
-            bp != null ? bp.getStatus() : null
+            bp.getCamundaEvent(),
+            bp.getProcessInstanceId(),
+            bp.getActivityId(),
+            bp.getStatus()
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
