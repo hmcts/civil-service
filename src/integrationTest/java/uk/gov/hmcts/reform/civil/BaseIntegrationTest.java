@@ -42,7 +42,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.ImmutableList.of;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -50,6 +49,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class})
 @AutoConfigureMockMvc
+@SuppressWarnings({"java:S112", "java:S6813", "java:S1874"})
 public abstract class BaseIntegrationTest {
 
     protected static final String BEARER_TOKEN = "Bearer eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiYi9PNk92VnYxK3k"
@@ -73,10 +73,9 @@ public abstract class BaseIntegrationTest {
 
     protected static final UserInfo USER_INFO = UserInfo.builder()
         .sub("solicitor@example.com")
-        .roles(of("caseworker-civil-solicitor"))
+        .roles(List.of("caseworker-civil-solicitor"))
         .build();
 
-    protected static final String s2sToken = "s2s AuthToken";
     @MockBean
     private ServiceAuthorisationApi serviceAuthorisationApi;
     @MockBean (name = "userService")
@@ -149,6 +148,7 @@ public abstract class BaseIntegrationTest {
     }
 
     @SneakyThrows
+    @SuppressWarnings("java:S2326")
     protected <T> ResultActions doFilePost(String auth, MockMultipartFile file, String urlTemplate, Object... uriVars) {
         return mockMvc.perform(
             MockMvcRequestBuilders.multipart(urlTemplate, uriVars)
@@ -158,6 +158,7 @@ public abstract class BaseIntegrationTest {
     }
 
     @SneakyThrows
+    @SuppressWarnings("java:S2326")
     protected <T> ResultActions doGet(String auth, String urlTemplate, Object... uriVars) {
         return mockMvc.perform(
             MockMvcRequestBuilders.get(urlTemplate, uriVars)
