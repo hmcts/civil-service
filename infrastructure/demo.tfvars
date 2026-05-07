@@ -16,10 +16,4 @@ monitor_scheduler_alerts = {
     enabled                = true
     action_group           = "demo-civil-service-slack-alert"
   }
-  "DefendantResponseDeadline" = {
-    frequency_in_minutes   = 60
-    time_window_in_minutes = 60
-    enabled                = true
-    action_group           = "demo-civil-service-slack-alert"
-  }
 }
