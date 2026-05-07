@@ -306,23 +306,14 @@ withNightlyPipeline(type, product, component) {
             }
           }
         }
+
+        enableFortifyScan()
+
+        afterAlways('fortify-scan') {
+          steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+        }
       }
     }
-  }
-
-  //enableMutationTest()
-  if(!runPrevFailedAndNotExecutedTestFiles && !forceGreenBuild) {
-    enableFortifyScan()
-
-    afterAlways('fortify-scan') {
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    }
-  }
-  //enableSecurityScan()
-
-  enableFullFunctionalTest(200)
-
-  if(!forceGreenBuild) {
 
     before('fullFunctionalTest') {
       copyPreviousAllureHistory()
@@ -345,5 +336,8 @@ withNightlyPipeline(type, product, component) {
       env.TESTS_FOR_ACCESSIBILITY = false
     }
   }
+
+  enableFullFunctionalTest(200)
+  
 }
 
