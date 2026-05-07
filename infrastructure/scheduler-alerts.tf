@@ -6,12 +6,14 @@ data "azurerm_key_vault_secret" "civil-service-alert-slack-email" {
 
 locals {
   civil_service_alert_slack_email = length(data.azurerm_key_vault_secret.civil-service-alert-slack-email) > 0 ? data.azurerm_key_vault_secret.civil-service-alert-slack-email[0].value : null
+  enabled_scheduler_alerts        = { for k, v in var.monitor_scheduler_alerts : k => v if try(v.enabled, true) }
+  resource_group_name             = "civil-service-${var.env}"
 }
 
 resource "azurerm_monitor_action_group" "civil-service-action-group" {
   for_each            = var.monitor_action_group
   name                = each.key
-  resource_group_name = "civil-service-${var.env}"
+  resource_group_name = local.resource_group_name
   short_name          = try(each.value.short_name, null)
   tags                = var.common_tags
 
@@ -26,12 +28,12 @@ resource "azurerm_monitor_action_group" "civil-service-action-group" {
 }
 
 module "scheduler-aborted-alerts" {
-  for_each = var.monitor_scheduler_alerts
+  for_each = local.enabled_scheduler_alerts
   source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
 
   app_insights_name  = module.application_insights.name
-  resourcegroup_name = "civil-service-${var.env}"
+  resourcegroup_name = local.resource_group_name
 
   alert_name = "${each.key}JobAborted"
   alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has aborted."
@@ -46,19 +48,19 @@ module "scheduler-aborted-alerts" {
   frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
   time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
   severity_level             = 3
-  action_group_name          = values(azurerm_monitor_action_group.civil-service-action-group)[0].name
+  action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "GreaterThan"
   trigger_threshold          = 0
   common_tags                = var.common_tags
 }
 
 module "scheduler-high-failure-rate-alerts" {
-  for_each = var.monitor_scheduler_alerts
+  for_each = local.enabled_scheduler_alerts
   source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
 
   app_insights_name  = module.application_insights.name
-  resourcegroup_name = "civil-service-${var.env}"
+  resourcegroup_name = local.resource_group_name
 
   alert_name = "${each.key}HighFailureRate"
   alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has a high failure rate."
@@ -76,19 +78,19 @@ module "scheduler-high-failure-rate-alerts" {
   frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
   time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
   severity_level             = 3
-  action_group_name          = values(azurerm_monitor_action_group.civil-service-action-group)[0].name
+  action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "GreaterThan"
   trigger_threshold          = 0
   common_tags                = var.common_tags
 }
 
 module "scheduler-job-not-run-alerts" {
-  for_each = var.monitor_scheduler_alerts
+  for_each = local.enabled_scheduler_alerts
   source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
 
   app_insights_name  = module.application_insights.name
-  resourcegroup_name = "civil-service-${var.env}"
+  resourcegroup_name = local.resource_group_name
 
   alert_name = "${each.key}JobNotRun"
   alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has not run in the last 26 hours."
@@ -103,7 +105,7 @@ module "scheduler-job-not-run-alerts" {
   frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
   time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
   severity_level             = 3
-  action_group_name          = values(azurerm_monitor_action_group.civil-service-action-group)[0].name
+  action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "LessThan"
   trigger_threshold          = 1
   common_tags                = var.common_tags

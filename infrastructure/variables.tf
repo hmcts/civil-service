@@ -51,11 +51,22 @@ variable "ccd_service_bus_filter_rule" {
 # Monitor Variables
 #================================================================================================
 variable "monitor_action_group" {
-  default = {}
+  type        = map(object({
+    short_name = optional(string)
+  }))
+  default     = {}
+  description = "Map of monitor action groups to create"
 }
 
 variable "monitor_scheduler_alerts" {
-  default = {}
+  type        = map(object({
+    frequency_in_minutes   = optional(number)
+    time_window_in_minutes = optional(number)
+    enabled                = optional(bool)
+    action_group           = string
+  }))
+  default     = {}
+  description = "Map of scheduler alerts to create, with action_group mapping"
 }
 
 variable "civil_service_alert_slack_email_secret_name" {
