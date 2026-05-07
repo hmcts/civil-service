@@ -10,9 +10,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -24,6 +27,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.Optional;
@@ -31,7 +35,9 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -48,6 +54,8 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
     private LocationReferenceDataService locationService;
 
     private CreateReferToJudgeCallbackHandler handler;
+    @Mock
+    private CoreCaseDataService coreCaseDataService;
     private ObjectMapper objectMapper;
 
     public static final String REFERENCE_NUMBER = "000DC001";
@@ -56,7 +64,7 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
     void setUp() {
         objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule());
-        handler = new CreateReferToJudgeCallbackHandler(locationService, helper, objectMapper);
+        handler = new CreateReferToJudgeCallbackHandler(locationService, helper, coreCaseDataService, objectMapper);
     }
 
     @Nested
@@ -194,7 +202,18 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setEventDescription("Test 123");
+            caseData.setAdditionalInformation("Test 123");
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            StartEventResponse startEventResponse = StartEventResponse.builder()
+                .eventId("REFER_TO_JUDGE")
+                .token("token")
+                .caseDetails(uk.gov.hmcts.reform.ccd.client.model.CaseDetails.builder().data(caseData.toMap(objectMapper)).build())
+                .build();
+            when(coreCaseDataService.startUpdate(anyString(), any(CaseEvent.class))).thenReturn(startEventResponse);
+            when(coreCaseDataService.submitUpdate(anyString(), any(CaseDataContent.class))).thenReturn(caseData);
+
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String header = format(

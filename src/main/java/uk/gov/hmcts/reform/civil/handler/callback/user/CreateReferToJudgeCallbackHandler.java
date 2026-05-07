@@ -7,6 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -19,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.Collections;
@@ -44,7 +48,7 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
     private static final Set<Party.Type> PEOPLE = EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER);
     private final LocationReferenceDataService locationRefDataService;
     private final LocationHelper locationHelper;
-
+    private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -67,16 +71,12 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
 
         if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             locationHelper.getClaimantRequestedCourt(caseData)
-                .filter(this::hasInfo)
-                .ifPresent(requestedCourt ->
-                               locationHelper.getMatching(
-                                       locationRefDataService.getCourtLocationsForDefaultJudgments(
-                                           callbackParams.getParams().get(BEARER_TOKEN).toString()),
-                                       requestedCourt)
-                                   .ifPresent(matchingLocation ->
-                                                  LocationHelper.updateWithLocation(caseData, matchingLocation)
-                                   )
-                );
+                .filter(this::hasInfo).flatMap(requestedCourt -> locationHelper.getMatching(
+                    locationRefDataService.getCourtLocationsForDefaultJudgments(
+                        callbackParams.getParams().get(BEARER_TOKEN).toString()),
+                    requestedCourt
+                )).ifPresent(matchingLocation ->
+                                 LocationHelper.updateWithLocation(caseData, matchingLocation));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -92,10 +92,35 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        final String caseId = caseData.getCcdCaseReference().toString();
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, EVENTS.getFirst());
+        String eventDescription = caseData.getEventDescription();
+        String additionalInformation = caseData.getAdditionalInformation();
+        CaseDataContent caseContent = getCaseContent(startEventResponse, eventDescription, additionalInformation);
+        CaseData submitUpdate = coreCaseDataService.submitUpdate(caseId, caseContent);
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
+            .confirmationHeader(getHeader(submitUpdate))
             .confirmationBody("<p>&nbsp;</p>")
+            .build();
+    }
+
+    private CaseDataContent getCaseContent(StartEventResponse startEventResponse,
+                                           String eventDescription,
+                                           String additionalInformation) {
+        Map<String, Object> data = startEventResponse.getCaseDetails().getData();
+        Event.EventBuilder eventBuilder = Event.builder()
+            .id(startEventResponse.getEventId())
+            .summary(eventDescription);
+
+        if (additionalInformation != null) {
+            eventBuilder.description(additionalInformation);
+        }
+
+        return CaseDataContent.builder()
+            .eventToken(startEventResponse.getToken())
+            .event(eventBuilder.build())
+            .data(data)
             .build();
     }
 

@@ -264,6 +264,8 @@ public class CivilCaseData extends BaseCaseData implements MappableObject {
     // sdo ui flags
     private  YesOrNo setSmallClaimsFlag;
     private  YesOrNo setFastTrackFlag;
+    private  String eventDescription;
+    private  String additionalInformation;
     private  String eventDescriptionRTJ;
     private  String additionalInformationRTJ;
 

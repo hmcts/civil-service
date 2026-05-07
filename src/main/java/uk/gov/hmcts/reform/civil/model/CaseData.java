@@ -583,10 +583,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     /**
      * RTJ = Refer To Judge.
      */
+    private  String eventDescription;
     private  String eventDescriptionRTJ;
     /**
      * RTJ = Refer To Judge.
      */
+    private  String additionalInformation;
     private  String additionalInformationRTJ;
     /**
      * Refer To Judge(Defence received in time).
