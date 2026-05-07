@@ -59,6 +59,19 @@ class TaskCompletionPredicateTest {
     }
 
     @Test
+    void shouldReturnFalseWhenTaskTaskPermissionsDoNotContainClaimPreventNpe() {
+        CaseData caseData = CaseData.builder()
+            .lastMessage(new Message().setMessageId(MESSAGE_ID))
+            .build();
+        Task task = new Task()
+            .setPermissions(new TaskPermissions().setValues(Collections.emptySet()));
+
+        Predicate<Task> predicate = TaskCompletionPredicate.taskToCompleteFilter(caseData);
+
+        assertFalse(predicate.test(task));
+    }
+
+    @Test
     void shouldReturnFalseWhenMessageIdsDoNotMatch() {
         CaseData caseData = CaseData.builder()
             .lastMessage(new Message().setMessageId(MESSAGE_ID))
@@ -79,6 +92,19 @@ class TaskCompletionPredicateTest {
         Task task = new Task()
             .setPermissions(new TaskPermissions().setValues(Set.of(CLAIM)))
             .setAdditionalProperties(Map.of("messageId", MESSAGE_ID));
+        Predicate<Task> predicate = TaskCompletionPredicate.taskToCompleteFilter(caseData);
+
+        assertFalse(predicate.test(task));
+    }
+
+    @Test
+    void shouldReturnFalseWhenAdditonalPropertiesContainsMessageIsNull() {
+        CaseData caseData = CaseData.builder()
+            .lastMessage(new Message().setMessageId(null))
+            .build();
+        Task task = new Task()
+            .setPermissions(new TaskPermissions().setValues(Set.of(CLAIM)))
+            .setAdditionalProperties(Map.of());
         Predicate<Task> predicate = TaskCompletionPredicate.taskToCompleteFilter(caseData);
 
         assertFalse(predicate.test(task));

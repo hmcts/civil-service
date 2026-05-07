@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -69,6 +71,23 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
             handler.handle(params);
 
             verify(notifier).notifyParties(caseData, NOTIFY_EVENT.toString(), TASK_ID);
+        }
+
+        @Test
+        void shouldThrowWhenNoNotifierRegisteredForTaskId() {
+            when(notifierFactory.getNotifier(TASK_ID)).thenReturn(null);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().businessProcess(
+                new BusinessProcess().setActivityId(TASK_ID)
+            ).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            assertThatThrownBy(() -> handler.handle(params))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("No Notifier registered for taskId '" + TASK_ID + "'")
+                .hasMessageContaining(caseData.getCcdCaseReference().toString())
+                .hasMessageContaining("BPMN caseEvent/activityId and Notifier#getTaskId mappings");
+
+            verifyNoInteractions(notifier);
         }
 
         @Test
