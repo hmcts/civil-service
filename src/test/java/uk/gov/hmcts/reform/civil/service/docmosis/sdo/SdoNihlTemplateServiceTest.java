@@ -65,6 +65,7 @@ class SdoNihlTemplateServiceTest {
 
         SdoDocumentFormFastNihl result = service.buildTemplate(caseData, "Judge Judy", true, "token");
 
+        assertThat(result.getCcdCaseReference()).isEqualTo("1594901956117591");
         assertThat(result.getJudgeName()).isEqualTo("Judge Judy");
         assertThat(result.isHasRestrictPages()).isTrue();
         assertThat(result.getSdoTrialHearingTimeAllocated()).isEqualTo("2 hours");
