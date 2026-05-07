@@ -47,11 +47,6 @@ public class CarmRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator
     }
 
     @Override
-    protected String getEmailTemplateId(CaseData caseData) {
-        return getEmailTemplateId(caseData, null);
-    }
-
-    @Override
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE;
     }

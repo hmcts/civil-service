@@ -67,7 +67,7 @@ class CarmDisabledRespSolTwoEmailDTOGeneratorTest {
         CaseData caseData = mock(CaseData.class);
         when(notificationsProperties.getMediationUnsuccessfulLRTemplate()).thenReturn(TEMPLATE_UNSUCCESSFUL);
 
-        String templateId = generator.getEmailTemplateId(caseData);
+        String templateId = generator.getEmailTemplateId(caseData, null);
 
         assertThat(templateId).isEqualTo(TEMPLATE_UNSUCCESSFUL);
     }

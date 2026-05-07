@@ -139,7 +139,7 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
         when(notificationsProperties.getMediationUnsuccessfulLRTemplate())
             .thenReturn("lr-unsuccessful-template");
 
-        String templateId = generator.getEmailTemplateId(caseData);
+        String templateId = generator.getEmailTemplateId(caseData, null);
 
         assertThat(templateId).isEqualTo("lr-unsuccessful-template");
     }

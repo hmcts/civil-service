@@ -22,6 +22,11 @@ public abstract class RespSolOneEmailDTOGenerator extends EmailDTOGenerator {
     }
 
     @Override
+    protected String getEmailTemplateId(CaseData caseData) {
+        return getEmailTemplateId(caseData, null);
+    }
+
+    @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         boolean isRespondent1 = true;
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
