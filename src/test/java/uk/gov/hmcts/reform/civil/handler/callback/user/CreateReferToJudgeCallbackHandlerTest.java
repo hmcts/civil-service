@@ -1,12 +1,21 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -29,8 +38,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -219,5 +232,91 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(REFER_TO_JUDGE);
+    }
+
+    @Test
+    void shouldBuildConfirmationOnSubmitted_andSubmitReferToJudgeEvent() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .ccdCaseReference(CASE_ID)
+            .legacyCaseReference(REFERENCE_NUMBER)
+            .build();
+        caseData.setEventDescription("Some summary");
+        caseData.setAdditionalInformation(null);
+
+        Map<String, Object> startData = new HashMap<>();
+        CaseDetails startCaseDetails = CaseDetails.builder().data(startData).build();
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .token("TOKEN")
+            .eventId("EVENT_ID")
+            .caseDetails(startCaseDetails)
+            .build();
+
+        CaseData submittedCaseData = CaseDataBuilder.builder()
+            .legacyCaseReference(REFERENCE_NUMBER)
+            .ccdCaseReference(CASE_ID)
+            .build();
+
+        when(coreCaseDataService.startUpdate(CASE_ID.toString(), REFER_TO_JUDGE)).thenReturn(startEventResponse);
+        when(coreCaseDataService.submitUpdate(eq(CASE_ID.toString()), any(CaseDataContent.class))).thenReturn(submittedCaseData);
+
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+        assertThat(response.getConfirmationHeader()).isEqualTo(
+            String.format(CreateReferToJudgeCallbackHandler.CONFIRMATION_HEADER, REFERENCE_NUMBER)
+        );
+        assertThat(response.getConfirmationBody()).isEqualTo("<p>&nbsp;</p>");
+
+        ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).submitUpdate(eq(CASE_ID.toString()), captor.capture());
+
+        CaseDataContent content = captor.getValue();
+        assertThat(content.getEventToken()).isEqualTo("TOKEN");
+        Event event = content.getEvent();
+        assertThat(event.getId()).isEqualTo("EVENT_ID");
+        assertThat(event.getSummary()).isEqualTo("Some summary");
+        assertThat(event.getDescription()).isNull();
+
+        // Data should include ReferToJudge flag
+        assertThat(content.getData()).hasFieldOrPropertyWithValue("isReferToJudgeClaim", YesOrNo.YES);
+    }
+
+    @Test
+    void shouldIncludeAdditionalInformationInSubmittedEventDescription_whenProvided() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .ccdCaseReference(CASE_ID)
+            .legacyCaseReference(REFERENCE_NUMBER)
+            .build();
+        caseData.setEventDescription("Summary");
+        caseData.setAdditionalInformation("Extra details");
+
+        Map<String, Object> startData = new HashMap<>();
+        CaseDetails startCaseDetails = CaseDetails.builder().data(startData).build();
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .token("TOKEN")
+            .eventId("EVENT_ID")
+            .caseDetails(startCaseDetails)
+            .build();
+
+        CaseData submittedCaseData = CaseDataBuilder.builder()
+            .legacyCaseReference(REFERENCE_NUMBER)
+            .ccdCaseReference(CASE_ID)
+            .build();
+
+        when(coreCaseDataService.startUpdate(CASE_ID.toString(), REFER_TO_JUDGE)).thenReturn(startEventResponse);
+        when(coreCaseDataService.submitUpdate(eq(CASE_ID.toString()), any(CaseDataContent.class))).thenReturn(submittedCaseData);
+
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+        handler.handle(params);
+
+        ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).submitUpdate(eq(CASE_ID.toString()), captor.capture());
+
+        CaseDataContent content = captor.getValue();
+        assertThat(content.getEvent().getDescription()).isEqualTo("Extra details");
     }
 }
