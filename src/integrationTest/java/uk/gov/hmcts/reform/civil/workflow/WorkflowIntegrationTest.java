@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.workflow;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MvcResult;
@@ -11,13 +12,12 @@ import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.workflow.helper.WorkflowBuilder;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,13 +29,9 @@ public abstract class WorkflowIntegrationTest extends BaseIntegrationTest {
     protected static final String SYSTEM_PASSWORD = "password";
     protected static final String SYSTEM_TOKEN = "system-token";
 
-    static final String CALLBACK_URL = "/cases/callbacks/{callback-type}";
-    static final String CALLBACK_PAGE_ID_URL = "/cases/callbacks/{callback-type}/{page-id}";
+    protected static final String CALLBACK_URL = "/cases/callbacks/{callback-type}";
+    protected static final String CALLBACK_PAGE_ID_URL = "/cases/callbacks/{callback-type}/{page-id}";
 
-    @MockBean
-    protected IdamClient idamClient;
-    @MockBean
-    protected CoreCaseUserService coreCaseUserService;
     @MockBean
     protected SystemUpdateUserConfiguration systemUpdateUserConfiguration;
 
@@ -46,31 +42,55 @@ public abstract class WorkflowIntegrationTest extends BaseIntegrationTest {
         when(userService.getAccessToken(SYSTEM_USER, SYSTEM_PASSWORD)).thenReturn(SYSTEM_TOKEN);
     }
 
-    protected WorkflowBuilder startWorkflow(CaseData caseData) {
-        return new WorkflowBuilder(this, caseData);
+    protected WorkflowBuilder<CaseData> startWorkflow(CaseData caseData) {
+        return new WorkflowBuilder<>(this::invokeCallback, caseData);
     }
 
-    protected void stubIdamUserLookup(String email, String userId) {
-        when(idamClient.searchUsers(SYSTEM_TOKEN, idamEmailSearch(email)))
-            .thenReturn(List.of(UserDetails.builder().id(userId).build()));
-    }
-
-    protected void stubIdamUserNotFound(String email) {
-        when(idamClient.searchUsers(SYSTEM_TOKEN, idamEmailSearch(email))).thenReturn(List.of());
-    }
-
-    WorkflowBuilder.CallbackResult invokeCallback(
+    public WorkflowBuilder.CallbackResult<CaseData> invokeCallback(
         CaseData caseData,
         CaseData caseDataBefore,
         String eventId,
         CallbackType callbackType,
         String pageId
     ) throws Exception {
-        // Build the same CCD callback payload shape that the controller receives in production.
+        CallbackInvocationResult<CaseData> result = invokeCallback(
+            caseData,
+            caseDataBefore,
+            eventId,
+            callbackType,
+            pageId,
+            CASE_TYPE,
+            CaseData.class,
+            CaseData::getCcdCaseReference,
+            data -> data.getCcdState() != null ? data.getCcdState().name() : null
+        );
+
+        return new WorkflowBuilder.CallbackResult<>(
+            result.response(),
+            result.submittedResponse(),
+            result.caseData(),
+            result.rawBody()
+        );
+    }
+
+    @SuppressWarnings("java:S107")
+    protected <T extends MappableObject> CallbackInvocationResult<T> invokeCallback(
+        T caseData,
+        T caseDataBefore,
+        String eventId,
+        CallbackType callbackType,
+        String pageId,
+        String caseTypeId,
+        Class<T> caseDataClass,
+        Function<T, Long> caseReferenceExtractor,
+        Function<T, String> stateExtractor
+    ) throws Exception {
         CallbackRequest callbackRequest = CallbackRequest.builder()
             .eventId(eventId)
-            .caseDetails(toCaseDetails(caseData))
-            .caseDetailsBefore(caseDataBefore != null ? toCaseDetails(caseDataBefore) : null)
+            .caseDetails(toCaseDetails(caseData, caseTypeId, caseReferenceExtractor, stateExtractor))
+            .caseDetailsBefore(caseDataBefore != null
+                                   ? toCaseDetails(caseDataBefore, caseTypeId, caseReferenceExtractor, stateExtractor)
+                                   : null)
             .build();
 
         ResultActions response = pageId == null
@@ -82,48 +102,94 @@ public abstract class WorkflowIntegrationTest extends BaseIntegrationTest {
             .andReturn();
 
         String body = result.getResponse().getContentAsString();
+
+        if (callbackType == CallbackType.SUBMITTED) {
+            JsonNode submittedResponse = body.isBlank()
+                ? objectMapper.createObjectNode()
+                : objectMapper.readTree(body);
+
+            return new CallbackInvocationResult<>(
+                null,
+                submittedResponse,
+                caseData,
+                body
+            );
+        }
+
         AboutToStartOrSubmitCallbackResponse callbackResponse = objectMapper.readValue(
             body,
             AboutToStartOrSubmitCallbackResponse.class
         );
 
-        return new WorkflowBuilder.CallbackResult(
+        return new CallbackInvocationResult<>(
             callbackResponse,
-            toCaseData(callbackResponse, caseData),
+            null,
+            toCaseData(callbackResponse, caseData, caseDataClass, caseReferenceExtractor, stateExtractor),
             body
         );
     }
 
-    private CaseDetails toCaseDetails(CaseData caseData) {
+    @SuppressWarnings("java:S4276")
+    protected <T extends MappableObject> CaseDetails toCaseDetails(
+        T caseData,
+        String caseTypeId,
+        Function<T, Long> caseReferenceExtractor,
+        Function<T, String> stateExtractor
+    ) {
         return CaseDetails.builder()
-            .id(caseData.getCcdCaseReference())
-            .state(caseData.getCcdState() != null ? caseData.getCcdState().name() : null)
-            .caseTypeId(CASE_TYPE)
+            .id(caseReferenceExtractor.apply(caseData))
+            .state(stateExtractor.apply(caseData))
+            .caseTypeId(caseTypeId)
             .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private CaseData toCaseData(AboutToStartOrSubmitCallbackResponse callbackResponse, CaseData currentCaseData) {
+    @SuppressWarnings("java:S4276")
+    protected <T extends MappableObject> T toCaseData(
+        AboutToStartOrSubmitCallbackResponse callbackResponse,
+        T currentCaseData,
+        Class<T> caseDataClass,
+        Function<T, Long> caseReferenceExtractor,
+        Function<T, String> stateExtractor
+    ) {
         if (callbackResponse.getData() == null) {
             return currentCaseData;
         }
 
-        // Rehydrate CaseData from callback response data while preserving CCD metadata used by later steps.
-        Map<String, Object> updatedData = new HashMap<>(callbackResponse.getData());
-        updatedData.put("ccdCaseReference", currentCaseData.getCcdCaseReference());
+        Map<String, Object> updatedData = new HashMap<>(currentCaseData.toMap(objectMapper));
+        updatedData.putAll(callbackResponse.getData());
+        updatedData.put("ccdCaseReference", caseReferenceExtractor.apply(currentCaseData));
 
-        String state = callbackResponse.getState() != null
-            ? callbackResponse.getState()
-            : currentCaseData.getCcdState() != null ? currentCaseData.getCcdState().name() : null;
+        String state = resolveState(callbackResponse, currentCaseData, stateExtractor);
 
         if (state != null) {
             updatedData.put("ccdState", state);
         }
 
-        return objectMapper.convertValue(updatedData, CaseData.class);
+        return objectMapper.convertValue(updatedData, caseDataClass);
     }
 
-    private String idamEmailSearch(String email) {
-        return String.format("email:\"%s\"", email);
+    protected <T> String resolveState(
+        AboutToStartOrSubmitCallbackResponse callbackResponse,
+        T currentCaseData,
+        Function<T, String> stateExtractor
+    ) {
+        if (callbackResponse.getState() != null) {
+            return callbackResponse.getState();
+        }
+        String currentState = stateExtractor.apply(currentCaseData);
+        if (currentState != null) {
+            return currentState;
+        }
+        return null;
     }
+
+    protected record CallbackInvocationResult<T>(
+        AboutToStartOrSubmitCallbackResponse response,
+        JsonNode submittedResponse,
+        T caseData,
+        String rawBody
+    ) {
+    }
+
 }
