@@ -10,8 +10,10 @@ import uk.gov.hmcts.reform.civil.notification.handlers.NotifierFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class UpdateNotifyEventTaskTest {
@@ -63,6 +65,23 @@ class UpdateNotifyEventTaskTest {
         NotificationCaseReference reference = new NotificationCaseReference(); // camundaProcessIdentifier not set
 
         assertThrows(IllegalArgumentException.class, () -> task.migrateCaseData(caseData, reference));
+    }
+
+    @Test
+    void shouldThrowWhenNoNotifierRegisteredForProcessIdentifier() {
+        CaseData caseData = mock(CaseData.class);
+        NotificationCaseReference reference = new NotificationCaseReference();
+        reference.setCamundaProcessIdentifier("missing-process");
+
+        when(notifierFactory.getNotifier("missing-process")).thenReturn(null);
+
+        IllegalStateException ex = assertThrows(
+            IllegalStateException.class,
+            () -> task.migrateCaseData(caseData, reference)
+        );
+        assertTrue(ex.getMessage().contains("'missing-process'"), ex.getMessage());
+        assertTrue(ex.getMessage().contains("Notifier#getTaskId mappings"), ex.getMessage());
+        verifyNoInteractions(notifier);
     }
 
     @Test
