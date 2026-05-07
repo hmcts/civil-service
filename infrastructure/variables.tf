@@ -46,3 +46,20 @@ variable "ccd_service_bus_filter_rule" {
   default     = "jurisdiction_id IN ('CIVIL','civil')"
   description = "SQL filter rule for CCD Events Service Bus Subscription"
 }
+
+#================================================================================================
+# Monitor Variables
+#================================================================================================
+variable "monitor_action_group" {
+  default = {}
+}
+
+variable "monitor_scheduler_alerts" {
+  default = {}
+}
+
+variable "civil_service_alert_slack_email_secret_name" {
+  type        = string
+  description = "The name of the Key Vault secret containing the slack email group"
+  default     = null
+}
