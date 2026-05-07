@@ -171,6 +171,9 @@ public enum DashboardClaimStatus {
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
+    DEFAULT_JUDGEMENT_ENTERED(
+        Claim::isDefaultJudgementEntered
+    ),
     DEFAULT_JUDGEMENT(
         Claim::isClaimantDefaultJudgement
     ),

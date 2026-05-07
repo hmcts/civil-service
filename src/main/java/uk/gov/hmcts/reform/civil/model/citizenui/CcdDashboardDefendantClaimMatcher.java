@@ -339,6 +339,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
+    public boolean isDefaultJudgementEntered() {
+        return false;
+    }
+
+    @Override
     public boolean isPartialAdmissionAccepted() {
         if (!featureToggleService.isLipVLipEnabled()) {
             return false;

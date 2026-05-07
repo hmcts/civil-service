@@ -451,6 +451,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isDefaultJudgementEntered() {
+        return false;
+    }
+
+    @Override
     public boolean isPartialAdmissionAccepted() {
 
         return hasResponse() && response.isPartAdmitPayImmediately()
