@@ -66,6 +66,7 @@ class SdoSmallClaimsDrhTemplateServiceTest {
 
         SdoDocumentFormSmallDrh result = service.buildTemplate(caseData, "Judge Judy", true, "token");
 
+        assertThat(result.getCcdCaseReference()).isEqualTo("1594901956117591");
         assertThat(result.getJudgeName()).isEqualTo("Judge Judy");
         assertThat(result.isHasSdoR2HearingTrialWindow()).isTrue();
         assertThat(result.getSmallClaimsMethod()).isEqualTo("in person");
