@@ -18,7 +18,8 @@ public class TaskCompletionPredicate {
         return task ->
             nonNull(task.getAdditionalProperties())
                 && task.getPermissions().getValues().contains(CLAIM)
-                && task.getAdditionalProperties().get("messageId").equals(caseData.getLastMessage().getMessageId());
+                && caseData.getLastMessage() != null
+                && caseData.getLastMessage().getMessageId() != null
+                && caseData.getLastMessage().getMessageId().equals(task.getAdditionalProperties().get("messageId"));
     }
-
 }
