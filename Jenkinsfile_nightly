@@ -299,28 +299,13 @@ withNightlyPipeline(type, product, component) {
             publishBootstrapReport()
           }
         }
+
+        enableFortifyScan()
+
+        afterAlways('fortify-scan') {
+          steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+        }
       }
-    }
-  }
-
-  //enableMutationTest()
-  if(!runPrevFailedAndNotExecutedTestFiles && !forceGreenBuild) {
-    enableFortifyScan()
-
-    afterAlways('fortify-scan') {
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    }
-  }
-  //enableSecurityScan()
-
-  enableFullFunctionalTest(200)
-
-  if(!forceGreenBuild) {
-    afterAlways('DependencyCheckNightly') {
-      sh """
-        ./bin/pull-latest-civil-ccd-files.sh ${ccdBranch}
-      """
-      yarnBuilder.yarn('install-dependencies')
     }
 
     before('fullFunctionalTest') {
@@ -344,5 +329,8 @@ withNightlyPipeline(type, product, component) {
       env.TESTS_FOR_ACCESSIBILITY = false
     }
   }
+
+  enableFullFunctionalTest(200)
+  
 }
 
