@@ -6,8 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -17,17 +21,15 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -43,17 +45,16 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REFER_TO_JUDGE);
     public static final String CONFIRMATION_HEADER = "# Your order has been referred to Judge%n## Claim number: %s";
-    private static final Set<Party.Type> PEOPLE = EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER);
     private final LocationReferenceDataService locationRefDataService;
     private final LocationHelper locationHelper;
-
+    private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitReferToJudge)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -67,8 +68,10 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         caseData.setIsReferToJudgeClaim(YesOrNo.YES);
         log.info("Submitting ReferToJudge caseData.getEventDescription(): {}", caseData.getEventDescription());
-        log.info("Submitting ReferToJudge caseData.getAdditionalInformation(): {}", caseData.getAdditionalInformation());
-
+        log.info(
+            "Submitting ReferToJudge caseData.getAdditionalInformation(): {}",
+            caseData.getAdditionalInformation()
+        );
         if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             locationHelper.getClaimantRequestedCourt(caseData)
                 .filter(this::hasInfo)
@@ -76,13 +79,13 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
                                locationHelper.getMatching(
                                        locationRefDataService.getCourtLocationsForDefaultJudgments(
                                            callbackParams.getParams().get(BEARER_TOKEN).toString()),
-                                       requestedCourt)
+                                       requestedCourt
+                                   )
                                    .ifPresent(matchingLocation ->
                                                   LocationHelper.updateWithLocation(caseData, matchingLocation)
                                    )
                 );
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
@@ -96,10 +99,33 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        final String caseId = caseData.getCcdCaseReference().toString();
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, EVENTS.getFirst());
+        String eventDescription = caseData.getEventDescription();
+        String additionalInformation = caseData.getAdditionalInformation();
+        CaseDataContent caseContent = getCaseContent(startEventResponse, eventDescription, additionalInformation);
+        CaseData submitUpdate = coreCaseDataService.submitUpdate(caseId, caseContent);
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
+            .confirmationHeader(getHeader(submitUpdate))
             .confirmationBody("<p>&nbsp;</p>")
+            .build();
+    }
+
+    private CaseDataContent getCaseContent(StartEventResponse startEventResponse,
+                                           String eventDescription,
+                                           String additionalInformation) {
+        Map<String, Object> data = startEventResponse.getCaseDetails().getData();
+        data.put("isReferToJudgeClaim", YesOrNo.YES);
+        Event.EventBuilder eventBuilder = Event.builder()
+            .id(startEventResponse.getEventId())
+            .summary(eventDescription);
+        if (additionalInformation != null) {
+            eventBuilder.description(additionalInformation);
+        }
+        return CaseDataContent.builder()
+            .eventToken(startEventResponse.getToken())
+            .event(eventBuilder.build())
+            .data(data)
             .build();
     }
 
@@ -109,5 +135,4 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
             caseData.getLegacyCaseReference()
         );
     }
-
 }
