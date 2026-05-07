@@ -486,8 +486,8 @@ class IncidentRetryEventHandlerTest {
                 && "CASE_PROGRESSION".equals(properties.get("stateId"))
                 && "EVENT_1".equals(properties.get("lastEventId"))
                 && "activity-search-1".equals(properties.get("failedActivityId"))
-                && "CasesStuckCheckSearchService".equals(properties.get("errorLocation"))
-                && "stuck_case_search".equals(properties.get("retryStatus"))
+                && "activity-search-1".equals(properties.get("errorLocation"))
+                && "stuck_case_open_incident".equals(properties.get("retryStatus"))
                 && "false".equals(properties.get("retryExhausted"))
                 && "UNKNOWN".equals(properties.get("jobId")))
         );
@@ -499,7 +499,7 @@ class IncidentRetryEventHandlerTest {
                 && "inc-search-2".equals(properties.get("incidentId"))
                 && "EVENT_2".equals(properties.get("lastEventId"))
                 && "activity-search-2".equals(properties.get("failedActivityId"))
-                && "stuck_case_search".equals(properties.get("retryStatus")))
+                && "stuck_case_open_incident".equals(properties.get("retryStatus")))
         );
     }
 

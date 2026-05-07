@@ -23,6 +23,8 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,7 +67,9 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         String incidentMessage,
         String stateId,
         String lastEventId,
-        String failedActivityId
+        String failedActivityId,
+        String errorLocation,
+        String retryStatus
     ) {
     }
 
@@ -83,6 +87,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private static final int PAGE_SIZE = 50;
     private static final Pattern ALREADY_PROCESSED_PATTERN =
         Pattern.compile("already processed|already performed", Pattern.CASE_INSENSITIVE);
+    private static final Pattern INCIDENT_URL_PATTERN =
+        Pattern.compile("to \\[(https?://[^\\]]+)\\]", Pattern.CASE_INSENSITIVE);
     private static final String ACTIVITY_ID = "activityId";
     private static final String UNKNOWN = "UNKNOWN";
     private static final String STUCK_CASE_EVENT_TYPE = "incidentRetry";
@@ -516,8 +522,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         additionalProperties.put(STATE_ID_VARIABLE, enrichment.stateId());
         additionalProperties.put("lastEventId", enrichment.lastEventId());
         additionalProperties.put("failedActivityId", enrichment.failedActivityId());
-        additionalProperties.put("errorLocation", "CasesStuckCheckSearchService");
-        additionalProperties.put("retryStatus", "stuck_case_search");
+        additionalProperties.put("errorLocation", enrichment.errorLocation());
+        additionalProperties.put("retryStatus", enrichment.retryStatus());
         additionalProperties.put("retryExhausted", Boolean.FALSE.toString());
         additionalProperties.put("jobId", UNKNOWN);
 
@@ -553,7 +559,9 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                     "Detected by CasesStuckCheckSearchService after incident retry processing",
                     stateId,
                     lastEventId,
-                    failedActivityId
+                    failedActivityId,
+                    "CasesStuckCheckSearchService",
+                    "stuck_case_no_process_instance"
                 );
             }
 
@@ -573,20 +581,25 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                     "Detected by CasesStuckCheckSearchService after incident retry processing",
                     stateId,
                     lastEventId,
-                    failedActivityId
+                    failedActivityId,
+                    "CasesStuckCheckSearchService",
+                    "stuck_case_no_open_incident"
                 );
             }
 
             IncidentDto incident = incidents.get(0);
+            String resolvedFailedActivityId = !UNKNOWN.equals(defaultIfBlank(incident.getActivityId()))
+                ? defaultIfBlank(incident.getActivityId())
+                : failedActivityId;
             return new StuckCaseSearchEnrichment(
                 processInstanceId,
                 defaultIfBlank(incident.getId()),
                 defaultIfBlank(incident.getIncidentMessage()),
                 stateId,
                 lastEventId,
-                !UNKNOWN.equals(defaultIfBlank(incident.getActivityId()))
-                    ? defaultIfBlank(incident.getActivityId())
-                    : failedActivityId
+                resolvedFailedActivityId,
+                resolveSearchErrorLocation(incident.getIncidentMessage(), resolvedFailedActivityId),
+                "stuck_case_open_incident"
             );
         } catch (Exception e) {
             log.warn("Could not enrich stuck case {} from search results", caseId, e);
@@ -596,8 +609,35 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 "Detected by CasesStuckCheckSearchService after incident retry processing",
                 UNKNOWN,
                 UNKNOWN,
-                UNKNOWN
+                UNKNOWN,
+                "CasesStuckCheckSearchService",
+                "stuck_case_enrichment_failed"
             );
+        }
+    }
+
+    private String resolveSearchErrorLocation(String incidentMessage, String failedActivityId) {
+        String host = extractHostFromIncidentMessage(incidentMessage);
+        if (StringUtils.isNotBlank(host)) {
+            return host;
+        }
+        return !UNKNOWN.equals(failedActivityId) ? failedActivityId : "CasesStuckCheckSearchService";
+    }
+
+    private String extractHostFromIncidentMessage(String incidentMessage) {
+        if (StringUtils.isBlank(incidentMessage)) {
+            return null;
+        }
+        var matcher = INCIDENT_URL_PATTERN.matcher(incidentMessage);
+        if (!matcher.find()) {
+            return null;
+        }
+        try {
+            URI uri = new URI(matcher.group(1));
+            return uri.getHost();
+        } catch (URISyntaxException e) {
+            log.debug("Could not parse incident URL from message {}", incidentMessage, e);
+            return null;
         }
     }
 
