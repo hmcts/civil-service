@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.notify;
 
 import org.jspecify.annotations.NonNull;
+import uk.gov.hmcts.reform.civil.notify.audit.NotificationAuditService;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class NotificationService {
 
     private final NotificationClient notificationClient;
+    private final Optional<NotificationAuditService> notificationAuditService;
 
     public void sendMail(
         String targetEmail,
@@ -33,10 +35,12 @@ public class NotificationService {
                 parameters,
                 reference
             );
+            String notificationId = getNotificationId(sendEmailResponse);
             log.info("NotificationService::sendMail::successful for reference: {}, notificationID: {}",
                      reference,
-                     getNotificationId(sendEmailResponse)
+                     notificationId
             );
+            recordAudit(emailTemplate, targetEmail, reference, notificationId);
         } catch (NotificationClientException e) {
             log.error("NotificationService::sendMail::error for reference: {}, message: {}", reference, e.getMessage());
             throw new NotificationException(e);
@@ -49,6 +53,17 @@ public class NotificationService {
         } catch (NotificationClientException e) {
             throw new NotificationException(e);
         }
+    }
+
+    private void recordAudit(String emailTemplate, String targetEmail, String reference, String notificationId) {
+        notificationAuditService.ifPresent(audit -> {
+            try {
+                audit.record(emailTemplate, targetEmail, reference, notificationId);
+            } catch (RuntimeException e) {
+                log.warn("NotificationService::sendMail::audit failed for reference: {}, message: {}",
+                         reference, e.getMessage());
+            }
+        });
     }
 
     private @NonNull String getNotificationId(SendEmailResponse sendEmailResponse) {

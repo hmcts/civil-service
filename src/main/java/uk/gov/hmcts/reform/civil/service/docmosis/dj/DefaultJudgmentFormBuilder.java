@@ -49,6 +49,7 @@ public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase i
 
         return new DefaultJudgmentForm()
             .setCaseNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setFormText("No response,")
             .setApplicant(getApplicants(caseData))
             .setRespondent(getPartyDetails(litigationFriend, respondent))
