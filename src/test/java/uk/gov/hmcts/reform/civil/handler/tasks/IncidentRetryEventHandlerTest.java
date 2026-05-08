@@ -444,6 +444,8 @@ class IncidentRetryEventHandlerTest {
             .thenReturn(List.of());
         when(casesStuckCheckSearchService.getCases("7"))
             .thenReturn(caseDetailsSet(1777022268539825L, 1777022272949457L));
+        mockSearchCaseEnrichment("1777022268539825", "proc-search-1", "inc-search-1", "activity-search-1", "EVENT_1");
+        mockSearchCaseEnrichment("1777022272949457", "proc-search-2", "inc-search-2", "activity-search-2", "EVENT_2");
 
         handler.handleTask(externalTask);
 
@@ -452,14 +454,14 @@ class IncidentRetryEventHandlerTest {
             eq("incidentRetryDailySummary"),
             eq("StuckCasesDailyDigest"),
             argThat(properties -> "2".equals(properties.get("stuckCaseCount"))
-                && "0".equals(properties.get("failedIncidentCount"))
+                && "2".equals(properties.get("failedIncidentCount"))
                 && "0".equals(properties.get("totalRetries"))
                 && "0".equals(properties.get("successRetries"))
                 && "0".equals(properties.get("failedRetries"))
                 && "1777022268539825,1777022272949457".equals(properties.get("caseIds"))
-                && "".equals(properties.get("incidentIds"))
-                && "".equals(properties.get("processInstanceIds"))
-                && "".equals(properties.get("failedActivityIds")))
+                && "inc-search-1,inc-search-2".equals(properties.get("incidentIds"))
+                && "proc-search-1,proc-search-2".equals(properties.get("processInstanceIds"))
+                && "activity-search-1,activity-search-2".equals(properties.get("failedActivityIds")))
         );
     }
 

@@ -139,7 +139,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             retryContext.successRetries.get(),
             retryContext.failedRetries.get(),
             stuckCases,
-            retryContext.stuckCasesForManualIntervention
+            retryContext.stuckCasesForManualIntervention,
+            retryContext.serviceAuthorization
         );
 
         return new ExternalTaskData();
@@ -611,7 +612,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                                              int successRetries,
                                              int failedRetries,
                                              Set<CaseDetails> stuckCases,
-                                             List<StuckCaseSummaryItem> stuckCasesForManualIntervention) {
+                                             List<StuckCaseSummaryItem> stuckCasesForManualIntervention,
+                                             String serviceAuthorization) {
         if (stuckCases.isEmpty()) {
             return;
         }
@@ -624,21 +626,32 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             .sorted()
             .toList();
 
-        List<String> failedIncidentIds = stuckCasesForManualIntervention.stream()
-            .map(StuckCaseSummaryItem::incidentId)
-            .distinct()
+        Set<String> incidentIds = ConcurrentHashMap.newKeySet();
+        Set<String> processInstanceIds = ConcurrentHashMap.newKeySet();
+        Set<String> failedActivityIds = ConcurrentHashMap.newKeySet();
+
+        stuckCasesForManualIntervention.forEach(item -> {
+            addIfKnown(incidentIds, item.incidentId());
+            addIfKnown(processInstanceIds, item.processInstanceId());
+            addIfKnown(failedActivityIds, item.failedActivityId());
+        });
+
+        stuckCaseIds.forEach(caseId -> {
+            StuckCaseSearchEnrichment enrichment = enrichStuckCaseFromSearch(caseId, serviceAuthorization);
+            addIfKnown(incidentIds, enrichment.incidentId());
+            addIfKnown(processInstanceIds, enrichment.processInstanceId());
+            addIfKnown(failedActivityIds, enrichment.failedActivityId());
+        });
+
+        List<String> failedIncidentIds = incidentIds.stream()
             .sorted()
             .toList();
 
-        List<String> failedProcessInstanceIds = stuckCasesForManualIntervention.stream()
-            .map(StuckCaseSummaryItem::processInstanceId)
-            .distinct()
+        List<String> failedProcessInstanceIds = processInstanceIds.stream()
             .sorted()
             .toList();
 
-        List<String> failedActivityIds = stuckCasesForManualIntervention.stream()
-            .map(StuckCaseSummaryItem::failedActivityId)
-            .distinct()
+        List<String> failedActivityIdList = failedActivityIds.stream()
             .sorted()
             .toList();
 
@@ -654,7 +667,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         additionalProperties.put("caseIds", String.join(",", stuckCaseIds));
         additionalProperties.put("incidentIds", String.join(",", failedIncidentIds));
         additionalProperties.put("processInstanceIds", String.join(",", failedProcessInstanceIds));
-        additionalProperties.put("failedActivityIds", String.join(",", failedActivityIds));
+        additionalProperties.put("failedActivityIds", String.join(",", failedActivityIdList));
 
         log.info(
             "Incident retry daily summary: Found {} stuck case(s) requiring manual intervention with ids {}",
@@ -668,6 +681,12 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             STUCK_CASE_DAILY_EVENT_NAME,
             additionalProperties
         );
+    }
+
+    private void addIfKnown(Set<String> target, String value) {
+        if (StringUtils.isNotBlank(value) && !UNKNOWN.equals(value)) {
+            target.add(value);
+        }
     }
 
     private String defaultIfBlank(String value) {
