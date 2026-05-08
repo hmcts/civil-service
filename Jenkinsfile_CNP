@@ -14,7 +14,7 @@ def product = "civil"
 def component = "service"
 def camundaBranch = "master"
 def dmnBranch = "master"
-def wiremockMappingsBranch = "master"
+def wiremockMappingsBranch = "noc_mappings"
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
