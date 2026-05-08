@@ -506,19 +506,21 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        JudgmentDetails activeJudgment;
-        if (isJudgementBufferEnabledForCase(caseData)) {
-            activeJudgment = djOnlineMapper.addPendingIssueActiveJudgment(caseData);
-        } else {
-            activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
-            caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            JudgmentDetails activeJudgment;
+            if (isJudgementBufferEnabledForCase(caseData)) {
+                activeJudgment = djOnlineMapper.addPendingIssueActiveJudgment(caseData);
+            } else {
+                activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
+                caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            }
+            caseData.setActiveJudgment(activeJudgment);
+            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+                activeJudgment,
+                true
+            ));
+            caseData.setJoDJCreatedDate(time.now());
         }
-        caseData.setActiveJudgment(activeJudgment);
-        caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
-            activeJudgment,
-            true
-        ));
-        caseData.setJoDJCreatedDate(time.now());
 
         caseData.setTotalInterest(interestCalculator.calculateInterest(caseData));
         caseData.setClaimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
@@ -531,6 +533,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         if (isNonDivergentForDJ && isJudgementBufferEnabledForCase(caseData)) {
             nextState = CaseState.JUDGMENT_REQUESTED.name();
+            caseData.setIsJoRequested(YesOrNo.YES);
         } else if (isNonDivergentForDJ && featureToggleService.isJudgmentOnlineLive()) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
