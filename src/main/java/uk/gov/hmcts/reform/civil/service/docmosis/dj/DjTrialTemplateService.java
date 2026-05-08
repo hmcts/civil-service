@@ -36,6 +36,7 @@ public class DjTrialTemplateService {
         DefaultJudgmentSDOOrderForm template = new DefaultJudgmentSDOOrderForm()
             .setWrittenByJudge(writtenByJudge)
             .setJudgeNameTitle(caseData.getTrialHearingJudgesRecitalDJ().getJudgeNameTitle())
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setCaseNumber(caseData.getLegacyCaseReference())
             .setOtherRemedyEnabled(featureToggleService.isOtherRemedyEnabled())
             .setTrialBuildingDispute(caseData.getTrialBuildingDispute())
