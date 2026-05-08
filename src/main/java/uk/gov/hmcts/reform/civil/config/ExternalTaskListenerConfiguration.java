@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
 
 @Configuration
 @EnableRetry
@@ -18,12 +19,15 @@ public class ExternalTaskListenerConfiguration {
 
     private final String baseUrl;
     private final AuthTokenGenerator authTokenGenerator;
+    private final AsyncHandlerProperties asyncHandlerProperties;
 
     @Autowired
     public ExternalTaskListenerConfiguration(@Value("${feign.client.config.processInstance.url}") String baseUrl,
-                                             AuthTokenGenerator authTokenGenerator) {
+                                             AuthTokenGenerator authTokenGenerator,
+                                             AsyncHandlerProperties asyncHandlerProperties) {
         this.baseUrl = baseUrl;
         this.authTokenGenerator = authTokenGenerator;
+        this.asyncHandlerProperties = asyncHandlerProperties;
     }
 
     @Bean
@@ -33,7 +37,7 @@ public class ExternalTaskListenerConfiguration {
             .asyncResponseTimeout(29000)
             .maxTasks(1)
             .backoffStrategy(new ExponentialBackoffStrategy(0, 0, 0))
-            .lockDuration(33L * 60L * 1000L) //wait for 33min to finish task before it gets picked by other client
+            .lockDuration(asyncHandlerProperties.getLockDuration()) //wait for some time to finish task before it gets picked by another client
             .baseUrl(baseUrl)
             .build();
     }

@@ -39,6 +39,7 @@ public class SdoNihlTemplateService {
             .setCurrentDate(LocalDate.now())
             .setJudgeName(judgeName)
             .setCaseNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setApplicant1PartyName(getApplicant1NameWithLitigiousFriend(caseData))
             .setApplicant2PartyName(getApplicant2NameWithLitigiousFriend(caseData))
             .setRespondent1PartyName(getRespondent1NameWithLitigiousFriend(caseData))

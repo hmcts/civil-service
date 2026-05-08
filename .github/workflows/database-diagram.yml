@@ -1,0 +1,50 @@
+name: Refresh database diagram
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'src/main/resources/db/migration/**'
+      - 'scripts/generate_database_diagram.py'
+      - '.github/workflows/database-diagram.yml'
+  workflow_dispatch: {}
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '18'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install diagram dependencies
+        run: npm install -g @mermaid-js/mermaid-cli@11.14.0 --ignore-scripts
+
+      - name: Generate database diagram
+        run: python3 scripts/generate_database_diagram.py
+
+      - name: Render diagram
+        env:
+          PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
+        run: mmdc -i docs/database_diagram.mmd -o docs/database_diagram.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
+
+      - name: Commit updates
+        run: |
+          git config user.name "database-diagram-bot"
+          git config user.email "civil-service@users.noreply.github.com"
+          git add docs/database.md docs/database_diagram.mmd docs/database_diagram.svg
+          if git diff --cached --quiet; then
+            echo "No database diagram changes"
+          else
+            git commit -m "chore: refresh database diagram"
+            git push
+          fi
