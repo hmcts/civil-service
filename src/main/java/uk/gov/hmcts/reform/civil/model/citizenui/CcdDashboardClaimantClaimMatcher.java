@@ -328,8 +328,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isDefaultJudgementGranted() {
-        return featureToggleService.isJudgmentBufferEnabled()
-            && isDefaultJudgmentGranted(caseData);
+        return isDefaultJudgmentGranted(caseData, featureToggleService);
     }
 
     @Override
