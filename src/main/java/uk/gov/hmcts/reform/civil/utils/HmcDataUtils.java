@@ -352,7 +352,9 @@ public class HmcDataUtils {
 
     private static boolean includesVideoHearing(HearingDaySchedule hearingDay) {
         return hearingDay.getAttendees().stream().anyMatch(attendee -> attendee.getHearingSubChannel() != null
-            && attendee.getHearingSubChannel().equals(VIDCVP));
+            && (attendee.getHearingSubChannel().equals(VIDCVP)
+            || attendee.getHearingSubChannel().equals(HearingSubChannel.VID)
+            || attendee.getHearingSubChannel().equals(HearingSubChannel.VIDTEAMS)));
     }
 
     private static boolean includesVideoHearing(List<HearingDaySchedule> schedule) {
@@ -363,15 +365,15 @@ public class HmcDataUtils {
         return includesVideoHearing(caseHearing.getHearingDaySchedule());
     }
 
-    private static List<Attendees> getAttendeesBySubChannel(HearingGetResponse hearing, HearingSubChannel subChannel) {
+    private static List<Attendees> getAttendeesBySubChannels(HearingGetResponse hearing, List<HearingSubChannel> subChannels) {
         HearingDaySchedule firstHearingDay = getHearingStartDay(hearing);
         return nonNull(firstHearingDay) && nonNull(firstHearingDay.getAttendees()) ? firstHearingDay.getAttendees().stream()
-                .filter(attendee -> nonNull(attendee.getHearingSubChannel()) && attendee.getHearingSubChannel().equals(subChannel)).toList()
+                .filter(attendee -> nonNull(attendee.getHearingSubChannel()) && subChannels.contains(attendee.getHearingSubChannel())).toList()
                 : new ArrayList<>();
     }
 
-    public static List<String> getHearingAttendeeNames(HearingGetResponse hearing, HearingSubChannel subChannel) {
-        return getAttendeesBySubChannel(hearing, subChannel).stream()
+    public static List<String> getHearingAttendeeNames(HearingGetResponse hearing, List<HearingSubChannel> subChannels) {
+        return getAttendeesBySubChannels(hearing, subChannels).stream()
                 .flatMap(attendee -> hearing.getPartyDetails().stream()
                         .filter(party -> party.getPartyID().equals(attendee.getPartyID()))
                         .filter(party -> party.getIndividualDetails() != null)
@@ -385,15 +387,15 @@ public class HmcDataUtils {
     }
 
     public static String getInPersonAttendeeNames(HearingGetResponse hearing) {
-        return concatenateNames(getHearingAttendeeNames(hearing, INTER));
+        return concatenateNames(getHearingAttendeeNames(hearing, List.of(INTER)));
     }
 
     public static String getPhoneAttendeeNames(HearingGetResponse hearing) {
-        return concatenateNames(getHearingAttendeeNames(hearing, TELCVP));
+        return concatenateNames(getHearingAttendeeNames(hearing, List.of(TELCVP)));
     }
 
     public static String getVideoAttendeesNames(HearingGetResponse hearing) {
-        return concatenateNames(getHearingAttendeeNames(hearing, VIDCVP));
+        return concatenateNames(getHearingAttendeeNames(hearing, List.of(VIDCVP, HearingSubChannel.VID, HearingSubChannel.VIDTEAMS)));
     }
 
     public static String getHearingTypeTitleText(CaseData caseData, HearingGetResponse hearing, boolean isWelsh) {
