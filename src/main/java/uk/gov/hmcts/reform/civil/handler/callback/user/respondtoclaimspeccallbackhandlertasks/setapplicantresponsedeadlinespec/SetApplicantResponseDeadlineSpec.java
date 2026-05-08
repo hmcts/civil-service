@@ -277,7 +277,8 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
                 .build();
         }
 
-        boolean isJoRequested = featureToggleService.isJudgmentBufferEnabled() && YesOrNo.YES.equals(caseData.getIsJoRequested());
+        boolean isJoRequested = featureToggleService.isJudgmentBufferEnabled()
+            && YesOrNo.YES.equals(caseData.getIsJoRequested());
         if (isJoRequested) {
             //Handle defendant lip NoC in judgment requested state
             JudgmentsOnlineHelper.clearJOCaseData(caseData);

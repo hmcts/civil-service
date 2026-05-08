@@ -109,7 +109,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 LocalDate.now()
             ));
 
-        boolean isJoRequested = featureToggleService.isJudgmentBufferEnabled() && YesOrNo.YES.equals(caseData.getIsJoRequested());
+        boolean isJoRequested = featureToggleService.isJudgmentBufferEnabled()
+            && YesOrNo.YES.equals(caseData.getIsJoRequested());
         if (isJoRequested) {
             JudgmentsOnlineHelper.clearJOCaseData(caseData);
         }
