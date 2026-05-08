@@ -32,7 +32,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_NON_DIVERGENT_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ENTERED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_GRANTED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,7 +91,7 @@ public class DefaultJudgementIssuedClaimantNotificationHandlerTest extends BaseC
     }
 
     @Test
-    void shouldCreateDefaultJudgmentEnteredDashboardNotifications_whenDashboardAndJudgmentBufferAreEnabled() {
+    void shouldCreateDefaultJudgmentGrantedDashboardNotifications_whenDashboardAndJudgmentBufferAreEnabled() {
         params.put("ccdCaseReference", "123");
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
@@ -103,14 +103,14 @@ public class DefaultJudgementIssuedClaimantNotificationHandlerTest extends BaseC
         handler.handle(callbackParams);
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
-            SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ENTERED_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_GRANTED_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             new ScenarioRequestParams(params)
         );
     }
 
     @Test
-    void shouldNotCreateDefaultJudgmentEnteredDashboardNotifications_whenJudgmentBufferEnabledAndJudgmentNotIssued() {
+    void shouldNotCreateDefaultJudgmentGrantedDashboardNotifications_whenJudgmentBufferEnabledAndJudgmentNotIssued() {
         params.put("ccdCaseReference", "123");
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);

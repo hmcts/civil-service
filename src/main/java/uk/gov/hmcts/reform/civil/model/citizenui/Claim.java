@@ -100,7 +100,7 @@ public interface Claim {
 
     boolean isClaimantDefaultJudgement();
 
-    boolean isDefaultJudgementEntered();
+    boolean isDefaultJudgementGranted();
 
     boolean isPartialAdmissionAccepted();
 

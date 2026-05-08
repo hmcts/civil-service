@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_NON_DIVERGENT_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ENTERED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_GRANTED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.DefaultJudgmentIssuedCaseDataHelper.isFinalOrdersIssuedDefaultJudgment;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isDefaultJudgmentGranted;
 
 @Service
 public class DefaultJudgementIssuedClaimantNotificationHandler extends DashboardJudgementOnlineCallbackHandler {
@@ -43,14 +43,14 @@ public class DefaultJudgementIssuedClaimantNotificationHandler extends Dashboard
         if (!featureToggleService.isJudgmentBufferEnabled()) {
             return SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT.getScenario();
         }
-        return isFinalOrdersIssuedDefaultJudgment(caseData)
-            ? SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ENTERED_CLAIMANT.getScenario()
+        return isDefaultJudgmentGranted(caseData)
+            ? SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_GRANTED_CLAIMANT.getScenario()
             : null;
     }
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isApplicant1NotRepresented()
-            && (!featureToggleService.isJudgmentBufferEnabled() || isFinalOrdersIssuedDefaultJudgment(caseData));
+            && (!featureToggleService.isJudgmentBufferEnabled() || isDefaultJudgmentGranted(caseData));
     }
 }

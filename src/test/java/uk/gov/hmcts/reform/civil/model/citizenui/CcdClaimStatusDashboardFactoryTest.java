@@ -204,25 +204,7 @@ class CcdClaimStatusDashboardFactoryTest {
                 Collections.emptyList()
             ));
 
-        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_ENTERED);
-    }
-
-    @Test
-    void given_judgmentBufferEnabledAndDefaultJudgmentDocumentExists_whenClaimantGetStatus_thenReturnDefaultJudgementEnteredStatus() {
-        CaseData claim = getClaimWithDefaultJudgementRequest()
-            .toBuilder()
-            .defaultJudgmentDocuments(List.of(defaultJudgmentDocument()))
-            .build();
-        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
-
-        DashboardClaimStatus status =
-            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                claim,
-                featureToggleService,
-                Collections.emptyList()
-            ));
-
-        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_ENTERED);
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_GRANTED);
     }
 
     @Test
@@ -984,11 +966,4 @@ class CcdClaimStatusDashboardFactoryTest {
             .setState(JudgmentState.ISSUED);
     }
 
-    private Element<CaseDocument> defaultJudgmentDocument() {
-        return new Element<CaseDocument>().setValue(
-            new CaseDocument()
-                .setDocumentType(DocumentType.DEFAULT_JUDGMENT)
-                .setCreatedDatetime(LocalDateTime.now())
-        );
-    }
 }

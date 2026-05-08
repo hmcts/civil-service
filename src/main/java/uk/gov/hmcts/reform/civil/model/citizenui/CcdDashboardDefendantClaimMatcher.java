@@ -339,7 +339,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
-    public boolean isDefaultJudgementEntered() {
+    public boolean isDefaultJudgementGranted() {
         return false;
     }
 
