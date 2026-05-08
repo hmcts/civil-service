@@ -50,6 +50,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         templateId = getTemplateId(caseData);
 
         templateData = getTemplateData(caseData, authorisation);
+        templateData.setCcdCaseReference(caseData.getCcdCaseReference().toString());
         docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
 
         CaseDocument uploadedDocument = documentManagementService.uploadDocument(
