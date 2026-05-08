@@ -51,7 +51,7 @@ variable "ccd_service_bus_filter_rule" {
 # Monitor Variables
 #================================================================================================
 variable "monitor_action_group" {
-  type        = map(object({
+  type = map(object({
     short_name = optional(string)
   }))
   default     = {}
@@ -59,7 +59,7 @@ variable "monitor_action_group" {
 }
 
 variable "monitor_scheduler_alerts" {
-  type        = map(object({
+  type = map(object({
     frequency_in_minutes   = optional(number)
     time_window_in_minutes = optional(number)
     enabled                = optional(bool)
