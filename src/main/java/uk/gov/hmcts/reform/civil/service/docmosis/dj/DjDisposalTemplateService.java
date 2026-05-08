@@ -34,6 +34,7 @@ public class DjDisposalTemplateService {
             .setWrittenByJudge(writtenByJudge)
             .setJudgeNameTitle(caseData.getDisposalHearingJudgesRecitalDJ().getJudgeNameTitle())
             .setCaseNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setDisposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
             .setDisposalHearingBundleDJAddSection(nonNull(caseData.getDisposalHearingBundleDJ()))
             .setTypeBundleInfo(bundleFieldService.buildBundleInfo(caseData))
