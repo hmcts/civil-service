@@ -45,12 +45,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         log.info("Starting generation of directions questionnaire for caseId {}", caseData.getCcdCaseReference());
 
         DocmosisTemplates templateId;
-        DocmosisDocument docmosisDocument;
         DirectionsQuestionnaireForm templateData;
         templateId = getTemplateId(caseData);
-
         templateData = getTemplateData(caseData, authorisation);
         templateData.setCcdCaseReference(caseData.getCcdCaseReference().toString());
+        DocmosisDocument docmosisDocument;
         docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
 
         CaseDocument uploadedDocument = documentManagementService.uploadDocument(
