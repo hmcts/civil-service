@@ -46,6 +46,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class DefaultJudgmentSDOOrderForm implements MappableObject {
 
+    private  String ccdCaseReference;
     private  String caseNumber;
     private  String applicant;
     private  String respondent;
