@@ -114,6 +114,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
+    public boolean isJudgmentBufferEligible() {
+        return featureToggleService.isJudgmentBufferEnabled() && isEligibleForCCJ();
+    }
+
+    @Override
     public boolean claimantConfirmedDefendantPaid() {
         return caseData.getRespondent1CourtOrderPayment() != null && caseData.respondent1PaidInFull();
     }
