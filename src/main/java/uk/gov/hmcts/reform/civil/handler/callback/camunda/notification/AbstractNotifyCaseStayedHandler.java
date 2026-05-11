@@ -28,9 +28,14 @@ public abstract class AbstractNotifyCaseStayedHandler extends CallbackHandler im
 
     public CallbackResponse sendNotification(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        String recipient = getRecipient(callbackParams);
+
+        if (recipient == null || recipient.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
 
         notificationService.sendMail(
-            getRecipient(callbackParams),
+            recipient,
             getNotificationTemplate(caseData),
             addPropertiesAll(callbackParams),
             String.format(getReferenceTemplate(), caseData.getCcdCaseReference())
@@ -56,6 +61,7 @@ public abstract class AbstractNotifyCaseStayedHandler extends CallbackHandler im
 
     protected abstract boolean isBilingual(CaseData caseData);
 
+    @SuppressWarnings("java:S1168")
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return null;
