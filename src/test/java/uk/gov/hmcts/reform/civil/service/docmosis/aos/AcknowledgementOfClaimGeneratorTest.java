@@ -60,6 +60,7 @@ class AcknowledgementOfClaimGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
+    private static final String CCD_CASE_REFERENCE = "1594901956117591";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String FILE_NAME = format(N11.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
@@ -71,7 +72,6 @@ class AcknowledgementOfClaimGeneratorTest {
         .documentName(FILE_NAME_1V2)
         .documentType(ACKNOWLEDGEMENT_OF_CLAIM)
         .build();
-    private LocalDateTime acknowledgementDate;
 
     private final Representative representative = new Representative().setOrganisationName("test org");
 
@@ -107,6 +107,7 @@ class AcknowledgementOfClaimGeneratorTest {
         AcknowledgementOfClaimForm expectedDocmosisData = new AcknowledgementOfClaimForm(
             "[userImage:courtseal.PNG]",
             "Mr. John Rambo \nvs Mr. Sole Trader T/A Sole Trader co",
+            CCD_CASE_REFERENCE,
             LEGACY_CASE_REFERENCE,
             caseData.getSolicitorReferences(),
             caseData.getIssueDate(),
@@ -152,6 +153,7 @@ class AcknowledgementOfClaimGeneratorTest {
         AcknowledgementOfClaimForm expectedDocmosisData = new AcknowledgementOfClaimForm(
             "[userImage:courtseal.PNG]",
             "Mr. John Rambo \nvs 1 Mr. Sole Trader T/A Sole Trader co & 2 Mr. John Rambo",
+            CCD_CASE_REFERENCE,
             LEGACY_CASE_REFERENCE,
             caseData.getSolicitorReferences(),
             caseData.getIssueDate(),
@@ -204,6 +206,7 @@ class AcknowledgementOfClaimGeneratorTest {
         AcknowledgementOfClaimForm expectedDocmosisData = new AcknowledgementOfClaimForm(
             "[userImage:courtseal.PNG]",
             "Mr. John Rambo \nvs 1 Mr. Sole Trader T/A Sole Trader co & 2 Mr. John Rambo",
+            CCD_CASE_REFERENCE,
             LEGACY_CASE_REFERENCE,
             caseData.getSolicitorReferences(),
             caseData.getIssueDate(),
@@ -265,6 +268,7 @@ class AcknowledgementOfClaimGeneratorTest {
         AcknowledgementOfClaimForm expectedDocmosisData = new AcknowledgementOfClaimForm(
             "[userImage:courtseal.PNG]",
             "Mr. John Rambo \nvs 1 Mr. Sole Trader T/A Sole Trader co & 2 Mr. John Rambo",
+            CCD_CASE_REFERENCE,
             LEGACY_CASE_REFERENCE,
             caseData.getSolicitorReferences(),
             caseData.getIssueDate(),
@@ -315,6 +319,7 @@ class AcknowledgementOfClaimGeneratorTest {
         AcknowledgementOfClaimForm expectedDocmosisData = new AcknowledgementOfClaimForm(
             "[userImage:courtseal.PNG]",
             "1 Mr. John Rambo & 2 Mr. John Rambo \nvs Mr. Sole Trader T/A Sole Trader co",
+            CCD_CASE_REFERENCE,
             LEGACY_CASE_REFERENCE,
             caseData.getSolicitorReferences(),
             caseData.getIssueDate(),
