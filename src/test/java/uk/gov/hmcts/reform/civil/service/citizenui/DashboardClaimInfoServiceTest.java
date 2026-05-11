@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.citizenui;
 
+import org.elasticsearch.common.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,6 +74,7 @@ public class DashboardClaimInfoServiceTest {
     @Mock
     private CoreCaseEventDataService eventDataService;
 
+    @Inject
     private DashboardClaimInfoService dashboardClaimInfoService;
 
     private static final BigDecimal PART_ADMIT_PAY_IMMEDIATELY_AMOUNT = BigDecimal.valueOf(500);

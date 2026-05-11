@@ -545,26 +545,6 @@ dependencies {
       because 'CVE-2025-68161 (upgrade to vendor recommended version)'
     }
   }
-  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.15.0'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '9.1.2'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.9'
-
-  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin'
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
-  implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv'
-
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: versions.camunda
-  implementation group: 'org.camunda.community.rest', name: 'camunda-platform-7-rest-client-spring-boot-starter', version: versions.camunda
-  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: versions.camunda
-
-  implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
-
-  // JAX-B dependencies for JDK 9+
-  implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.5'
-  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.6'
-  implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-  runtimeOnly group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.9'
-  runtimeOnly group: 'com.sun.activation', name: 'javax.activation', version: '1.2.0'
 
   testAnnotationProcessor "org.projectlombok:lombok:${versions.lombok}"
   testCompileOnly "org.projectlombok:lombok:${versions.lombok}"
