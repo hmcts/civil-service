@@ -11,7 +11,7 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.54.0'
   id 'org.sonarqube' version '6.3.1.5724'
   id 'au.com.dius.pact' version '4.6.17'
-  id "io.freefair.lombok" version "8.14.4"
+  id "io.freefair.lombok" version "9.5.0"
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.4"
