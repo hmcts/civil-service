@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -32,6 +33,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
@@ -72,6 +74,9 @@ class NotifyDefendantCaseStayedHandlerTest {
             .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe").setType(Party.Type.INDIVIDUAL))
             .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson").setType(Party.Type.INDIVIDUAL))
             .build();
+    }
+
+    private void setupConfiguration() {
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
         when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
@@ -100,6 +105,7 @@ class NotifyDefendantCaseStayedHandlerTest {
             .caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(
                 isRespondentBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString())))
             .respondentSolicitor1EmailAddress(email)
+            .respondent1(caseData.getRespondent1().copy().setPartyEmail(isRespondentLiP ? email : null))
             .respondent2(!isRespondent1
                              ? new Party().setIndividualFirstName("John").setIndividualLastName("Johnson").setType(Party.Type.INDIVIDUAL) : null)
             .addRespondent2(!isRespondent1
@@ -116,6 +122,7 @@ class NotifyDefendantCaseStayedHandlerTest {
             .eventId(isRespondent1 ? CaseEvent.NOTIFY_DEFENDANT_STAY_CASE.name() : CaseEvent.NOTIFY_DEFENDANT_TWO_STAY_CASE.name()).build();
         CallbackParams params = new CallbackParams().request(request).caseData(caseData);
 
+        setupConfiguration();
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isRespondentLiP && isRespondentBilingual) {
             when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("bilingual-template");
@@ -151,6 +158,23 @@ class NotifyDefendantCaseStayedHandlerTest {
             "case-stayed-defendant-notification-1594901956117591"
         );
 
+    }
+
+    @Test
+    void shouldNotSendNotification_whenRespondentLiPHasNoEmail() {
+        caseData = caseData.toBuilder()
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(caseData.getRespondent1().copy().setPartyEmail(null))
+            .respondentSolicitor1EmailAddress("solicitor@example.com")
+            .build();
+
+        CallbackRequest request = CallbackRequest.builder()
+            .eventId(CaseEvent.NOTIFY_DEFENDANT_STAY_CASE.name()).build();
+        CallbackParams params = new CallbackParams().request(request).caseData(caseData);
+
+        handler.sendNotification(params);
+
+        verifyNoInteractions(notificationService);
     }
 
     @NotNull
