@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
@@ -92,6 +93,15 @@ public class HearingNoticeSchedulerEventHandler {
             }
         } else {
             log.info("Hearing status not 'LISTED' [{}].", hearingId);
+        }
+
+        LocalDateTime hmcReceivedDateTime = hearing.getHearingResponse().getReceivedDateTime();
+        if (partiesNotified != null
+            && partiesNotified.getResponseReceivedDateTime() != null
+            && !partiesNotified.getResponseReceivedDateTime().isBefore(hmcReceivedDateTime)
+            && !HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
+            log.debug("Skipping partiesNotified PUT for hearing [{}] — already notified with current data", hearingId);
+            return;
         }
 
         log.info("Updating parties notified for hearing [{}].", hearingId);

@@ -41,6 +41,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -318,6 +319,35 @@ class HearingNoticeSchedulerEventHandlerTest {
                                                       .setHearingNoticeGenerated(false))
         );
         verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
+        verifyNoInteractions(messageCorrelationBuilder);
+    }
+
+    @Test
+    void shouldSkipPartiesNotifiedPut_whenHearingIsListedAndAlreadyNotifiedWithUnchangedData() {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
+            createHearing(ListAssistCaseStatus.LISTED));
+        // responseReceivedDateTime == RECEIVED_DATETIME: HMC has already accepted the notification
+        // for the current hearing version; data (days + venue) is unchanged → guard fires
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
+            new PartiesNotifiedResponses().setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setResponseReceivedDateTime(RECEIVED_DATETIME)
+                    .setServiceData(new PartiesNotifiedServiceData()
+                        .setDays(List.of(new HearingDay()
+                            .setHearingStartDateTime(HEARING_DATE)
+                            .setHearingEndDateTime(HEARING_DATE.plusHours(1))))
+                        .setHearingLocation(VENUE_ID)))));
+
+        CaseDetails mockCaseDetails = CaseDetails.builder()
+            .id(Long.parseLong(CASE_ID))
+            .state("CASE_PROGRESSION")
+            .build();
+        when(coreCaseDataService.getCase(Long.parseLong(CASE_ID))).thenReturn(mockCaseDetails);
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(hearingsService, times(0)).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
+        verify(runtimeService, times(0)).createMessageCorrelation(any());
         verifyNoInteractions(messageCorrelationBuilder);
     }
 
