@@ -242,9 +242,9 @@ ccd:
   ccd-definition-store-api:
     java:
       imagePullPolicy: Always
-      devcpuRequests: 1000m
+      devcpuRequests: 2000m
       devmemoryRequests: 4096Mi
-      devmemoryLimits: 8192Mi
+      devmemoryLimits: 4000m
       environment:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_DB_OPTIONS: "?stringtype=unspecified"
