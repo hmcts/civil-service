@@ -257,8 +257,8 @@ ccd:
     java:
       imagePullPolicy: Always
       devcpuRequests: 2000m
-      devmemoryRequests: 4096Mi
-      devmemoryLimits: 4000m
+      devmemoryRequests: 4Gi
+      devmemoryLimits: 4Gi
       environment:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_DB_OPTIONS: "?stringtype=unspecified"
