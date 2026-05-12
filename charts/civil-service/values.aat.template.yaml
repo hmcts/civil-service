@@ -3,7 +3,6 @@ java:
   ingressHost: ${SERVICE_FQDN}
   memoryRequests: 2Gi
   cpuRequests: 2000m
-  memoryLimits: 4Gi
   cpuLimits: 3500m
   devmemoryRequests: 6Gi
   devcpuRequests: 2000m
@@ -141,7 +140,7 @@ xui-webapp:
     ingressHost: civil-service-xui-staging.aat.platform.hmcts.net
     memoryRequests: 2Gi
     cpuRequests: 2000m
-    memoryLimits: 4Gi
+    memoryLimits: 3Gi
     cpuLimits: 3500m
     devmemoryRequests: 6Gi
     devcpuRequests: 2000m
@@ -207,7 +206,7 @@ ccd:
       imagePullPolicy: Always
       devcpuRequests: 1000m
       devmemoryRequests: 2048Mi
-      devmemoryLimits: 8Gi
+      devmemoryLimits: 6Gi
       autoscaling:
         enabled: false
       environment:
@@ -243,8 +242,8 @@ ccd:
     java:
       imagePullPolicy: Always
       devcpuRequests: 2000m
-      devmemoryRequests: 4096Mi
-      devmemoryLimits: 4000m
+      devmemoryRequests: 4Gi
+      devmemoryLimits: 4Gi
       environment:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_DB_OPTIONS: "?stringtype=unspecified"
