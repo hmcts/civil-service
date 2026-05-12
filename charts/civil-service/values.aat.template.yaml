@@ -3,7 +3,6 @@ java:
   ingressHost: ${SERVICE_FQDN}
   memoryRequests: 2Gi
   cpuRequests: 2000m
-  memoryLimits: 4Gi
   cpuLimits: 3500m
   devmemoryRequests: 6Gi
   devcpuRequests: 2000m
