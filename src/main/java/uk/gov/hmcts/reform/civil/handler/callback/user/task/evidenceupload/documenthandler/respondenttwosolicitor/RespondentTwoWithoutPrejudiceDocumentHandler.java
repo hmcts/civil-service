@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentWithDescriptionCategoryUtils;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentTwoSolicitorDocumentHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.retriever.UploadDocumentWithDescriptionRetriever;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -26,19 +27,12 @@ public class RespondentTwoWithoutPrejudiceDocumentHandler extends RespondentTwoS
 
     @Override
     public void handleDocuments(CaseData caseData, String litigantType, StringBuilder notificationStringBuilder) {
-        if (getDocumentList(caseData) == null || getDocumentList(caseData).isEmpty()) {
-            return;
-        }
-        getDocumentList(caseData).forEach(element -> {
-            if (element.getValue() != null && element.getValue().getDocument() != null) {
-                element.getValue().getDocument().setCategoryID(documentCategory.getCategoryId());
-            }
-        });
+        DocumentWithDescriptionCategoryUtils.applyCategoryId(getDocumentList(caseData), documentCategory);
     }
 
     @Override
-    @SuppressWarnings("java:S1186")
-    public void addUploadDocList(CaseData caseData) {
+    protected boolean shouldPopulatePostBundleUploadList() {
+        return false;
     }
 }
 
