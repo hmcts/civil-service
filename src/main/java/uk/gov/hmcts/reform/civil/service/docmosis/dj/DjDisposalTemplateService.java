@@ -33,6 +33,7 @@ public class DjDisposalTemplateService {
             .setWrittenByJudge(writtenByJudge)
             .setJudgeNameTitle(caseData.getDisposalHearingJudgesRecitalDJ().getJudgeNameTitle())
             .setCaseNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setDisposalHearingDisclosureOfDocumentsDJ(caseData.getDisposalHearingDisclosureOfDocumentsDJ())
             .setDisposalHearingDisclosureOfDocumentsDJAddSection(
                 nonNull(caseData.getDisposalHearingDisclosureOfDocumentsDJ()))

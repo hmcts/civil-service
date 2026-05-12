@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVars;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
@@ -59,6 +60,9 @@ class AutomatedHearingNoticeHandlerTest {
 
     @Mock
     private SystemUpdateUserConfiguration userConfig;
+
+    @Mock
+    private AsyncHandlerProperties asyncHandlerProperties;
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
@@ -216,7 +220,7 @@ class AutomatedHearingNoticeHandlerTest {
     }
 
     private UnNotifiedHearingResponse createUnnotifiedHearings(List<String> hearingIds) {
-        return new UnNotifiedHearingResponse(hearingIds, Long.valueOf(hearingIds.size()));
+        return new UnNotifiedHearingResponse(hearingIds, (long) hearingIds.size());
     }
 
 }
