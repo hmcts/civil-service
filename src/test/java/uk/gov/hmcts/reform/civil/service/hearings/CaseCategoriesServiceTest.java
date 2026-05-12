@@ -22,10 +22,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(SpringExtension.class)
-public class CaseCategoriesServiceTest {
+class CaseCategoriesServiceTest {
 
     private static final String AUTH = "auth";
 
@@ -47,6 +51,7 @@ public class CaseCategoriesServiceTest {
             .build();
 
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
+        given(paymentsConfiguration.getSpecSiteId()).willReturn("AAA6");
     }
 
     @Test
@@ -58,7 +63,7 @@ public class CaseCategoriesServiceTest {
             AUTH
         );
 
-        assertThat(actual).isEqualTo(null);
+        assertThat(actual).isNull();
     }
 
     @Test
@@ -75,6 +80,96 @@ public class CaseCategoriesServiceTest {
         expected.setCategoryParent(null);
         expected.setCategoryType(CategoryType.CASE_TYPE);
         expected.setCategoryValue("AAA7-FAST_CLAIM");
+
+        caseData = caseData.toBuilder().allocatedTrack(FAST_CLAIM).build();
+
+        CaseCategoryModel actual = caseCategoriesService.getCaseCategoriesFor(
+            CategoryType.CASE_TYPE,
+            caseData,
+            AUTH
+        );
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldReturnCaseType_whenJudgeReallocatedTrack() {
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(
+            new Category()
+                .setCategoryKey("caseType")
+                .setKey("AAA7-MULTI_CLAIM")
+        ));
+        when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any()))
+            .thenReturn(Optional.of(categorySearchResult));
+        CaseCategoryModel expected = new CaseCategoryModel();
+        expected.setCategoryParent(null);
+        expected.setCategoryType(CategoryType.CASE_TYPE);
+        expected.setCategoryValue("AAA7-MULTI_CLAIM");
+
+        caseData = caseData.toBuilder()
+            .allocatedTrack(FAST_CLAIM)
+            .finalOrderAllocateToTrack(YES)
+            .finalOrderTrackAllocation(MULTI_CLAIM)
+            .build();
+
+        CaseCategoryModel actual = caseCategoriesService.getCaseCategoriesFor(
+            CategoryType.CASE_TYPE,
+            caseData,
+            AUTH
+        );
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldReturnCaseType_whenSpecClaimWithResponseTrack() {
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(
+            new Category()
+                .setCategoryKey("caseType")
+                .setKey("AAA6-FAST_CLAIM")
+        ));
+        when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any()))
+            .thenReturn(Optional.of(categorySearchResult));
+        CaseCategoryModel expected = new CaseCategoryModel();
+        expected.setCategoryParent(null);
+        expected.setCategoryType(CategoryType.CASE_TYPE);
+        expected.setCategoryValue("AAA6-FAST_CLAIM");
+
+        caseData = caseData.toBuilder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .responseClaimTrack("FAST_CLAIM")
+            .build();
+
+        CaseCategoryModel actual = caseCategoriesService.getCaseCategoriesFor(
+            CategoryType.CASE_TYPE,
+            caseData,
+            AUTH
+        );
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldReturnCaseType_whenSpecClaimWithNoResponseTrack() {
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(
+            new Category()
+                .setCategoryKey("caseType")
+                .setKey("AAA6-SMALL_CLAIM")
+        ));
+        when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any()))
+            .thenReturn(Optional.of(categorySearchResult));
+        CaseCategoryModel expected = new CaseCategoryModel();
+        expected.setCategoryParent(null);
+        expected.setCategoryType(CategoryType.CASE_TYPE);
+        expected.setCategoryValue("AAA6-SMALL_CLAIM");
+
+        caseData = caseData.toBuilder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .responseClaimTrack(null)
+            .build();
 
         CaseCategoryModel actual = caseCategoriesService.getCaseCategoriesFor(
             CategoryType.CASE_TYPE,
