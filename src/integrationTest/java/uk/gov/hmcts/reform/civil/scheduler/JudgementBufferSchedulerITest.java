@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.judgementbuffer.JudgementBufferScheduler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
 import java.util.List;
@@ -41,6 +42,9 @@ public class JudgementBufferSchedulerITest {
     @MockBean
     private TelemetryService telemetryService;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void shouldExecuteJudgementBufferScheduler() {
@@ -51,6 +55,7 @@ public class JudgementBufferSchedulerITest {
             .cases(List.of(case1))
             .build();
 
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
         when(coreCaseDataService.searchCases(any(Query.class))).thenReturn(searchResult);
 
         // When
