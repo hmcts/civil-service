@@ -24,11 +24,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@PactTestFor(providerName = "referenceData_location")
+@PactTestFor(providerName = "referenceData_location_civil_service")
 @MockServerConfig(hostInterface = "localhost", port = "6669")
 public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/refdata/location/court-venues";
+    private static final String COURT_TYPE_ID = "12345";
 
     @Autowired
     private LocationReferenceDataApiClient locationReferenceDataApiClient;
@@ -45,7 +46,7 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
         List<LocationRefData> response = locationReferenceDataApiClient.getAllCivilCourtVenues(
             SERVICE_AUTH_TOKEN,
             AUTHORIZATION_TOKEN,
-            "courtTypeId",
+            COURT_TYPE_ID,
             "locationType"
         );
         assertThat(
@@ -61,7 +62,7 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
             .path(ENDPOINT)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
-            .matchQuery("court_type_id", "courtTypeId", "courtTypeId")
+            .matchQuery("court_type_id", "\\d+", COURT_TYPE_ID)
             .matchQuery("location_type", "locationType", "locationType")
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -74,22 +75,22 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
         return newJsonArray(response ->
                                 response
                                     .object(locationRefData -> locationRefData
-                                        .stringType("courtVenueId", "courtVenueId123")
-                                        .stringType("epimmsId", "epimmsIdTest123")
-                                        .stringType("siteName", "siteNameTest123")
-                                        .stringType("regionId", "regionIdTest123")
+                                        .stringType("court_venue_id", "12345")
+                                        .stringType("epimms_id", "epimmsIdTest123")
+                                        .stringType("site_name", "siteNameTest123")
+                                        .stringType("region_id", "regionIdTest123")
                                         .stringType("region", "regionTest123")
-                                        .stringType("courtType", "courtTypeTest123")
-                                        .stringType("courtTypeId", "courtTypeIdTest123")
-                                        .stringType("courtAddress", "courtAddressTest123")
+                                        .stringType("court_type", "courtTypeTest123")
+                                        .stringType("court_type_id", "courtTypeIdTest123")
+                                        .stringType("court_address", "courtAddressTest123")
                                         .stringType("postcode", "postcodeTest123")
-                                        .stringType("phoneNumber", "phoneNumberTest123")
-                                        .stringType("courtLocationCode", "courtLocationCodeTest123")
-                                        .stringType("courtStatus", "courtStatusTest123")
-                                        .stringType("courtName", "courtNameTest123")
-                                        .stringType("venueName", "venueNameTest123")
-                                        .stringType("locationType", "locationTypeTest123")
-                                        .stringType("parentLocation", "parentLocationTest123"))
+                                        .stringType("phone_number", "phoneNumberTest123")
+                                        .stringType("court_location_code", "courtLocationCodeTest123")
+                                        .stringType("court_status", "courtStatusTest123")
+                                        .stringType("court_name", "courtNameTest123")
+                                        .stringType("venue_name", "venueNameTest123")
+                                        .stringType("location_type", "locationTypeTest123")
+                                        .stringType("parent_location", "parentLocationTest123"))
         ).build();
     }
 }
