@@ -43,6 +43,8 @@ public class JudgementBufferScheduledTask implements ScheduledTask {
             caseDataContent.getEvent().setSummary("Issue Judgement");
             caseDataContent.getEvent().setDescription("Issue Judgement after Judgement Buffer");
             coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
+        } else {
+            log.info("JudgementBufferScheduledTask::accept case {} is not eligible for Issue Default Judgement Spec", caseId);
         }
     }
 }
