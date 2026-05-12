@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
@@ -14,6 +15,9 @@ import uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils;
 
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CollectorUtils.toSingleton;
 
 @Service
@@ -36,10 +40,7 @@ public class CaseCategoriesService {
             hmctsServiceID
         );
 
-        String allocatedTrack = caseData.getAllocatedTrack() != null
-            ? caseData.getAllocatedTrack().toString()  //unspec
-            : caseData.getResponseClaimTrack(); //spec
-
+        String allocatedTrack = getClaimTrack(caseData);
         String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, allocatedTrack);
         log.info("Searching for category caseNumber={}, hmctsServiceID={}, allocatedTrack={}, categoryKey={}, categoryType={}",
                  caseData.getCcdCaseReference(), hmctsServiceID, allocatedTrack, categoryKey, categoryType);
@@ -67,6 +68,23 @@ public class CaseCategoriesService {
         } else if (CASE_SUB_TYPE.equals(category.getCategoryKey())) {
             return CategoryType.CASE_SUBTYPE;
         }
+        return null;
+    }
+
+    private String getClaimTrack(CaseData caseData) {
+        if (YES.equals(caseData.getFinalOrderAllocateToTrack())
+            && caseData.getFinalOrderTrackAllocation() != null) {
+            return caseData.getFinalOrderTrackAllocation().name();
+        }
+
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return caseData.getAllocatedTrack() != null ? caseData.getAllocatedTrack().name() : null;
+        } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return caseData.getResponseClaimTrack() != null
+                ? caseData.getResponseClaimTrack()
+                : AllocatedTrack.SMALL_CLAIM.name();
+        }
+
         return null;
     }
 }
