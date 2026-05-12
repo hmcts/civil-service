@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,6 +123,11 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+
+        LocalDate agreedExtensionDate = YesOrNo.NO.equals(caseData.getIsRespondent1())
+            ? caseData.getRespondentSolicitor2AgreedDeadlineExtension()
+            : caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+
         HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
                 caseData.getApplicant1OrganisationPolicy()
@@ -128,7 +135,7 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
                 caseData
             ),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE),
+            AGREED_EXTENSION_DATE, formatLocalDate(agreedExtensionDate, DATE),
             DEFENDANT_NAME, fetchDefendantName(caseData),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
