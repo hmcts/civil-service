@@ -748,7 +748,6 @@ public class ParentCaseUpdateHelper {
                                                                Element<GeneralApplicationsDetails> masterApplication) {
         List<Element<GADetailsRespondentSol>> respondentDetails = upsertRespondentVisibilityCollection(
             ofNullable(caseData.getRespondentSolGaAppDetails()).orElse(newArrayList()),
-            caseData,
             masterApplication,
             newState,
             applicationId,
@@ -756,7 +755,6 @@ public class ParentCaseUpdateHelper {
         );
         List<Element<GADetailsRespondentSol>> respondentTwoDetails = upsertRespondentVisibilityCollection(
             ofNullable(caseData.getRespondentSolTwoGaAppDetails()).orElse(newArrayList()),
-            caseData,
             masterApplication,
             newState,
             applicationId,
@@ -778,7 +776,6 @@ public class ParentCaseUpdateHelper {
     }
 
     private List<Element<GADetailsRespondentSol>> upsertRespondentVisibilityCollection(List<Element<GADetailsRespondentSol>> respondentDetails,
-                                                                                       GeneralApplicationCaseData caseData,
                                                                                        Element<GeneralApplicationsDetails> masterApplication,
                                                                                        String newState,
                                                                                        String applicationId,
@@ -787,7 +784,7 @@ public class ParentCaseUpdateHelper {
         String collectionName = isRespondentOne ? "Respondent One Solicitor" : "Respondent Two Solicitor";
         if (!isPresent) {
             log.info("Adding application to {} collection.", collectionName);
-            respondentDetails.add(element(createRespondentSolDetails(masterApplication, newState, caseData)));
+            respondentDetails.add(element(createRespondentSolDetails(masterApplication, newState, applicationId)));
             return respondentDetails;
         }
 
@@ -797,16 +794,20 @@ public class ParentCaseUpdateHelper {
 
     private GADetailsRespondentSol createRespondentSolDetails(Element<GeneralApplicationsDetails> masterApplication,
                                                               String newState,
-                                                              GeneralApplicationCaseData generalAppCaseData) {
-        return createRespondentSolDetails(masterApplication.getValue(), generalAppCaseData.getCcdCaseReference())
+                                                              String caseReference) {
+        return createRespondentSolDetails(masterApplication.getValue(), caseReference)
             .setCaseState(newState);
     }
 
     private GADetailsRespondentSol createRespondentSolDetails(GeneralApplicationsDetails source, Long caseReference) {
+        return createRespondentSolDetails(source, String.valueOf(caseReference));
+    }
+
+    private GADetailsRespondentSol createRespondentSolDetails(GeneralApplicationsDetails source, String caseReference) {
         return new GADetailsRespondentSol()
             .setGeneralApplicationType(source.getGeneralApplicationType())
             .setGeneralAppSubmittedDateGAspec(source.getGeneralAppSubmittedDateGAspec())
-            .setCaseLink(new CaseLink(String.valueOf(caseReference)))
+            .setCaseLink(new CaseLink(caseReference))
             .setParentClaimantIsApplicant(source.getParentClaimantIsApplicant());
     }
 
@@ -825,7 +826,7 @@ public class ParentCaseUpdateHelper {
         List<Element<GeneralApplicationsDetails>> claimantDetails = ofNullable(caseData.getClaimantGaAppDetails()).orElse(newArrayList());
         boolean isPresent = claimantDetails.stream().anyMatch(gaClaimant -> applicationFilterCriteria(gaClaimant, applicationId));
         if (!isPresent) {
-            claimantDetails.add(element(createClaimantDetails(masterApplication, newState, caseData)));
+            claimantDetails.add(element(createClaimantDetails(masterApplication, newState, applicationId)));
             return claimantDetails;
         }
         return updateGaApplicationState(caseData, newState, applicationId, null);
@@ -833,8 +834,8 @@ public class ParentCaseUpdateHelper {
 
     private GeneralApplicationsDetails createClaimantDetails(Element<GeneralApplicationsDetails> masterApplication,
                                                              String newState,
-                                                             GeneralApplicationCaseData generalAppCaseData) {
-        return createGeneralApplicationsDetails(masterApplication.getValue(), generalAppCaseData.getCcdCaseReference())
+                                                             String caseReference) {
+        return createGeneralApplicationsDetails(masterApplication.getValue(), caseReference)
             .setCaseState(newState);
     }
 
@@ -1089,18 +1090,26 @@ public class ParentCaseUpdateHelper {
     }
 
     private GeneralApplicationsDetails createGeneralApplicationsDetails(GeneralApplicationsDetails source, Long caseReference) {
+        return createGeneralApplicationsDetails(source, String.valueOf(caseReference));
+    }
+
+    private GeneralApplicationsDetails createGeneralApplicationsDetails(GeneralApplicationsDetails source, String caseReference) {
         return new GeneralApplicationsDetails()
             .setGeneralApplicationType(source.getGeneralApplicationType())
             .setGeneralAppSubmittedDateGAspec(source.getGeneralAppSubmittedDateGAspec())
-            .setCaseLink(new CaseLink(String.valueOf(caseReference)))
+            .setCaseLink(new CaseLink(caseReference))
             .setParentClaimantIsApplicant(source.getParentClaimantIsApplicant());
     }
 
     private GeneralApplicationsDetails createGeneralApplicationsDetails(GADetailsRespondentSol source, Long caseReference) {
+        return createGeneralApplicationsDetails(source, String.valueOf(caseReference));
+    }
+
+    private GeneralApplicationsDetails createGeneralApplicationsDetails(GADetailsRespondentSol source, String caseReference) {
         return new GeneralApplicationsDetails()
             .setGeneralApplicationType(source.getGeneralApplicationType())
             .setGeneralAppSubmittedDateGAspec(source.getGeneralAppSubmittedDateGAspec())
-            .setCaseLink(new CaseLink(String.valueOf(caseReference)))
+            .setCaseLink(new CaseLink(caseReference))
             .setParentClaimantIsApplicant(source.getParentClaimantIsApplicant());
     }
 
