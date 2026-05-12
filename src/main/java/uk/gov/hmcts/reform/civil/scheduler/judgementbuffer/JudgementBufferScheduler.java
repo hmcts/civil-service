@@ -8,8 +8,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-
-import java.util.Collections;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.search.JudgementBufferExpiredSearchService;
 
 @Component
 @RequiredArgsConstructor
@@ -19,19 +19,23 @@ public class JudgementBufferScheduler {
 
     public static final String SCHEDULER_NAME = "JudgementBuffer";
 
+    private final JudgementBufferExpiredSearchService searchService;
     private final ScheduledTaskRunner scheduledTaskRunner;
     private final JudgementBufferScheduledTask judgementBufferScheduledTask;
+    private final FeatureToggleService featureToggleService;
 
     @Scheduled(cron = "${scheduler.judgementBuffer.cronExpression}")
     @SchedulerLock(name = "JudgementBufferScheduler_issueJudgement",
         lockAtMostFor = "${scheduler.lockAtMostFor}",
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     public void issueJudgement() {
-        log.info("Running {} scheduler", SCHEDULER_NAME);
-        scheduledTaskRunner.run(
-            new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-            Collections::emptySet,
-            judgementBufferScheduledTask
-        );
+        if (featureToggleService.isJudgmentBufferEnabled()) {
+            log.info("Running {} scheduler", SCHEDULER_NAME);
+            scheduledTaskRunner.run(
+                new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
+                searchService::getCases,
+                judgementBufferScheduledTask
+            );
+        }
     }
 }
