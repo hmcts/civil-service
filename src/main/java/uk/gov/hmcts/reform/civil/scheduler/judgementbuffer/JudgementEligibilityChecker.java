@@ -16,7 +16,7 @@ public class JudgementEligibilityChecker {
     public boolean isEligibleForJudgement(CaseData caseData) {
         return !isDefenceSubmitted(caseData)
             && !isCaseOffline(caseData)
-            && isDeadlinePast(caseData);
+            && isResponseDeadlinePast(caseData);
     }
 
     private boolean isDefenceSubmitted(CaseData caseData) {
@@ -27,7 +27,7 @@ public class JudgementEligibilityChecker {
         return nonNull(caseData.getTakenOfflineDate());
     }
 
-    private boolean isDeadlinePast(CaseData caseData) {
+    private boolean isResponseDeadlinePast(CaseData caseData) {
         return nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isBefore(time.now());
     }
