@@ -26,7 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@PactTestFor(providerName = "em_stitchBundle")
+@PactTestFor(providerName = "em_stitchBundle_civil_service")
 @MockServerConfig(hostInterface = "localhost", port = "6664")
 @TestPropertySource(properties = "bundle.api.url=http://localhost:6664")
 public class StitchBundleApiConsumerTest extends BaseContractTest {
@@ -61,7 +61,8 @@ public class StitchBundleApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildStitchBundleResponsePact(PactDslWithProvider builder) throws IOException {
         return builder
-            .uponReceiving("a stitch bundle request")
+            .given("a stitch bundle request")
+            .uponReceiving("a request to get an stitch bundle")
             .path(ENDPOINT)
             .method(HttpMethod.POST.toString())
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
