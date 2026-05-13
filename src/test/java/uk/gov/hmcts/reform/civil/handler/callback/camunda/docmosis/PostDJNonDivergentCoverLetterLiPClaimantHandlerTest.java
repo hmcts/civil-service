@@ -94,7 +94,7 @@ class PostDJNonDivergentCoverLetterLiPClaimantHandlerTest {
         verify(bulkPrintService).printLetter(
             "PDF".getBytes(),
             "001MC001",
-            "001MC001",
+            "1",
             "default-judgment-non-divergent-spec-cover_letter",
             List.of("Mr. John Rambo"),
             List.of("dj.pdf", "default_judgment_cover_letter.pdf")
