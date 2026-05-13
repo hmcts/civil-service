@@ -59,7 +59,7 @@ public class NoticeOfDiscontinuanceLiPLetterGenerator {
             bulkPrintFileNames.add(discontinuanceCaseDocument.getDocumentLink().getDocumentFileName());
             bulkPrintService.printLetter(
                 letterContent, caseData.getLegacyCaseReference(),
-                caseData.getLegacyCaseReference(), NOTICE_OF_DISCONTINUANCE_LETTER, recipient, bulkPrintFileNames
+                caseData.getCcdCaseReference().toString(), NOTICE_OF_DISCONTINUANCE_LETTER, recipient, bulkPrintFileNames
             );
         }
     }

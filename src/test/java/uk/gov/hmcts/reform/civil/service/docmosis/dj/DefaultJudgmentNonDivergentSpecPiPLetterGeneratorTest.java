@@ -168,7 +168,7 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
-                CASE_DATA.getLegacyCaseReference(),
+                CASE_DATA.getCcdCaseReference().toString(),
                 CASE_DATA.getLegacyCaseReference(),
                 DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF,
                 List.of(CASE_DATA.getRespondent1().getPartyName()),
