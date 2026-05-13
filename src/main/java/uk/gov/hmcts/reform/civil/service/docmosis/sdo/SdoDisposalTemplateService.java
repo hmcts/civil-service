@@ -66,8 +66,6 @@ public class SdoDisposalTemplateService {
             .setDisposalHearingMethodVideoConferenceHearing(
                 disposalDirectionsService.getVideoConferenceHearingLabel(caseData)
             )
-            .setDisposalHearingBundle(caseData.getDisposalHearingBundle())
-            .setDisposalHearingBundleTypeText(disposalDirectionsService.getBundleTypeText(caseData))
             .setHasNewDirections(disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingAddNewDirections"))
             .setDisposalHearingAddNewDirections(caseData.getDisposalHearingAddNewDirections())
             .setDisposalHearingNotes(caseData.getDisposalHearingNotes())
@@ -91,9 +89,6 @@ public class SdoDisposalTemplateService {
             )
             .setDisposalHearingMethodToggle(
                 disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingMethodToggle")
-            )
-            .setDisposalHearingBundleToggle(
-                disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingBundleToggle")
             )
             .setDisposalHearingClaimSettlingToggle(
                 disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingClaimSettlingToggle")
