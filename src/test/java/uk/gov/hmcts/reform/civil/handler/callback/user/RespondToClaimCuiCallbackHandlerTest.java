@@ -161,7 +161,9 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldClearJoCaseDataWhenMovingToAwaitingApplicantIntention() {
+        void shouldClearJoCaseDataWhenJudgmentWasRequested() {
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
             RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
             respondentLiPResponse.setRespondent1ResponseLanguage("ENGLISH");
             CaseDataLiP caseDataLiP = new CaseDataLiP();
@@ -192,6 +194,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRepaymentSuggestion("repayment suggestion");
             caseData.setRepaymentSummaryObject("repayment summary");
             caseData.setShowOldDJFixedCostsScreen(YES);
+            caseData.setIsJoRequested(YES);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
