@@ -30,6 +30,7 @@ public class SdoDocumentFormSmallDrh implements MappableObject {
     //Header
     private String judgeName;
     private String caseNumber;
+    private String ccdCaseReference;
     private Party applicant1;
     private Party respondent1;
     private boolean hasApplicant2;

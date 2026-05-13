@@ -28,8 +28,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getContentText;
@@ -113,7 +113,7 @@ public class HmcDataUtils {
                     HearingDay datesFromHearingDay = new HearingDay()
                         .setHearingStartDateTime(convertFromUTC(hearingDay.getHearingStartDateTime()))
                         .setHearingEndDateTime(convertFromUTC(hearingDay.getHearingEndDateTime()));
-                    if (!serviceData.getHearingLocation().equals(hearingDay.getHearingVenueId())
+                    if (!Objects.equals(serviceData.getHearingLocation(), hearingDay.getHearingVenueId())
                         || !serviceData.getDays().contains(datesFromHearingDay)) {
                         return true;
                     }
@@ -200,8 +200,8 @@ public class HmcDataUtils {
      */
     public static Integer getTotalHearingDurationInMinutes(HearingGetResponse hearing) {
         return hearing.getHearingResponse().getHearingDaySchedule().stream()
-            .map(day -> getHearingDayMinutesDuration(day))
-            .reduce((aac, day) -> aac + day).orElse(null);
+            .map(HmcDataUtils::getHearingDayMinutesDuration)
+            .reduce(Integer::sum).orElse(null);
     }
 
     /**
@@ -240,7 +240,7 @@ public class HmcDataUtils {
      */
     private static String concatWithAnd(List<String> strings) {
         return strings.stream()
-            .filter(string -> string != null && !string.equals(""))
+            .filter(string -> string != null && !string.isEmpty())
             .reduce((acc, displayText) -> String.format("%s and %s", acc, displayText))
             .orElse("");
     }
@@ -255,7 +255,7 @@ public class HmcDataUtils {
     private static String concatWithWelshAnd(List<String> strings, Boolean vowelStart) {
         String andText = vowelStart ? "ac" : "a";
         return strings.stream()
-            .filter(string -> string != null && !string.equals(""))
+            .filter(string -> string != null && !string.isEmpty())
             .reduce((acc, displayText) -> String.format("%s %s %s", acc, andText, displayText))
             .orElse("");
     }
@@ -347,55 +347,55 @@ public class HmcDataUtils {
 
     public static boolean includesVideoHearing(HearingsResponse hearings) {
         return hasHearings(hearings)
-                && hearings.getCaseHearings().stream()
-                .filter(HmcDataUtils::includesVideoHearing).count() > 0;
+                && hearings.getCaseHearings().stream().anyMatch(HmcDataUtils::includesVideoHearing);
     }
 
     private static boolean includesVideoHearing(HearingDaySchedule hearingDay) {
-        return hearingDay.getAttendees().stream().filter(
-            attendee -> attendee.getHearingSubChannel() != null
-                && attendee.getHearingSubChannel().equals(VIDCVP)).count() > 0;
+        return hearingDay.getAttendees().stream().anyMatch(attendee -> attendee.getHearingSubChannel() != null
+            && (attendee.getHearingSubChannel().equals(VIDCVP)
+            || attendee.getHearingSubChannel().equals(HearingSubChannel.VID)
+            || attendee.getHearingSubChannel().equals(HearingSubChannel.VIDTEAMS)));
     }
 
     private static boolean includesVideoHearing(List<HearingDaySchedule> schedule) {
-        return schedule.stream().filter(HmcDataUtils::includesVideoHearing).count() > 0;
+        return schedule.stream().anyMatch(HmcDataUtils::includesVideoHearing);
     }
 
     private static boolean includesVideoHearing(CaseHearing caseHearing) {
         return includesVideoHearing(caseHearing.getHearingDaySchedule());
     }
 
-    private static List<Attendees> getAttendeesBySubChannel(HearingGetResponse hearing, HearingSubChannel subChannel) {
+    private static List<Attendees> getAttendeesBySubChannels(HearingGetResponse hearing, List<HearingSubChannel> subChannels) {
         HearingDaySchedule firstHearingDay = getHearingStartDay(hearing);
         return nonNull(firstHearingDay) && nonNull(firstHearingDay.getAttendees()) ? firstHearingDay.getAttendees().stream()
-                .filter(attendee -> nonNull(attendee.getHearingSubChannel()) && attendee.getHearingSubChannel().equals(subChannel)).toList()
+                .filter(attendee -> nonNull(attendee.getHearingSubChannel()) && subChannels.contains(attendee.getHearingSubChannel())).toList()
                 : new ArrayList<>();
     }
 
-    public static List<String> getHearingAttendeeNames(HearingGetResponse hearing, HearingSubChannel subChannel) {
-        return getAttendeesBySubChannel(hearing, subChannel).stream()
+    public static List<String> getHearingAttendeeNames(HearingGetResponse hearing, List<HearingSubChannel> subChannels) {
+        return getAttendeesBySubChannels(hearing, subChannels).stream()
                 .flatMap(attendee -> hearing.getPartyDetails().stream()
                         .filter(party -> party.getPartyID().equals(attendee.getPartyID()))
                         .filter(party -> party.getIndividualDetails() != null)
                         .map(party -> StringUtils.joinNonNull(" ", party.getIndividualDetails().getFirstName(),
                                 party.getIndividualDetails().getLastName()))
-                ).collect(Collectors.toList());
+                ).toList();
     }
 
     private static String concatenateNames(List<String> names) {
-        return nonNull(names) && names.size() > 0 ? org.apache.commons.lang.StringUtils.join(names, "\n") : null;
+        return nonNull(names) && !names.isEmpty() ? org.apache.commons.lang.StringUtils.join(names, "\n") : null;
     }
 
     public static String getInPersonAttendeeNames(HearingGetResponse hearing) {
-        return concatenateNames(getHearingAttendeeNames(hearing, INTER));
+        return concatenateNames(getHearingAttendeeNames(hearing, List.of(INTER)));
     }
 
     public static String getPhoneAttendeeNames(HearingGetResponse hearing) {
-        return concatenateNames(getHearingAttendeeNames(hearing, TELCVP));
+        return concatenateNames(getHearingAttendeeNames(hearing, List.of(TELCVP)));
     }
 
     public static String getVideoAttendeesNames(HearingGetResponse hearing) {
-        return concatenateNames(getHearingAttendeeNames(hearing, VIDCVP));
+        return concatenateNames(getHearingAttendeeNames(hearing, List.of(VIDCVP, HearingSubChannel.VID, HearingSubChannel.VIDTEAMS)));
     }
 
     public static String getHearingTypeTitleText(CaseData caseData, HearingGetResponse hearing, boolean isWelsh) {
@@ -416,7 +416,7 @@ public class HmcDataUtils {
         List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(bearerToken);
         var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
         if (!matchedLocations.isEmpty()) {
-            return matchedLocations.get(0);
+            return matchedLocations.getFirst();
         } else {
             throw new IllegalArgumentException("Hearing location data not available for hearing " + hearingId + " venueId " + venueId);
         }

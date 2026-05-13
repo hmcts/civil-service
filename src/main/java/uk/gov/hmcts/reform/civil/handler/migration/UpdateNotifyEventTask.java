@@ -32,8 +32,16 @@ public class UpdateNotifyEventTask extends MigrationTask<NotificationCaseReferen
             throw new IllegalArgumentException("CaseReference camundaProcessIdentifier must not be null");
         }
 
-        final Notifier notifier = notifierFactory.getNotifier(caseReference.getCamundaProcessIdentifier());
-        final String summary = notifier.notifyParties(caseData, NOTIFY_EVENT.toString(), caseReference.getCamundaProcessIdentifier());
+        final String camundaProcessIdentifier = caseReference.getCamundaProcessIdentifier();
+        final Notifier notifier = notifierFactory.getNotifier(camundaProcessIdentifier);
+
+        if (notifier == null) {
+            throw new IllegalStateException(
+                "No Notifier registered for camundaProcessIdentifier '" + camundaProcessIdentifier
+                    + "'. Check the migration CSV input against Notifier#getTaskId mappings.");
+        }
+
+        final String summary = notifier.notifyParties(caseData, NOTIFY_EVENT.toString(), camundaProcessIdentifier);
 
         caseData.setNotificationSummary(summary);
         return caseData;

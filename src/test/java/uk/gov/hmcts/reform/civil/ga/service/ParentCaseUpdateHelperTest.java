@@ -118,6 +118,42 @@ class ParentCaseUpdateHelperTest {
     }
 
     @Test
+    void updateParentApplicationVisibilityWithNewStateUsesGaReferenceWhenAddingRespondentVisibilityEntry() {
+        Long gaCaseId = 1778254115392178L;
+        Long parentCaseId = 1778503287806062L;
+        String gaCaseReference = gaCaseId.toString();
+        String parentCaseReference = parentCaseId.toString();
+        GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseData()
+            .ccdCaseReference(gaCaseId)
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(parentCaseReference));
+        GeneralApplicationsDetails masterApplication = new GeneralApplicationsDetails()
+            .setGeneralApplicationType("Summary judgment")
+            .setCaseLink(new CaseLink(gaCaseReference))
+            .setCaseState("pending");
+        GeneralApplicationCaseData parentCaseData = new GeneralApplicationCaseData()
+            .ccdCaseReference(parentCaseId)
+            .generalApplications(List.of())
+            .claimantGaAppDetails(Lists.newArrayList())
+            .respondentSolGaAppDetails(Lists.newArrayList())
+            .respondentSolTwoGaAppDetails(Lists.newArrayList())
+            .gaDetailsMasterCollection(Lists.newArrayList(element(masterApplication)));
+
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(parentCaseData);
+
+        parentCaseUpdateHelper.updateParentApplicationVisibilityWithNewState(gaCaseData, ORDER_MADE.toString());
+
+        verify(coreCaseDataService).caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
+        List<?> respondentDetails = capturedList("respondentSolGaAppDetails");
+        Element<?> respondentDetail = (Element<?>) respondentDetails.getFirst();
+        GADetailsRespondentSol respondentSolDetail = (GADetailsRespondentSol) respondentDetail.getValue();
+        assertThat(respondentDetails).hasSize(1);
+        assertThat(respondentSolDetail.getCaseLink().getCaseReference())
+            .isEqualTo(gaCaseReference)
+            .isNotEqualTo(parentCaseReference);
+    }
+
+    @Test
     void updateParentApplicationVisibilityWithNewStateWhenApplicationMissingFromMasterCollection() {
         GeneralApplicationCaseData caseData = getCaseWithApplicationData(false).copy()
             .gaDetailsMasterCollection(List.of())

@@ -347,8 +347,8 @@ def sonarExclusions = [
   "**/utils/**",
   "**/filters/**",
   "**/model/hearingvalues/**",
-  "**/config/AsyncHandlerConfiguration.java",
-  "**/config/HttpClientConfiguration.java",
+  "**/config/HttpClientFeignConfigurationTest.java",
+  "**/config/HttpClientRestConfiguration.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java",
@@ -483,7 +483,7 @@ dependencies {
   implementation "org.springframework.retry:spring-retry"
   implementation "com.github.hmcts.java-logging:logging:8.0.0"
   implementation "com.microsoft.azure:applicationinsights-web:3.7.8"
-  implementation "com.github.hmcts:befta-fw:9.2.6_CCD-7522"
+  implementation "com.github.hmcts:befta-fw:9.2.6"
   implementation "commons-lang:commons-lang:2.6"
   implementation "com.github.hmcts:core-case-data-store-client:5.2.0"
   implementation "com.github.hmcts:document-management-client:7.0.1"
@@ -521,7 +521,7 @@ dependencies {
   implementation "org.glassfish.jaxb:jaxb-runtime:4.0.7"
   implementation "javax.xml.bind:jaxb-api:2.3.1"
   implementation "com.launchdarkly:launchdarkly-java-server-sdk:6.3.0"
-  implementation "com.azure:azure-core:1.57.1"
+  implementation "com.azure:azure-core:1.58.0"
   implementation "com.azure:azure-messaging-servicebus:7.17.17"
   implementation "org.apache.pdfbox:pdfbox:${versions.pdfbox}"
   implementation "org.apache.pdfbox:pdfbox-io:${versions.pdfbox}"
@@ -529,6 +529,8 @@ dependencies {
   implementation 'org.apache.poi:poi:5.5.1'
   implementation 'org.apache.poi:poi-ooxml:5.5.1'
   implementation "org.apache.httpcomponents.client5:httpclient5:5.6.1"
+  implementation "net.javacrumbs.shedlock:shedlock-spring:7.7.0"
+  implementation "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.7.0"
 
   implementation('com.github.hmcts:fees-java-client:0.1.0') {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
@@ -551,9 +553,9 @@ dependencies {
 
   testImplementation "org.apache.pdfbox:pdfbox-io:${versions.pdfbox}"
   testImplementation("org.apache.pdfbox:preflight:${versions.pdfbox}", withoutJunit4)
-  testImplementation "org.mockito:mockito-core:4.11.0"
-  testImplementation "org.mockito:mockito-junit-jupiter:4.11.0"
-  testImplementation "org.mockito:mockito-inline:4.11.0"
+  testImplementation "org.mockito:mockito-core:5.23.0"
+  testImplementation "org.mockito:mockito-junit-jupiter:5.23.0"
+  testImplementation "org.mockito:mockito-inline:5.2.0"
   testImplementation "net.bytebuddy:byte-buddy:1.18.8"
   testImplementation "net.bytebuddy:byte-buddy-agent:1.18.8"
   testImplementation libraries.junit5
