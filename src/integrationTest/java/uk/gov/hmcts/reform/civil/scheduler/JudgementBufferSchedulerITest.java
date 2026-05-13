@@ -5,9 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -17,7 +16,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.judgementbuffer.JudgementBufferScheduler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
 
 import java.util.List;
 
@@ -27,10 +26,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
-@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
+@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=JudgementBufferSchedulerITest",
     "scheduler.judgementBuffer.enabled=true"
 })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class JudgementBufferSchedulerITest {
 
     private static final Long CASE_ID = 123L;
@@ -39,30 +39,17 @@ public class JudgementBufferSchedulerITest {
     private JudgementBufferScheduler scheduler;
 
     @MockBean
-    private IdamClient idamClient;
-
-    @MockBean
-    private CoreCaseDataApi coreCaseDataApi;
-
-    @MockBean
-    private AuthTokenGenerator authTokenGenerator;
-
-    @MockBean
     private TelemetryService telemetryService;
 
     @MockBean
     private FeatureToggleService featureToggleService;
 
+    @Autowired
     private CoreCaseDataApiMockHelper coreCaseDataApiMockHelper;
 
     @BeforeEach
     void setUp() {
         when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
-        coreCaseDataApiMockHelper = new CoreCaseDataApiMockHelper(
-            coreCaseDataApi,
-            idamClient,
-            authTokenGenerator
-        );
         coreCaseDataApiMockHelper.setupIdamClient();
     }
 
