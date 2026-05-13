@@ -181,7 +181,7 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
     private  List<Element<UploadEvidenceDocumentType>> documentCostsRes2;
     private  List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
     private  LocalDateTime caseDocumentUploadDateRes;
-    // Without prejudice / Part 36
+
     private List<Element<DocumentWithDescription>> documentPart36Rejection;
     private List<Element<DocumentWithDescription>> documentPart36RejectionApp2;
     private List<Element<DocumentWithDescription>> documentPart36RejectionRes;
