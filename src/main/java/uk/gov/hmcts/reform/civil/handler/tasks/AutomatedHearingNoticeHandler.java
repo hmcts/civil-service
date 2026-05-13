@@ -46,7 +46,6 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         log.info("Found [{}] unnotified hearings, {}", unnotifiedHearings.getTotalFound(), unnotifiedHearings.getHearingIds());
 
         long effectiveDelay = calculateEffectiveDelay(unnotifiedHearings.getTotalFound(), asyncHandlerProperties.getLockDuration(), asyncHandlerProperties.getEventDispatchDelay());
-        log.debug("Effective delay is: {}ms", effectiveDelay);
 
         unnotifiedHearings.getHearingIds()
             .stream()
@@ -73,6 +72,8 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
 
+        log.info("Trying to complete external task '{}' with processInstanceId '{}'",
+                 topicName, processInstanceId);
         try {
             externalTaskService.complete(externalTask, getVariableMap(data));
 
