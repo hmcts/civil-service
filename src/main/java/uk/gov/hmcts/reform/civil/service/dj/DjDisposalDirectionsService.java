@@ -27,12 +27,11 @@ public class DjDisposalDirectionsService {
         caseDataBuilder.disposalHearingFinalDisposalHearingDJ(disposalNarrativeService.buildFinalDisposalHearing());
         caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(
             disposalNarrativeService.buildFinalDisposalHearingTime());
-        caseDataBuilder.disposalHearingBundleDJ(disposalNarrativeService.buildBundle());
         caseDataBuilder.disposalHearingNotesDJ(disposalNarrativeService.buildNotes());
 
         // copy of disposalHearingNotesDJ field to update order made without hearing field without breaking
         // existing cases
-        LocalDate orderDeadline = deadlineService.workingDaysFromNow(5);
+        LocalDate orderDeadline = deadlineService.nextWorkingDayInDays(7);
         caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(
             new DisposalHearingOrderMadeWithoutHearingDJ()
                 .setInput(welshLanguageService.buildOrderMadeWithoutHearingText(orderDeadline)));
