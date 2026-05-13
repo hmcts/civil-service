@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
@@ -66,9 +65,6 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private LocationRefData hearingLocation;
     private LocationRefData caseManagementLocation;
 
-    private DisposalHearingBundle disposalHearingBundle;
-    private String disposalHearingBundleTypeText;
-
     private boolean hasNewDirections;
     private List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
 
@@ -82,7 +78,6 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private boolean disposalHearingSchedulesOfLossToggle;
     private boolean disposalHearingFinalDisposalHearingToggle;
     private boolean disposalHearingMethodToggle;
-    private boolean disposalHearingBundleToggle;
     private boolean disposalHearingClaimSettlingToggle;
     private boolean disposalHearingCostsToggle;
     private boolean writtenByJudge;
