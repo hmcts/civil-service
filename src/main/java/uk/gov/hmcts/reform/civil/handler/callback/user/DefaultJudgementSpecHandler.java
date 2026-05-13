@@ -74,6 +74,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         + "The claim will now progress offline (on paper)";
     public static final String JUDGMENT_REQUESTED_LIP_CASE = "A request for default judgement has been sent to the court for review." +
         "<br>The claim will now progress offline (on paper)";
+    public static final String JUDGMENT_BUFFER_REQUESTED_LIP_CASE = "%n%n A CCJ has been requested. You will be notified when this is confirmed.";
     public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
         + " breathing space";
     public static final String PARTIAL_PAYMENT_OFFLINE = "This feature is currently not available, please see guidance below";
@@ -142,7 +143,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private String getBody(CaseData caseData) {
         if (isJudgementBufferEnabledForCase(caseData)
             && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
-            return format(JUDGMENT_REQUESTED_LIP_CASE);
+            return format(JUDGMENT_BUFFER_REQUESTED_LIP_CASE);
         } else if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             return format(JUDGMENT_GRANTED, format(
                 CASES_CASE_DETAILS_CLAIM_DOCUMENTS,
