@@ -37,6 +37,7 @@ public class SdoDocumentFormDisposal implements MappableObject {
 
     private LocalDate currentDate;
     private String caseNumber;
+    private String ccdCaseReference;
     private String judgeName;
     private JudgementSum drawDirectionsOrder;
     private YesOrNo drawDirectionsOrderRequired;

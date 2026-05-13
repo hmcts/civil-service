@@ -34,6 +34,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DefaultJudgmentSDOOrderForm templateData = getDefaultJudgmentForms(caseData, authorisation);
+        templateData.setCcdCaseReference(caseData.getCcdCaseReference().toString());
         DocmosisTemplates docmosisTemplate = caseData.getCaseManagementOrderSelection().equals(DISPOSAL_HEARING)
             ? getDocmosisTemplate()
             : getDocmosisTemplateTrial();

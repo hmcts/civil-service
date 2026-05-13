@@ -61,5 +61,6 @@ class SdoDisposalTemplateServiceTest {
         assertThat(result.getDisposalHearingTimeEstimate()).isEqualTo("2 hours 30 minutes");
         assertThat(result.getHearingLocation()).isEqualTo(location);
         assertThat(result.isHasDisposalWelshToggle()).isFalse();
+        assertThat(result.getCcdCaseReference()).isEqualTo("1594901956117591");
     }
 }
