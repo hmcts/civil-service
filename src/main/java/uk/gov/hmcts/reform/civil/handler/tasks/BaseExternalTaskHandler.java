@@ -190,6 +190,27 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
         return null;
     }
 
+    protected long calculateEffectiveDelay(long totalFound, long lock, long delay) {
+        if (totalFound <= 25) {
+            // skip for small batches
+            return 0;
+        }
+        long maxExecutionTimeMs = (long) (lock * 0.8);
+        long maxDelay = maxExecutionTimeMs / totalFound;
+        return Math.min(maxDelay, delay);
+    }
+
+    protected void throttle(long delay) {
+        if (delay == 0) {
+            return;
+        }
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     /**
      * Executed for each fetched and locked task.
      *
