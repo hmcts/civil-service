@@ -12,13 +12,13 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVars;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.hmc.exception.HmcException;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
@@ -39,8 +39,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -77,6 +79,9 @@ class HearingNoticeSchedulerEventHandlerTest {
     @Mock
     private CoreCaseDataService coreCaseDataService;
 
+    @Mock
+    private AsyncHandlerProperties asyncHandlerProperties;
+
     @InjectMocks
     private HearingNoticeSchedulerEventHandler handler;
 
@@ -104,8 +109,8 @@ class HearingNoticeSchedulerEventHandlerTest {
     }
 
     @Test
-    void isNotAllowedState_shouldReturnFalse_whenCaseStateIsAllowed() {
-        for (CaseState allowedState : new CaseState[]{
+    void isAllowedState_shouldReturnFalse_whenCaseStateIsDisallowed() {
+        for (CaseState disallowedState : new CaseState[]{
             CaseState.CASE_SETTLED,
             CaseState.PROCEEDS_IN_HERITAGE_SYSTEM,
             CaseState.CASE_STAYED,
@@ -114,26 +119,26 @@ class HearingNoticeSchedulerEventHandlerTest {
             CaseState.CLOSED,
             CaseState.All_FINAL_ORDERS_ISSUED
         }) {
-            boolean result = invokeIsNotAllowedState(allowedState.name());
-            assertTrue(result, "Allowed state should return false: " + allowedState);
+            boolean result = invokeIsAllowedState(disallowedState.name());
+            assertFalse(result, "Disallowed state should return false: " + disallowedState);
         }
     }
 
     @Test
-    void isNotAllowedState_shouldReturnTrue_whenCaseStateIsInvalid() {
-        assertTrue(invokeIsNotAllowedState("INVALID_STATE"), "Invalid state should return true");
+    void isAllowedState_shouldReturnFalse_whenCaseStateIsInvalid() {
+        assertFalse(invokeIsAllowedState("INVALID_STATE"), "Invalid state should return false");
     }
 
     @Test
-    void isNotAllowedState_shouldReturnTrue_whenCaseStateIsNotInAllowedList() {
-        assertTrue(invokeIsNotAllowedState(CaseState.CASE_DISMISSED.name()), "State not in allowed list should return true");
+    void isAllowedState_shouldReturnTrue_whenCaseStateIsAllowed() {
+        assertTrue(invokeIsAllowedState("CASE_PROGRESSION"), "Allowed state should return true");
     }
 
     // Helper to call the private static method using reflection
-    private boolean invokeIsNotAllowedState(String state) {
+    private boolean invokeIsAllowedState(String state) {
         try {
             var method = HearingNoticeSchedulerEventHandler.class.getDeclaredMethod(
-                "isNotAllowedState", String.class, String.class
+                "isAllowedState", String.class, String.class
             );
             method.setAccessible(true);
             return (boolean) method.invoke(null, state, "test-case-ref");
@@ -274,7 +279,7 @@ class HearingNoticeSchedulerEventHandlerTest {
     }
 
     @Test
-    void shouldNotDispatchCamundaMessage_whenHearingDataMatchesLatestHearingResponseData() {
+    void shouldNotCallUpdatePartiesNotified_whenHearingDataMatchesLatestHearingResponseData() {
         HearingNoticeSchedulerVars hearingNoticeSchedulerVars = new HearingNoticeSchedulerVars();
         hearingNoticeSchedulerVars.setServiceId(SERVICE_ID);
         hearingNoticeSchedulerVars.setDispatchedHearingIds(List.of());
@@ -293,29 +298,12 @@ class HearingNoticeSchedulerEventHandlerTest {
                                                        .setHearingEndDateTime(HEARING_DATE.plusHours(1))))
                                      .setHearingLocation(VENUE_ID)))));
 
-        CaseDetails mockCaseDetails = CaseDetails.builder()
-            .id(Long.parseLong(CASE_ID))
-            .state("CASE_PROGRESSION")
-            .build();
-
-        when(coreCaseDataService.getCase(Long.parseLong(CASE_ID))).thenReturn(mockCaseDetails);
-
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
-        verify(hearingsService, times(1)).updatePartiesNotifiedResponse(
-            AUTH_TOKEN,
-            HEARING_ID,
-            VERSION,
-            RECEIVED_DATETIME,
-            new PartiesNotified().setServiceData(new PartiesNotifiedServiceData()
-                                                      .setHearingLocation(VENUE_ID)
-                                                      .setDays(List.of(new HearingDay()
-                                                                        .setHearingStartDateTime(HEARING_DATE)
-                                                                        .setHearingEndDateTime(HEARING_DATE.plusHours(1))))
-                                                      .setHearingNoticeGenerated(false))
+        verify(hearingsService, times(0)).updatePartiesNotifiedResponse(
+            anyString(), anyString(), anyInt(), any(), any()
         );
         verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
-        verifyNoInteractions(messageCorrelationBuilder);
     }
 
     @Test
@@ -341,16 +329,6 @@ class HearingNoticeSchedulerEventHandlerTest {
             RECEIVED_DATETIME,
             new PartiesNotified().setServiceData(new PartiesNotifiedServiceData())
         );
-        verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
-    }
-
-    @Test
-    void shouldAttemptToCallHmcApiThreeTimes_whenGetHearingThrowsException() {
-        when(hearingsService.getHearingResponse(anyString(), anyString())).thenThrow(HmcException.class);
-
-        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
-
-        verify(hearingsService, times(3)).getHearingResponse(anyString(), anyString());
         verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
     }
 

@@ -4,13 +4,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 
-import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -34,24 +31,6 @@ public class SdoFastTrackTemplateFieldService {
     public String getMethodVideoConferenceHearingLabel(CaseData caseData) {
         FastTrackMethodVideoConferenceHearing hearing = caseData.getFastTrackMethodVideoConferenceHearing();
         return hearing != null ? hearing.getLabel() : "";
-    }
-
-    public String getTrialBundleTypeText(CaseData caseData) {
-        FastTrackTrial trial = caseData.getFastTrackTrial();
-        if (trial == null || trial.getType() == null || trial.getType().isEmpty()) {
-            return "";
-        }
-
-        List<FastTrackTrialBundleType> types = trial.getType();
-        if (types.size() == 3) {
-            return FastTrackTrialBundleType.DOCUMENTS.getLabel()
-                + " / " + FastTrackTrialBundleType.ELECTRONIC.getLabel()
-                + " / " + FastTrackTrialBundleType.SUMMARY.getLabel();
-        }
-        if (types.size() == 2) {
-            return types.get(0).getLabel() + " / " + types.get(1).getLabel();
-        }
-        return types.get(0).getLabel();
     }
 
     public String getHearingTimeLabel(CaseData caseData) {
