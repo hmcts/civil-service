@@ -63,5 +63,6 @@ class SdoSmallClaimsTemplateServiceTest {
         assertThat(result.getSmallClaimsHearingTime()).isEqualTo("2 hours");
         assertThat(result.getHearingLocation()).isEqualTo(location);
         assertThat(result.isSmallClaimsWelshLanguageToggle()).isTrue();
+        assertThat(result.getCcdCaseReference()).isEqualTo("1594901956117591");
     }
 }
