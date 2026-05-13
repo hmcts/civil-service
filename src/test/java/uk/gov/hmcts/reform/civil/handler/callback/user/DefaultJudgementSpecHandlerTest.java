@@ -1970,7 +1970,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                       .confirmationHeader(JUDGMENT_REQUESTED_HEADER)
-                                                                      .confirmationBody(JUDGMENT_BUFFER_REQUESTED_LIP_CASE)
+                                                                      .confirmationBody(String.format(JUDGMENT_BUFFER_REQUESTED_LIP_CASE))
                                                                       .build());
     }
 
@@ -1989,7 +1989,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                       .confirmationHeader(JUDGMENT_REQUESTED_HEADER)
-                                                                      .confirmationBody(JUDGMENT_BUFFER_REQUESTED_LIP_CASE)
+                                                                      .confirmationBody(String.format(JUDGMENT_BUFFER_REQUESTED_LIP_CASE))
                                                                       .build());
     }
 }
