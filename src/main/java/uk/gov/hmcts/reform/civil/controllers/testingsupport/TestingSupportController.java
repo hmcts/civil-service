@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.scheduler.common.CivilSchedulerRepository;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -100,6 +101,7 @@ public class TestingSupportController {
     private final OrganisationService organisationService;
     private final CoreCaseUserService coreCaseUserService;
     private final GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
+    private final CivilSchedulerRepository civilSchedulerRepository;
 
     private static final String SUCCESS = "success";
     private static final String FAILED = "failed";
@@ -124,6 +126,21 @@ public class TestingSupportController {
         boolean featureEnabled = featureToggleService.isFeatureEnabled(toggle);
         FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
         return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
+    }
+
+    @GetMapping("/testing-support/run-scheduler/{schedulerName}")
+    public ResponseEntity<String> runScheduler(@PathVariable("schedulerName") String schedulerName) {
+        log.info("Testing support endpoint triggered for scheduler: {}", schedulerName);
+        if (civilSchedulerRepository.runScheduler(schedulerName)) {
+            return new ResponseEntity<>(SUCCESS, HttpStatus.ACCEPTED);
+        }
+        log.warn("Testing support endpoint failed: scheduler {} not found", schedulerName);
+        return new ResponseEntity<>("Scheduler not found", HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/testing-support/schedulers")
+    public ResponseEntity<List<String>> getSchedulers() {
+        return new ResponseEntity<>(civilSchedulerRepository.getSchedulerNames(), HttpStatus.OK);
     }
 
     @SuppressWarnings("ClassEscapesDefinedScope")

@@ -57,7 +57,7 @@ public class DefendantResponseDeadlineSchedulerITest {
         when(coreCaseDataService.searchCases(any(Query.class))).thenReturn(searchResult);
 
         // When
-        scheduler.deadlineCheck();
+        scheduler.runScheduledTask();
 
         // Then
         verify(coreCaseDataService, atLeastOnce()).searchCases(any(Query.class));
