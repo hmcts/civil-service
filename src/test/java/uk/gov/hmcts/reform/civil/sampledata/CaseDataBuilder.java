@@ -3443,6 +3443,8 @@ public class CaseDataBuilder {
         respondent2OrgRegistered = null;
         respondent2Represented = null;
         addRespondent2 = null;
+        paymentTypeSelection = DJPaymentTypeSelection.IMMEDIATELY;
+        totalClaimAmount = BigDecimal.valueOf(1010);
         return this;
     }
 
