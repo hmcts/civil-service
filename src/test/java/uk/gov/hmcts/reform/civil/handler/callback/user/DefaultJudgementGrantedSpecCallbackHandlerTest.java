@@ -29,13 +29,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-class IssueDefaultJudgementSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
+class DefaultJudgementGrantedSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Spy
     private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
     @InjectMocks
-    private IssueDefaultJudgementSpecCallbackHandler handler;
+    private DefaultJudgementGrantedSpecCallbackHandler handler;
 
     @Nested
     class AboutToSubmitCallback {

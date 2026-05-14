@@ -21,7 +21,6 @@ public class JudgementBufferScheduledTask implements ScheduledTask {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
-    private final JudgementEligibilityChecker judgementEligibilityChecker;
 
     @Override
     public void accept(CaseDetails caseDetails) {
@@ -30,21 +29,17 @@ public class JudgementBufferScheduledTask implements ScheduledTask {
 
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
             String.valueOf(caseId),
-            CaseEvent.ISSUE_DEFAULT_JUDGEMENT_SPEC
+            CaseEvent.DEFAULT_JUDGEMENT_GRANTED_SPEC
         );
 
         CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
 
-        if (judgementEligibilityChecker.isEligibleForJudgement(caseData)) {
-            CaseDataContent caseDataContent = coreCaseDataService.caseDataContentFromStartEventResponse(
-                startEventResponse,
-                caseData.toMap(objectMapper)
-            );
-            caseDataContent.getEvent().setSummary("Issue Judgement");
-            caseDataContent.getEvent().setDescription("Issue Judgement after Judgement Buffer");
-            coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
-        } else {
-            log.info("JudgementBufferScheduledTask::accept case {} is not eligible for Issue Default Judgement Spec", caseId);
-        }
+        CaseDataContent caseDataContent = coreCaseDataService.caseDataContentFromStartEventResponse(
+            startEventResponse,
+            caseData.toMap(objectMapper)
+        );
+        caseDataContent.getEvent().setSummary("Issue Judgement");
+        caseDataContent.getEvent().setDescription("Issue Judgement after Judgement Buffer");
+        coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
     }
 }
