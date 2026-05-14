@@ -20,6 +20,6 @@ public abstract class AllowedEventScenario {
 
     public Set<CaseEvent> loadBaseEvents(String state) {
         // Default: reuse existing unspec map; spec scenarios should override
-        return new HashSet<>(repo.getAllowedEvents(scenarioFile(), state));
+        return new HashSet<>(repo.getFlowStateAllowedEvents(scenarioFile(), state));
     }
 }
