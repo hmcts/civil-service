@@ -72,6 +72,7 @@ public class TrialReadyFormGenerator {
 
     private TrialReadyForm getTemplateData(CaseData caseData, String camundaActivity) {
         var trialReadyForm = new TrialReadyForm()
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setCaseNumber(caseData.getLegacyCaseReference())
             .setDate(formatLocalDate(LocalDate.now(), DATE))
             .setClaimant1(caseData.getApplicant1().getPartyName())
