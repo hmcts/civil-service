@@ -18,9 +18,11 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.UnavailabilityRangeModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -346,6 +348,7 @@ public class HearingsPartyMapper {
         return partyDetails;
     }
 
+    @SuppressWarnings("java:S1168")
     private static List<UnavailabilityRangeModel> getUnavailabilityRanges(List<Element<UnavailableDate>> unavailableDates) {
         if (unavailableDates == null) {
             return null;
@@ -356,17 +359,25 @@ public class HearingsPartyMapper {
     }
 
     private static UnavailabilityRangeModel mapUnAvailableDateToRange(UnavailableDate date) {
-        String unavailableFrom = SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
-            .format(DateTimeFormatter.ofPattern(DATE_STRING)) : date.getFromDate()
-            .format(DateTimeFormatter.ofPattern(DATE_STRING));
-        String unavailableTo = SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
-            .format(DateTimeFormatter.ofPattern(DATE_STRING)) : date.getToDate()
-            .format(DateTimeFormatter.ofPattern(DATE_STRING));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_STRING);
+
+        LocalDate fromDate = SINGLE_DATE.equals(date.getUnavailableDateType())
+            ? date.getDate() : Optional.ofNullable(date.getFromDate()).orElse(date.getDate());
+
+        LocalDate toDate = SINGLE_DATE.equals(date.getUnavailableDateType())
+            ? date.getDate() : Optional.ofNullable(date.getToDate()).orElse(date.getDate());
 
         UnavailabilityRangeModel unavailabilityRangeModel = new UnavailabilityRangeModel();
         unavailabilityRangeModel.setUnavailabilityType(ALL_DAY);
-        unavailabilityRangeModel.setUnavailableFromDate(unavailableFrom);
-        unavailabilityRangeModel.setUnavailableToDate(unavailableTo);
+        unavailabilityRangeModel.setUnavailableFromDate(
+            Optional.ofNullable(fromDate)
+                .map(d -> d.format(formatter))
+                .orElse(null));
+        unavailabilityRangeModel.setUnavailableToDate(
+            Optional.ofNullable(toDate)
+                .map(d -> d.format(formatter))
+                .orElse(null));
         return unavailabilityRangeModel;
     }
+
 }
