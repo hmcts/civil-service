@@ -175,13 +175,14 @@ class CoverLetterServiceTest {
     @Test
     void shouldBuildTemplateDataCorrectly() {
         CaseData caseData = CaseData.builder()
-            .legacyCaseReference("001MC001").build();
+            .legacyCaseReference("001MC001").ccdCaseReference(1234L).build();
         Party party = new PartyBuilder().individual().build();
 
         JudgementCoverLetter result = coverLetterService.buildTemplateData(party, null, caseData);
 
         assertThat(result).isEqualTo(
             new JudgementCoverLetter()
+                .setCcdCaseReference(caseData.getCcdCaseReference().toString())
                 .setClaimNumber(caseData.getLegacyCaseReference())
                 .setPartyName(party.getPartyName())
                 .setAddress(party.getPrimaryAddress()));
