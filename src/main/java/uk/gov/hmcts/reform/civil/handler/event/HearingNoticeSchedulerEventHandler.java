@@ -104,9 +104,8 @@ public class HearingNoticeSchedulerEventHandler {
         LocalDateTime hmcReceivedDateTime = hearing.getHearingResponse().getReceivedDateTime();
         if (partiesNotified != null
             && partiesNotified.getResponseReceivedDateTime() != null
-            && !partiesNotified.getResponseReceivedDateTime().isBefore(hmcReceivedDateTime)
-            && !HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
-            log.debug("Skipping partiesNotified PUT for hearing [{}] — already notified with current data", hearingId);
+            && !partiesNotified.getResponseReceivedDateTime().isBefore(hmcReceivedDateTime)) {
+            log.debug("Skipping partiesNotified PUT for hearing [{}] — already notified for this version", hearingId);
             return;
         }
 
