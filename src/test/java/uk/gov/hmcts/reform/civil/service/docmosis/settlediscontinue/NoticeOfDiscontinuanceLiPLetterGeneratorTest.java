@@ -56,7 +56,7 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
         verify(bulkPrintService).printLetter(
             LETTER_CONTENT,
             caseData.getLegacyCaseReference(),
-            caseData.getLegacyCaseReference(),
+            caseData.getCcdCaseReference().toString(),
             NOTICE_OF_DISCONTINUANCE_LETTER,
             List.of(party.getPartyName()),
             List.of(caseDocument.getDocumentLink().getDocumentFileName())
@@ -69,6 +69,7 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
         Party respondent1 = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
+            .ccdCaseReference(1L)
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                          .setRespondent1ResponseLanguage("ENGLISH")))
@@ -96,6 +97,7 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
         Party respondent1 = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
+            .ccdCaseReference(1L)
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                          .setRespondent1ResponseLanguage("ENGLISH")))
@@ -123,6 +125,7 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
         Party respondent1 = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
+            .ccdCaseReference(1L)
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                          .setRespondent1ResponseLanguage("ENGLISH")))
