@@ -26,15 +26,15 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ISSUE_DEFAULT_JUDGEMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_GRANTED_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class IssueDefaultJudgementSpecCallbackHandler extends CallbackHandler {
+public class DefaultJudgementGrantedSpecCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(ISSUE_DEFAULT_JUDGEMENT_SPEC);
+    private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_GRANTED_SPEC);
     private static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
     private static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
         + "%n%n The defendant will be served with the Default Judgment.";
