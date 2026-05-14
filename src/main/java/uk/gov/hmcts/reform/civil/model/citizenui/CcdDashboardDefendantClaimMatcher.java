@@ -106,7 +106,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         if (isCasedDiscontinued() || isPaperResponse()) {
             return false;
         }
-        return (CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())
+        return (isAwaitingRespondentAcknowledgementOrJudgmentRequested()
             && caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() == null
@@ -333,6 +333,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         return (
             caseData.isCcjRequestJudgmentByAdmission()
             && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState()))
+            || isPendingDefaultJudgment()
             || caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
