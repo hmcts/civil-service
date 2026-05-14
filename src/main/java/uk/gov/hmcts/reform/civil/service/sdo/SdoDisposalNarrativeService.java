@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
@@ -19,9 +18,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_JUDGES_RECITAL_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_UPLOAD_SDO;
@@ -52,9 +49,7 @@ public class SdoDisposalNarrativeService {
     public void applyDisclosureOfDocuments(CaseData caseData) {
         caseData.setDisposalHearingDisclosureOfDocuments(new DisposalHearingDisclosureOfDocuments()
                                                              .setInput1(DISPOSAL_DOCUMENTS_EXCHANGE)
-                                                             .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
-                                                             .setInput2(DISPOSAL_DOCUMENTS_UPLOAD)
-                                                             .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(10)));
+                                                             .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4)));
     }
 
     public void applyWitnessOfFact(CaseData caseData) {
@@ -63,7 +58,7 @@ public class SdoDisposalNarrativeService {
                                                             .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
                                                             .setInput4(DISPOSAL_WITNESS_CPR32_6)
                                                             .setInput5(DISPOSAL_WITNESS_CPR32_7_DEADLINE)
-                                                            .setDate3(sdoDeadlineService.nextWorkingDayFromNowWeeks(6))
+                                                            .setDate3(sdoDeadlineService.nextWorkingDayFromNowWeeks(9))
                                                             .setInput6(DISPOSAL_WITNESS_TRIAL_NOTE_SDO));
     }
 
@@ -81,22 +76,23 @@ public class SdoDisposalNarrativeService {
     public void applySchedulesOfLoss(CaseData caseData) {
         caseData.setDisposalHearingSchedulesOfLoss(new DisposalHearingSchedulesOfLoss()
                                                               .setInput2(DISPOSAL_SCHEDULE_CLAIMANT_UPLOAD_SDO)
-                                                              .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
+                                                              .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(8))
                                                               .setInput3(DISPOSAL_SCHEDULE_COUNTER_SEND)
-                                                              .setDate3(sdoDeadlineService.nextWorkingDayFromNowWeeks(12))
+                                                              .setDate3(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
                                                               .setInput4(DISPOSAL_SCHEDULE_COUNTER_UPLOAD_SDO)
-                                                              .setDate4(sdoDeadlineService.nextWorkingDayFromNowWeeks(12)));
+                                                              .setDate4(sdoDeadlineService.nextWorkingDayFromNowWeeks(10)));
     }
 
     public void applyFinalDisposalHearing(CaseData caseData) {
         caseData.setDisposalHearingFinalDisposalHearing(new DisposalHearingFinalDisposalHearing()
                                                                        .setInput(DISPOSAL_FINAL_HEARING_LISTING_SDO)
-                                                                       .setDate(LocalDate.now().plusWeeks(16)));
+                                                                       .setDate(LocalDate.now().plusWeeks(12)));
     }
 
     public void applyHearingTime(CaseData caseData) {
         caseData.setDisposalHearingHearingTime(new DisposalHearingHearingTime()
                                                        .setInput(DISPOSAL_FINAL_HEARING_LISTING_SDO)
+                                                       .setDateFrom(LocalDate.now().plusWeeks(12))
                                                        .setDateTo(LocalDate.now().plusWeeks(16)));
     }
 
@@ -107,11 +103,6 @@ public class SdoDisposalNarrativeService {
                                                               ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE,
                                                               sdoDeadlineService.workingDaysFromNow(5).format(DEADLINE_FORMATTER)
                                                           )));
-    }
-
-    public void applyBundle(CaseData caseData) {
-        caseData.setDisposalHearingBundle(new DisposalHearingBundle()
-                                                .setInput(DISPOSAL_BUNDLE_REQUIREMENT));
     }
 
     public void applyNotes(CaseData caseData) {

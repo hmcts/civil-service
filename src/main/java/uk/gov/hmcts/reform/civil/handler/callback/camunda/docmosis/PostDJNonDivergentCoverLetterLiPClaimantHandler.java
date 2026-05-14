@@ -74,7 +74,7 @@ public class PostDJNonDivergentCoverLetterLiPClaimantHandler extends CallbackHan
             List<String> recipients = List.of(caseData.getApplicant1().getPartyName());
             bulkPrintService.printLetter(
                 claimantDjLetterBinary, caseData.getLegacyCaseReference(),
-                caseData.getLegacyCaseReference(), COVER_LETTER_REF, recipients, bulkPrintFileNames
+                caseData.getCcdCaseReference().toString(), COVER_LETTER_REF, recipients, bulkPrintFileNames
             );
         }
 
