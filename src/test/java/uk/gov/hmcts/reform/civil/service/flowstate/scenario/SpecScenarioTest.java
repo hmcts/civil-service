@@ -18,11 +18,11 @@ class SpecScenarioTest {
         AllowedEventRepository repo = mock(AllowedEventRepository.class);
         var scenario = new SpecScenario(repo);
 
-        when(repo.getAllowedEvents("allowed-spec-events.yml", "MAIN.DRAFT"))
+        when(repo.getFlowStateAllowedEvents("allowed-spec-events.yml", "MAIN.DRAFT"))
             .thenReturn(Set.of(CREATE_CLAIM_SPEC));
 
         assertThat(scenario.loadBaseEvents("MAIN.DRAFT"))
             .contains(CREATE_CLAIM_SPEC);
-        verify(repo).getAllowedEvents("allowed-spec-events.yml", "MAIN.DRAFT");
+        verify(repo).getFlowStateAllowedEvents("allowed-spec-events.yml", "MAIN.DRAFT");
     }
 }
