@@ -5,7 +5,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
-import uk.gov.hmcts.reform.civil.scheduler.CoreCaseDataApiMockHelper;
+import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 @TestConfiguration
