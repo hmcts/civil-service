@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ISSUE_DEFAULT_JUDGEMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_GRANTED_SPEC;
 
 public class CoreCaseDataApiMockHelper {
 
@@ -56,7 +56,7 @@ public class CoreCaseDataApiMockHelper {
             JURISDICTION,
             CASE_TYPE,
             caseIdString,
-            ISSUE_DEFAULT_JUDGEMENT_SPEC.name()
+            DEFAULT_JUDGEMENT_GRANTED_SPEC.name()
         )).thenReturn(startEventResponse);
     }
 

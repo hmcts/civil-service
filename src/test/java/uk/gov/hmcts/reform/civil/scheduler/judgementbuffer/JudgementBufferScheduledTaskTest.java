@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,14 +31,12 @@ class JudgementBufferScheduledTaskTest {
     private CaseDetailsConverter caseDetailsConverter;
     @Mock
     private ObjectMapper objectMapper;
-    @Mock
-    private JudgementEligibilityChecker judgementEligibilityChecker;
 
     @InjectMocks
     private JudgementBufferScheduledTask task;
 
     @Test
-    void shouldTriggerUpdateWhenCaseIsEligibleForJudgement() {
+    void shouldTriggerUpdateWhenCaseIsEligibleForDefaultJudgement() {
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
         StartEventResponse startEventResponse = StartEventResponse.builder()
             .caseDetails(caseDetails)
@@ -53,75 +50,12 @@ class JudgementBufferScheduledTaskTest {
             .event(Event.builder().build())
             .build();
 
-        when(coreCaseDataService.startUpdate("1", CaseEvent.ISSUE_DEFAULT_JUDGEMENT_SPEC)).thenReturn(startEventResponse);
+        when(coreCaseDataService.startUpdate("1", CaseEvent.DEFAULT_JUDGEMENT_GRANTED_SPEC)).thenReturn(startEventResponse);
         when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
-        when(judgementEligibilityChecker.isEligibleForJudgement(caseData)).thenReturn(true);
         when(coreCaseDataService.caseDataContentFromStartEventResponse(eq(startEventResponse), any())).thenReturn(caseDataContent);
 
         task.accept(caseDetails);
 
         verify(coreCaseDataService).submitUpdate("1", caseDataContent);
-    }
-
-    @Test
-    void shouldNotTriggerUpdateWhenDefenceSubmitted() {
-        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
-        StartEventResponse startEventResponse = StartEventResponse.builder()
-            .caseDetails(caseDetails)
-            .build();
-
-        CaseData caseData = CaseData.builder()
-            .respondent1ResponseDate(LocalDateTime.now())
-            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
-            .build();
-
-        when(coreCaseDataService.startUpdate("1", CaseEvent.ISSUE_DEFAULT_JUDGEMENT_SPEC)).thenReturn(startEventResponse);
-        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
-        when(judgementEligibilityChecker.isEligibleForJudgement(caseData)).thenReturn(false);
-
-        task.accept(caseDetails);
-
-        verify(coreCaseDataService, never()).submitUpdate(eq("1"), any());
-    }
-
-    @Test
-    void shouldNotTriggerUpdateWhenCaseOffline() {
-        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
-        StartEventResponse startEventResponse = StartEventResponse.builder()
-            .caseDetails(caseDetails)
-            .build();
-
-        CaseData caseData = CaseData.builder()
-            .takenOfflineDate(LocalDateTime.now())
-            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
-            .build();
-
-        when(coreCaseDataService.startUpdate("1", CaseEvent.ISSUE_DEFAULT_JUDGEMENT_SPEC)).thenReturn(startEventResponse);
-        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
-        when(judgementEligibilityChecker.isEligibleForJudgement(caseData)).thenReturn(false);
-
-        task.accept(caseDetails);
-
-        verify(coreCaseDataService, never()).submitUpdate(eq("1"), any());
-    }
-
-    @Test
-    void shouldNotTriggerUpdateWhenDeadlineInFuture() {
-        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
-        StartEventResponse startEventResponse = StartEventResponse.builder()
-            .caseDetails(caseDetails)
-            .build();
-
-        CaseData caseData = CaseData.builder()
-            .respondent1ResponseDeadline(LocalDateTime.now().plusDays(1))
-            .build();
-
-        when(coreCaseDataService.startUpdate("1", CaseEvent.ISSUE_DEFAULT_JUDGEMENT_SPEC)).thenReturn(startEventResponse);
-        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
-        when(judgementEligibilityChecker.isEligibleForJudgement(caseData)).thenReturn(false);
-
-        task.accept(caseDetails);
-
-        verify(coreCaseDataService, never()).submitUpdate(eq("1"), any());
     }
 }
