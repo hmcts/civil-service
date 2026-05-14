@@ -18,11 +18,11 @@ class UnspecScenarioTest {
         AllowedEventRepository repo = mock(AllowedEventRepository.class);
         var scenario = new UnspecScenario(repo);
 
-        when(repo.getAllowedEvents("allowed-unspec-events.yml", "MAIN.DRAFT"))
+        when(repo.getFlowStateAllowedEvents("allowed-unspec-events.yml", "MAIN.DRAFT"))
             .thenReturn(Set.of(CaseEvent.CREATE_CLAIM));
 
         assertThat(scenario.loadBaseEvents("MAIN.DRAFT"))
             .contains(CaseEvent.CREATE_CLAIM);
-        verify(repo).getAllowedEvents("allowed-unspec-events.yml", "MAIN.DRAFT");
+        verify(repo).getFlowStateAllowedEvents("allowed-unspec-events.yml", "MAIN.DRAFT");
     }
 }
