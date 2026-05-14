@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.scheduler;
+package uk.gov.hmcts.test.helper;
 
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
