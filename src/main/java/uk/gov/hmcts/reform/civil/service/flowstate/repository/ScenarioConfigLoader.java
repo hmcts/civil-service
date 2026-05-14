@@ -31,6 +31,7 @@ public class ScenarioConfigLoader implements AllowedEventRepository {
     private final ObjectMapper yaml = new ObjectMapper(new YAMLFactory());
 
     private final Map<String, Map<String, Set<CaseEvent>>> cache = new ConcurrentHashMap<>();
+    private final Map<String, Set<CaseEvent>> eventSetCache = new ConcurrentHashMap<>();
 
     private volatile Set<CaseEvent> whitelist;
 
@@ -49,9 +50,14 @@ public class ScenarioConfigLoader implements AllowedEventRepository {
     }
 
     @Override
-    public Set<CaseEvent> getAllowedEvents(String scenarioFile, String stateFullName) {
+    public Set<CaseEvent> getFlowStateAllowedEvents(String scenarioFile, String stateFullName) {
         Map<String, Set<CaseEvent>> eventsByState = cache.computeIfAbsent(scenarioFile, this::loadScenario);
         return eventsByState.getOrDefault(stateFullName, Set.of());
+    }
+
+    @Override
+    public Set<CaseEvent> getNoOngoingBPAllowedEvents(String fileName) {
+        return eventSetCache.computeIfAbsent(fileName, this::loadEventSet);
     }
 
     private Map<String, Set<CaseEvent>> loadScenario(String scenarioFile) {
@@ -75,7 +81,20 @@ public class ScenarioConfigLoader implements AllowedEventRepository {
     }
 
     private Set<CaseEvent> loadWhitelist() {
-        String location = "classpath:config/" + WHITELIST_FILE;
+        String location = configLocation(WHITELIST_FILE);
+        try {
+            Resource resource = resourceLoader.getResource(location);
+            if (!resource.exists()) {
+                return Set.of();
+            }
+            return loadEventSet(WHITELIST_FILE);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Failed to load whitelist: " + location, ex);
+        }
+    }
+
+    private Set<CaseEvent> loadEventSet(String fileName) {
+        String location = configLocation(fileName);
         try {
             Resource resource = resourceLoader.getResource(location);
             if (!resource.exists()) {
@@ -86,15 +105,15 @@ public class ScenarioConfigLoader implements AllowedEventRepository {
                     is, new TypeReference<>() {
                     }
                 );
-                LinkedHashSet<CaseEvent> set = new LinkedHashSet<>();
-                for (String v : Optional.ofNullable(raw).orElse(List.of())) {
-                    set.add(CaseEvent.valueOf(v));
-                }
-                return Set.copyOf(set);
+                return toCaseEvents(raw);
             }
         } catch (Exception ex) {
-            throw new IllegalStateException("Failed to load whitelist: " + location, ex);
+            throw new IllegalStateException("Failed to load event config: " + location, ex);
         }
+    }
+
+    private String configLocation(String fileName) {
+        return "classpath:config/" + fileName;
     }
 
     private Set<CaseEvent> toCaseEvents(List<String> raw) {
