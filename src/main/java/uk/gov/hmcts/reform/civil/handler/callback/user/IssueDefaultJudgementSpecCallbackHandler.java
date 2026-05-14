@@ -26,7 +26,7 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ISSUE_DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
@@ -34,8 +34,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @Slf4j
 public class IssueDefaultJudgementSpecCallbackHandler extends CallbackHandler {
 
+    private static final List<CaseEvent> EVENTS = List.of(ISSUE_DEFAULT_JUDGEMENT_SPEC);
     private static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
-    private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
         + "%n%n The defendant will be served with the Default Judgment.";
     private static final String CASES_CASE_DETAILS_CLAIM_DOCUMENTS = "/cases/case-details/%s#Claim documents";
