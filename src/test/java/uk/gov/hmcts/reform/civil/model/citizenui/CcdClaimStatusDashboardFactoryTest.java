@@ -124,6 +124,19 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
+    void given_judgmentRequestedAndJudgmentBufferEnabled_whenGetStatus_thenReturnEligibleForCCJStatus() {
+        CaseData claim = CaseData.builder()
+            .ccdState(CaseState.JUDGMENT_REQUESTED)
+            .respondent1ResponseDeadline(LocalDate.now().minusDays(1).atTime(16, 0, 0))
+            .build();
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService, Collections.emptyList()));
+        assertThat(status).isEqualTo(DashboardClaimStatus.ELIGIBLE_FOR_CCJ);
+    }
+
+    @Test
     void given_isEligibleForCCJ_whenGetStatus_thenReturnDefaultJudgementStatus() {
         CaseData claim = CaseData.builder()
             .ccdState(All_FINAL_ORDERS_ISSUED)
@@ -133,6 +146,36 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService, Collections.emptyList()));
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT);
+    }
+
+    @Test
+    void given_pendingDefaultJudgmentForDefendant_whenGetStatus_thenReturnDefaultJudgementStatus() {
+        CaseData claim = CaseData.builder()
+            .ccdState(CaseState.JUDGMENT_REQUESTED)
+            .respondent1ResponseDeadline(LocalDate.now().minusDays(1).atTime(16, 0, 0))
+            .activeJudgment(new JudgmentDetails()
+                                .setType(JudgmentType.DEFAULT_JUDGMENT)
+                                .setState(JudgmentState.PENDING_ISSUE))
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService, Collections.emptyList()));
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT);
+    }
+
+    @Test
+    void given_pendingDefaultJudgmentForClaimant_whenGetStatus_thenReturnDefaultJudgementStatus() {
+        CaseData claim = CaseData.builder()
+            .ccdState(CaseState.JUDGMENT_REQUESTED)
+            .respondent1ResponseDeadline(LocalDate.now().minusDays(1).atTime(16, 0, 0))
+            .activeJudgment(new JudgmentDetails()
+                                .setType(JudgmentType.DEFAULT_JUDGMENT)
+                                .setState(JudgmentState.PENDING_ISSUE))
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
             claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT);
     }
