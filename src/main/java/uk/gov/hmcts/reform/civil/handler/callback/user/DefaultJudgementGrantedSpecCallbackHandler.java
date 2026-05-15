@@ -15,18 +15,21 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_GRANTED_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
@@ -50,30 +53,66 @@ public class DefaultJudgementGrantedSpecCallbackHandler extends CallbackHandler 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::handleAboutToSubmit)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
-    private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
+    private CallbackResponse handleAboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = checkCaseEligibility(caseData);
 
-        caseData.getActiveJudgment()
-            .setState(JudgmentState.ISSUED)
+        if (!errors.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updateCaseData(caseData).toMap(objectMapper))
+            .state(CaseState.All_FINAL_ORDERS_ISSUED.name())
+            .build();
+    }
+
+    private List<String> checkCaseEligibility(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+
+        if (!Objects.equals(caseData.getCcdState(), CaseState.JUDGMENT_REQUESTED)) {
+            errors.add(format(
+                "Event DEFAULT_JUDGEMENT_GRANTED_SPEC: Cannot grant default judgment for case in state %s for caseId %d",
+                caseData.getCcdState(),
+                caseData.getCcdCaseReference()
+            ));
+        }
+
+        if (caseData.getActiveJudgment() == null) {
+            errors.add(format(
+                "Event DEFAULT_JUDGEMENT_GRANTED_SPEC: Active judgment is null for caseId %d",
+                caseData.getCcdCaseReference()
+            ));
+        }
+
+        if (!errors.isEmpty()) {
+            errors.forEach(log::error);
+        }
+
+        return errors;
+    }
+
+    private CaseData updateCaseData(CaseData caseData) {
+        JudgmentDetails activeJudgment = caseData.getActiveJudgment();
+        activeJudgment.setState(JudgmentState.ISSUED)
             .setIssueDate(LocalDate.now())
             .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState());
 
         caseData.setJoIsRegisteredWithRTL(YES);
         caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .state(CaseState.All_FINAL_ORDERS_ISSUED.name())
-            .build();
+        return caseData;
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
+        CaseData caseData = callbackParams.getCaseData();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(JUDGMENT_GRANTED_HEADER)

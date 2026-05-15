@@ -46,6 +46,7 @@ class DefaultJudgementGrantedSpecCallbackHandlerTest extends BaseCallbackHandler
                 .atStateClaimIssued()
                 .build()
                 .toBuilder()
+                .ccdState(CaseState.JUDGMENT_REQUESTED)
                 .activeJudgment(new JudgmentDetails())
                 .build();
 
@@ -60,6 +61,47 @@ class DefaultJudgementGrantedSpecCallbackHandlerTest extends BaseCallbackHandler
             assertThat(updatedData.getActiveJudgment().getRtlState()).isEqualTo(JudgmentRTLStatus.ISSUED.getRtlState());
             assertThat(updatedData.getJoIsRegisteredWithRTL()).isEqualTo(YES);
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        }
+
+        @Test
+        void shouldReturnError_whenCaseStateIsNotJudgmentRequested() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build()
+                .toBuilder()
+                .ccdState(CaseState.CASE_ISSUED)
+                .activeJudgment(new JudgmentDetails())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(format(
+                "Event DEFAULT_JUDGEMENT_GRANTED_SPEC: Cannot grant default judgment for case in state %s for caseId %d",
+                caseData.getCcdState(),
+                caseData.getCcdCaseReference()
+            ));
+        }
+
+        @Test
+        void shouldReturnError_whenActiveJudgmentIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build()
+                .toBuilder()
+                .ccdState(CaseState.JUDGMENT_REQUESTED)
+                .activeJudgment(null)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(format(
+                "Event DEFAULT_JUDGEMENT_GRANTED_SPEC: Active judgment is null for caseId %d",
+                caseData.getCcdCaseReference()
+            ));
         }
     }
 
