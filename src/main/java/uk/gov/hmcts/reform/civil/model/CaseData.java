@@ -737,20 +737,28 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isPayBySetDate() {
-        return defenceAdmitPartPaymentTimeRouteRequired != null
-            && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
+        return (defenceAdmitPartPaymentTimeRouteRequired != null
+            && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+            || (getDefenceAdmitPartPaymentTimeRouteRequired2() != null
+            && getDefenceAdmitPartPaymentTimeRouteRequired2() == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
     }
 
     @JsonIgnore
     public boolean isPayByInstallment() {
-        return defenceAdmitPartPaymentTimeRouteRequired != null
+        return (defenceAdmitPartPaymentTimeRouteRequired != null
             && defenceAdmitPartPaymentTimeRouteRequired
-            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            || (getDefenceAdmitPartPaymentTimeRouteRequired2() != null
+            && getDefenceAdmitPartPaymentTimeRouteRequired2()
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
     }
 
     @JsonIgnore
     public boolean isPayImmediately() {
-        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(getDefenceAdmitPartPaymentTimeRouteRequired());
+        return (getDefenceAdmitPartPaymentTimeRouteRequired2() != null
+            && getDefenceAdmitPartPaymentTimeRouteRequired2()
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            || (RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(getDefenceAdmitPartPaymentTimeRouteRequired()));
     }
 
     @JsonIgnore
@@ -763,10 +771,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isPaidFullAmount() {
         RespondToClaim localRespondToClaim = null;
-        if (getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+        if (FULL_DEFENCE == getRespondent1ClaimResponseTypeForSpec()) {
             localRespondToClaim = getRespondToClaim();
-        } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
+        } else if (PART_ADMISSION == getRespondent1ClaimResponseTypeForSpec()) {
             localRespondToClaim = getRespondToAdmittedClaim();
+        } else if (PART_ADMISSION == getRespondent2ClaimResponseTypeForSpec()) {
+            localRespondToClaim = getRespondToAdmittedClaim2();
+        } else if (FULL_DEFENCE == getRespondent2ClaimResponseTypeForSpec()) {
+            localRespondToClaim = getRespondToClaim2();
         }
 
         return ofNullable(localRespondToClaim)
