@@ -777,6 +777,44 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
+    void givenCaseTakenOfflineFromJudgmentRequested_whenGetClaimantStatus_thenReturnResponseByPost() {
+        CaseData claim = CaseData.builder()
+            .takenOfflineByStaffDate(LocalDateTime.now())
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .previousCCDState(CaseState.JUDGMENT_REQUESTED)
+            .build();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                claim,
+                featureToggleService,
+                Collections.emptyList()
+            ));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
+    }
+
+    @Test
+    void givenCaseTakenOfflineFromJudgmentRequested_whenGetDefendantStatus_thenReturnResponseByPost() {
+        CaseData claim = CaseData.builder()
+            .takenOfflineByStaffDate(LocalDateTime.now())
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .previousCCDState(CaseState.JUDGMENT_REQUESTED)
+            .build();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                claim,
+                featureToggleService,
+                Collections.emptyList()
+            ));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
+    }
+
+    @Test
     void given_defendantHasNoticeOfChange_whenGetStatus_thenReturnDefendantNoticeOfChangeApply() {
         CaseData claim = CaseData.builder().takenOfflineDate(LocalDateTime.now()).ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .businessProcess(new BusinessProcess()
