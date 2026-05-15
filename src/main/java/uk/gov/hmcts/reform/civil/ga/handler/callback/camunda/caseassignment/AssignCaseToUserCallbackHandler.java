@@ -115,8 +115,14 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
             return;
         }
 
-        var applicantOrgId = caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier();
-        var respondentSolicitorsList = caseData.getGeneralAppRespondentSolicitors().stream()
+        var applicantSolicitor = caseData.getGeneralAppApplnSolicitor();
+        if (applicantSolicitor == null) {
+            return;
+        }
+
+        var applicantOrgId = applicantSolicitor.getOrganisationIdentifier();
+        var respondentSolicitorsList = ofNullable(caseData.getGeneralAppRespondentSolicitors())
+            .orElseGet(ArrayList::new).stream()
             .filter(sol ->
                         !sol.getValue().getOrganisationIdentifier().equalsIgnoreCase(applicantOrgId))
             .toList();
@@ -126,7 +132,7 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
         if (shouldAssignRespondentSolicitorRoles(caseData)) {
             /*
              * Don't assign the case to respondent solicitors if GA is without notice
-             * Assign case to Respondent Solicitors only after the payment is made by Applicant.
+             * Assign a case to Respondent Solicitors only after the payment is made by Applicant.
              * If the Application is Free Application, then assign the respondent roles during Initiation of GA
              * */
             assignRespondentSolicitorRoles(respondentSolicitorsList, caseData);
@@ -182,7 +188,7 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
 
         /*
          * Don't assign the case to respondent solicitors if GA is without notice
-         * Assign case to Respondent Solicitors only after the payment is made by Applicant.
+         * Assign a case to Respondent Solicitors only after the payment is made by Applicant.
          * If the Application is Free Application, then assign the respondent roles during Initiation of GA
          * */
         if (shouldAssignRespondentSolicitorRoles(caseData)) {
