@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -35,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_LIP;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler {
@@ -66,10 +68,15 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
 
     private CallbackResponse applyNoticeOfChangeDecision(CallbackParams callbackParams) {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
+        ChangeOrganisationRequest changeOrganisationRequest = callbackParams.getCaseData().getChangeOrganisationRequestField();
+        if (changeOrganisationRequest == null) {
+            log.info("Change organisation request is null, skipping NoC decision application");
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
         // Keep the original CoR payload before NoC decision mutates/nullifies parts of the request.
         CaseData preDecisionData = objectMapper.convertValue(caseDetails.getData(), CaseData.class);
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String selectedCaseRole = callbackParams.getCaseData().getChangeOrganisationRequestField().getCaseRoleId().getValue().getCode();
+        String selectedCaseRole = changeOrganisationRequest.getCaseRoleId().getValue().getCode();
 
         updateOrgPoliciesForLiP(callbackParams.getRequest().getCaseDetails());
 
@@ -89,8 +96,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         );
 
         postDecisionData.setBusinessProcess(BusinessProcess.ready(getBusinessProcessEvent(postDecisionData, selectedCaseRole)));
-        postDecisionData.setChangeOfRepresentation(getChangeOfRepresentation(
-            callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionData));
+        postDecisionData.setChangeOfRepresentation(getChangeOfRepresentation(changeOrganisationRequest, postDecisionData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(postDecisionData.toMap(objectMapper)).build();
