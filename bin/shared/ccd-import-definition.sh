@@ -27,18 +27,20 @@ fi
 
 version="n/a"
 newVersion="n/a"
+curlCommonOptions=(--insecure --silent --show-error --http1.1)
+definitionStoreUrl=${CCD_DEFINITION_STORE_API_BASE_URL:-http://localhost:4451}
 
 if [ "${ENVIRONMENT}" == "preview" ] || [ "${ENVIRONMENT}" == "aat" ]; then
-  version=$(curl --insecure --silent --show-error -X GET \
-    ${CCD_DEFINITION_STORE_API_BASE_URL:-http://localhost:4451}/api/data/case-type/CIVIL/version \
+  version=$(curl "${curlCommonOptions[@]}" -X GET \
+    ${definitionStoreUrl}/api/data/case-type/CIVIL/version \
     -H "Authorization: Bearer ${userToken}" \
     -H "ServiceAuthorization: Bearer ${serviceToken}" || echo 'bypass-if-error')
 
   echo "Current version is ${version}"
 fi
 
-uploadResponse=$(curl --insecure --silent -w "\n%{http_code}"  --show-error --max-time 60  -X POST \
-  ${CCD_DEFINITION_STORE_API_BASE_URL:-http://localhost:4451}/import \
+uploadResponse=$(curl "${curlCommonOptions[@]}" -w "\n%{http_code}" --connect-timeout 10 --max-time 300 --retry 2 --retry-delay 10 --retry-all-errors -X POST \
+  ${definitionStoreUrl}/import \
   -H "Authorization: Bearer ${userToken}" \
   -H "ServiceAuthorization: Bearer ${serviceToken}" \
   -F "file=@${filepath};filename=${uploadFilename}" || echo 'bypass-if-error')
@@ -50,19 +52,37 @@ upload_response_content=$(echo "$uploadResponse" | sed '$d')
 
 if [ "${ENVIRONMENT}" == "preview" ] || [ "${ENVIRONMENT}" == "aat" ]; then
  if [ "${upload_http_code}" != "201" ]; then
-  echo "Bypassing audit check as on preview - will wait 45s and then verify the version has changed"
-  sleep 45
+  echo "Bypassing audit check as on preview - will verify the import completed"
 
-  newVersion=$(curl --insecure --silent --show-error -X GET \
-    ${CCD_DEFINITION_STORE_API_BASE_URL:-http://localhost:4451}/api/data/case-type/CIVIL/version \
-    -H "Authorization: Bearer ${userToken}" \
-    -H "ServiceAuthorization: Bearer ${serviceToken}" || echo 'bypass-if-error')
+  for try in {1..20}
+  do
+    sleep 15
+    echo "Checking CCD definition import completed (Try ${try})"
+
+    newVersion=$(curl "${curlCommonOptions[@]}" -X GET \
+      ${definitionStoreUrl}/api/data/case-type/CIVIL/version \
+      -H "Authorization: Bearer ${userToken}" \
+      -H "ServiceAuthorization: Bearer ${serviceToken}" || echo 'bypass-if-error')
 
     echo "Current version is ${newVersion}"
-    if [[ "$newVersion" == "$version" ]]; then
-      echo "Version has not changed - the definition was not imported successfully"
-      exit 1
+    if [[ "${newVersion}" == *'"version"'* && "${newVersion}" != "${version}" ]]; then
+      echo "CCD definition version has changed, definition successfully uploaded"
+      exit 0
     fi
+
+    audit_response=$(curl "${curlCommonOptions[@]}" -X GET \
+      ${definitionStoreUrl}/api/import-audits \
+      -H "Authorization: Bearer ${userToken}" \
+      -H "ServiceAuthorization: Bearer ${serviceToken}" || echo 'bypass-if-error')
+
+    if [[ ${audit_response} == *"${uploadFilename}"* ]]; then
+      echo "${filename} (${uploadFilename}) uploaded"
+      exit 0
+    fi
+  done
+
+  echo "Import audit entry was not found and version has not changed - the definition was not imported successfully"
+  exit 1
  fi
   echo "CCD definition version has changed, definition successfully uploaded"
   exit 0
@@ -73,8 +93,8 @@ if [[ "${upload_http_code}" == '504' ]]; then
   do
     sleep 5
     echo "Checking status of ${filename} (${uploadFilename}) upload (Try ${try})"
-    audit_response=$(curl --insecure --silent --show-error -X GET \
-      ${CCD_DEFINITION_STORE_API_BASE_URL:-http://localhost:4451}/api/import-audits \
+    audit_response=$(curl "${curlCommonOptions[@]}" -X GET \
+      ${definitionStoreUrl}/api/import-audits \
       -H "Authorization: Bearer ${userToken}" \
       -H "ServiceAuthorization: Bearer ${serviceToken}")
 
