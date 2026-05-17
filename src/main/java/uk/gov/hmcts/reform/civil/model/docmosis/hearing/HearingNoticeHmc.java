@@ -17,6 +17,7 @@ public class HearingNoticeHmc implements MappableObject {
 
     private String title;
     private Long caseNumber;
+    private String legacyNumber;
     private LocalDate creationDate;
     private String creationDateWelshText;
     private String claimant;

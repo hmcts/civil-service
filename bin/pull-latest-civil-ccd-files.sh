@@ -37,6 +37,8 @@ cp -r "${mergedDefinitionsDir}" ./ccd-definition
 
 cp -r "./${ccdRepoName}/e2e" .
 cp -r "./${ccdRepoName}/playwright-e2e" .
+cp -r "./${ccdRepoName}/playwright-categories.json" .
+cp -r "./${ccdRepoName}/tsconfig.json" .
 cp -r "./${ccdRepoName}/plugins" .
 cp -r "./${ccdRepoName}/package.json" .
 cp -r "./${ccdRepoName}/yarn.lock" .
