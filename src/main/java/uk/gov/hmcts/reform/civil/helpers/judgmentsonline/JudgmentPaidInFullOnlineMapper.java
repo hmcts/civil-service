@@ -48,11 +48,13 @@ public class JudgmentPaidInFullOnlineMapper extends JudgmentOnlineMapper {
     }
 
     protected JudgmentState getJudgmentState(CaseData caseData, LocalDate paymentDate) {
-        boolean paidAfter31Days = JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan31Days(
-            caseData.getActiveJudgment().getIssueDate(),
+        LocalDate issueDate = caseData.getActiveJudgment().getIssueDate();
+        log.info("Getting Judgment State based on issueDate date: {}, eligible days: {}", issueDate, issueDate.lengthOfMonth());
+        boolean paidAfterEligibleDays = JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThanDaysInMonth(
+            issueDate,
             nonNull(paymentDate) ? paymentDate : caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade()
         );
-        return paidAfter31Days ? JudgmentState.SATISFIED : JudgmentState.CANCELLED;
+        return paidAfterEligibleDays ? JudgmentState.SATISFIED : JudgmentState.CANCELLED;
     }
 
     protected JudgmentState getJudgmentState(CaseData caseData) {

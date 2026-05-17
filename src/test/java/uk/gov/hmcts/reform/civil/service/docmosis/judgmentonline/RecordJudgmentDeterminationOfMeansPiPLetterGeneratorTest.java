@@ -142,7 +142,7 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
-                caseData.getLegacyCaseReference(),
+                String.valueOf(caseData.getCcdCaseReference()),
                 caseData.getLegacyCaseReference(),
                 RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER,
                 List.of(caseData.getRespondent1().getPartyName()),
