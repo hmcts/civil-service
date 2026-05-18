@@ -42,8 +42,8 @@ public class SendAndReplyMessageService {
         Map<String, RolePool> supportedRolesMap = new LinkedHashMap<>();
         supportedRolesMap.put("wlu-team-leader", RolePool.WLU_ADMIN);
         supportedRolesMap.put("wlu-admin", RolePool.WLU_ADMIN);
-        supportedRolesMap.put("ctsc-team-leader", RolePool.ADMIN);
-        supportedRolesMap.put("ctsc", RolePool.ADMIN);
+        supportedRolesMap.put("ctsc-team-leader", RolePool.CTSC);
+        supportedRolesMap.put("ctsc", RolePool.CTSC);
         supportedRolesMap.put("hearing-centre-team-leader", RolePool.ADMIN);
         supportedRolesMap.put("hearing-centre-admin", RolePool.ADMIN);
         supportedRolesMap.put("senior-tribunal-caseworker", RolePool.LEGAL_OPERATIONS);
@@ -115,7 +115,7 @@ public class SendAndReplyMessageService {
 
         return new Message()
             .setSenderName(senderName)
-            .setSenderRoleType(supportRoleMap.get(role.getRoleName()));
+            .setSenderRoleType(supportRoleMap.get(role.getRoleName())); //
     }
 
     public List<Element<Message>> addReplyToMessage(List<Element<Message>> messages, String messageId, MessageReply messageReply,
