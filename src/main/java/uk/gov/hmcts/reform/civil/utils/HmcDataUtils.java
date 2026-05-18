@@ -74,7 +74,7 @@ public class HmcDataUtils {
     }
 
     public static PartiesNotifiedResponse getLatestHearingNoticeDetails(PartiesNotifiedResponses partiesNotified) {
-        return Optional.ofNullable(partiesNotified.getResponses()).orElse(List.of())
+        return Optional.ofNullable(partiesNotified).map(PartiesNotifiedResponses::getResponses).orElse(List.of())
             .stream().max(Comparator.comparing(PartiesNotifiedResponse::getResponseReceivedDateTime))
             .orElse(null);
     }
@@ -82,7 +82,7 @@ public class HmcDataUtils {
     public static PartiesNotifiedResponse getLatestHearingResponseForRequestVersion(
         PartiesNotifiedResponses partiesNotified, int requestVersion) {
 
-        return Optional.ofNullable(partiesNotified.getResponses())
+        return Optional.ofNullable(partiesNotified).map(PartiesNotifiedResponses::getResponses)
             .orElse(List.of())
             .stream()
             .filter(r -> r.getRequestVersion() == requestVersion)
