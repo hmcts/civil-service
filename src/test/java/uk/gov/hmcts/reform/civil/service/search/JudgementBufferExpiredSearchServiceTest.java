@@ -4,6 +4,8 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
@@ -24,7 +26,10 @@ class JudgementBufferExpiredSearchServiceTest extends ElasticSearchServiceTest {
 
     @BeforeEach
     void setup() {
-        searchService = new JudgementBufferExpiredSearchService(coreCaseDataService);
+        WorkingDayIndicator workingDayIndicator = Mockito.mock(WorkingDayIndicator.class);
+        Mockito.when(workingDayIndicator.minusWorkingHours(FIXED_NOW, 48))
+            .thenReturn(FIXED_NOW.minusDays(2));
+        searchService = new JudgementBufferExpiredSearchService(coreCaseDataService, workingDayIndicator);
         zonedDateTimeMock = mockStatic(ZonedDateTime.class, CALLS_REAL_METHODS);
         zonedDateTimeMock.when(() -> ZonedDateTime.now(ZoneOffset.UTC)).thenReturn(FIXED_NOW);
     }
@@ -36,11 +41,12 @@ class JudgementBufferExpiredSearchServiceTest extends ElasticSearchServiceTest {
 
     @Override
     protected Query buildQuery(int fromValue) {
-        ZonedDateTime timeMinus48Hours = FIXED_NOW.minusHours(48);
+        // Adjusted for working days: previous working day from (date - 2 days)
+        ZonedDateTime timeMinus48WorkingHours = FIXED_NOW.minusDays(2);
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48Hours))
+                        .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48WorkingHours.toString()))
                         .must(boolQuery().must(matchQuery("state", CaseState.JUDGMENT_REQUESTED.toString())))
                         .must(((JudgementBufferExpiredSearchService) searchService).haveNoOngoingBusinessProcess()));
         return new Query(query, List.of("reference"), fromValue, true);

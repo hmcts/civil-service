@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.search;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.search.Query;
@@ -19,19 +20,23 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 @Slf4j
 public class JudgementBufferExpiredSearchService extends ElasticSearchService {
 
-    public JudgementBufferExpiredSearchService(CoreCaseDataService coreCaseDataService) {
+    private final WorkingDayIndicator workingDayIndicator;
+
+    public JudgementBufferExpiredSearchService(CoreCaseDataService coreCaseDataService, WorkingDayIndicator workingDayIndicator) {
         super(coreCaseDataService);
+        this.workingDayIndicator = workingDayIndicator;
     }
 
     @Override
     public Query query(int startIndex, String timeNow) {
         log.info("Call to JudgementBufferExpiredSearchService query with index {} and timeNow {}", startIndex, timeNow);
-        ZonedDateTime timeMinus48Hours = ZonedDateTime.parse(timeNow).minusHours(48);
+        ZonedDateTime now = ZonedDateTime.parse(timeNow);
+        ZonedDateTime timeMinus48WorkingHours = workingDayIndicator.minusWorkingHours(now, 48);
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48Hours))
+                            .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48WorkingHours.toString()))
                             .must(beState(CaseState.JUDGMENT_REQUESTED))
                             .must(haveNoOngoingBusinessProcess())
                 ),
