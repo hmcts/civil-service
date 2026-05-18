@@ -16,14 +16,14 @@ import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -38,38 +38,33 @@ class BaseExternalTaskHandlerTest {
     @Mock
     private ExternalTaskService externalTaskService;
 
+    @Mock
+    private ExternalTaskCompletionService externalTaskCompletionService;
+
     private TestBaseExternalTaskHandler handler;
 
     @BeforeEach
     void setUp() {
         handler = new TestBaseExternalTaskHandler();
+        handler.externalTaskCompletionService = externalTaskCompletionService;
     }
 
     private static class TestBaseExternalTaskHandler extends BaseExternalTaskHandler {
-        private ExternalTaskData externalTaskData;
         private Exception exceptionToThrow;
 
         @Override
         protected ExternalTaskData handleTask(ExternalTask externalTask) {
             if (exceptionToThrow != null) {
-                if (exceptionToThrow instanceof RuntimeException) {
-                    throw (RuntimeException) exceptionToThrow;
+                if (exceptionToThrow instanceof RuntimeException re) {
+                    throw re;
                 }
                 throw new RuntimeException(exceptionToThrow);
             }
-            return externalTaskData;
+            return null;
         }
 
         public void setExceptionToThrow(Exception exceptionToThrow) {
             this.exceptionToThrow = exceptionToThrow;
-        }
-
-        @Override
-        protected VariableMap getVariableMap(ExternalTaskData data) {
-            if (data != null) {
-                return Variables.createVariables().putValue("data", "some data");
-            }
-            return null;
         }
     }
 
@@ -80,7 +75,34 @@ class BaseExternalTaskHandlerTest {
         void shouldCompleteTask_whenHandleTaskSucceeds() {
             handler.execute(externalTask, externalTaskService);
 
-            verify(externalTaskService).complete(eq(externalTask), any());
+            verify(externalTaskCompletionService).completeTask(eq(handler), eq(externalTask), eq(externalTaskService), any());
+        }
+
+        @Test
+        void shouldSimulateFinalCompletionFailure_whenHandleTaskSucceeds() {
+            // This test demonstrates how to simulate the @Recover behavior in unit tests
+            doAnswer(invocation -> {
+                handler.handleFailureNotRetryable(invocation.getArgument(1), invocation.getArgument(2),
+                                                  new CompleteTaskException(new RuntimeException("final error")));
+                return null;
+            }).when(externalTaskCompletionService).completeTask(any(), any(), any(), any());
+
+            handler.execute(externalTask, externalTaskService);
+
+            // Verify that handleFailure was called with 0 retries (as handled by handleFailureNotRetryable)
+            verify(externalTaskService).handleFailure(eq(externalTask), eq("java.lang.RuntimeException: final error"),
+                                                      anyString(), eq(0), eq(1000L));
+        }
+
+        @Test
+        void shouldHandleNotRetryableExceptionFromCompleteTask_whenHandleTaskSucceeds() {
+            NotRetryableException exception = new NotRetryableException("complete error");
+            doThrow(exception).when(externalTaskCompletionService).completeTask(any(), any(), any(), any());
+
+            handler.execute(externalTask, externalTaskService);
+
+            // Verify that handleFailure was called with 0 retries (as handled by handleFailureNotRetryable)
+            verify(externalTaskService).handleFailure(eq(externalTask), eq("complete error"), anyString(), eq(0), eq(1000L));
         }
 
         @Test
@@ -119,14 +141,22 @@ class BaseExternalTaskHandlerTest {
     }
 
     @Nested
-    class CompleteTask {
+    class GetVariableMap {
 
         @Test
-        void shouldThrowCompleteTaskException_whenExternalTaskServiceFails() {
-            doThrow(new RuntimeException("failed")).when(externalTaskService).complete(any(), any());
+        void shouldReturnNull_whenDataHasVariables() {
+            // Base implementation always returns null unless overridden
+            VariableMap variables = Variables.createVariables().putValue("key", "value");
+            ExternalTaskData data = new ExternalTaskData().setVariables(variables);
 
-            assertThrows(CompleteTaskException.class, () ->
-                handler.completeTask(externalTask, externalTaskService, null));
+            VariableMap result = handler.getVariableMap(data);
+
+            assertThat(result).isNull();
+        }
+
+        @Test
+        void shouldReturnNull_whenDataIsNull() {
+            assertThat(handler.getVariableMap(null)).isNull();
         }
     }
 
@@ -175,19 +205,6 @@ class BaseExternalTaskHandlerTest {
     }
 
     @Nested
-    class Recover {
-
-        @Test
-        void shouldHandleFailureNotRetryable_whenRecoverCalled() {
-            String errorMessage = "msg";
-            CompleteTaskException exception = new CompleteTaskException(new RuntimeException(errorMessage));
-            handler.recover(exception, externalTask, externalTaskService);
-
-            verify(externalTaskService).handleFailure(eq(externalTask), eq("java.lang.RuntimeException: " + errorMessage), anyString(), eq(0), eq(1000L));
-        }
-    }
-
-    @Nested
     class HandleFailure {
 
         @Test
@@ -213,7 +230,15 @@ class BaseExternalTaskHandlerTest {
     }
 
     @Nested
-    class GetStackTrace {
+    class HandleFailureNotRetryable {
+
+        @Test
+        void shouldCallHandleFailure_withZeroRetries() {
+            Exception e = new RuntimeException("error");
+            handler.handleFailureNotRetryable(externalTask, externalTaskService, e);
+
+            verify(externalTaskService).handleFailure(eq(externalTask), eq("error"), anyString(), eq(0), eq(1000L));
+        }
 
         @Test
         void shouldReturnFeignExceptionContent_whenExceptionIsFeignException() {
@@ -222,7 +247,7 @@ class BaseExternalTaskHandlerTest {
 
             handler.handleFailureNotRetryable(externalTask, externalTaskService, feignException);
 
-            verify(externalTaskService).handleFailure(eq(externalTask), any(), eq("feign error body"), anyInt(), anyLong());
+            verify(externalTaskService).handleFailure(eq(externalTask), any(), eq("feign error body"), eq(0), eq(1000L));
         }
     }
 
