@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.advice;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.model.CallbackErrorResponse;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.service.notify.NotificationClientException;
@@ -20,6 +21,7 @@ import uk.gov.service.notify.NotificationClientException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -30,11 +32,13 @@ public class ResourceExceptionHandlerTest {
     @Mock
     private ContentCachingRequestWrapper contentCachingRequestWrapper;
 
-    @InjectMocks
     private ResourceExceptionHandler handler;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
+        handler = new ResourceExceptionHandler(objectMapper);
         String jsonString = "{ \"case_details\" : {\"case_data\" : {\"array\" : [{\"key\" : \"value\"}]}, \"id\" : \"1234\"}}";
         when(contentCachingRequestWrapper.getHeader("user-id")).thenReturn("4321");
         when(contentCachingRequestWrapper.getContentAsByteArray()).thenReturn(jsonString.getBytes(StandardCharsets.UTF_8));
@@ -224,6 +228,30 @@ public class ResourceExceptionHandlerTest {
             ), contentCachingRequestWrapper),
             HttpStatus.EXPECTATION_FAILED
         );
+    }
+
+    @Test
+    void shouldReturnUnprocessableEntity_withParsedCallbackErrorResponse_whenFeign422BodyIsValidJson()
+        throws Exception {
+        CallbackErrorResponse expected = new CallbackErrorResponse();
+        expected.setCallbackErrors(List.of("error one", "error two"));
+        expected.setCallbackWarnings(List.of("warn one"));
+        byte[] body = objectMapper.writeValueAsBytes(expected);
+
+        FeignException.UnprocessableEntity exception = new FeignException.UnprocessableEntity(
+            "unprocessable",
+            Mockito.mock(feign.Request.class),
+            body,
+            Collections.emptyMap()
+        );
+
+        ResponseEntity<Object> result = handler.unprocessableEntity(exception, contentCachingRequestWrapper);
+
+        assertThat(result.getStatusCode()).isSameAs(HttpStatus.UNPROCESSABLE_ENTITY);
+        assertThat(result.getBody()).isInstanceOf(CallbackErrorResponse.class);
+        CallbackErrorResponse actual = (CallbackErrorResponse) result.getBody();
+        assertThat(actual.getCallbackErrors()).containsExactly("error one", "error two");
+        assertThat(actual.getCallbackWarnings()).containsExactly("warn one");
     }
 
     private <E extends Throwable> void testTemplate(
