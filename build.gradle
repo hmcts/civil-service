@@ -370,7 +370,13 @@ def sonarExclusions = [
   "**/setup/CamundaHighLevelDataSetupApp.java",
   "**/setup/CamundaDefinitionImporter.java",
   "**/setup/CamundaImportConfiguration.java",
-  "**/setup/ServiceAuthorisationRestApi.java"
+  "**/setup/ServiceAuthorisationRestApi.java",
+  "**/informagreedextensiondate/InformAgreedExtensionDateAppSolOneEmailDTOGenerator.java",
+  "**/informagreedextensiondate/InformAgreedExtensionDateRespSolOneEmailDTOGenerator.java",
+  "**/informagreedextensiondate/InformAgreedExtensionDateRespSolTwoEmailDTOGenerator.java",
+  "**/setasidejudgementrequest/SetAsideJudgementRequestAppSolOneEmailDTOGenerator.java",
+  "**/setasidejudgementrequest/SetAsideJudgementRequestRespSolOneEmailDTOGenerator.java",
+ " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java"
 ]
 
 sonarqube {

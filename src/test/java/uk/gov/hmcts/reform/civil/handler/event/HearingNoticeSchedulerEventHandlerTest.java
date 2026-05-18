@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
-import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVars;
@@ -79,9 +78,6 @@ class HearingNoticeSchedulerEventHandlerTest {
     @Mock
     private CoreCaseDataService coreCaseDataService;
 
-    @Mock
-    private AsyncHandlerProperties asyncHandlerProperties;
-
     @InjectMocks
     private HearingNoticeSchedulerEventHandler handler;
 
@@ -134,8 +130,8 @@ class HearingNoticeSchedulerEventHandlerTest {
         assertTrue(invokeIsAllowedState("CASE_PROGRESSION"), "Allowed state should return true");
     }
 
-    // Helper to call the private static method using reflection
     private boolean invokeIsAllowedState(String state) {
+        // Helper to call the private static method using reflection
         try {
             var method = HearingNoticeSchedulerEventHandler.class.getDeclaredMethod(
                 "isAllowedState", String.class, String.class

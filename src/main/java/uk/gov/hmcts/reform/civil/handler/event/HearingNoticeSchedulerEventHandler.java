@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
-import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVars;
@@ -46,7 +45,6 @@ public class HearingNoticeSchedulerEventHandler {
     private final RuntimeService runtimeService;
     private final ObjectMapper mapper;
     private final CoreCaseDataService coreCaseDataService;
-    private final AsyncHandlerProperties asyncHandlerProperties;
     static final CaseState[] DISALLOWED_CASE_STATES = {
         CASE_SETTLED,
         PROCEEDS_IN_HERITAGE_SYSTEM,
@@ -83,8 +81,19 @@ public class HearingNoticeSchedulerEventHandler {
 
         PartiesNotifiedResponse partiesNotified = getLatestPartiesNotifiedResponse(hearingId);
         if (!HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
-            log.info("Hearing notice data not changed or already notified [{}].", hearingId);
-            // HMC already has a record that matches the current version and schedule of the hearing
+            log.info("Hearing notice data not changed [{}].", hearingId);
+            // HMC already has a record that matches the current schedule of the hearing
+            Integer notifiedVersion = partiesNotified.getRequestVersion();
+            if (notifiedVersion != null && notifiedVersion < requestedHearingVersion) {
+                try {
+                    // Acknowledge and mark hearing as "processed" for current version
+                    notifyHmc(hearingId, hearing, partiesNotified.getServiceData());
+                } catch (Exception ex) {
+                    log.warn("HMC update failed for unchanged hearing [{}] from version [{}] to [{}]. Reason: {}",
+                        hearingId, notifiedVersion, requestedHearingVersion, ex.getMessage()
+                    );
+                }
+            }
             return;
         }
 
