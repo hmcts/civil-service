@@ -140,7 +140,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 respondToAdmittedClaimOwingAmount
             );
         }
-        CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         boolean needsTranslating = (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual());
         LocalDateTime responseDate = time.now();
 
@@ -148,8 +147,16 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             responseDate
         ) : null;
 
+        log.info(
+            "case id: {}, applicantDeadline: {}",
+            callbackParams.getRequest().getCaseDetails().getId(),
+            applicantDeadline
+        );
+
         caseData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI));
         caseData.setRespondent1ResponseDate(responseDate);
+
+        CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         caseData.setRespondent1GeneratedResponseDocument(dummyDocument);
         caseData.setRespondent1ClaimResponseDocumentSpec(dummyDocument);
         caseData.setResponseClaimTrack(AllocatedTrack.getAllocatedTrack(

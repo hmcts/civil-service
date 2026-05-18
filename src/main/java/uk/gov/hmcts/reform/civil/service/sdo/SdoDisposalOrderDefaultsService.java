@@ -20,7 +20,6 @@ public class SdoDisposalOrderDefaultsService {
         sdoDisposalNarrativeService.applyFinalDisposalHearing(caseData);
         sdoDisposalNarrativeService.applyHearingTime(caseData);
         sdoDisposalNarrativeService.applyOrderWithoutHearing(caseData);
-        sdoDisposalNarrativeService.applyBundle(caseData);
         sdoDisposalNarrativeService.applyNotes(caseData);
     }
 }
