@@ -95,6 +95,12 @@ public class SetApplicantResponseDeadline implements CaseTask {
         LocalDateTime responseDate = time.now();
         LocalDateTime applicant1Deadline = getApplicant1ResponseDeadline(responseDate);
 
+        log.info(
+            "case id: {}, applicantDeadline: {}",
+            caseData.getCcdCaseReference(),
+            applicant1Deadline
+        );
+
         if (isRespondent2SameLegalRep(caseData)) {
             updateDataRespondentDeadlineResponse
                 .updateBothRespondentsResponseSameLegalRep(
