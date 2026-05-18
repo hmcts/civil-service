@@ -24,12 +24,13 @@ import static uk.gov.hmcts.reform.civil.helpers.ExponentialRetryTimeoutHelper.ca
 /**
  * Interface for standard implementation of task handler that is invoked for each fetched and locked task.
  */
+@SuppressWarnings("java:S6813")
 public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
 
     public static final String FLOW_STATE = "flowState";
     public static final String FLOW_FLAGS = "flowFlags";
 
-    protected Logger log = LoggerFactory.getLogger(BaseExternalTaskHandler.class);
+    protected final Logger log = LoggerFactory.getLogger(BaseExternalTaskHandler.class);
 
     /**
      * Executed for each fetched and locked task.
@@ -128,7 +129,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
             externalTask.getRetries(),
             maxRetries
         );
-        log.error("Error occured {} remainingRetries {}", e.getMessage(), remainingRetries, e);
+        log.error("Error occurred {} remainingRetries {}", e.getMessage(), remainingRetries, e);
         externalTaskService.handleFailure(
             externalTask,
             e.getMessage(),
@@ -146,7 +147,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      * @param externalTaskService to interact with fetched and locked tasks.
      * @param e                   the exception thrown by business logic.
      */
-    void handleFailureNotRetryable(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
+    public void handleFailureNotRetryable(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
         int remainingRetries = 0;
         log.info(
             "No Retryable Handle failure processInstanceId: '{}' ",
@@ -186,7 +187,8 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      *
      * @return the variables to add to the external task.
      */
-    protected VariableMap getVariableMap(ExternalTaskData data) {
+    @SuppressWarnings("java:S1168")
+    public VariableMap getVariableMap(ExternalTaskData data) {
         return null;
     }
 
