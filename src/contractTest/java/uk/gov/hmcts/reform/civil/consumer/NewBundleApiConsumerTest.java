@@ -69,6 +69,7 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildCreateBundleResponsePact(PactDslWithProvider builder) throws IOException {
         return builder
+            .given("a request to prepare a new bundle is successful")
             .uponReceiving("a new bundle request")
             .path(ENDPOINT)
             .method(HttpMethod.POST.toString())

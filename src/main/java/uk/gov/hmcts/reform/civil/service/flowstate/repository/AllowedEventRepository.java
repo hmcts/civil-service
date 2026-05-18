@@ -8,6 +8,8 @@ public interface AllowedEventRepository {
 
     Set<CaseEvent> getWhitelist();
 
-    Set<CaseEvent> getAllowedEvents(String scenarioKey, String stateFullName);
+    Set<CaseEvent> getFlowStateAllowedEvents(String scenarioKey, String stateFullName);
+
+    Set<CaseEvent> getNoOngoingBPAllowedEvents(String fileName);
 
 }
