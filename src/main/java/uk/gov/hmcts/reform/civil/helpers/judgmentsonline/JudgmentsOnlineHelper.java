@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.jetbrains.annotations.NotNull;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -80,6 +81,11 @@ public class JudgmentsOnlineHelper {
         return  MultiPartyScenario.isOneVOne(caseData)
             || MultiPartyScenario.isTwoVOne(caseData)
             || caseData.isLRvLipOneVOne();
+    }
+
+    public static boolean isDefaultJudgmentRequested(CaseData caseData) {
+        return caseData != null
+            && CaseState.JUDGMENT_REQUESTED.equals(caseData.getCcdState());
     }
 
     public static BigDecimal getClaimFeeOfJudgmentForDJ(CaseData data) {

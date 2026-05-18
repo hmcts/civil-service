@@ -564,6 +564,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isDefaultJudgementRequested() {
+        return false;
+    }
+
+    @Override
     public boolean decisionMadeDocumentsAreInTranslation() {
         return false;
     }
