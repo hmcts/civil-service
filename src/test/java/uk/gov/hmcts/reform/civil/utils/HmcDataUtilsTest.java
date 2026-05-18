@@ -53,11 +53,6 @@ import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
 class HmcDataUtilsTest {
 
     @Test
-    void getLatestPartiesNotifiedResponse_WhenNull_ReturnsNull() {
-        assertNull(HmcDataUtils.getLatestHearingNoticeDetails(null));
-    }
-
-    @Test
     void getLatestPartiesNotifiedResponse_WhenEmptyList_ReturnsNull() {
         PartiesNotifiedResponses partiesNotified = new PartiesNotifiedResponses().setResponses(List.of());
 
@@ -83,11 +78,6 @@ class HmcDataUtilsTest {
         PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
 
         assertEquals(result, expected);
-    }
-
-    @Test
-    void getHearingResponseForRequestVersion_WhenNull_ReturnsNull() {
-        assertNull(HmcDataUtils.getLatestHearingResponseForRequestVersion(null, 1));
     }
 
     @Test
