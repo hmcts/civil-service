@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingRespons
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -177,7 +176,7 @@ public class HearingsApiConsumerTest extends BaseContractTest {
         PartiesNotifiedResponses response = hearingsService.getPartiesNotifiedResponses(AUTHORIZATION_TOKEN, HEARING_ID);
 
         assertThat(response.getResponses()).hasSize(1);
-        assertThat(response.getResponses().get(0).getServiceData().isHearingNoticeGenerated()).isFalse();
+        assertThat(response.getResponses().get(0).getServiceData().isHearingNoticeGenerated()).isTrue();
     }
 
     @Test
@@ -221,9 +220,9 @@ public class HearingsApiConsumerTest extends BaseContractTest {
     private PartiesNotified getPartiesNotifiedPayload() {
         return new PartiesNotified()
             .setServiceData(new PartiesNotifiedServiceData()
-                .setHearingNoticeGenerated(false)
-                .setHearingDate(LocalDate.of(2024, 10, 20).atStartOfDay())
-                .setHearingLocation("Central Court")
+                .setHearingNoticeGenerated(true)
+                .setHearingDate(HEARING_START)
+                .setHearingLocation("0001")
                 .setDays(List.of(new HearingDay()
                     .setHearingStartDateTime(HEARING_START)
                     .setHearingEndDateTime(HEARING_END))));
@@ -264,8 +263,8 @@ public class HearingsApiConsumerTest extends BaseContractTest {
                         .integerType("requestVersion", 1)
                         .stringType("partiesNotified", PARTIES_NOTIFIED_DATE.minusHours(1).toString())
                         .object("serviceData", data ->
-                            data.booleanType("hearingNoticeGenerated", false)
-                                .stringType("hearingLocation", "Central Court")
+                            data.booleanType("hearingNoticeGenerated", true)
+                                .stringType("hearingLocation", "0001")
                                 .stringType("hearingDate", HEARING_START.toString())
                                 .minArrayLike("days", 1, day ->
                                     day.stringType("hearingStartDateTime", HEARING_START.toString())

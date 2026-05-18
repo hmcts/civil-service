@@ -74,31 +74,26 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         int requestVersion = camundaVariables.getRequestVersion().intValue();
         LocalDateTime receivedDateTime = camundaVariables.getResponseDateTime();
 
+        if (isHearingResponseNotifiedForRequestVersion(hearingId, requestVersion, receivedDateTime)) {
+            log.info("Skipping partiesNotified PUT — already notified for caseId {}, hearingId {}, requestVersion {}",
+                     ccdCaseReference, hearingId, requestVersion);
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         PartiesNotified partiesNotified = buildPartiesNotified(camundaVariables);
         logRequestPayload(partiesNotified, ccdCaseReference, hearingId);
 
-        try {
-            hearingsService.updatePartiesNotifiedResponse(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                hearingId,
-                requestVersion,
-                receivedDateTime,
-                partiesNotified
-            );
+        hearingsService.updatePartiesNotifiedResponse(
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            hearingId,
+            requestVersion,
+            receivedDateTime,
+            partiesNotified
+        );
 
-            log.info("Successfully updated parties notified for caseId {}, hearingId {}, requestVersion {}, receivedDateTime {}",
-                     ccdCaseReference, hearingId, requestVersion, receivedDateTime);
+        log.info("Successfully updated parties notified for caseId {}, hearingId {}, requestVersion {}, receivedDateTime {}",
+                 ccdCaseReference, hearingId, requestVersion, receivedDateTime);
 
-        } catch (Exception ex) {
-            if (isHearingResponseNotifiedForRequestVersion(hearingId, requestVersion, receivedDateTime)) {
-                log.info("Update succeeded despite exception for caseId {}, hearingId {}, requestVersion {}",
-                         ccdCaseReference, hearingId, requestVersion);
-            } else {
-                log.error("HearingsService.updatePartiesNotifiedResponse failed for caseId {}, hearingId {}, requestVersion {}",
-                          ccdCaseReference, hearingId, requestVersion, ex);
-                throw ex;
-            }
-        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
@@ -106,6 +101,7 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         return new PartiesNotified()
             .setServiceData(new PartiesNotifiedServiceData()
                              .setHearingNoticeGenerated(true)
+                             .setHearingDate(camundaVariables.getHearingStartDateTime())
                              .setHearingLocation(camundaVariables.getHearingLocationEpims())
                              .setDays(camundaVariables.getDays()));
     }
