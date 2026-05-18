@@ -114,14 +114,25 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
     }
 
     /**
-     * Called when an exception arises and retry is not required from the {@link BaseExternalTaskHandler handleTask(externalTask)} method.
+     * Called when an exception arises from the {@link BaseExternalTaskHandler handleTask(externalTask)} method.
      *
      * @param externalTask        the external task to be handled.
      * @param externalTaskService to interact with fetched and locked tasks.
      * @param e                   the exception thrown by business logic.
      */
-    void handleFailureNotRetryable(ExternalTask externalTask, ExternalTaskService externalTaskService, Throwable e) {
-        log.info("Handle task failure Not Retryable, processInstanceId: '{}' ", externalTask.getProcessInstanceId());
+    void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
+        int maxRetries = getMaxAttempts();
+        int remainingRetries = externalTask.getRetries() == null ? maxRetries : externalTask.getRetries();
+        log.info(
+            "Handle failure externalTask.getRetries() is null ?? '{}' processInstanceId: '{}' " +
+                "remainingRetries value : '{}' externalTask.getRetries() value: '{}' maxRetries: '{}'",
+            externalTask.getRetries() == null,
+            externalTask.getProcessInstanceId() != null ? externalTask.getProcessInstanceId() : "Instance id is null",
+            remainingRetries,
+            externalTask.getRetries(),
+            maxRetries
+        );
+
         externalTaskService.handleFailure(
             externalTask,
             e.getMessage(),
