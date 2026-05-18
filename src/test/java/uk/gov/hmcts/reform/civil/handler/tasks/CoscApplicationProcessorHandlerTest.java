@@ -13,14 +13,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.CoscApplicationProcessorEvent;
-import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.search.CoscApplicationSearchService;
 
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -111,9 +109,7 @@ class CoscApplicationProcessorHandlerTest {
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
             .when(externalTaskService).complete(mockTask, null);
 
-        assertThrows(
-            CompleteTaskException.class,
-            () -> handler.execute(mockTask, externalTaskService));
+        handler.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),

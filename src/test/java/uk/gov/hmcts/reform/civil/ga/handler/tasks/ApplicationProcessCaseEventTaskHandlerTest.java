@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
-import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
@@ -36,7 +35,6 @@ import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -44,6 +42,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGES_FORM;
@@ -205,10 +204,9 @@ class ApplicationProcessCaseEventTaskHandlerTest {
                 .thenReturn(new GeneralApplicationCaseData().generalAppParentCaseLink(
                     new GeneralAppParentCaseLink().setCaseReference("123")).build());
 
-            assertThrows(CompleteTaskException.class,
-                () -> applicationProcessCaseEventTaskHandler.execute(mockTask, externalTaskService));
+            applicationProcessCaseEventTaskHandler.execute(mockTask, externalTaskService);
 
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService, times(1)).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),

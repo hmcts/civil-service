@@ -16,11 +16,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.EvidenceUploadNotificationEvent;
-import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.search.EvidenceUploadNotificationSearchService;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -124,9 +122,7 @@ class EvidenceUploadCheckHandlerTest {
             .when(externalTaskService).complete(mockTask, null);
 
         // When: handler is called
-        assertThrows(
-            CompleteTaskException.class,
-            () -> handler.execute(mockTask, externalTaskService));
+        handler.execute(mockTask, externalTaskService);
 
         // Then: handle failure should not get called
         verify(externalTaskService, never()).handleFailure(
