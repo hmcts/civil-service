@@ -21,9 +21,14 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 public class ExternalTaskCompletionService {
 
     @Retryable(
-        value = CompleteTaskException.class,
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 60000, multiplier = 15)
+        retryFor = CompleteTaskException.class,
+        noRetryFor = NotRetryableException.class,
+        notRecoverable = {NotRetryableException.class},
+        maxAttemptsExpression = "${external-task-completion.retry.max-attempts:3}",
+        backoff = @Backoff(
+            delayExpression = "${external-task-completion.retry.delay:60000}",
+            multiplierExpression = "${external-task-completion.retry.multiplier:15}"
+        )
     )
     public void completeTask(BaseExternalTaskHandler handler,
                              ExternalTask externalTask,
