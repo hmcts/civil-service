@@ -5,9 +5,12 @@ import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
@@ -32,6 +35,7 @@ public class ResourceExceptionHandlerTest {
     @Mock
     private ContentCachingRequestWrapper contentCachingRequestWrapper;
 
+    @InjectMocks
     private ResourceExceptionHandler handler;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -238,20 +242,39 @@ public class ResourceExceptionHandlerTest {
         expected.setCallbackWarnings(List.of("warn one"));
         byte[] body = objectMapper.writeValueAsBytes(expected);
 
-        FeignException.UnprocessableEntity exception = new FeignException.UnprocessableEntity(
-            "unprocessable",
-            Mockito.mock(feign.Request.class),
-            body,
-            Collections.emptyMap()
+        testTemplate(
+            "CallbackErrorResponse(callbackErrors=[error one, error two], callbackWarnings=[warn one])",
+            handler.unprocessableEntity(new FeignException.UnprocessableEntity(
+                "unprocessable",
+                Mockito.mock(feign.Request.class),
+                body,
+                Collections.emptyMap()
+            ), contentCachingRequestWrapper),
+            HttpStatus.UNPROCESSABLE_ENTITY
         );
+    }
 
-        ResponseEntity<Object> result = handler.unprocessableEntity(exception, contentCachingRequestWrapper);
+    @Test
+    @MockitoSettings(strictness = Strictness.LENIENT)
+    void shouldReturnUnprocessableEntity_withFallbackMessage_whenFeign422BodyIsNotValidJson() {
+        String invalidJson = """
+        {
+          "callbackErrors": [
+            "Validation failed",
+            "Missing required field: caseId"
+          ]
+            """; // missing closing brace
 
-        assertThat(result.getStatusCode()).isSameAs(HttpStatus.UNPROCESSABLE_ENTITY);
-        assertThat(result.getBody()).isInstanceOf(CallbackErrorResponse.class);
-        CallbackErrorResponse actual = (CallbackErrorResponse) result.getBody();
-        assertThat(actual.getCallbackErrors()).containsExactly("error one", "error two");
-        assertThat(actual.getCallbackWarnings()).containsExactly("warn one");
+        testTemplate(
+            "CallbackErrorResponse(callbackErrors=[Unable to parse error response], callbackWarnings=null)",
+            handler.unprocessableEntity(new FeignException.UnprocessableEntity(
+                "unprocessable",
+                Mockito.mock(feign.Request.class),
+                invalidJson.getBytes(StandardCharsets.UTF_8),
+                Collections.emptyMap()
+            ), contentCachingRequestWrapper),
+            HttpStatus.UNPROCESSABLE_ENTITY
+        );
     }
 
     private <E extends Throwable> void testTemplate(

@@ -27,7 +27,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-public class ResourceExceptionHandlerTest extends BaseIntegrationTest {
+public class ResourceExceptionHandlerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

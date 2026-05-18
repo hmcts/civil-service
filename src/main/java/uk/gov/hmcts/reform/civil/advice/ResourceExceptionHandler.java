@@ -98,9 +98,8 @@ public class ResourceExceptionHandler {
                 .body(errorResponse);
         }
 
-        log.info(exception.getMessage(), exception);
         String errorMessage = "Unprocessable Entity error with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
+        log.info(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
         return ResponseEntity
             .unprocessableEntity()
