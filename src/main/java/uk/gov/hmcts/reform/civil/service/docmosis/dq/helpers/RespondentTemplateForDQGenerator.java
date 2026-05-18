@@ -64,6 +64,7 @@ public class RespondentTemplateForDQGenerator {
 
         return new DirectionsQuestionnaireForm()
             .setCaseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .setCcdCaseReference(caseData.getCcdCaseReference().toString())
             .setReferenceNumber(caseData.getLegacyCaseReference())
             .setSolicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
             .setSubmittedOn(caseData.getRespondent2SameLegalRepresentative().equals(YES)
