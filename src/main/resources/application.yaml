@@ -788,9 +788,9 @@ rd_commondata:
 robotics:
   notification:
     sender: hmcts.civil@gmail.com
-    recipient: hmcts.civil.multiparty.robotics@gmail.com
-    multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
-    specRecipient: hmcts.civil.multiparty.robotics@gmail.com
+    recipient: dane.faulconbridge@hmcts.net
+    multipartyrecipient: dane.faulconbridge@hmcts.net
+    specRecipient: dane.faulconbridge@hmcts.net
     lipJRecipient: civilmoneyclaimsdemo@gmail.com
 
 notification:
