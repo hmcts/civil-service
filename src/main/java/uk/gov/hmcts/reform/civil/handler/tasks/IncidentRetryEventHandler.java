@@ -85,6 +85,9 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private static final Pattern ALREADY_PROCESSED_PATTERN =
         Pattern.compile("already processed|already performed", Pattern.CASE_INSENSITIVE);
     private static final String ACTIVITY_ID = "activityId";
+    private static final String INCIDENT_TIMESTAMP = "incidentTimestamp";
+    private static final String SEARCH_RESULT_INCIDENT_MESSAGE =
+        "Detected by CasesStuckCheckSearchService after incident retry processing";
     private static final String UNKNOWN = "UNKNOWN";
     private static final String STUCK_CASE_EVENT_TYPE = "incidentRetry";
     private static final String STUCK_CASE_EVENT_NAME = "StuckCaseDetected";
@@ -135,12 +138,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         trackDailyStuckCasesSummary(
             incidentStartTime,
             incidentEndTime,
-            retryContext.totalRetries.get(),
-            retryContext.successRetries.get(),
-            retryContext.failedRetries.get(),
             stuckCases,
-            retryContext.stuckCasesForManualIntervention,
-            retryContext.serviceAuthorization
+            retryContext
         );
 
         return new ExternalTaskData();
@@ -364,7 +363,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 serviceAuthorization,
                 true,
                 processInstanceId,
-                "incidentTimestamp",
+                INCIDENT_TIMESTAMP,
                 "desc",
                 1
             );
@@ -504,7 +503,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             .filter(Objects::nonNull)
             .map(String::valueOf)
             .sorted()
-            .filter(caseId -> retryContext.trackedStuckCaseIds.add(caseId))
+            .filter(retryContext.trackedStuckCaseIds::add)
             .forEach(caseId -> trackStuckCaseSearchResultEvent(caseId, retryContext.serviceAuthorization));
     }
 
@@ -550,7 +549,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 return new StuckCaseSearchEnrichment(
                     UNKNOWN,
                     UNKNOWN,
-                    "Detected by CasesStuckCheckSearchService after incident retry processing",
+                    SEARCH_RESULT_INCIDENT_MESSAGE,
                     stateId,
                     lastEventId,
                     failedActivityId,
@@ -562,7 +561,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 serviceAuthorization,
                 true,
                 processInstanceId,
-                "incidentTimestamp",
+                INCIDENT_TIMESTAMP,
                 "desc",
                 1
             );
@@ -571,7 +570,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 return new StuckCaseSearchEnrichment(
                     processInstanceId,
                     UNKNOWN,
-                    "Detected by CasesStuckCheckSearchService after incident retry processing",
+                    SEARCH_RESULT_INCIDENT_MESSAGE,
                     stateId,
                     lastEventId,
                     failedActivityId,
@@ -597,7 +596,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             return new StuckCaseSearchEnrichment(
                 UNKNOWN,
                 UNKNOWN,
-                "Detected by CasesStuckCheckSearchService after incident retry processing",
+                SEARCH_RESULT_INCIDENT_MESSAGE,
                 UNKNOWN,
                 UNKNOWN,
                 UNKNOWN,
@@ -608,12 +607,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private void trackDailyStuckCasesSummary(String incidentStartTime,
                                              String incidentEndTime,
-                                             int totalRetries,
-                                             int successRetries,
-                                             int failedRetries,
                                              Set<CaseDetails> stuckCases,
-                                             List<StuckCaseSummaryItem> stuckCasesForManualIntervention,
-                                             String serviceAuthorization) {
+                                             IncidentRetryContext retryContext) {
         if (stuckCases.isEmpty()) {
             return;
         }
@@ -630,14 +625,14 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         Set<String> processInstanceIds = ConcurrentHashMap.newKeySet();
         Set<String> failedActivityIds = ConcurrentHashMap.newKeySet();
 
-        stuckCasesForManualIntervention.forEach(item -> {
+        retryContext.stuckCasesForManualIntervention.forEach(item -> {
             addIfKnown(incidentIds, item.incidentId());
             addIfKnown(processInstanceIds, item.processInstanceId());
             addIfKnown(failedActivityIds, item.failedActivityId());
         });
 
         stuckCaseIds.forEach(caseId -> {
-            StuckCaseSearchEnrichment enrichment = enrichStuckCaseFromSearch(caseId, serviceAuthorization);
+            StuckCaseSearchEnrichment enrichment = enrichStuckCaseFromSearch(caseId, retryContext.serviceAuthorization);
             addIfKnown(incidentIds, enrichment.incidentId());
             addIfKnown(processInstanceIds, enrichment.processInstanceId());
             addIfKnown(failedActivityIds, enrichment.failedActivityId());
@@ -661,9 +656,9 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         additionalProperties.put("manualInterventionRequired", Boolean.TRUE.toString());
         additionalProperties.put("stuckCaseCount", String.valueOf(stuckCaseIds.size()));
         additionalProperties.put("failedIncidentCount", String.valueOf(failedIncidentIds.size()));
-        additionalProperties.put("totalRetries", String.valueOf(totalRetries));
-        additionalProperties.put("successRetries", String.valueOf(successRetries));
-        additionalProperties.put("failedRetries", String.valueOf(failedRetries));
+        additionalProperties.put("totalRetries", String.valueOf(retryContext.totalRetries.get()));
+        additionalProperties.put("successRetries", String.valueOf(retryContext.successRetries.get()));
+        additionalProperties.put("failedRetries", String.valueOf(retryContext.failedRetries.get()));
         additionalProperties.put("caseIds", String.join(",", stuckCaseIds));
         additionalProperties.put("incidentIds", String.join(",", failedIncidentIds));
         additionalProperties.put("processInstanceIds", String.join(",", failedProcessInstanceIds));
@@ -705,7 +700,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                         serviceAuthorization,
                         true,                   // open incidents only
                         processInstanceId,       // single process instance
-                        "incidentTimestamp",     // use default sortBy
+                        INCIDENT_TIMESTAMP,      // use default sortBy
                         "desc",                  // use default sortOrder
                         1                        // use default maxResults
                     );
