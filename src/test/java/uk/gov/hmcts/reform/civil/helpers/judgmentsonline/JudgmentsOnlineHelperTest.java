@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
@@ -14,6 +15,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -36,6 +39,8 @@ import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineH
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getMoneyValue;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getPartialPayment;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isNonDivergentForDJ;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isDefaultJudgmentGranted;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isDefaultJudgmentRequested;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class JudgmentsOnlineHelperTest {
@@ -229,5 +234,38 @@ public class JudgmentsOnlineHelperTest {
         assertThat(clearedCaseData.getRepaymentSuggestion()).isNull();
         assertThat(clearedCaseData.getRepaymentSummaryObject()).isNull();
         assertThat(clearedCaseData.getShowOldDJFixedCostsScreen()).isNull();
+    }
+
+    @Test
+    void shouldIdentifyDefaultJudgmentGranted() {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .activeJudgment(new JudgmentDetails()
+                                .setType(JudgmentType.DEFAULT_JUDGMENT)
+                                .setState(JudgmentState.ISSUED))
+            .build();
+
+        assertThat(isDefaultJudgmentGranted(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotIdentifyDefaultJudgmentGrantedWhenStateOrJudgmentDoNotMatch() {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.JUDGMENT_REQUESTED)
+            .activeJudgment(new JudgmentDetails()
+                                .setType(JudgmentType.DEFAULT_JUDGMENT)
+                                .setState(JudgmentState.ISSUED))
+            .build();
+
+        assertThat(isDefaultJudgmentGranted(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldIdentifyDefaultJudgmentRequested() {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.JUDGMENT_REQUESTED)
+            .build();
+
+        assertThat(isDefaultJudgmentRequested(caseData)).isTrue();
     }
 }

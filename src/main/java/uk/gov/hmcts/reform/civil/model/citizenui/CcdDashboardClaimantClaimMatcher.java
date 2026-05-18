@@ -26,7 +26,6 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isDefaultJudgmentGranted;
 
 @Slf4j
 public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
@@ -324,11 +323,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             || Objects.nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
-    }
-
-    @Override
-    public boolean isDefaultJudgementGranted() {
-        return isDefaultJudgmentGranted(caseData, featureToggleService);
     }
 
     @Override

@@ -29,7 +29,8 @@ public class DjNonDivergentClaimantDashboardService extends DashboardScenarioSer
 
     @Override
     public String getScenario(CaseData caseData) {
-        return isDefaultJudgmentGranted(caseData, featureToggleService)
+        return featureToggleService.isJudgmentBufferEnabled()
+            && isDefaultJudgmentGranted(caseData)
             ? SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_GRANTED_CLAIMANT.getScenario()
             : SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT.getScenario();
     }

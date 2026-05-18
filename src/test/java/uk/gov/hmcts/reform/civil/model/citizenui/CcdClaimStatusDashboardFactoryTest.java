@@ -186,7 +186,7 @@ class CcdClaimStatusDashboardFactoryTest {
                 Collections.emptyList()
             ));
 
-        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT);
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_REQUESTED);
     }
 
     @Test
@@ -205,6 +205,24 @@ class CcdClaimStatusDashboardFactoryTest {
             ));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_GRANTED);
+    }
+
+    @Test
+    void given_judgmentBufferEnabledAndJudgmentRequested_whenClaimantGetStatus_thenReturnDefaultJudgementRequestedStatus() {
+        CaseData claim = getClaimWithDefaultJudgementRequest()
+            .toBuilder()
+            .ccdState(CaseState.JUDGMENT_REQUESTED)
+            .build();
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                claim,
+                featureToggleService,
+                Collections.emptyList()
+            ));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_REQUESTED);
     }
 
     @Test

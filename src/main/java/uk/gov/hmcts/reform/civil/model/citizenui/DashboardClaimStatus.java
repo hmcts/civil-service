@@ -174,6 +174,9 @@ public enum DashboardClaimStatus {
     DEFAULT_JUDGEMENT_GRANTED(
         Claim::isDefaultJudgementGranted
     ),
+    DEFAULT_JUDGEMENT_REQUESTED(
+        Claim::isDefaultJudgementRequested
+    ),
     DEFAULT_JUDGEMENT(
         Claim::isClaimantDefaultJudgement
     ),

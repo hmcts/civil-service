@@ -102,6 +102,8 @@ public interface Claim {
 
     boolean isDefaultJudgementGranted();
 
+    boolean isDefaultJudgementRequested();
+
     boolean isPartialAdmissionAccepted();
 
     boolean isPaymentPlanRejected();
