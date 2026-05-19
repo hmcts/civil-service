@@ -376,7 +376,8 @@ def sonarExclusions = [
   "**/informagreedextensiondate/InformAgreedExtensionDateRespSolTwoEmailDTOGenerator.java",
   "**/setasidejudgementrequest/SetAsideJudgementRequestAppSolOneEmailDTOGenerator.java",
   "**/setasidejudgementrequest/SetAsideJudgementRequestRespSolOneEmailDTOGenerator.java",
- " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java"
+ " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java",
+  "**/notification/handlers/mediationsuccessfulandunsuccessful/carmdisabled/CarmDisabledRespSolOneRepresentedEmailDTOGenerator.java"
 ]
 
 sonarqube {
