@@ -20,6 +20,7 @@ import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
@@ -54,7 +55,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
             taskListService,
             scenarioService
         );
-        when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
+        lenient().when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
     }
 
     @Nested
