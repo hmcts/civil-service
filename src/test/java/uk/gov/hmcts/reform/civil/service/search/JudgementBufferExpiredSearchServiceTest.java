@@ -40,7 +40,7 @@ class JudgementBufferExpiredSearchServiceTest extends ElasticSearchServiceTest {
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48Hours.toString()))
+                        .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48Hours))
                         .must(boolQuery().must(matchQuery("state", CaseState.JUDGMENT_REQUESTED.toString())))
                         .must(((JudgementBufferExpiredSearchService) searchService).haveNoOngoingBusinessProcess()));
         return new Query(query, List.of("reference"), fromValue, true);
