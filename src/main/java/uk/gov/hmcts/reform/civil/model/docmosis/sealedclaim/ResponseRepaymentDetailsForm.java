@@ -189,11 +189,13 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
 
     private static void alreadyPaid(CaseData caseData, ResponseRepaymentDetailsFormData data) {
         RespondToClaim respondToClaim = caseData.getResponseToClaim();
-        String howMuchWasPaidAsString = MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "";
-        data.setWhyReject("ALREADY_PAID")
-            .setHowMuchWasPaid(howMuchWasPaidAsString)
-            .setPaymentDate(respondToClaim.getWhenWasThisAmountPaid())
-            .setPaymentHow(respondToClaim.getExplanationOnHowTheAmountWasPaid());
+        if (respondToClaim != null) {
+            String howMuchWasPaidAsString = MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "";
+            data.setWhyReject("ALREADY_PAID")
+                .setHowMuchWasPaid(howMuchWasPaidAsString)
+                .setPaymentDate(respondToClaim.getWhenWasThisAmountPaid())
+                .setPaymentHow(respondToClaim.getExplanationOnHowTheAmountWasPaid());
+        }
     }
 
     private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, ResponseRepaymentDetailsFormData data) {
@@ -218,7 +220,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
 
     private static void partAdmissionData(CaseData caseData, ResponseRepaymentDetailsFormData data) {
         addDetailsOnWhyClaimIsRejected(caseData, data);
-        if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
+        if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES || caseData.getSpecDefenceAdmitted2Required() == YesOrNo.YES) {
             alreadyPaid(caseData, data);
         } else {
             BigDecimal amountInPennies =

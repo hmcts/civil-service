@@ -355,6 +355,7 @@ class RespondToClaimConfirmationTextSpecGeneratorTest
                 .atStateApplicantRespondToDefenceAndProceed()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .totalClaimAmount(totalClaimAmount)
+                .isRespondent1(YesOrNo.YES)
                 .respondent1Represented(isLipVLR ? YesOrNo.YES : YesOrNo.NO)
                 .applicant1Represented(isLipVLR ? YesOrNo.NO : YesOrNo.YES)
                 .build();

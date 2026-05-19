@@ -2886,6 +2886,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondToAdmittedClaim(respondToClaim);
             BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
             caseData.setTotalClaimAmount(totalClaimAmount);
+            caseData.setIsRespondent1(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             // When
@@ -2894,9 +2895,40 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getConfirmationBody())
                     .contains(caseData.getApplicant1().getPartyName())
+                    .contains("You told us you've paid the")
                     .contains("The claim will be settled. We'll contact you when they respond.")
                     .contains(MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid())
                             .toString());
+
+        }
+
+        @Test
+        void specificSummary_whenPartialAdmitRespondent2PaidLess() {
+            // Given
+            BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setSpecDefenceAdmitted2Required(YesOrNo.YES);
+            RespondToClaim respondToClaim  = new RespondToClaim();
+            respondToClaim.setHowMuchWasPaid(howMuchWasPaid);
+            caseData.setRespondToAdmittedClaim2(respondToClaim);
+            BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
+            caseData.setTotalClaimAmount(totalClaimAmount);
+            caseData.setIsRespondent2(YesOrNo.YES);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains("You told us you've paid the")
+                .contains("The claim will be settled. We'll contact you when they respond.")
+                .contains(MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaim2().getHowMuchWasPaid())
+                              .toString());
 
         }
 
