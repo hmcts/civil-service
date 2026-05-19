@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -28,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class NoticeOfChangeRequestCallbackHandler extends CallbackHandler {
 
@@ -59,7 +61,7 @@ public class NoticeOfChangeRequestCallbackHandler extends CallbackHandler {
 
     private CallbackResponse checkNoticeOfChangeApproval(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
+        log.info("NoC request for checkNocApproval: {}", callbackParams.getRequest());
         return caseAssignmentApi.checkNocApproval(
             authToken, authTokenGenerator.generate(), callbackParams.getRequest());
     }
