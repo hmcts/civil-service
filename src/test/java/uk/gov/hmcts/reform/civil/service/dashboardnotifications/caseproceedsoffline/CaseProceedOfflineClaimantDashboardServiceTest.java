@@ -273,6 +273,29 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 any(ScenarioRequestParams.class)
             );
         }
+
+        @Test
+        void shouldNotRecordPrimaryScenario_whenInvokedForLipvLRCaseInCaseProgression_ButNotOneVOne() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO)
+                .addApplicant2(YesOrNo.YES)
+                .ccdCaseReference(1234L)
+                .previousCCDState(uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION)
+                .build();
+
+            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
+
+            service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
+
+            // Primary scenario should NOT be recorded because it is 2v1, not 1v1
+            verify(dashboardScenariosService, org.mockito.Mockito.never()).recordScenarios(
+                eq(AUTH_TOKEN),
+                eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario()),
+                eq(caseData.getCcdCaseReference().toString()),
+                any(ScenarioRequestParams.class)
+            );
+        }
     }
 
     private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
