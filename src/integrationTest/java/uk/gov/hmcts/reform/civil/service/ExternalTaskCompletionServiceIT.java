@@ -5,11 +5,11 @@ import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
@@ -23,8 +23,12 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -52,19 +56,31 @@ class ExternalTaskCompletionServiceIT {
         ExternalTaskCompletionService externalTaskCompletionService() {
             return new ExternalTaskCompletionService();
         }
+
+        @Bean
+        TestExternalTaskHandler testExternalTaskHandler() {
+            return new TestExternalTaskHandler();
+        }
     }
 
-    @MockBean
     private BaseExternalTaskHandler handler;
-    @MockBean
     private ExternalTask externalTask;
-    @MockBean
     private ExternalTaskService externalTaskService;
-    @MockBean
     private ExternalTaskData data;
 
     @Autowired
     private ExternalTaskCompletionService service;
+
+    @Autowired
+    private TestExternalTaskHandler testExternalTaskHandler;
+
+    @BeforeEach
+    void setUp() {
+        handler = mock(BaseExternalTaskHandler.class);
+        externalTask = mock(ExternalTask.class);
+        externalTaskService = mock(ExternalTaskService.class);
+        data = mock(ExternalTaskData.class);
+    }
 
     @Test
     void shouldRetryCompletionOnTransientFailureAndEventuallySucceed() {
@@ -130,5 +146,43 @@ class ExternalTaskCompletionServiceIT {
 
         verify(externalTaskService).complete(externalTask, null);
         verify(handler, never()).handleFailureNotRetryable(any(), any(), any());
+    }
+
+    @Test
+    void shouldRecoverAfterRetriesExhaustedWithoutTriggeringGenericHandlerFailure() {
+        when(externalTask.getTopicName()).thenReturn(TOPIC);
+        when(externalTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
+        when(externalTask.getRetries()).thenReturn(null);
+
+        doThrow(new RuntimeException("boom"))
+            .when(externalTaskService).complete(externalTask, null);
+
+        assertThatCode(() -> testExternalTaskHandler.execute(externalTask, externalTaskService))
+            .doesNotThrowAnyException();
+
+        verify(externalTaskService, times(3)).complete(externalTask, null);
+        // Failure without retry
+        verify(externalTaskService).handleFailure(
+            eq(externalTask),
+            contains("boom"),
+            anyString(),
+            eq(0),
+            eq(1000L)
+        );
+        // Failure with retry - generic
+        verify(externalTaskService, never()).handleFailure(
+            eq(externalTask),
+            anyString(),
+            anyString(),
+            eq(2),
+            anyLong()
+        );
+    }
+
+    static class TestExternalTaskHandler extends BaseExternalTaskHandler {
+        @Override
+        protected ExternalTaskData handleTask(ExternalTask externalTask) {
+            return null;
+        }
     }
 }
