@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.DefResponse.MoreTimeRequested.JR.Cancelled.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "The CCJ has been cancelled",
+  "titleCy": "Mae’r CCJ wedi cael ei ganslo.",
+  "descriptionEn": "<p class=\"govuk-body\">The defendant has been granted an extension of time to respond to the claim. The CCJ you requested has been cancelled.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae’r diffynnydd wedi cael estyniad amser i ymateb i’r hawliad. Mae’r CCJ y gwnaethoch ofyn amdano wedi’i ganslo.</p>"
+}

@@ -3,17 +3,25 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.informagreedext
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT;
+import java.util.Map;
+
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.*;
 
 @Service
 public class InformAgreedExtensionDateSpecClaimantDashboardService extends DashboardScenarioService {
 
-    public InformAgreedExtensionDateSpecClaimantDashboardService(DashboardScenariosService dashboardScenariosService, DashboardNotificationsParamsMapper mapper) {
+    private final FeatureToggleService featureToggleService;
+
+    public InformAgreedExtensionDateSpecClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
+                                                                 DashboardNotificationsParamsMapper mapper,
+                                                                 FeatureToggleService featureToggleService) {
         super(dashboardScenariosService, mapper);
+        this.featureToggleService = featureToggleService;
     }
 
     public void notifyInformAgreedExtensionDateSpec(CaseData caseData, String authToken) {
@@ -23,6 +31,14 @@ public class InformAgreedExtensionDateSpecClaimantDashboardService extends Dashb
     @Override
     public String getScenario(CaseData caseData) {
         return SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT.getScenario();
+    }
+
+
+    @Override
+    protected Map<String, Boolean> getScenarios(CaseData caseData) {
+        return Map.of(SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_JR_CANCELLED_CLAIMANT.getScenario(),
+                      featureToggleService.isJudgmentBufferEnabled()
+                          && YesOrNo.YES.equals(caseData.getIsJoRequested()));
     }
 
     @Override
