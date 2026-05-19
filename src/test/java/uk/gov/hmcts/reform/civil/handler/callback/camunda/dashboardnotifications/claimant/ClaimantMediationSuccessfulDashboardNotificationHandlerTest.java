@@ -71,7 +71,6 @@ class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends BaseCa
     void createDashboardNotificationsWhenCarmIsEnabled() {
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         params.put("ccdCaseReference", "123");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -100,7 +99,6 @@ class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends BaseCa
     @Test
     void createDashboardNotificationsWhenCarmIsDisabled() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");

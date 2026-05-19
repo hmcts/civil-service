@@ -69,11 +69,7 @@ public class DashboardClaimInfoService {
         List<DashboardClaimInfo> ocmcClaims = getClaimsForClaimant(authorisation, claimantId);
 
         int startIndex = (currentPage - 1) * CASES_PER_PAGE;
-        SearchResult ccdData = null;
-
-        if (featureToggleService.isLipVLipEnabled()) {
-            ccdData = coreCaseDataService.getCCDClaimsForLipClaimant(authorisation, startIndex);
-        }
+        SearchResult ccdData = coreCaseDataService.getCCDClaimsForLipClaimant(authorisation, startIndex);
 
         int totalPages = getTotalPagesToBeListed(getCcdClaimsCount(ccdData) + ocmcClaims.size());
         List<DashboardClaimInfo> currentPageItems = currentPage <= totalPages

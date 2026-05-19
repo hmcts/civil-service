@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -42,9 +41,6 @@ class StayLiftedDefendantDashboardServiceTest {
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @InjectMocks
     private StayLiftedDefendantDashboardService stayLiftedDefendantDashboardService;
 
@@ -65,21 +61,7 @@ class StayLiftedDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotRecordScenarios_whenLipVLipDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-        caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setPreStayState(IN_MEDIATION.toString());
-
-        stayLiftedDefendantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
-
-        verify(dashboardScenariosService, never()).recordScenarios(any(), any(), any(), any());
-    }
-
-    @Test
     void shouldRecordMainScenario_only_whenPreStayStateIsMediation() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
@@ -94,7 +76,6 @@ class StayLiftedDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordResetAndViewDocumentScenarios_forPfHcHAndHearingReadiness() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
@@ -112,7 +93,6 @@ class StayLiftedDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordViewDocumentsNotAvailable_whenNoEvidenceUploaded() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
@@ -128,7 +108,6 @@ class StayLiftedDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordAllScenarios_forAllFinalOrdersIssued() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
