@@ -404,7 +404,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
         @SuppressWarnings("unchecked")
         Map<String, Object> file = (Map<String, Object>) responseDocumentData.get("file");
-        assertThat(file.get("categoryID")).isEqualTo("directionsQuestionnaire");
+        assertThat(file.get("category_id")).isEqualTo("directionsQuestionnaire");
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
