@@ -47,8 +47,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -534,6 +533,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (isNonDivergentForDJ && isJudgementBufferEnabledForCase(caseData)) {
             nextState = CaseState.JUDGMENT_REQUESTED.name();
             caseData.setIsJoRequested(YesOrNo.YES);
+            caseData.setBusinessProcess(BusinessProcess.ready(JUDGMENT_REQUESTED_SPEC));
         } else if (isNonDivergentForDJ && featureToggleService.isJudgmentOnlineLive()) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
