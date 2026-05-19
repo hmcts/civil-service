@@ -22,11 +22,14 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.model.citizenui.ManageDocumentType.WITHOUT_PREJUDICE_PART_36_OFFER_OR_REJECTIONS;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ManageDocumentsHandler extends CallbackHandler {
+
+    private static final String WITHOUT_PREJUDICE_CATEGORY_ID = "WithoutPrejudice";
 
     private static final List<CaseEvent> EVENTS = List.of(MANAGE_DOCUMENTS);
     private final ObjectMapper objectMapper;
@@ -55,10 +58,7 @@ public class ManageDocumentsHandler extends CallbackHandler {
             log.info("submit data callback called {}", caseData.getCcdCaseReference());
             for (Element<ManageDocument> element : manageDocumentsList) {
                 ManageDocument manageDocument = element.getValue();
-                Document documentLink = manageDocument.getDocumentLink();
-                if (documentLink != null) {
-                    manageDocument.setDocumentLink(preserveCategoryId(callbackParams, documentLink));
-                }
+                manageDocument.setDocumentLink(resolveCategoryId(callbackParams, manageDocument));
             }
             caseData.setManageDocuments(manageDocumentsList);
             taskListService.makeViewDocumentTaskAvailable(caseData.getCcdCaseReference().toString());
@@ -69,27 +69,51 @@ public class ManageDocumentsHandler extends CallbackHandler {
             .build();
     }
 
-    private Document preserveCategoryId(CallbackParams callbackParams, Document documentLink) {
+    private Document resolveCategoryId(CallbackParams callbackParams, ManageDocument manageDocument) {
+        Document documentLink = manageDocument.getDocumentLink();
+        if (documentLink == null) {
+            return null;
+        }
+
+        Document documentWithCategory = documentLink;
+        Document previousDocumentLink = findPreviousDocumentLink(callbackParams, documentLink.getDocumentBinaryUrl());
+        if (previousDocumentLink != null) {
+            documentWithCategory = copyDocumentWithCategory(documentLink, previousDocumentLink.getCategoryID());
+        }
+
+        if (manageDocument.getDocumentType() == WITHOUT_PREJUDICE_PART_36_OFFER_OR_REJECTIONS
+            && documentWithCategory.getCategoryID() == null) {
+            return copyDocumentWithCategory(documentWithCategory, WITHOUT_PREJUDICE_CATEGORY_ID);
+        }
+
+        return documentWithCategory;
+    }
+
+    private Document findPreviousDocumentLink(CallbackParams callbackParams, String documentBinaryUrl) {
         CaseData caseDataBefore = callbackParams.getCaseDataBefore();
-        if (caseDataBefore != null) {
-            List<Element<ManageDocument>> manageDocumentsListBefore = caseDataBefore.getManageDocumentsList();
-            if (!manageDocumentsListBefore.isEmpty()) {
-                for (Element<ManageDocument> element : manageDocumentsListBefore) {
-                    ManageDocument manageDocument = element.getValue();
-                    Document previousDocumentLink = manageDocument.getDocumentLink();
-                    if (previousDocumentLink != null
-                        && documentLink.getDocumentBinaryUrl().equals(previousDocumentLink.getDocumentBinaryUrl())) {
-                        return new Document()
-                            .setDocumentUrl(documentLink.getDocumentUrl())
-                            .setDocumentBinaryUrl(documentLink.getDocumentBinaryUrl())
-                            .setDocumentFileName(documentLink.getDocumentFileName())
-                            .setDocumentHash(documentLink.getDocumentHash())
-                            .setCategoryID(previousDocumentLink.getCategoryID())
-                            .setUploadTimestamp(documentLink.getUploadTimestamp());
-                    }
-                }
+        if (caseDataBefore == null) {
+            return null;
+        }
+
+        List<Element<ManageDocument>> manageDocumentsListBefore = caseDataBefore.getManageDocumentsList();
+        for (Element<ManageDocument> element : manageDocumentsListBefore) {
+            Document previousDocumentLink = element.getValue().getDocumentLink();
+            if (previousDocumentLink != null
+                && documentBinaryUrl.equals(previousDocumentLink.getDocumentBinaryUrl())) {
+                return previousDocumentLink;
             }
         }
-        return documentLink;
+
+        return null;
+    }
+
+    private Document copyDocumentWithCategory(Document source, String categoryId) {
+        return new Document()
+            .setDocumentUrl(source.getDocumentUrl())
+            .setDocumentBinaryUrl(source.getDocumentBinaryUrl())
+            .setDocumentFileName(source.getDocumentFileName())
+            .setDocumentHash(source.getDocumentHash())
+            .setCategoryID(categoryId)
+            .setUploadTimestamp(source.getUploadTimestamp());
     }
 }
