@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum RolePool {
     ADMIN("Court staff"),
+    CTSC("CTSC staff"),
     JUDICIAL("Judge"),
     JUDICIAL_DISTRICT("District Judge"),
     JUDICIAL_CIRCUIT("Circuit Judge"),
