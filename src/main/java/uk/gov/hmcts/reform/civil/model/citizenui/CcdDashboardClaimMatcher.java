@@ -72,12 +72,19 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     public boolean isClaimProceedInCaseMan() {
         List<CaseState> caseMovedInCaseManStates = List.of(CaseState.AWAITING_APPLICANT_INTENTION,
                                                            CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+                                                           CaseState.JUDGMENT_REQUESTED,
                                                            CaseState.IN_MEDIATION, CaseState.JUDICIAL_REFERRAL
         );
 
-        return Objects.nonNull(caseData.getTakenOfflineDate())
+        return hasCaseProceedOfflineDate()
             && Objects.nonNull(caseData.getPreviousCCDState())
             && (caseMovedInCaseManStates.contains(caseData.getPreviousCCDState()));
+    }
+
+    protected boolean hasCaseProceedOfflineDate() {
+        return Objects.nonNull(caseData.getTakenOfflineDate())
+            || (CaseState.JUDGMENT_REQUESTED.equals(caseData.getPreviousCCDState())
+                && Objects.nonNull(caseData.getTakenOfflineByStaffDate()));
     }
 
     protected boolean isSDOMadeByLegalAdviser() {

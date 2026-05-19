@@ -151,7 +151,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             return false;
         }
 
-        return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
+        return hasCaseProceedOfflineDate() && Objects.nonNull(caseData.getCcdState())
             && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
     }
 
