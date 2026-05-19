@@ -10,7 +10,8 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.*;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_JR_CANCELLED_CLAIMANT;
 
 @Service
 public class InformAgreedExtensionDateSpecClaimantDashboardService extends DashboardScenarioService {
@@ -32,7 +33,6 @@ public class InformAgreedExtensionDateSpecClaimantDashboardService extends Dashb
     public String getScenario(CaseData caseData) {
         return SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT.getScenario();
     }
-
 
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
