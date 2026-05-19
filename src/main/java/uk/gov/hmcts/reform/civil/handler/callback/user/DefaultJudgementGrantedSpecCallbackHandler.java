@@ -103,9 +103,9 @@ public class DefaultJudgementGrantedSpecCallbackHandler extends CallbackHandler 
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
         activeJudgment.setState(JudgmentState.ISSUED)
             .setIssueDate(LocalDate.now())
-            .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState());
+            .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .setIsRegisterWithRTL(YES);
 
-        caseData.setJoIsRegisteredWithRTL(YES);
         caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
 
         return caseData;
