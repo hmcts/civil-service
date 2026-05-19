@@ -36,7 +36,7 @@ public class JudgementBufferExpiredSearchService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48WorkingHours.toString()))
+                            .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48WorkingHours))
                             .must(beState(CaseState.JUDGMENT_REQUESTED))
                             .must(haveNoOngoingBusinessProcess())
                 ),
