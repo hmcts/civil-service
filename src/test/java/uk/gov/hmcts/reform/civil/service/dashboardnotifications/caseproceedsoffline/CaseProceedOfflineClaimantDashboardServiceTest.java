@@ -309,4 +309,45 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
             "Applications"
         );
     }
+
+    @Nested
+    class EligibleForCaseProgressionState {
+
+        @Test
+        void shouldReturnTrue_whenLipVLipOneVOne() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+
+            boolean result = service.eligibleForCaseProgressionState(caseData);
+
+            org.junit.jupiter.api.Assertions.assertTrue(result);
+        }
+
+        @Test
+        void shouldReturnTrue_whenLipVLROneVOne() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+
+            boolean result = service.eligibleForCaseProgressionState(caseData);
+
+            org.junit.jupiter.api.Assertions.assertTrue(result);
+        }
+
+        @Test
+        void shouldReturnFalse_whenNotOneVOne() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO)
+                .addApplicant2(YesOrNo.YES)
+                .build();
+
+            boolean result = service.eligibleForCaseProgressionState(caseData);
+
+            org.junit.jupiter.api.Assertions.assertFalse(result);
+        }
+    }
 }
