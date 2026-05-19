@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
@@ -49,7 +50,7 @@ class CarmDisabledRespSolOneRepresentedEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyForLrVsLrOneVOne() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseDataBuilder()
             .applicant1Represented(YesOrNo.YES)
             .respondent1Represented(YesOrNo.YES)
             .build();
@@ -59,7 +60,7 @@ class CarmDisabledRespSolOneRepresentedEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotifyForLipVsLrOneVOne() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseDataBuilder()
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.YES)
             .build();

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulanduns
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmDefendantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmRespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmRespSolTwoEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Set;
@@ -61,7 +62,7 @@ class MediationUpdateAllPartiesEmailGeneratorTest {
     @InjectMocks
     private MediationUpdateAllPartiesEmailGenerator generator;
 
-    private final CaseData caseData = CaseData.builder().ccdCaseReference(123456789L).build();
+    private final CaseData caseData = new CaseDataBuilder().ccdCaseReference(123456789L).build();
     private final String taskId = "some-task-id";
 
     @Test
