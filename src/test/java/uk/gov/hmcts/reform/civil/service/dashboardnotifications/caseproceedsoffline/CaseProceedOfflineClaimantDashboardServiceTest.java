@@ -20,7 +20,6 @@ import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
@@ -55,7 +54,6 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
             taskListService,
             scenarioService
         );
-        lenient().when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
     }
 
     @Nested
@@ -70,6 +68,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 .previousCCDState(All_FINAL_ORDERS_ISSUED)
                 .build();
 
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
@@ -94,6 +93,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 .previousCCDState(All_FINAL_ORDERS_ISSUED)
                 .build();
 
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
@@ -123,6 +123,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 .previousCCDState(uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION)
                 .build();
 
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
@@ -145,6 +146,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 .previousCCDState(uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION)
                 .build();
 
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
@@ -167,6 +169,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 .previousCCDState(uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL)
                 .build();
 
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
@@ -189,6 +192,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 .previousCCDState(uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION)
                 .build();
 
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
@@ -211,6 +215,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 .previousCCDState(uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION)
                 .build();
 
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
@@ -233,6 +238,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 .previousCCDState(uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION)
                 .build();
 
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
@@ -262,6 +268,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 .previousCCDState(uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION)
                 .build();
 
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
@@ -285,6 +292,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 .previousCCDState(uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION)
                 .build();
 
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
