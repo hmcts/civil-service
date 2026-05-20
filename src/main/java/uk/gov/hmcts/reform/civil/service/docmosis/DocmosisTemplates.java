@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.
 import jakarta.validation.constraints.NotNull;
 
 public enum DocmosisTemplates {
-    N1("CV-UNS-CLM-ENG-01126.docx", SEALED_CLAIM_FORM),
+    N1("CV-UNS-CLM-ENG-99999999.docx", SEALED_CLAIM_FORM),
     N1_MULTIPARTY_SAME_SOL("CV-UNS-CLM-ENG-01125.docx", SEALED_CLAIM_FORM),
     N2("CV-SPC-CLM-ENG-01349.docx", SEALED_CLAIM_FORM_SPEC),
     N2_2V1_LIP("CV-SPC-CLM-ENG-01355.docx", SEALED_CLAIM_FORM_SPEC),
