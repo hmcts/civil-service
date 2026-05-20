@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -38,10 +37,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class DefaultJudgementGrantedSpecCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_GRANTED_SPEC);
-    private static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
-    private static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
-        + "%n%n The defendant will be served with the Default Judgment.";
-    private static final String CASES_CASE_DETAILS_CLAIM_DOCUMENTS = "/cases/case-details/%s#Claim documents";
 
     private final ObjectMapper objectMapper;
 
@@ -54,7 +49,7 @@ public class DefaultJudgementGrantedSpecCallbackHandler extends CallbackHandler 
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_SUBMIT), this::handleAboutToSubmit)
-            .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
             .build();
     }
 
@@ -109,17 +104,5 @@ public class DefaultJudgementGrantedSpecCallbackHandler extends CallbackHandler 
         caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
 
         return caseData;
-    }
-
-    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        return SubmittedCallbackResponse.builder()
-            .confirmationHeader(JUDGMENT_GRANTED_HEADER)
-            .confirmationBody(format(
-                JUDGMENT_GRANTED,
-                format(CASES_CASE_DETAILS_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
-            ))
-            .build();
     }
 }
