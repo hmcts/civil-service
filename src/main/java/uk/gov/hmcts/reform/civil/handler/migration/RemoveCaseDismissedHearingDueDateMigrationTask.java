@@ -35,7 +35,7 @@ public class RemoveCaseDismissedHearingDueDateMigrationTask extends MigrationTas
         if (caseData == null || caseReference == null) {
             throw new IllegalArgumentException("CaseData and CaseReference must not be null");
         } else {
-            return caseData;
+            return caseData.toBuilder().caseDismissedHearingFeeDueDate(null).build();
         }
     }
 

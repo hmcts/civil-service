@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
@@ -22,7 +23,7 @@ class RemoveCaseDismissedHearingDueDateMigrationTaskTest {
     }
 
     @Test
-    void shouldKeepCaseDataAndUseExplicitNullificationForCaseDismissedHearingFeeDueDate() {
+    void shouldRemoveCaseDismissedHearingDueDateSuccessfully() {
         LocalDateTime hearingFeeDueDate = LocalDateTime.of(2024, 8, 6, 12, 0);
         CaseData caseData = CaseData.builder()
             .caseDismissedHearingFeeDueDate(hearingFeeDueDate)
@@ -31,7 +32,7 @@ class RemoveCaseDismissedHearingDueDateMigrationTaskTest {
 
         CaseData updatedCaseData = task.migrateCaseData(caseData, caseReference);
 
-        assertEquals(hearingFeeDueDate, updatedCaseData.getCaseDismissedHearingFeeDueDate());
+        assertNull(updatedCaseData.getCaseDismissedHearingFeeDueDate());
         assertEquals(List.of("caseDismissedHearingFeeDueDate"), task.getFieldsToNullify());
     }
 
