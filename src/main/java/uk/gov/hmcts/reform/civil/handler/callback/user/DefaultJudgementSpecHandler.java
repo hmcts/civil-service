@@ -123,7 +123,10 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        if (isJudgementBufferEnabledForCase(caseData)
+            && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            return format(JUDGMENT_REQUESTED_HEADER);
+        } else if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             return format(JUDGMENT_GRANTED_HEADER);
         } else if (caseData.isLRvLipOneVOne()
             || (caseData.getRespondent2() != null
@@ -137,7 +140,10 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getBody(CaseData caseData) {
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        if (isJudgementBufferEnabledForCase(caseData)
+            && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            return format(JUDGMENT_REQUESTED_LIP_CASE);
+        } else if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             return format(JUDGMENT_GRANTED, format(
                 CASES_CASE_DETAILS_CLAIM_DOCUMENTS,
                 caseData.getCcdCaseReference()
@@ -501,13 +507,18 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (featureToggleService.isJudgmentOnlineLive()) {
-            JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
+            JudgmentDetails activeJudgment;
+            if (isJudgementBufferEnabledForCase(caseData)) {
+                activeJudgment = djOnlineMapper.addPendingIssueActiveJudgment(caseData);
+            } else {
+                activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
+                caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            }
             caseData.setActiveJudgment(activeJudgment);
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
                 activeJudgment,
                 true
             ));
-            caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             caseData.setJoDJCreatedDate(time.now());
         }
 
@@ -518,7 +529,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         ));
         String nextState;
 
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        boolean isNonDivergentForDJ = JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
+
+        if (isNonDivergentForDJ && isJudgementBufferEnabledForCase(caseData)) {
+            nextState = CaseState.JUDGMENT_REQUESTED.name();
+            caseData.setIsJoRequested(YesOrNo.YES);
+        } else if (isNonDivergentForDJ && featureToggleService.isJudgmentOnlineLive()) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else {
@@ -541,6 +557,11 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return name;
     }
 
+    private boolean isJudgementBufferEnabledForCase(CaseData caseData) {
+        return featureToggleService.isJudgmentBufferEnabled()
+            && caseData.isRespondent1NotRepresented();
+    }
+
     class RepaymentSummary {
         private final String repaymentBreakdown;
         private final BigDecimal overallTotal;
@@ -552,6 +573,4 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
 }
-
-
 
