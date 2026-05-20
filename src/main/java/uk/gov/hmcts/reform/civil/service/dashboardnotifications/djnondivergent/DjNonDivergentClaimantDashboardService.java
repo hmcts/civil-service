@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.djnondivergent;
 
-import org.apache.lucene.search.grouping.GroupFacetCollector;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
