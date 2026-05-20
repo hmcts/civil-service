@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
@@ -34,13 +35,21 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && !RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
             || !RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            && !RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE.equals(
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired2())) {
             return Optional.empty();
         }
 
         BigDecimal admitOwed = caseData.getRespondToAdmittedClaimOwingAmountPounds();
         LocalDate whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        if (YES.equals(caseData.getIsRespondent2())) {
+            if (caseData.getRespondToClaimAdmitPartLRspec2() != null) {
+                whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec2().getWhenWillThisAmountBePaid();
+            }
+        }
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
         if (Stream.of(admitOwed, whenWillYouPay, totalClaimAmount)
             .anyMatch(Objects::isNull)) {

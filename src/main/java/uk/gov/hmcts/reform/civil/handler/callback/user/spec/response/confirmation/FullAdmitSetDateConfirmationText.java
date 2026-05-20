@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 
 @Component
@@ -20,13 +21,23 @@ public class FullAdmitSetDateConfirmationText implements RespondToClaimConfirmat
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && !RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
             || !YesOrNo.NO.equals(caseData.getSpecDefenceFullAdmittedRequired())
+            && !YesOrNo.NO.equals(caseData.getSpecDefenceFullAdmitted2Required())
             || !RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            && !RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE.equals(
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired2())) {
             return Optional.empty();
         }
 
         LocalDate whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+
+        if (YES.equals(caseData.getIsRespondent2())) {
+            if (caseData.getRespondToClaimAdmitPartLRspec2() != null) {
+                whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec2().getWhenWillThisAmountBePaid();
+            }
+        }
 
         String applicantName = caseData.getApplicant1().getPartyName();
         if (caseData.getApplicant2() != null) {

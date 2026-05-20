@@ -2647,12 +2647,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void specificSummary_whenPartialAdmitPaidFull() {
             // Given
             BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
-            BigDecimal howMuchWasPaid = new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .build();
             caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
             caseData.setSpecDefenceAdmittedRequired(YesOrNo.YES);
+            caseData.setIsRespondent1(YesOrNo.YES);
+            BigDecimal howMuchWasPaid = new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount));
             RespondToClaim respondToClaim = new  RespondToClaim();
             respondToClaim.setHowMuchWasPaid(howMuchWasPaid);
             caseData.setRespondToAdmittedClaim(respondToClaim);
@@ -2665,6 +2666,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getConfirmationBody())
                     .contains(caseData.getApplicant1().getPartyName())
+                    .contains("You told us you've paid the")
                     .contains(caseData.getTotalClaimAmount().toString());
         }
 
