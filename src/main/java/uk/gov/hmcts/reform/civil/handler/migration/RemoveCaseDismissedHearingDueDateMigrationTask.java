@@ -17,11 +17,6 @@ public class RemoveCaseDismissedHearingDueDateMigrationTask extends MigrationTas
     }
 
     @Override
-    protected String getEventSummary() {
-        return "Remove hearing dismissed due date Migration";
-    }
-
-    @Override
     protected String getEventDescription() {
         return "This task removes the hearing dismissed due date for cases based on the provided case references.";
     }
@@ -33,5 +28,10 @@ public class RemoveCaseDismissedHearingDueDateMigrationTask extends MigrationTas
         } else {
             return caseData.toBuilder().caseDismissedHearingFeeDueDate(null).build();
         }
+    }
+
+    @Override
+    protected String getEventSummary() {
+        return "Remove hearing dismissed due date Migration";
     }
 }
