@@ -10,12 +10,15 @@ import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledAppSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledDefendantEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledRespSolOneRepresentedEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledRespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledRespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmAppSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmDefendantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmRespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmRespSolTwoEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Set;
@@ -45,6 +48,10 @@ class MediationUpdateAllPartiesEmailGeneratorTest {
     @Mock
     private CarmDisabledRespSolOneEmailDTOGenerator carmDisabledRespSolOneEmailDTOGenerator;
     @Mock
+    private CarmDisabledRespSolOneRepresentedEmailDTOGenerator carmDisabledRespSolOneRepresentedEmailDTOGenerator;
+    @Mock
+    private CarmDisabledRespSolTwoEmailDTOGenerator carmDisabledRespSolTwoEmailDTOGenerator;
+    @Mock
     private CarmDisabledClaimantEmailDTOGenerator carmDisabledClaimantEmailDTOGenerator;
     @Mock
     private CarmDisabledDefendantEmailDTOGenerator carmDisabledDefendantEmailDTOGenerator;
@@ -55,7 +62,7 @@ class MediationUpdateAllPartiesEmailGeneratorTest {
     @InjectMocks
     private MediationUpdateAllPartiesEmailGenerator generator;
 
-    private final CaseData caseData = CaseData.builder().ccdCaseReference(123456789L).build();
+    private final CaseData caseData = new CaseDataBuilder().ccdCaseReference(123456789L).build();
     private final String taskId = "some-task-id";
 
     @Test
@@ -99,6 +106,14 @@ class MediationUpdateAllPartiesEmailGeneratorTest {
         when(carmDisabledRespSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId))
             .thenReturn(new EmailDTO("test@example.com", "DisabledRespSolOne", null, "ref-id"));
 
+        when(carmDisabledRespSolOneRepresentedEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(true);
+        when(carmDisabledRespSolOneRepresentedEmailDTOGenerator.buildEmailDTO(caseData, taskId))
+            .thenReturn(new EmailDTO("test@example.com", "DisabledRespSolOneRepresented", null, "ref-id"));
+
+        when(carmDisabledRespSolTwoEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(true);
+        when(carmDisabledRespSolTwoEmailDTOGenerator.buildEmailDTO(caseData, taskId))
+            .thenReturn(new EmailDTO("test2@example.com", "DisabledRespSolTwo", null, "ref-id"));
+
         when(carmDisabledClaimantEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(true);
         when(carmDisabledClaimantEmailDTOGenerator.buildEmailDTO(caseData, taskId))
             .thenReturn(new EmailDTO("test@example.com", "DisabledClaimant", null, "ref-id"));
@@ -111,7 +126,9 @@ class MediationUpdateAllPartiesEmailGeneratorTest {
 
         Set<EmailDTO> emails = generator.getPartiesToNotify(caseData, taskId);
 
-        assertThat(emails).hasSize(4);
+        assertThat(emails).hasSize(6);
+        verify(carmDisabledRespSolOneRepresentedEmailDTOGenerator).getShouldNotify(caseData);
+        verify(carmDisabledRespSolTwoEmailDTOGenerator).getShouldNotify(caseData);
         verify(carmDisabledDefendantEmailDTOGenerator).getShouldNotify(caseData);
         verify(carmDisabledDefendantEmailDTOGenerator).buildEmailDTO(caseData, taskId);
     }
