@@ -13,7 +13,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.ManageStayWATaskEvent;
-import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.ManageStayUpdateRequestedSearchService;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.reform.civil.service.search.ManageStayUpdateRequestedSearchS
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -111,7 +109,7 @@ class ManageStayWATaskSchedulerHandlerTest {
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
             .when(externalTaskService).complete(mockTask, null);
 
-        assertThrows(CompleteTaskException.class, () -> handler.execute(mockTask, externalTaskService));
+        handler.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
@@ -136,7 +134,7 @@ class ManageStayWATaskSchedulerHandlerTest {
         String errorMessage = "Manage Stay WA Task scheduler failed to process case with id: ";
 
         doThrow(new NullPointerException(errorMessage))
-            .when(applicationEventPublisher).publishEvent(eq(new ManageStayWATaskEvent(caseId)));
+            .when(applicationEventPublisher).publishEvent(new ManageStayWATaskEvent(caseId));
 
         handler.execute(mockTask, externalTaskService);
 
