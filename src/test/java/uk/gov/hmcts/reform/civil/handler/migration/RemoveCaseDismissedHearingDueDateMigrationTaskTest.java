@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -31,6 +32,11 @@ class RemoveCaseDismissedHearingDueDateMigrationTaskTest {
         CaseData updatedCaseData = task.migrateCaseData(caseData, caseReference);
 
         assertNull(updatedCaseData.getCaseDismissedHearingFeeDueDate());
+    }
+
+    @Test
+    void shouldDeclareCaseDismissedHearingFeeDueDateForExplicitNullification() {
+        assertEquals(List.of("caseDismissedHearingFeeDueDate"), task.getFieldsToNullify());
     }
 
     @Test

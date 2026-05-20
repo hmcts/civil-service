@@ -4,8 +4,12 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.util.List;
+
 @Component
 public class RemoveCaseDismissedHearingDueDateMigrationTask extends MigrationTask<CaseReference> {
+
+    private static final String CASE_DISMISSED_HEARING_FEE_DUE_DATE = "caseDismissedHearingFeeDueDate";
 
     public RemoveCaseDismissedHearingDueDateMigrationTask() {
         super(CaseReference.class);
@@ -22,11 +26,16 @@ public class RemoveCaseDismissedHearingDueDateMigrationTask extends MigrationTas
     }
 
     @Override
+    protected List<String> getFieldsToNullify() {
+        return List.of(CASE_DISMISSED_HEARING_FEE_DUE_DATE);
+    }
+
+    @Override
     protected CaseData migrateCaseData(CaseData caseData, CaseReference caseReference) {
         if (caseData == null || caseReference == null) {
             throw new IllegalArgumentException("CaseData and CaseReference must not be null");
         } else {
-            return caseData.toBuilder().caseDismissedHearingFeeDueDate(null).build();
+            return caseData;
         }
     }
 
