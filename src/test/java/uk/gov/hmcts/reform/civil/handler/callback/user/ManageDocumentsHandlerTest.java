@@ -123,7 +123,7 @@ class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
             List<Element<ManageDocument>> manageDocuments = convertToMap(response.getData().get("manageDocuments"));
 
             assertEquals(WITHOUT_PREJUDICE_CATEGORY_ID,
-                         manageDocuments.get(0).getValue().getDocumentLink().getCategoryID());
+                         manageDocuments.getFirst().getValue().getDocumentLink().getCategoryID());
         }
 
         @Test
@@ -151,7 +151,44 @@ class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
             List<Element<ManageDocument>> manageDocuments = convertToMap(response.getData().get("manageDocuments"));
 
             assertEquals(WITHOUT_PREJUDICE_CATEGORY_ID,
-                         manageDocuments.get(0).getValue().getDocumentLink().getCategoryID());
+                         manageDocuments.getFirst().getValue().getDocumentLink().getCategoryID());
+        }
+
+        @Test
+        void shouldRemoveWithoutPrejudiceCategoryWhenDocumentTypeChangedAwayFromWithoutPrejudice() {
+            Document sharedFile = new Document()
+                .setDocumentUrl("http://test.com")
+                .setDocumentBinaryUrl("http://test.com/binary")
+                .setDocumentFileName("document.pdf")
+                .setCategoryID(WITHOUT_PREJUDICE_CATEGORY_ID);
+
+            ManageDocument before = new ManageDocument();
+            before.setDocumentType(ManageDocumentType.WITHOUT_PREJUDICE_PART_36_OFFER_OR_REJECTIONS);
+            before.setDocumentName("wp doc");
+            before.setDocumentLink(sharedFile);
+
+            Element<ManageDocument> elementBefore = new Element<>(UUID.randomUUID(), before);
+
+            ManageDocument after = new ManageDocument();
+            after.setDocumentType(ManageDocumentType.N9A_PAPER_ADMISSION_FULL_OR_PART);
+            after.setDocumentName("wp doc");
+            after.setDocumentLink(new Document()
+                .setDocumentUrl(sharedFile.getDocumentUrl())
+                .setDocumentBinaryUrl(sharedFile.getDocumentBinaryUrl())
+                .setDocumentFileName(sharedFile.getDocumentFileName()));
+
+            CaseData caseDataBefore = CaseDataBuilder.builder().build();
+            caseDataBefore.setManageDocuments(List.of(elementBefore));
+
+            CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1L).build();
+            caseData.setManageDocuments(List.of(new Element<>(UUID.randomUUID(), after)));
+
+            CallbackParams params = callbackParamsOf(caseData, caseDataBefore, CallbackType.ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            List<Element<ManageDocument>> manageDocuments = convertToMap(response.getData().get("manageDocuments"));
+
+            assertNull(manageDocuments.getFirst().getValue().getDocumentLink().getCategoryID());
         }
     }
 
