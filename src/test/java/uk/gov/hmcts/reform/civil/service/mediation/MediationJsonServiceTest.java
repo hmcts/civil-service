@@ -745,7 +745,7 @@ public class MediationJsonServiceTest {
 
             MediationCase mediationCase = service.generateJsonContent(caseData);
 
-            assertThat(mediationCase.getCaseTitle()).isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+            assertThat(mediationCase.getCaseTitle()).isEqualTo("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co");
         }
 
         @Test
@@ -757,7 +757,7 @@ public class MediationJsonServiceTest {
 
             MediationCase mediationCase = service.generateJsonContent(caseData);
 
-            assertThat(mediationCase.getCaseTitle()).isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+            assertThat(mediationCase.getCaseTitle()).isEqualTo("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co");
         }
 
         @Test
@@ -770,7 +770,7 @@ public class MediationJsonServiceTest {
 
             MediationCase mediationCase = service.generateJsonContent(caseData);
 
-            assertThat(mediationCase.getCaseTitle()).isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
+            assertThat(mediationCase.getCaseTitle()).isEqualTo("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co and Mr. John Rambo");
         }
 
         @Test
@@ -783,7 +783,7 @@ public class MediationJsonServiceTest {
 
             MediationCase mediationCase = service.generateJsonContent(caseData);
 
-            assertThat(mediationCase.getCaseTitle()).isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
+            assertThat(mediationCase.getCaseTitle()).isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader T/A Sole Trader co");
         }
     }
 
@@ -891,7 +891,7 @@ public class MediationJsonServiceTest {
             return new MediationLitigant()
                 .setPartyID("res-1-party-id")
                 .setPartyRole("Defendant 1")
-                .setPartyName("Mr. Sole Trader")
+                .setPartyName("Mr. Sole Trader T/A Sole Trader co")
                 .setPartyType(SOLE_TRADER)
                 .setPaperResponse(PAPER_RESPONSE)
                 .setRepresented(true)
@@ -906,7 +906,7 @@ public class MediationJsonServiceTest {
             return new MediationLitigant()
                 .setPartyID("res-1-party-id")
                 .setPartyRole("Defendant 1")
-                .setPartyName("Mr. Sole Trader")
+                .setPartyName("Mr. Sole Trader T/A Sole Trader co")
                 .setPartyType(SOLE_TRADER)
                 .setPaperResponse(PAPER_RESPONSE)
                 .setRepresented(false)
