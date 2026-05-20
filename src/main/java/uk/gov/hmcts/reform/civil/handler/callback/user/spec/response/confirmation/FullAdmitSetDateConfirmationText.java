@@ -31,7 +31,10 @@ public class FullAdmitSetDateConfirmationText implements RespondToClaimConfirmat
             return Optional.empty();
         }
 
-        LocalDate whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        LocalDate whenWillYouPay = null;
+        if (caseData.getRespondToClaimAdmitPartLRspec() != null) {
+            whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        }
 
         if (YES.equals(caseData.getIsRespondent2())) {
             if (caseData.getRespondToClaimAdmitPartLRspec2() != null) {

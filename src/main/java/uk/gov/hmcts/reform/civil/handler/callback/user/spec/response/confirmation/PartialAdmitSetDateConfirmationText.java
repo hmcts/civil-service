@@ -44,7 +44,10 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
         }
 
         BigDecimal admitOwed = caseData.getRespondToAdmittedClaimOwingAmountPounds();
-        LocalDate whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        LocalDate whenWillYouPay = null;
+        if (caseData.getRespondToClaimAdmitPartLRspec() != null) {
+            whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        }
         if (YES.equals(caseData.getIsRespondent2())) {
             if (caseData.getRespondToClaimAdmitPartLRspec2() != null) {
                 whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec2().getWhenWillThisAmountBePaid();

@@ -2471,6 +2471,36 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void specificSummary_whenPartialAdmitNotPay_LrAdmissionBulkEnabledRespondent2() {
+            // Given
+            BigDecimal admitted = BigDecimal.valueOf(1000);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .setDefendantMediationFlag(YES)
+                .build();
+            caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+            caseData.setRespondToAdmittedClaimOwingAmountPounds(admitted);
+            RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new  RespondToClaimAdmitPartLRspec();
+            LocalDate whenWillPay = LocalDate.now().plusMonths(1);
+            respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
+            caseData.setRespondToClaimAdmitPartLRspec2(respondToClaimAdmitPartLRspec);
+            caseData.setTotalClaimAmount(admitted.multiply(BigDecimal.valueOf(2)));
+            caseData.setIsRespondent2(YES);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains(admitted.toString())
+                .contains(caseData.getTotalClaimAmount().toString() + " plus the claim fee and any costs and further interest claimed")
+                .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
+        }
+
+        @Test
         void specificSummary_whenPartialAdmitPayImmediately() {
             // Given
             BigDecimal admitted = BigDecimal.valueOf(1000);
@@ -2491,6 +2521,30 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getConfirmationBody())
                     .contains(caseData.getApplicant1().getPartyName());
+        }
+
+        @Test
+        void specificSummary_whenPartialAdmitPayImmediatelyRespondent2() {
+            // Given
+            BigDecimal admitted = BigDecimal.valueOf(1000);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            caseData.setRespondToClaimAdmitPartLRspec2(new RespondToClaimAdmitPartLRspec());
+            caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(IMMEDIATELY);
+            caseData.setRespondToAdmittedClaimOwingAmountPounds(admitted);
+            caseData.setIsRespondent2(YES);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName());
         }
 
         @Test
@@ -2594,6 +2648,28 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void specificSummary_whenRepayPlanPartialAdmitRespondent2() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setSpecDefenceFullAdmitted2Required(YesOrNo.NO);
+            caseData.setIsRespondent2(YES);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains("repayment plan");
+        }
+
+        @Test
         void specificSummary_whenFullAdmitAlreadyPaid() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
@@ -2644,6 +2720,36 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void specificSummary_whenFullAdmitBySetDateRespondent2() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            caseData.setRespondent2ClaimResponseTypeForSpec(FULL_ADMISSION);
+            caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
+            caseData.setIsRespondent2(YesOrNo.YES);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+            RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new  RespondToClaimAdmitPartLRspec();
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
+            caseData.setRespondToClaimAdmitPartLRspec2(respondToClaimAdmitPartLRspec);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains(" and your explanation of why you cannot pay before then.")
+                .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE))
+                .doesNotContain(caseData.getTotalClaimAmount().toString());
+
+        }
+
+        @Test
         void specificSummary_whenPartialAdmitPaidFull() {
             // Given
             BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
@@ -2668,6 +2774,33 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .contains(caseData.getApplicant1().getPartyName())
                     .contains("You told us you've paid the")
                     .contains(caseData.getTotalClaimAmount().toString());
+        }
+
+        @Test
+        void specificSummary_whenPartialAdmitPaidFullRespondent2() {
+            // Given
+            BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setSpecDefenceAdmitted2Required(YesOrNo.YES);
+            caseData.setIsRespondent2(YesOrNo.YES);
+            BigDecimal howMuchWasPaid = new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount));
+            RespondToClaim respondToClaim = new  RespondToClaim();
+            respondToClaim.setHowMuchWasPaid(howMuchWasPaid);
+            caseData.setRespondToAdmittedClaim2(respondToClaim);
+            caseData.setTotalClaimAmount(totalClaimAmount);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains("You told us you've paid the")
+                .contains(caseData.getTotalClaimAmount().toString());
         }
 
         @Test
