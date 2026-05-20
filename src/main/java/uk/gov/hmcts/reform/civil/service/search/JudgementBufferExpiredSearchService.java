@@ -6,10 +6,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.search.calculator.SearchDateCalculator;
+import uk.gov.hmcts.reform.civil.service.search.calculator.SearchDateTimeCalculator;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
@@ -20,19 +22,19 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 @Slf4j
 public class JudgementBufferExpiredSearchService extends ElasticSearchService {
 
-    private final SearchDateCalculator dateCalculator;
+    private final SearchDateTimeCalculator dateTimeCalculator;
 
     public JudgementBufferExpiredSearchService(CoreCaseDataService coreCaseDataService,
-                                               SearchDateCalculator dateCalculator) {
+                                               SearchDateTimeCalculator dateTimeCalculator) {
         super(coreCaseDataService);
-        this.dateCalculator = dateCalculator;
+        this.dateTimeCalculator = dateTimeCalculator;
     }
 
     @Override
     public Query query(int startIndex, String timeNow) {
         log.info("Call to JudgementBufferExpiredSearchService query with index {} and timeNow {}", startIndex, timeNow);
-        ZonedDateTime now = ZonedDateTime.parse(timeNow);
-        ZonedDateTime timeMinus48WorkingHours = dateCalculator.minusWorkingHours(now, 48);
+        ZonedDateTime now = ZonedDateTime.parse(timeNow).withZoneSameInstant(LOCAL_ZONE);
+        ZonedDateTime timeMinus48WorkingHours = dateTimeCalculator.minusWorkingHours(now, 48);
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)

@@ -10,7 +10,7 @@ import static java.util.Objects.requireNonNull;
 
 @Component
 @AllArgsConstructor
-public class SearchDateCalculator {
+public class SearchDateTimeCalculator {
 
     private final WorkingDayIndicator workingDayIndicator;
 
@@ -28,19 +28,13 @@ public class SearchDateCalculator {
 
         while (remainingHours > 0) {
             if (workingDayIndicator.isWorkingDay(result.toLocalDate())) {
-                result = subtractWorkingHours(result, remainingHours);
-                remainingHours = Math.max(0, remainingHours - HOURS_IN_DAY);
+                long hoursToSubtract = Math.min(remainingHours, HOURS_IN_DAY);
+                result = result.minusHours(hoursToSubtract);
+                remainingHours -= hoursToSubtract;
             } else {
-                result = result.minusDays(1);
+                result = result.minusHours(HOURS_IN_DAY);
             }
         }
         return result;
-    }
-
-    private ZonedDateTime subtractWorkingHours(ZonedDateTime dateTime, long hours) {
-        if (hours <= HOURS_IN_DAY) {
-            return dateTime.minusHours(hours);
-        }
-        return dateTime.minusHours(HOURS_IN_DAY);
     }
 }
