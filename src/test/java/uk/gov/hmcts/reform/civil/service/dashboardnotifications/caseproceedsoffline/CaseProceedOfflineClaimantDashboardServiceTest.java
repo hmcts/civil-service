@@ -243,14 +243,13 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
 
-            // Primary scenario should NOT be recorded
             verify(dashboardScenariosService, org.mockito.Mockito.never()).recordScenarios(
                 eq(AUTH_TOKEN),
                 eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario()),
                 eq(caseData.getCcdCaseReference().toString()),
                 any(ScenarioRequestParams.class)
             );
-            // But additional scenarios might still be recorded as they don't have the Lip check in this service
+
             verify(dashboardScenariosService).recordScenarios(
                 eq(AUTH_TOKEN),
                 eq("Scenario.AAA6.GeneralApplication.InitiateApplication.Inactive.Claimant"),
@@ -273,7 +272,6 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
 
-            // Primary scenario should NOT be recorded
             verify(dashboardScenariosService, org.mockito.Mockito.never()).recordScenarios(
                 eq(AUTH_TOKEN),
                 eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario()),
@@ -297,7 +295,6 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
 
-            // Primary scenario should NOT be recorded because it is 2v1, not 1v1
             verify(dashboardScenariosService, org.mockito.Mockito.never()).recordScenarios(
                 eq(AUTH_TOKEN),
                 eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario()),
