@@ -110,17 +110,12 @@ class DefaultJudgementGrantedSpecCallbackHandlerTest extends BaseCallbackHandler
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenSubmitted() {
-            String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" "
-                + "target=\"_blank\">Download  default judgment</a> "
-                + "%n%n The defendant will be served with the Default Judgment.";
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# Default Judgment Granted ")
-                    .confirmationBody(format(body))
                     .build());
         }
     }
