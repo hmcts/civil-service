@@ -176,6 +176,38 @@ class UpdateWaCourtLocationsServiceTest {
     }
 
     @Test
+    void shouldNotEvaluateWALocations_whenClaimTrackIsNullForSpecCase() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .responseClaimTrack(null)
+            .taskManagementLocations(testTaskManagementLocations)
+            .build();
+
+        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseData);
+
+        assertEquals(testTaskManagementLocations, caseData.getTaskManagementLocations());
+        verifyNoInteractions(camundaClient);
+    }
+
+    @Test
+    void shouldNotEvaluateWALocations_whenAllocatedTrackIsNullForUnspecCase() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .allocatedTrack(null)
+            .taskManagementLocations(testTaskManagementLocations)
+            .build();
+
+        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseData);
+
+        assertEquals(testTaskManagementLocations, caseData.getTaskManagementLocations());
+        verifyNoInteractions(camundaClient);
+    }
+
+    @Test
     void shouldNotUpdateCourtListingWALocations_whenCourtNotFound() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         Map<String, Object> emptyMap = new HashMap<>();

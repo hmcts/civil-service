@@ -38,6 +38,11 @@ public class UpdateWaCourtLocationsService {
         List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation);
 
         String claimTrack = getClaimTrack(caseData);
+        if (claimTrack == null) {
+            log.info("Claim track not set for case {}, skipping WA court location update",
+                     caseData.getCcdCaseReference());
+            return;
+        }
         if ("FAST_CLAIM".equals(claimTrack) || "SMALL_CLAIM".equals(claimTrack)) {
             // when track is small or fast do not evaluate DMN, and also if claim was changed to small or fast
             // remove any previously evaluated and populate locations from taskManagementLocations
@@ -159,7 +164,7 @@ public class UpdateWaCourtLocationsService {
 
     private String getClaimTrack(CaseData caseData) {
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return caseData.getAllocatedTrack().name();
+            return (null != caseData.getAllocatedTrack()) ? caseData.getAllocatedTrack().name() : null;
         } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return caseData.getResponseClaimTrack();
         }
