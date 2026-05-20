@@ -81,6 +81,11 @@ public class ManageDocumentsHandler extends CallbackHandler {
             documentWithCategory = copyDocumentWithCategory(documentLink, previousDocumentLink.getCategoryID());
         }
 
+        if (manageDocument.getDocumentType() != WITHOUT_PREJUDICE_PART_36_OFFER_OR_REJECTIONS
+            && WITHOUT_PREJUDICE_CATEGORY_ID.equals(documentWithCategory.getCategoryID())) {
+            documentWithCategory = copyDocumentWithCategory(documentWithCategory, null);
+        }
+
         if (manageDocument.getDocumentType() == WITHOUT_PREJUDICE_PART_36_OFFER_OR_REJECTIONS
             && documentWithCategory.getCategoryID() == null) {
             return copyDocumentWithCategory(documentWithCategory, WITHOUT_PREJUDICE_CATEGORY_ID);
