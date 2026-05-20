@@ -4,8 +4,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.time.LocalDateTime;
-
 @Component
 public class RemoveCaseDismissedHearingDueDateMigrationTask extends MigrationTask<CaseReference> {
 
