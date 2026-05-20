@@ -10,15 +10,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SearchDateCalculatorTest {
+class SearchDateTimeCalculatorTest {
 
     private static final ZonedDateTime MONDAY_11AM = ZonedDateTime.of(2025, 6, 5, 11, 0, 0, 0, ZoneOffset.UTC);
 
@@ -26,18 +28,25 @@ class SearchDateCalculatorTest {
     private WorkingDayIndicator workingDayIndicator;
 
     @InjectMocks
-    private SearchDateCalculator calculator;
+    private SearchDateTimeCalculator calculator;
 
     @Nested
     class MinusWorkingHoursTest {
 
         @BeforeEach
         void setup() {
-            when(workingDayIndicator.isWorkingDay(org.mockito.ArgumentMatchers.any())).thenAnswer(invocation -> {
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenAnswer(invocation -> {
                 LocalDate date = invocation.getArgument(0);
+                if (date == null) {
+                    return false;
+                }
                 return !date.equals(LocalDate.of(2025, 6, 3))
                     && !date.equals(LocalDate.of(2025, 6, 4))
-                    && !date.equals(LocalDate.of(2025, 5, 29));
+                    && !date.equals(LocalDate.of(2025, 5, 29))
+                    && !date.equals(LocalDate.of(2026, 3, 28))
+                    && !date.equals(LocalDate.of(2026, 3, 29))
+                    && !date.equals(LocalDate.of(2026, 10, 24))
+                    && !date.equals(LocalDate.of(2026, 10, 25));
             });
         }
 
@@ -83,6 +92,34 @@ class SearchDateCalculatorTest {
         void shouldHandleLessThan24Hours() {
             ZonedDateTime result = calculator.minusWorkingHours(MONDAY_11AM, 5);
             assertEquals(MONDAY_11AM.minusHours(5), result);
+        }
+
+        @Test
+        void shouldHandleDSTSpringForward_FullDay() {
+            // In 2026, UK DST starts on March 29 at 01:00 (clocks go forward to 02:00)
+            ZoneId london = ZoneId.of("Europe/London");
+            // Monday March 30, 11:00 AM BST (UTC+1)
+            ZonedDateTime monday = ZonedDateTime.of(2026, 3, 30, 11, 0, 0, 0, london);
+
+            // Subtract 48 absolute working hours (2 full working days).
+            ZonedDateTime result = calculator.minusWorkingHours(monday, 48);
+
+            assertEquals(10, result.getHour(), "Hour should change because of Spring Forward (lost 1 hour)");
+            assertEquals(26, result.getDayOfMonth());
+        }
+
+        @Test
+        void shouldHandleDSTAutumnBack_FullDay() {
+            // In 2026, UK DST ends on October 25 at 02:00 (clocks go back to 01:00)
+            ZoneId london = ZoneId.of("Europe/London");
+            // Monday Oct 26, 11:00 AM GMT (UTC)
+            ZonedDateTime monday = ZonedDateTime.of(2026, 10, 26, 11, 0, 0, 0, london);
+
+            // Subtract 48 working hours.
+            ZonedDateTime result = calculator.minusWorkingHours(monday, 48);
+
+            assertEquals(12, result.getHour(), "Hour should change because of Autumn Back (gained 1 hour)");
+            assertEquals(22, result.getDayOfMonth());
         }
     }
 
