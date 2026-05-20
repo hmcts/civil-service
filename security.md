@@ -3,14 +3,14 @@
 ## Purpose
 
 This document outlines how security vulnerabilities should be reported for this
-repository.
+repository..
 
 HMCTS is committed to responsible vulnerability disclosure and to addressing
 legitimate security issues in a timely and coordinated manner.
 
 ## Reporting a vulnerability
 
-If you believe you have identified a security vulnerability in this repository, please report it by email to: 
+If you believe you have identified a security vulnerability in this repository, please report it by email to:
 
 HMCTSVulnerabilityDisclosure@justice.gov.uk
 
