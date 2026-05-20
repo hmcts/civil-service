@@ -167,8 +167,6 @@ class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
             before.setDocumentName("wp doc");
             before.setDocumentLink(sharedFile);
 
-            Element<ManageDocument> elementBefore = new Element<>(UUID.randomUUID(), before);
-
             ManageDocument after = new ManageDocument();
             after.setDocumentType(ManageDocumentType.N9A_PAPER_ADMISSION_FULL_OR_PART);
             after.setDocumentName("wp doc");
@@ -178,7 +176,7 @@ class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
                 .setDocumentFileName(sharedFile.getDocumentFileName()));
 
             CaseData caseDataBefore = CaseDataBuilder.builder().build();
-            caseDataBefore.setManageDocuments(List.of(elementBefore));
+            caseDataBefore.setManageDocuments(List.of(new Element<>(UUID.randomUUID(), before)));
 
             CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1L).build();
             caseData.setManageDocuments(List.of(new Element<>(UUID.randomUUID(), after)));
