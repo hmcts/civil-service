@@ -79,4 +79,24 @@ class DjNonDivergentClaimantDashboardServiceTest {
             new ScenarioRequestParams(new HashMap<>())
         );
     }
+
+    @Test
+    void shouldRecordDefaultScenarioWhenBufferDisabledAndCaseInJudgmentRequestedState() {
+        when(toggleService.isJudgmentBufferEnabled()).thenReturn(false);
+
+        CaseData caseData = new CaseDataBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .atStateClaimIssued()
+            .build();
+        caseData.setCcdState(CaseState.JUDGMENT_REQUESTED);
+
+        service.notifyDjNonDivergent(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT.getScenario(),
+            "1594901956117591",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+    }
 }

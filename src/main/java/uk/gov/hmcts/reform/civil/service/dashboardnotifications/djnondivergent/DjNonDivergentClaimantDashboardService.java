@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class DjNonDivergentClaimantDashboardService extends DashboardScenarioService {
 
-    private FeatureToggleService toggleService;
+    private final FeatureToggleService toggleService;
 
     public DjNonDivergentClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                   DashboardNotificationsParamsMapper mapper,
