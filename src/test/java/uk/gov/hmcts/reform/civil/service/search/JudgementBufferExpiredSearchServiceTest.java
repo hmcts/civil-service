@@ -5,9 +5,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.service.search.calculator.SearchDateCalculator;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -26,10 +26,10 @@ class JudgementBufferExpiredSearchServiceTest extends ElasticSearchServiceTest {
 
     @BeforeEach
     void setup() {
-        WorkingDayIndicator workingDayIndicator = Mockito.mock(WorkingDayIndicator.class);
-        Mockito.when(workingDayIndicator.minusWorkingHours(FIXED_NOW, 48))
+        SearchDateCalculator dateCalculator = Mockito.mock(SearchDateCalculator.class);
+        Mockito.when(dateCalculator.minusWorkingHours(FIXED_NOW, 48))
             .thenReturn(FIXED_NOW.minusDays(2));
-        searchService = new JudgementBufferExpiredSearchService(coreCaseDataService, workingDayIndicator);
+        searchService = new JudgementBufferExpiredSearchService(coreCaseDataService, dateCalculator);
         zonedDateTimeMock = mockStatic(ZonedDateTime.class, CALLS_REAL_METHODS);
         zonedDateTimeMock.when(() -> ZonedDateTime.now(ZoneOffset.UTC)).thenReturn(FIXED_NOW);
     }
@@ -41,7 +41,6 @@ class JudgementBufferExpiredSearchServiceTest extends ElasticSearchServiceTest {
 
     @Override
     protected Query buildQuery(int fromValue) {
-        // Adjusted for working days: previous working day from (date - 2 days)
         ZonedDateTime timeMinus48WorkingHours = FIXED_NOW.minusDays(2);
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)

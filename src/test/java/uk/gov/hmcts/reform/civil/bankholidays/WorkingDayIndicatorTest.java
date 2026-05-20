@@ -11,10 +11,11 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.bankholidays.NonWorkingDaysCollection;
+import uk.gov.hmcts.reform.civil.bankholidays.PublicHolidaysCollection;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 
 import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,7 +26,6 @@ import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -191,55 +191,8 @@ class WorkingDayIndicatorTest {
             );
 
             LocalDate previousWorkingDay = service.getPreviousWorkingDay(BANK_HOLIDAY);
+
             assertEquals(PREVIOUS_WORKING_DAY_BEFORE_BANK_HOLIDAY, previousWorkingDay);
-        }
-    }
-
-    @Nested
-    class MinusWorkingHours {
-
-        private static final ZonedDateTime MONDAY_11AM = ZonedDateTime.of(2017, 6, 5, 11, 0, 0, 0, ZoneOffset.UTC);
-
-        @Test
-        void shouldSubtract48HoursAcrossWorkingDays_whenNoNonWorkingDays() {
-            ZonedDateTime result = service.minusWorkingHours(MONDAY_11AM, 48);
-            // 48 working hours from Monday 11:00 skips weekend → lands on previous Thursday 11:00
-            assertEquals(ZonedDateTime.of(2017, 6, 1, 11, 0, 0, 0, ZoneOffset.UTC), result);
-        }
-
-        @Test
-        void shouldSkipWeekend_whenSubtractingWorkingHours() {
-            // Monday 11:00 minus 48 working hours skips Sat/Sun → lands on previous Thursday 11:00
-            ZonedDateTime result = service.minusWorkingHours(MONDAY_11AM, 48);
-            assertEquals(ZonedDateTime.of(2017, 6, 1, 11, 0, 0, 0, ZoneOffset.UTC), result);
-        }
-
-        @Test
-        void shouldSkipBankHoliday_whenSubtractingWorkingHours() {
-            when(publicHolidaysApiClient.getPublicHolidays())
-                .thenReturn(new HashSet<>(singletonList(BANK_HOLIDAY))); // 2017-05-29 (Monday)
-
-            ZonedDateTime start = ZonedDateTime.of(2017, 6, 1, 10, 0, 0, 0, ZoneOffset.UTC); // Thursday after bank holiday
-            ZonedDateTime result = service.minusWorkingHours(start, 24);
-            // Should go back to Wednesday (skipping the bank holiday Monday)
-            assertEquals(ZonedDateTime.of(2017, 5, 31, 10, 0, 0, 0, ZoneOffset.UTC), result);
-        }
-
-        @Test
-        void shouldHandleExactly24Hours() {
-            ZonedDateTime result = service.minusWorkingHours(MONDAY_11AM, 24);
-            assertEquals(ZonedDateTime.of(2017, 6, 5, 11, 0, 0, 0, ZoneOffset.UTC).minusDays(1), result);
-        }
-
-        @Test
-        void shouldHandleLessThan24Hours() {
-            ZonedDateTime result = service.minusWorkingHours(MONDAY_11AM, 5);
-            assertEquals(MONDAY_11AM.minusHours(5), result);
-        }
-
-        @Test
-        void shouldThrowNpe_whenDateTimeIsNull() {
-            assertThrows(NullPointerException.class, () -> service.minusWorkingHours(null, 48));
         }
     }
 }
