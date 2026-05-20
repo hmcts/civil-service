@@ -13,7 +13,7 @@ Civil CCD Callback Service.
 
 ## StateFlow diagrams
 
-Visual snapshots of the automated journey logic are generated from the live StateFlow configuration. The diagrams below update automatically via the `Refresh StateFlow diagrams` GitHub Action after any change to the transition builders.
+Visual snapshots of the automated journey logic are generated from the live StateFlow configuration. The diagrams below update automatically via the `Refresh StateFlow diagrams` GitHub Action after any change to the transition builders..
 
 #### Draft to Submission
 ![Draft to Submission](docs/draft_flow.svg)
