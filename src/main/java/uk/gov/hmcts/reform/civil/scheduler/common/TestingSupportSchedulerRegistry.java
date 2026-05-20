@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @ConditionalOnExpression("${testing.support.enabled:false}")
-public class TestingSupportSchedulerRepository {
+public class TestingSupportSchedulerRegistry {
 
     private final Map<String, CivilScheduler> schedulers;
     private final TaskExecutor taskExecutor;
 
-    public TestingSupportSchedulerRepository(List<CivilScheduler> schedulers,
-                                             @Qualifier("asyncHandlerExecutor") TaskExecutor taskExecutor) {
+    public TestingSupportSchedulerRegistry(List<CivilScheduler> schedulers,
+                                           @Qualifier("asyncHandlerExecutor") TaskExecutor taskExecutor) {
         this.schedulers = schedulers.stream()
             .collect(Collectors.toMap(
                 CivilScheduler::getName,
