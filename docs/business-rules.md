@@ -74,9 +74,9 @@
 | **Notification** | `hasClaimNotifiedToBoth` | Claim notification date exists and defendant notify options are either not set or set to 'Both' |
 | **OutOfTime** | `notBeingTakenOffline` | Applicant response deadline passed, applicant has not responded and staff offline date does not exist |
 | **Payment** | `failed` | Card payment for the issue fee failed (or claim issue recorded as failed) and the applicant is represented |
+| **Payment** | `payImmediately` | Admission where the payment time selected is 'IMMEDIATELY' |
 | **Payment** | `payImmediatelyAcceptedPartAdmit` | Part admission payment time (IMMEDIATELY) Accepted |
 | **Payment** | `payImmediatelyFullAdmission` | SPEC 1v1 full admission where 'when to be paid' is set and the applicant chose not to proceed |
-| **Payment** | `payImmediatelyPartAdmit` | Part admission where the payment time selected is 'IMMEDIATELY' |
 | **Payment** | `successful` | Card payment for the issue fee succeeded (or claim issue recorded as successful) and the applicant is represented |
 | **Repayment** | `acceptRepaymentPlan` | Applicant accepted the proposed repayment plan; if LiP v LiP, the case has not been taken offline by staff |
 | **Repayment** | `rejectRepaymentPlan` | Applicant rejected the proposed repayment plan; if LiP v LiP, the case has not been taken offline by staff |
@@ -87,8 +87,8 @@
 | **Response** | `awaitingResponsesFullDefenceReceivedSpec` | In a 1v2 two‑solicitor SPEC case one defendant has provided a full defence and the co‑defendant is yet to respond |
 | **Response** | `awaitingResponsesNonFullDefenceOrFullAdmitReceived` | In a 1v2 two‑solicitor case one defendant has provided a response other than full defence / admission and the co‑defendant is yet to respond |
 | **Response** | `awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec` | In a 1v2 two‑solicitor SPEC case one defendant has provided a response other than full defence / admission and the co‑defendant is yet to respond |
-| **Response** | `isType()` | Checks if the respondent response type(s) for SPEC match the given RespondentResponseTypeSpec for multi‑party scenario |
 | **Response** | `isType()` | Checks if respondent response type(s) for UNSPEC match the given RespondentResponseType for multi‑party scenario |
+| **Response** | `isType()` | Checks if the respondent response type(s) for SPEC match the given RespondentResponseTypeSpec for multi‑party scenario |
 | **Response** | `notificationAcknowledged` | At least one required defendant has acknowledged service (matches State Flow 'NOTIFICATION_ACKNOWLEDGED') |
 | **Response** | `respondentTimeExtension` | A defendant has obtained a time extension to respond |
 | **TakenOffline** | `afterClaimDetailsNotified` | Claim details notification date exists and notify options were set (not 'Both') |
