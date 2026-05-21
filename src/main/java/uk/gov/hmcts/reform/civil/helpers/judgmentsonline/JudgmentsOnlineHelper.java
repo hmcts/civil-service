@@ -9,10 +9,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -25,7 +23,6 @@ import java.util.List;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT;
 
 public class JudgmentsOnlineHelper {
 
@@ -84,16 +81,6 @@ public class JudgmentsOnlineHelper {
         return  MultiPartyScenario.isOneVOne(caseData)
             || MultiPartyScenario.isTwoVOne(caseData)
             || caseData.isLRvLipOneVOne();
-    }
-
-    public static boolean isDefaultJudgmentGranted(CaseData caseData, FeatureToggleService featureToggleService) {
-        return featureToggleService.isJudgmentBufferEnabled()
-            && caseData != null
-            && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState())
-            && ofNullable(caseData.getActiveJudgment())
-            .map(activeJudgment -> DEFAULT_JUDGMENT.equals(activeJudgment.getType())
-                && JudgmentState.ISSUED.equals(activeJudgment.getState()))
-            .orElse(false);
     }
 
     public static BigDecimal getClaimFeeOfJudgmentForDJ(CaseData data) {
