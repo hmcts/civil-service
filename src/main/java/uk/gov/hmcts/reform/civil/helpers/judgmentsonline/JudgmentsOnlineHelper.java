@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.jetbrains.annotations.NotNull;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
