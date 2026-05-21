@@ -139,7 +139,6 @@ tasks.withType(Copy).configureEach {
 }
 
 def integration = tasks.register('integration', Test) {
-  maxHeapSize = '3G'
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
@@ -147,6 +146,7 @@ def integration = tasks.register('integration', Test) {
   failFast = System.getenv('GITHUB_ACTIONS') != 'true'
   testLogging.showStandardStreams = false
 
+  // CI retry logic for integration tests
   if (System.getenv('GITHUB_ACTIONS') == 'true') {
     retry {
       maxRetries = 3
@@ -667,19 +667,33 @@ tasks.register('runProviderPactVerification') {
 }
 
 tasks.withType(Test).configureEach { t ->
+  useJUnitPlatform()
+
   doFirst {
     logger.lifecycle("Available Processors for ${t.name}: ${Runtime.runtime.availableProcessors()}")
   }
-  useJUnitPlatform()
 
-  maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
-  jvmArgs '-Xshare:off'
-  // Use Parallel GC for faster, short-lived test forks
-  jvmArgs '-XX:+UseParallelGC'
+  if (t.name == 'integration') {
+    description = "Runs integration tests"
+    maxHeapSize = "3G"
+    // Use G1 GC for better performance with larger heap sizes and longer-running test forks
+    jvmArgs '-XX:+UseG1GC'
+    // Set a reasonable target for max GC pause times to help prevent long pauses during test execution
+    jvmArgs '-XX:MaxGCPauseMillis=200'
+  } else {
+    description = "Runs unit tests"
+    maxHeapSize = "1536m"
+    // Disable class data sharing to avoid potential issues with shared class metadata in test forks,
+    // increases memory usage but improves stability in CI environments
+    jvmArgs '-Xshare:off'
+    // Use Parallel GC for faster, short-lived test forks
+    jvmArgs '-XX:+UseParallelGC'
+  }
 
+  // Common configuration for all test tasks
   // Keep within typical Jenkins container limits
+  maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
   minHeapSize = "256m"
-  maxHeapSize = "1536m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"
   jvmArgs '-XX:ReservedCodeCacheSize=512m'
   // Temurin 21.0.7 occasionally crashes in C2 (BoolNode::Ideal SIGSEGV); stay on C1 until upstream fix.
