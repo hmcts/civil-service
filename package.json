@@ -1,0 +1,20 @@
+{
+  "name": "civil-service-bpmn-tools",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Node.js tooling for rendering Camunda BPMN diagrams in CI (not the main application).",
+  "type": "module",
+  "scripts": {
+    "render:bpmn": "node scripts/render-bpmn-diagrams.mjs"
+  },
+  "dependencies": {
+    "bpmn-to-image": "0.10.0"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.34.0"
+  },
+  "overrides": {
+    "basic-ftp": "5.3.1",
+    "ip-address": "10.1.1"
+  }
+}
