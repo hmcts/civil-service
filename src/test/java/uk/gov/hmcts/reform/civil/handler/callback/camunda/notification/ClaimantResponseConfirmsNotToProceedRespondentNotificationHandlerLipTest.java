@@ -206,7 +206,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
             Map<String, String> properties = new HashMap<>(addCommonProperties());
             properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
             properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Mr. Sole Trader");
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Mr. Sole Trader T/A Sole Trader co");
             properties.put(CASEMAN_REF, "000DC001");
             return properties;
         }

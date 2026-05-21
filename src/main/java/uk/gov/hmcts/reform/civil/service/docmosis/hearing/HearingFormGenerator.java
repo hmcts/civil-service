@@ -82,6 +82,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .setCourtName(caseManagementLocationDetails.getExternalShortName())
             .setListingOrRelistingWithFeeDue(listingOrRelistingWithFeeDue(caseData))
             .setCourt(caseData.getHearingLocation().getValue().getLabel())
+            .setLegacyCaseNumber(caseData.getLegacyCaseReference())
             .setCaseNumber(caseData.getCcdCaseReference().toString())
             .setCreationDate(getDateFormatted(LocalDate.now()))
             .setClaimant(caseData.getApplicant1().getPartyName())

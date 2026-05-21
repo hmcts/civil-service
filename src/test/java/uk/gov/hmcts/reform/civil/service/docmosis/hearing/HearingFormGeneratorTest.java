@@ -64,7 +64,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARI
     HearingFormGenerator.class,
     JacksonAutoConfiguration.class
 })
-public class HearingFormGeneratorTest {
+class HearingFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";

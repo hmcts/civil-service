@@ -1,0 +1,39 @@
+package uk.gov.hmcts.reform.civil.workflow.ccd;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.workflow.WorkflowIntegrationTest;
+import uk.gov.hmcts.reform.civil.workflow.ccd.fixture.DismissClaimFixtures;
+
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
+@SuppressWarnings("java:S5960")
+class DismissClaimWorkflowTest extends WorkflowIntegrationTest {
+
+    private static final LocalDateTime DISMISSED_AT = LocalDateTime.of(2026, 5, 19, 14, 0);
+
+    @MockBean
+    private Time time;
+
+    @Test
+    void shouldSetDismissedDateAndBusinessProcessAtAboutToSubmit() throws Exception {
+        when(time.now()).thenReturn(DISMISSED_AT);
+
+        startWorkflow(DismissClaimFixtures.caseData())
+            .eventId(CaseEvent.DISMISS_CLAIM)
+            .aboutToSubmit()
+            .then(result -> {
+                assertThat(result.response().getErrors()).isNullOrEmpty();
+                assertThat(result.caseData().getClaimDismissedDate()).isEqualTo(DISMISSED_AT);
+                assertThat(result.caseData().getBusinessProcess())
+                    .extracting("status", "camundaEvent")
+                    .containsExactly(BusinessProcessStatus.READY, CaseEvent.DISMISS_CLAIM.name());
+            });
+    }
+}
