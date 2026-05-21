@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -108,7 +109,11 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 LocalDate.now()
             ));
 
-        JudgmentsOnlineHelper.clearJOCaseData(caseData);
+        boolean isJoRequested = featureToggleService.isJudgmentBufferEnabled()
+            && YesOrNo.YES.equals(caseData.getIsJoRequested());
+        if (isJoRequested) {
+            JudgmentsOnlineHelper.clearJOCaseData(caseData);
+        }
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper));
@@ -119,7 +124,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
         if (!needsTranslating) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
-        } else if (isJudgmentRequestedCase(callbackParams.getCaseData(), callbackParams)) {
+        } else if (isJoRequested) {
             // Keep translated judgment-requested cases in the respondent acknowledgement stage.
             responseBuilder.state(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
         }
@@ -145,7 +150,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 respondToAdmittedClaimOwingAmount
             );
         }
-        CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         boolean needsTranslating = (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual());
         LocalDateTime responseDate = time.now();
 
@@ -153,8 +157,16 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             responseDate
         ) : null;
 
+        log.info(
+            "case id: {}, applicantDeadline: {}",
+            callbackParams.getRequest().getCaseDetails().getId(),
+            applicantDeadline
+        );
+
         caseData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI));
         caseData.setRespondent1ResponseDate(responseDate);
+
+        CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         caseData.setRespondent1GeneratedResponseDocument(dummyDocument);
         caseData.setRespondent1ClaimResponseDocumentSpec(dummyDocument);
         caseData.setResponseClaimTrack(AllocatedTrack.getAllocatedTrack(

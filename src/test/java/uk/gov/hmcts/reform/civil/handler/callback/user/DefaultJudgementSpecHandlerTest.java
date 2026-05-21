@@ -1314,8 +1314,17 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPaymentAmount("10");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("0123");
+            caseLocationCivil.setRegion("0321");
+            caseData.setCaseManagementLocation(caseLocationCivil);
             DynamicListElement element = new DynamicListElement(null, "John Smith");
             DynamicList list = new DynamicList();
             list.setValue(element);
@@ -1534,11 +1543,21 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
             caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
 
+            when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setApplicant1(new PartyBuilder().individual().build());
             caseData.setApplicant2(new PartyBuilder().individual().build());
             caseData.setAddApplicant2(YesOrNo.YES);
+            caseData.setPartialPaymentAmount("10");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("0123");
+            caseLocationCivil.setRegion("0321");
+            caseData.setCaseManagementLocation(caseLocationCivil);
             DynamicListElement element = new DynamicListElement(null, "John Smith");
             DynamicList list = new DynamicList();
             list.setValue(element);
@@ -1625,12 +1644,21 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
 
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setApplicant1(new PartyBuilder().individual().build());
             caseData.setRespondent1(new PartyBuilder().individual().build());
             caseData.setRespondent1Represented(NO);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPaymentAmount("10");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("0123");
+            caseLocationCivil.setRegion("0321");
+            caseData.setCaseManagementLocation(caseLocationCivil);
             DynamicListElement element = new DynamicListElement(null, "John Smith");
             DynamicList list = new DynamicList();
             list.setValue(element);
@@ -1670,6 +1698,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var createdDate = LocalDateTime.of(2024, 1, 15, 10, 30);
 
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             when(time.now()).thenReturn(createdDate);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
@@ -1677,6 +1706,14 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent1(new PartyBuilder().individual().build());
             caseData.setRespondent1Represented(NO);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPaymentAmount("10");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("0123");
+            caseLocationCivil.setRegion("0321");
+            caseData.setCaseManagementLocation(caseLocationCivil);
             DynamicListElement element = new DynamicListElement(null, "John Smith");
             DynamicList list = new DynamicList();
             list.setValue(element);
@@ -1690,7 +1727,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedData.getBusinessProcess()).isNull();
-            assertThat(updatedData.getActiveJudgment()).isNull();
+            assertThat(updatedData.getActiveJudgment()).isNotNull();
+            assertThat(updatedData.getActiveJudgment().getState().name()).isEqualTo("PENDING_ISSUE");
             assertThat(updatedData.getJoIsLiveJudgmentExists()).isNull();
             assertThat(updatedData.getJoDJCreatedDate()).isEqualTo(createdDate);
             assertThat(response.getState()).isEqualTo(CaseState.JUDGMENT_REQUESTED.name());
@@ -1885,8 +1923,17 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         when(interestCalculator.calculateInterest(any()))
             .thenReturn(BigDecimal.valueOf(0)
             );
+        when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+        caseData.setPartialPaymentAmount("10");
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+        caseData.setPartialPayment(YES);
+        caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+        CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+        caseLocationCivil.setBaseLocation("0123");
+        caseLocationCivil.setRegion("0321");
+        caseData.setCaseManagementLocation(caseLocationCivil);
         DynamicListElement element = new DynamicListElement(null, "John Smith");
         DynamicList list = new DynamicList();
         list.setValue(element);

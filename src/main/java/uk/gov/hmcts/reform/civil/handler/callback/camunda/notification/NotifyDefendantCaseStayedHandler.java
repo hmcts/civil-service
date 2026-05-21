@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_STAY_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_TWO_STAY_CASE;
@@ -40,7 +39,7 @@ public class NotifyDefendantCaseStayedHandler extends AbstractNotifyCaseStayedHa
     @Override
     protected String getRecipient(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.isRespondent1LiP() && nonNull(caseData.getRespondent1().getPartyEmail())) {
+        if (caseData.isRespondent1LiP()) {
             return caseData.getRespondent1().getPartyEmail();
         } else {
             return isForRespondent1(callbackParams)

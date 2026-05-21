@@ -506,17 +506,22 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isJudgmentOnlineLive() && !featureToggleService.isJudgmentBufferEnabled()) {
-            JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            JudgmentDetails activeJudgment;
+            if (isJudgementBufferEnabledForCase(caseData)) {
+                activeJudgment = djOnlineMapper.addPendingIssueActiveJudgment(caseData);
+            } else {
+                activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
+                caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            }
             caseData.setActiveJudgment(activeJudgment);
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
                 activeJudgment,
                 true
             ));
-            caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            caseData.setJoDJCreatedDate(time.now());
         }
 
-        caseData.setJoDJCreatedDate(time.now());
         caseData.setTotalInterest(interestCalculator.calculateInterest(caseData));
         caseData.setClaimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
             DEFAULT_JUDGEMENT_SPEC_DEADLINE_EXTENSION_MONTHS,
@@ -524,10 +529,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         ));
         String nextState;
 
-        if (isJudgementBufferEnabledForCase(caseData)
-                && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        boolean isNonDivergentForDJ = JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
+
+        if (isNonDivergentForDJ && isJudgementBufferEnabledForCase(caseData)) {
             nextState = CaseState.JUDGMENT_REQUESTED.name();
-        } else if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            caseData.setIsJoRequested(YesOrNo.YES);
+        } else if (isNonDivergentForDJ && featureToggleService.isJudgmentOnlineLive()) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else {

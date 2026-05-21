@@ -27,16 +27,16 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan31Days;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThanDaysInMonth;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.clearJOCaseData;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getMoneyValue;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getPartialPayment;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isNonDivergentForDJ;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class JudgmentsOnlineHelperTest {
 
@@ -57,8 +57,8 @@ public class JudgmentsOnlineHelperTest {
 
     @Test
     void shouldCheckIfDateDifferenceIsGreaterThan31Days() {
-        assertThat(checkIfDateDifferenceIsGreaterThan31Days(LocalDate.now(), LocalDate.now().plusDays(31))).isFalse();
-        assertThat(checkIfDateDifferenceIsGreaterThan31Days(LocalDate.now(), LocalDate.now().plusDays(32))).isTrue();
+        assertThat(checkIfDateDifferenceIsGreaterThanDaysInMonth(LocalDate.of(2026, 4,  5), LocalDate.of(2026, 4,  7))).isFalse();
+        assertThat(checkIfDateDifferenceIsGreaterThanDaysInMonth(LocalDate.of(2026, 3,  5), LocalDate.of(2026, 4,  7))).isTrue();
     }
 
     @Test

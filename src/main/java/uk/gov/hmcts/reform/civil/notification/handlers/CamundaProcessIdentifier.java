@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
+@SuppressWarnings("java:S115")
 public enum CamundaProcessIdentifier {
     ClaimDismissedNotifyParties,
     ClaimantConfirmProceedNotifyParties,
@@ -70,8 +71,12 @@ public enum CamundaProcessIdentifier {
     NotifyDecisionOnReconsiderationRequestNotifier,
     SettleClaimPaidInFullNotificationNotifier,
     ClaimantResponsePartAdmitPayImmediatelyNotifier,
+    InformAgreedExtensionDateNotifier,
+    InformAgreedExtensionDateSpecNotifier,
+    SetAsideJudgementRequestNotifier,
     NotifyDefendantClaimantSettleTheClaimNotify,
     TranslatedDocumentUploadedNotifyParties,
     STANDARD_DIRECTION_ORDER_DJ_NOTIFY_PARTIES,
-    DJ_NON_DIVERGENT_NOTIFIER;
+    DJ_NON_DIVERGENT_NOTIFIER,
+    RequestJudgementByAdmissionNotifyParties;
 }

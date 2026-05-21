@@ -347,8 +347,8 @@ def sonarExclusions = [
   "**/utils/**",
   "**/filters/**",
   "**/model/hearingvalues/**",
-  "**/config/AsyncHandlerConfiguration.java",
-  "**/config/HttpClientConfiguration.java",
+  "**/config/HttpClientFeignConfigurationTest.java",
+  "**/config/HttpClientRestConfiguration.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java",
@@ -370,7 +370,13 @@ def sonarExclusions = [
   "**/setup/CamundaHighLevelDataSetupApp.java",
   "**/setup/CamundaDefinitionImporter.java",
   "**/setup/CamundaImportConfiguration.java",
-  "**/setup/ServiceAuthorisationRestApi.java"
+  "**/setup/ServiceAuthorisationRestApi.java",
+  "**/informagreedextensiondate/InformAgreedExtensionDateAppSolOneEmailDTOGenerator.java",
+  "**/informagreedextensiondate/InformAgreedExtensionDateRespSolOneEmailDTOGenerator.java",
+  "**/informagreedextensiondate/InformAgreedExtensionDateRespSolTwoEmailDTOGenerator.java",
+  "**/setasidejudgementrequest/SetAsideJudgementRequestAppSolOneEmailDTOGenerator.java",
+  "**/setasidejudgementrequest/SetAsideJudgementRequestRespSolOneEmailDTOGenerator.java",
+ " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java"
 ]
 
 sonarqube {

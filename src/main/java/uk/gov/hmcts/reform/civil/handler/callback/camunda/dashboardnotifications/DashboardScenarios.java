@@ -67,6 +67,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT("Scenario.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant"),
     SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT("Scenario.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT("Scenario.AAA6.DefResponse.MoreTimeRequested.Claimant"),
+    SCENARIO_AAA6_DEFENDANT_RESPONSE_JUDGMENT_REQUESTED_CANCELLED_CLAIMANT("Scenario.AAA6.DefResponse.JR.Cancelled.Claimant"),
     SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT("Scenario.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT("Scenario.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant"),
     SCENARIO_AAA6_CLAIMANT_MEDIATION_SUCCESSFUL("Scenario.AAA6.MediationSuccessful.CARM.Claimant"),
@@ -258,6 +259,9 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_CLAIMANT("Scenario.AAA6.ProofOfDebtPayment.Confirmation.Claimant"),
     SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_DEFENDANT("Scenario.AAA6.ProofOfDebtPayment.Confirmation.Defendant"),
     SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_JBA_CLAIM_MOVES_OFFLINE_CLAIMANT("Scenario.AAA6.DefendantNoticeOfChange.JudgmentByAdmissionClaimMovesOffline.Claimant"),
+
+    SCENARIO_AAA6_MARK_PAID_IN_FULL_CLAIMANT("Scenario.AAA6.MarkPaidInFull.Confirmation.Claimant"),
+    SCENARIO_AAA6_MARK_PAID_IN_FULL_DEFENDANT("Scenario.AAA6.MarkPaidInFull.Confirmation.Defendant"),
 
     //General Application
     SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_NONURGENT_RESPONDENT("Scenario.AAA6.GeneralApps.NonUrgentApplicationMade.Respondent"),
