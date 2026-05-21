@@ -60,6 +60,7 @@ public class LiPRequestReconsiderationGeneratorService {
 
         return new LiPRequestForReconsiderationForm()
         .setCurrentDate(LocalDate.now())
+        .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
         .setCaseNumber(caseData.getLegacyCaseReference())
         .setCountyCourt(venueName)
         .setPartyName(isApplicant

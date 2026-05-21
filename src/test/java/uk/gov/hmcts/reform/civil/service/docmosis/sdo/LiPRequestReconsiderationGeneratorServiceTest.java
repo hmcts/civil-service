@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.REQUE
     LiPRequestReconsiderationGeneratorService.class,
     JacksonAutoConfiguration.class
 })
-public class LiPRequestReconsiderationGeneratorServiceTest {
+class LiPRequestReconsiderationGeneratorServiceTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};

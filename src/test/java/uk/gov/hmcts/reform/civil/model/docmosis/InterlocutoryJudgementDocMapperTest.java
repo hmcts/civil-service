@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPay
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
 
 @ExtendWith(MockitoExtension.class)
-public class InterlocutoryJudgementDocMapperTest {
+class InterlocutoryJudgementDocMapperTest {
 
     private static final LocalDate ISSUE_DATE = LocalDate.of(2023, 11, 28);
     private static final String CLAIM_NUMBER = "claim001";
@@ -48,7 +48,7 @@ public class InterlocutoryJudgementDocMapperTest {
     private CaseData caseData;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         mapper = new InterlocutoryJudgementDocMapper(calculatorService, repaymentPlanDecisionCalculator, claimantResponseUtils);
     }
 
@@ -57,7 +57,7 @@ public class InterlocutoryJudgementDocMapperTest {
 
         //Given
         caseData = getCaseData();
-        try (MockedStatic mocked = mockStatic(ClaimantResponseUtils.class)) {
+        try (MockedStatic<ClaimantResponseUtils> mocked = mockStatic(ClaimantResponseUtils.class)) {
             given(repaymentPlanDecisionCalculator.calculateDisposableIncome(
                 caseData)).willReturn(-100.989999);
             given(claimantResponseUtils.getClaimantRepaymentType(caseData)).willReturn("Immediately");
@@ -93,7 +93,7 @@ public class InterlocutoryJudgementDocMapperTest {
         InterlocutoryJudgementDoc actual = mapper.toInterlocutoryJudgementDoc(caseData);
 
         // Then
-        assertEquals(actual.getClaimantResponseToDefendantAdmission(), "I accept full admission");
+        assertEquals("I accept full admission", actual.getClaimantResponseToDefendantAdmission());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class InterlocutoryJudgementDocMapperTest {
         InterlocutoryJudgementDoc actual = mapper.toInterlocutoryJudgementDoc(caseData);
 
         // Then
-        assertEquals(actual.getFormattedDisposableIncome(), "£100.99");
+        assertEquals("£100.99", actual.getFormattedDisposableIncome());
     }
 
     @Test
@@ -195,6 +195,7 @@ public class InterlocutoryJudgementDocMapperTest {
         return new InterlocutoryJudgementDoc()
             .setClaimIssueDate(ISSUE_DATE)
             .setClaimNumber(CLAIM_NUMBER)
+            .setCcdCaseReference("112434565433456")
             .setClaimantRequestRepaymentBy("Immediately")
             .setClaimantResponseSubmitDateTime(CLAIMANT_RESPONSE_DATE_TIME)
             .setClaimantResponseToDefendantAdmission("I accept part admission")
@@ -207,6 +208,7 @@ public class InterlocutoryJudgementDocMapperTest {
 
     private static CaseData getCaseData() {
         return CaseData.builder()
+            .ccdCaseReference(112434565433456L)
             .issueDate(ISSUE_DATE)
             .legacyCaseReference(CLAIM_NUMBER)
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)

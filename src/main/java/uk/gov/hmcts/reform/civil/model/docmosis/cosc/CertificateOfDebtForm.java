@@ -14,6 +14,7 @@ public class CertificateOfDebtForm implements MappableObject {
 
     private String courtLocationName;
     private String claimNumber;
+    private String ccdCaseReference;
     private String defendantFullName;
     private String defendantAddress;
     private String defendantFullNameFromJudgment;
