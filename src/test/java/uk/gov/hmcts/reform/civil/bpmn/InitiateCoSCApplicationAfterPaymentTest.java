@@ -6,6 +6,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import java.util.HashMap;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,12 +34,12 @@ class InitiateCoSCApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentTest
     }
 
     @ParameterizedTest
-    @CsvSource({
+    @CsvSource(value = {
         "false,false,null",
         "false,true,null",
         "true,null,true",
         "true,null,false",
-    })
+    }, nullValues = "null")
     void shouldSuccessfullyComplete_whenCalled(Boolean isJudgmentMarkedPaidInFull, Boolean isClaimantLR, Boolean joFlag) {
         //assert process has started
         assertFalse(processInstance.isEnded());
@@ -46,10 +47,10 @@ class InitiateCoSCApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentTest
         //assert message start event
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
+        Map<String, Object> flowFlagsMap = new HashMap<>();
+        flowFlagsMap.put(IS_JO_LIVE_FEED_ACTIVE, joFlag);
         VariableMap variables = Variables.createVariables();
-        variables.put("flowFlags", Map.of(
-            IS_JO_LIVE_FEED_ACTIVE, joFlag
-        ));
+        variables.put("flowFlags", flowFlagsMap);
         variables.put("isJudgmentMarkedPaidInFull", isJudgmentMarkedPaidInFull);
         variables.put("isClaimantLR", isClaimantLR);
 
@@ -73,8 +74,8 @@ class InitiateCoSCApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentTest
             variables
         );
 
-        if (!isJudgmentMarkedPaidInFull) {
-            if (isClaimantLR) {
+        if (Boolean.FALSE.equals(isJudgmentMarkedPaidInFull)) {
+            if (Boolean.TRUE.equals(isClaimantLR)) {
                 // email notification for claimant
                 ExternalTask claimantNotificationTask = assertNextExternalTask(APPLICATION_PROCESS_EVENT_GASPEC);
                 assertCompleteExternalTask(
@@ -88,7 +89,7 @@ class InitiateCoSCApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentTest
         }
 
         //complete the CC notification
-        if (isJudgmentMarkedPaidInFull) {
+        if (Boolean.TRUE.equals(isJudgmentMarkedPaidInFull)) {
             //complete generate Document
             ExternalTask generateDoc = assertNextExternalTask(APPLICATION_PROCESS_EVENT_GASPEC);
             assertCompleteExternalTask(
@@ -100,7 +101,7 @@ class InitiateCoSCApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentTest
             );
         }
 
-        if (joFlag) {
+        if (Boolean.TRUE.equals(joFlag)) {
             ExternalTask notificationTask = assertNextExternalTask(APPLICATION_PROCESS_EVENT_GASPEC);
             assertCompleteExternalTask(
                 notificationTask,

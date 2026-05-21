@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -100,20 +101,22 @@ class TakeCaseOfflineTest extends BpmnBaseTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true, true", "true, false", "false, true", "true, null"})
+    @CsvSource(value = {"true, true", "true, false", "false, true", "true, null"}, nullValues = "null")
     void shouldSuccessfullyCompleteTakeCaseOfflineUnrepresentedDefendant(boolean unrepresentedDefendant1,
-                                                                         boolean unrepresentedDefendant2) {
+                                                                         Boolean unrepresentedDefendant2) {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
         //assert message start event
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
+        Map<String, Object> flowFlags = new HashMap<>();
+        flowFlags.put(UNREPRESENTED_DEFENDANT_ONE, unrepresentedDefendant1);
+        if (unrepresentedDefendant2 != null) {
+            flowFlags.put(UNREPRESENTED_DEFENDANT_TWO, unrepresentedDefendant2);
+        }
         VariableMap variables = Variables.createVariables();
-        variables.put("flowFlags", Map.of(
-                UNREPRESENTED_DEFENDANT_ONE, unrepresentedDefendant1,
-                UNREPRESENTED_DEFENDANT_TWO, unrepresentedDefendant2
-        ));
+        variables.put("flowFlags", flowFlags);
 
         //complete the start business process
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
@@ -245,21 +248,23 @@ class TakeCaseOfflineTest extends BpmnBaseTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true, true", "true, false", "false, true", "true, null"})
+    @CsvSource(value = {"true, true", "true, false", "false, true", "true, null"}, nullValues = "null")
     void shouldSuccessfullyCompleteTakeCaseOfflineUnrepresentedDefendant_GAEnabled(boolean unrepresentedDefendant1,
-                                                                                   boolean unrepresentedDefendant2) {
+                                                                                   Boolean unrepresentedDefendant2) {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
         //assert message start event
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
+        Map<String, Object> flowFlags = new HashMap<>();
+        flowFlags.put(UNREPRESENTED_DEFENDANT_ONE, unrepresentedDefendant1);
+        if (unrepresentedDefendant2 != null) {
+            flowFlags.put(UNREPRESENTED_DEFENDANT_TWO, unrepresentedDefendant2);
+        }
+        flowFlags.put(DASHBOARD_SERVICE_ENABLED, true);
         VariableMap variables = Variables.createVariables();
-        variables.put("flowFlags", Map.of(
-                UNREPRESENTED_DEFENDANT_ONE, unrepresentedDefendant1,
-                UNREPRESENTED_DEFENDANT_TWO, unrepresentedDefendant2,
-                DASHBOARD_SERVICE_ENABLED, true
-        ));
+        variables.put("flowFlags", flowFlags);
 
         //complete the start business process
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);

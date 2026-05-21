@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -227,18 +228,19 @@ class CaseProceedsInCasemanTest extends BpmnBaseTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true", "false", "null"})
-    void shouldSuccessfullyComplete_unrepresentedDefendant(boolean unrepresentedDefendant1) {
+    @CsvSource(value = {"true", "false", "null"}, nullValues = "null")
+    void shouldSuccessfullyComplete_unrepresentedDefendant(Boolean unrepresentedDefendant1) {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
         //assert message start event
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
+        Map<String, Object> flowFlagsMap = new HashMap<>();
+        flowFlagsMap.put(DASHBOARD_SERVICE_ENABLED, false);
+        flowFlagsMap.put(UNREPRESENTED_DEFENDANT_ONE, unrepresentedDefendant1);
         VariableMap variables = Variables.createVariables();
-        variables.put("flowFlags", Map.of(DASHBOARD_SERVICE_ENABLED, false,
-            UNREPRESENTED_DEFENDANT_ONE, unrepresentedDefendant1
-        ));
+        variables.put("flowFlags", flowFlagsMap);
 
         //complete the start business process
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
