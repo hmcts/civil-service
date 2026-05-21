@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.JR.Cancelled.Case.Stayed.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "The case has been stayed",
+  "titleCy": "Mae’r achos wedi cael ei atal",
+  "descriptionEn": "<p class=\"govuk-body\">The case has been stayed. The CCJ you requested has been cancelled. You will need to request a new CCJ when the stay is lifted.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae’r achos wedi’i ohirio. Mae’r CCJ y gwnaethoch ofyn amdano wedi’i chanslo. Bydd angen i chi wneud cais am CCJ newydd pan fydd yr ohiriad yn cael ei godi.</p>"
+}
