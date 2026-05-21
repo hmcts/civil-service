@@ -342,6 +342,7 @@ public class JudgmentsOnlineHelper {
         caseData.setRepaymentSummaryObject(null);
         caseData.setShowOldDJFixedCostsScreen(null);
         caseData.setJoState(null);
+        caseData.setIsJoRequested(null);
         return caseData;
     }
 

@@ -225,6 +225,7 @@ public class JudgmentsOnlineHelperTest {
         caseData.setRepaymentSuggestion("repayment suggestion");
         caseData.setRepaymentSummaryObject("repayment summary");
         caseData.setShowOldDJFixedCostsScreen(YES);
+        caseData.setIsJoRequested(YES);
 
         CaseData clearedCaseData = clearJOCaseData(caseData);
 
@@ -250,5 +251,6 @@ public class JudgmentsOnlineHelperTest {
         assertThat(clearedCaseData.getRepaymentSuggestion()).isNull();
         assertThat(clearedCaseData.getRepaymentSummaryObject()).isNull();
         assertThat(clearedCaseData.getShowOldDJFixedCostsScreen()).isNull();
+        assertThat(clearedCaseData.getIsJoRequested()).isNull();
     }
 }
