@@ -1,7 +1,7 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
-  devcpuRequests: 500m
+  devcpuRequests: 50m
   devmemoryRequests: 2048Mi
   devmemoryLimits: 4096Mi
   environment:
@@ -123,7 +123,7 @@ java:
         enabled: false
       resources:
         requests:
-          cpu: 500m
+          cpu: 50m
       initdb:
         scripts:
           init.sql: |
@@ -152,11 +152,11 @@ xui-webapp:
     image: hmctsprod.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
     memoryRequests: 2Gi
-    cpuRequests: 2000m
+    cpuRequests: 50m
     memoryLimits: 4Gi
     cpuLimits: 3500m
     devmemoryRequests: 6Gi
-    devcpuRequests: 2000m
+    devcpuRequests: 50m
     devmemoryLimits: 8Gi
     devcpuLimits: 4500m
     environment:
@@ -220,7 +220,7 @@ ccd:
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
-      devcpuRequests: 500m
+      devcpuRequests: 50m
       devmemoryRequests: 4096Mi
       devmemoryLimits: 8192Mi
       autoscaling:
@@ -256,7 +256,7 @@ ccd:
   ccd-definition-store-api:
     java:
       imagePullPolicy: Always
-      devcpuRequests: 2000m
+      devcpuRequests: 50m
       devmemoryRequests: 4Gi
       devmemoryLimits: 4Gi
       environment:
@@ -285,7 +285,7 @@ camunda-bpm:
     disableKeyVaults: true
     releaseNameOverride: ${SERVICE_NAME}-camunda
     ingressHost: camunda-${SERVICE_FQDN}
-    devcpuRequests: 500m
+    devcpuRequests: 50m
     devmemoryRequests: 1024Mi
     devcpuLimits: 1
     devmemoryLimits: 1Gi
@@ -513,4 +513,3 @@ wiremockMappings:
         "body": "{\"status\":\"UP\"}"
       }
     }
-
