@@ -1,0 +1,34 @@
+{
+  "ccdCaseReference": 1644495739087775,
+  "parentCaseReference": "1644495739088885",
+  "legacyCaseReference": "000DC001",
+  "parentClaimantIsApplicant": "Yes",
+  "generalAppType": {
+    "types": [
+      "VARY_PAYMENT_TERMS_OF_JUDGMENT"
+    ]
+  },
+  "businessProcess": {
+    "status": "READY"
+  },
+  "generalAppInformOtherParty": {
+    "isWithNotice": "Yes"
+  },
+  "generalAppRespondentAgreement": {
+    "hasAgreed": "Yes"
+  },
+  "generalAppPBADetails": {
+    "paymentSuccessfulDate": "2020-01-01T12:00:00",
+    "paymentDetails": {
+      "status": "SUCCESS",
+      "reference": "RC-1658-4258-2679-9795",
+      "customerReference": "12345"
+    },
+    "fee": {
+      "code": "FE203",
+      "calculatedAmountInPence": 27500,
+      "version": "1"
+    },
+    "serviceReqReference": "12345"
+  }
+}

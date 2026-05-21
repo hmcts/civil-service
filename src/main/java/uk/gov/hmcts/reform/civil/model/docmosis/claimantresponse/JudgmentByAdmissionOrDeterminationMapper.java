@@ -89,6 +89,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .setFormName(getFormName(caseData))
             .setClaimant(claimant)
             .setDefendant(defendant)
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
             .setTotalClaimAmount(totalClaimAmount)
             .setTotalInterestAmount(totalInterest)

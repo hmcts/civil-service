@@ -18,7 +18,7 @@ public class JudgmentByDeterminationDocForm implements MappableObject {
 
     // Claim identification
     private String claimReferenceNumber;
-
+    private String ccdCaseReference;
     // Party information
     private Party applicant;
     private List<Party> applicants;
