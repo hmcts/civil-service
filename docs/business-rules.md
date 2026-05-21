@@ -166,7 +166,7 @@
 | **Claimant** | `responseTypeSpecClaimant1()` | Checks claimant 1's SPEC response enum equals the provided type |
 | **Claimant** | `responseTypeSpecClaimant2()` | Checks claimant 2's SPEC response enum equals the provided type |
 | **Claimant** | `responsesDifferSpec` | Both claimant SPEC response enums are present and not equal |
-| **Hearing** | `hasDismissedFeeDueDate` | True when a hearing fee due date (dismissed) exists and is before now. |
+| **Hearing** | `hasDismissedFeeDueDate` | True when a hearing fee due date (dismissed) is recorded on the case. |
 | **Hearing** | `hasReference` | True when a hearing reference number is recorded for the case. |
 | **Hearing** | `isListed` | True when the case has a hearing listing (listing status is LISTING). |
 | **Judgment** | `isByAdmission` | True when an active judgment exists and its type is 'judgment by admission'. |

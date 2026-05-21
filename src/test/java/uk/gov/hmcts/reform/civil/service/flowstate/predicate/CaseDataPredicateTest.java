@@ -752,20 +752,14 @@ class CaseDataPredicateTest {
         }
 
         @Test
-        void should_return_true_for_hasDismissedFeeDueDate_when_date_in_past() {
-            when(caseData.getCaseDismissedHearingFeeDueDate()).thenReturn(LocalDateTime.now().minusDays(1));
+        void should_return_true_for_hasDismissedFeeDueDate_when_present() {
+            when(caseData.getCaseDismissedHearingFeeDueDate()).thenReturn(LocalDateTime.now());
             assertTrue(CaseDataPredicate.Hearing.hasDismissedFeeDueDate.test(caseData));
         }
 
         @Test
         void should_return_false_for_hasDismissedFeeDueDate_when_absent() {
             when(caseData.getCaseDismissedHearingFeeDueDate()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Hearing.hasDismissedFeeDueDate.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasDismissedFeeDueDate_when_date_in_future() {
-            when(caseData.getCaseDismissedHearingFeeDueDate()).thenReturn(LocalDateTime.now().plusDays(1));
             assertFalse(CaseDataPredicate.Hearing.hasDismissedFeeDueDate.test(caseData));
         }
     }

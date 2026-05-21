@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -108,10 +107,9 @@ public class AsyncCaseMigrationService {
         }
     }
 
-    protected CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData, MigrationTask<?> task) {
+    protected CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData, MigrationTask task) {
 
-        Map<String, Object> updatedData = new HashMap<>(caseData.toMap(objectMapper));
-        task.getFieldsToNullify().forEach(field -> updatedData.put(field, null));
+        Map<String, Object> updatedData = caseData.toMap(objectMapper);
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())

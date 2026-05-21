@@ -517,12 +517,11 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
 
         @BusinessRule(
             group = "Hearing",
-            summary = "Hearing dismissed fee due date passed",
-            description = "True when a hearing fee due date (dismissed) exists and is before now."
+            summary = "Hearing dismissed fee due date present",
+            description = "True when a hearing fee due date (dismissed) is recorded on the case."
         )
         Predicate<CaseData> hasDismissedFeeDueDate =
-            nullSafe(c -> c.getCaseDismissedHearingFeeDueDate() != null
-                && c.getCaseDismissedHearingFeeDueDate().isBefore(LocalDateTime.now()));
+            nullSafe(c -> c.getCaseDismissedHearingFeeDueDate() != null);
 
     }
 

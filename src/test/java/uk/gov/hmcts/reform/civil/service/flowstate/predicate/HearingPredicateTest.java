@@ -46,7 +46,7 @@ class HearingPredicateTest {
         void should_return_false_for_isInReadiness_when_case_dismissed() {
             when(caseData.getHearingReferenceNumber()).thenReturn("000HN001");
             when(caseData.getListingOrRelisting()).thenReturn(LISTING);
-            when(caseData.getCaseDismissedHearingFeeDueDate()).thenReturn(LocalDateTime.now().minusDays(5));
+            when(caseData.getCaseDismissedHearingFeeDueDate()).thenReturn(LocalDateTime.now().plusDays(5));
             assertFalse(HearingPredicate.isInReadiness.test(caseData));
         }
 
