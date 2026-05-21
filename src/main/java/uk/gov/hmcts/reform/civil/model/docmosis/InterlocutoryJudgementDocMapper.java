@@ -45,6 +45,7 @@ public class InterlocutoryJudgementDocMapper implements MappableObject {
     public InterlocutoryJudgementDoc toInterlocutoryJudgementDoc(CaseData caseData) {
         return new InterlocutoryJudgementDoc()
             .setClaimIssueDate(caseData.getIssueDate())
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setClaimNumber(caseData.getLegacyCaseReference())
             .setClaimantRequestRepaymentBy(claimantResponseUtils.getClaimantRepaymentType(caseData))
             .setClaimantRequestRepaymentLastDateBy(getClaimantRequestRepaymentLastDateBy(caseData))
