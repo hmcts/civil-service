@@ -1,0 +1,30 @@
+{
+  "ccdCaseReference": 72014545416,
+  "ccdState": "PREPARE_FOR_HEARING_CONDUCT_HEARING",
+  "legacyCaseReference": "reference",
+  "applicant1Represented": "No",
+  "respondent1Represented": "No",
+  "applicant1": {
+    "type": "INDIVIDUAL",
+    "individualFirstName": "Claimant",
+    "individualLastName": "Tester"
+  },
+  "respondent1": {
+    "type": "INDIVIDUAL",
+    "individualFirstName": "Defendant",
+    "individualLastName": "Tester"
+  },
+  "caseManagementLocation": {
+    "baseLocation": "00002"
+  },
+  "finalOrderDocumentCollection": [
+    {
+      "id": "22222222-2222-2222-2222-222222222222",
+      "value": {
+        "documentLink": {
+          "documentBinaryUrl": "url"
+        }
+      }
+    }
+  ]
+}
