@@ -28,7 +28,10 @@ jobs:
           node-version: 20
 
       - name: Install npm dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
+
+      - name: Download Puppeteer browser
+        run: npx puppeteer browsers install chrome
 
       - name: Determine changed BPMN files
         id: changed
