@@ -408,7 +408,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 "partyReferences",
                 "Claimant reference: 12345 - Defendant reference: 6789",
                 "name",
-                "Mr. Sole Trader",
+                "Mr. Sole Trader T/A Sole Trader co",
                 "claimReferenceNumber",
                 "1594901956117591",
                 "casemanRef",
