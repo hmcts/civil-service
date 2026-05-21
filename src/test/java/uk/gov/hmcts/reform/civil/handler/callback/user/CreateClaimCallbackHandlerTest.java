@@ -1572,7 +1572,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAddCaseNamePublic_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).containsEntry("caseNamePublic", "John Rambo v Sole Trader");
+            assertThat(response.getData()).containsEntry("caseNamePublic", "John Rambo v Sole Trader T/A Sole Trader co");
         }
 
         @Test
@@ -1693,7 +1693,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("John Rambo v Sole Trader, John Rambo");
+                .isEqualTo("John Rambo v Sole Trader T/A Sole Trader co, John Rambo");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1706,7 +1706,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("John Rambo, Jason Rambo v Sole Trader");
+                .isEqualTo("John Rambo, Jason Rambo v Sole Trader T/A Sole Trader co");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1719,7 +1719,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("John Rambo v Sole Trader");
+                .isEqualTo("John Rambo v Sole Trader T/A Sole Trader co");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1905,7 +1905,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader");
+                    .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader T/A Sole Trader co");
             }
 
             @Test
@@ -1919,7 +1919,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
-                    .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader, Mr. John Rambo");
+                    .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader T/A Sole Trader co, Mr. John Rambo");
             }
 
             @Test
@@ -1933,7 +1933,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
-                    .containsEntry("allPartyNames", "Mr. John Rambo, Mr. Jason Rambo V Mr. Sole Trader");
+                    .containsEntry("allPartyNames", "Mr. John Rambo, Mr. Jason Rambo V Mr. Sole Trader T/A Sole Trader co");
             }
         }
 
