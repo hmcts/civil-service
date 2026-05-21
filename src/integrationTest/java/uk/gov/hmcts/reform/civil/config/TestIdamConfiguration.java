@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil;
+package uk.gov.hmcts.reform.civil.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

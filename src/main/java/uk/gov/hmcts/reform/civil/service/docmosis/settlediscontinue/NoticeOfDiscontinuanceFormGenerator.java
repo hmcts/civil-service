@@ -61,7 +61,7 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
     private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData, String partyName, Address address, boolean isQMEnabled, boolean isRespondentLiP) {
         return new NoticeOfDiscontinuanceForm()
             .setCaseNumber(caseData.getLegacyCaseReference())
-            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setClaimReferenceNumber(caseData.getCcdCaseReference().toString())
             .setLetterIssueDate(LocalDate.now())
             .setDateOfEvent(LocalDate.now())
             .setCoverLetterName(partyName)
