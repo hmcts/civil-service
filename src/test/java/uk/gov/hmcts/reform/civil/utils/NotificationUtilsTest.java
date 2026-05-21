@@ -301,7 +301,7 @@ class NotificationUtilsTest {
 
         String actual = NotificationUtils.getDefendantNameBasedOnCaseType(caseData);
 
-        assertThat(actual).isEqualTo("Mr. Sole Trader and Mr. John Rambo");
+        assertThat(actual).isEqualTo("Mr. Sole Trader T/A Sole Trader co and Mr. John Rambo");
     }
 
     @Test
@@ -310,7 +310,7 @@ class NotificationUtilsTest {
 
         String actual = NotificationUtils.getDefendantNameBasedOnCaseType(caseData);
 
-        assertThat(actual).isEqualTo("Mr. Sole Trader");
+        assertThat(actual).isEqualTo("Mr. Sole Trader T/A Sole Trader co");
     }
 
     @Test

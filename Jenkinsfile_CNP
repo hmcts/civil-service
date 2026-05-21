@@ -184,6 +184,10 @@ withPipeline(type, product, component) {
   }
 
   afterAlways('functionalTest:preview') {
+    if(checkForSkipFunctionalTests(env.BRANCH_NAME)) {
+      echo "Skipping publish functional test results due to label: pr-values:skip-functional-tests"
+      return
+    }
     publishFunctionalTestResults()
   }
 
@@ -206,13 +210,23 @@ withPipeline(type, product, component) {
   }
 
   before('functionalTest:preview') {
-    prepareFunctionalTests(checkForRunAllFunctionalTests(env.BRANCH_NAME))
+    if(checkForSkipFunctionalTests(env.BRANCH_NAME)) {
+      env.SKIP_FUNCTIONAL_TESTS = true
+      return
+    }
+    prepareFunctionalTests(checkForRunAllFunctionalTests(env.BRANCH_NAME))  
   }
 
   before('functionalTest:aat') {
     prepareFunctionalTests(false)
     setStagingUrls()
   }
+}
+
+def checkForSkipFunctionalTests(branch_name) {
+  return new GithubAPI(this)
+    .getLabelsbyPattern(branch_name, "pr-values:skip-functional-tests")
+    .contains("pr-values:skip-functional-tests")
 }
 
 def checkForRunAllFunctionalTests(branch_name) {
