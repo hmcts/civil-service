@@ -27,6 +27,7 @@ public class JudgmentByAdmissionOrDetermination implements MappableObject {
 
     private String formHeader;
     private String formName;
+    private String ccdCaseReference;
     private String claimReferenceNumber;
     private LipFormParty claimant;
     private LipFormParty defendant;

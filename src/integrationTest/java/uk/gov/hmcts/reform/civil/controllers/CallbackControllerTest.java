@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

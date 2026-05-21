@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 public class SettlementAgreementForm implements MappableObject {
 
     private String claimReferenceNumber;
+    private String ccdReferenceNumber;
     private LipFormParty claimant;
     private LipFormParty defendant;
     private Address claimantCorrespondenceAddress;
