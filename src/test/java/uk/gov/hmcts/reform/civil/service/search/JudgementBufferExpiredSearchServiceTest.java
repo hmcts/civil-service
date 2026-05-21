@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.service.search.calculator.SearchDateTimeCalcula
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
@@ -48,7 +49,7 @@ class JudgementBufferExpiredSearchServiceTest extends ElasticSearchServiceTest {
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48WorkingHours))
+                        .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48WorkingHours.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
                         .must(boolQuery().must(matchQuery("state", CaseState.JUDGMENT_REQUESTED.toString())))
                         .must(((JudgementBufferExpiredSearchService) searchService).haveNoOngoingBusinessProcess()));
         return new Query(query, List.of("reference"), fromValue, true);

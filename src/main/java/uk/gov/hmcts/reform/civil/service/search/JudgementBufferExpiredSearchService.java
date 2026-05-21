@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.calculator.SearchDateTimeCalculator;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
@@ -39,7 +40,7 @@ public class JudgementBufferExpiredSearchService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48WorkingHours))
+                            .must(rangeQuery("data.joDJCreatedDate").lte(formatToIsoLocal(timeMinus48WorkingHours)))
                             .must(beState(CaseState.JUDGMENT_REQUESTED))
                             .must(haveNoOngoingBusinessProcess())
                 ),
@@ -60,5 +61,9 @@ public class JudgementBufferExpiredSearchService extends ElasticSearchService {
             .should(boolQuery().mustNot(existsQuery("data.businessProcess")))
             .should(boolQuery().mustNot(existsQuery("data.businessProcess.status")))
             .should(boolQuery().must(matchQuery("data.businessProcess.status", "FINISHED")));
+    }
+
+    private String formatToIsoLocal(ZonedDateTime timeMinus48WorkingHours) {
+        return timeMinus48WorkingHours.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 }
