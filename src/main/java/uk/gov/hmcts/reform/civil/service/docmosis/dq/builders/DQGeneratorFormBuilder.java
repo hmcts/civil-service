@@ -90,6 +90,7 @@ public class DQGeneratorFormBuilder {
         DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm()
             .setCaseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .setReferenceNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(caseData.getCcdCaseReference().toString())
             .setSolicitorReferences(DocmosisTemplateDataUtils
                                      .fetchSolicitorReferences(caseData))
             .setRespondents(respondentsForDQGeneratorTask.getRespondents(caseData, null))

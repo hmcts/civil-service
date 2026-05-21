@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 public class TrialReadyForm implements MappableObject {
 
     private String caseNumber;
+    private String ccdCaseReference;
     private String claimant1;
     private String claimant2;
     private String claimantReferenceNumber;

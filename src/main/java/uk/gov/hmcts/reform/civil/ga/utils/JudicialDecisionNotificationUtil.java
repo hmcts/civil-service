@@ -110,7 +110,7 @@ public class JudicialDecisionNotificationUtil {
                     .getGeneralAppRespondentSolicitors())
             .stream().flatMap(
                 List::stream
-            ).filter(e -> !e.getValue().getEmail().isEmpty()).findFirst().orElse(null);
+            ).filter(e -> StringUtils.isNotBlank(e.getValue().getEmail())).findFirst().orElse(null);
         return respondents != null;
     }
 
