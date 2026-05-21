@@ -1,0 +1,35 @@
+{
+  "ccdCaseReference": 1594901956117591,
+  "parentClaimantIsApplicant": "Yes",
+  "generalAppType": {
+    "types": [
+      "EXTEND_TIME"
+    ]
+  },
+  "businessProcess": {
+    "camundaEvent": "HEARING_SCHEDULED_GA"
+  },
+  "generalAppInformOtherParty": {
+    "isWithNotice": "No"
+  },
+  "generalAppRespondentAgreement": {
+    "hasAgreed": "No"
+  },
+  "generalAppPBADetails": {
+    "paymentDetails": {
+      "status": "SUCCESS",
+      "reference": "RC-1658-4258-2679-9795",
+      "customerReference": "12345"
+    },
+    "fee": {
+      "code": "FEE0443",
+      "calculatedAmountInPence": 10800,
+      "version": "1"
+    },
+    "serviceReqReference": "12345"
+  },
+  "judicialDecision": {
+    "decision": "LIST_FOR_A_HEARING"
+  },
+  "judicialListForHearing": {}
+}
