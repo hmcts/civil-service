@@ -287,7 +287,7 @@ camunda-bpm:
     ingressHost: camunda-${SERVICE_FQDN}
     devcpuRequests: 50m
     devmemoryRequests: 1024Mi
-    devcpuLimits: 1
+    devcpuLimits: 500m
     devmemoryLimits: 1Gi
     environment:
       CAMUNDA_API_AUTH_ENABLED: false
