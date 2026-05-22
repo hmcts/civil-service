@@ -39,8 +39,13 @@ public class UpdateWaCourtLocationsService {
 
         String claimTrack = getClaimTrack(caseData);
         if (claimTrack == null) {
-            log.info("Claim track not set for case {}, skipping WA court location update",
-                     caseData.getCcdCaseReference());
+            // For SPEC cases this is expected before the respondent responds — responseClaimTrack
+            // is set by DEFENDANT_RESPONSE_SPEC/CUI. WA listing locations will be evaluated when
+            // the respondent/claimant responds or at SDO time. For UNSPEC this is unusual since
+            // allocatedTrack is set at CREATE_CLAIM.
+            log.info("Claim track not yet set for case {} (caseAccessCategory={}); "
+                     + "skipping WA listing location update — will be evaluated on later event",
+                     caseData.getCcdCaseReference(), caseData.getCaseAccessCategory());
             return;
         }
         if ("FAST_CLAIM".equals(claimTrack) || "SMALL_CLAIM".equals(claimTrack)) {
