@@ -525,10 +525,15 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         ));
         String nextState;
 
-        if (isJudgementBufferEnabledForCase(caseData)
-                && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+
+        boolean isNonDivergentForDJ = JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
+
+        if (isNonDivergentForDJ
+            && isJudgementBufferEnabledForCase(caseData)) {
             nextState = CaseState.JUDGMENT_REQUESTED.name();
-        } else if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            caseData.setIsJoRequested(YesOrNo.YES);
+        } else if (isNonDivergentForDJ
+            && featureToggleService.isJudgmentOnlineLive()) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else {
