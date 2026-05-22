@@ -36,7 +36,7 @@ public class ServiceHearingsCaseLevelMapperTest {
 
         String hmctsInternalCaseName = ServiceHearingsCaseLevelMapper.getHmctsInternalCaseName(caseData);
 
-        assertThat(hmctsInternalCaseName).isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+        assertThat(hmctsInternalCaseName).isEqualTo("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co");
     }
 
     @Test
@@ -45,7 +45,7 @@ public class ServiceHearingsCaseLevelMapperTest {
 
         String publicCaseName = ServiceHearingsCaseLevelMapper.getPublicCaseName(caseData);
 
-        assertThat(publicCaseName).isEqualTo("John Rambo v Sole Trader");
+        assertThat(publicCaseName).isEqualTo("John Rambo v Sole Trader T/A Sole Trader co");
     }
 
     @Test

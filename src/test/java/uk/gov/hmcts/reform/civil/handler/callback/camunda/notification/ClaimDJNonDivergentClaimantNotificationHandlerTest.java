@@ -190,7 +190,7 @@ public class ClaimDJNonDivergentClaimantNotificationHandlerTest extends BaseCall
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, "Test Org Name",
-            DEFENDANT_NAME_INTERIM, "Mr. Sole Trader",
+            DEFENDANT_NAME_INTERIM, "Mr. Sole Trader T/A Sole Trader co",
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
@@ -203,7 +203,7 @@ public class ClaimDJNonDivergentClaimantNotificationHandlerTest extends BaseCall
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, "Test Org Name",
-            DEFENDANT_NAME_INTERIM, "Mr. Sole Trader and Mr. John Rambo",
+            DEFENDANT_NAME_INTERIM, "Mr. Sole Trader T/A Sole Trader co and Mr. John Rambo",
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
