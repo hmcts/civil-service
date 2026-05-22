@@ -154,11 +154,11 @@ xui-webapp:
     memoryRequests: 512Mi
     cpuRequests: 50m
     memoryLimits: 1Gi
-    cpuLimits: 3500m
+    cpuLimits: 500m
     devmemoryRequests: 512Mi
     devcpuRequests: 50m
     devmemoryLimits: 1Gi
-    devcpuLimits: 4500m
+    devcpuLimits: 500m
     environment:
       FEATURE_ACCESS_MANAGEMENT_ENABLED: true
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
