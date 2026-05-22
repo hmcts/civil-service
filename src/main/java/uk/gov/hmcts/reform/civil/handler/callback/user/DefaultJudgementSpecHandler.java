@@ -525,7 +525,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         ));
         String nextState;
 
-
         boolean isNonDivergentForDJ = JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
 
         if (isNonDivergentForDJ
