@@ -83,7 +83,7 @@ class DismissClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("joRepaymentSummaryObject", "joIsDisplayInJudgmentTab", "isJoRequested")
-                .containsOnly(null, null, null);
+                .containsOnly(null, null, "Yes");
         }
 
         @Test

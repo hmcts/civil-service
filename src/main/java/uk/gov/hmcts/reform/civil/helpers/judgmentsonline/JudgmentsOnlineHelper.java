@@ -319,6 +319,10 @@ public class JudgmentsOnlineHelper {
         return formattedLine.length() > 0 ? formattedLine.substring(0, formattedLine.length() - 1) : "";
     }
 
+    public static boolean isJoRequested(CaseData caseData, uk.gov.hmcts.reform.civil.service.FeatureToggleService featureToggleService) {
+        return featureToggleService.isJudgmentBufferEnabled() && YesOrNo.YES.equals(caseData.getIsJoRequested());
+    }
+
     public static CaseData clearJOCaseData(CaseData caseData) {
         caseData.setActiveJudgment(null);
         caseData.setDefaultJudgementOverallTotal(null);
@@ -341,8 +345,6 @@ public class JudgmentsOnlineHelper {
         caseData.setRepaymentSuggestion(null);
         caseData.setRepaymentSummaryObject(null);
         caseData.setShowOldDJFixedCostsScreen(null);
-        caseData.setJoState(null);
-        caseData.setIsJoRequested(null);
         return caseData;
     }
 

@@ -18,8 +18,10 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_CCJ_CANCELLED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT;
 
@@ -80,6 +82,44 @@ class DismissCaseClaimantDashboardServiceTest {
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT.getScenario(),
+            "1234",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+    }
+
+    @Test
+    void shouldRecordCcjCancelledScenarioWhenJudgementBufferEnabledAndJoRequested() {
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .ccdCaseReference(1234L)
+            .isJoRequested(YesOrNo.YES)
+            .build();
+        when(toggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        service.notifyCaseDismissed(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_DISMISS_CASE_CCJ_CANCELLED_CLAIMANT.getScenario(),
+            "1234",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+    }
+
+    @Test
+    void shouldNotRecordCcjCancelledScenarioWhenJudgementBufferEnabledAndJoNotRequested() {
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .ccdCaseReference(1234L)
+            .isJoRequested(null)
+            .build();
+        when(toggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        service.notifyCaseDismissed(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService, never()).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_DISMISS_CASE_CCJ_CANCELLED_CLAIMANT.getScenario(),
             "1234",
             new ScenarioRequestParams(new HashMap<>())
         );
