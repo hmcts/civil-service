@@ -205,9 +205,8 @@ class CourtVenueServiceTest {
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterByLocationType(String serviceId) {
         List<LocationRefData> result = courtVenueService.getByLocationType(serviceAuth, auth, "Court", serviceId);
-        assertThat(result).containsExactlyInAnyOrder(court1, court2, court4 ,court5);
+        assertThat(result).containsExactlyInAnyOrder(court1, court2, court4, court5);
     }
-
 
     @Test
     void shouldFilterByLocationCode() {

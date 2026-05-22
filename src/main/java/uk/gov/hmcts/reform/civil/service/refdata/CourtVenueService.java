@@ -123,7 +123,7 @@ public class CourtVenueService {
         return filterCachedCourtsByServiceId(serviceAuth, auth, c ->
             threeDigitCode.equalsIgnoreCase(c.getCourtLocationCode())
                 && COURT_STATUS.equalsIgnoreCase(c.getCourtStatus())
-                && IS_CASE_MANAGEMENT_LOCATION.equalsIgnoreCase(c.getIsCaseManagementLocation()),serviceId
+                && IS_CASE_MANAGEMENT_LOCATION.equalsIgnoreCase(c.getIsCaseManagementLocation()), serviceId
         );
     }
 
@@ -136,7 +136,6 @@ public class CourtVenueService {
         log.info("Fetching courts by welsh site name: {} and serviceId {}", welshSiteName, serviceId);
         return filterCachedCourtsByServiceId(serviceAuth, auth, c -> welshSiteName.equalsIgnoreCase(c.getWelshSiteName()), serviceId);
     }
-
 
     public List<LocationRefData> getHearingLocationCourts(String serviceAuth, String auth) {
         return filterCachedCourts(serviceAuth, auth, c -> IS_HEARING_LOCATION.equals(c.getIsHearingLocation()));

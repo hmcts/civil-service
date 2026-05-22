@@ -57,7 +57,6 @@ class RdClientServiceTest {
         closeable.close();
     }
 
-
     @Test
     void shouldReturnAllCivilCourts() {
         List<LocationRefData> result = rdClientService.fetchAllCivilCourts(serviceAuth, auth);
