@@ -804,7 +804,7 @@ class CaseFlagUtilsTest {
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
                 Flags actual = caseData.getRespondent1().getFlags();
-                Flags expected = new Flags().setPartyName("Mr. Solo New trader")
+                Flags expected = new Flags().setPartyName("Mr. Solo New trader T/A Sole Trader co")
                     .setDetails(wrapElements(List.of(
                         new FlagDetail().setName("flag name"))))
                     .setRoleOnCase("respondent");
@@ -1303,7 +1303,7 @@ class CaseFlagUtilsTest {
                 Flags actualFlags = individual.getFlags();
                 Flags expectedFlags = new Flags().setPartyName("Org Ind")
                     .setDetails(List.of())
-                    .setRoleOnCase("Mr. Sole Trader");
+                    .setRoleOnCase("Mr. Sole Trader T/A Sole Trader co");
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isNotNull();
