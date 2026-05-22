@@ -18,4 +18,12 @@ public interface LocationReferenceDataApiClient {
         @RequestParam("court_type_id") final String courtTypeId,
         @RequestParam("location_type") final String locationType
     );
+
+    @GetMapping(value = "/refdata/location/court-venues")
+    List<LocationRefData> getAllCivilCourtVenuesByServiceId(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
+        @RequestHeader("Authorization") final String authorisation,
+        @RequestParam("location_type") final String locationType,
+        @RequestParam("service_code") final String serviceId
+    );
 }

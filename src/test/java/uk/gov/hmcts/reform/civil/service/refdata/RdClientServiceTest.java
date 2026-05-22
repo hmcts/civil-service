@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.refdata;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -29,10 +32,11 @@ class RdClientServiceTest {
 
     private final String serviceAuth = "serviceAuth";
     private final String auth = "auth";
+    private AutoCloseable closeable;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
 
         court1 = new LocationRefData()
             .setEpimmsId("111")
@@ -44,7 +48,15 @@ class RdClientServiceTest {
 
         when(locationRefDataApiClient.getAllCivilCourtVenues(any(), any(), any(), any()))
             .thenReturn(List.of(court1, court2));
+        when(locationRefDataApiClient.getAllCivilCourtVenuesByServiceId(any(), any(), any(), any()))
+            .thenReturn(List.of(court1, court2));
     }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        closeable.close();
+    }
+
 
     @Test
     void shouldReturnAllCivilCourts() {
@@ -53,6 +65,16 @@ class RdClientServiceTest {
 
         verify(locationRefDataApiClient, times(1))
             .getAllCivilCourtVenues(serviceAuth, auth, "10", "Court");
+    }
+
+    @ParameterizedTest()
+    @ValueSource(strings = {"AAA6", "AAA7"})
+    void shouldReturnAllCivilCourtsByServiceId(String serviceId) {
+        List<LocationRefData> result = rdClientService.fetchAllCivilCourtsByServiceId(serviceAuth, auth, serviceId);
+        assertThat(result).containsExactlyInAnyOrder(court1, court2);
+
+        verify(locationRefDataApiClient, times(1))
+            .getAllCivilCourtVenuesByServiceId(serviceAuth, auth, "Court", serviceId);
     }
 
     @Test
