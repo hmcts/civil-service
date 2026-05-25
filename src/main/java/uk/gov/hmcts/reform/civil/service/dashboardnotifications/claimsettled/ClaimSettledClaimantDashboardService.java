@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -11,9 +12,13 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 @Service
 public class ClaimSettledClaimantDashboardService extends DashboardScenarioService {
 
+    private final FeatureToggleService featureToggleService;
+
     public ClaimSettledClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
-                                                DashboardNotificationsParamsMapper mapper) {
+                                                DashboardNotificationsParamsMapper mapper,
+                                                FeatureToggleService featureToggleService) {
         super(dashboardScenariosService, mapper);
+        this.featureToggleService = featureToggleService;
     }
 
     public void notifyClaimSettled(CaseData caseData, String authToken) {
@@ -22,6 +27,10 @@ public class ClaimSettledClaimantDashboardService extends DashboardScenarioServi
 
     @Override
     protected String getScenario(CaseData caseData) {
+        if (featureToggleService.isJudgmentBufferEnabled()
+            && YesOrNo.YES.equals(caseData.getIsJoRequested())) {
+            return DashboardScenarios.SCENARIO_AAA6_CASE_SETTLED_JR_CANCELLED_CLAIMANT.getScenario();
+        }
         return DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_EVENT_CLAIMANT.getScenario();
     }
 

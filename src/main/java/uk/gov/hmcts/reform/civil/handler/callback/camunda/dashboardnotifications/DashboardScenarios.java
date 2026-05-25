@@ -69,6 +69,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT("Scenario.AAA6.DefResponse.MoreTimeRequested.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_JR_CANCELLED_CLAIMANT("Scenario.AAA6.DefResponse.MoreTimeRequested.JR.Cancelled.Claimant"),
     SCENARIO_AAA6_CASE_STAYED_JR_CANCELLED_CLAIMANT("Scenario.AAA6.JR.Cancelled.Case.Stayed.Claimant"),
+    SCENARIO_AAA6_CASE_SETTLED_JR_CANCELLED_CLAIMANT("Scenario.AAA6.JR.Cancelled.Case.Settled.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_JUDGMENT_REQUESTED_CANCELLED_CLAIMANT("Scenario.AAA6.DefResponse.JR.Cancelled.Claimant"),
     SCENARIO_AAA6_DEFISLIP_JUDGMENT_REQUESTED_CLAIMANT("Scenario.AAA6.DefIsLip.Judgment.Requested.Claimant"),
     SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT("Scenario.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant"),

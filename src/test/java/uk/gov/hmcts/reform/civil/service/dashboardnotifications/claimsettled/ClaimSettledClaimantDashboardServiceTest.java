@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -20,6 +21,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_SETTLED_JR_CANCELLED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_EVENT_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +33,8 @@ class ClaimSettledClaimantDashboardServiceTest {
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private ClaimSettledClaimantDashboardService service;
@@ -52,6 +56,25 @@ class ClaimSettledClaimantDashboardServiceTest {
         verify(dashboardScenariosService).recordScenarios(
             eq(AUTH_TOKEN),
             eq(SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_EVENT_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldRecordJudgmentRequestedCancelledScenarioForLipClaimant() {
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .isJoRequested(YesOrNo.YES)
+            .ccdCaseReference(1234L)
+            .build();
+
+        service.notifyClaimSettled(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CASE_SETTLED_JR_CANCELLED_CLAIMANT.getScenario()),
             eq("1234"),
             any(ScenarioRequestParams.class)
         );
