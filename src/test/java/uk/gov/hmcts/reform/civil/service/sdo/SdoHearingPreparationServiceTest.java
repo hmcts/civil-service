@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.crd.model.Category;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -17,8 +19,6 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
-import uk.gov.hmcts.reform.civil.crd.model.Category;
-import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -66,7 +66,7 @@ class SdoHearingPreparationServiceTest {
         requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation("NEW"));
         when(locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData))
             .thenReturn(Optional.of(requestedCourt));
-        when(sdoLocationService.fetchCourtLocationsByEpimmsId(AUTH, "NEW"))
+        when(sdoLocationService.fetchCourtLocationsByEpimmsId(AUTH, "NEW", "AAA6"))
             .thenReturn(List.of(locationRefData()));
 
         Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData, AUTH);
@@ -86,7 +86,7 @@ class SdoHearingPreparationServiceTest {
         requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation("NEW"));
         when(locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData))
             .thenReturn(Optional.of(requestedCourt));
-        when(sdoLocationService.fetchCourtLocationsByEpimmsId(AUTH, "NEW"))
+        when(sdoLocationService.fetchCourtLocationsByEpimmsId(AUTH, "NEW", "AAA6"))
             .thenReturn(null);
 
         Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData, AUTH);

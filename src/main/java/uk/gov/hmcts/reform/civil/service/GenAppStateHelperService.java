@@ -25,6 +25,7 @@ import java.util.function.BiConsumer;
 
 import static java.lang.Long.parseLong;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Slf4j
@@ -84,7 +85,8 @@ public class GenAppStateHelperService {
 
         LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(
             caseData.getCaseManagementLocation().getBaseLocation(),
-            authToken
+            authToken,
+            getCaseServiceId(caseData)
         );
         caseData.setGeneralApplications(wrapElements(buildUpdatedGeneralApplications(caseData, locationDetails)));
         return caseData;

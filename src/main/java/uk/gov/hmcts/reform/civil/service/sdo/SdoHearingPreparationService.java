@@ -8,14 +8,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
+import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -49,10 +49,13 @@ public class SdoHearingPreparationService {
             preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData);
             preferredCourt.map(RequestedCourt::getCaseLocation)
                 .ifPresent(caseData::setCaseManagementLocation);
+            String serviceId = CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                ? SPEC_SERVICE_ID
+                : UNSPEC_SERVICE_ID;
             preferredCourt
                 .map(RequestedCourt::getCaseLocation)
                 .map(CaseLocationCivil::getBaseLocation)
-                .map(epimmsId -> sdoLocationService.fetchCourtLocationsByEpimmsId(authToken, epimmsId))
+                .map(epimmsId -> sdoLocationService.fetchCourtLocationsByEpimmsId(authToken, epimmsId, serviceId))
                 .map(list -> Optional.of(list).orElse(Collections.emptyList()))
                 .flatMap(locations -> locations.stream().findFirst())
                 .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));

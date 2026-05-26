@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -125,7 +126,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
             isValidRange(hearingDatesElement);
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsForDefaultJudgments(authToken));
+            .getCourtLocationsForDefaultJudgments(authToken, getCaseServiceId(caseData)));
         LocationRefData location = fillPreferredLocationData(locations, caseData.getHearingSupportRequirementsDJ());
         if (Objects.nonNull(location)) {
             caseData.setCaseManagementLocation(LocationHelper.buildCaseLocation(location));
@@ -185,7 +186,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsForDefaultJudgments(authToken));
+            .getCourtLocationsForDefaultJudgments(authToken, getCaseServiceId(caseData)));
         HearingSupportRequirementsDJ hearingSupportRequirementsDJ = new HearingSupportRequirementsDJ();
         hearingSupportRequirementsDJ.setHearingTemporaryLocation(getLocationsFromList(locations));
         caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);

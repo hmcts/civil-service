@@ -66,7 +66,7 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
             .build();
         caseData.setDetailsOfWhyDoesYouDisputeTheClaim("Dispute details");
 
-        given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).willReturn(LOCATIONS);
+        given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any(), any())).willReturn(LOCATIONS);
 
         SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
         referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, "authorisation");
@@ -118,7 +118,7 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
             .build();
         caseData.setDetailsOfWhyDoesYouDisputeTheClaim("Dispute details");
 
-        given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).willReturn(LOCATIONS);
+        given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any(), any())).willReturn(LOCATIONS);
 
         SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
         referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, "authorisation");
@@ -154,7 +154,7 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
             .build();
         caseData.setDetailsOfWhyDoesYouDisputeTheClaim("Dispute details");
 
-        given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).willReturn(Collections.emptyList());
+        given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any(), any())).willReturn(Collections.emptyList());
 
         SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
         referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, "authorisation");

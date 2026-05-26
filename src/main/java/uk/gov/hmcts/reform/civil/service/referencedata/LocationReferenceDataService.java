@@ -76,29 +76,9 @@ public class LocationReferenceDataService {
         return new LocationRefData();
     }
 
-    public List<LocationRefData> getCourtLocationsForDefaultJudgments(String authToken) {
-        try {
-            return courtVenueService.getCMLAndHLCourts(authTokenGenerator.generate(), authToken);
-        } catch (Exception e) {
-            log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
-        }
-        return new ArrayList<>();
-    }
-
     public List<LocationRefData> getCourtLocationsForDefaultJudgments(String authToken, String serviceId) {
         try {
             return courtVenueService.getCMLAndHLCourts(authTokenGenerator.generate(), authToken, serviceId);
-        } catch (Exception e) {
-            log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
-        }
-        return new ArrayList<>();
-    }
-
-    public List<LocationRefData> getCourtLocationsForGeneralApplication(String authToken) {
-        try {
-            List<LocationRefData> responseEntity = courtVenueService.getCMLAndHLCourts(authTokenGenerator.generate(), authToken);
-            return onlyEnglandAndWalesLocations(responseEntity)
-                .stream().sorted(Comparator.comparing(LocationRefData::getSiteName)).toList();
         } catch (Exception e) {
             log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
         }
@@ -114,10 +94,6 @@ public class LocationReferenceDataService {
             log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
         }
         return new ArrayList<>();
-    }
-
-    public List<LocationRefData> getCourtLocationsByEpimmsId(String authToken, String epimmsId) {
-        return getCourtLocationsByEpimmsIdAndCourtType(authToken, epimmsId);
     }
 
     public List<LocationRefData> getCourtLocationsByEpimmsId(String authToken, String epimmsId, String serviceId) {

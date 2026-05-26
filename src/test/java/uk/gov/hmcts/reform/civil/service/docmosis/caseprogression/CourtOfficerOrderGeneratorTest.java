@@ -75,7 +75,7 @@ class CourtOfficerOrderGeneratorTest {
     void setUp() {
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(locationRefDataService.getCcmccLocation(any(), any())).thenReturn(locationRefData);
-        when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(List.of(
+        when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString(), anyString())).thenReturn(List.of(
             locationRefData
         ));
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(List.of(locationRefData));

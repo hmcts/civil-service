@@ -66,6 +66,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
@@ -74,7 +75,6 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("unchecked")
 public class RespondToDefenceCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE);
@@ -271,12 +271,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         caseData.setApplicant1DefenceResponseDocument(null);
         caseData.setRespondent1ClaimResponseDocument(null);
         caseData.setRespondentSharedClaimResponseDocument(null);
-        if (caseData.getApplicant1DQ() != null
-            && caseData.getApplicant1DQ() != null) {
+        if (caseData.getApplicant1DQ() != null) {
             caseData.getApplicant1DQ().setApplicant1DQDraftDirections(null);
         }
-        if (caseData.getApplicant2DQ() != null
-            && caseData.getApplicant2DQ() != null) {
+        if (caseData.getApplicant2DQ() != null) {
             caseData.getApplicant2DQ().setApplicant2DQDraftDirections(null);
         }
 
@@ -334,7 +332,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 caseData,
                 requestedCourt,
                 () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                    CallbackParams.Params.BEARER_TOKEN).toString())
+                    CallbackParams.Params.BEARER_TOKEN).toString(), getCaseServiceId(caseData))
             ));
 
         if (log.isDebugEnabled()) {

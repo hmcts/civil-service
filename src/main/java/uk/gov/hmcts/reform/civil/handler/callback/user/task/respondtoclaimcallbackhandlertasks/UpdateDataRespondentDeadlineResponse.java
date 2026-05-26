@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Component
 public class UpdateDataRespondentDeadlineResponse {
@@ -287,6 +288,9 @@ public class UpdateDataRespondentDeadlineResponse {
 
     private List<LocationRefData> getLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(
+            authToken,
+            getCaseServiceId(callbackParams.getCaseData())
+        );
     }
 }

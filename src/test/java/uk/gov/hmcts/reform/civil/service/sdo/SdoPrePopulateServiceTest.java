@@ -125,7 +125,8 @@ class SdoPrePopulateServiceTest {
         when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(any(LocalDateTime.class)))
             .thenAnswer(invocation -> invocation.getArgument(0, LocalDateTime.class).toLocalDate());
         lenient().when(locationService.fetchHearingLocations(anyString())).thenReturn(Collections.emptyList());
-        lenient().when(locationService.fetchCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(Collections.emptyList());
+        lenient().when(locationService.fetchCourtLocationsByEpimmsId(anyString(), anyString(), anyString()))
+            .thenReturn(Collections.emptyList());
         lenient().when(locationService.buildLocationList(ArgumentMatchers.nullable(RequestedCourt.class), anyBoolean(), ArgumentMatchers.anyList()))
             .thenAnswer(invocation -> dynamicList("loc", "Location"));
         lenient().when(locationService.buildCourtLocationForSdoR2(ArgumentMatchers.nullable(RequestedCourt.class), ArgumentMatchers.anyList()))
@@ -198,7 +199,7 @@ class SdoPrePopulateServiceTest {
         RequestedCourt requestedCourt = new RequestedCourt();
         requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation("EPIMS999"));
         when(locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData)).thenReturn(Optional.of(requestedCourt));
-        when(locationService.fetchCourtLocationsByEpimmsId(AUTH_TOKEN, "EPIMS999"))
+        when(locationService.fetchCourtLocationsByEpimmsId(AUTH_TOKEN, "EPIMS999", "AAA6"))
             .thenReturn(List.of(locationRefData()));
 
         DirectionsOrderTaskContext context = buildContext(caseData);

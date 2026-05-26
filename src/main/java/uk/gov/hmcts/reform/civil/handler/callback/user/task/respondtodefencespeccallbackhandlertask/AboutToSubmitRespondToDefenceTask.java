@@ -56,6 +56,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DATE_FORMATTER;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
@@ -335,7 +336,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             caseData,
             requestedCourt,
             () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
-                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                getCaseServiceId(caseData))
         ));
 
         if (log.isDebugEnabled()) {
@@ -373,7 +375,10 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(
+            authToken,
+            getCaseServiceId(callbackParams.getCaseData())
+        );
     }
 
     private void is1v1RespondImmediately(CaseData caseData) {

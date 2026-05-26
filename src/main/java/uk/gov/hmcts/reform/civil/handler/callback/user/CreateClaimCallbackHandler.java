@@ -720,7 +720,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             caseData.setCourtLocation(courtLocation1);
 
             List<LocationRefData> locations = locationRefDataService
-                .getCourtLocationsByEpimmsId(authToken, epimmsId);
+                .getCourtLocationsByEpimmsId(authToken, epimmsId, getCaseServiceId(caseData));
             Optional.ofNullable(locations)
                 .orElseGet(Collections::emptyList).stream().findFirst()
                 .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));

@@ -32,8 +32,8 @@ public class SdoLocationService {
         return locationReferenceDataService.getHearingCourtLocations(authToken);
     }
 
-    public List<LocationRefData> fetchDefaultJudgmentLocations(String authToken) {
-        return locationReferenceDataService.getCourtLocationsForDefaultJudgments(authToken);
+    public List<LocationRefData> fetchDefaultJudgmentLocations(String authToken, String serviceId) {
+        return locationReferenceDataService.getCourtLocationsForDefaultJudgments(authToken, serviceId);
     }
 
     public DynamicList buildLocationList(RequestedCourt preferredCourt,
@@ -94,8 +94,8 @@ public class SdoLocationService {
         updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(authToken, caseData));
     }
 
-    public List<LocationRefData> fetchCourtLocationsByEpimmsId(String authToken, String epimmsId) {
-        return locationReferenceDataService.getCourtLocationsByEpimmsId(authToken, epimmsId);
+    public List<LocationRefData> fetchCourtLocationsByEpimmsId(String authToken, String epimmsId, String serviceId) {
+        return locationReferenceDataService.getCourtLocationsByEpimmsId(authToken, epimmsId, serviceId);
     }
 
     public void clearWaLocationMetadata(CaseData caseData) {

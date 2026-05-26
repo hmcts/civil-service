@@ -123,16 +123,6 @@ class LocationReferenceDataServiceTest {
         assertThat(result).isEqualTo(getMockLocation(serviceId));
     }
 
-    @Test
-    void shouldReturnCourtsForDefaultJudgments() {
-        when(courtVenueService.getCMLAndHLCourts(generatedAuth, auth))
-            .thenReturn(List.of(loc1, loc2));
-
-        List<LocationRefData> result = service.getCourtLocationsForDefaultJudgments(auth);
-
-        assertThat(result).containsExactly(loc1, loc2);
-    }
-
     @ParameterizedTest
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnCourtsForDefaultJudgments(String serviceId) {
@@ -142,17 +132,6 @@ class LocationReferenceDataServiceTest {
         List<LocationRefData> result = service.getCourtLocationsForDefaultJudgments(auth, serviceId);
 
         assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
-    }
-
-    @Test
-    void shouldReturnSortedEnglandAndWalesCourtsForGA() {
-        when(courtVenueService.getCMLAndHLCourts(generatedAuth, auth))
-            .thenReturn(List.of(loc1, loc2, loc3));
-
-        List<LocationRefData> result = service.getCourtLocationsForGeneralApplication(auth);
-
-        assertThat(result).containsExactly(loc1, loc2);
-        assertThat(result.getFirst().getSiteName()).isEqualTo("Site A");
     }
 
     @ParameterizedTest
@@ -165,16 +144,6 @@ class LocationReferenceDataServiceTest {
 
         assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
         assertThat(result.getFirst().getSiteName()).isEqualTo("AAA6".equals(serviceId) ? "Site A" : "Site B");
-    }
-
-    @Test
-    void shouldReturnCourtLocationsByEpimmsId() {
-        when(courtVenueService.getCourtByEpimmsId(generatedAuth, auth, "111"))
-            .thenReturn(List.of(loc1));
-
-        List<LocationRefData> result = service.getCourtLocationsByEpimmsId(auth, "111");
-
-        assertThat(result).containsExactly(loc1);
     }
 
     @ParameterizedTest

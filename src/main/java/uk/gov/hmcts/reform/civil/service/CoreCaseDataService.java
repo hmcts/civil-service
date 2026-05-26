@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Service
 @Slf4j
@@ -79,9 +80,12 @@ public class CoreCaseDataService {
                                               String eventSummary,
                                               String eventDescription) {
 
+        StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
+        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         List<LocationRefData> locationRefDataList = referenceDataService.getCourtLocationsByEpimmsId(
             getSystemUpdateUser().getUserToken(),
-            epimdsId
+            epimdsId,
+            getCaseServiceId(caseData)
         );
         LocationRefData locationRefData = locationRefDataList.get(0);
 
@@ -91,9 +95,6 @@ public class CoreCaseDataService {
 
         DynamicList transferCourtLocationList = new DynamicList();
         transferCourtLocationList.setValue(dynamicListElement);
-
-        StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
-        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
 
         caseData.setTransferCourtLocationList(transferCourtLocationList);
         caseData.setReasonForTransfer(transferReason);

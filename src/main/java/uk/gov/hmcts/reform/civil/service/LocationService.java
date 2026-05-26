@@ -83,10 +83,14 @@ public class LocationService {
 
     }
 
-    public LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken) {
-        List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(authToken, baseLocation);
+    public LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken, String serviceId) {
+        List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(
+            authToken,
+            baseLocation,
+            serviceId
+        );
         if (locationDetails != null && !locationDetails.isEmpty()) {
-            return locationDetails.get(0);
+            return locationDetails.getFirst();
         } else {
             return new LocationRefData();
         }
