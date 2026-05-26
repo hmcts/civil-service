@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -83,7 +85,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             log.info(
                 "case id: {}, defendant response cui before about to submit: {}",
                 callbackParams.getRequest().getCaseDetails().getId(),
-                callbackParams.getCaseData().getRespondent1().getFlags()
+                getRespondent1Flags(callbackParams.getCaseData())
             );
         }
 
@@ -123,7 +125,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             log.info(
                 "case id: {}, defendant response cui after about to submit: {}",
                 callbackParams.getRequest().getCaseDetails().getId(),
-                caseData.getRespondent1().getFlags()
+                getRespondent1Flags(caseData)
             );
         }
 
@@ -194,5 +196,12 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             caseData.setDefendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
         }
         return caseData;
+    }
+
+    private Flags getRespondent1Flags(CaseData caseData) {
+        return Optional.ofNullable(caseData)
+            .map(CaseData::getRespondent1)
+            .map(Party::getFlags)
+            .orElse(null);
     }
 }

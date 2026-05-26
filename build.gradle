@@ -21,8 +21,8 @@ group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 def versions = [
-  junit             : '5.14.4',
-  junitPlatform     : '1.14.4',
+  junit             : '6.1.0',
+  junitPlatform     : '6.1.0',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.38',
@@ -578,14 +578,14 @@ dependencies {
   contractTestImplementation 'au.com.dius.pact.provider:junit5:4.6.17'
   contractTestImplementation 'au.com.dius.pact.provider:junit5spring:4.6.17'
   contractTestImplementation "org.hamcrest:java-hamcrest:2.0.0.0"
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.14.4')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.14.4')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:6.1.0')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:6.1.0')
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.14.4')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.14.4')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:6.1.0')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:6.1.0')
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
