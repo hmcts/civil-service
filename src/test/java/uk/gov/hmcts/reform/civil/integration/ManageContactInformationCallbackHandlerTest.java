@@ -1386,7 +1386,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getCaseNameHmctsInternal())
                 .isEqualTo("John Rambo represented by Applicant Litigation Friend (litigation friend) " +
-                               "v Sole Trader");
+                               "v Sole Trader T/A Sole Trader co");
         }
 
         @Nested

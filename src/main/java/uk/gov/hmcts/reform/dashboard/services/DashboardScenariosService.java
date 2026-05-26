@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.dashboard.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringSubstitutor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.reform.civil.service.TelemetryService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.ScenarioEntity;
@@ -30,41 +32,76 @@ import java.util.stream.Collectors;
 @Transactional
 public class DashboardScenariosService {
 
+    private static final String RECORD_SCENARIO_DURATION_METRIC = "dashboard.scenario.record.duration_ms";
+    private static final String RECORD_SCENARIO_EVENT = "dashboard.scenario.record";
+
     private final ScenarioRepository scenarioRepository;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
     private final TaskItemTemplateRepository taskItemTemplateRepository;
+    private final TelemetryService telemetryService;
+
+    @Value("${dashboard.scenario.slow-threshold:15000}")
+    private long slowScenarioStepThresholdMs;
 
     public DashboardScenariosService(ScenarioRepository scenarioRepository,
                                      NotificationTemplateCatalog notificationTemplateCatalog,
                                      DashboardNotificationService dashboardNotificationService,
                                      TaskListService taskListService,
-                                     TaskItemTemplateRepository taskItemTemplateRepository) {
+                                     TaskItemTemplateRepository taskItemTemplateRepository,
+                                     TelemetryService telemetryService) {
         this.scenarioRepository = scenarioRepository;
         this.notificationTemplateCatalog = notificationTemplateCatalog;
         this.dashboardNotificationService = dashboardNotificationService;
         this.taskListService = taskListService;
         this.taskItemTemplateRepository = taskItemTemplateRepository;
+        this.telemetryService = telemetryService;
     }
 
     @SuppressWarnings("java:S1172")
     public void recordScenarios(String authorisation, String scenarioReference,
                                 String uniqueCaseIdentifier, ScenarioRequestParams scenarioRequestParams) {
+        long started = System.nanoTime();
+        boolean success = false;
+        boolean scenarioFound = false;
         log.info("Recording scenario {} with caseReference {}", scenarioReference, uniqueCaseIdentifier);
 
-        Optional<ScenarioEntity> scenarioByName = scenarioRepository.findByName(scenarioReference);
-        scenarioByName.ifPresent(scenario -> {
+        try {
+            Optional<ScenarioEntity> scenarioByName = timedStep(
+                "lookupScenario",
+                scenarioReference,
+                uniqueCaseIdentifier,
+                () -> scenarioRepository.findByName(scenarioReference)
+            );
+            scenarioFound = scenarioByName.isPresent();
+            scenarioByName.ifPresent(scenario -> {
 
-            //create notifications based on notification template for given scenario Ref.
-            createNotificationsForScenario(scenario, uniqueCaseIdentifier, scenarioRequestParams);
+                //create notifications based on notification template for given scenario Ref.
+                timedStep("createNotifications", scenarioReference, uniqueCaseIdentifier,
+                          () -> createNotificationsForScenario(scenario, uniqueCaseIdentifier, scenarioRequestParams));
 
-            //Create or update taskItem(s) based on task items template for given scenario ref.
-            createTaskItemsForScenario(scenarioReference, uniqueCaseIdentifier, scenarioRequestParams);
+                //Create or update taskItem(s) based on task items template for given scenario ref.
+                timedStep("createTaskItems", scenarioReference, uniqueCaseIdentifier,
+                          () -> createTaskItemsForScenario(scenarioReference, uniqueCaseIdentifier, scenarioRequestParams));
 
-            //Delete old notifications as notification template says for scenario ref (if exist for case ref)
-            deleteNotificationForScenario(scenario, uniqueCaseIdentifier);
-        });
+                //Delete old notifications as notification template says for scenario ref (if exist for case ref)
+                timedStep("deleteNotifications", scenarioReference, uniqueCaseIdentifier,
+                          () -> deleteNotificationForScenario(scenario, uniqueCaseIdentifier));
+            });
+            success = true;
+        } finally {
+            long durationMs = elapsedMs(started);
+            trackRecordScenarioTelemetry(
+                scenarioReference,
+                uniqueCaseIdentifier,
+                "total",
+                durationMs,
+                success,
+                scenarioFound
+            );
+            logScenarioDuration("total", scenarioReference, uniqueCaseIdentifier, durationMs, success);
+        }
     }
 
     public void reconfigureCaseDashboardNotifications(String uniqueCaseIdentifier, ScenarioRequestParams scenarioRequestParams, String roleType) {
@@ -264,5 +301,76 @@ public class DashboardScenariosService {
                 );
             }
         });
+    }
+
+    private <T> T timedStep(String step, String scenarioReference, String uniqueCaseIdentifier, TimedSupplier<T> supplier) {
+        long started = System.nanoTime();
+        boolean success = false;
+        try {
+            T result = supplier.get();
+            success = true;
+            return result;
+        } finally {
+            long durationMs = elapsedMs(started);
+            trackRecordScenarioTelemetry(scenarioReference, uniqueCaseIdentifier, step, durationMs, success, null);
+            logScenarioDuration(step, scenarioReference, uniqueCaseIdentifier, durationMs, success);
+        }
+    }
+
+    private void timedStep(String step, String scenarioReference, String uniqueCaseIdentifier, Runnable runnable) {
+        timedStep(step, scenarioReference, uniqueCaseIdentifier, () -> {
+            runnable.run();
+            return null;
+        });
+    }
+
+    private long elapsedMs(long started) {
+        return (System.nanoTime() - started) / 1_000_000;
+    }
+
+    private void logScenarioDuration(String step, String scenarioReference, String uniqueCaseIdentifier,
+                                     long durationMs, boolean success) {
+        if (durationMs >= slowScenarioStepThresholdMs) {
+            log.warn(
+                "Slow dashboard scenario record step={} scenario={} caseReference={} durationMs={} success={}",
+                step,
+                scenarioReference,
+                uniqueCaseIdentifier,
+                durationMs,
+                success
+            );
+            return;
+        }
+
+        log.info(
+            "Dashboard scenario record step={} scenario={} caseReference={} durationMs={} success={}",
+            step,
+            scenarioReference,
+            uniqueCaseIdentifier,
+            durationMs,
+            success
+        );
+    }
+
+    private void trackRecordScenarioTelemetry(String scenarioReference, String uniqueCaseIdentifier, String step,
+                                              long durationMs, boolean success, Boolean scenarioFound) {
+        telemetryService.trackMetric(RECORD_SCENARIO_DURATION_METRIC, durationMs);
+
+        Map<String, String> properties = new HashMap<>();
+        properties.put("scenario", scenarioReference);
+        properties.put("caseReference", uniqueCaseIdentifier);
+        properties.put("step", step);
+        properties.put("durationMs", String.valueOf(durationMs));
+        properties.put("success", String.valueOf(success));
+        if (scenarioFound != null) {
+            properties.put("scenarioFound", String.valueOf(scenarioFound));
+        }
+
+        telemetryService.trackEvent(RECORD_SCENARIO_EVENT, properties);
+    }
+
+    @FunctionalInterface
+    private interface TimedSupplier<T> {
+        T get();
     }
 }

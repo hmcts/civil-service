@@ -45,7 +45,7 @@ class UploadMediationDocumentsUtilsTest {
         List<DynamicListElement> dynamicListOptions = new ArrayList<>();
         UploadMediationDocumentsUtils.addDefendant1Option(dynamicListOptions, caseData);
 
-        DynamicListElement expected = dynamicElementFromCode("DEFENDANT_1", "Defendant 1: Mr. Sole Trader");
+        DynamicListElement expected = dynamicElementFromCode("DEFENDANT_1", "Defendant 1: Mr. Sole Trader T/A Sole Trader co");
 
         assertThat(dynamicListOptions).containsExactly(expected);
     }
@@ -71,7 +71,7 @@ class UploadMediationDocumentsUtilsTest {
         List<DynamicListElement> dynamicListOptions = new ArrayList<>();
         UploadMediationDocumentsUtils.addSameSolicitorDefendantOptions(dynamicListOptions, caseData);
 
-        DynamicListElement expected1 = dynamicElementFromCode("DEFENDANT_1", "Defendant 1: Mr. Sole Trader");
+        DynamicListElement expected1 = dynamicElementFromCode("DEFENDANT_1", "Defendant 1: Mr. Sole Trader T/A Sole Trader co");
         DynamicListElement expected2 = dynamicElementFromCode("DEFENDANT_2", "Defendant 2: Mr. John Rambo");
         DynamicListElement expected3 = dynamicElementFromCode("DEFENDANTS", "Defendants 1 and 2");
 
