@@ -157,13 +157,14 @@ class GaCoreCaseDataServiceTest {
             List<LocationRefData> mockLocation = new ArrayList<>();
             LocationRefData locationRefData = new LocationRefData()
                 .setRegion("1")
+                .setServiceId("AAA6")
                 .setEpimmsId("12345")
                 .setCourtAddress("Central London")
                 .setPostcode("LJ09 EMM")
                 .setSiteName("London SX12 2345");
             mockLocation.add(locationRefData);
-            when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(mockLocation);
-
+            when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString(), anyString())).thenReturn(mockLocation);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
             when(coreCaseDataApi.submitEventForCaseWorker(
                      eq(USER_AUTH_TOKEN),
                      eq(SERVICE_AUTH_TOKEN),

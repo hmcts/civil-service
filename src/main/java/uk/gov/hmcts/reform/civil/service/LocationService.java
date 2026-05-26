@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +63,7 @@ public class LocationService {
             courtLocation = assignCaseManagementLocationToMainCaseLocation(caseData, authToken);
             return Pair.of(courtLocation, true);
         } else {
-            LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken);
+            LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken, getCaseServiceId(caseData));
             courtLocation = new CaseLocationCivil();
             courtLocation.setRegion(cnbcLocation.getRegionId());
             courtLocation.setBaseLocation(cnbcLocation.getEpimmsId());

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -59,12 +61,13 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
     @Nested
     class AboutToStartCallbackHandling {
 
-        @Test
-        void shouldReturnLocationList_whenLocationsAreQueried() {
+        @ParameterizedTest
+        @CsvSource({"AAA6", "AAA7"})
+        void shouldReturnLocationList_whenLocationsAreQueried(String serviceId) {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
-            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
-            when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setServiceId(serviceId).setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setServiceId(serviceId).setCourtAddress("Address2").setPostcode("28000"));
+            when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdState(CaseState.LISTING_FOR_A_HEARING).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -73,12 +76,13 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
                            .get("label")).isEqualTo("Site Name 1 - Address1 - 18000");
         }
 
-        @Test
-        void shouldNotPrepopulateData_whenCcdStateIsOrderMade() {
+        @ParameterizedTest
+        @CsvSource({"AAA6", "AAA7"})
+        void shouldNotPrepopulateData_whenCcdStateIsOrderMade(String serviceId) {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
-            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
-            when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setServiceId(serviceId).setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setServiceId(serviceId).setCourtAddress("Address2").setPostcode("28000"));
+            when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdState(CaseState.ORDER_MADE).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -86,14 +90,15 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
             assertNull(response.getData().get("gaHearingNoticeInformation"));
         }
 
-        @Test
-        void shouldReturnLocationList_with_preferredLocationSelected_whenLocationsAreQueried() {
+        @ParameterizedTest
+        @CsvSource({"AAA6", "AAA7"})
+        void shouldReturnLocationList_with_preferredLocationSelected_whenLocationsAreQueried(String serviceId) {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
-            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setServiceId(serviceId).setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setServiceId(serviceId).setCourtAddress("Address2").setPostcode("28000"));
             DynamicListElement location1 = new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
 
-            when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
+            when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
             GAJudgesHearingListGAspec gaJudgesHearingListGAspec =
                 new GAJudgesHearingListGAspec().setHearingPreferredLocation(new DynamicList().setListItems(List.of(location1)).setValue(location1));
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdState(CaseState.LISTING_FOR_A_HEARING)
@@ -107,14 +112,15 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
             assertThat(label).isEqualTo("Site Name 2 - Address2 - 28000");
         }
 
-        @Test
-        void shouldNotReturnLocationList_with_preferredLocationSelected_whenLocationsAreQueried() {
+        @ParameterizedTest
+        @CsvSource({"AAA6", "AAA7"})
+        void shouldNotReturnLocationList_with_preferredLocationSelected_whenLocationsAreQueried(String serviceId) {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
-            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setServiceId(serviceId).setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setServiceId(serviceId).setCourtAddress("Address2").setPostcode("28000"));
             DynamicListElement location1 = new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
 
-            when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
+            when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
             GAJudgesHearingListGAspec gaJudgesHearingListGAspec =
                 new GAJudgesHearingListGAspec().setHearingPreferredLocation(new DynamicList().setListItems(List.of(location1)).setValue(location1));
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdState(CaseState.ORDER_MADE)

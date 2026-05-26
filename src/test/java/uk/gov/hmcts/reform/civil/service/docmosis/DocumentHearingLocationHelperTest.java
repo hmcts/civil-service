@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = {
     DocumentHearingLocationHelper.class})
-public class DocumentHearingLocationHelperTest {
+class DocumentHearingLocationHelperTest {
 
     @Autowired
     private DocumentHearingLocationHelper hearingLocationHelper;
@@ -128,7 +128,7 @@ public class DocumentHearingLocationHelperTest {
             .setRegionId(caseData.getCaseManagementLocation().getRegion())
             .setEpimmsId(caseData.getCaseManagementLocation().getBaseLocation());
 
-        when(locationRefDataService.getCcmccLocation(authorisation)).thenReturn(new LocationRefData()
+        when(locationRefDataService.getCcmccLocation(authorisation, "AAA7")).thenReturn(new LocationRefData()
                                                                                             .setEpimmsId(ccmcEpimmId)
                                                                                             .setRegionId("CCMCC region"));
         LocationRefData returnedLocation = hearingLocationHelper
@@ -152,7 +152,7 @@ public class DocumentHearingLocationHelperTest {
             .setRegionId(caseData.getCaseManagementLocation().getRegion())
             .setEpimmsId(caseData.getCaseManagementLocation().getBaseLocation());
 
-        when(locationRefDataService.getCnbcLocation(authorisation)).thenReturn(new LocationRefData()
+        when(locationRefDataService.getCnbcLocation(authorisation, "AAA6")).thenReturn(new LocationRefData()
                                                                                     .setEpimmsId(cnbcEpimmId)
                                                                                     .setRegionId("CNBC region"));
         LocationRefData returnedLocation = hearingLocationHelper
@@ -183,7 +183,7 @@ public class DocumentHearingLocationHelperTest {
             .setRegionId(caseData.getCaseManagementLocation().getRegion())
             .setEpimmsId(caseData.getCaseManagementLocation().getBaseLocation());
 
-        when(locationRefDataService.getHearingCourtLocations(authorisation)).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(authorisation, "AAA6")).thenReturn(locations);
         LocationRefData returnedLocation = hearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
         Assertions.assertEquals(returnedLocation.getEpimmsId(), location1.getEpimmsId());
@@ -212,5 +212,4 @@ public class DocumentHearingLocationHelperTest {
         assertThrows(IllegalArgumentException.class, () -> hearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation));
     }
-
 }

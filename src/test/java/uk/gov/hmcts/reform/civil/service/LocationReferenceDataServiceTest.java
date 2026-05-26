@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -46,6 +48,7 @@ class LocationReferenceDataServiceTest {
 
         loc1 = new LocationRefData()
             .setSiteName("Site A")
+            .setServiceId("AAA6")
             .setWelshSiteName("Welsh A")
             .setCourtAddress("Address A")
             .setPostcode("AA1 1AA")
@@ -59,6 +62,7 @@ class LocationReferenceDataServiceTest {
 
         loc2 = new LocationRefData()
             .setSiteName("Site B")
+            .setServiceId("AAA7")
             .setCourtAddress("Address B")
             .setPostcode("BB1 1BB")
             .setRegion("Wales")
@@ -71,6 +75,7 @@ class LocationReferenceDataServiceTest {
 
         loc3 = new LocationRefData()
             .setSiteName("Site C")
+            .setServiceId("AAA7")
             .setCourtAddress("Address C")
             .setPostcode("CC1 1CC")
             .setRegion("Scotland")
@@ -81,36 +86,41 @@ class LocationReferenceDataServiceTest {
             .setIsHearingLocation("N");
     }
 
-    @Test
-    void shouldReturnCNBcLocation() {
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldReturnCNBcLocation(String serviceId) {
         when(courtVenueService.getCourtVenueByName(generatedAuth, auth,
-                                                   LocationReferenceDataService.CIVIL_NATIONAL_BUSINESS_CENTRE))
-            .thenReturn(List.of(loc1));
+                                                   LocationReferenceDataService.CIVIL_NATIONAL_BUSINESS_CENTRE,
+                                                   serviceId))
+            .thenReturn(getMockLocationList(serviceId));
 
-        LocationRefData result = service.getCnbcLocation(auth);
+        LocationRefData result = service.getCnbcLocation(auth, serviceId);
 
-        assertThat(result).isEqualTo(loc1);
+        assertThat(result).isEqualTo(getMockLocation(serviceId));
     }
 
-    @Test
-    void shouldReturnEmptyWhenCNBcNotFound() {
-        when(courtVenueService.getCourtVenueByName(any(), any(), any()))
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldReturnEmptyWhenCNBcNotFound(String serviceId) {
+        when(courtVenueService.getCourtVenueByName(any(), any(), any(), any()))
             .thenReturn(List.of());
 
-        LocationRefData result = service.getCnbcLocation(auth);
+        LocationRefData result = service.getCnbcLocation(auth, serviceId);
 
         assertThat(result.getSiteName()).isNull();
     }
 
-    @Test
-    void shouldReturnCcmccLocation() {
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldReturnCcmccLocation(String serviceId) {
         when(courtVenueService.getCourtVenueByName(generatedAuth, auth,
-                                                   LocationReferenceDataService.COUNTY_COURT_MONEY_CLAIMS_CENTRE))
-            .thenReturn(List.of(loc2));
+                                                   LocationReferenceDataService.COUNTY_COURT_MONEY_CLAIMS_CENTRE,
+                                                   serviceId))
+            .thenReturn(getMockLocationList(serviceId));
 
-        LocationRefData result = service.getCcmccLocation(auth);
+        LocationRefData result = service.getCcmccLocation(auth, serviceId);
 
-        assertThat(result).isEqualTo(loc2);
+        assertThat(result).isEqualTo(getMockLocation(serviceId));
     }
 
     @Test
@@ -123,6 +133,17 @@ class LocationReferenceDataServiceTest {
         assertThat(result).containsExactly(loc1, loc2);
     }
 
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldReturnCourtsForDefaultJudgments(String serviceId) {
+        when(courtVenueService.getCMLAndHLCourts(generatedAuth, auth, serviceId))
+            .thenReturn(getMockLocationList(serviceId));
+
+        List<LocationRefData> result = service.getCourtLocationsForDefaultJudgments(auth, serviceId);
+
+        assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
+    }
+
     @Test
     void shouldReturnSortedEnglandAndWalesCourtsForGA() {
         when(courtVenueService.getCMLAndHLCourts(generatedAuth, auth))
@@ -131,7 +152,19 @@ class LocationReferenceDataServiceTest {
         List<LocationRefData> result = service.getCourtLocationsForGeneralApplication(auth);
 
         assertThat(result).containsExactly(loc1, loc2);
-        assertThat(result.get(0).getSiteName()).isEqualTo("Site A");
+        assertThat(result.getFirst().getSiteName()).isEqualTo("Site A");
+    }
+
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldReturnSortedEnglandAndWalesCourtsForGA(String serviceId) {
+        when(courtVenueService.getCMLAndHLCourts(generatedAuth, auth, serviceId))
+            .thenReturn(getMockLocationList(serviceId));
+
+        List<LocationRefData> result = service.getCourtLocationsForGeneralApplication(auth, serviceId);
+
+        assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
+        assertThat(result.getFirst().getSiteName()).isEqualTo("AAA6".equals(serviceId) ? "Site A" : "Site B");
     }
 
     @Test
@@ -144,6 +177,17 @@ class LocationReferenceDataServiceTest {
         assertThat(result).containsExactly(loc1);
     }
 
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldReturnCourtLocationsByEpimmsId(String serviceId) {
+        when(courtVenueService.getCourtByEpimmsId(generatedAuth, auth, "111", serviceId))
+            .thenReturn(getMockLocationList(serviceId));
+
+        List<LocationRefData> result = service.getCourtLocationsByEpimmsId(auth, "111", serviceId);
+
+        assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
+    }
+
     @Test
     void shouldReturnCourtLocationsByEpimmsIdWithCML() {
         when(courtVenueService.getCMLCourtByEpimmsId(generatedAuth, auth, "111"))
@@ -154,6 +198,17 @@ class LocationReferenceDataServiceTest {
         assertThat(result).containsExactly(loc1);
     }
 
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldReturnCourtLocationsByEpimmsIdWithCML(String serviceId) {
+        when(courtVenueService.getCMLCourtByEpimmsId(generatedAuth, auth, "111", serviceId))
+            .thenReturn(getMockLocationList(serviceId));
+
+        List<LocationRefData> result = service.getCourtLocationsByEpimmsIdWithCML(auth, "111", serviceId);
+
+        assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
+    }
+
     @Test
     void shouldReturnHearingLocationCourts() {
         when(courtVenueService.getHearingLocationCourts(generatedAuth, auth))
@@ -162,6 +217,17 @@ class LocationReferenceDataServiceTest {
         List<LocationRefData> result = service.getHearingCourtLocations(auth);
 
         assertThat(result).containsExactly(loc1, loc2);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldReturnHearingLocationCourts(String serviceId) {
+        when(courtVenueService.getHearingLocationCourts(generatedAuth, auth, serviceId))
+            .thenReturn(getMockLocationList(serviceId));
+
+        List<LocationRefData> result = service.getHearingCourtLocations(auth, serviceId);
+
+        assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
     }
 
     @Test
@@ -176,9 +242,29 @@ class LocationReferenceDataServiceTest {
         assertThat(result).contains(loc1);
     }
 
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldReturnMatchingLabelLocation(String serviceId) {
+        when(courtVenueService.getHearingLocationCourts(generatedAuth, auth, serviceId))
+            .thenReturn(getMockLocationList(serviceId));
+
+        String label = LocationReferenceDataService.getDisplayEntry(getMockLocation(serviceId));
+
+        Optional<LocationRefData> result = service.getLocationMatchingLabel(label, auth, serviceId);
+
+        assertThat(result).contains("AAA6".equals(serviceId) ? loc1 : loc2);
+    }
+
     @Test
     void shouldReturnEmptyWhenLabelBlank() {
         Optional<LocationRefData> result = service.getLocationMatchingLabel("", auth);
+        assertThat(result).isEmpty();
+    }
+
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldReturnEmptyWhenLabelBlank(String serviceId) {
+        Optional<LocationRefData> result = service.getLocationMatchingLabel("", auth, serviceId);
         assertThat(result).isEmpty();
     }
 
@@ -204,12 +290,34 @@ class LocationReferenceDataServiceTest {
         assertThat(result).isEqualTo(loc1);
     }
 
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldReturnCourtLocationByThreeDigitCode(String serviceId) {
+        when(courtVenueService.getCourtVenueByLocationCode(generatedAuth, auth, "AAA", serviceId))
+            .thenReturn(List.of(loc1));
+
+        LocationRefData result = service.getCourtLocation(auth, "AAA", serviceId);
+
+        assertThat(result).isEqualTo(loc1);
+    }
+
     @Test
     void shouldReturnEmptyWhenNoCourtFoundByThreeDigitCode() {
         when(courtVenueService.getCourtVenueByLocationCode(any(), any(), any()))
             .thenReturn(List.of());
 
         LocationRefData result = service.getCourtLocation(auth, "AAA");
+
+        assertThat(result.getSiteName()).isNull();
+    }
+
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldReturnEmptyWhenNoCourtFoundByThreeDigitCode(String serviceId) {
+        when(courtVenueService.getCourtVenueByLocationCode(any(), any(), any(), any()))
+            .thenReturn(List.of());
+
+        LocationRefData result = service.getCourtLocation(auth, "AAA", serviceId);
 
         assertThat(result.getSiteName()).isNull();
     }
@@ -236,6 +344,28 @@ class LocationReferenceDataServiceTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenMoreThanOneCourtFoundByServiceId() {
+        // Duplicate court with the same location code "AAA"
+        LocationRefData duplicateLoc = new LocationRefData()
+            .setSiteName("Site D")
+            .setServiceId("AAA6")
+            .setCourtAddress("Address D")
+            .setPostcode("DD1 1DD")
+            .setEpimmsId("444")
+            .setCourtLocationCode("AAA") // same as loc1
+            .setCourtStatus("Open")
+            .setIsCaseManagementLocation("Y")
+            .setIsHearingLocation("Y");
+
+        when(courtVenueService.getCourtVenueByLocationCode(any(), any(), any(), any()))
+            .thenReturn(List.of(loc1, duplicateLoc));
+
+        assertThatThrownBy(() -> service.getCourtLocation(auth, "AAA", "AAA6"))
+            .isInstanceOf(LocationRefDataException.class)
+            .hasMessageContaining("More than one court location found");
+    }
+
+    @Test
     void shouldThrowExceptionWhenFilterFindsNone() {
         when(courtVenueService.getCourtVenueByLocationCode(any(), any(), any()))
             .thenReturn(List.of(loc2));
@@ -243,5 +373,29 @@ class LocationReferenceDataServiceTest {
         assertThatThrownBy(() -> service.getCourtLocation(auth, "AAA"))
             .isInstanceOf(LocationRefDataException.class)
             .hasMessageContaining("No court Location Found");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFilterFindsNoneByServiceId() {
+        when(courtVenueService.getCourtVenueByLocationCode(any(), any(), any(), any()))
+            .thenReturn(List.of(loc2));
+
+        assertThatThrownBy(() -> service.getCourtLocation(auth, "AAA", "AAA6"))
+            .isInstanceOf(LocationRefDataException.class)
+            .hasMessageContaining("No court Location Found");
+    }
+
+    private List<LocationRefData> getMockLocationList(String serviceId) {
+        if ("AAA6".equals(serviceId)) {
+            return List.of(loc1);
+        }
+        return List.of(loc2);
+    }
+
+    private LocationRefData getMockLocation(String serviceId) {
+        if ("AAA6".equals(serviceId)) {
+            return loc1;
+        }
+        return loc2;
     }
 }

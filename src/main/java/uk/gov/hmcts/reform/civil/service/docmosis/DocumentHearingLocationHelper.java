@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Component
 @RequiredArgsConstructor
@@ -56,33 +57,33 @@ public class DocumentHearingLocationHelper {
                 } else if (sameLocation.size() == 1) {
                     log.info("Claim " + caseData.getLegacyCaseReference()
                                  + " found one matching location: " + LocationReferenceDataService.getDisplayEntry(
-                        sameLocation.get(0)));
-                    return sameLocation.get(0);
+                        sameLocation.getFirst()));
+                    return sameLocation.getFirst();
                 } else {
                     log.info("Claim " + caseData.getLegacyCaseReference() +
                                  "found " + sameLocation.size() + " locations with same epimmsId and region "
                                  + baseLocation + "/" + caseData.getCaseManagementLocation().getRegion()
                                  + ": " + sameLocation.stream().map(LocationReferenceDataService::getDisplayEntry)
                         .collect(Collectors.joining(", ")));
-                    return sameLocation.get(0);
+                    return sameLocation.getFirst();
                 }
             }).orElse(null);
     }
 
     public LocationRefData getCaseManagementLocationDetailsNro(CaseData caseData, LocationReferenceDataService locationRefDataService, String authorisation) {
         LocationRefData caseManagementLocationDetails = null;
-        if (checkIfCcmccOrCnbc(caseData) && caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
-            caseManagementLocationDetails = locationRefDataService.getCnbcLocation(authorisation);
+        if (Boolean.TRUE.equals(checkIfCcmccOrCnbc(caseData)) && caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            caseManagementLocationDetails = locationRefDataService.getCnbcLocation(authorisation, getCaseServiceId(caseData));
         }
-        if (checkIfCcmccOrCnbc(caseData) && caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
-            caseManagementLocationDetails = locationRefDataService.getCcmccLocation(authorisation);
+        if (Boolean.TRUE.equals(checkIfCcmccOrCnbc(caseData)) && caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+            caseManagementLocationDetails = locationRefDataService.getCcmccLocation(authorisation, getCaseServiceId(caseData));
         }
-        if (!checkIfCcmccOrCnbc(caseData)) {
-            List<LocationRefData>  locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation);
+        if (Boolean.FALSE.equals(checkIfCcmccOrCnbc(caseData))) {
+            List<LocationRefData>  locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation, getCaseServiceId(caseData));
             var foundLocations = locationRefDataList.stream()
                 .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
             if (!foundLocations.isEmpty()) {
-                caseManagementLocationDetails = foundLocations.get(0);
+                caseManagementLocationDetails = foundLocations.getFirst();
             } else {
                 throw new IllegalArgumentException("Base Court Location not found, in location data");
             }

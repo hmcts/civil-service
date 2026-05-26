@@ -86,6 +86,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
@@ -178,7 +179,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse startClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<LocationRefData> locations = fetchLocationData(authToken);
+        List<LocationRefData> locations = fetchLocationData(authToken, getCaseServiceId(caseData));
 
         CourtLocation courtLocation = new CourtLocation();
         courtLocation.setApplicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations));
@@ -204,8 +205,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .data(caseData.toMap(objectMapper)).build();
     }
 
-    private List<LocationRefData> fetchLocationData(String authToken) {
-        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+    private List<LocationRefData> fetchLocationData(String authToken, String serviceId) {
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken, serviceId);
     }
 
     private CallbackResponse validateApplicant1Details(CallbackParams callbackParams) {
@@ -704,7 +705,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         DynamicList courtLocations = caseData.getCourtLocation().getApplicantPreferredCourtLocationList();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
-            fetchLocationData(authToken), courtLocations);
+            fetchLocationData(authToken, getCaseServiceId(caseData)), courtLocations);
         if (nonNull(courtLocation)) {
             CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
             caseLocationCivil.setBaseLocation(epimmsId);
