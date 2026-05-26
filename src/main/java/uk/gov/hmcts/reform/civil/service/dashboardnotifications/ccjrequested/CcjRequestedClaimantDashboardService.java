@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -22,13 +21,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class CcjRequestedClaimantDashboardService extends DashboardScenarioService {
 
-    private final FeatureToggleService featureToggleService;
-
     public CcjRequestedClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
-                                                DashboardNotificationsParamsMapper mapper,
-                                                FeatureToggleService featureToggleService) {
+                                                DashboardNotificationsParamsMapper mapper) {
         super(dashboardScenariosService, mapper);
-        this.featureToggleService = featureToggleService;
     }
 
     public void notifyClaimant(CaseData caseData, String authToken) {
@@ -45,8 +40,7 @@ public class CcjRequestedClaimantDashboardService extends DashboardScenarioServi
 
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
-        return featureToggleService.isLipVLipEnabled()
-            && YesOrNo.NO.equals(caseData.getApplicant1Represented());
+        return YesOrNo.NO.equals(caseData.getApplicant1Represented());
     }
 
     private boolean claimantSubmitsEitherCcjOrDjWithoutSettlementAgreement(CaseData caseData) {

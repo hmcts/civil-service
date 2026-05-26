@@ -117,7 +117,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
         }
 
         @Test
-        void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenR2EnabledAndClaimIssuedInBilingual() {
+        void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenClaimIssuedInBilingual() {
             when(notificationsProperties.getNotifyLiPClaimantDefendantRespondedWelshLip()).thenReturn(
                 CLAIMANT_LIP_EMAIL_TEMPLATE_BILINGUAL);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -132,7 +132,6 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
                     .applicant1Represented(YesOrNo.NO)
                     .claimantBilingualLanguagePreference("BOTH")
                     .build();
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CaseEvent.NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED.name())
                             .build()).build();
@@ -149,7 +148,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
         }
 
         @Test
-        void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenR2EnabledAndClaimIssuedInEnglish() {
+        void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenClaimIssuedInEnglish() {
             when(notificationsProperties.getNotifyLiPClaimantDefendantResponded()).thenReturn(
                 CLAIMANT_LIP_EMAIL_TEMPLATE_ENGLISH);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -163,7 +162,6 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
                 .build();
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED.name())
                     .build()).build();

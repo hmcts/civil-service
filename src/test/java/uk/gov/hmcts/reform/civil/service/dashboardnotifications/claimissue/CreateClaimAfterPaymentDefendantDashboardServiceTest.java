@@ -48,7 +48,6 @@ class CreateClaimAfterPaymentDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordResponseRequiredAndFastTrackWhenUnrepresented() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
         when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
 
@@ -88,20 +87,7 @@ class CreateClaimAfterPaymentDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotRecordAnythingWhenLipVLipDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCcdCaseReference(1234L);
-
-        service.notifyDefendant(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
     void shouldNotRecordAnythingWhenDashboardDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDashboardEnabledForCase(any())).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -115,7 +101,6 @@ class CreateClaimAfterPaymentDefendantDashboardServiceTest {
 
     @Test
     void shouldNotRecordAnythingWhenNotLipCase() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -130,7 +115,6 @@ class CreateClaimAfterPaymentDefendantDashboardServiceTest {
 
     @Test
     void shouldNotRecordAnythingWhenRespondentRepresentedEvenIfLipCase() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();

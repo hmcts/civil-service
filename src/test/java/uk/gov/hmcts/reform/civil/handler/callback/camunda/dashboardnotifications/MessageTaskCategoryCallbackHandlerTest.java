@@ -42,7 +42,6 @@ class MessageTaskCategoryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     void setup() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
     }
 
     @Test

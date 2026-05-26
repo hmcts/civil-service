@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.ccjrequested;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -14,13 +13,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class CcjRequestedDefendantDashboardService extends DashboardScenarioService {
 
-    private final FeatureToggleService featureToggleService;
-
     public CcjRequestedDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
-                                                 DashboardNotificationsParamsMapper mapper,
-                                                 FeatureToggleService featureToggleService) {
+                                                 DashboardNotificationsParamsMapper mapper) {
         super(dashboardScenariosService, mapper);
-        this.featureToggleService = featureToggleService;
     }
 
     public void notifyDefendant(CaseData caseData, String authToken) {
@@ -41,7 +36,7 @@ public class CcjRequestedDefendantDashboardService extends DashboardScenarioServ
 
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
-        return featureToggleService.isLipVLipEnabled();
+        return true;
     }
 
     private boolean respondentRejectedSettlementAgreementOrNotRespondedByDeadline(CaseData caseData) {

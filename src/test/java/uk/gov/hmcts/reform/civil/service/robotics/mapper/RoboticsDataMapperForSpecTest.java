@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
@@ -55,8 +54,6 @@ class RoboticsDataMapperForSpecTest {
     private EventHistoryMapper eventHistoryMapper;
     @Mock
     private OrganisationService organisationService;
-    @Mock
-    private FeatureToggleService featureToggleService;
     @Mock
     private RoboticsCaseDataSupport caseDataSupport;
     private static final String BEARER_TOKEN = "Bearer Token";
@@ -348,8 +345,7 @@ class RoboticsDataMapperForSpecTest {
     }
 
     @Test
-    void shouldSkipApplicantSolicitorWhenLipVlipEnabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+    void shouldSkipApplicantSolicitorWhenLipVlip() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference("reference")
