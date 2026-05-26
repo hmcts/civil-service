@@ -38,6 +38,14 @@ public class DashboardTaskContext {
             return generalApplication(callbackParams.getGeneralApplicationCaseData(), authToken, callbackParams);
         }
 
+        if (!callbackParams.isCivilCaseType()) {
+            try {
+                return generalApplication(callbackParams.getGeneralApplicationCaseData(), authToken, callbackParams);
+            } catch (IllegalStateException ignored) {
+                return civil(callbackParams.getCaseData(), authToken, callbackParams);
+            }
+        }
+
         return civil(callbackParams.getCaseData(), authToken, callbackParams);
     }
 
