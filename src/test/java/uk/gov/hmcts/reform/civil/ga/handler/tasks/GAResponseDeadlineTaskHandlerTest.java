@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDateTime;
@@ -65,6 +66,19 @@ class GAResponseDeadlineTaskHandlerTest {
         ObjectMapperFactory.instance());
 
     private GAResponseDeadlineTaskHandler gaResponseDeadlineTaskHandler;
+
+    @BeforeEach
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        gaResponseDeadlineTaskHandler = new GAResponseDeadlineTaskHandler(
+            new ExternalTaskCompletionService(),
+            eventProperties,
+            caseSearchService,
+            coreCaseDataService,
+            caseDetailsConverter
+        );
+    }
 
     private CaseDetails caseDetails1;
     private CaseDetails caseDetails2;

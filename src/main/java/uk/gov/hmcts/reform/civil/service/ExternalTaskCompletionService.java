@@ -46,7 +46,7 @@ public class ExternalTaskCompletionService {
             externalTaskService.complete(externalTask, handler.getVariableMap(data));
         } catch (NotFoundException e) {
             log.info(
-                "Completing task '{}' NotFound error processInstanceId '{}' has already completed/aborted.",
+                "Completing task '{}' NotFound error, processInstanceId '{}' has already completed/aborted.",
                 topicName, processInstanceId
             );
         } catch (BadRequestException e) {
@@ -60,7 +60,7 @@ public class ExternalTaskCompletionService {
             throw new NotRetryableException(e.getMessage());
         } catch (Exception e) {
             // Inc EngineException | ConnectionLostException | UnknownHttpErrorException
-            log.error("Completing task '{}' errored, processInstanceId '{}'", topicName, processInstanceId, e);
+            log.error("Completing task '{}' error, processInstanceId '{}'", topicName, processInstanceId, e);
             throw new CompleteTaskException(e);
         }
     }

@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
@@ -33,7 +34,8 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
 
     private static final String FILENAME = "ocmc_mediation_data.csv";
 
-    protected GenerateCsvAndTransferTaskHandler(EventProperties eventProperties,
+    protected GenerateCsvAndTransferTaskHandler(ExternalTaskCompletionService externalTaskCompletionService,
+                                                EventProperties eventProperties,
                                                 MediationCasesSearchService caseSearchService,
                                                 CoreCaseDataService coreCaseDataService,
                                                 CaseDetailsConverter caseDetailsConverter,
@@ -42,7 +44,6 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
                                                 MediationCsvServiceFactory mediationCsvServiceFactory,
                                                 MediationCSVEmailConfiguration mediationCSVEmailConfiguration1) {
         super(
-            eventProperties,
             caseSearchService,
             coreCaseDataService,
             caseDetailsConverter,

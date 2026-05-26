@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
@@ -80,6 +81,7 @@ class ApplicationProcessCaseEventTaskHandlerTest {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         applicationProcessCaseEventTaskHandler = new ApplicationProcessCaseEventTaskHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             caseDetailsConverter,
             gaStateFlowEngine,
@@ -187,7 +189,7 @@ class ApplicationProcessCaseEventTaskHandlerTest {
                 eq(mockTask),
                 eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
                 anyString(),
-                anyInt(),
+                eq(0),
                 anyLong()
             );
         }

@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -33,6 +34,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public AutomatedHearingNoticeHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         UserService userService,
         SystemUpdateUserConfiguration userConfig,
@@ -41,7 +43,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         ObjectMapper mapper,
         ApplicationEventPublisher applicationEventPublisher
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.userService = userService;
         this.userConfig = userConfig;
         this.hearingsService = hearingsService;
