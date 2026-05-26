@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -22,14 +21,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class StayLiftedClaimantDashboardService extends DashboardScenarioService {
 
-    private final FeatureToggleService featureToggleService;
     private static final String citizenRole = "CLAIMANT";
 
     protected StayLiftedClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
-                                                 DashboardNotificationsParamsMapper mapper,
-                                                 FeatureToggleService featureToggleService) {
+                                                 DashboardNotificationsParamsMapper mapper) {
         super(dashboardScenariosService, mapper);
-        this.featureToggleService = featureToggleService;
     }
 
     public void notifyStayLifted(CaseData caseData, String authToken) {
@@ -44,7 +40,7 @@ public class StayLiftedClaimantDashboardService extends DashboardScenarioService
 
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
-        if (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled()) {
+        if (caseData.isApplicant1NotRepresented()) {
             Map<String, Boolean> scenarios = new HashMap<>();
             scenarios.put(SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(), true);
             scenarios.putAll(getScenariosBasedOnPreStayState(caseData));

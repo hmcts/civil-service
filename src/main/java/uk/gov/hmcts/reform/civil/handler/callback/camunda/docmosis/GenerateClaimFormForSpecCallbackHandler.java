@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
@@ -49,7 +48,6 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private final DeadlinesCalculator deadlinesCalculator;
     private final CivilStitchService civilStitchService;
     private final AssignCategoryId assignCategoryId;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -70,7 +68,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         Long caseId = caseData.getCcdCaseReference();
         log.info("Generating claim form for spec claim for caseId {}", caseId);
-        if (featureToggleService.isLipVLipEnabled() && caseData.isApplicantNotRepresented()) {
+        if (caseData.isApplicantNotRepresented()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
         }

@@ -5,11 +5,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DocumentsToBeConsideredSection;
@@ -53,9 +56,8 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
     private static final String AUTH = "auth";
 
     @Test
-    void shouldReturnLipTemplate_whenLipVLipEnabledAndClaimantLip() {
+    void shouldReturnLipTemplate_whenClaimantIsLip() {
         //Given
-        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
         given(caseData.isApplicantNotRepresented()).willReturn(true);
         //When
         DocmosisTemplates docmosisTemplate = generator.getTemplateId(caseData);
@@ -64,9 +66,8 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
     }
 
     @Test
-    void shouldReturnLipTempate_whenLipVLipEnabledAndDefendantLip() {
+    void shouldReturnLipTemplate_whenDefendantIsLip() {
         //Given
-        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
         given(caseData.isRespondent1NotRepresented()).willReturn(true);
         //When
         DocmosisTemplates docmosisTemplate = generator.getTemplateId(caseData);
@@ -75,14 +76,13 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
     }
 
     @Test
-    void shouldNotReturnLipTemplateWhenLipvLipIsNotEnabled() {
+    void shouldReturnLipTemplateWhenDefendantIsLip() {
         //Given
-        given(featureToggleService.isLipVLipEnabled()).willReturn(false);
         given(caseData.isRespondent1NotRepresented()).willReturn(true);
         //When
         DocmosisTemplates docmosisTemplate = generator.getTemplateId(caseData);
         //Then
-        assertThat(docmosisTemplate).isNotEqualTo(DQ_LIP_RESPONSE);
+        assertThat(docmosisTemplate).isEqualTo(DQ_LIP_RESPONSE);
     }
 
     @Test
@@ -184,5 +184,35 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
             "Claimants documents to be considered",
             "Are there any documents the claimants have that you want the court to consider?"
         ));
+    }
+
+    @Test
+    void shouldPopulateRespondentCorrespondenceAddressForLipResponse() {
+        Address correspondenceAddress = new Address(
+            "1 High Street",
+            null,
+            null,
+            "London",
+            null,
+            "UK",
+            "SW1A 1AA"
+        );
+        DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
+        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(any(CaseData.class), anyString()))
+            .thenReturn(form);
+
+        CaseData lipCaseData = CaseData.builder()
+            .applicant1(new Party().setPartyName("Applicant").setType(Party.Type.COMPANY))
+            .respondent1(new Party().setPartyName("Respondent").setType(Party.Type.COMPANY))
+            .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
+            .respondent1DQ(new Respondent1DQ())
+            .caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+                new RespondentLiPResponse().setRespondent1LiPCorrespondenceAddress(correspondenceAddress)
+            ))
+            .build();
+
+        DirectionsQuestionnaireForm templateData = generator.getTemplateData(lipCaseData, AUTH);
+
+        assertThat(templateData.getRespondent1LiPCorrespondenceAddress()).isEqualTo(correspondenceAddress);
     }
 }
