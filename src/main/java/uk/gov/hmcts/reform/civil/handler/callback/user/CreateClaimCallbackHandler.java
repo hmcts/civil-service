@@ -116,7 +116,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "the next steps option 'notify claim' for the service of the claim form and 'notify claim details' for service "
         + "of the claim details.%n%n If notification of the claim is processed in the digital portal, the exact date "
         + "when you must notify the claim details will be provided when you first notify the Defendant legal "
-        + "representative of the claim.";
+        + "representative of the claim. small change for Toyin stuff.";
     private static final String PARTICULARS_OF_CLAIM = "particularsOfClaim";
 
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
