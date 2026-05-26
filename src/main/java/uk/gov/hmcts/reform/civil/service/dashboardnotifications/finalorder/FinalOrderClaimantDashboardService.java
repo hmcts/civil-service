@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.finalorder;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
@@ -16,17 +15,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class FinalOrderClaimantDashboardService extends DashboardScenarioService {
 
     private final DashboardNotificationHelper dashboardDecisionHelper;
-    private final FeatureToggleService featureToggleService;
     private final DashboardTasksHelper dashboardTasksHelper;
 
     protected FinalOrderClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                  DashboardNotificationsParamsMapper mapper,
                                                  DashboardNotificationHelper dashboardDecisionHelper,
-                                                 FeatureToggleService featureToggleService,
                                                  DashboardTasksHelper dashboardTasksHelper) {
         super(dashboardScenariosService, mapper);
         this.dashboardDecisionHelper = dashboardDecisionHelper;
-        this.featureToggleService = featureToggleService;
         this.dashboardTasksHelper = dashboardTasksHelper;
     }
 
@@ -53,7 +49,6 @@ public class FinalOrderClaimantDashboardService extends DashboardScenarioService
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isApplicant1NotRepresented()
-            && featureToggleService.isLipVLipEnabled()
             && dashboardDecisionHelper.isDashBoardEnabledForCase(caseData);
     }
 }
