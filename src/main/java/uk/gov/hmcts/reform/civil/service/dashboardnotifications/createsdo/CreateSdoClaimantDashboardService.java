@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.createsdo;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
@@ -25,7 +24,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class CreateSdoClaimantDashboardService extends DashboardScenarioService {
 
-    private final FeatureToggleService featureToggleService;
     private final DashboardNotificationHelper dashboardDecisionHelper;
     private final CreateSdoDashboardDate createSdoDashboardDate;
     private final DashboardTasksHelper dashboardTasksHelper;
@@ -34,12 +32,10 @@ public class CreateSdoClaimantDashboardService extends DashboardScenarioService 
 
     public CreateSdoClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
                                              DashboardNotificationsParamsMapper mapper,
-                                             FeatureToggleService featureToggleService,
                                              DashboardNotificationHelper dashboardDecisionHelper,
                                              CreateSdoDashboardDate createSdoDashboardDate,
                                              DashboardTasksHelper dashboardTasksHelper) {
         super(dashboardScenariosService, mapper);
-        this.featureToggleService = featureToggleService;
         this.dashboardDecisionHelper = dashboardDecisionHelper;
         this.createSdoDashboardDate = createSdoDashboardDate;
         this.dashboardTasksHelper = dashboardTasksHelper;
@@ -78,7 +74,6 @@ public class CreateSdoClaimantDashboardService extends DashboardScenarioService 
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isApplicant1NotRepresented()
-            && featureToggleService.isLipVLipEnabled()
             && dashboardDecisionHelper.isDashBoardEnabledForCase(caseData);
     }
 
@@ -95,7 +90,6 @@ public class CreateSdoClaimantDashboardService extends DashboardScenarioService 
         );
         return caseData.isLipvLROneVOne()
             && addNocNotificationScenarios.contains(selectedScenario)
-            && featureToggleService.isLipVLipEnabled()
             && dashboardDecisionHelper.isDashBoardEnabledForCase(caseData);
     }
 
