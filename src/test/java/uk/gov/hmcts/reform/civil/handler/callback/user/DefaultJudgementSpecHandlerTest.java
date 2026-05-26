@@ -61,6 +61,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_REQUESTED_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_BUFFER_REQUESTED_LIP_CASE;
@@ -1644,7 +1645,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getBusinessProcess()).isNull();
+            assertThat(updatedData.getBusinessProcess()).isNotNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(JUDGMENT_REQUESTED_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.JUDGMENT_REQUESTED.name());
             assertInterestIsPopulated(response, 0);
             assertThat(updatedData.getActiveJudgment()).isNull();
@@ -1692,7 +1694,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getBusinessProcess()).isNull();
+            assertThat(updatedData.getBusinessProcess()).isNotNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(JUDGMENT_REQUESTED_SPEC.name());
             assertThat(updatedData.getActiveJudgment()).isNull();
             assertThat(updatedData.getJoIsLiveJudgmentExists()).isNull();
             assertThat(updatedData.getJoDJCreatedDate()).isEqualTo(createdDate);
