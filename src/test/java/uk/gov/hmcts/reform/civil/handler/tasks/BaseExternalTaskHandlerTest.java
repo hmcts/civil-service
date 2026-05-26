@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import feign.FeignException;
+import feign.Request;
+import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.delegate.BpmnError;
@@ -10,8 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -20,156 +24,231 @@ import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BaseExternalTaskHandlerTest {
 
-    @Mock
-    private ExternalTask externalTask;
-    @Mock
-    private ExternalTaskService externalTaskService;
+    private static final long LOCK_DURATION = 1000L;
+    private static final int DISPATCH_DELAY = 500;
+    private static final int RETRY_COUNT = 3;
 
     @Mock
     private ExternalTaskCompletionService externalTaskCompletionService;
+
+    @Mock
+    private ExternalTask externalTask;
+
+    @Mock
+    private ExternalTaskService externalTaskService;
 
     private TestBaseExternalTaskHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new TestBaseExternalTaskHandler();
-        handler.externalTaskCompletionService = externalTaskCompletionService;
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(RETRY_COUNT);
+        eventProperties.setLockDuration(LOCK_DURATION);
+        eventProperties.setDispatchDelay(DISPATCH_DELAY);
+        handler = new TestBaseExternalTaskHandler(externalTaskCompletionService, eventProperties);
     }
 
-    private static class TestBaseExternalTaskHandler extends BaseExternalTaskHandler {
-        private Exception exceptionToThrow;
+    @Nested
+    class ExecuteHandleTaskLine {
 
-        @Override
-        protected ExternalTaskData handleTask(ExternalTask externalTask) {
-            if (exceptionToThrow != null) {
-                if (exceptionToThrow instanceof RuntimeException re) {
-                    throw re;
-                }
-                throw new RuntimeException(exceptionToThrow);
-            }
-            return null;
+        @Test
+        void shouldPassHandleTaskResultToCompletionService_whenHandleTaskSucceeds() {
+            ExternalTaskData externalTaskData = new ExternalTaskData();
+            handler.returnExternalTaskData(externalTaskData);
+
+            handler.execute(externalTask, externalTaskService);
+
+            verify(externalTaskCompletionService).completeTask(handler, externalTask, externalTaskService, externalTaskData);
         }
 
-        public void setExceptionToThrow(Exception exceptionToThrow) {
-            this.exceptionToThrow = exceptionToThrow;
+        @Test
+        void shouldHandleBpmnError_whenHandleTaskThrowsBpmnError() {
+            handler.throwBpmnError(new BpmnError("ABORT", "message"));
+
+            handler.execute(externalTask, externalTaskService);
+
+            verify(externalTaskService).handleBpmnError(externalTask, "ABORT");
+            verify(externalTaskCompletionService, never()).completeTask(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldCallHandleTaskFailureNotRetryable_whenHandleTaskThrowsNotRetryableException() {
+            handler.throwNotRetryable(new NotRetryableException("bad-data"));
+
+            handler.execute(externalTask, externalTaskService);
+
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                eq("bad-data"),
+                anyString(),
+                eq(0),
+                eq(1000L)
+            );
+            verify(externalTaskCompletionService, never()).completeTask(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldCallHandleTaskFailure_whenHandleTaskThrowsRetryableException() {
+            when(externalTask.getRetries()).thenReturn(null);
+            handler.throwRetryable(new RuntimeException("boom"));
+
+            handler.execute(externalTask, externalTaskService);
+
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                eq("boom"),
+                anyString(),
+                eq(2),
+                eq(114L)
+            );
+            verify(externalTaskCompletionService, never()).completeTask(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldCallHandleTaskFailureNotRetryable_whenHandleTaskThrowsRemoteProcessEngineClientError() {
+            handler.throwRetryable(new RemoteProcessEngineException(
+                "REST-CLIENT-001 Error during remote Camunda engine invocation of DocmosisApiClient#createDocument(DocmosisRequest): Bad Request",
+                new FeignException.BadRequest(
+                    "Bad request",
+                    Request.create(Request.HttpMethod.GET, "url", java.util.Map.of(), null, null, null),
+                    null,
+                    null
+                )
+            ));
+
+            handler.execute(externalTask, externalTaskService);
+
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                contains("Bad Request"),
+                anyString(),
+                eq(0),
+                eq(1000L)
+            );
+            verify(externalTaskCompletionService, never()).completeTask(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldCallHandleTaskFailure_whenHandleTaskThrowsRemoteProcessEngineServerError() {
+            when(externalTask.getRetries()).thenReturn(null);
+            handler.throwRetryable(new RemoteProcessEngineException(
+                "REST-CLIENT-001 Error during remote Camunda engine invocation: Bad Gateway",
+                new FeignException.BadGateway(
+                    "Bad gateway",
+                    Request.create(Request.HttpMethod.GET, "url", java.util.Map.of(), null, null, null),
+                    null,
+                    null
+                )
+            ));
+
+            handler.execute(externalTask, externalTaskService);
+
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                contains("Bad Gateway"),
+                anyString(),
+                eq(2),
+                eq(114L)
+            );
+            verify(externalTaskCompletionService, never()).completeTask(any(), any(), any(), any());
         }
     }
 
     @Nested
-    class Execute {
+    class ExecuteCompleteTaskLine {
 
         @Test
-        void shouldCompleteTask_whenHandleTaskSucceeds() {
+        void shouldCallHandleTaskFailureNotRetryable_whenCompleteTaskThrowsNotRetryableException() {
+            doThrow(new NotRetryableException("complete error"))
+                .when(externalTaskCompletionService).completeTask(any(), any(), any(), any());
+
             handler.execute(externalTask, externalTaskService);
 
-            verify(externalTaskCompletionService).completeTask(eq(handler), eq(externalTask), eq(externalTaskService), any());
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                eq("complete error"),
+                anyString(),
+                eq(0),
+                eq(1000L)
+            );
         }
 
         @Test
-        void shouldSimulateFinalCompletionFailure_whenHandleTaskSucceeds() {
-            // This test demonstrates how to simulate the @Recover behavior in unit tests
+        void shouldCallHandleTaskFailure_whenCompleteTaskThrowsRetryableException() {
+            when(externalTask.getRetries()).thenReturn(null);
+            doThrow(new CompleteTaskException(new RuntimeException("complete boom")))
+                .when(externalTaskCompletionService).completeTask(any(), any(), any(), any());
+
+            handler.execute(externalTask, externalTaskService);
+
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                contains("complete boom"),
+                anyString(),
+                eq(2),
+                eq(114L)
+            );
+        }
+
+        @Test
+        void shouldAllowCompletionServiceRecoveryToUseHandleTaskFailureNotRetryable() {
             doAnswer(invocation -> {
-                handler.handleFailureNotRetryable(invocation.getArgument(1), invocation.getArgument(2),
-                                                  new CompleteTaskException(new RuntimeException("final error")));
+                handler.handleTaskFailureNotRetryable(
+                    invocation.getArgument(1),
+                    invocation.getArgument(2),
+                    new CompleteTaskException(new RuntimeException("final error"))
+                );
                 return null;
             }).when(externalTaskCompletionService).completeTask(any(), any(), any(), any());
 
             handler.execute(externalTask, externalTaskService);
 
-            // Verify that handleFailure was called with 0 retries (as handled by handleFailureNotRetryable)
-            verify(externalTaskService).handleFailure(eq(externalTask), eq("java.lang.RuntimeException: final error"),
-                                                      anyString(), eq(0), eq(1000L));
-        }
-
-        @Test
-        void shouldHandleNotRetryableExceptionFromCompleteTask_whenHandleTaskSucceeds() {
-            NotRetryableException exception = new NotRetryableException("complete error");
-            doThrow(exception).when(externalTaskCompletionService).completeTask(any(), any(), any(), any());
-
-            handler.execute(externalTask, externalTaskService);
-
-            // Verify that handleFailure was called with 0 retries (as handled by handleFailureNotRetryable)
-            verify(externalTaskService).handleFailure(eq(externalTask), eq("complete error"), anyString(), eq(0), eq(1000L));
-        }
-
-        @Test
-        void shouldHandleBpmnError_whenBpmnErrorThrown() {
-            BpmnError bpmnError = new BpmnError("errorCode", "message");
-            handler.setExceptionToThrow(bpmnError);
-
-            handler.execute(externalTask, externalTaskService);
-
-            verify(externalTaskService).handleBpmnError(externalTask, "errorCode");
-            verify(externalTaskService, never()).complete(any(), any());
-        }
-
-        @Test
-        void shouldHandleNotRetryableException_whenNotRetryableExceptionThrown() {
-            NotRetryableException exception = new NotRetryableException("message");
-            handler.setExceptionToThrow(exception);
-
-            handler.execute(externalTask, externalTaskService);
-
-            verify(externalTaskService).handleFailure(eq(externalTask), eq("message"), anyString(), eq(0), eq(1000L));
-            verify(externalTaskService, never()).complete(any(), any());
-        }
-
-        @Test
-        void shouldHandleGenericException_whenExceptionThrown() {
-            RuntimeException exception = new RuntimeException("generic error");
-            handler.setExceptionToThrow(exception);
-            when(externalTask.getRetries()).thenReturn(3);
-
-            handler.execute(externalTask, externalTaskService);
-
-            verify(externalTaskService).handleFailure(eq(externalTask), eq("generic error"), anyString(), eq(2), anyLong());
-            verify(externalTaskService, never()).complete(any(), any());
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                contains("final error"),
+                anyString(),
+                eq(0),
+                eq(1000L)
+            );
         }
     }
 
     @Nested
-    class GetVariableMap {
+    class HelperMethods {
 
         @Test
-        void shouldReturnNull_whenDataHasVariables() {
-            // Base implementation always returns null unless overridden
+        void shouldReturnNullVariableMapByDefault() {
             VariableMap variables = Variables.createVariables().putValue("key", "value");
             ExternalTaskData data = new ExternalTaskData().setVariables(variables);
 
-            VariableMap result = handler.getVariableMap(data);
-
-            assertThat(result).isNull();
-        }
-
-        @Test
-        void shouldReturnNull_whenDataIsNull() {
+            assertThat(handler.getVariableMap(data)).isNull();
             assertThat(handler.getVariableMap(null)).isNull();
         }
-    }
-
-    @Nested
-    class IsEventAlreadyProcessed {
 
         @Test
-        void shouldReturnTrue_whenEventAlreadyProcessed() {
+        void shouldIdentifyAlreadyProcessedEvent() {
             String processInstanceId = "proc-id";
             String activityId = "act-id";
             BusinessProcess businessProcess = new BusinessProcess()
                 .setProcessInstanceId(processInstanceId)
                 .setActivityId(activityId);
+
             when(externalTask.getProcessInstanceId()).thenReturn(processInstanceId);
             when(externalTask.getActivityId()).thenReturn(activityId);
 
@@ -177,107 +256,117 @@ class BaseExternalTaskHandlerTest {
         }
 
         @Test
-        void shouldReturnFalse_whenBusinessProcessIsNull() {
-            assertThat(handler.isEventAlreadyProcessed(externalTask, null)).isFalse();
-        }
-
-        @Test
-        void shouldReturnFalse_whenProcessInstanceIdDiffers() {
+        void shouldReturnFalseWhenBusinessProcessDoesNotMatch() {
             BusinessProcess businessProcess = new BusinessProcess()
                 .setProcessInstanceId("other-id")
-                .setActivityId("act-id");
+                .setActivityId("other-act");
+
             when(externalTask.getProcessInstanceId()).thenReturn("proc-id");
 
+            assertThat(handler.isEventAlreadyProcessed(externalTask, null)).isFalse();
             assertThat(handler.isEventAlreadyProcessed(externalTask, businessProcess)).isFalse();
         }
 
         @Test
-        void shouldReturnFalse_whenActivityIdDiffers() {
-            String processInstanceId = "proc-id";
-            BusinessProcess businessProcess = new BusinessProcess()
-                .setProcessInstanceId(processInstanceId)
-                .setActivityId("other-act");
-            when(externalTask.getProcessInstanceId()).thenReturn(processInstanceId);
-            when(externalTask.getActivityId()).thenReturn("act-id");
+        void shouldUseConfiguredBackoffWhenHandlingTaskFailure() {
+            when(externalTask.getRetries()).thenReturn(2);
 
-            assertThat(handler.isEventAlreadyProcessed(externalTask, businessProcess)).isFalse();
-        }
-    }
+            handler.handleTaskFailure(externalTask, externalTaskService, new RuntimeException("boom"));
 
-    @Nested
-    class HandleFailure {
-
-        @Test
-        void shouldHandleFailureWithMaxAttempts_whenRetriesIsNull() {
-            Exception e = new RuntimeException("error");
-            when(externalTask.getRetries()).thenReturn(null);
-
-            handler.handleFailure(externalTask, externalTaskService, e);
-
-            // maxAttempts is 3, so remainingRetries should be 3-1 = 2
-            verify(externalTaskService).handleFailure(eq(externalTask), eq("error"), anyString(), eq(2), anyLong());
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                eq("boom"),
+                anyString(),
+                eq(1),
+                eq(228L)
+            );
         }
 
         @Test
-        void shouldHandleFailureWithDecrementedRetries_whenRetriesIsNotNull() {
-            Exception e = new RuntimeException("error");
-            when(externalTask.getRetries()).thenReturn(5);
+        void totalRetriesShouldNotExceedLockDuration() {
 
-            handler.handleFailure(externalTask, externalTaskService, e);
+            when(externalTask.getRetries()).thenReturn(3, 2, 1);
 
-            verify(externalTaskService).handleFailure(eq(externalTask), eq("error"), anyString(), eq(4), anyLong());
+            handler.handleTaskFailure(externalTask, externalTaskService, new RuntimeException("boom"));
+            handler.handleTaskFailure(externalTask, externalTaskService, new RuntimeException("boom"));
+            handler.handleTaskFailure(externalTask, externalTaskService, new RuntimeException("boom"));
+
+            ArgumentCaptor<Long> retryTimeoutCaptor = ArgumentCaptor.forClass(Long.class);
+
+            verify(externalTaskService, times(3)).handleFailure(
+                eq(externalTask),
+                eq("boom"),
+                anyString(),
+                anyInt(),
+                retryTimeoutCaptor.capture()
+            );
+
+            long totalRetryTimeout = retryTimeoutCaptor.getAllValues()
+                .stream()
+                .mapToLong(Long::longValue)
+                .sum();
+
+            assertThat(totalRetryTimeout).isLessThanOrEqualTo((long) (LOCK_DURATION * 0.8));
         }
-    }
-
-    @Nested
-    class HandleFailureNotRetryable {
 
         @Test
-        void shouldCallHandleFailure_withZeroRetries() {
-            Exception e = new RuntimeException("error");
-            handler.handleFailureNotRetryable(externalTask, externalTaskService, e);
-
-            verify(externalTaskService).handleFailure(eq(externalTask), eq("error"), anyString(), eq(0), eq(1000L));
-        }
-
-        @Test
-        void shouldReturnFeignExceptionContent_whenExceptionIsFeignException() {
+        void shouldReturnFeignBodyWhenHandlingNotRetryableFailure() {
             FeignException feignException = mock(FeignException.class);
             when(feignException.contentUTF8()).thenReturn("feign error body");
 
-            handler.handleFailureNotRetryable(externalTask, externalTaskService, feignException);
+            handler.handleTaskFailureNotRetryable(externalTask, externalTaskService, feignException);
 
-            verify(externalTaskService).handleFailure(eq(externalTask), any(), eq("feign error body"), eq(0), eq(1000L));
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                isNull(),
+                eq("feign error body"),
+                eq(0),
+                eq(1000L)
+            );
         }
     }
 
-    @Nested
-    class CalculateEffectiveDelay {
+    private static final class TestBaseExternalTaskHandler extends BaseExternalTaskHandler {
+        private ExternalTaskData nextExternalTaskData = new ExternalTaskData();
+        private RuntimeException retryableException;
+        private NotRetryableException notRetryableException;
+        private BpmnError bpmnError;
 
-        @Test
-        void shouldReturnZero_whenTotalFoundIsSmall() {
-            assertThat(handler.calculateEffectiveDelay(25, 1000, 100)).isZero();
+        private TestBaseExternalTaskHandler(
+            ExternalTaskCompletionService externalTaskCompletionService,
+            EventProperties eventProperties
+        ) {
+            super(externalTaskCompletionService, eventProperties);
         }
 
-        @Test
-        void shouldReturnCalculatedDelay_whenTotalFoundIsLarge() {
-            assertThat(handler.calculateEffectiveDelay(50, 1000, 100)).isEqualTo(16);
+        private void returnExternalTaskData(ExternalTaskData externalTaskData) {
+            this.nextExternalTaskData = externalTaskData;
         }
 
-        @Test
-        void shouldReturnDelay_whenMaxDelayIsGreater() {
-            assertThat(handler.calculateEffectiveDelay(50, 10000, 100)).isEqualTo(100);
+        private void throwRetryable(RuntimeException exception) {
+            this.retryableException = exception;
         }
-    }
 
-    @Nested
-    class Throttle {
+        private void throwNotRetryable(NotRetryableException exception) {
+            this.notRetryableException = exception;
+        }
 
-        @Test
-        void shouldHandleInterruptedException() {
-            Thread.currentThread().interrupt();
-            handler.throttle(100);
-            assertThat(Thread.interrupted()).isTrue();
+        private void throwBpmnError(BpmnError error) {
+            this.bpmnError = error;
+        }
+
+        @Override
+        protected ExternalTaskData handleTask(ExternalTask externalTask) {
+            if (bpmnError != null) {
+                throw bpmnError;
+            }
+            if (notRetryableException != null) {
+                throw notRetryableException;
+            }
+            if (retryableException != null) {
+                throw retryableException;
+            }
+            return nextExternalTaskData;
         }
     }
 }

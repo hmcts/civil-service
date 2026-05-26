@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import org.camunda.bpm.client.exception.BadRequestException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -14,8 +15,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
+import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -91,6 +95,25 @@ class ExternalTaskCompletionServiceTest {
                 service.completeTask(handler, externalTask, externalTaskService, data));
             assertEquals(cause, exception.getCause());
         }
+
+        @Test
+        void shouldThrowNotRetryableException_whenBadRequestExceptionIsThrown() {
+            VariableMap variables = Variables.createVariables();
+            when(handler.getVariableMap(data)).thenReturn(variables);
+            doThrow(new BadRequestException("Bad Request", new RestException("", "", 400)))
+                .when(externalTaskService).complete(externalTask, variables);
+
+            assertThrows(NotRetryableException.class, () ->
+                service.completeTask(handler, externalTask, externalTaskService, data));
+        }
+
+        @Test
+        void shouldThrowNotRetryableException_whenVariableMappingThrowsNoSuchElementException() {
+            when(handler.getVariableMap(data)).thenThrow(new NoSuchElementException("anythingwilldo"));
+
+            assertThrows(NotRetryableException.class, () ->
+                service.completeTask(handler, externalTask, externalTaskService, data));
+        }
     }
 
     @Nested
@@ -102,7 +125,7 @@ class ExternalTaskCompletionServiceTest {
 
             service.recover(exception, handler, externalTask, externalTaskService, data);
 
-            verify(handler).handleFailureNotRetryable(externalTask, externalTaskService, exception);
+            verify(handler).handleTaskFailureNotRetryable(externalTask, externalTaskService, exception);
         }
     }
 }
