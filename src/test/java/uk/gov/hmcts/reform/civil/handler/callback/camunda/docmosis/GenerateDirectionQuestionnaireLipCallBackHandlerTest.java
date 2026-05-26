@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipGeneratorFactory;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipResponseGenerator;
-import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireLipGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
@@ -51,9 +50,6 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
 
     @Mock
     private DirectionQuestionnaireLipGeneratorFactory directionQuestionnaireLipGeneratorFactory;
-
-    @Mock
-    private DirectionsQuestionnaireLipGenerator directionsQuestionnaireLipGenerator;
 
     @Mock
     private DirectionQuestionnaireLipResponseGenerator directionQuestionnaireLipResponseGenerator;
@@ -118,45 +114,45 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
 
     @Test
     void shouldGenerateForm_whenAboutToSubmitCalled() {
-        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
-        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionQuestionnaireLipResponseGenerator);
+        given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         CaseData caseData = CaseDataBuilder.builder().build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
+        verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_APP1.getValue()));
         // No longer expect duplicate copy with APP1_DQ category
     }
 
     @Test
     void shouldGenerateFormAndStoreItIntoPreTranslationCollection_whenAboutToSubmitCalledAndClaimantBilingual() {
-        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
-        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionQuestionnaireLipResponseGenerator);
+        given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .claimantBilingualLanguagePreference("BOTH").build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
+        verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
         verify(systemGeneratedDocumentService, never()).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
     }
 
     @Test
     void shouldGenerateFormAndStoreItIntoPreTranslationCollection_whenAboutToSubmitCalledAndClaimHasEnglishParty() {
-        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
-        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionQuestionnaireLipResponseGenerator);
+        given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .claimantBilingualLanguagePreference("ENGLISH").build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
+        verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
     }
 
     @Test
     void shouldGenerateFormAndStoreItIntoPreTranslationCollection_whenAboutToSubmitCalledAndDefendantBilingual() {
-        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
-        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionQuestionnaireLipResponseGenerator);
+        given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
         respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
@@ -166,12 +162,12 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         caseData.setCaseDataLiP(caseDataLiP);
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
+        verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
         verify(systemGeneratedDocumentService, never()).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
     }
 
     @Test
-    void shouldGenerateForm_whenAboutToSubmitCalledLipVLipEnabled() {
+    void shouldGenerateForm_whenAboutToSubmitCalledForLipResponseCase() {
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(
             directionQuestionnaireLipResponseGenerator);
         given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
@@ -195,7 +191,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
         // Verify interactions
-        verify(directionsQuestionnaireLipGenerator, never()).generate(any(CaseData.class), anyString());
+        verify(directionQuestionnaireLipResponseGenerator, never()).generate(any(CaseData.class), anyString());
         verify(systemGeneratedDocumentService, never()).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
     }
 
@@ -211,14 +207,14 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
         // Verify interactions
-        verify(directionsQuestionnaireLipGenerator, never()).generate(any(CaseData.class), anyString());
+        verify(directionQuestionnaireLipResponseGenerator, never()).generate(any(CaseData.class), anyString());
         verify(systemGeneratedDocumentService, never()).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
     }
 
     @Test
     void shouldGenerateForm_whenAboutToSubmitCalledWhenClaimantRejectsThePartAdmit() {
-        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
-        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionQuestionnaireLipResponseGenerator);
+        given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
@@ -227,19 +223,19 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         // Call the handler's callback method
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
-        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
+        verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_APP1.getValue()));
         // No longer expect duplicate copy with APP1_DQ category
     }
 
     @Test
     void shouldGenerateForm_whenAboutToSubmitCalled_defendantDoc() {
-        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
-        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM_DEFENDANT);
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionQuestionnaireLipResponseGenerator);
+        given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM_DEFENDANT);
         CaseData caseData = CaseDataBuilder.builder().build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
+        verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_DEF1.getValue()));
         verifyNoMoreInteractions(assignCategoryId);
     }
@@ -247,8 +243,8 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     @Test
     void shouldGenerateForm_whenAboutToSubmitCalled_defendantDocHideFromWelshParty() {
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(
-            directionsQuestionnaireLipGenerator);
-        given(directionsQuestionnaireLipGenerator.generate(
+            directionQuestionnaireLipResponseGenerator);
+        given(directionQuestionnaireLipResponseGenerator.generate(
             any(CaseData.class),
             anyString()
         )).willReturn(FORM_DEFENDANT);
@@ -257,7 +253,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getData().get("respondent1OriginalDqDoc")).isNotNull();
-        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
+        verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_DEF1.getValue()));
         verifyNoMoreInteractions(assignCategoryId);
     }
@@ -265,8 +261,8 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     @Test
     void shouldGenerateForm_whenAboutToSubmitCalled_defendantDocHideFromWelshPartyForRespondent() {
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(
-            directionsQuestionnaireLipGenerator);
-        given(directionsQuestionnaireLipGenerator.generate(
+            directionQuestionnaireLipResponseGenerator);
+        given(directionQuestionnaireLipResponseGenerator.generate(
             any(CaseData.class),
             anyString()
         )).willReturn(FORM_DEFENDANT);
@@ -280,7 +276,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getData().get("respondent1OriginalDqDoc")).isNotNull();
-        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
+        verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_DEF1.getValue()));
         verifyNoMoreInteractions(assignCategoryId);
     }
@@ -288,8 +284,8 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     @Test
     void shouldNotCreateDuplicateDocuments_whenClaimantDQGenerated() {
         // Given
-        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
-        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionQuestionnaireLipResponseGenerator);
+        given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -299,7 +295,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
 
         // Then
         assertThat(response).isNotNull();
-        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
+        verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
         verify(systemGeneratedDocumentService).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
 
         // Should only assign one category ID for claimant DQ (DQ_APP1), not create duplicate with APP1_DQ
