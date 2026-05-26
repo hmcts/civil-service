@@ -49,7 +49,6 @@ class CreateClaimAfterPaymentApplicantDashboardServiceTest {
 
     @Test
     void shouldRecordBaseAndExtraScenariosWhenEligible() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
         when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
 
@@ -92,20 +91,7 @@ class CreateClaimAfterPaymentApplicantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotRecordAnythingWhenLipVLipDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCcdCaseReference(1234L);
-
-        service.notifyClaimant(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
     void shouldNotRecordAnythingWhenDashboardDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDashboardEnabledForCase(any())).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -119,7 +105,6 @@ class CreateClaimAfterPaymentApplicantDashboardServiceTest {
 
     @Test
     void shouldNotRecordAnythingWhenNotLipCase() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -134,7 +119,6 @@ class CreateClaimAfterPaymentApplicantDashboardServiceTest {
 
     @Test
     void shouldNotRecordAnythingWhenApplicantRepresentedEvenIfLipCase() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();

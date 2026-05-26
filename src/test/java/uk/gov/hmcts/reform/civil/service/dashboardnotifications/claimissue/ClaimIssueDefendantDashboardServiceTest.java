@@ -49,7 +49,6 @@ class ClaimIssueDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarios_whenSmallClaimAndUnrepresented() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = new CaseDataBuilder()
             .ccdCaseReference(123L)
             .respondent1Represented(YesOrNo.NO)
@@ -69,7 +68,6 @@ class ClaimIssueDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarios_whenFastTrackAndUnrepresented() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = new CaseDataBuilder()
             .ccdCaseReference(123L)
             .respondent1Represented(YesOrNo.NO)
@@ -95,7 +93,6 @@ class ClaimIssueDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarios_whenQueryManagementEnabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
         CaseData caseData = new CaseDataBuilder()
             .ccdCaseReference(123L)
@@ -134,7 +131,6 @@ class ClaimIssueDefendantDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenarios_whenRepresented() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = new CaseDataBuilder()
             .ccdCaseReference(123L)
             .respondent1Represented(YesOrNo.YES)
@@ -147,22 +143,7 @@ class ClaimIssueDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotRecordScenarios_whenFeatureToggleDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-        CaseData caseData = new CaseDataBuilder()
-            .ccdCaseReference(123L)
-            .respondent1Represented(YesOrNo.NO)
-            .totalClaimAmount(new BigDecimal(1000))
-            .build();
-
-        service.notifyClaimIssue(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
     void shouldRecordQueryScenarios_whenRespondentRepresentedAndQueryManagementEnabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
         CaseData caseData = new CaseDataBuilder()
             .ccdCaseReference(123L)
