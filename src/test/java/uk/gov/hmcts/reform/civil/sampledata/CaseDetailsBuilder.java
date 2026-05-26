@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
@@ -98,6 +99,13 @@ public class CaseDetailsBuilder {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified1v1().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateJudgmentRequested() {
+        CaseData caseData = CaseDataBuilder.builder().atStateJudgmentRequested().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = JUDGMENT_REQUESTED.name();
         return this;
     }
 
