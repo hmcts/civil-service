@@ -34,7 +34,6 @@ public class HearingScheduledDefendantScenarioTest extends DashboardBaseIntegrat
 
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
         DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");

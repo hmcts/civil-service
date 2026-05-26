@@ -109,7 +109,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test

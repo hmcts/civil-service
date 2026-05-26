@@ -6,7 +6,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.workflow.dashboard.fixture.HearingScheduledDefendantFixtures;
 
@@ -22,14 +21,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class HearingScheduledDefendantWorkflowTest extends DashboardWorkflowIntegrationTest {
 
     @MockBean
-    private FeatureToggleService featureToggleService;
-
-    @MockBean
     private LocationReferenceDataService locationReferenceDataService;
 
     @BeforeEach
     void setup() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationReferenceDataService.getHearingCourtLocations(any()))
             .thenReturn(HearingScheduledDefendantFixtures.locations());
     }
