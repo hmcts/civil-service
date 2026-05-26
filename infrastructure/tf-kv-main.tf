@@ -9,7 +9,7 @@ data "azurerm_user_assigned_identity" "jenkins" {
 }
 
 module "key-vault" {
-  source                  = "git@github.com:hmcts/cnp-module-key-vault?ref=DTSPO-31965/remove-jenkins-ptl-access"
+  source                  = "git@github.com:hmcts/cnp-module-key-vault?ref=DTSPO-31965/remove-jenkins-ptl-access-da"
   name                    = "${var.product}-${var.env}"
   product                 = var.product
   env                     = var.env
@@ -20,9 +20,7 @@ module "key-vault" {
   jenkins_object_id       = data.azurerm_user_assigned_identity.jenkins.principal_id
   common_tags             = var.common_tags
   create_managed_identity = true
-  managed_identity_object_ids = var.env == "aat" ? [
-    # Temporary exception for DTSPO-30107: preview deploys currently read AAT
-    # team secrets. Remove once preview secret loading no longer needs AAT KV access.
-    "a289f989-29fd-46c0-a590-d4bb2be50d39" # jenkins-preview-mi
-  ] : []
+  # Temporary exception for DTSPO-30107: preview deploys currently read AAT
+  # team secrets. Remove once preview secret loading no longer needs AAT KV access.
+  grant_preview_jenkins_access = var.env == "aat"
 }
