@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,8 +26,8 @@ class ExternalTaskListenerConfigurationTest {
     @Configuration
     static class TestConfig {
         @Bean
-        public AsyncHandlerProperties asyncHandlerProperties() {
-            AsyncHandlerProperties props = new AsyncHandlerProperties();
+        public EventProperties eventProperties() {
+            EventProperties props = new EventProperties();
             props.setLockDuration(1980000);
             return props;
         }
