@@ -1387,6 +1387,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. Sole Trader T/A Sole Trader co");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
+            assertThat(updatedData.getJoIsLiveJudgmentExists()).isEqualTo(YES);
             assertInterestIsPopulated(response, 0);
 
         }
@@ -1627,12 +1628,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
 
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setApplicant1(new PartyBuilder().individual().build());
             caseData.setRespondent1(new PartyBuilder().individual().build());
             caseData.setRespondent1Represented(NO);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
             DynamicListElement element = new DynamicListElement(null, "John Smith");
             DynamicList list = new DynamicList();
             list.setValue(element);
@@ -1676,12 +1680,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
             when(time.now()).thenReturn(createdDate);
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setApplicant1(new PartyBuilder().individual().build());
             caseData.setRespondent1(new PartyBuilder().individual().build());
             caseData.setRespondent1Represented(NO);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
             DynamicListElement element = new DynamicListElement(null, "John Smith");
             DynamicList list = new DynamicList();
             list.setValue(element);
@@ -1696,8 +1703,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(updatedData.getBusinessProcess()).isNotNull();
             assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(JUDGMENT_REQUESTED_SPEC.name());
-            assertThat(updatedData.getActiveJudgment()).isNull();
-            assertThat(updatedData.getJoIsLiveJudgmentExists()).isNull();
+            assertThat(updatedData.getActiveJudgment()).isNotNull();
+            assertThat(updatedData.getActiveJudgment().getState().name()).isEqualTo("PENDING_ISSUE");
+            assertThat(updatedData.getJoIsLiveJudgmentExists()).isEqualTo(YES);
             assertThat(updatedData.getJoDJCreatedDate()).isEqualTo(createdDate);
             assertThat(response.getState()).isEqualTo(CaseState.JUDGMENT_REQUESTED.name());
             assertInterestIsPopulated(response, 0);
