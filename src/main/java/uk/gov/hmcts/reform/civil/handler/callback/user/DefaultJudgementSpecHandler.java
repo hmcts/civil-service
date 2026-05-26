@@ -508,8 +508,14 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isJudgmentOnlineLive() && !featureToggleService.isJudgmentBufferEnabled()) {
-            JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            JudgmentDetails activeJudgment;
+            if (isJudgementBufferEnabledForCase(caseData)) {
+                activeJudgment = djOnlineMapper.addPendingIssueActiveJudgment(caseData);
+            } else {
+                activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
+                caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            }
             caseData.setActiveJudgment(activeJudgment);
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
                 activeJudgment,
