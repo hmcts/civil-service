@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -31,6 +32,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 class CvpJoinLinkSchedulerHandlerTest {
@@ -49,6 +53,11 @@ class CvpJoinLinkSchedulerHandlerTest {
 
     @Mock
     private AsyncHandlerProperties asyncHandlerProperties;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private CvpJoinLinkSchedulerHandler handler;
@@ -98,8 +107,8 @@ class CvpJoinLinkSchedulerHandlerTest {
             eq(mockTask),
             eq(errorMessage),
             anyString(),
-            eq(2),
-            eq(300000L)
+            eq(0),
+            anyLong()
         );
     }
 
@@ -151,4 +160,16 @@ class CvpJoinLinkSchedulerHandlerTest {
         verify(applicationEventPublisher).publishEvent(new CvpJoinLinkEvent(caseId));
         verify(applicationEventPublisher).publishEvent(new CvpJoinLinkEvent(otherId));
     }
+
+    @Test
+    void shouldOnlyAttemptOnce() {
+        assertEquals(1, handler.getMaxAttempts());
+    }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +16,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 @ConditionalOnExpression("${polling.event.emitter.enabled:true}")
 public class PollingEventEmitterHandler extends BaseExternalTaskHandler {
@@ -27,6 +27,20 @@ public class PollingEventEmitterHandler extends BaseExternalTaskHandler {
     private final CaseReadyBusinessProcessSearchService caseSearchService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final EventEmitterService eventEmitterService;
+
+    public PollingEventEmitterHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        CaseReadyBusinessProcessSearchService caseSearchService,
+        CaseDetailsConverter caseDetailsConverter,
+        EventEmitterService eventEmitterService
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.eventEmitterService = eventEmitterService;
+    }
+
     @Value("${polling.emitter.multiple.cases.delay.seconds:30}")
     private long multiCasesExecutionDelayInSeconds;
 

@@ -12,12 +12,12 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepres
 import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDate;
@@ -84,7 +85,6 @@ class GAJudgeRevisitTaskHandlerTest {
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(
         ObjectMapperFactory.instance());
 
-    @InjectMocks
     private GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
 
     private CaseDetails caseDetailsDirectionOrder;
@@ -97,6 +97,21 @@ class GAJudgeRevisitTaskHandlerTest {
 
     Logger logger = (Logger) LoggerFactory.getLogger(GAJudgeRevisitTaskHandler.class);
     ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+
+    @BeforeEach
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        gaJudgeRevisitTaskHandler = new GAJudgeRevisitTaskHandler(
+            new ExternalTaskCompletionService(),
+            eventProperties,
+            caseStateSearchService,
+            coreCaseDataService,
+            caseDetailsConverter,
+            gaForLipService,
+            dashboardNotificationService
+        );
+    }
 
     @BeforeEach
     void init() {

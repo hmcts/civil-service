@@ -6,11 +6,11 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
@@ -55,7 +56,6 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
     @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @InjectMocks
     private CheckUnlessOrderDeadlineEndTaskHandler gaUnlessOrderMadeTaskHandler;
 
     @Spy
@@ -82,39 +82,53 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
     private final LocalDate deadLineToday = LocalDate.now();
 
     @BeforeEach
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        gaUnlessOrderMadeTaskHandler = new CheckUnlessOrderDeadlineEndTaskHandler(
+            new ExternalTaskCompletionService(),
+            eventProperties,
+            searchService,
+            coreCaseDataService,
+            caseDetailsConverter,
+            mapper
+        );
+    }
+
+    @BeforeEach
     void init() {
-        caseDetailsWithTodayDeadlineNotProcessed = getCaseDetails(1L, UNLESS_ORDER, deadLineToday,
+        caseDetailsWithTodayDeadlineNotProcessed = getCaseDetails(1L, deadLineToday,
                                                                   YesOrNo.NO);
-        caseDataWithTodayDeadlineNotProcessed = getCaseData(1L, UNLESS_ORDER, deadLineToday,
+        caseDataWithTodayDeadlineNotProcessed = getCaseData(1L, deadLineToday,
                                                             YesOrNo.NO);
 
-        caseDetailsWithTodayDeadlineProcessed = getCaseDetails(1L, UNLESS_ORDER, deadLineToday,
+        caseDetailsWithTodayDeadlineProcessed = getCaseDetails(1L, deadLineToday,
                                                                YesOrNo.YES);
-        caseDataWithTodayDeadlineProcessed = getCaseData(1L, UNLESS_ORDER, deadLineToday,
+        caseDataWithTodayDeadlineProcessed = getCaseData(1L, deadLineToday,
                                                          YesOrNo.YES);
 
-        caseDetailsWithDeadlineCrossedNotProcessed = getCaseDetails(3L, UNLESS_ORDER,
+        caseDetailsWithDeadlineCrossedNotProcessed = getCaseDetails(3L,
                                                                     deadlineCrossed, YesOrNo.NO);
-        caseDataWithDeadlineCrossedNotProcessed = getCaseData(3L, UNLESS_ORDER, deadlineCrossed,
+        caseDataWithDeadlineCrossedNotProcessed = getCaseData(3L, deadlineCrossed,
                                                               YesOrNo.NO);
 
-        caseDetailsWithDeadlineCrossedProcessed = getCaseDetails(4L, UNLESS_ORDER, deadlineCrossed,
+        caseDetailsWithDeadlineCrossedProcessed = getCaseDetails(4L, deadlineCrossed,
                                                                  YesOrNo.YES);
-        caseDataWithDeadlineCrossedProcessed = getCaseData(4L, UNLESS_ORDER, deadlineCrossed,
+        caseDataWithDeadlineCrossedProcessed = getCaseData(4L, deadlineCrossed,
                                                            YesOrNo.YES);
 
-        caseDetailsWithNoDeadline = getCaseDetails(5L, UNLESS_ORDER,
+        caseDetailsWithNoDeadline = getCaseDetails(5L,
                                                    null, YesOrNo.NO);
-        caseDataWithNoDeadline = getCaseData(5L, UNLESS_ORDER,
+        caseDataWithNoDeadline = getCaseData(5L,
                                              null, YesOrNo.NO);
 
-        caseDetailsWithFutureDeadline = getCaseDetails(6L, UNLESS_ORDER,
+        caseDetailsWithFutureDeadline = getCaseDetails(6L,
                                                        deadlineInFuture, YesOrNo.NO);
-        caseDataWithFutureDeadline = getCaseData(6L, UNLESS_ORDER,
+        caseDataWithFutureDeadline = getCaseData(6L,
                                                  deadlineInFuture, YesOrNo.NO);
-        caseDetailsWithTodayDeadLineWithOrderProcessedNull = getCaseDetails(7L, UNLESS_ORDER,
+        caseDetailsWithTodayDeadLineWithOrderProcessedNull = getCaseDetails(7L,
                                                                             deadLineToday, null);
-        caseDataWithTodayDeadLineWithOrderProcessedNull = getCaseData(7L, UNLESS_ORDER,
+        caseDataWithTodayDeadLineWithOrderProcessedNull = getCaseData(7L,
                                                                       deadLineToday, null);
     }
 
@@ -179,7 +193,7 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
 
         verify(searchService).getOrderMadeGeneralApplications(ORDER_MADE, UNLESS_ORDER);
         verify(coreCaseDataService).triggerGaEvent(1L, END_SCHEDULER_CHECK_UNLESS_ORDER_DEADLINE,
-                                                   getCaseData(1L, UNLESS_ORDER, deadLineToday,
+                                                   getCaseData(1L, deadLineToday,
                                                                YesOrNo.YES).toMap(mapper));
         verifyNoMoreInteractions(coreCaseDataService);
         verify(externalTaskService).complete(any(), any());
@@ -211,10 +225,10 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
 
         verify(searchService).getOrderMadeGeneralApplications(ORDER_MADE, UNLESS_ORDER);
         verify(coreCaseDataService).triggerGaEvent(1L, END_SCHEDULER_CHECK_UNLESS_ORDER_DEADLINE,
-                                                   getCaseData(1L, UNLESS_ORDER, deadLineToday,
+                                                   getCaseData(1L, deadLineToday,
                                                                YesOrNo.YES).toMap(mapper));
         verify(coreCaseDataService).triggerGaEvent(3L, END_SCHEDULER_CHECK_UNLESS_ORDER_DEADLINE,
-                                                   getCaseData(3L, UNLESS_ORDER, deadlineCrossed,
+                                                   getCaseData(3L, deadlineCrossed,
                                                                YesOrNo.YES).toMap(mapper));
         verifyNoMoreInteractions(coreCaseDataService);
         verify(externalTaskService).complete(any(), any());
@@ -236,12 +250,11 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
         verify(externalTaskService).complete(any(), any());
     }
 
-    private GeneralApplicationCaseData getCaseData(Long ccdId, GeneralApplicationTypes generalApplicationType,
-                                                   LocalDate deadline, YesOrNo isProcessed) {
+    private GeneralApplicationCaseData getCaseData(Long ccdId, LocalDate deadline, YesOrNo isProcessed) {
         return GeneralApplicationCaseDataBuilder.builder()
             .ccdCaseReference(ccdId)
             .ccdState(ORDER_MADE)
-            .generalAppType(new GAApplicationType().setTypes(List.of(generalApplicationType)))
+            .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.UNLESS_ORDER)))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                            .setMakeAnOrder(APPROVE_OR_EDIT)
                                            .setJudgeRecitalText("Sample Text")
@@ -250,8 +263,7 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
                                            .setIsOrderProcessedByUnlessScheduler(isProcessed)).build();
     }
 
-    private CaseDetails getCaseDetails(Long ccdId, GeneralApplicationTypes generalApplicationType,
-                                       LocalDate deadline, YesOrNo isProcessed) {
+    private CaseDetails getCaseDetails(Long ccdId, LocalDate deadline, YesOrNo isProcessed) {
         return CaseDetails.builder().id(ccdId).data(
                 Map.of("judicialDecisionMakeOrder", new GAJudicialMakeAnOrder()
                            .setMakeAnOrder(APPROVE_OR_EDIT)
@@ -259,7 +271,7 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
                            .setJudgeApproveEditOptionDateForUnlessOrder(deadline)
                            .setReasonForDecisionText("Sample Test")
                            .setIsOrderProcessedByUnlessScheduler(isProcessed),
-                       "generalAppType", new GAApplicationType().setTypes(List.of(generalApplicationType))))
+                       "generalAppType", new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.UNLESS_ORDER))))
             .state(ORDER_MADE.toString()).build();
     }
 }

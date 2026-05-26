@@ -128,10 +128,10 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
 
     protected abstract ExternalTaskData handleTask(ExternalTask externalTask);
 
-    protected void throttle(long totalFound) {
+    protected void throttle(long count) {
         long lock = eventProperties.getLockDuration();
         long delay = eventProperties.getDispatchDelay();
-        long effectiveDelay = calculateEffectiveDelay(totalFound, lock, delay);
+        long effectiveDelay = calculateEffectiveDelay(count, lock, delay);
         if (effectiveDelay == 0) {
             return;
         }

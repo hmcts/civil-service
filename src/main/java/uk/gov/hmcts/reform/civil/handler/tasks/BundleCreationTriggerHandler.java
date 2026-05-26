@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,9 +20,10 @@ import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
 
@@ -35,6 +35,25 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     @Value("${stitch-bundle.wait-time-in-milliseconds}")
     private Integer waitTime;
     private final NoCacheUserService noCacheUserService;
+
+    public BundleCreationTriggerHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        BundleCreationTriggerService bundleCreationTriggerService,
+        ApplicationEventPublisher applicationEventPublisher,
+        CaseDetailsConverter caseDetailsConverter,
+        CoreCaseDataService coreCaseDataService,
+        SystemUpdateUserConfiguration userConfig,
+        NoCacheUserService noCacheUserService
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.bundleCreationTriggerService = bundleCreationTriggerService;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.coreCaseDataService = coreCaseDataService;
+        this.userConfig = userConfig;
+        this.noCacheUserService = noCacheUserService;
+    }
 
     @SuppressWarnings("java:S2142")
     @Override

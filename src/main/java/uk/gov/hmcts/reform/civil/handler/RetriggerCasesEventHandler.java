@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
@@ -11,7 +10,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -23,16 +21,27 @@ import java.util.Map;
 import java.util.UUID;
 
 import static java.lang.Long.parseLong;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
 
     private static final String FINAL_ORDER_DOCUMENT_COLLECTION = "finalOrderDocumentCollection";
     private final CoreCaseDataService coreCaseDataService;
-    private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+
+    public RetriggerCasesEventHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        CoreCaseDataService coreCaseDataService,
+        ObjectMapper mapper
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.mapper = mapper;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -52,8 +61,7 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
                 break;
             }
             try {
-                log.info("" +
-                    "Retrigger CaseId: {} started", caseId);
+                log.info("Retrigger CaseId: {} started", caseId);
                 externalTask.getAllVariables().put("caseId", caseId);
                 coreCaseDataService.triggerEvent(
                     parseLong(caseId.trim()),
@@ -90,8 +98,7 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
                                                  CaseEvent caseEvent,
                                                  String documentJson,
                                                  String processInstanceId) {
-        CaseDocument document = null;
-
+        CaseDocument document;
         try {
             document = mapper.readValue(documentJson, CaseDocument.class);
         } catch (JsonProcessingException e) {
@@ -126,4 +133,5 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
             eventDescription
         );
     }
+
 }

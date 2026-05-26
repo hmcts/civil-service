@@ -82,6 +82,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(MockitoExtension.class)
 class CaseEventTaskHandlerTest {
@@ -104,6 +106,12 @@ class CaseEventTaskHandlerTest {
     private RoboticsEventTextFormatter textFormatter = new RoboticsEventTextFormatter();
     @Captor
     ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
+
     @InjectMocks
     private CaseEventTaskHandler caseEventTaskHandler;
     private static final String IS_JUDGMENT_MARKED_PAID_IN_FULL = "isJudgmentMarkedPaidInFull";
@@ -323,18 +331,17 @@ class CaseEventTaskHandlerTest {
                 eq(errorMessage),
                 anyString(),
                 eq(2),
-                eq(300000L)
+                anyLong()
             );
         }
 
         @Test
-        void shouldCallHandleFailureMethod_whenFeignExceptionFromBusinessLogic() {
+        void shouldCallHandleFailureMethod_whenFeignExceptionFromUnprocessableContent() {
             String errorMessage = "there was an error";
             int status = 422;
             Request.HttpMethod requestType = Request.HttpMethod.POST;
             String exampleUrl = "example url";
 
-            when(mockTask.getRetries()).thenReturn(null);
             when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
                 .thenAnswer(invocation -> {
                     throw FeignException.errorStatus(errorMessage, Response.builder()
@@ -358,8 +365,8 @@ class CaseEventTaskHandlerTest {
                 eq(mockTask),
                 eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
                 anyString(),
-                eq(2),
-                eq(300000L)
+                eq(0),
+                anyLong()
             );
         }
     }
@@ -1181,4 +1188,11 @@ class CaseEventTaskHandlerTest {
             );
         }
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

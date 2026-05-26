@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_SCHEDULER_CHECK_STAY_ORDER_DEADLINE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.ORDER_MADE;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_FROM_SANCTIONS;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT;
 
@@ -19,12 +18,12 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -35,6 +34,7 @@ import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDate;
@@ -55,21 +55,17 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
 
     @Mock private GaCoreCaseDataService coreCaseDataService;
 
-    @InjectMocks private CheckStayOrderDeadlineEndTaskHandler gaOrderMadeTaskHandler;
+    private CheckStayOrderDeadlineEndTaskHandler gaOrderMadeTaskHandler;
 
     @Spy private ObjectMapper mapper = ObjectMapperFactory.instance();
 
     private CaseDetails caseDetailsWithTodayDeadlineNotProcessed;
-    private CaseDetails caseDetailsWithTodayDeadlineReliefFromSanctionOrder;
     private CaseDetails caseDetailsWithDeadlineCrossedNotProcessed;
-    private CaseDetails caseDetailsWithDeadlineCrossedProcessed;
 
     private CaseDetails caseDetailsWithNoDeadline;
     private CaseDetails caseDetailsWithFutureDeadline;
     private GeneralApplicationCaseData caseDataWithDeadlineCrossedNotProcessed;
     private GeneralApplicationCaseData caseDataWithTodayDeadlineNotProcessed;
-    private GeneralApplicationCaseData caseDataWithTodayDeadlineReliefFromSanctionOrder;
-    private GeneralApplicationCaseData caseDataWithDeadlineCrossedProcessed;
     private GeneralApplicationCaseData caseDataWithNoDeadline;
     private GeneralApplicationCaseData caseDataWithFutureDeadline;
 
@@ -78,33 +74,37 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
     private final LocalDate deadLineToday = LocalDate.now();
 
     @BeforeEach
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        gaOrderMadeTaskHandler = new CheckStayOrderDeadlineEndTaskHandler(
+            new ExternalTaskCompletionService(),
+            eventProperties,
+            searchService,
+            coreCaseDataService,
+            caseDetailsConverter,
+            mapper
+        );
+    }
+
+    @BeforeEach
     void init() {
         caseDetailsWithTodayDeadlineNotProcessed =
-                getCaseDetails(1L, STAY_THE_CLAIM, deadLineToday, YesOrNo.NO);
+                getCaseDetails(1L, deadLineToday);
         caseDataWithTodayDeadlineNotProcessed =
-                getCaseData(1L, STAY_THE_CLAIM, deadLineToday, YesOrNo.NO);
-
-        caseDetailsWithTodayDeadlineReliefFromSanctionOrder =
-                getCaseDetails(2L, RELIEF_FROM_SANCTIONS, deadLineToday, YesOrNo.NO);
-        caseDataWithTodayDeadlineReliefFromSanctionOrder =
-                getCaseData(2L, RELIEF_FROM_SANCTIONS, deadLineToday, YesOrNo.NO);
+                getCaseData(1L, deadLineToday, YesOrNo.NO);
 
         caseDetailsWithDeadlineCrossedNotProcessed =
-                getCaseDetails(3L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.NO);
+                getCaseDetails(3L, deadlineCrossed);
         caseDataWithDeadlineCrossedNotProcessed =
-                getCaseData(3L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.NO);
+                getCaseData(3L, deadlineCrossed, YesOrNo.NO);
 
-        caseDetailsWithDeadlineCrossedProcessed =
-                getCaseDetails(4L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.YES);
-        caseDataWithDeadlineCrossedProcessed =
-                getCaseData(4L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.YES);
-
-        caseDetailsWithNoDeadline = getCaseDetails(5L, STAY_THE_CLAIM, null, YesOrNo.NO);
-        caseDataWithNoDeadline = getCaseData(5L, STAY_THE_CLAIM, null, YesOrNo.NO);
+        caseDetailsWithNoDeadline = getCaseDetails(5L, null);
+        caseDataWithNoDeadline = getCaseData(5L, null, YesOrNo.NO);
 
         caseDetailsWithFutureDeadline =
-                getCaseDetails(6L, STAY_THE_CLAIM, deadlineInFuture, YesOrNo.NO);
-        caseDataWithFutureDeadline = getCaseData(6L, STAY_THE_CLAIM, deadlineInFuture, YesOrNo.NO);
+                getCaseDetails(6L, deadlineInFuture);
+        caseDataWithFutureDeadline = getCaseData(6L, deadlineInFuture, YesOrNo.NO);
     }
 
     @Test
@@ -150,9 +150,9 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
     @Test
     void shouldNotSendMessageAndTriggerGaEvent_whenCasesHaveFutureDeadLine_consentOrder() {
         GeneralApplicationCaseData consentOrderCaseData =
-                getConsentOrderCaseData(1L, STAY_THE_CLAIM, deadlineInFuture, YesOrNo.NO);
+                getConsentOrderCaseData(deadlineInFuture, YesOrNo.NO);
         CaseDetails consentOrderCaseDetails =
-                getConsentOrderCaseDetails(1L, STAY_THE_CLAIM, deadlineInFuture, YesOrNo.NO);
+                getConsentOrderCaseDetails(deadlineInFuture);
         when(searchService.getOrderMadeGeneralApplications(ORDER_MADE, STAY_THE_CLAIM))
                 .thenReturn(Set.of(consentOrderCaseDetails));
 
@@ -197,12 +197,12 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
                 .triggerGaEvent(
                         1L,
                         END_SCHEDULER_CHECK_STAY_ORDER_DEADLINE,
-                        getCaseData(1L, STAY_THE_CLAIM, deadLineToday, YesOrNo.YES).toMap(mapper));
+                        getCaseData(1L, deadLineToday, YesOrNo.YES).toMap(mapper));
         verify(coreCaseDataService)
                 .triggerGaEvent(
                         3L,
                         END_SCHEDULER_CHECK_STAY_ORDER_DEADLINE,
-                        getCaseData(3L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.YES)
+                        getCaseData(3L, deadlineCrossed, YesOrNo.YES)
                                 .toMap(mapper));
         verifyNoMoreInteractions(coreCaseDataService);
         verify(externalTaskService).complete(any(), any());
@@ -211,9 +211,9 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
     @Test
     void shouldEmitBusinessProcessEvent_onlyWhen_NotProcessedAndDeadlineReached_consentOrder() {
         GeneralApplicationCaseData consentOrderCaseData =
-                getConsentOrderCaseData(1L, STAY_THE_CLAIM, deadLineToday, YesOrNo.NO);
+                getConsentOrderCaseData(deadLineToday, YesOrNo.NO);
         CaseDetails consentOrderCaseDetails =
-                getConsentOrderCaseDetails(1L, STAY_THE_CLAIM, deadLineToday, YesOrNo.NO);
+                getConsentOrderCaseDetails(deadLineToday);
         when(searchService.getOrderMadeGeneralApplications(ORDER_MADE, STAY_THE_CLAIM))
                 .thenReturn(Set.of(consentOrderCaseDetails));
 
@@ -227,7 +227,7 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
                 .triggerGaEvent(
                         1L,
                         END_SCHEDULER_CHECK_STAY_ORDER_DEADLINE,
-                        getConsentOrderCaseData(1L, STAY_THE_CLAIM, deadLineToday, YesOrNo.YES)
+                        getConsentOrderCaseData(deadLineToday, YesOrNo.YES)
                                 .toMap(mapper));
         verifyNoMoreInteractions(coreCaseDataService);
         verify(externalTaskService).complete(any(), any());
@@ -248,15 +248,11 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
         verify(externalTaskService).complete(any(), any());
     }
 
-    private GeneralApplicationCaseData getCaseData(
-            Long ccdId,
-            GeneralApplicationTypes generalApplicationType,
-            LocalDate deadline,
-            YesOrNo esProcessed) {
+    private GeneralApplicationCaseData getCaseData(Long ccdId, LocalDate deadline, YesOrNo esProcessed) {
         return GeneralApplicationCaseDataBuilder.builder()
                 .ccdCaseReference(ccdId)
                 .ccdState(ORDER_MADE)
-                .generalAppType(new GAApplicationType().setTypes(List.of(generalApplicationType)))
+                .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.STAY_THE_CLAIM)))
                 .judicialDecisionMakeOrder(
                         new GAJudicialMakeAnOrder()
                                 .setMakeAnOrder(APPROVE_OR_EDIT)
@@ -267,15 +263,11 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
                 .build();
     }
 
-    private GeneralApplicationCaseData getConsentOrderCaseData(
-            Long ccdId,
-            GeneralApplicationTypes generalApplicationType,
-            LocalDate deadline,
-            YesOrNo isProcessed) {
+    private GeneralApplicationCaseData getConsentOrderCaseData(LocalDate deadline, YesOrNo isProcessed) {
         return GeneralApplicationCaseDataBuilder.builder()
-                .ccdCaseReference(ccdId)
+                .ccdCaseReference(1L)
                 .ccdState(ORDER_MADE)
-                .generalAppType(new GAApplicationType().setTypes(List.of(generalApplicationType)))
+                .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.STAY_THE_CLAIM)))
                 .approveConsentOrder(
                         new GAApproveConsentOrder()
                                 .setConsentOrderDescription("Testing prepopulated text")
@@ -284,11 +276,7 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
                 .build();
     }
 
-    private CaseDetails getCaseDetails(
-            Long ccdId,
-            GeneralApplicationTypes generalApplicationType,
-            LocalDate deadline,
-            YesOrNo isProcessed) {
+    private CaseDetails getCaseDetails(Long ccdId, LocalDate deadline) {
         return CaseDetails.builder()
                 .id(ccdId)
                 .data(
@@ -299,21 +287,17 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
                                                 .setJudgeRecitalText("Sample Text")
                                                 .setJudgeApproveEditOptionDate(deadline)
                                                 .setReasonForDecisionText("Sample Test")
-                                                .setIsOrderProcessedByStayScheduler(isProcessed),
+                                                .setIsOrderProcessedByStayScheduler(YesOrNo.NO),
                                 "generalAppType",
                                         new GAApplicationType()
-                                                .setTypes(List.of(generalApplicationType))))
+                                                .setTypes(List.of(GeneralApplicationTypes.STAY_THE_CLAIM))))
                 .state(ORDER_MADE.toString())
                 .build();
     }
 
-    private CaseDetails getConsentOrderCaseDetails(
-            Long ccdId,
-            GeneralApplicationTypes generalApplicationType,
-            LocalDate deadline,
-            YesOrNo isProcessed) {
+    private CaseDetails getConsentOrderCaseDetails(LocalDate deadline) {
         return CaseDetails.builder()
-                .id(ccdId)
+                .id(1L)
                 .data(
                         Map.of(
                                 "approveConsentOrder",
@@ -321,10 +305,10 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
                                                 .setConsentOrderDescription(
                                                         "Testing prepopulated text")
                                                 .setConsentOrderDateToEnd(deadline)
-                                                .setIsOrderProcessedByStayScheduler(isProcessed),
+                                                .setIsOrderProcessedByStayScheduler(YesOrNo.NO),
                                 "generalAppType",
                                         new GAApplicationType()
-                                                .setTypes(List.of(generalApplicationType))))
+                                                .setTypes(List.of(GeneralApplicationTypes.STAY_THE_CLAIM))))
                 .state(ORDER_MADE.toString())
                 .build();
     }

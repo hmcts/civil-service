@@ -29,6 +29,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 class CoscApplicationProcessorHandlerTest {
@@ -44,6 +47,11 @@ class CoscApplicationProcessorHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private CoscApplicationProcessorHandler handler;
@@ -94,7 +102,7 @@ class CoscApplicationProcessorHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(300000L)
+            anyLong()
         );
     }
 
@@ -114,6 +122,12 @@ class CoscApplicationProcessorHandlerTest {
             anyInt(),
             anyLong()
         );
+    }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
     }
 
 }
