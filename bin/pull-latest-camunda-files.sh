@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-branchName=$1
+branchName=${1:-master}
 
-#Checkout specific branch pf  civil camunda bpmn definition 
+# Checkout specific branch of civil-camunda-bpmn-definition.
 rm -rf ./civil-camunda-bpmn-definition ./camunda
 git clone https://github.com/hmcts/civil-camunda-bpmn-definition.git
 cd civil-camunda-bpmn-definition
