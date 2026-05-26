@@ -42,6 +42,9 @@ class BaseExternalTaskHandlerTest {
     private static final int DISPATCH_DELAY = 200;
 
     @Mock
+    private ExternalTaskCompletionService externalTaskCompletionService;
+
+    @Mock
     private ExternalTask externalTask;
 
     @Mock

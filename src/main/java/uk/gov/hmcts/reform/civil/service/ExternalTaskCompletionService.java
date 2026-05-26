@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.exception.BadRequestException;
 import org.camunda.bpm.client.exception.NotFoundException;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.springframework.retry.annotation.Backoff;
@@ -14,6 +15,8 @@ import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -34,27 +37,30 @@ public class ExternalTaskCompletionService {
                              ExternalTask externalTask,
                              ExternalTaskService externalTaskService,
                              ExternalTaskData data) throws CompleteTaskException, NotRetryableException {
+
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
-        log.info("Trying to complete external task '{}' finished with processInstanceId '{}'",
-                 topicName, processInstanceId);
+        log.info("Completing task '{}', processInstanceId '{}'", topicName, processInstanceId);
 
         try {
             externalTaskService.complete(externalTask, handler.getVariableMap(data));
-            log.info("External task '{}' completed with processInstanceId '{}'", topicName, processInstanceId);
         } catch (NotFoundException e) {
             log.info(
-                "Completing external task '{}' was skipped as process instance '{}' has already completed.",
+                "Completing task '{}' NotFound error processInstanceId '{}' has already completed/aborted.",
                 topicName, processInstanceId
             );
         } catch (BadRequestException e) {
-            log.error(
-                "Completing external task '{}' errored with processInstanceId '{}', bad request error",
-                topicName, processInstanceId
-            );
+            log.error("Completing task '{}' Bad Request error, processInstanceId '{}'", topicName, processInstanceId, e);
+            throw new NotRetryableException(e.getMessage());
+        } catch (ValueMapperException e) {
+            log.error("Completing task '{}' Value Mapper error, processInstanceId '{}'", topicName, processInstanceId, e);
+            throw new NotRetryableException(e.getMessage());
+        } catch (NoSuchElementException e) {
+            log.error("Completing task '{}' No Such Element error, processInstanceId '{}'", topicName, processInstanceId, e);
             throw new NotRetryableException(e.getMessage());
         } catch (Exception e) {
-            log.error("Completing external task '{}' errored  with processInstanceId '{}'", topicName, processInstanceId, e);
+            // Inc EngineException | ConnectionLostException | UnknownHttpErrorException
+            log.error("Completing task '{}' errored, processInstanceId '{}'", topicName, processInstanceId, e);
             throw new CompleteTaskException(e);
         }
     }
@@ -65,9 +71,9 @@ public class ExternalTaskCompletionService {
                         ExternalTask externalTask,
                         ExternalTaskService externalTaskService,
                         ExternalTaskData data) {
-        log.error("All attempts to completing task '{}' failed  with processInstanceId '{}' with error message '{}'",
+        log.error("Completing task '{}' All retry attempts failed, processInstanceId '{}', error message '{}'",
                   externalTask.getTopicName(), externalTask.getProcessInstanceId(), exception.getMessage()
         );
-        handler.handleFailureNotRetryable(externalTask, externalTaskService, exception);
+        handler.handleTaskFailureNotRetryable(externalTask, externalTaskService, exception);
     }
 }
