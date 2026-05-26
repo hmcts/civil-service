@@ -40,6 +40,7 @@ public class SdoDisposalTemplateService {
             .setCurrentDate(LocalDate.now())
             .setJudgeName(judgeName)
             .setCaseNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(caseData.getCcdCaseReference().toString())
             .setApplicant1(caseData.getApplicant1())
             .setApplicant1PartyName(getApplicant1NameWithLitigiousFriend(caseData))
             .setApplicant2PartyName(getApplicant2NameWithLitigiousFriend(caseData))

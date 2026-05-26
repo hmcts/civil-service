@@ -45,6 +45,7 @@ public class SdoSmallClaimsTemplateService {
             .setWrittenByJudge(isJudge)
             .setCurrentDate(LocalDate.now())
             .setJudgeName(judgeName)
+            .setCcdCaseReference(caseData.getCcdCaseReference().toString())
             .setCaseNumber(caseData.getLegacyCaseReference())
             .setApplicant1PartyName(getApplicant1NameWithLitigiousFriend(caseData))
             .setApplicant2PartyName(getApplicant2NameWithLitigiousFriend(caseData))
