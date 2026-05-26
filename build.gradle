@@ -12,7 +12,7 @@ plugins {
   id 'org.sonarqube' version '6.3.1.5724'
   id 'au.com.dius.pact' version '4.6.17'
   id "io.freefair.lombok" version "8.14.4"
-  id "org.flywaydb.flyway" version "10.22.0"
+  id "org.flywaydb.flyway" version "12.6.2"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.4"
 }
@@ -480,7 +480,7 @@ dependencies {
   implementation "org.jdbi:jdbi3-sqlobject:3.53.0"
   implementation "org.jdbi:jdbi3-spring:3.53.0"
   implementation "org.flywaydb:flyway-core"
-  implementation "org.flywaydb:flyway-database-postgresql:10.22.0"
+  implementation "org.flywaydb:flyway-database-postgresql:12.6.2"
   implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
   implementation "org.springframework.cloud:spring-cloud-openfeign-core"
   implementation "com.github.hmcts:service-auth-provider-java-client:4.1.2"
