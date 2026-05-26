@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @Slf4j
@@ -137,8 +138,8 @@ public class DashboardClaimInfoService {
         DashboardClaimInfo item = new DashboardClaimInfo().setClaimId(String.valueOf(caseData.getCcdCaseReference()))
             .setCreatedDate(submittedDateToCreatedDate(caseData))
             .setClaimNumber(caseData.getLegacyCaseReference())
-            .setClaimantName(nonNull(caseData.getApplicant1()) ? caseData.getApplicant1().getPartyName() : null)
-            .setDefendantName(nonNull(caseData.getRespondent1()) ? caseData.getRespondent1().getPartyName() : null)
+            .setClaimantName(getPartyNameBasedOnType(caseData.getApplicant1()))
+            .setDefendantName(getPartyNameBasedOnType(caseData.getRespondent1()))
             .setClaimAmount(nonNull(caseData.getTotalClaimAmount()) ? caseData.getTotalClaimAmount() : null)
             .setAdmittedAmount(caseData.getPartAdmitPaidValuePounds())
             .setResponseDeadlineTime(caseData.getRespondent1ResponseDeadline())
