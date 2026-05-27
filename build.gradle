@@ -14,7 +14,7 @@ plugins {
   id "io.freefair.lombok" version "8.14.4"
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
-  id "org.gradle.test-retry" version "1.6.4"
+  id "org.gradle.test-retry" version "1.6.5"
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -29,7 +29,7 @@ def versions = [
   camunda           : '7.24.0',
   testcontainers    : '1.21.4',
   pdfbox            : '3.0.7',
-  tika              : '3.3.0'
+  tika              : '3.3.1'
 ]
 
 allprojects {
@@ -49,7 +49,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '13.4.1'
+    toolVersion = '13.4.2'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
     ignoreFailures = System.getenv('CHECKSTYLE_SKIP') == 'true'
   }
@@ -79,7 +79,7 @@ allprojects {
 
       dependency 'com.squareup.okhttp3:okhttp:5.3.2'
 
-      dependency 'org.slf4j:slf4j-nop:2.0.17'
+      dependency 'org.slf4j:slf4j-nop:2.0.18'
 
       dependencySet(group: 'org.apache.httpcomponents.core5', version: '5.4.2') {
         entry 'httpcore5'
@@ -500,7 +500,7 @@ dependencies {
   implementation "com.sendgrid:sendgrid-java:4.10.3"
   implementation "org.projectlombok:lombok:${versions.lombok}"
   implementation "org.springframework.boot:spring-boot-starter-cache"
-  implementation "com.github.ben-manes.caffeine:caffeine:3.2.3"
+  implementation "com.github.ben-manes.caffeine:caffeine:3.2.4"
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"
   implementation "org.springframework.security:spring-security-core"
@@ -511,8 +511,8 @@ dependencies {
   implementation "com.nimbusds:nimbus-jose-jwt:10.9"
   implementation "io.jsonwebtoken:jjwt:0.13.0"
   implementation "com.github.hmcts:idam-java-client:3.0.5"
-  implementation "org.apache.logging.log4j:log4j-api:2.25.4"
-  implementation "org.apache.logging.log4j:log4j-to-slf4j:2.25.4"
+  implementation "org.apache.logging.log4j:log4j-api:2.26.0"
+  implementation "org.apache.logging.log4j:log4j-to-slf4j:2.26.0"
   implementation "org.apache.commons:commons-text:1.15.0"
   implementation "org.elasticsearch:elasticsearch:7.17.29"
   implementation "com.networknt:json-schema-validator:1.5.9"
@@ -527,11 +527,11 @@ dependencies {
   implementation "org.camunda.bpm:camunda-engine-rest-core:${versions.camunda}"
   implementation "org.apiguardian:apiguardian-api:1.1.2"
   implementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.5"
-  implementation "org.glassfish.jaxb:jaxb-runtime:4.0.7"
+  implementation "org.glassfish.jaxb:jaxb-runtime:4.0.8"
   implementation "javax.xml.bind:jaxb-api:2.3.1"
   implementation "com.launchdarkly:launchdarkly-java-server-sdk:6.3.0"
   implementation "com.azure:azure-core:1.58.0"
-  implementation "com.azure:azure-messaging-servicebus:7.17.17"
+  implementation "com.azure:azure-messaging-servicebus:7.17.18"
   implementation "org.apache.pdfbox:pdfbox:${versions.pdfbox}"
   implementation "org.apache.pdfbox:pdfbox-io:${versions.pdfbox}"
   implementation "com.github.hmcts:auth-checker-lib:3.1.1"
@@ -550,7 +550,7 @@ dependencies {
   }
 
   constraints {
-    implementation('org.apache.logging.log4j:log4j-core:2.25.4') {
+    implementation('org.apache.logging.log4j:log4j-core:2.26.0') {
       because 'CVE-2025-68161 (upgrade to vendor recommended version)'
     }
   }
