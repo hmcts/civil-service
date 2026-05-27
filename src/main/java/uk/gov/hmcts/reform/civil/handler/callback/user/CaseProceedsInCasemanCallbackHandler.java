@@ -11,13 +11,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
-import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.groups.CasemanTransferDateGroup;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -29,9 +26,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
-import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.PENDING_ISSUE;
-import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +36,6 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
     private final Validator validator;
     private final Time time;
     private final ObjectMapper mapper;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -72,73 +65,20 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
 
     private CallbackResponse addTakenOfflineDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseState previousCaseState = getPreviousCaseSate(callbackParams);
-
         caseData.setBusinessProcess(BusinessProcess.ready(CASE_PROCEEDS_IN_CASEMAN));
         caseData.setTakenOfflineByStaffDate(time.now());
         caseData.setCoSCApplicationStatus(updateCoScApplicationStatus(callbackParams));
-        caseData.setPreviousCCDState(previousCaseState);
-        clearPendingJudgmentRequestIfRequired(caseData, previousCaseState, callbackParams);
+        caseData.setPreviousCCDState(getPreviousCaseSate(callbackParams));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))
             .build();
     }
 
-    private void clearPendingJudgmentRequestIfRequired(CaseData caseData,
-                                                       CaseState previousCaseState,
-                                                       CallbackParams callbackParams) {
-        if (shouldClearPendingJudgmentRequest(caseData, previousCaseState, callbackParams)) {
-            JudgmentsOnlineHelper.clearJOCaseData(caseData);
-        }
-    }
-
-    private boolean shouldClearPendingJudgmentRequest(CaseData caseData,
-                                                      CaseState previousCaseState,
-                                                      CallbackParams callbackParams) {
-        return isJudgmentRequestedState(caseData, previousCaseState, callbackParams)
-            && hasNoActiveJudgmentOrPendingDefaultJudgment(caseData.getActiveJudgment());
-    }
-
-    private boolean isJudgmentRequestedState(CaseData caseData,
-                                             CaseState previousCaseState,
-                                             CallbackParams callbackParams) {
-        return JUDGMENT_REQUESTED.equals(previousCaseState)
-            || JUDGMENT_REQUESTED.equals(caseData.getCcdState())
-            || isCallbackCaseStateJudgmentRequested(callbackParams);
-    }
-
-    private boolean isCallbackCaseStateJudgmentRequested(CallbackParams callbackParams) {
-        return callbackParams.getRequest() != null
-            && callbackParams.getRequest().getCaseDetails() != null
-            && JUDGMENT_REQUESTED.name().equals(callbackParams.getRequest().getCaseDetails().getState());
-    }
-
-    private boolean hasNoActiveJudgmentOrPendingDefaultJudgment(JudgmentDetails activeJudgment) {
-        return activeJudgment == null
-            || (DEFAULT_JUDGMENT.equals(activeJudgment.getType())
-                && PENDING_ISSUE.equals(activeJudgment.getState()));
-    }
-
     private CaseState getPreviousCaseSate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String previousState = getPreviousCaseDetailsState(callbackParams);
-        if (JUDGMENT_REQUESTED.name().equals(previousState)) {
-            return JUDGMENT_REQUESTED;
-        }
-        if (featureToggleService.isLipVLipEnabled()) {
-            return previousState != null
-                && (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
-                    ? CaseState.valueOf(previousState)
-                    : null;
-        }
-        return null;
-    }
-
-    private String getPreviousCaseDetailsState(CallbackParams callbackParams) {
-        return callbackParams.getRequest() != null
-            && callbackParams.getRequest().getCaseDetailsBefore() != null
-            ? callbackParams.getRequest().getCaseDetailsBefore().getState()
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
+            ? CaseState.valueOf(callbackParams.getRequest().getCaseDetailsBefore().getState())
             : null;
     }
 

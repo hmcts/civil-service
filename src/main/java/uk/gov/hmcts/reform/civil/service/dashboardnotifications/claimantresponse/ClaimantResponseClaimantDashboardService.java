@@ -58,7 +58,7 @@ public class ClaimantResponseClaimantDashboardService extends ClaimantResponseDa
 
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
-        return featureToggleService.isLipVLipEnabled() && caseData.isApplicantNotRepresented();
+        return caseData.isApplicantNotRepresented();
     }
 
     @Override

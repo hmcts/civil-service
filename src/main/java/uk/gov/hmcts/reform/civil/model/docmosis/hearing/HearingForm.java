@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 public class HearingForm implements MappableObject {
 
     private String caseNumber;
+    private String legacyCaseNumber;
     private String court;
     private String courtName;
     private String creationDate;

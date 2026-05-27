@@ -23,4 +23,13 @@ public class TelemetryService {
         }
         telemetryClient.trackEvent(eventName, properties, null);
     }
+
+    public void trackMetric(String metricName, double value) {
+        TelemetryClient telemetryClient = telemetryClientProvider.getIfAvailable();
+        if (telemetryClient == null) {
+            log.debug("TelemetryClient not available, skipping metric: {}", metricName);
+            return;
+        }
+        telemetryClient.trackMetric(metricName, value);
+    }
 }

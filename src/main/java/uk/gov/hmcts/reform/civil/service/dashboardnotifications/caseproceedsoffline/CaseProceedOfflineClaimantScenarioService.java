@@ -27,7 +27,7 @@ public class CaseProceedOfflineClaimantScenarioService extends CaseProceedOfflin
 
     public boolean shouldRecordScenarioInCaseProgression(CaseData caseData) {
         return inCaseProgressionState(caseData)
-            && caseData.isLipvLipOneVOne();
+            && (caseData.isLipvLipOneVOne() || caseData.isLipvLROneVOne());
     }
 
     @Override
