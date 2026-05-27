@@ -413,9 +413,6 @@ wiremock:
   releaseNameOverride: ${SERVICE_NAME}-wiremock
   verbose: false
   ingressHost: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
-  resources:
-    requests:
-      cpu: 50m
   volumes:
     - name: wiremock-mappings
       configMap:
