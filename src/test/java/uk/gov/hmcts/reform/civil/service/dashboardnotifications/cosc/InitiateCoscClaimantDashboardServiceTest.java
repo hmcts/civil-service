@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -32,8 +31,6 @@ class InitiateCoscClaimantDashboardServiceTest {
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
-    private FeatureToggleService featureToggleService;
-    @Mock
     private CoscDashboardHelper coscDashboardHelper;
 
     @InjectMocks
@@ -54,7 +51,6 @@ class InitiateCoscClaimantDashboardServiceTest {
     void shouldRecordScenario_whenInvokedCoScCaseNotMarkedPaidInFull() {
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(false);
 
         parentCaseData.setApplicant1Represented(YesOrNo.NO);
@@ -71,7 +67,6 @@ class InitiateCoscClaimantDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenario_whenCoScCaseMarkedPaidInFull() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(true);
 
         parentCaseData.setApplicant1Represented(YesOrNo.NO);
@@ -83,19 +78,9 @@ class InitiateCoscClaimantDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenario_whenApplicantRepresented() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(false);
 
         parentCaseData.setApplicant1Represented(YesOrNo.YES);
-
-        initiateCoscClaimantDashboardService.notifyInitiateCosc(gaCaseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
-    void shouldNotRecordScenario_whenLipVLipDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
         initiateCoscClaimantDashboardService.notifyInitiateCosc(gaCaseData, AUTH_TOKEN);
 

@@ -55,6 +55,6 @@ public class CaseProceedOfflineClaimantDashboardService extends CaseProceedOffli
 
     @Override
     protected boolean eligibleForCaseProgressionState(CaseData caseData) {
-        return caseData.isLipvLipOneVOne();
+        return caseData.isLipvLipOneVOne() || caseData.isLipvLROneVOne();
     }
 }

@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -40,8 +39,6 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationCourtOfficerOrder";
 
     @Test
@@ -67,7 +64,6 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
             caseData.setRespondent1Represented(YesOrNo.NO);
@@ -100,7 +96,6 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
             caseData.setRespondent1Represented(YesOrNo.NO);
@@ -138,24 +133,6 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT.name()).build()
             ).build();
-            // When
-            handler.handle(params);
-
-            // Then
-            verifyNoInteractions(dashboardScenariosService);
-        }
-
-        @Test
-        void shouldNotRecordScenario_whenCaseEventsIsNotEnabled() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
-            caseData.setRespondent1Represented(YesOrNo.NO);
-            caseData.setCcdCaseReference(1234L);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT.name()).build()
-            ).build();
-
             // When
             handler.handle(params);
 
