@@ -1961,7 +1961,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldReturnJudgementBufferedResponse_whenJudgmentBufferEnabledAndLrVLip() {
+    void shouldReturnJudgementRequestedResponse_whenJudgmentBufferEnabledButJudgmentOnlineDisabledAndLrVLip() {
         when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
@@ -1974,7 +1974,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                       .confirmationHeader(JUDGMENT_REQUESTED_HEADER)
-                                                                      .confirmationBody(String.format(JUDGMENT_BUFFER_REQUESTED_LIP_CASE))
+                                                                      .confirmationBody(String.format(JUDGMENT_REQUESTED_LIP_CASE))
                                                                       .build());
     }
 
