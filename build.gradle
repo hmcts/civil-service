@@ -349,6 +349,7 @@ def sonarExclusions = [
   "**/model/hearingvalues/**",
   "**/config/HttpClientFeignConfigurationTest.java",
   "**/config/HttpClientRestConfiguration.java",
+  "**/service/ExternalTaskCompletionService",
   "**/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java",

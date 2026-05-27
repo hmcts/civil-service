@@ -7,6 +7,7 @@ import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -16,12 +17,23 @@ import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExternalTaskCompletionService {
+
+    private static final Duration QA_FAILURE_DELAY = Duration.ofMinutes(30);
+    private static final SecureRandom QA_FAILURE_RANDOM = new SecureRandom();
+
+    @Value("${testing.support.enabled:false}")
+    private boolean testingSupportEnabled;
+
+    private final Instant startedAt = Instant.now();
 
     @Retryable(
         retryFor = CompleteTaskException.class,
@@ -43,6 +55,7 @@ public class ExternalTaskCompletionService {
         log.info("Completing task '{}', processInstanceId '{}'", topicName, processInstanceId);
 
         try {
+            maybeThrowQaCompletionException(topicName, processInstanceId);
             externalTaskService.complete(externalTask, handler.getVariableMap(data));
         } catch (NotFoundException e) {
             log.info(
@@ -62,6 +75,33 @@ public class ExternalTaskCompletionService {
             // Inc EngineException | ConnectionLostException | UnknownHttpErrorException
             log.error("Completing task '{}' errored, processInstanceId '{}'", topicName, processInstanceId, e);
             throw new CompleteTaskException(e);
+        }
+    }
+
+    @SuppressWarnings("java:S112")
+    private void maybeThrowQaCompletionException(String topicName, String processInstanceId) throws Exception {
+        if (!testingSupportEnabled || Instant.now().isBefore(startedAt.plus(QA_FAILURE_DELAY))) {
+            return;
+        }
+
+        if (QA_FAILURE_RANDOM.nextInt(2) != 0) {
+            return;
+        }
+
+        log.warn("Injecting QA completion failure for task '{}', processInstanceId '{}'", topicName, processInstanceId);
+
+        switch (QA_FAILURE_RANDOM.nextInt(10)) {
+            case 0:
+                throw new NotFoundException("QA injected not found exception",
+                    new BadRequestException("QA injected root cause", null));
+            case 1:
+                throw new BadRequestException("QA injected bad request exception", null);
+            case 2:
+                throw new ValueMapperException("QA injected value mapper exception");
+            case 3:
+                throw new NoSuchElementException("QA injected no such element exception");
+            default:
+                throw new Exception("QA injected retryable completion exception");
         }
     }
 
