@@ -558,7 +558,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private boolean isJudgementBufferEnabledForCase(CaseData caseData) {
-        return featureToggleService.isJudgmentBufferEnabled()
+        return featureToggleService.isJudgmentOnlineLive()
+            && featureToggleService.isJudgmentBufferEnabled()
             && caseData.isRespondent1NotRepresented();
     }
 
@@ -573,4 +574,3 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
 }
-

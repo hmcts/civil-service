@@ -1626,7 +1626,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldMoveToJudgmentRequested_whenJudgmentBufferEnabledForNonDivergentLipvLr() {
+        void shouldNotMoveToJudgmentRequested_whenJudgmentBufferEnabledButJudgmentOnlineDisabledForNonDivergentLipvLr() {
             Flags respondent1Flags = new Flags();
             respondent1Flags.setPartyName("respondent1name");
             respondent1Flags.setRoleOnCase("respondent1");
@@ -1671,8 +1671,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getBusinessProcess()).isNull();
-            assertThat(response.getState()).isEqualTo(CaseState.JUDGMENT_REQUESTED.name());
+            assertThat(updatedData.getBusinessProcess()).isNotNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
+            assertThat(updatedData.getActiveJudgment()).isNull();
+            assertThat(updatedData.getIsJoRequested()).isNull();
+            assertThat(updatedData.getTakenOfflineDate()).isNotNull();
+            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             assertInterestIsPopulated(response, 0);
         }
 
