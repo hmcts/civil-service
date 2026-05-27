@@ -53,7 +53,6 @@ public class ExternalTaskCompletionService {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
         log.info("Completing task '{}', processInstanceId '{}'", topicName, processInstanceId);
-
         try {
             maybeThrowQaCompletionException(topicName, processInstanceId);
             externalTaskService.complete(externalTask, handler.getVariableMap(data));
