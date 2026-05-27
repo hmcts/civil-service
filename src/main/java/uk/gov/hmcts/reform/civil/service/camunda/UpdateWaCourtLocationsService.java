@@ -19,6 +19,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @RequiredArgsConstructor
 @Service
@@ -35,7 +36,10 @@ public class UpdateWaCourtLocationsService {
     private String ccmccEpimmId;
 
     public void updateCourtListingWALocations(String authorisation, CaseData caseData) {
-        List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation);
+        List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(
+            authorisation,
+            getCaseServiceId(caseData)
+        );
 
         String claimTrack = getClaimTrack(caseData);
         if ("FAST_CLAIM".equals(claimTrack) || "SMALL_CLAIM".equals(claimTrack)) {

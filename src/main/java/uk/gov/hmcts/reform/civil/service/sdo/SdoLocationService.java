@@ -28,8 +28,8 @@ public class SdoLocationService {
     private final LocationHelper locationHelper;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
-    public List<LocationRefData> fetchHearingLocations(String authToken) {
-        return locationReferenceDataService.getHearingCourtLocations(authToken);
+    public List<LocationRefData> fetchHearingLocations(String authToken, String serviceId) {
+        return locationReferenceDataService.getHearingCourtLocations(authToken, serviceId);
     }
 
     public List<LocationRefData> fetchDefaultJudgmentLocations(String authToken, String serviceId) {

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.refdata;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
@@ -119,8 +118,6 @@ class CourtVenueServiceTest {
             .setIsHearingLocation("N")
             .setWelshSiteName("Llys2");
 
-        when(rdClientService.fetchAllCivilCourts(any(), any()))
-            .thenReturn(List.of(court1, court2, court3));
         when(rdClientService.fetchAllCivilCourtsByServiceId(any(), any(), any()))
             .thenReturn(List.of(court1, court2, court3, court4, court5, court6));
     }
@@ -130,23 +127,11 @@ class CourtVenueServiceTest {
         closeable.close();
     }
 
-    @Test
-    void shouldFilterByEpimmsId() {
-        List<LocationRefData> result = courtVenueService.getCourtByEpimmsId(serviceAuth, auth, "111");
-        assertThat(result).containsExactly(court1);
-    }
-
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterByEpimmsIdAndServiceId(String serviceId) {
         List<LocationRefData> result = courtVenueService.getCourtByEpimmsId(serviceAuth, auth, "111", serviceId);
         assertThat(result).containsExactlyInAnyOrder(court1, court4);
-    }
-
-    @Test
-    void shouldFilterCMLByEpimmsId() {
-        List<LocationRefData> result = courtVenueService.getCMLCourtByEpimmsId(serviceAuth, auth, "111");
-        assertThat(result).containsExactly(court1); // court3 has CML=Y but hearing=N
     }
 
     @ParameterizedTest()
@@ -156,23 +141,11 @@ class CourtVenueServiceTest {
         assertThat(result).containsExactlyInAnyOrder(court1, court4); // court3 has CML=Y but hearing=N
     }
 
-    @Test
-    void shouldFilterByCourtName() {
-        List<LocationRefData> result = courtVenueService.getCourtVenueByName(serviceAuth, auth, "London Court");
-        assertThat(result).containsExactly(court1);
-    }
-
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterByCourtNameAndServiceId(String serviceId) {
         List<LocationRefData> result = courtVenueService.getCourtVenueByName(serviceAuth, auth, "London Court", serviceId);
         assertThat(result).containsExactlyInAnyOrder(court1, court4);
-    }
-
-    @Test
-    void shouldFilterByRegion() {
-        List<LocationRefData> result = courtVenueService.getByRegion(serviceAuth, auth, "South");
-        assertThat(result).containsExactlyInAnyOrder(court1, court3);
     }
 
     @ParameterizedTest()
@@ -182,23 +155,11 @@ class CourtVenueServiceTest {
         assertThat(result).containsExactlyInAnyOrder(court1, court3, court4, court6);
     }
 
-    @Test
-    void shouldFilterByRegionId() {
-        List<LocationRefData> result = courtVenueService.getByRegionId(serviceAuth, auth, "10");
-        assertThat(result).containsExactlyInAnyOrder(court1, court3);
-    }
-
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterByRegionId(String serviceId) {
         List<LocationRefData> result = courtVenueService.getByRegionId(serviceAuth, auth, "10", serviceId);
         assertThat(result).containsExactlyInAnyOrder(court1, court3, court4, court6);
-    }
-
-    @Test
-    void shouldFilterByLocationType() {
-        List<LocationRefData> result = courtVenueService.getByLocationType(serviceAuth, auth, "Court");
-        assertThat(result).containsExactlyInAnyOrder(court1, court2);
     }
 
     @ParameterizedTest()
@@ -208,23 +169,11 @@ class CourtVenueServiceTest {
         assertThat(result).containsExactlyInAnyOrder(court1, court2, court4, court5);
     }
 
-    @Test
-    void shouldFilterByLocationCode() {
-        List<LocationRefData> result = courtVenueService.getCourtVenueByLocationCode(serviceAuth, auth, "AAA");
-        assertThat(result).containsExactly(court1); // must be Open + CML=Y
-    }
-
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterByLocationCode(String serviceId) {
         List<LocationRefData> result = courtVenueService.getCourtVenueByLocationCode(serviceAuth, auth, "AAA", serviceId);
         assertThat(result).containsExactlyInAnyOrder(court1, court4); // must be Open + CML=Y
-    }
-
-    @Test
-    void shouldFilterByWelshSiteName() {
-        List<LocationRefData> result = courtVenueService.getCourtByWelshSiteName(serviceAuth, auth, "Llys");
-        assertThat(result).containsExactly(court1);
     }
 
     @ParameterizedTest()
@@ -234,23 +183,11 @@ class CourtVenueServiceTest {
         assertThat(result).containsExactlyInAnyOrder(court1, court4);
     }
 
-    @Test
-    void shouldReturnHearingLocationCourts() {
-        List<LocationRefData> result = courtVenueService.getHearingLocationCourts(serviceAuth, auth);
-        assertThat(result).containsExactlyInAnyOrder(court1, court2);
-    }
-
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldReturnHearingLocationCourts(String serviceId) {
         List<LocationRefData> result = courtVenueService.getHearingLocationCourts(serviceAuth, auth, serviceId);
         assertThat(result).containsExactlyInAnyOrder(court1, court2, court4, court5);
-    }
-
-    @Test
-    void shouldReturnCMLAndHLCourts() {
-        List<LocationRefData> result = courtVenueService.getCMLAndHLCourts(serviceAuth, auth);
-        assertThat(result).containsExactly(court1);
     }
 
     @ParameterizedTest()

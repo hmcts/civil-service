@@ -117,7 +117,11 @@ public class LocationService {
         log.info("Case managementLocation region {} and base Location {} caseId {}", region, epimmsId, caseRef);
 
         List<LocationRefData> locationRefDataList =
-            locationRefDataService.getCourtLocationsByEpimmsIdWithCML(authToken, epimmsId);
+            locationRefDataService.getCourtLocationsByEpimmsIdWithCML(
+                authToken,
+                epimmsId,
+                getCaseServiceId(caseData)
+            );
 
         log.info("CML court locations found : {} for caseId {}",
                  locationRefDataList, caseData.getCcdCaseReference());

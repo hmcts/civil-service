@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -37,7 +41,7 @@ class DocumentHearingLocationHelperTest {
         String authorisation = "authorisation";
 
         LocationRefData location1 = new LocationRefData();
-        when(locationRefDataService.getLocationMatchingLabel(fromForm, authorisation))
+        when(locationRefDataService.getLocationMatchingLabel(fromForm, authorisation, "AAA6"))
             .thenReturn(Optional.of(location1));
         LocationRefData location = hearingLocationHelper.getHearingLocation(
             fromForm,
@@ -48,26 +52,29 @@ class DocumentHearingLocationHelperTest {
         Assertions.assertEquals(location, location1);
     }
 
-    @Test
-    void whenNotMatchingForm_thenDefaultToCaseLocation() {
+    @ParameterizedTest
+    @MethodSource("provideCategoryData")
+    void whenNotMatchingForm_thenDefaultToCaseLocation(CaseCategory caseCategory, String serviceId) {
         String fromForm = "label from form";
         CaseData caseData = CaseData.builder()
             .caseManagementLocation(new CaseLocationCivil()
                                         .setBaseLocation("base location")
                                         .setRegion("region")
                                         )
+            .caseAccessCategory(caseCategory)
             .build();
         String authorisation = "authorisation";
 
         LocationRefData location1 = new LocationRefData()
             .setRegionId(caseData.getCaseManagementLocation().getRegion())
             .setEpimmsId(caseData.getCaseManagementLocation().getBaseLocation());
-        when(locationRefDataService.getLocationMatchingLabel(fromForm, authorisation))
+        when(locationRefDataService.getLocationMatchingLabel(fromForm, authorisation, serviceId))
             .thenReturn(Optional.empty());
         when(locationRefDataService
                          .getCourtLocationsByEpimmsIdAndCourtType(
                              authorisation,
-                             caseData.getCaseManagementLocation().getBaseLocation()
+                             caseData.getCaseManagementLocation().getBaseLocation(),
+                             serviceId
                          )).thenReturn(Collections.singletonList(location1));
         LocationRefData location = hearingLocationHelper.getHearingLocation(
             fromForm,
@@ -92,12 +99,13 @@ class DocumentHearingLocationHelperTest {
         LocationRefData location1 = new LocationRefData()
             .setRegionId(caseData.getCaseManagementLocation().getRegion())
             .setEpimmsId(caseData.getCaseManagementLocation().getBaseLocation());
-        when(locationRefDataService.getLocationMatchingLabel(fromForm, authorisation))
+        when(locationRefDataService.getLocationMatchingLabel(fromForm, authorisation, "AAA6"))
             .thenReturn(Optional.empty());
         when(locationRefDataService
                          .getCourtLocationsByEpimmsIdAndCourtType(
                              authorisation,
-                             caseData.getCaseManagementLocation().getBaseLocation()
+                             caseData.getCaseManagementLocation().getBaseLocation(),
+                             "AAA6"
                          )).thenReturn(List.of(location1,
                                                new LocationRefData()
                                                    .setRegionId("region 2")
@@ -208,8 +216,15 @@ class DocumentHearingLocationHelperTest {
                                         )
             .build();
 
-        when(locationRefDataService.getHearingCourtLocations(authorisation)).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(authorisation, "AAA6")).thenReturn(locations);
         assertThrows(IllegalArgumentException.class, () -> hearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation));
+    }
+
+    private static Stream<Arguments> provideCategoryData() {
+        return Stream.of(
+            Arguments.of(CaseCategory.UNSPEC_CLAIM, "AAA7"),
+            Arguments.of(CaseCategory.SPEC_CLAIM, "AAA6")
+        );
     }
 }

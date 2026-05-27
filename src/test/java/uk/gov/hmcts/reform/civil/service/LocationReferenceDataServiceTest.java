@@ -157,16 +157,6 @@ class LocationReferenceDataServiceTest {
         assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
     }
 
-    @Test
-    void shouldReturnCourtLocationsByEpimmsIdWithCML() {
-        when(courtVenueService.getCMLCourtByEpimmsId(generatedAuth, auth, "111"))
-            .thenReturn(List.of(loc1));
-
-        List<LocationRefData> result = service.getCourtLocationsByEpimmsIdWithCML(auth, "111");
-
-        assertThat(result).containsExactly(loc1);
-    }
-
     @ParameterizedTest
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnCourtLocationsByEpimmsIdWithCML(String serviceId) {
@@ -176,16 +166,6 @@ class LocationReferenceDataServiceTest {
         List<LocationRefData> result = service.getCourtLocationsByEpimmsIdWithCML(auth, "111", serviceId);
 
         assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
-    }
-
-    @Test
-    void shouldReturnHearingLocationCourts() {
-        when(courtVenueService.getHearingLocationCourts(generatedAuth, auth))
-            .thenReturn(List.of(loc1, loc2));
-
-        List<LocationRefData> result = service.getHearingCourtLocations(auth);
-
-        assertThat(result).containsExactly(loc1, loc2);
     }
 
     @ParameterizedTest
@@ -199,18 +179,6 @@ class LocationReferenceDataServiceTest {
         assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
     }
 
-    @Test
-    void shouldReturnMatchingLabelLocation() {
-        when(courtVenueService.getHearingLocationCourts(generatedAuth, auth))
-            .thenReturn(List.of(loc1));
-
-        String label = LocationReferenceDataService.getDisplayEntry(loc1);
-
-        Optional<LocationRefData> result = service.getLocationMatchingLabel(label, auth);
-
-        assertThat(result).contains(loc1);
-    }
-
     @ParameterizedTest
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnMatchingLabelLocation(String serviceId) {
@@ -222,12 +190,6 @@ class LocationReferenceDataServiceTest {
         Optional<LocationRefData> result = service.getLocationMatchingLabel(label, auth, serviceId);
 
         assertThat(result).contains("AAA6".equals(serviceId) ? loc1 : loc2);
-    }
-
-    @Test
-    void shouldReturnEmptyWhenLabelBlank() {
-        Optional<LocationRefData> result = service.getLocationMatchingLabel("", auth);
-        assertThat(result).isEmpty();
     }
 
     @ParameterizedTest
@@ -249,16 +211,6 @@ class LocationReferenceDataServiceTest {
         assertThat(label).isEqualTo("Welsh A - Address A - AA1 1AA");
     }
 
-    @Test
-    void shouldReturnCourtLocationByThreeDigitCode() {
-        when(courtVenueService.getCourtVenueByLocationCode(generatedAuth, auth, "AAA"))
-            .thenReturn(List.of(loc1));
-
-        LocationRefData result = service.getCourtLocation(auth, "AAA");
-
-        assertThat(result).isEqualTo(loc1);
-    }
-
     @ParameterizedTest
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnCourtLocationByThreeDigitCode(String serviceId) {
@@ -268,16 +220,6 @@ class LocationReferenceDataServiceTest {
         LocationRefData result = service.getCourtLocation(auth, "AAA", serviceId);
 
         assertThat(result).isEqualTo(loc1);
-    }
-
-    @Test
-    void shouldReturnEmptyWhenNoCourtFoundByThreeDigitCode() {
-        when(courtVenueService.getCourtVenueByLocationCode(any(), any(), any()))
-            .thenReturn(List.of());
-
-        LocationRefData result = service.getCourtLocation(auth, "AAA");
-
-        assertThat(result.getSiteName()).isNull();
     }
 
     @ParameterizedTest
@@ -293,27 +235,6 @@ class LocationReferenceDataServiceTest {
 
     @Test
     void shouldThrowExceptionWhenMoreThanOneCourtFound() {
-        // Duplicate court with the same location code "AAA"
-        LocationRefData duplicateLoc = new LocationRefData()
-            .setSiteName("Site D")
-            .setCourtAddress("Address D")
-            .setPostcode("DD1 1DD")
-            .setEpimmsId("444")
-            .setCourtLocationCode("AAA") // same as loc1
-            .setCourtStatus("Open")
-            .setIsCaseManagementLocation("Y")
-            .setIsHearingLocation("Y");
-
-        when(courtVenueService.getCourtVenueByLocationCode(any(), any(), any()))
-            .thenReturn(List.of(loc1, duplicateLoc));
-
-        assertThatThrownBy(() -> service.getCourtLocation(auth, "AAA"))
-            .isInstanceOf(LocationRefDataException.class)
-            .hasMessageContaining("More than one court location found");
-    }
-
-    @Test
-    void shouldThrowExceptionWhenMoreThanOneCourtFoundByServiceId() {
         // Duplicate court with the same location code "AAA"
         LocationRefData duplicateLoc = new LocationRefData()
             .setSiteName("Site D")
@@ -334,22 +255,13 @@ class LocationReferenceDataServiceTest {
             .hasMessageContaining("More than one court location found");
     }
 
-    @Test
-    void shouldThrowExceptionWhenFilterFindsNone() {
-        when(courtVenueService.getCourtVenueByLocationCode(any(), any(), any()))
-            .thenReturn(List.of(loc2));
-
-        assertThatThrownBy(() -> service.getCourtLocation(auth, "AAA"))
-            .isInstanceOf(LocationRefDataException.class)
-            .hasMessageContaining("No court Location Found");
-    }
-
-    @Test
-    void shouldThrowExceptionWhenFilterFindsNoneByServiceId() {
+    @ParameterizedTest
+    @CsvSource({"AAA6", "AAA7"})
+    void shouldThrowExceptionWhenFilterFindsNoneByServiceId(String serviceId) {
         when(courtVenueService.getCourtVenueByLocationCode(any(), any(), any(), any()))
             .thenReturn(List.of(loc2));
 
-        assertThatThrownBy(() -> service.getCourtLocation(auth, "AAA", "AAA6"))
+        assertThatThrownBy(() -> service.getCourtLocation(auth, "AAA", serviceId))
             .isInstanceOf(LocationRefDataException.class)
             .hasMessageContaining("No court Location Found");
     }

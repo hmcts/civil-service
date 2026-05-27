@@ -14,17 +14,10 @@ public class RdClientService {
 
     private final LocationReferenceDataApiClient locationRefDataApiClient;
 
-    private static final String CIVIL_COURT_TYPE_ID = "10";
     private static final String LOCATION_TYPE = "Court";
 
     public RdClientService(LocationReferenceDataApiClient locationRefDataApiClient) {
         this.locationRefDataApiClient = locationRefDataApiClient;
-    }
-
-    @Cacheable(value = "courtVenueCache", key = "'allLocations'")
-    public List<LocationRefData> fetchAllCivilCourts(String serviceAuth, String auth) {
-        log.info("[RdClientService] Cache MISS → calling Location Reference Data API to fetch all courts");
-        return locationRefDataApiClient.getAllCivilCourtVenues(serviceAuth, auth, CIVIL_COURT_TYPE_ID, LOCATION_TYPE);
     }
 
     @Cacheable(value = "courtVenueCache", key = "T(String).format('allLocations-%s', #serviceId)")

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Slf4j
 @Component
@@ -26,7 +27,7 @@ public class RequestedCourtForClaimDetailsTab {
 
     private final LocationReferenceDataService locationRefDataService;
 
-    public RequestedCourtForTabDetails createCourtDetails(String auth, DQ courtDetails) {
+    public RequestedCourtForTabDetails createCourtDetails(String auth, DQ courtDetails, String serviceId) {
         return new RequestedCourtForTabDetails()
             .setRequestedCourt(
                 Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRequestedCourt())
@@ -35,7 +36,7 @@ public class RequestedCourtForClaimDetailsTab {
             )
             .setRequestedCourtName(
                 Optional.ofNullable(courtDetails)
-                    .flatMap(details -> Optional.ofNullable(getCourtName(auth, details)))
+                    .flatMap(details -> Optional.ofNullable(getCourtName(auth, details, serviceId)))
                     .orElse(null)
             )
             .setReasonForHearingAtSpecificCourt(
@@ -55,7 +56,7 @@ public class RequestedCourtForClaimDetailsTab {
             );
     }
 
-    public RequestedCourtForTabDetails createCourtDetailsSpec(String auth, DQ courtDetails) {
+    public RequestedCourtForTabDetails createCourtDetailsSpec(String auth, DQ courtDetails, String serviceId) {
         return new RequestedCourtForTabDetails()
             .setRequestedCourt(
                 Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRequestedCourt())
@@ -64,7 +65,7 @@ public class RequestedCourtForClaimDetailsTab {
             )
             .setRequestedCourtName(
                 Optional.ofNullable(courtDetails)
-                    .flatMap(details -> Optional.ofNullable(getCourtName(auth, details)))
+                    .flatMap(details -> Optional.ofNullable(getCourtName(auth, details, serviceId)))
                     .orElse(null)
             )
             .setReasonForHearingAtSpecificCourt(
@@ -84,9 +85,9 @@ public class RequestedCourtForClaimDetailsTab {
             );
     }
 
-    private String getCourtName(String auth, DQ courtDetail) {
+    private String getCourtName(String auth, DQ courtDetail, String serviceId) {
         LocationRefData courtLocationDetails;
-        List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(auth);
+        List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(auth, serviceId);
 
         String preferredBaseLocation = Optional.ofNullable(courtDetail)
             .map(DQ::getRequestedCourt)
@@ -111,36 +112,36 @@ public class RequestedCourtForClaimDetailsTab {
     public void updateRequestCourtClaimTabApplicant(CallbackParams callbackParams, CaseData updatedData) {
         DQ appRequestedCourt = updatedData.getApplicant1DQ();
         updatedData.setRequestedCourtForTabDetailsApp(createCourtDetails(callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                                                                      appRequestedCourt));
+                                                                      appRequestedCourt, getCaseServiceId(updatedData)));
     }
 
     public void updateRequestCourtClaimTabApplicantSpec(CallbackParams callbackParams, CaseData caseData) {
         DQ appRequestedCourt = caseData.getApplicant1DQ();
         caseData.setRequestedCourtForTabDetailsApp(createCourtDetailsSpec(callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                                                                          appRequestedCourt));
+                                                                          appRequestedCourt, getCaseServiceId(caseData)));
     }
 
     public void updateRequestCourtClaimTabRespondent1Spec(CaseData caseData, CallbackParams callbackParams) {
         DQ res1RequestedCourt = caseData.getRespondent1DQ();
         caseData.setRequestedCourtForTabDetailsRes1(createCourtDetailsSpec(callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                                                                           res1RequestedCourt));
+                                                                           res1RequestedCourt, getCaseServiceId(caseData)));
     }
 
     public void updateRequestCourtClaimTabRespondent2Spec(CallbackParams callbackParams, CaseData updatedData) {
         DQ res2RequestedCourt = updatedData.getRespondent2DQ();
         updatedData.setRequestedCourtForTabDetailsRes2(createCourtDetailsSpec(callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                                                                           res2RequestedCourt));
+                                                                           res2RequestedCourt, getCaseServiceId(updatedData)));
     }
 
     public void updateRequestCourtClaimTabRespondent1(CallbackParams callbackParams, CaseData caseData) {
         DQ res1RequestedCourt = caseData.getRespondent1DQ();
         caseData.setRequestedCourtForTabDetailsRes1(createCourtDetails(callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                                                                       res1RequestedCourt));
+                                                                       res1RequestedCourt, getCaseServiceId(caseData)));
     }
 
     public void updateRequestCourtClaimTabRespondent2(CallbackParams callbackParams, CaseData caseData) {
         DQ res2RequestedCourt = caseData.getRespondent2DQ();
         caseData.setRequestedCourtForTabDetailsRes2(createCourtDetails(callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                                                                       res2RequestedCourt));
+                                                                       res2RequestedCourt, getCaseServiceId(caseData)));
     }
 }

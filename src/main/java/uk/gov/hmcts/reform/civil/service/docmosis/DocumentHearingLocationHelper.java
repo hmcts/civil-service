@@ -33,7 +33,8 @@ public class DocumentHearingLocationHelper {
         if (StringUtils.isNotBlank(valueFromForm)) {
             Optional<LocationRefData> fromForm = locationRefDataService.getLocationMatchingLabel(
                 valueFromForm,
-                authorisation
+                authorisation,
+                getCaseServiceId(caseData)
             );
             if (fromForm.isPresent()) {
                 log.info("Case location for " + caseData.getLegacyCaseReference()
@@ -47,7 +48,8 @@ public class DocumentHearingLocationHelper {
             .map(baseLocation -> {
                 List<LocationRefData> sameLocation = locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
                     authorisation,
-                    baseLocation
+                    baseLocation,
+                    getCaseServiceId(caseData)
                 ).stream().filter(location -> StringUtils.equals(
                     location.getRegionId(),
                     caseData.getCaseManagementLocation().getRegion()

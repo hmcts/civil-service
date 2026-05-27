@@ -152,7 +152,7 @@ public class DQGeneratorFormBuilder {
             .setStatementOfTruth(dq.getStatementOfTruth())
             .setDisclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
             .setVulnerabilityQuestions(dq.getVulnerabilityQuestions())
-            .setRequestedCourt(respondentTemplateForDQGenerator.getRequestedCourt(dq, authorisation));
+            .setRequestedCourt(respondentTemplateForDQGenerator.getRequestedCourt(dq, authorisation, caseData.getCaseAccessCategory()));
 
         setRepresentativeOrganisationName(form, caseData);
         return form;

@@ -149,7 +149,7 @@ class UpdateWaCourtLocationsServiceTest {
             .setTrialListingLocation(new DmnListingLocationsModel().setType("String").setValue("789654").setValueInfo(null));
 
         when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(testMap);
-        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
         when(objectMapper.convertValue(testMap, DmnListingLocations.class)).thenReturn(dmnListingLocations);
         Field fieldcnbc = UpdateWaCourtLocationsService.class.getDeclaredField("cnbcEpimmId");
         fieldcnbc.setAccessible(true);
@@ -201,7 +201,7 @@ class UpdateWaCourtLocationsServiceTest {
             new LocationRefData().setEpimmsId("zzzzz").setRegion("west").setRegionId("3").setSiteName("stoke somewhere")
         );
 
-        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
@@ -289,7 +289,7 @@ class UpdateWaCourtLocationsServiceTest {
             .setTrialListingLocation(new DmnListingLocationsModel().setType("String").setValue(cnbcEpimmId).setValueInfo(null));
 
         when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(testCnbcMap);
-        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
         when(objectMapper.convertValue(testCnbcMap, DmnListingLocations.class)).thenReturn(dmnListingLocations);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
@@ -349,7 +349,7 @@ class UpdateWaCourtLocationsServiceTest {
             .setTrialListingLocation(new DmnListingLocationsModel().setType("String").setValue(ccmccEpimmId).setValueInfo(null));
 
         when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(testCnbcMap);
-        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
         when(objectMapper.convertValue(testCnbcMap, DmnListingLocations.class)).thenReturn(dmnListingLocations);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()

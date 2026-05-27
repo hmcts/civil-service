@@ -124,7 +124,7 @@ class SdoPrePopulateServiceTest {
             });
         when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(any(LocalDateTime.class)))
             .thenAnswer(invocation -> invocation.getArgument(0, LocalDateTime.class).toLocalDate());
-        lenient().when(locationService.fetchHearingLocations(anyString())).thenReturn(Collections.emptyList());
+        lenient().when(locationService.fetchHearingLocations(anyString(), anyString())).thenReturn(Collections.emptyList());
         lenient().when(locationService.fetchCourtLocationsByEpimmsId(anyString(), anyString(), anyString()))
             .thenReturn(Collections.emptyList());
         lenient().when(locationService.buildLocationList(ArgumentMatchers.nullable(RequestedCourt.class), anyBoolean(), ArgumentMatchers.anyList()))
@@ -152,7 +152,7 @@ class SdoPrePopulateServiceTest {
         assertThat(result.getDisposalHearingMethodInPerson()).isNotNull();
         assertThat(result.getFastTrackMethodInPerson()).isNotNull();
         assertThat(result.getSmallClaimsMethodInPerson()).isNotNull();
-        verify(locationService).fetchHearingLocations(AUTH_TOKEN);
+        verify(locationService).fetchHearingLocations(AUTH_TOKEN, "AAA6");
     }
 
     @Test

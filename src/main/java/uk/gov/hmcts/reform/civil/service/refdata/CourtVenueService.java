@@ -25,12 +25,6 @@ public class CourtVenueService {
     /**
      * Helper to filter cached court data.
      */
-    private List<LocationRefData> filterCachedCourts(String serviceAuth, String auth, Predicate<LocationRefData> predicate) {
-        return rdClientService.fetchAllCivilCourts(serviceAuth, auth).stream()
-            .filter(predicate)
-            .collect(Collectors.toList());
-    }
-
     private List<LocationRefData> filterCachedCourtsByServiceId(String serviceAuth,
                                                                 String auth,
                                                                 Predicate<LocationRefData> predicate,
@@ -40,22 +34,9 @@ public class CourtVenueService {
             .collect(Collectors.toList());
     }
 
-    public List<LocationRefData> getCourtByEpimmsId(String serviceAuth, String auth, String epimmsId) {
-        log.info("Fetching courts by epimms id: {}", epimmsId);
-        return filterCachedCourts(serviceAuth, auth, c -> epimmsId.equals(c.getEpimmsId()));
-    }
-
     public List<LocationRefData> getCourtByEpimmsId(String serviceAuth, String auth, String epimmsId, String serviceId) {
         log.info("Fetching courts by epims id: {} and serviceId {}", epimmsId, serviceId);
         return filterCachedCourtsByServiceId(serviceAuth, auth, c -> epimmsId.equals(c.getEpimmsId()), serviceId);
-    }
-
-    public List<LocationRefData> getCMLCourtByEpimmsId(String serviceAuth, String auth, String epimmsId) {
-        log.info("Fetching CML courts by epimms id: {}", epimmsId);
-        return filterCachedCourts(serviceAuth, auth, c ->
-            epimmsId.equals(c.getEpimmsId())
-                && IS_CASE_MANAGEMENT_LOCATION.equals(c.getIsCaseManagementLocation())
-        );
     }
 
     public List<LocationRefData> getCMLCourtByEpimmsId(String serviceAuth, String auth, String epimmsId, String serviceId) {
@@ -66,19 +47,9 @@ public class CourtVenueService {
         );
     }
 
-    public List<LocationRefData> getCourtVenueByName(String serviceAuth, String auth, String courtName) {
-        log.info("Fetching court by name: {}", courtName);
-        return filterCachedCourts(serviceAuth, auth, c -> courtName.equalsIgnoreCase(c.getCourtName()));
-    }
-
     public List<LocationRefData> getCourtVenueByName(String serviceAuth, String auth, String courtName, String serviceId) {
         log.info("Fetching court by name: {} and serviceId {}", courtName, serviceId);
         return filterCachedCourtsByServiceId(serviceAuth, auth, c -> courtName.equalsIgnoreCase(c.getCourtName()), serviceId);
-    }
-
-    public List<LocationRefData> getByRegion(String serviceAuth, String auth, String region) {
-        log.info("Fetching courts by region: {}", region);
-        return filterCachedCourts(serviceAuth, auth, c -> region.equalsIgnoreCase(c.getRegion()));
     }
 
     public List<LocationRefData> getByRegion(String serviceAuth, String auth, String region, String serviceId) {
@@ -86,33 +57,14 @@ public class CourtVenueService {
         return filterCachedCourtsByServiceId(serviceAuth, auth, c -> region.equalsIgnoreCase(c.getRegion()), serviceId);
     }
 
-    public List<LocationRefData> getByRegionId(String serviceAuth, String auth, String regionId) {
-        log.info("Fetching courts by region ID: {}", regionId);
-        return filterCachedCourts(serviceAuth, auth, c -> regionId.equals(c.getRegionId()));
-    }
-
     public List<LocationRefData> getByRegionId(String serviceAuth, String auth, String regionId, String serviceId) {
         log.info("Fetching courts by region ID: {} and serviceId {}", regionId, serviceId);
         return filterCachedCourtsByServiceId(serviceAuth, auth, c -> regionId.equals(c.getRegionId()), serviceId);
     }
 
-    public List<LocationRefData> getByLocationType(String serviceAuth, String auth, String locationType) {
-        log.info("Fetching courts by location type: {}", locationType);
-        return filterCachedCourts(serviceAuth, auth, c -> locationType.equalsIgnoreCase(c.getLocationType()));
-    }
-
     public List<LocationRefData> getByLocationType(String serviceAuth, String auth, String locationType, String serviceId) {
         log.info("Fetching courts by location type: {} and serviceId {}", locationType, serviceId);
         return filterCachedCourtsByServiceId(serviceAuth, auth, c -> locationType.equalsIgnoreCase(c.getLocationType()), serviceId);
-    }
-
-    public List<LocationRefData> getCourtVenueByLocationCode(String serviceAuth, String auth, String threeDigitCode) {
-        log.info("Fetching courts by court location three digit code: {}", threeDigitCode);
-        return filterCachedCourts(serviceAuth, auth, c ->
-            threeDigitCode.equalsIgnoreCase(c.getCourtLocationCode())
-                && COURT_STATUS.equalsIgnoreCase(c.getCourtStatus())
-                && IS_CASE_MANAGEMENT_LOCATION.equalsIgnoreCase(c.getIsCaseManagementLocation())
-        );
     }
 
     public List<LocationRefData> getCourtVenueByLocationCode(String serviceAuth,
@@ -127,26 +79,13 @@ public class CourtVenueService {
         );
     }
 
-    public List<LocationRefData> getCourtByWelshSiteName(String serviceAuth, String auth, String welshSiteName) {
-        log.info("Fetching courts by welsh site name: {}", welshSiteName);
-        return filterCachedCourts(serviceAuth, auth, c -> welshSiteName.equalsIgnoreCase(c.getWelshSiteName()));
-    }
-
     public List<LocationRefData> getCourtByWelshSiteName(String serviceAuth, String auth, String welshSiteName, String serviceId) {
         log.info("Fetching courts by welsh site name: {} and serviceId {}", welshSiteName, serviceId);
         return filterCachedCourtsByServiceId(serviceAuth, auth, c -> welshSiteName.equalsIgnoreCase(c.getWelshSiteName()), serviceId);
     }
 
-    public List<LocationRefData> getHearingLocationCourts(String serviceAuth, String auth) {
-        return filterCachedCourts(serviceAuth, auth, c -> IS_HEARING_LOCATION.equals(c.getIsHearingLocation()));
-    }
-
     public List<LocationRefData> getHearingLocationCourts(String serviceAuth, String auth, String serviceId) {
         return filterCachedCourtsByServiceId(serviceAuth, auth, c -> IS_HEARING_LOCATION.equals(c.getIsHearingLocation()), serviceId);
-    }
-
-    public List<LocationRefData> getCMLAndHLCourts(String serviceAuth, String auth) {
-        return filterCachedCourts(serviceAuth, auth, this::isCMLAndHL);
     }
 
     public List<LocationRefData> getCMLAndHLCourts(String serviceAuth, String auth, String serviceId) {

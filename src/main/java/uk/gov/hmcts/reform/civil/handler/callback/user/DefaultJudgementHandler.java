@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
@@ -267,10 +268,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
             String code = list.getValue().getCode();
             final String epimId = code.substring(code.lastIndexOf("-") + 1).trim();
             List<LocationRefData> locations = (locationRefDataService
-                .getCourtLocationsByEpimmsIdAndCourtType(authToken, epimId));
+                .getCourtLocationsByEpimmsIdAndCourtType(authToken, epimId, CaseServiceUtil.getCaseServiceId(caseData)));
 
             if (!locations.isEmpty()) {
-                LocationRefData locationRefData = locations.get(0);
+                LocationRefData locationRefData = locations.getFirst();
                 CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
                 caseLocationCivil.setRegion(locationRefData.getRegionId());
                 caseLocationCivil.setBaseLocation(locationRefData.getEpimmsId());

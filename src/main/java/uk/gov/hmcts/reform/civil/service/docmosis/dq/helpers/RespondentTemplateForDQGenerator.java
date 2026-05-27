@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -98,7 +100,7 @@ public class RespondentTemplateForDQGenerator {
             .setVulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .setAllocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                 ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack())
-            .setRequestedCourt(getRequestedCourt(dq, authorisation));
+            .setRequestedCourt(getRequestedCourt(dq, authorisation, caseData.getCaseAccessCategory()));
     }
 
     public DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData, String defendantIdentifier, String authorisation) {
@@ -137,7 +139,7 @@ public class RespondentTemplateForDQGenerator {
             .setStatementOfTruthText(getStatementOfTruthText())
             .setVulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .setAllocatedTrack(getClaimTrack(caseData))
-            .setRequestedCourt(getRequestedCourt(dq, authorisation));
+            .setRequestedCourt(getRequestedCourt(dq, authorisation, caseData.getCaseAccessCategory()));
     }
 
     private String getStatementOfTruthText() {
@@ -240,12 +242,13 @@ public class RespondentTemplateForDQGenerator {
         return true;
     }
 
-    public RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
+    public RequestedCourt getRequestedCourt(DQ dq, String authorisation, CaseCategory caseCategory) {
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc != null && null !=  rc.getCaseLocation()) {
             List<LocationRefData> courtLocations = (locationRefDataService
                 .getCourtLocationsByEpimmsIdAndCourtType(authorisation,
-                                                         rc.getCaseLocation().getBaseLocation()
+                                                         rc.getCaseLocation().getBaseLocation(),
+                                                         CaseServiceUtil.getCaseServiceId(caseCategory)
                 ));
             RequestedCourt requestedCourt = new RequestedCourt();
             requestedCourt.setRequestHearingAtSpecificCourt(YES);

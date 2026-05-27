@@ -46,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -114,7 +115,9 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
         FinalOrderFurtherHearing finalOrderFurtherHearing = new FinalOrderFurtherHearing();
         finalOrderFurtherHearing.setDatesToAvoidDateDropdown(datesFinalOrders);
         finalOrderFurtherHearing.setHearingLocationList(populateCurrentHearingLocation(caseData, authToken));
-        finalOrderFurtherHearing.setAlternativeHearingList(getLocationsFromList(locationRefDataService.getHearingCourtLocations(authToken)));
+        finalOrderFurtherHearing.setAlternativeHearingList(getLocationsFromList(
+            locationRefDataService.getHearingCourtLocations(authToken, getCaseServiceId(caseData))
+        ));
         caseData.setCourtOfficerFurtherHearingComplex(finalOrderFurtherHearing);
         caseData.setCourtOfficerGiveReasonsYesNo(YesOrNo.NO);
 

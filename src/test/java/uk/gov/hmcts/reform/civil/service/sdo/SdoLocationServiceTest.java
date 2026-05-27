@@ -60,12 +60,12 @@ class SdoLocationServiceTest {
         LocationRefData location = new LocationRefData();
         location.setEpimmsId("123");
         List<LocationRefData> locations = List.of(location);
-        when(locationReferenceDataService.getHearingCourtLocations(AUTH_TOKEN)).thenReturn(locations);
+        when(locationReferenceDataService.getHearingCourtLocations(AUTH_TOKEN, "AAA6")).thenReturn(locations);
 
-        List<LocationRefData> result = service.fetchHearingLocations(AUTH_TOKEN);
+        List<LocationRefData> result = service.fetchHearingLocations(AUTH_TOKEN, SERVICE_ID);
 
         assertThat(result).isEqualTo(locations);
-        verify(locationReferenceDataService).getHearingCourtLocations(AUTH_TOKEN);
+        verify(locationReferenceDataService).getHearingCourtLocations(AUTH_TOKEN, "AAA6");
     }
 
     @Test

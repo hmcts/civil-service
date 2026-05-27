@@ -172,7 +172,7 @@ class SdoHearingPreparationServiceTest {
         LocationRefData locationRefData = new LocationRefData();
         locationRefData.setEpimmsId("123");
         locationRefData.setSiteName("Site");
-        when(sdoLocationService.fetchHearingLocations(AUTH)).thenReturn(List.of(locationRefData));
+        when(sdoLocationService.fetchHearingLocations(AUTH, "AAA7")).thenReturn(List.of(locationRefData));
         when(sdoLocationService.buildLocationList(any(), anyBoolean(), anyList())).thenReturn(locationList);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -180,7 +180,7 @@ class SdoHearingPreparationServiceTest {
 
         assertThat(refs).hasSize(1);
         assertThat(caseData.getDisposalHearingMethodInPerson()).isEqualTo(locationList);
-        verify(sdoLocationService).fetchHearingLocations(AUTH);
+        verify(sdoLocationService).fetchHearingLocations(AUTH, "AAA7");
     }
 
     private CallbackParams callbackParams() {

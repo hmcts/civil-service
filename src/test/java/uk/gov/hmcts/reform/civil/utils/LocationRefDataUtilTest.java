@@ -17,7 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class LocationRefDataUtilTest {
+class LocationRefDataUtilTest {
 
     @InjectMocks
     private LocationRefDataUtil locationRefDataUtil;
@@ -32,7 +32,7 @@ public class LocationRefDataUtilTest {
     }
 
     @Test
-    public void shouldReturnPreferredCourtCodeFromRefDataWhenCaseLocationIsPresent() {
+    void shouldReturnPreferredCourtCodeFromRefDataWhenCaseLocationIsPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .courtLocation()
             .build();
@@ -41,14 +41,14 @@ public class LocationRefDataUtilTest {
                                .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
                                .setCourtTypeId("10").setCourtLocationCode("121")
                                .setEpimmsId("000000"));
-        when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(courtLocations);
+        when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any(), any())).thenReturn(courtLocations);
         String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(caseData,
                                                                               BEARER_TOKEN, true);
         assertEquals("121", preferredCourtCode);
     }
 
     @Test
-    public void shouldReturnApplicantPreferredCourtCodeWhenCaseLocationIsNotPresent() {
+    void shouldReturnApplicantPreferredCourtCodeWhenCaseLocationIsNotPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .courtLocation_old()
             .build();
@@ -64,7 +64,7 @@ public class LocationRefDataUtilTest {
     }
 
     @Test
-    public void shouldReturnEmptyStringWhenPreferredCourtCodeNotAvailableFromRefData() {
+    void shouldReturnEmptyStringWhenPreferredCourtCodeNotAvailableFromRefData() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .courtLocation()
             .build();

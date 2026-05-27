@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.refdata;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
@@ -30,8 +29,6 @@ class RdClientServiceTest {
     private LocationRefData court1;
     private LocationRefData court2;
 
-    private final String serviceAuth = "serviceAuth";
-    private final String auth = "auth";
     private AutoCloseable closeable;
 
     @BeforeEach
@@ -57,33 +54,16 @@ class RdClientServiceTest {
         closeable.close();
     }
 
-    @Test
-    void shouldReturnAllCivilCourts() {
-        List<LocationRefData> result = rdClientService.fetchAllCivilCourts(serviceAuth, auth);
-        assertThat(result).containsExactlyInAnyOrder(court1, court2);
-
-        verify(locationRefDataApiClient, times(1))
-            .getAllCivilCourtVenues(serviceAuth, auth, "10", "Court");
-    }
-
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldReturnAllCivilCourtsByServiceId(String serviceId) {
+        final String serviceAuth = "serviceAuth";
+        final String auth = "auth";
+
         List<LocationRefData> result = rdClientService.fetchAllCivilCourtsByServiceId(serviceAuth, auth, serviceId);
         assertThat(result).containsExactlyInAnyOrder(court1, court2);
 
         verify(locationRefDataApiClient, times(1))
             .getAllCivilCourtVenuesByServiceId(serviceAuth, auth, "Court", serviceId);
-    }
-
-    @Test
-    void shouldCallApiEachTimeWithoutSpringCaching() {
-        // In plain Mockito test, caching is not active
-        rdClientService.fetchAllCivilCourts(serviceAuth, auth);
-        rdClientService.fetchAllCivilCourts(serviceAuth, auth);
-
-        // API is called twice because @Cacheable is not active without Spring context
-        verify(locationRefDataApiClient, times(2))
-            .getAllCivilCourtVenues(serviceAuth, auth, "10", "Court");
     }
 }

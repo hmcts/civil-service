@@ -346,6 +346,7 @@ class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 locations.add(new LocationRefData().setCourtName("Court Name").setRegionId("2").setEpimmsId("123456"));
                 when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
                     any(),
+                    any(),
                     any()
                 )).thenReturn(locations);
                 DynamicListElement loc1Element = new DynamicListElement("loc1-123456", "loc1");

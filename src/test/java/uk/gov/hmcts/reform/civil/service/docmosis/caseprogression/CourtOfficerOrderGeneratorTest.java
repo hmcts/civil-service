@@ -78,7 +78,7 @@ class CourtOfficerOrderGeneratorTest {
         when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString(), anyString())).thenReturn(List.of(
             locationRefData
         ));
-        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(List.of(locationRefData));
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(List.of(locationRefData));
     }
 
     @Test

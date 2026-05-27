@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Service
 @RequiredArgsConstructor
@@ -102,7 +103,10 @@ public class SdoHearingPreparationService {
         String authToken,
         CaseData caseData
     ) {
-        List<LocationRefData> locationRefDataList = sdoLocationService.fetchHearingLocations(authToken);
+        List<LocationRefData> locationRefDataList = sdoLocationService.fetchHearingLocations(
+            authToken,
+            getCaseServiceId(caseData)
+        );
         DynamicList locationsList;
         if (caseData.getReasonForTransfer() != null && caseData.getTransferCourtLocationList() != null) {
             RequestedCourt requestedCourt = new RequestedCourt();
