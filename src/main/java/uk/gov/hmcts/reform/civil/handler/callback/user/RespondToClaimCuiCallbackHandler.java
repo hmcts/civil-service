@@ -208,10 +208,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         return caseData;
     }
 
-    private boolean isJudgmentRequestedCase(CaseData caseData, CallbackParams callbackParams) {
-        return CaseState.JUDGMENT_REQUESTED.equals(caseData.getCcdState())
-            || CaseState.JUDGMENT_REQUESTED.name().equals(callbackParams.getRequest().getCaseDetails().getState());
-    
     private Flags getRespondent1Flags(CaseData caseData) {
         return Optional.ofNullable(caseData)
             .map(CaseData::getRespondent1)
