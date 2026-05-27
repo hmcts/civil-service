@@ -781,7 +781,6 @@ class CcdClaimStatusDashboardFactoryTest {
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .previousCCDState(CaseState.JUDGMENT_REQUESTED)
             .build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
@@ -800,7 +799,6 @@ class CcdClaimStatusDashboardFactoryTest {
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .previousCCDState(CaseState.JUDGMENT_REQUESTED)
             .build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
