@@ -26,7 +26,7 @@ def versions = [
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.1',
   lombok            : '1.18.38',
-  camunda           : '7.24.1',
+  camunda           : '7.24.0',
   testcontainers    : '1.21.4',
   pdfbox            : '3.0.7',
   tika              : '3.3.0'
@@ -520,7 +520,10 @@ dependencies {
   implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
   implementation "org.camunda.bpm:camunda-external-task-client:${versions.camunda}"
-  implementation "org.camunda.community.rest:camunda-platform-7-rest-client-spring-boot-starter:${versions.camunda}"
+  implementation("org.camunda.community.rest:camunda-platform-7-rest-client-spring-boot-starter:${versions.camunda}") {
+    exclude group: 'io.holunda.camunda-api', module: 'camunda-bpm-engine-api'
+  }
+  implementation "org.camunda.bpm:camunda-engine:${versions.camunda}"
   implementation "org.camunda.bpm:camunda-engine-rest-core:${versions.camunda}"
   implementation "org.apiguardian:apiguardian-api:1.1.2"
   implementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.5"
@@ -541,7 +544,7 @@ dependencies {
   implementation('com.github.hmcts:fees-java-client:0.1.0') {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
   }
-  implementation('com.github.hmcts:payments-java-client:1.6.7') {
+  implementation('com.github.hmcts:payments-java-client:1.7.0') {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
     exclude group: 'uk.gov.hmcts.reform', module: 'service-auth-provider-client'
   }
