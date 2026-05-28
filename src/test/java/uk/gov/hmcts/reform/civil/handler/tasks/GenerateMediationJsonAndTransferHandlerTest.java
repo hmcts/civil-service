@@ -103,7 +103,7 @@ class GenerateMediationJsonAndTransferHandlerTest {
     }
 
     @Test
-    void shouldGenerateCsvAndSendEmailSuccessfully_R2LipVLipFlagEnabled() {
+    void shouldGenerateCsvAndSendEmailSuccessfullyForLipVLip() {
         when(searchService.getInMediationCases(true)).thenReturn(List.of(caseDetailsWithInMediationState));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
         when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
@@ -142,4 +142,3 @@ class GenerateMediationJsonAndTransferHandlerTest {
             .build();
     }
 }
-

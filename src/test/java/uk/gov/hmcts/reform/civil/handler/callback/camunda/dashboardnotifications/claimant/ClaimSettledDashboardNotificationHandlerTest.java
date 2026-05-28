@@ -73,7 +73,6 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test
