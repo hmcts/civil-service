@@ -186,6 +186,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     private String getTotalAmountOfClaim(CaseData caseData, BigDecimal interest) {
         BigDecimal fixedCostAmount = caseData.getFixedCosts() != null
             && caseData.getFixedCosts().getFixedCostAmount() != null
+            && YES == caseData.getFixedCosts().getClaimFixedCosts()
             ? BigDecimal.valueOf(Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount())) : null;
 
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount()
@@ -308,8 +309,9 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     }
 
     private String getFixedCostAmount(CaseData caseData) {
-        if (caseData.getFixedCosts() == null || caseData.getFixedCosts().getFixedCostAmount() == null) {
-            return BigDecimal.ZERO.toString();
+        if (caseData.getFixedCosts() == null || caseData.getFixedCosts().getFixedCostAmount() == null
+            || YES != caseData.getFixedCosts().getClaimFixedCosts()) {
+            return "0.00";
         }
         return MonetaryConversions.penniesToPounds(
             BigDecimal.valueOf(Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount()))
