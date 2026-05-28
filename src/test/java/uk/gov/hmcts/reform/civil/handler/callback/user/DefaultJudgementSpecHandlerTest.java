@@ -1627,7 +1627,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotMoveToJudgmentRequested_whenJudgmentBufferEnabledButJudgmentOnlineDisabledForNonDivergentLipvLr() {
+        void shouldMoveToJudgmentRequested_whenJudgmentBufferEnabledForNonDivergentLipvLr() {
             Flags respondent1Flags = new Flags();
             respondent1Flags.setPartyName("respondent1name");
             respondent1Flags.setRoleOnCase("respondent1");
@@ -1672,12 +1672,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getBusinessProcess()).isNotNull();
-            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
-            assertThat(updatedData.getActiveJudgment()).isNull();
-            assertThat(updatedData.getIsJoRequested()).isNull();
-            assertThat(updatedData.getTakenOfflineDate()).isNotNull();
-            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            assertThat(updatedData.getBusinessProcess()).isNull();
+            assertThat(response.getState()).isEqualTo(CaseState.JUDGMENT_REQUESTED.name());
             assertInterestIsPopulated(response, 0);
             assertThat(updatedData.getActiveJudgment()).isNull();
             assertThat(updatedData.getJoIsLiveJudgmentExists()).isNull();
@@ -1961,7 +1957,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldReturnJudgementRequestedResponse_whenJudgmentBufferEnabledButJudgmentOnlineDisabledAndLrVLip() {
+    void shouldReturnJudgementBufferedResponse_whenJudgmentBufferEnabledAndLrVLip() {
         when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
@@ -1974,7 +1970,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                       .confirmationHeader(JUDGMENT_REQUESTED_HEADER)
-                                                                      .confirmationBody(String.format(JUDGMENT_REQUESTED_LIP_CASE))
+                                                                      .confirmationBody(String.format(JUDGMENT_BUFFER_REQUESTED_LIP_CASE))
                                                                       .build());
     }
 

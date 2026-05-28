@@ -186,7 +186,6 @@ public class JudgmentsOnlineHelperTest {
         caseData.setActiveJudgment(new JudgmentDetails());
         caseData.setDefaultJudgementOverallTotal(BigDecimal.TEN);
         caseData.setJoDefendantName1("Defendant 1");
-        caseData.setJoDefendantName2("Defendant 2");
         caseData.setJoDJCreatedDate(LocalDateTime.now());
         caseData.setJoIsDisplayInJudgmentTab(YES);
         caseData.setJoIsLiveJudgmentExists(YES);
@@ -212,7 +211,6 @@ public class JudgmentsOnlineHelperTest {
         assertThat(clearedCaseData.getActiveJudgment()).isNull();
         assertThat(clearedCaseData.getDefaultJudgementOverallTotal()).isNull();
         assertThat(clearedCaseData.getJoDefendantName1()).isNull();
-        assertThat(clearedCaseData.getJoDefendantName2()).isNull();
         assertThat(clearedCaseData.getJoDJCreatedDate()).isNull();
         assertThat(clearedCaseData.getJoIsDisplayInJudgmentTab()).isNull();
         assertThat(clearedCaseData.getJoIsLiveJudgmentExists()).isNull();

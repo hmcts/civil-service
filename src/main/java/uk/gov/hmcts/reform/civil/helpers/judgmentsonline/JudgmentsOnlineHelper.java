@@ -317,7 +317,6 @@ public class JudgmentsOnlineHelper {
         caseData.setActiveJudgment(null);
         caseData.setDefaultJudgementOverallTotal(null);
         caseData.setJoDefendantName1(null);
-        caseData.setJoDefendantName2(null);
         caseData.setJoDJCreatedDate(null);
         caseData.setJoIsDisplayInJudgmentTab(null);
         caseData.setJoIsLiveJudgmentExists(null);
