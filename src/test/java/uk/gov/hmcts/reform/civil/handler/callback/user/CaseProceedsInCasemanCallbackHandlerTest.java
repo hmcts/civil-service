@@ -213,7 +213,6 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .setType(JudgmentType.DEFAULT_JUDGMENT)
                                     .setState(JudgmentState.PENDING_ISSUE)
                                     .setIsRegisterWithRTL(YesOrNo.NO))
-                .joDefendantName2("Defendant 2")
                 .joState(JudgmentState.PENDING_ISSUE)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -226,7 +225,6 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("previousCCDState", JUDGMENT_REQUESTED.name())
                 .containsEntry("takenOfflineByStaffDate", takenOfflineByStaffDate.format(ISO_DATE_TIME));
             assertThat(caseData.getActiveJudgment()).isNull();
-            assertThat(caseData.getJoDefendantName2()).isNull();
             assertThat(caseData.getJoState()).isNull();
         }
 
@@ -241,7 +239,6 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1Represented(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .activeJudgment(activeJudgment)
-                .joDefendantName2("Defendant 2")
                 .joState(JudgmentState.ISSUED)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -254,7 +251,6 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("previousCCDState", JUDGMENT_REQUESTED.name())
                 .containsEntry("takenOfflineByStaffDate", takenOfflineByStaffDate.format(ISO_DATE_TIME));
             assertThat(caseData.getActiveJudgment()).isSameAs(activeJudgment);
-            assertThat(caseData.getJoDefendantName2()).isEqualTo("Defendant 2");
             assertThat(caseData.getJoState()).isEqualTo(JudgmentState.ISSUED);
         }
     }
