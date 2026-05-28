@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.groups.CasemanTransferDateGroup;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,6 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
     private final Validator validator;
     private final Time time;
     private final ObjectMapper mapper;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -79,12 +77,9 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
 
     private CaseState getPreviousCaseSate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isLipVLipEnabled()) {
-            return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
-                    ? CaseState.valueOf(callbackParams.getRequest().getCaseDetailsBefore().getState())
-                    : null;
-        }
-        return null;
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
+            ? CaseState.valueOf(callbackParams.getRequest().getCaseDetailsBefore().getState())
+            : null;
     }
 
     private CoscApplicationStatus updateCoScApplicationStatus(CallbackParams callbackParams) {

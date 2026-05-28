@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardTasksHelper;
@@ -32,8 +31,6 @@ class FinalOrderDefendantDashboardServiceTest {
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
-    private FeatureToggleService featureToggleService;
-    @Mock
     private DashboardNotificationHelper dashboardDecisionHelper;
     @Mock
     private DashboardTasksHelper dashboardTasksHelper;
@@ -49,7 +46,6 @@ class FinalOrderDefendantDashboardServiceTest {
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
 
         when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
 
         finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
@@ -72,7 +68,6 @@ class FinalOrderDefendantDashboardServiceTest {
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
         when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
 
         finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
@@ -103,23 +98,6 @@ class FinalOrderDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotRecordScenario_whenLipVLipDisabled() {
-        CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
-        caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
-        caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-        caseData.setTrialReadyRespondent1(YesOrNo.YES);
-
-        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
-    }
-
-    @Test
     void shouldNotRecordScenario_whenDashBoardDisabled() {
         CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
@@ -128,7 +106,6 @@ class FinalOrderDefendantDashboardServiceTest {
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
         when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(false);
 
         finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
