@@ -18,7 +18,7 @@ jobs:
       GRADLE_OPTS: -Dorg.gradle.workers.max=2
     services:
       postgres:
-        image: postgres:15
+        image: postgres:18
         env:
           POSTGRES_DB: cmc
           POSTGRES_USER: postgres

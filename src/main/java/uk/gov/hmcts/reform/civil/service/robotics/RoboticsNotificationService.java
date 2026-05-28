@@ -223,7 +223,7 @@ public class RoboticsNotificationService {
     }
 
     private boolean isLipVsLipCase(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled();
+        return caseData.isLipvLipOneVOne();
     }
 
     private boolean isDefaultJudgementSpec(CaseData caseData) {
