@@ -26,7 +26,9 @@ def versions = [
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.1',
   lombok            : '1.18.38',
-  camunda           : '7.24.1',
+  camunda           : '7.24.0',
+  camundaRestClient : '7.24.1',
+  jackson           : '2.19.1',
   testcontainers    : '1.21.4',
   pdfbox            : '3.0.7',
   tika              : '3.3.1'
@@ -90,6 +92,7 @@ allprojects {
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2023.0.6'
       mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.25.0"
+      mavenBom "com.fasterxml.jackson:jackson-bom:${versions.jackson}"
     }
   }
 
@@ -520,7 +523,8 @@ dependencies {
   implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
   implementation "org.camunda.bpm:camunda-external-task-client:${versions.camunda}"
-  implementation "org.camunda.community.rest:camunda-platform-7-rest-client-spring-boot-starter:${versions.camunda}"
+  implementation "org.camunda.bpm:camunda-engine:${versions.camunda}"
+  implementation "org.camunda.community.rest:camunda-platform-7-rest-client-spring-boot-starter:${versions.camundaRestClient}"
   implementation "org.camunda.bpm:camunda-engine-rest-core:${versions.camunda}"
   implementation "org.apiguardian:apiguardian-api:1.1.2"
   implementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.5"
