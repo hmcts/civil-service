@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -111,6 +112,20 @@ class SdoHearingPreparationServiceTest {
 
     @Test
     void shouldReturnFilteredHearingMethodList() {
+        CategorySearchResult searchResult = getCategorySearchResult();
+        when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), anyString(), anyString()))
+            .thenReturn(Optional.of(searchResult));
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        DynamicList list = service.getDynamicHearingMethodList(callbackParams(), caseData);
+
+        assertThat(list.getListItems())
+            .extracting(DynamicListElement::getLabel)
+            .containsExactly(HearingMethod.IN_PERSON.getLabel(), HearingMethod.TELEPHONE.getLabel());
+    }
+
+    private static @NonNull CategorySearchResult getCategorySearchResult() {
         Category inPerson = new Category();
         inPerson.setCategoryKey("HearingChannel");
         inPerson.setKey("INTER");
@@ -128,16 +143,7 @@ class SdoHearingPreparationServiceTest {
         notInAttendance.setActiveFlag("Y");
         CategorySearchResult searchResult = new CategorySearchResult();
         searchResult.setCategories(List.of(inPerson, telephone, notInAttendance));
-        when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), anyString(), anyString()))
-            .thenReturn(Optional.of(searchResult));
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
-        DynamicList list = service.getDynamicHearingMethodList(callbackParams(), caseData);
-
-        assertThat(list.getListItems())
-            .extracting(DynamicListElement::getLabel)
-            .containsExactly(HearingMethod.IN_PERSON.getLabel(), HearingMethod.TELEPHONE.getLabel());
+        return searchResult;
     }
 
     @Test

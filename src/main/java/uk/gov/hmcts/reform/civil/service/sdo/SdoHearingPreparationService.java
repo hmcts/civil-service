@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 
 import java.math.BigDecimal;
@@ -50,9 +51,7 @@ public class SdoHearingPreparationService {
             preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData);
             preferredCourt.map(RequestedCourt::getCaseLocation)
                 .ifPresent(caseData::setCaseManagementLocation);
-            String serviceId = CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                ? SPEC_SERVICE_ID
-                : UNSPEC_SERVICE_ID;
+            final String serviceId = CaseServiceUtil.getCaseServiceId(caseData.getCaseAccessCategory());
             preferredCourt
                 .map(RequestedCourt::getCaseLocation)
                 .map(CaseLocationCivil::getBaseLocation)
