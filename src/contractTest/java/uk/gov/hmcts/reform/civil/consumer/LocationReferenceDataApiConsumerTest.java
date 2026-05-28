@@ -8,8 +8,7 @@ import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,7 +28,8 @@ import static org.hamcrest.Matchers.is;
 public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/refdata/location/court-venues";
-    private static final String SERVICE_ID = "AAA6";
+    private static final String CIVIL_SPEC_SERVICE_ID = "AAA6";
+    private static final String CIVIL_UN_SPEC_SERVICE_ID = "AAA7";
     private static final String SERVICE_ID_REGEX = "AAA6|AAA7";
     private static final String LOCATION_TYPE = "locationType";
 
@@ -37,15 +37,30 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
     private LocationReferenceDataApiClient locationReferenceDataApiClient;
 
     @Pact(consumer = "civil_service")
-    public RequestResponsePact getAllCivilCourtVenues(PactDslWithProvider builder)
+    public RequestResponsePact getAllCivilCourtVenuesForSpec(PactDslWithProvider builder)
         throws JSONException {
-        return buildCourtVenueResponsePact(builder);
+        return buildCourtVenueResponsePact(builder, CIVIL_SPEC_SERVICE_ID);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"AAA6", "AAA7"})
-    @PactTestFor(pactMethod = "getAllCivilCourtVenues")
-    public void verifyCourtVenue(String serviceId) {
+    @Pact(consumer = "civil_service")
+    public RequestResponsePact getAllCivilCourtVenuesForUnSpec(PactDslWithProvider builder)
+        throws JSONException {
+        return buildCourtVenueResponsePact(builder, CIVIL_UN_SPEC_SERVICE_ID);
+    }
+
+    @Test
+    @PactTestFor(pactMethod = "getAllCivilCourtVenuesForSpec")
+    public void verifyCivilSpecCourtVenue() {
+        verifyCourtVenue(CIVIL_SPEC_SERVICE_ID);
+    }
+
+    @Test
+    @PactTestFor(pactMethod = "getAllCivilCourtVenuesForUnSpec")
+    public void verifyCivilUnSpecCourtVenue() {
+        verifyCourtVenue(CIVIL_UN_SPEC_SERVICE_ID);
+    }
+
+    private void verifyCourtVenue(String serviceId) {
         List<LocationRefData> response = locationReferenceDataApiClient.getAllCivilCourtVenuesByServiceId(
             SERVICE_AUTH_TOKEN,
             AUTHORIZATION_TOKEN,
@@ -58,15 +73,15 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
         );
     }
 
-    private RequestResponsePact buildCourtVenueResponsePact(PactDslWithProvider builder)  {
+    private RequestResponsePact buildCourtVenueResponsePact(PactDslWithProvider builder, String serviceId)  {
         return builder
             .given("There are court locations to be returned")
-            .uponReceiving("a location request")
+            .uponReceiving("a location request for service " + serviceId)
             .path(ENDPOINT)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
             .matchQuery("location_type", LOCATION_TYPE, LOCATION_TYPE)
-            .matchQuery("service_code", SERVICE_ID_REGEX, SERVICE_ID)
+            .matchQuery("service_code", SERVICE_ID_REGEX, serviceId)
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(buildLocationRefDataResponseBody())
