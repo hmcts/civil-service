@@ -662,7 +662,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         Map<String, String> properties = new HashMap<>(addCommonProperties(true));
         properties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, "1594901956117591",
-            PARTY_NAME, applicant ? "Mr. John Rambo" : "Mr. Sole Trader"
+            PARTY_NAME, applicant ? "Mr. John Rambo" : "Mr. Sole Trader T/A Sole Trader co"
         ));
         return properties;
     }

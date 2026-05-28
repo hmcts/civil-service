@@ -1,0 +1,28 @@
+{
+  "ccdCaseReference": 8123456781,
+  "ccdState": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT",
+  "legacyCaseReference": "reference",
+  "hearingDueDate": "2024-04-01",
+  "hearingDate": "2024-04-01",
+  "applicant1Represented": "No",
+  "applicant1": {
+    "type": "INDIVIDUAL",
+    "individualFirstName": "Claimant",
+    "individualLastName": "Tester"
+  },
+  "respondent1": {
+    "type": "INDIVIDUAL",
+    "individualFirstName": "Defendant",
+    "individualLastName": "Tester"
+  },
+  "hearingLocation": {
+    "value": {
+      "label": "Name - Loc - 1"
+    },
+    "list_items": [
+      {
+        "label": "Name - Loc - 1"
+      }
+    ]
+  }
+}

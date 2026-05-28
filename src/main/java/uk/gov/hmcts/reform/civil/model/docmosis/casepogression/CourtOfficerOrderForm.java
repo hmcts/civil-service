@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 public class CourtOfficerOrderForm implements MappableObject {
 
     private String caseNumber;
+    private String legacyNumber;
     private String claimant1Name;
     private String claimant2Name;
     private String defendant1Name;
