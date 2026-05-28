@@ -369,6 +369,7 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
     private String joRepaymentSummaryObject;
     private YesOrNo respondForImmediateOption;
     private LocalDateTime joDJCreatedDate;
+    private YesOrNo isJoRequested;
 
     private  TransferCaseDetails transferCaseDetails;
 
