@@ -70,6 +70,10 @@ allprojects {
     analyzers.ossIndex.enabled = false
   }
 
+  tasks.named('dependencyCheckAggregate') {
+    dependsOn tasks.named('dependencyCheckUpdate')
+  }
+
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
