@@ -777,7 +777,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void givenCaseTakenOfflineFromJudgmentRequested_whenGetClaimantStatus_thenReturnResponseByPost() {
         CaseData claim = CaseData.builder()
-            .takenOfflineByStaffDate(LocalDateTime.now())
+            .takenOfflineDate(LocalDateTime.now())
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .previousCCDState(CaseState.JUDGMENT_REQUESTED)
             .build();
@@ -795,7 +795,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void givenCaseTakenOfflineFromJudgmentRequested_whenGetDefendantStatus_thenReturnResponseByPost() {
         CaseData claim = CaseData.builder()
-            .takenOfflineByStaffDate(LocalDateTime.now())
+            .takenOfflineDate(LocalDateTime.now())
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .previousCCDState(CaseState.JUDGMENT_REQUESTED)
             .build();

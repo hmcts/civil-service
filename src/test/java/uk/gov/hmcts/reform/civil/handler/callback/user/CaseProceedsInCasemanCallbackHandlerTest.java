@@ -228,30 +228,5 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(caseData.getJoState()).isNull();
         }
 
-        @Test
-        void shouldNotClearIssuedDefaultJudgment_whenCaseProceedsInCasemanFromJudgmentRequested() {
-            JudgmentDetails activeJudgment = new JudgmentDetails()
-                .setType(JudgmentType.DEFAULT_JUDGMENT)
-                .setState(JudgmentState.ISSUED)
-                .setIsRegisterWithRTL(YesOrNo.YES);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder()
-                .applicant1Represented(YesOrNo.YES)
-                .respondent1Represented(YesOrNo.NO)
-                .activeJudgment(activeJudgment)
-                .joState(JudgmentState.ISSUED)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            params.getRequest().getCaseDetailsBefore().setState(JUDGMENT_REQUESTED.name());
-
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .containsEntry("previousCCDState", JUDGMENT_REQUESTED.name())
-                .containsEntry("takenOfflineByStaffDate", takenOfflineByStaffDate.format(ISO_DATE_TIME));
-            assertThat(caseData.getActiveJudgment()).isSameAs(activeJudgment);
-            assertThat(caseData.getJoState()).isEqualTo(JudgmentState.ISSUED);
-        }
     }
 }

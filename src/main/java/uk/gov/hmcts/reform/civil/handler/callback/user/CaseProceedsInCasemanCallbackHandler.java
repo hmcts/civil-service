@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.groups.CasemanTransferDateGroup;
 
@@ -29,8 +28,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
-import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.PENDING_ISSUE;
-import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT;
 
 @Service
 @RequiredArgsConstructor
@@ -76,54 +73,22 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
         caseData.setTakenOfflineByStaffDate(time.now());
         caseData.setCoSCApplicationStatus(updateCoScApplicationStatus(callbackParams));
         caseData.setPreviousCCDState(previousCaseState);
-        clearPendingJudgmentRequestIfRequired(caseData, previousCaseState, callbackParams);
+        clearPendingJudgmentRequestIfRequired(caseData, previousCaseState);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))
             .build();
     }
 
-    private void clearPendingJudgmentRequestIfRequired(CaseData caseData,
-                                                       CaseState previousCaseState,
-                                                       CallbackParams callbackParams) {
-        if (shouldClearPendingJudgmentRequest(caseData, previousCaseState, callbackParams)) {
+    private void clearPendingJudgmentRequestIfRequired(CaseData caseData, CaseState previousCaseState) {
+        if (JUDGMENT_REQUESTED.equals(previousCaseState)) {
             JudgmentsOnlineHelper.clearJOCaseData(caseData);
         }
-    }
-
-    private boolean shouldClearPendingJudgmentRequest(CaseData caseData,
-                                                      CaseState previousCaseState,
-                                                      CallbackParams callbackParams) {
-        return isJudgmentRequestedState(caseData, previousCaseState, callbackParams)
-            && hasNoActiveJudgmentOrPendingDefaultJudgment(caseData.getActiveJudgment());
-    }
-
-    private boolean isJudgmentRequestedState(CaseData caseData,
-                                             CaseState previousCaseState,
-                                             CallbackParams callbackParams) {
-        return JUDGMENT_REQUESTED.equals(previousCaseState)
-            || JUDGMENT_REQUESTED.equals(caseData.getCcdState())
-            || isCallbackCaseStateJudgmentRequested(callbackParams);
-    }
-
-    private boolean isCallbackCaseStateJudgmentRequested(CallbackParams callbackParams) {
-        return callbackParams.getRequest() != null
-            && callbackParams.getRequest().getCaseDetails() != null
-            && JUDGMENT_REQUESTED.name().equals(callbackParams.getRequest().getCaseDetails().getState());
-    }
-
-    private boolean hasNoActiveJudgmentOrPendingDefaultJudgment(JudgmentDetails activeJudgment) {
-        return activeJudgment == null
-            || (DEFAULT_JUDGMENT.equals(activeJudgment.getType())
-                && PENDING_ISSUE.equals(activeJudgment.getState()));
     }
 
     private CaseState getPreviousCaseSate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String previousState = getPreviousCaseDetailsState(callbackParams);
-        if (JUDGMENT_REQUESTED.name().equals(previousState)) {
-            return JUDGMENT_REQUESTED;
-        }
         return previousState != null
             && (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
                 ? CaseState.valueOf(previousState)

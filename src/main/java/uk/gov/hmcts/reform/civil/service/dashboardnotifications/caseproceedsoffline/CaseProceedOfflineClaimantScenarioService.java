@@ -35,14 +35,13 @@ public class CaseProceedOfflineClaimantScenarioService extends CaseProceedOfflin
         Map<String, Boolean> scenarios = new HashMap<>(super.resolveAdditionalScenarios(caseData));
         scenarios.put(
             SCENARIO_AAA6_CASE_PROCEEDS_OFFLINE_JUDGMENT_REQUESTED_CANCELLED_CLAIMANT.getScenario(),
-            isJudgmentRequestedLipvLip(caseData)
+            isJudgmentRequested(caseData)
         );
         return scenarios;
     }
 
-    private boolean isJudgmentRequestedLipvLip(CaseData caseData) {
-        return CaseState.JUDGMENT_REQUESTED.equals(caseData.getPreviousCCDState())
-            && caseData.isLipvLipOneVOne();
+    private boolean isJudgmentRequested(CaseData caseData) {
+        return CaseState.JUDGMENT_REQUESTED.equals(caseData.getPreviousCCDState());
     }
 
     @Override

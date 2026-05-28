@@ -76,15 +76,9 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
                                                            CaseState.IN_MEDIATION, CaseState.JUDICIAL_REFERRAL
         );
 
-        return hasCaseProceedOfflineDate()
+        return Objects.nonNull(caseData.getTakenOfflineDate())
             && Objects.nonNull(caseData.getPreviousCCDState())
             && (caseMovedInCaseManStates.contains(caseData.getPreviousCCDState()));
-    }
-
-    protected boolean hasCaseProceedOfflineDate() {
-        return Objects.nonNull(caseData.getTakenOfflineDate())
-            || (CaseState.JUDGMENT_REQUESTED.equals(caseData.getPreviousCCDState())
-                && Objects.nonNull(caseData.getTakenOfflineByStaffDate()));
     }
 
     protected boolean isSDOMadeByLegalAdviser() {
