@@ -203,8 +203,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
 
         caseData.setDefendantDetailsSpec(DynamicList.fromList(listData,
-                                                                  null,
-                                                                  this::getPartNameForLabel, respondent1Name, false
+                                                              null,
+                                                              this::getPartNameForLabel, respondent1Name, false
         ));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -521,7 +521,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                 activeJudgment,
                 true
             ));
-            caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
         }
 
         caseData.setJoDJCreatedDate(time.now());
@@ -577,6 +576,4 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             this.overallTotal = overallTotal;
         }
     }
-
 }
-
