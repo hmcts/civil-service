@@ -42,9 +42,7 @@ class RdClientServiceTest {
         court2 = new LocationRefData()
             .setEpimmsId("222")
             .setCourtName("Bristol Court");
-
-        when(locationRefDataApiClient.getAllCivilCourtVenues(any(), any(), any(), any()))
-            .thenReturn(List.of(court1, court2));
+        
         when(locationRefDataApiClient.getAllCivilCourtVenuesByServiceId(any(), any(), any(), any()))
             .thenReturn(List.of(court1, court2));
     }

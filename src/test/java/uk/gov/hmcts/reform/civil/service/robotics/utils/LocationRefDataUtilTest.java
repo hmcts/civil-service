@@ -38,7 +38,7 @@ class LocationRefDataUtilTest {
             .courtLocation()
             .build();
         List<LocationRefData> courtLocations = new ArrayList<>();
-        courtLocations.add(new LocationRefData().setSiteName("SiteName").setCourtAddress("1").setPostcode("1")
+        courtLocations.add(new LocationRefData().setSiteName("SiteName").setServiceId("AAA7").setCourtAddress("1").setPostcode("1")
                                .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
                                .setCourtTypeId("10").setCourtLocationCode("121")
                                .setEpimmsId("000000"));
@@ -54,7 +54,7 @@ class LocationRefDataUtilTest {
             .courtLocation_old()
             .build();
         List<LocationRefData> courtLocations = new ArrayList<>();
-        courtLocations.add(new LocationRefData().setSiteName("SiteName").setCourtAddress("1").setPostcode("1")
+        courtLocations.add(new LocationRefData().setSiteName("SiteName").setServiceId("AAA7").setCourtAddress("1").setPostcode("1")
                                .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
                                .setCourtTypeId("10").setCourtLocationCode("127")
                                .setEpimmsId("000000"));

@@ -47,7 +47,6 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Component
@@ -157,7 +156,7 @@ public class RespondentTemplateForDQGenerator {
     private String getOrgNameFromParties(List<Party> parties) {
         return Optional.ofNullable(parties)
             .filter(p -> !p.isEmpty())
-            .map(p -> p.get(0))
+            .map(p -> p.getFirst())
             .map(Party::getRepresentative)
             .map(Representative::getOrganisationName)
             .filter(StringUtils::isNotBlank)
@@ -244,17 +243,18 @@ public class RespondentTemplateForDQGenerator {
 
     public RequestedCourt getRequestedCourt(DQ dq, String authorisation, CaseCategory caseCategory) {
         RequestedCourt rc = dq.getRequestedCourt();
+        String caseServiceId = CaseServiceUtil.getCaseServiceId(caseCategory);
         if (rc != null && null !=  rc.getCaseLocation()) {
             List<LocationRefData> courtLocations = (locationRefDataService
                 .getCourtLocationsByEpimmsIdAndCourtType(authorisation,
                                                          rc.getCaseLocation().getBaseLocation(),
-                                                         CaseServiceUtil.getCaseServiceId(caseCategory)
+                                                         caseServiceId
                 ));
             RequestedCourt requestedCourt = new RequestedCourt();
             requestedCourt.setRequestHearingAtSpecificCourt(YES);
             requestedCourt.setReasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
             courtLocations.stream()
-                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                .filter(id -> id.getServiceId().equals(caseServiceId))
                 .findFirst().ifPresent(court -> {
                     requestedCourt.setResponseCourtCode(court.getCourtLocationCode());
                     requestedCourt.setResponseCourtName(court.getCourtName());
@@ -272,14 +272,11 @@ public class RespondentTemplateForDQGenerator {
         if (hearing == null || hearing.getHearingLength() == null) {
             return null;
         }
-        switch (hearing.getHearingLength()) {
-            case LESS_THAN_DAY:
-                return hearing.getHearingLengthHours() + " hours";
-            case ONE_DAY:
-                return "One day";
-            default:
-                return hearing.getHearingLengthDays() + " days";
-        }
+        return switch (hearing.getHearingLength()) {
+            case LESS_THAN_DAY -> hearing.getHearingLengthHours() + " hours";
+            case ONE_DAY -> "One day";
+            default -> hearing.getHearingLengthDays() + " days";
+        };
     }
 
     private Hearing getHearing(DQ dq) {

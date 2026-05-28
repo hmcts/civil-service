@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 
 @Slf4j
 @Component
@@ -28,6 +27,7 @@ public class LocationRefDataUtil {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return "";
         }
+        final String caseServiceId = CaseServiceUtil.getCaseServiceId(caseData.getCaseAccessCategory());
         if (caseData.getCourtLocation().getCaseLocation() == null) {
             return caseData.getCourtLocation().getApplicantPreferredCourt();
         } else {
@@ -35,11 +35,11 @@ public class LocationRefDataUtil {
                 locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
                     authToken,
                     caseData.getCourtLocation().getCaseLocation().getBaseLocation(),
-                    CaseServiceUtil.getCaseServiceId(caseData.getCaseAccessCategory())
+                    caseServiceId
                 );
             if (!courtLocations.isEmpty()) {
                 return courtLocations.stream()
-                    .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                    .filter(id -> caseServiceId.equals(id.getServiceId()))
                     .findFirst()
                     .map(locationRefData -> isCourtCodeRequired
                         ? locationRefData.getCourtLocationCode() : locationRefData.getCourtName())
