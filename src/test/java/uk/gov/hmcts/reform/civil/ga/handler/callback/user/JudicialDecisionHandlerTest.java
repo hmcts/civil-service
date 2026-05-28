@@ -259,22 +259,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         }
 
         @Test
-        void testAboutToStartForApplicationCloakedForLipCaseWhenApplicationIsNotCloaked() {
-
-            when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            List<GeneralApplicationTypes> types = List.of(
-                (GeneralApplicationTypes.STAY_THE_CLAIM), (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
-
-            CallbackParams params = callbackParamsOf(getGaCaseAppln(types, NO, NO, SPEC_CLAIM), ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response).isNotNull();
-            assertThat(response.getData()).containsEntry("applicationIsCloaked", "Yes");
-        }
-
-        @Test
         void testAboutToStartForHearingPreferLocationsApplicantRespondent() {
 
             String expectedJudicialPreferenceLocationApplicantRespondent1Text =
@@ -1447,20 +1431,20 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         }
 
         @ParameterizedTest
-        @CsvSource({"UNSPEC_CLAIM, AAA7", "SPEC_CLAIM, AAA7"})
+        @CsvSource({"UNSPEC_CLAIM, AAA7", "SPEC_CLAIM, AAA6"})
         void shouldPrepopulateLocationIfApplicantAndRespondentHaveSameLocationPref(String claimType, String serviceId) {
 
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(new LocationRefData().setSiteName("siteName").setServiceId(serviceId).setCourtAddress("court Address")
+            locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address")
                               .setPostcode("post code").setCourtName("Court Name").setRegion("Region"));
-            when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
+            when(locationRefDataService.getCourtLocations(any(), eq(serviceId))).thenReturn(locations);
 
             when(helper.isApplicantAndRespondentLocationPrefSame(any())).thenReturn(true);
 
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.EXTEND_TIME), (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
-
-            CallbackParams params = callbackParamsOf(getHearingOrderApplnAndResp(types, NO, NO, claimType), ABOUT_TO_START);
+            GeneralApplicationCaseData gaCaseData = getHearingOrderApplnAndResp(types, NO, NO, claimType);
+            CallbackParams params = callbackParamsOf(gaCaseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response).isNotNull();
@@ -2206,7 +2190,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             assertThat(response.getData()).extracting("orderWithoutNotice").extracting("withoutNoticeSelectionDate")
                 .isEqualTo(localDatePlus7days.toString());
             assertThat(response.getData().get("caseNameHmctsInternal")
-                           .toString()).isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+                           .toString()).hasToString("Mr. John Rambo v Mr. Sole Trader");
             assertThat(response.getData())
                 .extracting("judicialDecisionRequestMoreInfo").extracting("judgeRequestMoreInfoByDate")
                 .isEqualTo(localDatePlus7days.toString());
@@ -2564,7 +2548,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             assertThat(response).isNotNull();
             GAJudicialMakeAnOrder makeAnOrder = getJudicialMakeAnOrder(response);
 
-            assertThat(makeAnOrder.getDirectionsText()).isEqualTo(null);
+            assertThat(makeAnOrder.getDirectionsText()).isNull();
         }
 
         @Test

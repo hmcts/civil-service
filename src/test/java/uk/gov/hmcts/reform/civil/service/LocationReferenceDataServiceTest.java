@@ -40,7 +40,6 @@ class LocationReferenceDataServiceTest {
 
     private LocationRefData loc1;
     private LocationRefData loc2;
-    private LocationRefData loc3;
 
     @BeforeEach
     void setup() {
@@ -48,7 +47,6 @@ class LocationReferenceDataServiceTest {
 
         loc1 = new LocationRefData()
             .setSiteName("Site A")
-            .setServiceId("AAA6")
             .setWelshSiteName("Welsh A")
             .setCourtAddress("Address A")
             .setPostcode("AA1 1AA")
@@ -62,7 +60,6 @@ class LocationReferenceDataServiceTest {
 
         loc2 = new LocationRefData()
             .setSiteName("Site B")
-            .setServiceId("AAA7")
             .setCourtAddress("Address B")
             .setPostcode("BB1 1BB")
             .setRegion("Wales")
@@ -72,18 +69,6 @@ class LocationReferenceDataServiceTest {
             .setCourtStatus("Open")
             .setIsCaseManagementLocation("Y")
             .setIsHearingLocation("Y");
-
-        loc3 = new LocationRefData()
-            .setSiteName("Site C")
-            .setServiceId("AAA7")
-            .setCourtAddress("Address C")
-            .setPostcode("CC1 1CC")
-            .setRegion("Scotland")
-            .setEpimmsId("333")
-            .setCourtLocationCode("CCC")
-            .setCourtStatus("Closed")
-            .setIsCaseManagementLocation("N")
-            .setIsHearingLocation("N");
     }
 
     @ParameterizedTest
@@ -96,7 +81,7 @@ class LocationReferenceDataServiceTest {
 
         LocationRefData result = service.getCnbcLocation(auth, serviceId);
 
-        assertThat(result).isEqualTo(getMockLocation(serviceId));
+        assertThat(result).isEqualTo(getMockLocationList(serviceId).getFirst());
     }
 
     @ParameterizedTest
@@ -120,7 +105,7 @@ class LocationReferenceDataServiceTest {
 
         LocationRefData result = service.getCcmccLocation(auth, serviceId);
 
-        assertThat(result).isEqualTo(getMockLocation(serviceId));
+        assertThat(result).isEqualTo(getMockLocationList(serviceId).getFirst());
     }
 
     @ParameterizedTest
@@ -131,7 +116,7 @@ class LocationReferenceDataServiceTest {
 
         List<LocationRefData> result = service.getCourtLocationsForDefaultJudgments(auth, serviceId);
 
-        assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
+        assertThat(result).isEqualTo(getMockLocationList(serviceId));
     }
 
     @ParameterizedTest
@@ -142,7 +127,7 @@ class LocationReferenceDataServiceTest {
 
         List<LocationRefData> result = service.getCourtLocationsForGeneralApplication(auth, serviceId);
 
-        assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
+        assertThat(result).isEqualTo(getMockLocationList(serviceId));
         assertThat(result.getFirst().getSiteName()).isEqualTo("AAA6".equals(serviceId) ? "Site A" : "Site B");
     }
 
@@ -154,7 +139,7 @@ class LocationReferenceDataServiceTest {
 
         List<LocationRefData> result = service.getCourtLocationsByEpimmsId(auth, "111", serviceId);
 
-        assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
+        assertThat(result).isEqualTo(getMockLocationList(serviceId));
     }
 
     @ParameterizedTest
@@ -165,7 +150,7 @@ class LocationReferenceDataServiceTest {
 
         List<LocationRefData> result = service.getCourtLocationsByEpimmsIdWithCML(auth, "111", serviceId);
 
-        assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
+        assertThat(result).isEqualTo(getMockLocationList(serviceId));
     }
 
     @ParameterizedTest
@@ -176,7 +161,7 @@ class LocationReferenceDataServiceTest {
 
         List<LocationRefData> result = service.getHearingCourtLocations(auth, serviceId);
 
-        assertThat(result).isEqualTo(List.of(getMockLocation(serviceId)));
+        assertThat(result).isEqualTo(getMockLocationList(serviceId));
     }
 
     @ParameterizedTest
@@ -185,7 +170,7 @@ class LocationReferenceDataServiceTest {
         when(courtVenueService.getHearingLocationCourts(generatedAuth, auth, serviceId))
             .thenReturn(getMockLocationList(serviceId));
 
-        String label = LocationReferenceDataService.getDisplayEntry(getMockLocation(serviceId));
+        String label = LocationReferenceDataService.getDisplayEntry(getMockLocationList(serviceId).getFirst());
 
         Optional<LocationRefData> result = service.getLocationMatchingLabel(label, auth, serviceId);
 
@@ -238,7 +223,6 @@ class LocationReferenceDataServiceTest {
         // Duplicate court with the same location code "AAA"
         LocationRefData duplicateLoc = new LocationRefData()
             .setSiteName("Site D")
-            .setServiceId("AAA6")
             .setCourtAddress("Address D")
             .setPostcode("DD1 1DD")
             .setEpimmsId("444")
@@ -271,12 +255,5 @@ class LocationReferenceDataServiceTest {
             return List.of(loc1);
         }
         return List.of(loc2);
-    }
-
-    private LocationRefData getMockLocation(String serviceId) {
-        if ("AAA6".equals(serviceId)) {
-            return loc1;
-        }
-        return loc2;
     }
 }

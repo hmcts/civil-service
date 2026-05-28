@@ -37,11 +37,14 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 @ExtendWith(MockitoExtension.class)
 class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
@@ -65,10 +68,15 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @CsvSource({"AAA6", "AAA7"})
         void shouldReturnLocationList_whenLocationsAreQueried(String serviceId) {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(new LocationRefData().setSiteName("Site Name 1").setServiceId(serviceId).setCourtAddress("Address1").setPostcode("18000"));
-            locations.add(new LocationRefData().setSiteName("Site Name 2").setServiceId(serviceId).setCourtAddress("Address2").setPostcode("28000"));
-            when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdState(CaseState.LISTING_FOR_A_HEARING).build();
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
+            when(locationRefDataService.getCourtLocations(any(), eq(serviceId))).thenReturn(locations);
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
+                .ccdState(CaseState.LISTING_FOR_A_HEARING)
+                .build()
+                .copy()
+                .caseAccessCategory("AAA7".equals(serviceId) ? UNSPEC_CLAIM : SPEC_CLAIM)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(((Map) ((ArrayList) ((Map) ((Map) (response.getData().get("gaHearingNoticeDetail")))
@@ -80,10 +88,15 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @CsvSource({"AAA6", "AAA7"})
         void shouldNotPrepopulateData_whenCcdStateIsOrderMade(String serviceId) {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(new LocationRefData().setSiteName("Site Name 1").setServiceId(serviceId).setCourtAddress("Address1").setPostcode("18000"));
-            locations.add(new LocationRefData().setSiteName("Site Name 2").setServiceId(serviceId).setCourtAddress("Address2").setPostcode("28000"));
-            when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdState(CaseState.ORDER_MADE).build();
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
+            when(locationRefDataService.getCourtLocations(any(), eq(serviceId))).thenReturn(locations);
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
+                .ccdState(CaseState.ORDER_MADE)
+                .build()
+                .copy()
+                .caseAccessCategory("AAA7".equals(serviceId) ? UNSPEC_CLAIM : SPEC_CLAIM)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertNull(response.getData().get("gaHearingNoticeApplication"));
@@ -94,14 +107,16 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @CsvSource({"AAA6", "AAA7"})
         void shouldReturnLocationList_with_preferredLocationSelected_whenLocationsAreQueried(String serviceId) {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(new LocationRefData().setSiteName("Site Name 1").setServiceId(serviceId).setCourtAddress("Address1").setPostcode("18000"));
-            locations.add(new LocationRefData().setSiteName("Site Name 2").setServiceId(serviceId).setCourtAddress("Address2").setPostcode("28000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
             DynamicListElement location1 = new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
 
-            when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
+            when(locationRefDataService.getCourtLocations(any(), eq(serviceId))).thenReturn(locations);
             GAJudgesHearingListGAspec gaJudgesHearingListGAspec =
                 new GAJudgesHearingListGAspec().setHearingPreferredLocation(new DynamicList().setListItems(List.of(location1)).setValue(location1));
-            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdState(CaseState.LISTING_FOR_A_HEARING)
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .ccdState(CaseState.LISTING_FOR_A_HEARING)
+                .generalAppSuperClaimType("AAA7".equals(serviceId) ? "UNSPEC_CLAIM" : "SPEC_CLAIM")
                 .judicialListForHearing(gaJudgesHearingListGAspec).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -116,14 +131,16 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @CsvSource({"AAA6", "AAA7"})
         void shouldNotReturnLocationList_with_preferredLocationSelected_whenLocationsAreQueried(String serviceId) {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(new LocationRefData().setSiteName("Site Name 1").setServiceId(serviceId).setCourtAddress("Address1").setPostcode("18000"));
-            locations.add(new LocationRefData().setSiteName("Site Name 2").setServiceId(serviceId).setCourtAddress("Address2").setPostcode("28000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
             DynamicListElement location1 = new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
 
-            when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
+            when(locationRefDataService.getCourtLocations(any(), eq(serviceId))).thenReturn(locations);
             GAJudgesHearingListGAspec gaJudgesHearingListGAspec =
                 new GAJudgesHearingListGAspec().setHearingPreferredLocation(new DynamicList().setListItems(List.of(location1)).setValue(location1));
-            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdState(CaseState.ORDER_MADE)
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .generalAppSuperClaimType("AAA7".equals(serviceId) ? "UNSPEC_CLAIM" : "SPEC_CLAIM")
+                .ccdState(CaseState.ORDER_MADE)
                 .judicialListForHearing(gaJudgesHearingListGAspec).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

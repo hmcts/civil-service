@@ -76,7 +76,7 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
     private RequestResponsePact buildCourtVenueResponsePact(PactDslWithProvider builder, String serviceId)  {
         return builder
             .given("There are court locations to be returned")
-            .uponReceiving("a location request for service " + serviceId)
+            .uponReceiving("a location request")
             .path(ENDPOINT)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())

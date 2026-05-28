@@ -254,7 +254,6 @@ public class RespondentTemplateForDQGenerator {
             requestedCourt.setRequestHearingAtSpecificCourt(YES);
             requestedCourt.setReasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
             courtLocations.stream()
-                .filter(id -> id.getServiceId().equals(caseServiceId))
                 .findFirst().ifPresent(court -> {
                     requestedCourt.setResponseCourtCode(court.getCourtLocationCode());
                     requestedCourt.setResponseCourtName(court.getCourtName());

@@ -41,7 +41,6 @@ public class ReferenceNumberAndCourtDetailsPopulator {
                 caseServiceId));
 
         Optional<LocationRefData> optionalCourtLocation = courtLocations.stream()
-            .filter(id -> caseServiceId.equals(id.getServiceId()))
             .findFirst();
 
         String hearingCourtLocation = optionalCourtLocation

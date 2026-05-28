@@ -22,14 +22,14 @@ import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
@@ -157,7 +157,6 @@ class GaCoreCaseDataServiceTest {
             List<LocationRefData> mockLocation = new ArrayList<>();
             LocationRefData locationRefData = new LocationRefData()
                 .setRegion("1")
-                .setServiceId("AAA6")
                 .setEpimmsId("12345")
                 .setCourtAddress("Central London")
                 .setPostcode("LJ09 EMM")
@@ -456,7 +455,7 @@ class GaCoreCaseDataServiceTest {
                 GENERALAPPLICATION_CASE_TYPE,
                 query.toString()
             );
-            assertThat(casesFound.size()).isEqualTo(11);
+            assertThat(casesFound).hasSize(11);
         }
 
         @Test
@@ -500,7 +499,7 @@ class GaCoreCaseDataServiceTest {
                 GENERALAPPLICATION_CASE_TYPE,
                 query.toString()
             );
-            assertThat(casesFound.size()).isEqualTo(3);
+            assertThat(casesFound).hasSize(3);
         }
 
     }

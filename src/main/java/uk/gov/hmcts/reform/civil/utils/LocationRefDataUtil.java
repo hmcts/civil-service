@@ -39,7 +39,6 @@ public class LocationRefDataUtil {
                 );
             if (!courtLocations.isEmpty()) {
                 return courtLocations.stream()
-                    .filter(id -> caseServiceId.equals(id.getServiceId()))
                     .findFirst()
                     .map(locationRefData -> isCourtCodeRequired
                         ? locationRefData.getCourtLocationCode() : locationRefData.getCourtName())

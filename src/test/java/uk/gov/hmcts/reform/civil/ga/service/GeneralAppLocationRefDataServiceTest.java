@@ -3,22 +3,16 @@ package uk.gov.hmcts.reform.civil.ga.service;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestClientException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.ga.config.GeneralAppLRDConfiguration;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.refdata.CourtVenueService;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,20 +24,8 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 @ExtendWith(MockitoExtension.class)
 class GeneralAppLocationRefDataServiceTest {
 
-    @Captor
-    private ArgumentCaptor<URI> uriCaptor;
-
-    @Captor
-    private ArgumentCaptor<HttpMethod> httpMethodCaptor;
-
-    @Captor
-    private ArgumentCaptor<HttpEntity<?>> httpEntityCaptor;
-
     @Mock
     private CourtVenueService courtVenueService;
-
-    @Mock
-    private GeneralAppLRDConfiguration lrdConfiguration;
 
     @Mock
     private AuthTokenGenerator authTokenGenerator;
@@ -53,7 +35,7 @@ class GeneralAppLocationRefDataServiceTest {
 
     private List<LocationRefData> getAllLocationsRefDataResponse() {
         List<LocationRefData> responseData = new ArrayList<>();
-        responseData.add(getLocationRefData("site_name_01", "London", "AA0 0BB",
+        responseData.add(getLocationRefData("site_name_01", "London", "AA0 0BC",
                                             "court address 1111"
         ));
         responseData.add(getLocationRefData("site_name_02", "London", "AA0 0BB",
@@ -93,60 +75,9 @@ class GeneralAppLocationRefDataServiceTest {
         return responseData;
     }
 
-    private List<LocationRefData> getAllLocationsRefDataResponse(String serviceId) {
-        List<LocationRefData> responseData = new ArrayList<>();
-        responseData.add(getLocationRefData("site_name_01", serviceId, "London", "AA0 0BB",
-                                            "court address 1111"
-        ));
-        responseData.add(getLocationRefData("site_name_02", serviceId, "London", "AA0 0BB",
-                                            "court address 2222"
-        ));
-        responseData.add(getLocationRefData("site_name_03", serviceId, "Midlands", "AA0 0BB",
-                                            "court address 3333"
-        ));
-        responseData.add(getLocationRefData("site_name_04", serviceId,  "Midlands", "AA0 0BB",
-                                            "court address 4444"
-        ));
-        responseData.add(getLocationRefData("site_name_05", serviceId, "North East", "AA0 0BB",
-                                            "court address 5555"
-        ));
-        responseData.add(getLocationRefData("site_name_06", serviceId, "South East", "AA0 0BB",
-                                            "court address 6666"
-        ));
-        responseData.add(getLocationRefData("site_name_07", serviceId, "North West", "AA0 0BB",
-                                            "court address 7777"
-        ));
-        responseData.add(getLocationRefData("site_name_08", serviceId, "South West", "AA0 0BB",
-                                            "court address 8888"
-        ));
-        responseData.add(getLocationRefData("site_name_09", serviceId, "Wales", "AA0 0BB",
-                                            "court address 9999"
-        ));
-        responseData.add(getLocationRefData("site_name_10", serviceId, "London", "AA0 0BB",
-                                            "court address 1001"
-        ));
-        responseData.add(getLocationRefData("site_name_11", serviceId, "Scotland", "AA0 0BB",
-                                            "court address 1011"
-        ));
-        responseData.add(getLocationRefData("site_name_12", serviceId, "Scotland", "AA0 0BB",
-                                            "court address 1012"
-        ));
-
-        return responseData;
-    }
-
     private List<LocationRefData> getAllLocationsRefDataResponseByEpimms() {
         List<LocationRefData> responseData = new ArrayList<>();
         responseData.add(getLocationRefData("site_name_01", "London", "AA0 0BB",
-                                            "court address 1111"
-        ));
-
-        return responseData;
-    }
-
-    private List<LocationRefData> getAllLocationsRefDataResponseByEpimms(String serviceId) {
-        List<LocationRefData> responseData = new ArrayList<>();
-        responseData.add(getLocationRefData("site_name_01", serviceId, "London", "AA0 0BB",
                                             "court address 1111"
         ));
 
@@ -162,15 +93,6 @@ class GeneralAppLocationRefDataServiceTest {
         return responseData;
     }
 
-    private List<LocationRefData> getLocationRefDataResponseForCcmcc(String serviceId) {
-        List<LocationRefData> responseData = new ArrayList<>();
-        responseData.add(getLocationRefData("banana", serviceId, "orange", "AA0 0BB",
-                                            "court address 1111"
-        ));
-
-        return responseData;
-    }
-
     private List<LocationRefData> getLocationRefDataResponseForCnbc() {
         List<LocationRefData> responseData = new ArrayList<>();
         responseData.add(getLocationRefData("pineapple", "mango", "AA0 0BB",
@@ -180,18 +102,9 @@ class GeneralAppLocationRefDataServiceTest {
         return responseData;
     }
 
-    private List<LocationRefData> getLocationRefDataResponseForCnbc(String serviceId) {
-        List<LocationRefData> responseData = new ArrayList<>();
-        responseData.add(getLocationRefData("pineapple", serviceId, "mango", "AA0 0BB",
-                                            "court address 1111"
-        ));
-
-        return responseData;
-    }
-
     private List<LocationRefData> getNonScotlandLocationsRefDataResponse() {
         List<LocationRefData> responseData = new ArrayList<>();
-        responseData.add(getLocationRefData("site_name_01", "London", "AA0 0BB",
+        responseData.add(getLocationRefData("site_name_01", "London", "AA0 0BC",
                                             "court address 1111"
         ));
         responseData.add(getLocationRefData("site_name_02", "London", "AA0 0BB",
@@ -231,48 +144,6 @@ class GeneralAppLocationRefDataServiceTest {
         return responseData;
     }
 
-    private List<LocationRefData> getNonScotlandLocationsRefDataResponse(String serviceId) {
-        List<LocationRefData> responseData = new ArrayList<>();
-        responseData.add(getLocationRefData("site_name_01", serviceId, "London", "AA0 0BB",
-                                            "court address 1111"
-        ));
-        responseData.add(getLocationRefData("site_name_02", serviceId, "London", "AA0 0BB",
-                                            "court address 2222"
-        ));
-        responseData.add(getLocationRefData("site_name_03", serviceId, "Midlands", "AA0 0BB",
-                                            "court address 3333"
-        ));
-        responseData.add(getLocationRefData("site_name_04", serviceId, "Midlands", "AA0 0BB",
-                                            "court address 4444"
-        ));
-        responseData.add(getLocationRefData("site_name_05", serviceId, "North East", "AA0 0BB",
-                                            "court address 5555"
-        ));
-        responseData.add(getLocationRefData("site_name_06", serviceId, "South East", "AA0 0BB",
-                                            "court address 6666"
-        ));
-        responseData.add(getLocationRefData("site_name_07", serviceId, "North West", "AA0 0BB",
-                                            "court address 7777"
-        ));
-        responseData.add(getLocationRefData("site_name_08", serviceId, "South West", "AA0 0BB",
-                                            "court address 8888"
-        ));
-        responseData.add(getLocationRefData("site_name_09", serviceId, "Wales", "AA0 0BB",
-                                            "court address 9999"
-        ));
-        responseData.add(getLocationRefData("site_name_10", serviceId,  "London", "AA0 0BB",
-                                            "court address 1001"
-        ));
-        responseData.add(getLocationRefData("site_name_11", serviceId, "Midlands", "AA0 0BB",
-                                            "court address 1011"
-        ));
-        responseData.add(getLocationRefData("site_name_12", serviceId, "Wales", "AA0 0BB",
-                                            "court address 1012"
-        ));
-
-        return responseData;
-    }
-
     private List<LocationRefData> getOnlyScotlandLocationsRefDataResponse() {
         List<LocationRefData> responseData = new ArrayList<>();
         responseData.add(getLocationRefData("site_name_01", "Scotland", "AA0 0BB",
@@ -294,34 +165,8 @@ class GeneralAppLocationRefDataServiceTest {
         return responseData;
     }
 
-    private List<LocationRefData> getOnlyScotlandLocationsRefDataResponse(String serviceId) {
-        List<LocationRefData> responseData = new ArrayList<>();
-        responseData.add(getLocationRefData("site_name_01", serviceId, "Scotland", "AA0 0BB",
-                                            "court address 1111"
-        ));
-        responseData.add(getLocationRefData("site_name_02", serviceId, "Scotland", "AA0 0BB",
-                                            "court address 2222"
-        ));
-        responseData.add(getLocationRefData("site_name_03", serviceId, "Scotland", "AA0 0BB",
-                                            "court address 3333"
-        ));
-        responseData.add(getLocationRefData("site_name_04", serviceId, "Scotland", "AA0 0BB",
-                                            "court address 4444"
-        ));
-        responseData.add(getLocationRefData("site_name_05", serviceId, "Scotland", "AA0 0BB",
-                                            "court address 5555"
-        ));
-
-        return responseData;
-    }
-
     private LocationRefData getLocationRefData(String siteName, String region, String postcode, String courtAddress) {
         return new LocationRefData().setSiteName(siteName).setRegion(region)
-            .setPostcode(postcode).setCourtAddress(courtAddress);
-    }
-
-    private LocationRefData getLocationRefData(String siteName, String serviceId, String region, String postcode, String courtAddress) {
-        return new LocationRefData().setSiteName(siteName).setServiceId(serviceId).setRegion(region)
             .setPostcode(postcode).setCourtAddress(courtAddress);
     }
 
@@ -334,7 +179,6 @@ class GeneralAppLocationRefDataServiceTest {
 
     private DynamicList getLocationsFromListWithServiceId(final List<LocationRefData> locations) {
         return fromList(locations.stream().map(location -> location.getSiteName() +
-                " - " + location.getServiceId() +
                 " - " + location.getCourtAddress() +
                 " - " + location.getPostcode())
                             .toList());
@@ -354,7 +198,7 @@ class GeneralAppLocationRefDataServiceTest {
             anyString(),
             anyString(),
             anyString()
-        )).thenReturn(getAllLocationsRefDataResponse(serviceId));
+        )).thenReturn(getAllLocationsRefDataResponse());
 
         List<LocationRefData> courtLocations = refDataService
             .getCourtLocations("user_token", serviceId);
@@ -362,16 +206,16 @@ class GeneralAppLocationRefDataServiceTest {
         DynamicList courtLocationString = getLocationsFromListWithServiceId(courtLocations);
 
         assertThat(locationsFromDynamicList(courtLocationString))
-            .containsOnly("site_name_01 - " + serviceId + " - court address 1111 - AA0 0BB",
-                          "site_name_02 - " + serviceId + " - court address 2222 - AA0 0BB",
-                          "site_name_03 - " + serviceId + " - court address 3333 - AA0 0BB",
-                          "site_name_04 - " + serviceId + " - court address 4444 - AA0 0BB",
-                          "site_name_05 - " + serviceId + " - court address 5555 - AA0 0BB",
-                          "site_name_06 - " + serviceId + " - court address 6666 - AA0 0BB",
-                          "site_name_07 - " + serviceId + " - court address 7777 - AA0 0BB",
-                          "site_name_08 - " + serviceId + " - court address 8888 - AA0 0BB",
-                          "site_name_09 - " + serviceId + " - court address 9999 - AA0 0BB",
-                          "site_name_10 - " + serviceId + " - court address 1001 - AA0 0BB"
+            .containsOnly("site_name_01 - court address 1111 - AA0 0BC",
+                          "site_name_02 - court address 2222 - AA0 0BB",
+                          "site_name_03 - court address 3333 - AA0 0BB",
+                          "site_name_04 - court address 4444 - AA0 0BB",
+                          "site_name_05 - court address 5555 - AA0 0BB",
+                          "site_name_06 - court address 6666 - AA0 0BB",
+                          "site_name_07 - court address 7777 - AA0 0BB",
+                          "site_name_08 - court address 8888 - AA0 0BB",
+                          "site_name_09 - court address 9999 - AA0 0BB",
+                          "site_name_10 - court address 1001 - AA0 0BB"
             );
 
         assertThat(courtLocations).hasSize(10);
@@ -401,7 +245,7 @@ class GeneralAppLocationRefDataServiceTest {
             anyString(),
             anyString(),
             anyString()
-        )).thenReturn(getOnlyScotlandLocationsRefDataResponse(serviceId));
+        )).thenReturn(getOnlyScotlandLocationsRefDataResponse());
 
         List<LocationRefData> courtLocations = refDataService.getCourtLocations("user_token", serviceId);
 
@@ -416,26 +260,26 @@ class GeneralAppLocationRefDataServiceTest {
             anyString(),
             anyString(),
             anyString()
-        )).thenReturn(getNonScotlandLocationsRefDataResponse(serviceId));
+        )).thenReturn(getNonScotlandLocationsRefDataResponse());
 
         List<LocationRefData> courtLocations = refDataService.getCourtLocations("user_token", serviceId);
 
-        DynamicList courtLocationString = getLocationsFromListWithServiceId(courtLocations);
+        DynamicList courtLocationString = getLocationsFromList(courtLocations);
 
         assertThat(courtLocations).hasSize(12);
         assertThat(locationsFromDynamicList(courtLocationString)).containsOnly(
-            "site_name_01 - " + serviceId + " - court address 1111 - AA0 0BB",
-            "site_name_02 - " + serviceId + " - court address 2222 - AA0 0BB",
-            "site_name_03 - " + serviceId + " - court address 3333 - AA0 0BB",
-            "site_name_04 - " + serviceId + " - court address 4444 - AA0 0BB",
-            "site_name_05 - " + serviceId + " - court address 5555 - AA0 0BB",
-            "site_name_06 - " + serviceId + " - court address 6666 - AA0 0BB",
-            "site_name_07 - " + serviceId + " - court address 7777 - AA0 0BB",
-            "site_name_08 - " + serviceId + " - court address 8888 - AA0 0BB",
-            "site_name_09 - " + serviceId + " - court address 9999 - AA0 0BB",
-            "site_name_10 - " + serviceId + " - court address 1001 - AA0 0BB",
-            "site_name_11 - " + serviceId + " - court address 1011 - AA0 0BB",
-            "site_name_12 - " + serviceId + " - court address 1012 - AA0 0BB"
+            "site_name_01 - court address 1111 - AA0 0BC",
+            "site_name_02 - court address 2222 - AA0 0BB",
+            "site_name_03 - court address 3333 - AA0 0BB",
+            "site_name_04 - court address 4444 - AA0 0BB",
+            "site_name_05 - court address 5555 - AA0 0BB",
+            "site_name_06 - court address 6666 - AA0 0BB",
+            "site_name_07 - court address 7777 - AA0 0BB",
+            "site_name_08 - court address 8888 - AA0 0BB",
+            "site_name_09 - court address 9999 - AA0 0BB",
+            "site_name_10 - court address 1001 - AA0 0BB",
+            "site_name_11 - court address 1011 - AA0 0BB",
+            "site_name_12 - court address 1012 - AA0 0BB"
         );
     }
 
@@ -464,7 +308,7 @@ class GeneralAppLocationRefDataServiceTest {
             anyString(),
             anyString(),
             anyString()
-        )).thenReturn(getAllLocationsRefDataResponseByEpimms(serviceId));
+        )).thenReturn(getAllLocationsRefDataResponseByEpimms());
 
         List<LocationRefData> courtLocations = refDataService
             .getCourtLocationsByEpimmsId("user_token", "00000", serviceId);
@@ -473,7 +317,7 @@ class GeneralAppLocationRefDataServiceTest {
 
         assertThat(locationsFromDynamicList(courtLocationString))
             .containsOnly(
-                "site_name_01 - " + serviceId + " - court address 1111 - AA0 0BB"
+                "site_name_01 - court address 1111 - AA0 0BB"
             );
 
         assertThat(courtLocations).hasSize(1);
@@ -488,7 +332,7 @@ class GeneralAppLocationRefDataServiceTest {
             anyString(),
             anyString(),
             anyString()
-        )).thenReturn(getLocationRefDataResponseForCcmcc(serviceId));
+        )).thenReturn(getLocationRefDataResponseForCcmcc());
 
         List<LocationRefData> courtLocations = refDataService
             .getCcmccLocation("user_token", serviceId);
@@ -497,7 +341,7 @@ class GeneralAppLocationRefDataServiceTest {
 
         assertThat(locationsFromDynamicList(courtLocationString))
             .containsOnly(
-                "banana - " + serviceId + " - court address 1111 - AA0 0BB"
+                "banana - court address 1111 - AA0 0BB"
             );
 
         assertThat(courtLocations).hasSize(1);
@@ -512,7 +356,7 @@ class GeneralAppLocationRefDataServiceTest {
             anyString(),
             anyString(),
             anyString()
-        )).thenReturn(getLocationRefDataResponseForCnbc(serviceId));
+        )).thenReturn(getLocationRefDataResponseForCnbc());
 
         List<LocationRefData> courtLocations = refDataService
             .getCnbcLocation("user_token", serviceId);
@@ -521,7 +365,7 @@ class GeneralAppLocationRefDataServiceTest {
 
         assertThat(locationsFromDynamicList(courtLocationString))
             .containsOnly(
-                "pineapple - " + serviceId + " - court address 1111 - AA0 0BB"
+                "pineapple - court address 1111 - AA0 0BB"
             );
 
         assertThat(courtLocations).hasSize(1);

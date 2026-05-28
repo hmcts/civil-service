@@ -28,20 +28,14 @@ class CourtVenueServiceTest {
     private LocationRefData court1;
     private LocationRefData court2;
     private LocationRefData court3;
-    private LocationRefData court4;
-    private LocationRefData court5;
-    private LocationRefData court6;
 
     private AutoCloseable closeable;
 
     @BeforeEach
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
-
-        String specServiceId = "AAA6";
         court1 = new LocationRefData()
             .setEpimmsId("111")
-            .setServiceId(specServiceId)
             .setCourtName("London Court")
             .setRegion("South")
             .setRegionId("10")
@@ -54,7 +48,6 @@ class CourtVenueServiceTest {
 
         court2 = new LocationRefData()
             .setEpimmsId("222")
-            .setServiceId(specServiceId)
             .setCourtName("Bristol Court")
             .setRegion("West")
             .setRegionId("20")
@@ -67,47 +60,6 @@ class CourtVenueServiceTest {
 
         court3 = new LocationRefData()
             .setEpimmsId("333")
-            .setServiceId(specServiceId)
-            .setCourtName("London Court Annex")
-            .setRegion("South")
-            .setRegionId("10")
-            .setLocationType("Tribunal")
-            .setCourtLocationCode("CCC")
-            .setCourtStatus("Open")
-            .setIsCaseManagementLocation("Y")
-            .setIsHearingLocation("N")
-            .setWelshSiteName("Llys2");
-
-        String unSpecServiceId = "AAA7";
-        court4 = new LocationRefData()
-            .setEpimmsId("111")
-            .setServiceId(unSpecServiceId)
-            .setCourtName("London Court")
-            .setRegion("South")
-            .setRegionId("10")
-            .setLocationType("Court")
-            .setCourtLocationCode("AAA")
-            .setCourtStatus("Open")
-            .setIsCaseManagementLocation("Y")
-            .setIsHearingLocation("Y")
-            .setWelshSiteName("Llys");
-
-        court5 = new LocationRefData()
-            .setEpimmsId("222")
-            .setServiceId(unSpecServiceId)
-            .setCourtName("Bristol Court")
-            .setRegion("West")
-            .setRegionId("20")
-            .setLocationType("Court")
-            .setCourtLocationCode("BBB")
-            .setCourtStatus("Closed")
-            .setIsCaseManagementLocation("N")
-            .setIsHearingLocation("Y")
-            .setWelshSiteName("None");
-
-        court6 = new LocationRefData()
-            .setEpimmsId("333")
-            .setServiceId(unSpecServiceId)
             .setCourtName("London Court Annex")
             .setRegion("South")
             .setRegionId("10")
@@ -119,7 +71,7 @@ class CourtVenueServiceTest {
             .setWelshSiteName("Llys2");
 
         when(rdClientService.fetchAllCivilCourtsByServiceId(any(), any(), any()))
-            .thenReturn(List.of(court1, court2, court3, court4, court5, court6));
+            .thenReturn(List.of(court1, court2, court3));
     }
 
     @AfterEach
@@ -131,69 +83,69 @@ class CourtVenueServiceTest {
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterByEpimmsIdAndServiceId(String serviceId) {
         List<LocationRefData> result = courtVenueService.getCourtByEpimmsId(serviceAuth, auth, "111", serviceId);
-        assertThat(result).containsExactlyInAnyOrder(court1, court4);
+        assertThat(result).containsExactly(court1);
     }
 
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterCMLByEpimmsIdAndServiceId(String serviceId) {
         List<LocationRefData> result = courtVenueService.getCMLCourtByEpimmsId(serviceAuth, auth, "111", serviceId);
-        assertThat(result).containsExactlyInAnyOrder(court1, court4); // court3 has CML=Y but hearing=N
+        assertThat(result).containsExactly(court1); // court3 has CML=Y but hearing=N
     }
 
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterByCourtNameAndServiceId(String serviceId) {
         List<LocationRefData> result = courtVenueService.getCourtVenueByName(serviceAuth, auth, "London Court", serviceId);
-        assertThat(result).containsExactlyInAnyOrder(court1, court4);
+        assertThat(result).containsExactly(court1);
     }
 
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterByRegionAndServiceId(String serviceId) {
         List<LocationRefData> result = courtVenueService.getByRegion(serviceAuth, auth, "South", serviceId);
-        assertThat(result).containsExactlyInAnyOrder(court1, court3, court4, court6);
+        assertThat(result).containsExactlyInAnyOrder(court1, court3);
     }
 
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterByRegionId(String serviceId) {
         List<LocationRefData> result = courtVenueService.getByRegionId(serviceAuth, auth, "10", serviceId);
-        assertThat(result).containsExactlyInAnyOrder(court1, court3, court4, court6);
+        assertThat(result).containsExactlyInAnyOrder(court1, court3);
     }
 
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterByLocationType(String serviceId) {
         List<LocationRefData> result = courtVenueService.getByLocationType(serviceAuth, auth, "Court", serviceId);
-        assertThat(result).containsExactlyInAnyOrder(court1, court2, court4, court5);
+        assertThat(result).containsExactlyInAnyOrder(court1, court2);
     }
 
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterByLocationCode(String serviceId) {
         List<LocationRefData> result = courtVenueService.getCourtVenueByLocationCode(serviceAuth, auth, "AAA", serviceId);
-        assertThat(result).containsExactlyInAnyOrder(court1, court4); // must be Open + CML=Y
+        assertThat(result).containsExactly(court1); // must be Open + CML=Y
     }
 
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldFilterByWelshSiteName(String serviceId) {
         List<LocationRefData> result = courtVenueService.getCourtByWelshSiteName(serviceAuth, auth, "Llys", serviceId);
-        assertThat(result).containsExactlyInAnyOrder(court1, court4);
+        assertThat(result).containsExactly(court1);
     }
 
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldReturnHearingLocationCourts(String serviceId) {
         List<LocationRefData> result = courtVenueService.getHearingLocationCourts(serviceAuth, auth, serviceId);
-        assertThat(result).containsExactlyInAnyOrder(court1, court2, court4, court5);
+        assertThat(result).containsExactlyInAnyOrder(court1, court2);
     }
 
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldReturnCMLAndHLCourts(String serviceId) {
         List<LocationRefData> result = courtVenueService.getCMLAndHLCourts(serviceAuth, auth, serviceId);
-        assertThat(result).containsExactlyInAnyOrder(court1, court4);
+        assertThat(result).containsExactly(court1);
     }
 }

@@ -36,7 +36,7 @@ class ReferenceNumberAndCourtDetailsPopulatorTest {
     @Mock
     private LocationReferenceDataService locationRefDataService;
 
-    private static final List<LocationRefData> LOCATIONS = List.of(new LocationRefData().setSiteName("SiteName").setServiceId("AAA6").setCourtAddress("1").setPostcode("1")
+    private static final List<LocationRefData> LOCATIONS = List.of(new LocationRefData().setSiteName("SiteName").setCourtAddress("1").setPostcode("1")
                                                                        .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
                                                                        .setCourtTypeId("10").setCourtLocationCode("121")
                                                                        .setEpimmsId("000000"));
