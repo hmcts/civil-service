@@ -42,7 +42,7 @@ public class LocationController {
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<List<DynamicListElement>> getCourtLocations(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-        @RequestParam("serviceId") String serviceId) {
+        @RequestParam(defaultValue = "AAA6") String serviceId) {
         return new ResponseEntity<>(courtLocationUtils.getLocationsFromList(
             locationRefDataService.getCourtLocationsForDefaultJudgments(authorization, serviceId)).getListItems(), HttpStatus.OK);
     }

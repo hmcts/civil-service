@@ -27,7 +27,7 @@ public class LocationControllerTest extends BaseIntegrationTest {
         DynamicList dynamicList = new DynamicList().setListItems(Collections.singletonList(dynamicListElement));
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(dynamicList);
 
-        doGet(BEARER_TOKEN, "/locations/courtLocations?serviceId=AAA6")
+        doGet(BEARER_TOKEN, "/locations/courtLocations")
             .andExpect(content().json(toJson(dynamicList.getListItems())))
             .andExpect(status().isOk());
     }
