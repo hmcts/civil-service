@@ -14,7 +14,6 @@ import java.util.function.Supplier;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.reform.civil.scheduler.defendantresponse.DefendantResponseDeadlineScheduler.SCHEDULER_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class DefendantResponseDeadlineSchedulerTest {
@@ -34,9 +33,9 @@ class DefendantResponseDeadlineSchedulerTest {
     @SuppressWarnings("unchecked")
     @Test
     void shouldRunTaskRunner_whenDeadlineCheckIsCalled() {
-        ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
+        ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(scheduler.getName());
 
-        scheduler.deadlineCheck();
+        scheduler.runScheduledTask();
 
         verify(scheduledTaskRunner).run(
             eq(expectedConfig),

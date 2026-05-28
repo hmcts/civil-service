@@ -18,7 +18,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.scheduler.judgementbuffer.JudgementBufferScheduler.SCHEDULER_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class JudgementBufferSchedulerTest {
@@ -44,10 +43,10 @@ class JudgementBufferSchedulerTest {
         @SuppressWarnings("unchecked")
         @Test
         void shouldRunTaskRunner_whenSchedulerIsEnabledAndFeatureToggleIsEnabled() {
-            ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
+            ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(scheduler.getName());
             when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
 
-            scheduler.issueJudgement();
+            scheduler.runScheduledTask();
 
             verify(scheduledTaskRunner).run(
                 eq(expectedConfig),
@@ -60,7 +59,7 @@ class JudgementBufferSchedulerTest {
         void shouldNotRunTaskRunner_whenSchedulerIsEnabledAndFeatureToggleIsDisabled() {
             when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(false);
 
-            scheduler.issueJudgement();
+            scheduler.runScheduledTask();
 
             verifyNoInteractions(scheduledTaskRunner);
         }

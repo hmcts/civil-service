@@ -68,7 +68,7 @@ public class JudgementBufferSchedulerITest {
         coreCaseDataApiMockHelper.mockSubmitEvent(caseIdString, caseDetails);
 
         // When
-        scheduler.issueJudgement();
+        scheduler.runScheduledTask();
 
         // Then
         verify(telemetryService).trackEvent(eq("JudgementBufferJobStarted"), anyMap());
