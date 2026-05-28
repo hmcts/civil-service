@@ -70,6 +70,10 @@ allprojects {
     analyzers.ossIndex.enabled = false
   }
 
+  tasks.named('dependencyCheckUpdate') {
+    dependsOn tasks.named('dependencyCheckPurge')
+  }
+
   tasks.named('dependencyCheckAggregate') {
     dependsOn tasks.named('dependencyCheckUpdate')
   }
