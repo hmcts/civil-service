@@ -58,9 +58,34 @@ class ScenarioConfigLoaderTest {
         Set<CaseEvent> events = loader.getNoOngoingBPAllowedEvents(NO_ONGOING_BP_ALLOWED_EVENTS_FILE);
 
         assertThat(events).contains(
+            CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS,
+            CaseEvent.CHANGE_SOLICITOR_EMAIL,
+            CaseEvent.CREATE_CASE_FLAGS,
+            CaseEvent.EVIDENCE_UPLOAD_JUDGE,
+            CaseEvent.MANAGE_CASE_FLAGS,
+            CaseEvent.MANAGE_DOCUMENTS,
+            CaseEvent.ORDER_REVIEW_OBLIGATION_CHECK,
             CaseEvent.UPDATE_CASE_DATA,
             CaseEvent.REMOVE_DOCUMENT,
             CaseEvent.SERVICE_REQUEST_RECEIVED
+        );
+    }
+
+    @Test
+    void doesNotAllowEventsThatSetOrTriggerBusinessProcessWithoutDeferral() {
+        var loader = new ScenarioConfigLoader(resourceLoader);
+
+        Set<CaseEvent> events = loader.getNoOngoingBPAllowedEvents(NO_ONGOING_BP_ALLOWED_EVENTS_FILE);
+
+        assertThat(events).doesNotContain(
+            CaseEvent.ADD_CASE_NOTE,
+            CaseEvent.AMEND_RESTITCH_BUNDLE,
+            CaseEvent.CREATE_BUNDLE,
+            CaseEvent.GENERATE_DIRECTIONS_ORDER,
+            CaseEvent.INITIATE_GENERAL_APPLICATION,
+            CaseEvent.MANAGE_CONTACT_INFORMATION,
+            CaseEvent.queryManagementRaiseQuery,
+            CaseEvent.queryManagementRespondQuery
         );
     }
 
