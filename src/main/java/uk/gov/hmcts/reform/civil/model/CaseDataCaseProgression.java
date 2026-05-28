@@ -115,6 +115,8 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
     private  List<EvidenceUploadTrial> trialSelectionEvidenceRes;
     private  List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
     private  List<EvidenceUploadWithoutPrejudice> withoutPrejudiceSelectionEvidence;
+    private  List<EvidenceUploadWithoutPrejudice> withoutPrejudiceSelectionEvidenceSmallClaim;
+    private  List<EvidenceUploadWithoutPrejudice> withoutPrejudiceSelectionEvidenceSmallClaimRes;
     //applicant
     private  List<Element<UploadEvidenceDocumentType>> documentDisclosureList;
     private  List<Element<UploadEvidenceDocumentType>> documentForDisclosure;
