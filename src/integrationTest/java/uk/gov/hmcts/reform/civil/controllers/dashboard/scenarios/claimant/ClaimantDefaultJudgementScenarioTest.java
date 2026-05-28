@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefaultJudgementIssuedClaimantNotificationHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardNotificationHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
@@ -22,7 +24,7 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
     public static final String CLAIMANT = "CLAIMANT";
 
     @Autowired
-    private DefaultJudgementIssuedClaimantNotificationHandler defaultJudgementIssuedClaimantNotificationHandler;
+    private DashboardNotificationHandler dashboardNotificationHandler;
 
     @Test
     void should_create_default_judgement_issued_scenario_for_claimant_when_judgment_buffer_disabled() throws Exception {
@@ -30,10 +32,9 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
         String caseId = "720111";
         CaseData caseData = defaultJudgmentIssuedCaseData(caseId);
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(false);
 
-        defaultJudgementIssuedClaimantNotificationHandler.handle(callbackParams(caseData));
+        dashboardNotificationHandler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, CLAIMANT)
@@ -57,10 +58,9 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
         String caseId = "720113";
         CaseData caseData = defaultJudgmentIssuedCaseData(caseId);
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
 
-        defaultJudgementIssuedClaimantNotificationHandler.handle(callbackParams(caseData));
+        dashboardNotificationHandler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, CLAIMANT)
@@ -84,10 +84,9 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
         String caseId = "720112";
         CaseData caseData = defaultJudgmentIssuedCaseData(caseId);
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
 
-        defaultJudgementIssuedClaimantNotificationHandler.handle(callbackParams(caseData));
+        dashboardNotificationHandler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, CLAIMANT)
@@ -112,6 +111,7 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .businessProcess(new BusinessProcess().setActivityId(DashboardTaskIds.DJ_NON_DIVERGENT))
             .activeJudgment(new JudgmentDetails()
                                 .setType(JudgmentType.DEFAULT_JUDGMENT)
                                 .setState(JudgmentState.ISSUED))
