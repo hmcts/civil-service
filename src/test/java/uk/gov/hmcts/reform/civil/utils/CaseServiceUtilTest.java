@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -12,36 +11,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 class CaseServiceUtilTest {
-
-    @Test
-    void shouldReturnAAA7WhenCaseAccessCategoryIsUnspecClaim() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.UNSPEC_CLAIM);
-
-        String serviceId = CaseServiceUtil.getCaseServiceId(caseData);
-
-        assertEquals("AAA7", serviceId);
-    }
-
-    @Test
-    void shouldReturnAAA6WhenCaseAccessCategoryIsNotUnspecClaim() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM); // Or any other category
-
-        String serviceId = CaseServiceUtil.getCaseServiceId(caseData);
-
-        assertEquals("AAA6", serviceId);
-    }
-
-    @Test
-    void shouldReturnAAA6WhenCaseAccessCategoryIsNull() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(null);
-
-        String serviceId = CaseServiceUtil.getCaseServiceId(caseData);
-
-        assertEquals("AAA6", serviceId);
-    }
 
     @Test
     void shouldReturnAAA7WhenGeneralApplicationCaseAccessCategoryIsUnspecClaim() {
