@@ -60,7 +60,6 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private ObjectMapper mapper;
-    @Mock
     private AssignCategoryId assignCategoryId;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
@@ -103,6 +102,11 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private final LocalDate issueDate = now();
+
+    @BeforeEach
+    void initialiseAssignCategoryId() {
+        assignCategoryId = new AssignCategoryId();
+    }
 
     @Nested
     class GenerateClaimFormOnly {

@@ -62,6 +62,7 @@ public class CourtOfficerOrderGenerator implements TemplateDataGenerator<CourtOf
 
         return new CourtOfficerOrderForm(
             caseData.getCcdCaseReference().toString(),
+            caseData.getLegacyCaseReference(),
             caseData.getApplicant1().getPartyName(),
             nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null,
             caseData.getRespondent1().getPartyName(),

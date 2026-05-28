@@ -2279,7 +2279,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateCasenamePublic_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("caseNamePublic").isEqualTo("John Rambo v Sole Trader");
+            assertThat(response.getData()).extracting("caseNamePublic").isEqualTo("John Rambo v Sole Trader T/A Sole Trader co");
         }
 
         @Test
@@ -2328,7 +2328,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData())
-                .containsEntry("caseNameHmctsInternal", "John Rambo v Sole Trader, John Rambo");
+                .containsEntry("caseNameHmctsInternal", "John Rambo v Sole Trader T/A Sole Trader co, John Rambo");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -2344,7 +2344,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData())
-                .containsEntry("caseNameHmctsInternal", "John Rambo, Jason Rambo v Sole Trader");
+                .containsEntry("caseNameHmctsInternal", "John Rambo, Jason Rambo v Sole Trader T/A Sole Trader co");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -2360,7 +2360,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("John Rambo v Sole Trader");
+                .isEqualTo("John Rambo v Sole Trader T/A Sole Trader co");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }

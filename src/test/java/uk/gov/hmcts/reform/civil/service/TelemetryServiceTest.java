@@ -57,4 +57,28 @@ class TelemetryServiceTest {
         // Then
         verifyNoInteractions(telemetryClient);
     }
+
+    @Test
+    void shouldTrackMetric_whenTelemetryClientIsPresent() {
+        // Given
+        when(telemetryClientProvider.getIfAvailable()).thenReturn(telemetryClient);
+
+        // When
+        telemetryService.trackMetric("testMetric", 123.0);
+
+        // Then
+        verify(telemetryClient).trackMetric("testMetric", 123.0);
+    }
+
+    @Test
+    void shouldNotThrowExceptionForMetric_whenTelemetryClientIsNull() {
+        // Given
+        when(telemetryClientProvider.getIfAvailable()).thenReturn(null);
+
+        // When
+        telemetryService.trackMetric("testMetric", 123.0);
+
+        // Then
+        verifyNoInteractions(telemetryClient);
+    }
 }

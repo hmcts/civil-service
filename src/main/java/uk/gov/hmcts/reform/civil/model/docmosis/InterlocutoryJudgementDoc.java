@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 public class InterlocutoryJudgementDoc implements MappableObject {
 
+    private String ccdCaseReference;
     private String claimNumber;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")

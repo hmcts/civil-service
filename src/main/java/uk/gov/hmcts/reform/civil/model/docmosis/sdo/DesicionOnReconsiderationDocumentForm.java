@@ -19,7 +19,7 @@ import java.time.LocalDate;
 public class DesicionOnReconsiderationDocumentForm implements MappableObject {
 
     private String caseNumber;
-
+    private String ccdCaseReference;
     private LocalDate currentDate;
 
     private Party applicant1;

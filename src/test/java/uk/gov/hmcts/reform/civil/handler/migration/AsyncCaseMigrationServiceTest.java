@@ -273,4 +273,29 @@ class AsyncCaseMigrationServiceTest {
         assertEquals("token123", sent.getEventToken());
         assertEquals("summary", sent.getEvent().getSummary());
     }
+
+    @Test
+    void shouldIncludeExplicitNullFieldsInBuiltCaseDataContent() {
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .eventId("event123")
+            .token("tokenABC")
+            .caseDetails(CaseDetails.builder().id(999L).state("STATE").build())
+            .build();
+
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.toMap(ArgumentMatchers.any())).thenReturn(Map.of("a", "b"));
+
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getEventSummary()).thenReturn("Summary123");
+        when(migrationTask.getEventDescription()).thenReturn("Desc456");
+        when(migrationTask.getFieldsToNullify()).thenReturn(List.of("caseDismissedHearingFeeDueDate"));
+
+        CaseDataContent content = asyncCaseMigrationService.buildCaseDataContent(startEventResponse, caseData, migrationTask);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> contentData = (Map<String, Object>) content.getData();
+
+        assertEquals("b", contentData.get("a"));
+        assertNull(contentData.get("caseDismissedHearingFeeDueDate"));
+    }
 }

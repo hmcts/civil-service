@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 public class ClaimantLipManualDeterminationForm implements MappableObject {
 
+    private String ccdCaseReference;
     private String referenceNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)

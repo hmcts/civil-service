@@ -119,6 +119,7 @@ public class JudgmentByDeterminationDocGenerator {
         docForm
             .setCosts(costs.toString())
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setDebt(orderAmount.toString())
             .setFormText("No response,")
             .setApplicants(getApplicants(caseData))
