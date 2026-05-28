@@ -12,14 +12,6 @@ import java.util.List;
 public interface LocationReferenceDataApiClient {
 
     @GetMapping(value = "/refdata/location/court-venues")
-    List<LocationRefData> getAllCivilCourtVenues(
-        @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
-        @RequestHeader("Authorization") final String authorisation,
-        @RequestParam("court_type_id") final String courtTypeId,
-        @RequestParam("location_type") final String locationType
-    );
-
-    @GetMapping(value = "/refdata/location/court-venues")
     List<LocationRefData> getAllCivilCourtVenuesByServiceId(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") final String authorisation,

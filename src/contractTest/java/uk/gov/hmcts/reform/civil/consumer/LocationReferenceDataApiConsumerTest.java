@@ -8,7 +8,8 @@ import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,7 +17,6 @@ import org.springframework.http.MediaType;
 import uk.gov.hmcts.reform.civil.client.LocationReferenceDataApiClient;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
-import java.io.IOException;
 import java.util.List;
 
 import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArray;
@@ -29,41 +29,44 @@ import static org.hamcrest.Matchers.is;
 public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/refdata/location/court-venues";
-    private static final String COURT_TYPE_ID = "12345";
+    private static final String SERVICE_ID = "AAA6";
+    private static final String SERVICE_ID_REGEX = "AAA6|AAA7";
+    private static final String LOCATION_TYPE = "locationType";
 
     @Autowired
     private LocationReferenceDataApiClient locationReferenceDataApiClient;
 
     @Pact(consumer = "civil_service")
     public RequestResponsePact getAllCivilCourtVenues(PactDslWithProvider builder)
-        throws JSONException, IOException {
+        throws JSONException {
         return buildCourtVenueResponsePact(builder);
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"AAA6", "AAA7"})
     @PactTestFor(pactMethod = "getAllCivilCourtVenues")
-    public void verifyCourtVenue() {
-        List<LocationRefData> response = locationReferenceDataApiClient.getAllCivilCourtVenues(
+    public void verifyCourtVenue(String serviceId) {
+        List<LocationRefData> response = locationReferenceDataApiClient.getAllCivilCourtVenuesByServiceId(
             SERVICE_AUTH_TOKEN,
             AUTHORIZATION_TOKEN,
-            COURT_TYPE_ID,
-            "locationType"
+            LOCATION_TYPE,
+            serviceId
         );
         assertThat(
-            response.get(0).getRegion(),
+            response.getFirst().getRegion(),
             is(equalTo("regionTest123"))
         );
     }
 
-    private RequestResponsePact buildCourtVenueResponsePact(PactDslWithProvider builder) throws IOException {
+    private RequestResponsePact buildCourtVenueResponsePact(PactDslWithProvider builder)  {
         return builder
             .given("There are court locations to be returned")
             .uponReceiving("a location request")
             .path(ENDPOINT)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
-            .matchQuery("court_type_id", "\\d+", COURT_TYPE_ID)
-            .matchQuery("location_type", "locationType", "locationType")
+            .matchQuery("location_type", LOCATION_TYPE, LOCATION_TYPE)
+            .matchQuery("service_code", SERVICE_ID_REGEX, SERVICE_ID)
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(buildLocationRefDataResponseBody())
