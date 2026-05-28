@@ -14,7 +14,6 @@ import lombok.experimental.Accessors;
 public class LocationRefData {
 
     private String courtVenueId;
-    private String serviceId;
     private String epimmsId;
     private String siteName;
     private String welshSiteName;
@@ -60,7 +59,6 @@ public class LocationRefData {
                     @JsonProperty("is_case_management_location") String isCaseManagementLocation,
                     @JsonProperty("is_hearing_location") String isHearingLocation) {
         this.courtVenueId = courtVenueId;
-        this.serviceId = serviceId;
         this.epimmsId = epimmsId;
         this.siteName = siteName;
         this.welshSiteName = welshSiteName;
