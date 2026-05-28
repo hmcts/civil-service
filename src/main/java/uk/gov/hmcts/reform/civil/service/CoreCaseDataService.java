@@ -85,9 +85,9 @@ public class CoreCaseDataService {
         List<LocationRefData> locationRefDataList = referenceDataService.getCourtLocationsByEpimmsId(
             getSystemUpdateUser().getUserToken(),
             epimdsId,
-            getCaseServiceId(caseData)
+            getCaseServiceId(caseData.getCaseAccessCategory())
         );
-        LocationRefData locationRefData = locationRefDataList.get(0);
+        LocationRefData locationRefData = locationRefDataList.getFirst();
 
         DynamicListElement dynamicListElement = new DynamicListElement();
         dynamicListElement.setCode(UUID.randomUUID().toString());

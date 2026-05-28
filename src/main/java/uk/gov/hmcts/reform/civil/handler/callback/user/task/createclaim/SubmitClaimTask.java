@@ -125,7 +125,7 @@ public class SubmitClaimTask {
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsByEpimmsId(authorisationToken, epimmsId, getCaseServiceId(caseData)));
+            .getCourtLocationsByEpimmsId(authorisationToken, epimmsId, getCaseServiceId(caseData.getCaseAccessCategory())));
 
         Optional.ofNullable(locations)
             .orElseGet(Collections::emptyList).stream().findFirst()
@@ -324,6 +324,7 @@ public class SubmitClaimTask {
     }
 
     private List<LocationRefData> fetchLocationData(String authToken, CaseData caseData) {
-        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken, getCaseServiceId(caseData));
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken,
+                                                                           getCaseServiceId(caseData.getCaseAccessCategory()));
     }
 }

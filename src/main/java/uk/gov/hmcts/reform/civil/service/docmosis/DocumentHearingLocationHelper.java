@@ -34,7 +34,7 @@ public class DocumentHearingLocationHelper {
             Optional<LocationRefData> fromForm = locationRefDataService.getLocationMatchingLabel(
                 valueFromForm,
                 authorisation,
-                getCaseServiceId(caseData)
+                getCaseServiceId(caseData.getCaseAccessCategory())
             );
             if (fromForm.isPresent()) {
                 log.info("Case location for " + caseData.getLegacyCaseReference()
@@ -49,7 +49,7 @@ public class DocumentHearingLocationHelper {
                 List<LocationRefData> sameLocation = locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
                     authorisation,
                     baseLocation,
-                    getCaseServiceId(caseData)
+                    getCaseServiceId(caseData.getCaseAccessCategory())
                 ).stream().filter(location -> StringUtils.equals(
                     location.getRegionId(),
                     caseData.getCaseManagementLocation().getRegion()
@@ -75,13 +75,15 @@ public class DocumentHearingLocationHelper {
     public LocationRefData getCaseManagementLocationDetailsNro(CaseData caseData, LocationReferenceDataService locationRefDataService, String authorisation) {
         LocationRefData caseManagementLocationDetails = null;
         if (Boolean.TRUE.equals(checkIfCcmccOrCnbc(caseData)) && caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
-            caseManagementLocationDetails = locationRefDataService.getCnbcLocation(authorisation, getCaseServiceId(caseData));
+            caseManagementLocationDetails = locationRefDataService.getCnbcLocation(authorisation,
+                                                                                   getCaseServiceId(caseData.getCaseAccessCategory()));
         }
         if (Boolean.TRUE.equals(checkIfCcmccOrCnbc(caseData)) && caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
-            caseManagementLocationDetails = locationRefDataService.getCcmccLocation(authorisation, getCaseServiceId(caseData));
+            caseManagementLocationDetails = locationRefDataService.getCcmccLocation(authorisation,
+                                                                                    getCaseServiceId(caseData.getCaseAccessCategory()));
         }
         if (Boolean.FALSE.equals(checkIfCcmccOrCnbc(caseData))) {
-            List<LocationRefData>  locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation, getCaseServiceId(caseData));
+            List<LocationRefData>  locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation, getCaseServiceId(caseData.getCaseAccessCategory()));
             var foundLocations = locationRefDataList.stream()
                 .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
             if (!foundLocations.isEmpty()) {

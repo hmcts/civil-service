@@ -154,7 +154,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             hearingId,
             caseData.getCaseManagementLocation().getBaseLocation(),
             bearerToken,
-            getCaseServiceId(caseData),
+            getCaseServiceId(caseData.getCaseAccessCategory()),
             locationRefDataService
         );
     }

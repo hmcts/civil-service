@@ -110,10 +110,10 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
             List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(
                 authorisation,
                 caseData.getCaseManagementLocation().getBaseLocation(),
-                getCaseServiceId(caseData)
+                getCaseServiceId(caseData.getCaseAccessCategory())
             );
             if (locationDetails != null && !locationDetails.isEmpty()) {
-                return locationDetails.get(0).getCourtName();
+                return locationDetails.getFirst().getCourtName();
             }
         }
         return null;

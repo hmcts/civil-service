@@ -332,7 +332,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 caseData,
                 requestedCourt,
                 () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                    CallbackParams.Params.BEARER_TOKEN).toString(), getCaseServiceId(caseData))
+                    CallbackParams.Params.BEARER_TOKEN).toString(), getCaseServiceId(caseData.getCaseAccessCategory()))
             ));
 
         if (log.isDebugEnabled()) {

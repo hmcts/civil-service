@@ -105,7 +105,7 @@ public class SdoHearingPreparationService {
     ) {
         List<LocationRefData> locationRefDataList = sdoLocationService.fetchHearingLocations(
             authToken,
-            getCaseServiceId(caseData)
+            getCaseServiceId(caseData.getCaseAccessCategory())
         );
         DynamicList locationsList;
         if (caseData.getReasonForTransfer() != null && caseData.getTransferCourtLocationList() != null) {

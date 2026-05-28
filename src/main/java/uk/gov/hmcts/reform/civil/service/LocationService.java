@@ -63,7 +63,7 @@ public class LocationService {
             courtLocation = assignCaseManagementLocationToMainCaseLocation(caseData, authToken);
             return Pair.of(courtLocation, true);
         } else {
-            LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken, getCaseServiceId(caseData));
+            LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken, getCaseServiceId(caseData.getCaseAccessCategory()));
             courtLocation = new CaseLocationCivil();
             courtLocation.setRegion(cnbcLocation.getRegionId());
             courtLocation.setBaseLocation(cnbcLocation.getEpimmsId());
@@ -120,7 +120,7 @@ public class LocationService {
             locationRefDataService.getCourtLocationsByEpimmsIdWithCML(
                 authToken,
                 epimmsId,
-                getCaseServiceId(caseData)
+                getCaseServiceId(caseData.getCaseAccessCategory())
             );
 
         log.info("CML court locations found : {} for caseId {}",
@@ -133,7 +133,7 @@ public class LocationService {
             ));
         }
 
-        LocationRefData caseManagementLocationDetails = locationRefDataList.get(0);
+        LocationRefData caseManagementLocationDetails = locationRefDataList.getFirst();
 
         CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
         caseLocationCivil.setRegion(caseManagementLocationDetails.getRegionId());

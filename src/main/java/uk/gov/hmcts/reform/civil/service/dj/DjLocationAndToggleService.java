@@ -143,7 +143,7 @@ public class DjLocationAndToggleService {
     private DynamicList buildLocationList(CallbackParams callbackParams, CaseData caseData) {
         List<LocationRefData> locations = locationReferenceDataService.getCourtLocationsForDefaultJudgments(
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
-            getCaseServiceId(caseData)
+            getCaseServiceId(caseData.getCaseAccessCategory())
         );
 
         Optional<RequestedCourt> preferredCourt;

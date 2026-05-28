@@ -86,7 +86,7 @@ public class GenAppStateHelperService {
         LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(
             caseData.getCaseManagementLocation().getBaseLocation(),
             authToken,
-            getCaseServiceId(caseData)
+            getCaseServiceId(caseData.getCaseAccessCategory())
         );
         caseData.setGeneralApplications(wrapElements(buildUpdatedGeneralApplications(caseData, locationDetails)));
         return caseData;

@@ -73,7 +73,7 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
                                locationHelper.getMatching(
                                        locationRefDataService.getCourtLocationsForDefaultJudgments(
                                            callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                                           getCaseServiceId(caseData)),
+                                           getCaseServiceId(caseData.getCaseAccessCategory())),
                                        requestedCourt)
                                    .ifPresent(matchingLocation ->
                                                   LocationHelper.updateWithLocation(caseData, matchingLocation)

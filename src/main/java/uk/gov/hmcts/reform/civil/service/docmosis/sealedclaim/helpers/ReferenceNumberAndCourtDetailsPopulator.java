@@ -37,7 +37,7 @@ public class ReferenceNumberAndCourtDetailsPopulator {
             .getCourtLocationsByEpimmsId(
                 authorisation,
                 requestedCourt,
-                getCaseServiceId(caseData)));
+                getCaseServiceId(caseData.getCaseAccessCategory())));
 
         Optional<LocationRefData> optionalCourtLocation = courtLocations.stream()
             .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))

@@ -337,7 +337,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             requestedCourt,
             () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                getCaseServiceId(caseData))
+                getCaseServiceId(caseData.getCaseAccessCategory()))
         ));
 
         if (log.isDebugEnabled()) {
@@ -377,7 +377,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(
             authToken,
-            getCaseServiceId(callbackParams.getCaseData())
+            getCaseServiceId(callbackParams.getCaseData().getCaseAccessCategory())
         );
     }
 

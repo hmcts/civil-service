@@ -225,7 +225,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(
             authToken,
-            getCaseServiceId(callbackParams.getCaseData())
+            getCaseServiceId(callbackParams.getCaseData().getCaseAccessCategory())
         );
     }
 

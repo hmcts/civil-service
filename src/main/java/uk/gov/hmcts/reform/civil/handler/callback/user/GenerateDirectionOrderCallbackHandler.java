@@ -332,7 +332,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         if (ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
             List<LocationRefData> locations = (locationRefDataService
-                .getHearingCourtLocations(authToken, getCaseServiceId(caseData)));
+                .getHearingCourtLocations(authToken, getCaseServiceId(caseData.getCaseAccessCategory())));
             populateFields(caseData, locations, authToken);
         } else  {
             populateFreeFormFields(caseData);

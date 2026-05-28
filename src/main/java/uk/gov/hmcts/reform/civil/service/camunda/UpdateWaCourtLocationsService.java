@@ -38,7 +38,7 @@ public class UpdateWaCourtLocationsService {
     public void updateCourtListingWALocations(String authorisation, CaseData caseData) {
         List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(
             authorisation,
-            getCaseServiceId(caseData)
+            getCaseServiceId(caseData.getCaseAccessCategory())
         );
 
         String claimTrack = getClaimTrack(caseData);

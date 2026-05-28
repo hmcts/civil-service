@@ -158,7 +158,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         GAHearingDetails generalAppHearingDetails = new GAHearingDetails();
         generalAppHearingDetails.setHearingPreferredLocation(getLocationsFromList(locationRefDataService
-            .getCourtLocationsForGeneralApplication(authToken, getCaseServiceId(caseData))));
+            .getCourtLocationsForGeneralApplication(authToken, getCaseServiceId(caseData.getCaseAccessCategory()))));
         caseData.setGeneralAppHearingDetails(generalAppHearingDetails);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)

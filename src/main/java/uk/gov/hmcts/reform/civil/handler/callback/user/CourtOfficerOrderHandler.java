@@ -116,7 +116,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
         finalOrderFurtherHearing.setDatesToAvoidDateDropdown(datesFinalOrders);
         finalOrderFurtherHearing.setHearingLocationList(populateCurrentHearingLocation(caseData, authToken));
         finalOrderFurtherHearing.setAlternativeHearingList(getLocationsFromList(
-            locationRefDataService.getHearingCourtLocations(authToken, getCaseServiceId(caseData))
+            locationRefDataService.getHearingCourtLocations(authToken, getCaseServiceId(caseData.getCaseAccessCategory()))
         ));
         caseData.setCourtOfficerFurtherHearingComplex(finalOrderFurtherHearing);
         caseData.setCourtOfficerGiveReasonsYesNo(YesOrNo.NO);

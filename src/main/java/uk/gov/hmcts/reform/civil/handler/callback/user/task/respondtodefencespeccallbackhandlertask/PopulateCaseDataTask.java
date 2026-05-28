@@ -128,7 +128,7 @@ public class PopulateCaseDataTask implements CaseTask {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(
             authToken,
-            getCaseServiceId(callbackParams.getCaseData())
+            getCaseServiceId(callbackParams.getCaseData().getCaseAccessCategory())
         );
     }
 

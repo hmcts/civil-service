@@ -35,7 +35,7 @@ public abstract class AbstractHearingScheduledDashboardService extends Dashboard
     private void populateCourtName(CaseData caseData, String authToken) {
         List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
             authToken,
-            getCaseServiceId(caseData)
+            getCaseServiceId(caseData.getCaseAccessCategory())
         );
         LocationRefData locationRefData = courtLocationUtils.fillPreferredLocationData(
             locations,

@@ -370,7 +370,7 @@ public class InitiateGeneralApplicationService {
         LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(
             caseData.getCaseManagementLocation().getBaseLocation(),
             authToken,
-            getCaseServiceId(caseData)
+            getCaseServiceId(caseData.getCaseAccessCategory())
         );
         CaseLocationCivil caseManagementLocation = new CaseLocationCivil();
         caseManagementLocation.setRegion(caseData.getCaseManagementLocation().getRegion());
@@ -394,7 +394,7 @@ public class InitiateGeneralApplicationService {
             LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(
                 caseLocation.getLeft().getBaseLocation(),
                 authToken,
-                getCaseServiceId(caseData)
+                getCaseServiceId(caseData.getCaseAccessCategory())
             );
             caseLocation.getLeft().setSiteName(locationDetails.getSiteName());
             caseLocation.getLeft().setAddress(locationDetails.getCourtAddress());
@@ -402,7 +402,7 @@ public class InitiateGeneralApplicationService {
         }
         applicationBuilder.setCaseManagementLocation(caseLocation.getLeft());
         applicationBuilder.setLocationName(hasSDOBeenMade(caseData) ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
-        applicationBuilder.setIsCcmccLocation(caseLocation.getRight() ? YES : NO);
+        applicationBuilder.setIsCcmccLocation(Boolean.TRUE.equals(caseLocation.getRight()) ? YES : NO);
     }
 
     private void setGeneralAppN245FormUpload(CaseData caseData, GeneralApplication applicationBuilder) {

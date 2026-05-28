@@ -52,7 +52,7 @@ public class UpdateCaseManagementDetailsService {
                     caseData,
                     requestedCourt,
                     () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                        CallbackParams.Params.BEARER_TOKEN).toString(), getCaseServiceId(caseData))
+                        CallbackParams.Params.BEARER_TOKEN).toString(), getCaseServiceId(caseData.getCaseAccessCategory()))
                 ));
         }
 
@@ -134,7 +134,7 @@ public class UpdateCaseManagementDetailsService {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(
             authToken,
-            getCaseServiceId(callbackParams.getCaseData())
+            getCaseServiceId(callbackParams.getCaseData().getCaseAccessCategory())
         );
     }
 
