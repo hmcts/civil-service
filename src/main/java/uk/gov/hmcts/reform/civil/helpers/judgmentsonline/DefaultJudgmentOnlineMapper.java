@@ -39,34 +39,30 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
-
-        BigInteger orderAmount = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator));
-        BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData));
-        BigInteger claimFee = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
         isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
-        JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
-        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, addressMapper);
+        JudgmentDetails activeJudgment = addDefaultActiveJudgment(caseData);
         activeJudgment
-            .setCreatedTimestamp(LocalDateTime.now())
             .setState(getJudgmentState(caseData))
-            .setType(JudgmentType.DEFAULT_JUDGMENT)
-            .setInstalmentDetails(DJPaymentTypeSelection.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())
-                                   ? getInstalmentDetails(caseData) : null)
-            .setPaymentPlan(getPaymentPlan(caseData))
             .setIsRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
             .setRtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
-            .setIssueDate(LocalDate.now())
-            .setOrderedAmount(orderAmount.toString())
-            .setClaimFeeAmount(claimFee.toString())
-            .setCosts(costs.toString())
-            .setTotalAmount(orderAmount.add(costs).add(claimFee).toString());
+            .setIssueDate(LocalDate.now());
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
 
         return activeJudgment;
     }
 
-    // Refactor this based on logic added for JO granted in DTSCCI-5217
     public JudgmentDetails addPendingIssueActiveJudgment(CaseData caseData) {
+        JudgmentDetails activeJudgment = addDefaultActiveJudgment(caseData);
+        activeJudgment
+            .setState(JudgmentState.PENDING_ISSUE)
+            .setRequestDate(LocalDate.now())
+            .setIsRegisterWithRTL(YesOrNo.NO);
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
+
+        return activeJudgment;
+    }
+
+    private JudgmentDetails addDefaultActiveJudgment(CaseData caseData) {
         BigInteger orderAmount = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator));
         BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData));
         BigInteger claimFee = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
@@ -74,10 +70,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, addressMapper);
         activeJudgment
             .setCreatedTimestamp(LocalDateTime.now())
-            .setState(JudgmentState.PENDING_ISSUE)
-            .setRequestDate(LocalDate.now())
             .setType(JudgmentType.DEFAULT_JUDGMENT)
-            .setIsRegisterWithRTL(YesOrNo.NO)
             .setInstalmentDetails(DJPaymentTypeSelection.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())
                                       ? getInstalmentDetails(caseData) : null)
             .setPaymentPlan(getPaymentPlan(caseData))
@@ -85,7 +78,6 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .setClaimFeeAmount(claimFee.toString())
             .setCosts(costs.toString())
             .setTotalAmount(orderAmount.add(costs).add(claimFee).toString());
-        super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
 
         return activeJudgment;
     }
