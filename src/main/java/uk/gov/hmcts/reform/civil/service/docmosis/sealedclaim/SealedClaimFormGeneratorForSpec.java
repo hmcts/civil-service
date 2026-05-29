@@ -311,7 +311,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     private String getFixedCostAmount(CaseData caseData) {
         if (caseData.getFixedCosts() == null || caseData.getFixedCosts().getFixedCostAmount() == null
             || YES != caseData.getFixedCosts().getClaimFixedCosts()) {
-            return "0.00";
+            return "0";
         }
         return MonetaryConversions.penniesToPounds(
             BigDecimal.valueOf(Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount()))

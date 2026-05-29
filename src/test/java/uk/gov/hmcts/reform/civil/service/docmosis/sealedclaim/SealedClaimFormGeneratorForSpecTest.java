@@ -364,7 +364,7 @@ class  SealedClaimFormGeneratorForSpecTest {
         verify(documentGeneratorService).generateDocmosisDocument(captor.capture(), eq(N2));
 
         SealedClaimFormForSpec templateData = captor.getValue();
-        assertThat(templateData.getFixedCostAmount()).isEqualTo("0.00");
+        assertThat(templateData.getFixedCostAmount()).isEqualTo("0");
         // totalClaimAmount (850.00) + claimFee (70.00) = 920.00
         assertThat(templateData.getTotalAmountOfClaim()).isEqualTo("920.00");
     }
@@ -442,6 +442,36 @@ class  SealedClaimFormGeneratorForSpecTest {
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
         verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
+    }
+
+    @Test
+    void shouldNotIncludeFixedCosts_whenClaimFixedCostsIsNull() {
+        CaseData caseData = getCaseDataBuilderWithAllDetails().build().toBuilder()
+            .totalClaimAmount(BigDecimal.valueOf(850))
+            .claimFee(new Fee()
+                          .setCalculatedAmountInPence(BigDecimal.valueOf(7000))
+            )
+            .fixedCosts(new FixedCosts()
+                            .setClaimFixedCosts(null)
+                            .setFixedCostAmount("2000")
+            )
+            .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
+            .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
+
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+
+        sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+
+        org.mockito.ArgumentCaptor<SealedClaimFormForSpec> captor = org.mockito.ArgumentCaptor.forClass(SealedClaimFormForSpec.class);
+        verify(documentGeneratorService).generateDocmosisDocument(captor.capture(), eq(N2));
+
+        SealedClaimFormForSpec templateData = captor.getValue();
+        assertThat(templateData.getFixedCostAmount()).isEqualTo("0");
+        // totalClaimAmount (850.00) + claimFee (70.00) = 920.00
+        assertThat(templateData.getTotalAmountOfClaim()).isEqualTo("920.00");
     }
 
     private SameRateInterestSelection buildSameRateSelection(BigDecimal rate, String reason) {
