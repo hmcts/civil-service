@@ -1,12 +1,15 @@
 data "azurerm_key_vault_secret" "civil-service-alert-slack-email" {
+  # Conditionally create the data source only if the secret name is provided
   count        = var.civil_service_alert_slack_email_secret_name != null ? 1 : 0
   name         = var.civil_service_alert_slack_email_secret_name
   key_vault_id = module.key-vault.key_vault_id
 }
 
 locals {
+  # Retrieves the Slack email address from Key Vault if the secret exists, otherwise defaults to null
   civil_service_alert_slack_email = length(data.azurerm_key_vault_secret.civil-service-alert-slack-email) > 0 ? data.azurerm_key_vault_secret.civil-service-alert-slack-email[0].value : null
-  enabled_scheduler_alerts        = { for k, v in var.monitor_scheduler_alerts : k => v if try(v.enabled, true) }
+  # Filters the monitor_scheduler_alerts map to only include alerts that are explicitly enabled (defaults to false)
+  enabled_scheduler_alerts        = { for k, v in var.monitor_scheduler_alerts : k => v if try(v.enabled, false) }
   resource_group_name             = "civil-service-${var.env}"
 }
 
