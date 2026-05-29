@@ -39,8 +39,7 @@ public class CaseProceedOfflineClaimantDashboardService extends CaseProceedOffli
 
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
-        Map<String, Boolean> scenarios = new HashMap<>();
-        scenarios.putAll(scenarioService.resolveAdditionalScenarios(caseData));
+        Map<String, Boolean> scenarios = new HashMap<>(scenarioService.resolveAdditionalScenarios(caseData));
         scenarios.put(
             SCENARIO_AAA6_CASE_PROCEEDS_OFFLINE_JUDGMENT_REQUESTED_CANCELLED_CLAIMANT.getScenario(),
             isJudgmentRequested(caseData)
