@@ -287,7 +287,7 @@ private FeatureToggleService featureToggleService;
 
 @BeforeEach
 void setup() {
-    when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+    when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 }
 ```
 If a scenario needs IDAM behaviour, add the relevant mock/stub in that concrete test rather than putting it in the

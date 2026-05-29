@@ -47,7 +47,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static String fileNameDisposal = null;
-    private static String FILE_NAME_DISPOSAL_HNL = null;
+    private static String fileNameDisposalHnl = null;
     private static String fileNameTrial = null;
     private static final CaseDocument CASE_DOCUMENT_DISPOSAL = CaseDocumentBuilder.builder()
         .documentName(fileNameDisposal)
@@ -79,7 +79,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
     void setUp() {
         fileNameDisposal = LocalDate.now() + "_Judge Dredd" + ".pdf";
         fileNameTrial = LocalDate.now() + "_Judge Dredd" + ".pdf";
-        FILE_NAME_DISPOSAL_HNL = LocalDate.now() + "_Judge Dredd" + ".pdf";
+        fileNameDisposalHnl = LocalDate.now() + "_Judge Dredd" + ".pdf";
 
         when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                      .forename("Judge")
@@ -163,7 +163,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
         ))
             .thenReturn(new DocmosisDocument(DJ_SDO_R2_DISPOSAL.getDocumentTitle(), bytes));
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposalHnl, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_DISPOSAL);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -180,7 +180,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
         assertThat(caseDocument).isNotNull();
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposalHnl, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
         verify(documentGeneratorService).generateDocmosisDocument(
             argThat((MappableObject arg) ->
                         arg instanceof DefaultJudgmentSDOOrderForm

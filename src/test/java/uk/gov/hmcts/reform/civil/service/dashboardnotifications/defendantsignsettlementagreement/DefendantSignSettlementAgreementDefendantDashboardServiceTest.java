@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -34,8 +33,6 @@ class DefendantSignSettlementAgreementDefendantDashboardServiceTest {
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private DefendantSignSettlementAgreementDefendantDashboardService service;
@@ -50,7 +47,6 @@ class DefendantSignSettlementAgreementDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordAcceptedScenarioForDefendant() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = baseCaseData(YesOrNo.YES, YesOrNo.NO);
 
         service.notifyDefendantSignSettlementAgreement(caseData, AUTH_TOKEN);
@@ -65,7 +61,6 @@ class DefendantSignSettlementAgreementDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordRejectedScenarioForDefendant() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = baseCaseData(YesOrNo.NO, YesOrNo.NO);
 
         service.notifyDefendantSignSettlementAgreement(caseData, AUTH_TOKEN);
@@ -80,18 +75,7 @@ class DefendantSignSettlementAgreementDefendantDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenarioWhenDefendantRepresented() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = baseCaseData(YesOrNo.YES, YesOrNo.YES);
-
-        service.notifyDefendantSignSettlementAgreement(caseData, AUTH_TOKEN);
-
-        verify(dashboardScenariosService, never()).recordScenarios(any(), any(), any(), any());
-    }
-
-    @Test
-    void shouldNotRecordScenarioWhenToggleDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-        CaseData caseData = baseCaseData(YesOrNo.YES, YesOrNo.NO);
 
         service.notifyDefendantSignSettlementAgreement(caseData, AUTH_TOKEN);
 
