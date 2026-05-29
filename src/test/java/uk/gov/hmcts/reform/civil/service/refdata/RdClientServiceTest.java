@@ -42,8 +42,8 @@ class RdClientServiceTest {
         court2 = new LocationRefData()
             .setEpimmsId("222")
             .setCourtName("Bristol Court");
-        
-        when(locationRefDataApiClient.getAllCivilCourtVenuesByServiceId(any(), any(), any(), any()))
+
+        when(locationRefDataApiClient.getAllCivilCourtVenuesByServiceId(any(), any(), any(), any(), any()))
             .thenReturn(List.of(court1, court2));
     }
 
@@ -62,6 +62,6 @@ class RdClientServiceTest {
         assertThat(result).containsExactlyInAnyOrder(court1, court2);
 
         verify(locationRefDataApiClient, times(1))
-            .getAllCivilCourtVenuesByServiceId(serviceAuth, auth, "Court", serviceId);
+            .getAllCivilCourtVenuesByServiceId(serviceAuth, auth, "10", "Court", serviceId);
     }
 }

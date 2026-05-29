@@ -29,6 +29,7 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/refdata/location/court-venues";
     private static final String CIVIL_SPEC_SERVICE_ID = "AAA6";
+    private static final String CIVIL_COURT_TYPE_ID = "10";
     private static final String CIVIL_UN_SPEC_SERVICE_ID = "AAA7";
     private static final String SERVICE_ID_REGEX = "AAA6|AAA7";
     private static final String LOCATION_TYPE = "locationType";
@@ -64,6 +65,7 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
         List<LocationRefData> response = locationReferenceDataApiClient.getAllCivilCourtVenuesByServiceId(
             SERVICE_AUTH_TOKEN,
             AUTHORIZATION_TOKEN,
+            CIVIL_COURT_TYPE_ID,
             LOCATION_TYPE,
             serviceId
         );

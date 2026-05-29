@@ -15,6 +15,7 @@ public interface LocationReferenceDataApiClient {
     List<LocationRefData> getAllCivilCourtVenuesByServiceId(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") final String authorisation,
+        @RequestParam("court_type_id") final String courtTypeId,
         @RequestParam("location_type") final String locationType,
         @RequestParam("service_code") final String serviceId
     );

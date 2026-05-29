@@ -14,6 +14,7 @@ public class RdClientService {
 
     private final LocationReferenceDataApiClient locationRefDataApiClient;
 
+    private static final String CIVIL_COURT_TYPE_ID = "10";
     private static final String LOCATION_TYPE = "Court";
 
     public RdClientService(LocationReferenceDataApiClient locationRefDataApiClient) {
@@ -23,6 +24,6 @@ public class RdClientService {
     @Cacheable(value = "courtVenueCache", key = "T(String).format('allLocations-%s', #serviceId)")
     public List<LocationRefData> fetchAllCivilCourtsByServiceId(String serviceAuth, String auth, String serviceId) {
         log.info("RdClientService Cache MISS → calling Location Reference Data API to fetch all courts for service id {}", serviceId);
-        return locationRefDataApiClient.getAllCivilCourtVenuesByServiceId(serviceAuth, auth, LOCATION_TYPE, serviceId);
+        return locationRefDataApiClient.getAllCivilCourtVenuesByServiceId(serviceAuth, auth, CIVIL_COURT_TYPE_ID, LOCATION_TYPE, serviceId);
     }
 }

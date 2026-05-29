@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -31,7 +30,7 @@ public class CourtVenueService {
                                                                 String serviceId) {
         return rdClientService.fetchAllCivilCourtsByServiceId(serviceAuth, auth, serviceId).stream()
             .filter(predicate)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<LocationRefData> getCourtByEpimmsId(String serviceAuth, String auth, String epimmsId, String serviceId) {
