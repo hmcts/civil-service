@@ -11,7 +11,7 @@ monitor_action_group = {
 
 monitor_scheduler_alerts = {
   "JudgementBuffer" = {
-    enabled                = true
-    action_group           = "demo-civil-service-slack-alert"
+    enabled      = true
+    action_group = "demo-civil-service-slack-alert"
   }
 }
