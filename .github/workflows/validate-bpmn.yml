@@ -12,7 +12,7 @@ jobs:
     if: "!contains(github.event.pull_request.head.ref, 'renovate') && !contains(github.event.pull_request.head.ref, 'dependabot')"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Check processes have name
       uses: mikefarah/yq@751d8ad57b84f1794661bc70c0afb92a22ad7b3c # v4.53.2
       with:
