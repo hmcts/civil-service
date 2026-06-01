@@ -7,7 +7,7 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.7'
   id 'org.springframework.boot' version '3.3.7'
-  id 'org.owasp.dependencycheck' version '12.2.1'
+  id 'org.owasp.dependencycheck' version '12.2.2'
   id 'com.github.ben-manes.versions' version '0.54.0'
   id 'org.sonarqube' version '7.3.0.8198'
   id 'au.com.dius.pact' version '4.6.17'
@@ -26,7 +26,7 @@ def versions = [
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.38',
-  camunda           : '7.20.0',
+  camunda           : '7.24.0',
   testcontainers    : '1.21.4',
   pdfbox            : '3.0.7',
   tika              : '3.3.1'
@@ -49,7 +49,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '13.4.2'
+    toolVersion = '13.5.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
     ignoreFailures = System.getenv('CHECKSTYLE_SKIP') == 'true'
   }
@@ -495,7 +495,7 @@ dependencies {
   implementation "com.github.hmcts:send-letter-client:5.1.1"
   implementation "net.logstash.logback:logstash-logback-encoder:9.0"
   implementation "uk.gov.service.notify:notifications-java-client:6.0.0-RELEASE"
-  implementation "com.github.hmcts:ccd-case-document-am-client:1.59.2"
+  implementation "com.github.hmcts:ccd-case-document-am-client:1.60.0"
   implementation "com.sendgrid:sendgrid-java:4.10.3"
   implementation "org.projectlombok:lombok:${versions.lombok}"
   implementation "org.springframework.boot:spring-boot-starter-cache"
@@ -507,7 +507,7 @@ dependencies {
   implementation "org.springframework.security:spring-security-oauth2-client"
   implementation "org.springframework.security:spring-security-oauth2-jose"
   implementation "org.springframework.security:spring-security-oauth2-core"
-  implementation "com.nimbusds:nimbus-jose-jwt:10.9"
+  implementation "com.nimbusds:nimbus-jose-jwt:10.9.1"
   implementation "io.jsonwebtoken:jjwt:0.13.0"
   implementation "com.github.hmcts:idam-java-client:3.0.5"
   implementation "org.apache.logging.log4j:log4j-api:2.26.0"
@@ -523,7 +523,7 @@ dependencies {
   implementation "org.camunda.bpm:camunda-engine-rest-core:${versions.camunda}"
   implementation "org.apiguardian:apiguardian-api:1.1.2"
   implementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.5"
-  implementation "org.glassfish.jaxb:jaxb-runtime:4.0.8"
+  implementation "org.glassfish.jaxb:jaxb-runtime:4.0.9"
   implementation "javax.xml.bind:jaxb-api:2.3.1"
   implementation "com.launchdarkly:launchdarkly-java-server-sdk:6.3.0"
   implementation "com.azure:azure-core:1.58.0"
