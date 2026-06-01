@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -23,7 +22,6 @@ import java.util.HashMap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_DEF_PAYMENT_MISSED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT;
@@ -38,8 +36,6 @@ class CcjRequestedDefendantDashboardServiceTest {
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private CcjRequestedDefendantDashboardService service;
@@ -51,7 +47,6 @@ class CcjRequestedDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordNoResponseScenarioWhenDefendantRejectedSettlementAgreement() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
@@ -76,7 +71,6 @@ class CcjRequestedDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordPaymentMissedScenarioWhenDefendantAcceptedSettlementAgreement() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
@@ -104,7 +98,6 @@ class CcjRequestedDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordDefaultScenarioWhenNoSettlementAgreementData() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -121,7 +114,6 @@ class CcjRequestedDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordNoResponseScenarioWhenDeadlineExpired() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
@@ -145,20 +137,7 @@ class CcjRequestedDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotRecordWhenToggleDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCcdCaseReference(1234L);
-
-        service.notifyDefendant(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
     void shouldRecordDefaultScenarioWhenSettlementAgreementNotRespondedAndDeadlineNotExpired() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);

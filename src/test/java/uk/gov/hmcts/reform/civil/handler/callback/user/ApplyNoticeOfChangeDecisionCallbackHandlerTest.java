@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -102,7 +103,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
                     .changeOrganisationRequestField(false, false, "1234", null, REQUESTER_EMAIL)
                     .build().toBuilder().respondent1OrganisationIDCopy(null).build();
 
-                executeTest(caseData, RESPONDENT_ONE_ORG_POLICY);
+                executeTest(caseData, RESPONDENT_ONE_ORG_POLICY, "APPLY_NOC_DECISION_DEFENDANT_LIP");
             }
 
             @Test
@@ -212,10 +213,27 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
                 .build();
-
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
             executeTest(caseData, RESPONDENT_ONE_ORG_POLICY, "APPLY_NOC_DECISION_DEFENDANT_LIP");
+        }
+
+        @Test
+        void shouldReturnEmptyResponse_whenChangeOrganisationRequestFieldAlreadyRemoved() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .changeOfRepresentation(false, false, "1234", null, REQUESTER_EMAIL)
+                .build();
+
+            CallbackParams params = callbackParamsOf(
+                caseData,
+                CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                ABOUT_TO_SUBMIT
+            );
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).isNull();
+            assertThat(response.getErrors()).isNull();
+            verifyNoInteractions(caseAssignmentApi, authTokenGenerator);
         }
 
         @NotNull

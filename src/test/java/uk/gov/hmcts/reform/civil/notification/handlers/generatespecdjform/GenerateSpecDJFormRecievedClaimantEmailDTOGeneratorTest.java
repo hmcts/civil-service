@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.HashMap;
@@ -36,15 +35,12 @@ class GenerateSpecDJFormRecievedClaimantEmailDTOGeneratorTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     private GenerateSpecDJFormRecievedClaimantEmailDTOGenerator generator;
     private MockedStatic<PartyUtils> partyUtilsMockedStatic;
 
     @BeforeEach
     void setUp() {
-        generator = new GenerateSpecDJFormRecievedClaimantEmailDTOGenerator(notificationsProperties, featureToggleService);
+        generator = new GenerateSpecDJFormRecievedClaimantEmailDTOGenerator(notificationsProperties);
         partyUtilsMockedStatic = mockStatic(PartyUtils.class);
     }
 
@@ -100,25 +96,13 @@ class GenerateSpecDJFormRecievedClaimantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldNotifyWhenLipVsLipAndToggleEnabled() {
+    void shouldNotifyWhenLipVsLip() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         assertThat(generator.getShouldNotify(caseData)).isTrue();
-    }
-
-    @Test
-    void shouldNotNotifyWhenToggleDisabled() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        assertThat(generator.getShouldNotify(caseData)).isFalse();
     }
 
     @Test

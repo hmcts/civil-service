@@ -31,8 +31,6 @@ public class CaseTaskTrackingService {
             return;
         }
 
-        log.info("tracking event for case {} with eventType {} and eventName {}", caseId, eventType, eventType);
-
         Map<String, String> properties = new HashMap<>();
         properties.put("caseId", caseId);
         properties.put("eventType", eventType);
@@ -40,6 +38,8 @@ public class CaseTaskTrackingService {
         if (additionalProperties != null) {
             properties.putAll(additionalProperties);
         }
+
+        log.info("Tracking custom event {} for case {} with properties {}", eventName, caseId, properties);
 
         telemetryClient.trackEvent(eventName, properties, null);
     }

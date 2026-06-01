@@ -39,28 +39,45 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
+        isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
+        JudgmentDetails activeJudgment = addDefaultActiveJudgment(caseData);
+        activeJudgment
+            .setState(getJudgmentState(caseData))
+            .setIsRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
+            .setRtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
+            .setIssueDate(LocalDate.now());
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
 
+        return activeJudgment;
+    }
+
+    public JudgmentDetails addPendingIssueActiveJudgment(CaseData caseData) {
+        JudgmentDetails activeJudgment = addDefaultActiveJudgment(caseData);
+        activeJudgment
+            .setState(JudgmentState.PENDING_ISSUE)
+            .setRequestDate(LocalDate.now())
+            .setIsRegisterWithRTL(YesOrNo.NO);
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
+
+        return activeJudgment;
+    }
+
+    private JudgmentDetails addDefaultActiveJudgment(CaseData caseData) {
         BigInteger orderAmount = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator));
         BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData));
         BigInteger claimFee = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
-        isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, addressMapper);
         activeJudgment
             .setCreatedTimestamp(LocalDateTime.now())
-            .setState(getJudgmentState(caseData))
             .setType(JudgmentType.DEFAULT_JUDGMENT)
             .setInstalmentDetails(DJPaymentTypeSelection.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())
-                                   ? getInstalmentDetails(caseData) : null)
+                                      ? getInstalmentDetails(caseData) : null)
             .setPaymentPlan(getPaymentPlan(caseData))
-            .setIsRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
-            .setRtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
-            .setIssueDate(LocalDate.now())
             .setOrderedAmount(orderAmount.toString())
             .setClaimFeeAmount(claimFee.toString())
             .setCosts(costs.toString())
             .setTotalAmount(orderAmount.add(costs).add(claimFee).toString());
-        super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
 
         return activeJudgment;
     }
@@ -78,16 +95,12 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private PaymentFrequency getPaymentFrequency(RepaymentFrequencyDJ freqDJ) {
-        switch (freqDJ) {
-            case ONCE_ONE_WEEK:
-                return PaymentFrequency.WEEKLY;
-            case ONCE_ONE_MONTH:
-                return PaymentFrequency.MONTHLY;
-            case ONCE_TWO_WEEKS:
-                return PaymentFrequency.EVERY_TWO_WEEKS;
-            default:
-                return null;
-        }
+        return switch (freqDJ) {
+            case ONCE_ONE_WEEK -> PaymentFrequency.WEEKLY;
+            case ONCE_ONE_MONTH -> PaymentFrequency.MONTHLY;
+            case ONCE_TWO_WEEKS -> PaymentFrequency.EVERY_TWO_WEEKS;
+            default -> null;
+        };
     }
 
     private JudgmentPaymentPlan getPaymentPlan(CaseData caseData) {
@@ -97,16 +110,12 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private PaymentPlanSelection getPaymentPlanSeletion(DJPaymentTypeSelection paymentType) {
-        switch (paymentType) {
-            case IMMEDIATELY:
-                return PaymentPlanSelection.PAY_IMMEDIATELY;
-            case SET_DATE:
-                return PaymentPlanSelection.PAY_BY_DATE;
-            case REPAYMENT_PLAN:
-                return PaymentPlanSelection.PAY_IN_INSTALMENTS;
-            default:
-                return null;
-        }
+        return switch (paymentType) {
+            case IMMEDIATELY -> PaymentPlanSelection.PAY_IMMEDIATELY;
+            case SET_DATE -> PaymentPlanSelection.PAY_BY_DATE;
+            case REPAYMENT_PLAN -> PaymentPlanSelection.PAY_IN_INSTALMENTS;
+            default -> null;
+        };
     }
 
     private LocalDate getPaymentDeadLineDate(CaseData caseData) {

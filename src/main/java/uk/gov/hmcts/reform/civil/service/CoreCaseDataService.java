@@ -50,7 +50,6 @@ public class CoreCaseDataService {
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
     private final UserService userService;
-    private final FeatureToggleService featureToggleService;
     private final LocationReferenceDataService referenceDataService;
 
     public void triggerEvent(Long caseId, CaseEvent eventName) {
@@ -278,17 +277,10 @@ public class CoreCaseDataService {
     }
 
     private String createQuery(String authorization, int startIndex, String userEmailField) {
-        if (featureToggleService.isLipVLipEnabled()) {
-            UserDetails defendantInfo = userService.getUserDetails(authorization);
-            return new SearchSourceBuilder()
-                .query(QueryBuilders.boolQuery()
-                           .must(QueryBuilders.termQuery(userEmailField, defendantInfo.getEmail())))
-                .sort("data.submittedDate", SortOrder.DESC)
-                .from(startIndex)
-                .size(RETURNED_NUMBER_OF_CASES).toString();
-        }
+        UserDetails defendantInfo = userService.getUserDetails(authorization);
         return new SearchSourceBuilder()
-            .query(QueryBuilders.matchAllQuery())
+            .query(QueryBuilders.boolQuery()
+                       .must(QueryBuilders.termQuery(userEmailField, defendantInfo.getEmail())))
             .sort("data.submittedDate", SortOrder.DESC)
             .from(startIndex)
             .size(RETURNED_NUMBER_OF_CASES).toString();

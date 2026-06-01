@@ -63,7 +63,8 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
     }
 
     private CertificateOfDebtForm getCertificateOfDebtTemplateData(CaseData caseData, String authorisation) {
-        var certificateOfDebtForm = new CertificateOfDebtForm()
+        return new CertificateOfDebtForm()
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setClaimNumber(caseData.getLegacyCaseReference())
             .setDefendantFullName(caseData.getRespondent1().getPartyName())
             .setDefendantAddress(AddressUtils.formatAddress(caseData.getRespondent1().getPrimaryAddress()))
@@ -86,8 +87,6 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
             .setJudgmentOrderDateWelsh(getDateInWelsh(caseData.getActiveJudgment().getIssueDate()))
             .setDateFinalPaymentMadeWelsh(getDateInWelsh(caseData.getActiveJudgment().getFullyPaymentMadeDate()))
             .setApplicationIssuedDateWelsh(getDateInWelsh(LocalDate.now()));
-
-        return certificateOfDebtForm;
     }
 
     private String getJudgmentText(JudgmentDetails activeJudgment, boolean isBilingual) {

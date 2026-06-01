@@ -24,7 +24,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class InterlocutoryJudgementDocGeneratorTest {
+class InterlocutoryJudgementDocGeneratorTest {
 
     private static final String AUTHORISATION = "authorisation";
     @Mock
@@ -39,7 +39,7 @@ public class InterlocutoryJudgementDocGeneratorTest {
     ArgumentCaptor<PDF> uploadDocumentArgumentCaptor;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         generator = new InterlocutoryJudgementDocGenerator(mapper, documentManagementService, documentGeneratorService);
     }
 
