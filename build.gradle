@@ -9,27 +9,27 @@ plugins {
   id 'org.springframework.boot' version '3.3.7'
   id 'org.owasp.dependencycheck' version '12.2.1'
   id 'com.github.ben-manes.versions' version '0.54.0'
-  id 'org.sonarqube' version '6.3.1.5724'
+  id 'org.sonarqube' version '7.3.0.8198'
   id 'au.com.dius.pact' version '4.6.17'
   id "io.freefair.lombok" version "8.14.4"
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
-  id "org.gradle.test-retry" version "1.6.4"
+  id "org.gradle.test-retry" version "1.6.5"
 }
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 def versions = [
-  junit             : '5.14.4',
-  junitPlatform     : '1.14.4',
+  junit             : '6.1.0',
+  junitPlatform     : '6.1.0',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.38',
   camunda           : '7.20.0',
   testcontainers    : '1.21.4',
   pdfbox            : '3.0.7',
-  tika              : '3.3.0'
+  tika              : '3.3.1'
 ]
 
 allprojects {
@@ -49,7 +49,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '13.4.1'
+    toolVersion = '13.4.2'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
     ignoreFailures = System.getenv('CHECKSTYLE_SKIP') == 'true'
   }
@@ -79,7 +79,7 @@ allprojects {
 
       dependency 'com.squareup.okhttp3:okhttp:5.3.2'
 
-      dependency 'org.slf4j:slf4j-nop:2.0.17'
+      dependency 'org.slf4j:slf4j-nop:2.0.18'
 
       dependencySet(group: 'org.apache.httpcomponents.core5', version: '5.4.2') {
         entry 'httpcore5'
@@ -139,7 +139,6 @@ tasks.withType(Copy).configureEach {
 }
 
 def integration = tasks.register('integration', Test) {
-  maxHeapSize = '3G'
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
@@ -147,6 +146,7 @@ def integration = tasks.register('integration', Test) {
   failFast = System.getenv('GITHUB_ACTIONS') != 'true'
   testLogging.showStandardStreams = false
 
+  // CI retry logic for integration tests
   if (System.getenv('GITHUB_ACTIONS') == 'true') {
     retry {
       maxRetries = 3
@@ -196,12 +196,11 @@ def pullLatestCivilCcdDefinitions = tasks.register('pullLatestCivilCcdDefinition
   }
 }
 
-def pullLatestCivilCamundaDefinitions = tasks.register('pullLatestCivilCamundaDefinitions', Exec) {
-  description = 'Pulls the civil Camunda BPMN definition repository branch needed for data setup.'
+def pullLatestCivilCamundaDefinitions = tasks.register('pullLatestCivilCamundaDefinitions', Copy) {
+  description = 'Stages the in-repo Camunda BPMN definitions for data setup.'
   onlyIf { isHighLevelDataSetupEnvironment() && isCamundaImportEnabled() }
-  doFirst {
-    commandLine './bin/pull-latest-camunda-files.sh', dataSetupBranch('CAMUNDA_DEFINITION_BRANCH')
-  }
+  from 'src/main/resources/camunda'
+  into 'camunda'
 }
 
 def pullLatestCivilWaDmnDefinitions = tasks.register('pullLatestCivilWaDmnDefinitions', Exec) {
@@ -500,7 +499,7 @@ dependencies {
   implementation "com.sendgrid:sendgrid-java:4.10.3"
   implementation "org.projectlombok:lombok:${versions.lombok}"
   implementation "org.springframework.boot:spring-boot-starter-cache"
-  implementation "com.github.ben-manes.caffeine:caffeine:3.2.3"
+  implementation "com.github.ben-manes.caffeine:caffeine:3.2.4"
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"
   implementation "org.springframework.security:spring-security-core"
@@ -511,8 +510,8 @@ dependencies {
   implementation "com.nimbusds:nimbus-jose-jwt:10.9"
   implementation "io.jsonwebtoken:jjwt:0.13.0"
   implementation "com.github.hmcts:idam-java-client:3.0.5"
-  implementation "org.apache.logging.log4j:log4j-api:2.25.4"
-  implementation "org.apache.logging.log4j:log4j-to-slf4j:2.25.4"
+  implementation "org.apache.logging.log4j:log4j-api:2.26.0"
+  implementation "org.apache.logging.log4j:log4j-to-slf4j:2.26.0"
   implementation "org.apache.commons:commons-text:1.15.0"
   implementation "org.elasticsearch:elasticsearch:7.17.29"
   implementation "com.networknt:json-schema-validator:1.5.9"
@@ -524,11 +523,11 @@ dependencies {
   implementation "org.camunda.bpm:camunda-engine-rest-core:${versions.camunda}"
   implementation "org.apiguardian:apiguardian-api:1.1.2"
   implementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.5"
-  implementation "org.glassfish.jaxb:jaxb-runtime:4.0.7"
+  implementation "org.glassfish.jaxb:jaxb-runtime:4.0.8"
   implementation "javax.xml.bind:jaxb-api:2.3.1"
   implementation "com.launchdarkly:launchdarkly-java-server-sdk:6.3.0"
   implementation "com.azure:azure-core:1.58.0"
-  implementation "com.azure:azure-messaging-servicebus:7.17.17"
+  implementation "com.azure:azure-messaging-servicebus:7.17.18"
   implementation "org.apache.pdfbox:pdfbox:${versions.pdfbox}"
   implementation "org.apache.pdfbox:pdfbox-io:${versions.pdfbox}"
   implementation "com.github.hmcts:auth-checker-lib:3.1.1"
@@ -547,7 +546,7 @@ dependencies {
   }
 
   constraints {
-    implementation('org.apache.logging.log4j:log4j-core:2.25.4') {
+    implementation('org.apache.logging.log4j:log4j-core:2.26.0') {
       because 'CVE-2025-68161 (upgrade to vendor recommended version)'
     }
   }
@@ -573,19 +572,20 @@ dependencies {
   testImplementation "org.testcontainers:postgresql:${versions.testcontainers}"
   testImplementation "org.testcontainers:junit-jupiter:${versions.testcontainers}"
   testImplementation "com.h2database:h2:2.4.240"
+  testImplementation "org.camunda.bpm:camunda-engine:${versions.camunda}"
 
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.17'
   contractTestImplementation 'au.com.dius.pact.provider:junit5:4.6.17'
   contractTestImplementation 'au.com.dius.pact.provider:junit5spring:4.6.17'
   contractTestImplementation "org.hamcrest:java-hamcrest:2.0.0.0"
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.14.4')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.14.4')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:6.1.0')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:6.1.0')
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.14.4')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.14.4')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:6.1.0')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:6.1.0')
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
@@ -666,19 +666,33 @@ tasks.register('runProviderPactVerification') {
 }
 
 tasks.withType(Test).configureEach { t ->
+  useJUnitPlatform()
+
   doFirst {
     logger.lifecycle("Available Processors for ${t.name}: ${Runtime.runtime.availableProcessors()}")
   }
-  useJUnitPlatform()
 
-  maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
-  jvmArgs '-Xshare:off'
-  // Use Parallel GC for faster, short-lived test forks
-  jvmArgs '-XX:+UseParallelGC'
+  if (t.name == 'integration') {
+    description = "Runs integration tests"
+    maxHeapSize = "3G"
+    // Use G1 GC for better performance with larger heap sizes and longer-running test forks
+    jvmArgs '-XX:+UseG1GC'
+    // Set a reasonable target for max GC pause times to help prevent long pauses during test execution
+    jvmArgs '-XX:MaxGCPauseMillis=200'
+  } else {
+    description = "Runs unit tests"
+    maxHeapSize = "1536m"
+    // Disable class data sharing to avoid potential issues with shared class metadata in test forks,
+    // increases memory usage but improves stability in CI environments
+    jvmArgs '-Xshare:off'
+    // Use Parallel GC for faster, short-lived test forks
+    jvmArgs '-XX:+UseParallelGC'
+  }
 
+  // Common configuration for all test tasks
   // Keep within typical Jenkins container limits
+  maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
   minHeapSize = "256m"
-  maxHeapSize = "1536m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"
   jvmArgs '-XX:ReservedCodeCacheSize=512m'
   // Temurin 21.0.7 occasionally crashes in C2 (BoolNode::Ideal SIGSEGV); stay on C1 until upstream fix.

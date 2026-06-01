@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class SettlementAgreementFormMapperTest {
+class SettlementAgreementFormMapperTest {
 
     private static final String INDIVIDUAL_TITLE = "Mr.";
     private static final String INDIVIDUAL_FIRST_NAME = "FirstName";
@@ -59,7 +59,7 @@ public class SettlementAgreementFormMapperTest {
     }
 
     private static CaseData getCaseData() {
-        CaseData caseData = CaseData.builder()
+        return CaseData.builder()
                 .applicant1(new Party()
                         .setIndividualLastName(INDIVIDUAL_LAST_NAME)
                         .setIndividualFirstName(INDIVIDUAL_FIRST_NAME)
@@ -78,7 +78,7 @@ public class SettlementAgreementFormMapperTest {
                 .caseDataLiP(new CaseDataLiP()
                         .setApplicant1AdditionalLipPartyDetails(new AdditionalLipPartyDetails())
                         .setRespondent1AdditionalLipPartyDetails(new AdditionalLipPartyDetails()))
+                .ccdCaseReference(1234567812345678L)
                 .build();
-        return caseData;
     }
 }

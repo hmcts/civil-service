@@ -138,7 +138,7 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
                         .map(amount -> amount.setScale(2))
                         .orElse(ZERO);
 
-        if (caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+        if (caseData.isApplicantLipOneVOne()) {
             fixedCost = ClaimFeeUtility.getCourtFee(caseData);
             claimFee = ZERO;
         }
