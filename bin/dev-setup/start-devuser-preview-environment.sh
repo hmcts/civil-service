@@ -3,8 +3,7 @@
 set -eu
 
 ccd_branch=${1:-master}
-camunda_branch=${2:-master}
-dmn_branch=${3:-${camunda_branch}}
+dmn_branch=${2:-master}
 
 user=$(whoami | tr -cd '[:alnum:]' | tr '[:upper:]' '[:lower:]' | cut -c1-8)
 service_name="civil-service-${user}"
@@ -66,7 +65,7 @@ echo "Importing Roles to the CCD pod"
 ./bin/dev-setup/add-roles.sh
 
 echo "Importing Camunda definitions"
-./bin/pull-latest-camunda-files.sh "${camunda_branch}"
+cp -r src/main/resources/camunda .
 ./bin/pull-latest-dmn-files.sh "${dmn_branch}"
 ./gradlew camundaHighLevelDataSetup
 
