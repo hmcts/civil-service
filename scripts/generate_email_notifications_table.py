@@ -23,7 +23,7 @@ DASHBOARD_SCENARIOS_PATH = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civi
 TEMPLATE_DIR = RESOURCE_ROOT / 'notification-templates'
 RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-service/master/"
 TEMPLATE_VIEWER_PATH = "dashboard-template.html"
-DIAGRAM_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/"
+DIAGRAM_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/"
 DOCMOSIS_TEMPLATE_BASE_URL = "https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/"
 DOCMOSIS_TEMPLATE_PROD_URL = "https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Prod/"
 
@@ -1875,8 +1875,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     default_ccd_root = (REPO_ROOT / '..' / 'civil-ccd-definition' / 'ccd-definition').resolve()
     default_ga_root = (REPO_ROOT / '..' / 'civil-general-apps-ccd-definition' / 'ga-ccd-definition').resolve()
     parser = argparse.ArgumentParser(description="Generate docs/email-notifications.md")
-    parser.add_argument('--bpmn-root', default=str((REPO_ROOT / '..' / 'civil-camunda-bpmn-definition').resolve()),
-                        help='Path to civil-camunda-bpmn-definition project (default: sibling directory).')
+    parser.add_argument('--bpmn-root', default=str((REPO_ROOT / 'src' / 'main' / 'resources').resolve()),
+                        help='Path to directory containing camunda/ BPMN files (default: src/main/resources).')
     parser.add_argument('--ccd-definition-root',
                         default=str(default_ccd_root) if default_ccd_root.exists() else '',
                         help='Path to civil-ccd-definition/ccd-definition (default: sibling directory if present).')

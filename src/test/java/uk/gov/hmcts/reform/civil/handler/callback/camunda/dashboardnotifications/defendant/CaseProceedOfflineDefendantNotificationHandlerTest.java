@@ -101,7 +101,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             caseData.setGeneralApplications(gaApplications);
             caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -140,7 +139,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             caseData.setCcdCaseReference(12890L);
             caseData.setPreviousCCDState(CASE_PROGRESSION);
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -172,7 +170,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             caseData.setCcdCaseReference(12890L);
             caseData.setPreviousCCDState(CASE_PROGRESSION);
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -201,7 +198,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             caseData.setCcdCaseReference(12890L);
             caseData.setPreviousCCDState(PENDING_CASE_ISSUED);
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -251,7 +247,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             caseData.setActiveJudgment(new JudgmentDetails());
             caseData.setPreviousCCDState(CaseState.All_FINAL_ORDERS_ISSUED);
             caseData.setGeneralApplications(gaApplications);
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -281,7 +276,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             caseData.setResponseClaimTrack(AllocatedTrack.FAST_CLAIM.toString());
             caseData.setPreviousCCDState(CaseState.All_FINAL_ORDERS_ISSUED);
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
