@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_038vuuf" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.41.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:message id="Message_0yl8iuc" name="INITIATE_GENERAL_APPLICATION" />
+  <bpmn:process id="UPLOAD_TRANSLATED_FREE_GA_SUMMARY_DOC" name="uploadTranslatedAppSumDocForFreeApplication" isExecutable="true" camunda:historyTimeToLive="P90D">
+    <bpmn:callActivity id="Activity_099a8bs" name="Start Business Process" calledElement="GA_StartGeneralApplicationBusinessProcess">
+      <bpmn:extensionElements>
+        <camunda:in variables="all" />
+        <camunda:out variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0waujj0</bpmn:incoming>
+      <bpmn:outgoing>Flow_1dryhgr</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:boundaryEvent id="Event_1r5gva6" name="Abort" attachedToRef="Activity_099a8bs">
+      <bpmn:outgoing>Flow_0pg0q3q</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_05p2p60" />
+    </bpmn:boundaryEvent>
+    <bpmn:endEvent id="Event_0shejso">
+      <bpmn:incoming>Flow_0pg0q3q</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0pg0q3q" sourceRef="Event_1r5gva6" targetRef="Event_0shejso" />
+    <bpmn:serviceTask id="GeneralApplicationNotifying" name="Notifying respondents" camunda:type="external" camunda:topic="applicationEventGASpec">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">NOTIFY_GENERAL_APPLICATION_RESPONDENT</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1dryhgr</bpmn:incoming>
+      <bpmn:outgoing>Flow_17guhe2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:callActivity id="Activity_18x7hxw" name="End Business Process" calledElement="GA_EndBusinessProcess">
+      <bpmn:extensionElements>
+        <camunda:in variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0u80xxv</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ujnajq</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="Event_05yxbay" name="">
+      <bpmn:incoming>Flow_0ujnajq</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0ujnajq" sourceRef="Activity_18x7hxw" targetRef="Event_05yxbay" />
+    <bpmn:sequenceFlow id="Flow_1dryhgr" sourceRef="Activity_099a8bs" targetRef="GeneralApplicationNotifying" />
+    <bpmn:sequenceFlow id="Flow_17guhe2" sourceRef="GeneralApplicationNotifying" targetRef="GenerateDashboardNotificationsGaApplicationIssued" />
+    <bpmn:serviceTask id="GenerateDashboardNotificationsGaApplicationIssued" name="Create Dashboard notification" camunda:type="external" camunda:topic="applicationEventGASpec">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_17guhe2</bpmn:incoming>
+      <bpmn:outgoing>Flow_0u80xxv</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="Event_1jp55hn" name="start">
+      <bpmn:outgoing>Flow_0waujj0</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1o704zs" messageRef="Message_3g7gib3" />
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0waujj0" sourceRef="Event_1jp55hn" targetRef="Activity_099a8bs" />
+    <bpmn:sequenceFlow id="Flow_0u80xxv" sourceRef="GenerateDashboardNotificationsGaApplicationIssued" targetRef="Activity_18x7hxw" />
+  </bpmn:process>
+  <bpmn:message id="Message_0rapbcd" name="Message_0rapbcd" />
+  <bpmn:message id="Message_3g7gib3" name="UPLOAD_TRANSLATED_DOCUMENT_FOR_FREE_FEE_APPLICATION" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="UPLOAD_TRANSLATED_FREE_GA_SUMMARY_DOC">
+      <bpmndi:BPMNShape id="BPMNShape_09inh63" bpmnElement="Activity_099a8bs">
+        <dc:Bounds x="230" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0shejso_di" bpmnElement="Event_0shejso">
+        <dc:Bounds x="262" y="82" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0i1xk7m" bpmnElement="GeneralApplicationNotifying">
+        <dc:Bounds x="390" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1jp55hn_di" bpmnElement="Event_1jp55hn">
+        <dc:Bounds x="132" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="139" y="235" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0wo3nim" bpmnElement="GenerateDashboardNotificationsGaApplicationIssued">
+        <dc:Bounds x="560" y="170" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1vmzx7q" bpmnElement="Activity_18x7hxw">
+        <dc:Bounds x="730" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1top2yy" bpmnElement="Event_05yxbay">
+        <dc:Bounds x="892" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1966" y="275" width="88" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1alphtq" bpmnElement="Event_1r5gva6">
+        <dc:Bounds x="262" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="287" y="122" width="27" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0pg0q3q_di" bpmnElement="Flow_0pg0q3q">
+        <di:waypoint x="280" y="152" />
+        <di:waypoint x="280" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ujnajq_di" bpmnElement="Flow_0ujnajq">
+        <di:waypoint x="830" y="210" />
+        <di:waypoint x="892" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dryhgr_di" bpmnElement="Flow_1dryhgr">
+        <di:waypoint x="330" y="210" />
+        <di:waypoint x="390" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17guhe2_di" bpmnElement="Flow_17guhe2">
+        <di:waypoint x="490" y="210" />
+        <di:waypoint x="560" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0waujj0_di" bpmnElement="Flow_0waujj0">
+        <di:waypoint x="168" y="210" />
+        <di:waypoint x="230" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0u80xxv_di" bpmnElement="Flow_0u80xxv">
+        <di:waypoint x="660" y="210" />
+        <di:waypoint x="730" y="210" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

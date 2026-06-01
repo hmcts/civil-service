@@ -1,0 +1,55 @@
+package uk.gov.hmcts.reform.civil.bpmn;
+
+import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.junit.jupiter.api.Test;
+
+public class UploadTranslatedDiscontinuanceDocTest extends BpmnBaseTest {
+
+    public UploadTranslatedDiscontinuanceDocTest() {
+        super("upload_translated_discontinuance_doc.bpmn", "UPLOAD_TRANSLATED_DISCONTINUANCE_DOC");
+    }
+
+    @Test
+    void shouldRunProcess() {
+        ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
+        assertCompleteExternalTask(
+            startBusiness,
+            START_BUSINESS_TOPIC,
+            START_BUSINESS_EVENT,
+            START_BUSINESS_ACTIVITY
+        );
+
+        //send notification to parties
+        ExternalTask notifyDefendantLip = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            notifyDefendantLip,
+            PROCESS_CASE_EVENT,
+            "NOTIFY_EVENT",
+            "DiscontinuanceClaimNotifyParties"
+        );
+
+        //Post Notice of Discontinuance
+        ExternalTask sendDiscontinuancePipLetter = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            sendDiscontinuancePipLetter,
+            PROCESS_CASE_EVENT,
+            "SEND_DISCONTINUANCE_LETTER_LIP_DEFENDANT1",
+            "PostNoticeOfDiscontinuanceDefendant1LIP"
+        );
+
+        //send Dashboard Notification
+        ExternalTask generateDashboardNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            generateDashboardNotification,
+            PROCESS_CASE_EVENT,
+            "DASHBOARD_NOTIFICATION_EVENT",
+            "GenerateDashboardNotificationsDiscontinueClaimClaimant"
+        );
+
+        //end business process
+        ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
+        completeBusinessProcess(endBusinessProcess);
+
+        assertNoExternalTasksLeft();
+    }
+}
