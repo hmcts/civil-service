@@ -16,6 +16,9 @@ http:
     maxPerRoute: ${HTTP_MAX_PER_ROUTE:5}
     maxTotal: ${HTTP_MAX_TOTAL:25}
     threshold: ${HTTP_CLIENT_THRESHOLD:15000}
+    error-classifier:
+      enabled: ${HTTP_ERROR_CLASSIFIER_ENABLED:true}
+      logHeaders: ${HTTP_ERROR_CLASSIFIER_LOG_HEADERS:false}
 ```
 
 - `connectTimeout`: Time to establish the connection with the remote host.
@@ -24,6 +27,17 @@ http:
 - `maxPerRoute`: Maximum concurrent connections per route/host.
 - `maxTotal`: Total maximum concurrent connections across all routes.
 - `threshold`: Threshold in milliseconds after which a request is logged as a 'slow request' in Application Insights.
+- `error-classifier.enabled`: Enables logging-only Feign error classification while preserving default Feign exception behaviour.
+- `error-classifier.logHeaders`: Includes selected headers (for now `Retry-After`) in classifier logs.
+
+#### Error Classification (Logging-only)
+`HttpClientFeignConfiguration` now also registers a global Feign `ErrorDecoder` (`FeignErrorClassificationDecoder`) that:
+
+1. Calls the default Feign decoder and returns the same exception type (no retry behaviour change).
+2. Logs whether an error would be considered retryable/non-retryable based on status + method idempotency.
+3. Parses `Retry-After` when present and logs the parsed value.
+
+This allows you to observe real production error patterns and refine idempotent endpoint policy before introducing an actual `Retryer`.
 
 #### Customising Specific Clients
 You can override these settings (except pool sizes) for specific Feign clients under `feign.client.config`. The configuration key must match the `name` or `value` attribute of the `@FeignClient` annotation.
