@@ -5,23 +5,34 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentStrategy;
+import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentStrategyFactory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_GA_LANGUAGE_UPDATE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH;
@@ -29,17 +40,41 @@ import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguag
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.WELSH;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.DEFENDANT;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
-public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTest {
+class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private ChangeLanguagePreferenceCallbackHandler handler;
     private ObjectMapper mapper;
 
+    @Mock
+    private UploadTranslatedDocumentStrategyFactory uploadTranslatedDocumentStrategyFactory;
+    @Mock
+    private UploadTranslatedDocumentStrategy uploadTranslatedDocumentStrategy;
+    @Mock
+    private GenAppStateHelperService helperService;
+
     @BeforeEach
     void setup() {
         mapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-        handler = new ChangeLanguagePreferenceCallbackHandler(mapper);
+        handler = new ChangeLanguagePreferenceCallbackHandler(
+            uploadTranslatedDocumentStrategyFactory,
+            mapper,
+            helperService
+        );
+    }
+
+    private void stubUploadDocumentResponse() {
+        when(uploadTranslatedDocumentStrategyFactory.getUploadTranslatedDocumentStrategy(nullable(CallbackVersion.class)))
+            .thenReturn(uploadTranslatedDocumentStrategy);
+        when(uploadTranslatedDocumentStrategy.uploadDocument(any(CallbackParams.class)))
+            .thenAnswer(invocation -> {
+                CallbackParams callbackParams = invocation.getArgument(0);
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .data(callbackParams.getCaseData().toMap(mapper))
+                    .build();
+            });
     }
 
     @Test
@@ -188,6 +223,7 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
             caseData.setChangeLanguagePreference(changeLanguagePreference);
             caseData.setApplicant1Represented(NO);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            stubUploadDocumentResponse();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -206,6 +242,7 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
             caseData.setChangeLanguagePreference(changeLanguagePreference);
             caseData.setApplicant1Represented(NO);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            stubUploadDocumentResponse();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -213,7 +250,6 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("WELSH");
             assertThat(updatedCaseData.getClaimantLanguagePreferenceDisplay()).isEqualTo(WELSH);
-            assertThat(updatedCaseData.getBusinessProcess().getCamundaEvent()).isEqualTo(CHANGE_LANGUAGE_PREFERENCE.name());
         }
 
         @Test
@@ -230,6 +266,7 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
             caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
             caseData.setCaseDataLiP(caseDataLiP);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            stubUploadDocumentResponse();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -237,6 +274,23 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage()).isEqualTo("BOTH");
             assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(ENGLISH_AND_WELSH);
+        }
+
+        @Test
+        void shouldTriggerGaLanguageUpdateEvent_WhenCaseHasGeneralApplications() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
+            changeLanguagePreference.setUserType(CLAIMANT);
+            changeLanguagePreference.setPreferredLanguage(WELSH);
+            caseData.setChangeLanguagePreference(changeLanguagePreference);
+            caseData.setApplicant1Represented(NO);
+            caseData.setGeneralApplications(wrapElements(new GeneralApplication()));
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            stubUploadDocumentResponse();
+
+            handler.handle(params);
+
+            verify(helperService).triggerEvent(caseData, TRIGGER_GA_LANGUAGE_UPDATE);
         }
     }
 }
