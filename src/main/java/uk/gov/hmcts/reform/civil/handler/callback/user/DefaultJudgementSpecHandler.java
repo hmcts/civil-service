@@ -85,7 +85,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private static final String BOTH = "Both";
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
-    private final FeatureToggleService toggleService;
     private final DefaultJudgmentOnlineMapper djOnlineMapper;
     private final CaseDetailsConverter caseDetailsConverter;
     private final Time time;
@@ -127,7 +126,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (isJudgementBufferEnabledForCase(caseData)
             && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             return format(JUDGMENT_REQUESTED_HEADER);
-        } else if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        } else if (JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             return format(JUDGMENT_GRANTED_HEADER);
         } else if (caseData.isLRvLipOneVOne()
             || (caseData.getRespondent2() != null
@@ -144,7 +143,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (isJudgementBufferEnabledForCase(caseData)
             && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             return format(JUDGMENT_BUFFER_REQUESTED_LIP_CASE);
-        } else if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        } else if (JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             return format(JUDGMENT_GRANTED, format(
                 CASES_CASE_DETAILS_CLAIM_DOCUMENTS,
                 caseData.getCcdCaseReference()
@@ -396,15 +395,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
         }
 
-        if (!toggleService.isJudgmentOnlineLive()) {
-            repaymentBreakdown.append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(
-                2));
-            if (interest.compareTo(BigDecimal.ZERO) != 0) {
-                repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
-            }
-        } else {
-            repaymentBreakdown.append("\n").append("### Claim amount \n £").append(claimAmountWithInterest.setScale(2));
-        }
+        repaymentBreakdown.append("\n").append("### Claim amount \n £").append(claimAmountWithInterest.setScale(2));
 
         if ((caseData.getFixedCosts() != null
             && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts()))
@@ -507,21 +498,19 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            JudgmentDetails activeJudgment;
-            if (isJudgementBufferEnabledForCase(caseData)) {
-                activeJudgment = djOnlineMapper.addPendingIssueActiveJudgment(caseData);
-            } else {
-                activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
-                caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
-            }
-            caseData.setActiveJudgment(activeJudgment);
-            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
-                activeJudgment,
-                true
-            ));
-            caseData.setJoDJCreatedDate(time.now());
+        JudgmentDetails activeJudgment;
+        if (isJudgementBufferEnabledForCase(caseData)) {
+            activeJudgment = djOnlineMapper.addPendingIssueActiveJudgment(caseData);
+        } else {
+            activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
+            caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
         }
+        caseData.setActiveJudgment(activeJudgment);
+        caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+            activeJudgment,
+            true
+        ));
+        caseData.setJoDJCreatedDate(time.now());
 
         caseData.setTotalInterest(interestCalculator.calculateInterest(caseData));
         caseData.setClaimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
@@ -535,7 +524,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (isNonDivergentForDJ && isJudgementBufferEnabledForCase(caseData)) {
             nextState = CaseState.JUDGMENT_REQUESTED.name();
             caseData.setIsJoRequested(YesOrNo.YES);
-        } else if (isNonDivergentForDJ && featureToggleService.isJudgmentOnlineLive()) {
+        } else if (isNonDivergentForDJ) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else {
@@ -574,4 +563,3 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
 }
-

@@ -302,7 +302,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(new PartyBuilder().individual()
@@ -321,7 +320,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(new PartyBuilder().individual()
@@ -340,7 +338,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(new PartyBuilder().individual()
@@ -359,7 +356,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(new PartyBuilder().individual()
@@ -378,7 +374,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Line 1 test again for more than 35 characters");
@@ -407,7 +402,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Company_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("TEST");
@@ -431,7 +425,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Individual_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Address line 1");
@@ -456,7 +449,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_sole_trader_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Address line 1");
@@ -481,7 +473,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_org_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Address line 1");
@@ -503,9 +494,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotError_when_address_exceeds_max_length_in_org_name_when_flag_in_off() {
+        void shouldNotError_whenApplicant1OrgNameExceedsMaxLengthWithoutAddress() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(false);
 
             Party party = new Party();
             party.setType(Party.Type.ORGANISATION);
@@ -600,7 +590,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Line 1 test again for more than 35 characters");
@@ -629,7 +618,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Company_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("TEST");
@@ -653,7 +641,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Individual_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Address line 1");
@@ -678,7 +665,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_sole_trader_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Address line 1");
@@ -703,7 +689,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_org_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Address line 1");
@@ -1674,7 +1659,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @BeforeEach
             void setup() {
-                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
             }
 
             @Test
@@ -1731,7 +1715,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @BeforeEach
             void setup() {
-                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
             }
 
             @Test
@@ -2051,7 +2034,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenRespondent1PartyNameNotValid() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Party respondent1 = new Party();
             respondent1.setType(Party.Type.ORGANISATION);
@@ -2074,7 +2056,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenRespondent2PartyNameNotValid() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Party respondent2 = new Party();
             respondent2.setType(Party.Type.INDIVIDUAL);

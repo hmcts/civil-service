@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -14,15 +13,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class JudgmentByAdmissionIssuedClaimantDashboardService extends DashboardScenarioService {
 
-    private final FeatureToggleService featureToggleService;
-
     public JudgmentByAdmissionIssuedClaimantDashboardService(
         DashboardScenariosService dashboardScenariosService,
-        DashboardNotificationsParamsMapper mapper,
-        FeatureToggleService featureToggleService
+        DashboardNotificationsParamsMapper mapper
     ) {
         super(dashboardScenariosService, mapper);
-        this.featureToggleService = featureToggleService;
     }
 
     public void notifyClaimant(CaseData caseData, String authToken) {
@@ -39,7 +34,7 @@ public class JudgmentByAdmissionIssuedClaimantDashboardService extends Dashboard
 
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
-        return featureToggleService.isJudgmentOnlineLive();
+        return true;
     }
 
     private boolean isJudgmentOrderIssued(CaseData caseData) {

@@ -29,7 +29,6 @@ public class JudgementService {
         "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
     private static final String JUDGEMENT_ORDER_V2 = "The judgment will order the defendant to pay £%s"
         + ", including the claim fee, any fixed costs if claimed and interest if applicable, as shown:";
-    private final FeatureToggleService featureToggleService;
     private final InterestCalculator interestCalculator;
 
     public CCJPaymentDetails buildJudgmentAmountSummaryDetails(CaseData caseData) {
@@ -142,12 +141,8 @@ public class JudgementService {
     private String ccjJudgmentStatement(CaseData caseData) {
         if (caseData.isLRvLipOneVOne()) {
             boolean hasPaymentOption = caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
-            if (featureToggleService.isJudgmentOnlineLive()
-                && hasPaymentOption) {
-                return JUDGEMENT_BY_COURT_NOT_OFFLINE;
-            }
             if (hasPaymentOption) {
-                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
+                return JUDGEMENT_BY_COURT_NOT_OFFLINE;
             }
             return JUDGEMENT_BY_COURT;
         } else {

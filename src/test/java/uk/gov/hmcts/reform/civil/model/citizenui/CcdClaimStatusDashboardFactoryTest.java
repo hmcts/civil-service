@@ -811,7 +811,7 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_defaultJudgementStatusIssuedByClaimant_thenReturnDefaultJudgementStatus_WhenJOFlagIsOff() {
+    void givenDefaultJudgementDocumentExistsThenReturnDefaultJudgementStatus() {
         CaseData claim =
             CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
                 .defaultJudgmentDocuments(List.of(
