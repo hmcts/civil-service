@@ -4,7 +4,6 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import feign.Client;
 import feign.Request;
 import feign.Response;
-import feign.codec.ErrorDecoder;
 import feign.httpclient.ApacheHttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -49,15 +48,6 @@ public class HttpClientFeignConfiguration {
             telemetryClient,
             slowRequestThreshold
         );
-    }
-
-    @Bean
-    public ErrorDecoder feignErrorDecoder(
-        TelemetryClient telemetryClient,
-        @Value("${http.client.error-classifier.enabled:true}") boolean enabled,
-        @Value("${http.client.error-classifier.logHeaders:false}") boolean logHeaders
-    ) {
-        return new FeignErrorClassificationDecoder(telemetryClient, enabled, logHeaders);
     }
 
     private CloseableHttpClient getHttpClient(PoolingHttpClientConnectionManager connectionManager) {
