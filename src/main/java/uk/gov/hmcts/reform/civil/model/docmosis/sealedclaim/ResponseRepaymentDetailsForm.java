@@ -111,7 +111,6 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
 
         return data
             .setWhyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec())
-            .setResponseType(caseData.getRespondent1ClaimResponseTypeForSpec())
             .setMediation(caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES)
             .toForm();
     }
