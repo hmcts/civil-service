@@ -398,6 +398,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     public CaseDocument generate(CaseData caseData, String authorization) {
         SealedClaimResponseFormForSpec templateData = getTemplateData(caseData, authorization);
         DocmosisTemplates docmosisTemplate = getTemplate(caseData);
+        log.info("templateData ******* {} ", templateData.toString());
+        log.info("docmosisTemplate getTemplate ******* {} ", docmosisTemplate.getTemplate());
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData, docmosisTemplate
