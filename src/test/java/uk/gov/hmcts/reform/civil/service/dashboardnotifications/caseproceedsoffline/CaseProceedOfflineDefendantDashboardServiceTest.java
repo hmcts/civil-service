@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -66,7 +67,6 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             taskListService,
             scenarioService
         );
-        when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
     }
 
     @Nested
@@ -79,12 +79,14 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             );
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
                 .ccdCaseReference(1234L)
                 .generalApplications(gaApplications)
                 .previousCCDState(AWAITING_APPLICANT_INTENTION)
                 .build();
 
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
 
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
 
@@ -110,8 +112,55 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
         }
 
         @Test
+        void shouldRecordScenario_whenLipVLRCase() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO)
+                .ccdCaseReference(1234L)
+                .previousCCDState(AWAITING_APPLICANT_INTENTION)
+                .build();
+
+            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
+
+            service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
+
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+            verify(dashboardScenariosService).recordScenarios(
+                eq(AUTH_TOKEN),
+                eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario()),
+                eq(caseData.getCcdCaseReference().toString()),
+                any()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_whenLRvLipCase() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.YES)
+                .ccdCaseReference(1234L)
+                .previousCCDState(AWAITING_APPLICANT_INTENTION)
+                .build();
+
+            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
+
+            service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
+
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+            verify(dashboardScenariosService).recordScenarios(
+                eq(AUTH_TOKEN),
+                eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario()),
+                eq(caseData.getCcdCaseReference().toString()),
+                any()
+            );
+        }
+
+        @Test
         void shouldRecordScenario_whenCaseProgressionEnabledAndActiveJudgment() {
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .ccdCaseReference(5555L)
@@ -141,6 +190,8 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
                 .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .build();
 
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
+
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
 
             verify(dashboardScenariosService).recordScenarios(
@@ -154,6 +205,7 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
         @Test
         void shouldRecordQueryScenario_whenCitizenQueryAwaitingResponse() {
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
                 .includesRespondentCitizenQueryFollowUp(OffsetDateTime.now())
@@ -173,6 +225,96 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             );
         }
 
+        @Test
+        void shouldNotRecordScenario_whenCaseNotInEligibleState() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .ccdCaseReference(1234L)
+                .previousCCDState(CaseState.CASE_ISSUED) // Not in CASE_PROCEEDS_IN_CASEMAN_STATES or CASE_PROGRESSION_STATES
+                .build();
+
+            service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
+
+            verify(dashboardScenariosService, org.mockito.Mockito.never()).recordScenarios(
+                eq(AUTH_TOKEN),
+                eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario()),
+                eq(caseData.getCcdCaseReference().toString()),
+                any()
+            );
+        }
+
+        @Test
+        void shouldNotRecordScenario_whenNotOneVOne() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.YES)
+                .ccdCaseReference(1234L)
+                .respondent2(new Party().setType(Party.Type.INDIVIDUAL))
+                .previousCCDState(AWAITING_APPLICANT_INTENTION)
+                .build();
+
+            service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
+
+            verify(dashboardScenariosService, org.mockito.Mockito.never()).recordScenarios(
+                eq(AUTH_TOKEN),
+                eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario()),
+                eq(caseData.getCcdCaseReference().toString()),
+                any()
+            );
+        }
+    }
+
+    @Nested
+    class EligibilityTests {
+        @Test
+        void shouldReturnTrue_whenLipVLipOneVOne() {
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+
+            org.assertj.core.api.Assertions.assertThat(service.eligibleForCasemanState(caseData)).isTrue();
+            org.assertj.core.api.Assertions.assertThat(service.eligibleForCaseProgressionState(caseData)).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenLipVLROneVOne() {
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+
+            org.assertj.core.api.Assertions.assertThat(service.eligibleForCasemanState(caseData)).isTrue();
+            org.assertj.core.api.Assertions.assertThat(service.eligibleForCaseProgressionState(caseData)).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenLRvLipOneVOne() {
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.YES)
+                .build();
+
+            org.assertj.core.api.Assertions.assertThat(service.eligibleForCasemanState(caseData)).isTrue();
+            org.assertj.core.api.Assertions.assertThat(service.eligibleForCaseProgressionState(caseData)).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenNotOneVOne() {
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.YES)
+                .respondent2(new Party().setType(Party.Type.INDIVIDUAL))
+                .build();
+
+            org.assertj.core.api.Assertions.assertThat(service.eligibleForCasemanState(caseData)).isFalse();
+            org.assertj.core.api.Assertions.assertThat(service.eligibleForCaseProgressionState(caseData)).isFalse();
+        }
+
+        @Test
+        void shouldReturnDefendantRole() {
+            org.assertj.core.api.Assertions.assertThat(service.citizenRole()).isEqualTo("DEFENDANT");
+        }
     }
 
     private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {

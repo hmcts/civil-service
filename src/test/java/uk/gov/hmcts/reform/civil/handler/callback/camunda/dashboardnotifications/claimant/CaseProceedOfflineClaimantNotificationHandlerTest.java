@@ -255,6 +255,66 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         }
 
         @Test
+        void shouldRecordScenarioForLRvLip_whenInvokedInCaseProgression() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.YES);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
+
+            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
+            ).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                new ScenarioRequestParams(scenarioParams)
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioForLRvLip_whenInvokedWithoutCPEnabled() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.YES);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
+
+            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder()
+                    .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
+            ).build();
+            // When
+            handler.handle(params);
+
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                new ScenarioRequestParams(scenarioParams)
+            );
+        }
+
+        @Test
         void shouldNotRecordPrimaryScenario_whenInvokedForNonLipCase() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
