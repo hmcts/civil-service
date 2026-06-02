@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -40,17 +41,20 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
                                 .must(rangeQuery("data.applicant1ResponseDeadline").lt(timeNow))
                                 .must(beState(AWAITING_APPLICANT_INTENTION))
                                 .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
-                                .mustNot(existsQuery("data.applicant1ResponseDate")))
+                                .mustNot(existsQuery("data.applicant1ResponseDate"))
+                                .must(haveNoOngoingBusinessProcess()))
                     .should(boolQuery()
                                 .must(rangeQuery("data.addLegalRepDeadlineRes1").lt(timeNow))
-                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
+                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
+                                .must(haveNoOngoingBusinessProcess()))
                     .should(boolQuery()
                                 .must(rangeQuery("data.addLegalRepDeadlineRes2").lt(timeNow))
-                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
+                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
+                                .must(haveNoOngoingBusinessProcess())),
                 List.of("reference"),
                 startIndex
             );
-            log.info("Take Case Offline query: {}", query);
+            log.info("Take Case Offline query (WelshEnabled): {}", query);
             return query;
         } else {
             Query query = new Query(
@@ -59,13 +63,16 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
                     .should(boolQuery()
                                 .must(rangeQuery("data.applicant1ResponseDeadline").lt(timeNow))
                                 .must(beState(AWAITING_APPLICANT_INTENTION))
-                                .mustNot(matchQuery("data.isMintiLipCase", "Yes")))
+                                .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
+                                .must(haveNoOngoingBusinessProcess()))
                     .should(boolQuery()
                                 .must(rangeQuery("data.addLegalRepDeadlineRes1").lt(timeNow))
-                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
+                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
+                                .must(haveNoOngoingBusinessProcess()))
                     .should(boolQuery()
                                 .must(rangeQuery("data.addLegalRepDeadlineRes2").lt(timeNow))
-                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
+                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
+                                .must(haveNoOngoingBusinessProcess())),
                 List.of("reference"),
                 startIndex
             );
@@ -77,5 +84,13 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
     private QueryBuilder beState(CaseState caseState) {
         return boolQuery()
             .must(matchQuery("state", caseState.toString()));
+    }
+
+    public BoolQueryBuilder haveNoOngoingBusinessProcess() {
+        return boolQuery()
+            .minimumShouldMatch(1)
+            .should(boolQuery().mustNot(existsQuery("data.businessProcess")))
+            .should(boolQuery().mustNot(existsQuery("data.businessProcess.status")))
+            .should(boolQuery().must(matchQuery("data.businessProcess.status", "FINISHED")));
     }
 }
