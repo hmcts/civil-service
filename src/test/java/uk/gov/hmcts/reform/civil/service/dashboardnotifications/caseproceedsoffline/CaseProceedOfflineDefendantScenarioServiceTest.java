@@ -81,8 +81,8 @@ class CaseProceedOfflineDefendantScenarioServiceTest {
     }
 
     @Test
-    void shouldRecordScenarioInCaseProgressionOnlyWhenEligible() {
-        CaseData eligible =
+    void shouldRecordScenarioInCaseProgression() {
+        CaseData lipvLipCase =
                 CaseData.builder()
                         .ccdCaseReference(1L)
                         .respondent1Represented(YesOrNo.NO)
@@ -90,9 +90,33 @@ class CaseProceedOfflineDefendantScenarioServiceTest {
                         .previousCCDState(CaseState.CASE_PROGRESSION)
                         .build();
 
-        CaseData ineligible = eligible.toBuilder().respondent1Represented(YesOrNo.YES).build();
+        CaseData lipvLrCase =
+            CaseData.builder()
+                .ccdCaseReference(1L)
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO)
+                .previousCCDState(CaseState.CASE_PROGRESSION)
+                .build();
 
-        assertThat(service.shouldRecordScenarioInCaseProgression(eligible)).isTrue();
-        assertThat(service.shouldRecordScenarioInCaseProgression(ineligible)).isFalse();
+        CaseData lrvLipCase =
+            CaseData.builder()
+                .ccdCaseReference(1L)
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.YES)
+                .previousCCDState(CaseState.CASE_PROGRESSION)
+                .build();
+
+        CaseData nonLipCase =
+            CaseData.builder()
+                .ccdCaseReference(1L)
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.YES)
+                .previousCCDState(CaseState.CASE_PROGRESSION)
+                .build();
+
+        assertThat(service.shouldRecordScenarioInCaseProgression(lipvLipCase)).isTrue();
+        assertThat(service.shouldRecordScenarioInCaseProgression(lipvLrCase)).isTrue();
+        assertThat(service.shouldRecordScenarioInCaseProgression(lrvLipCase)).isTrue();
+        assertThat(service.shouldRecordScenarioInCaseProgression(nonLipCase)).isFalse();
     }
 }

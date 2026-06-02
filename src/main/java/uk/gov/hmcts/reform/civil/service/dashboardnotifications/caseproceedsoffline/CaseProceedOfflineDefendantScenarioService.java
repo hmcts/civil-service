@@ -28,9 +28,9 @@ public class CaseProceedOfflineDefendantScenarioService extends CaseProceedOffli
     }
 
     public boolean shouldRecordScenarioInCaseProgression(CaseData caseData) {
-        boolean isLipVLipOrLRvLip = caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne();
+        boolean isLipVLipOrLRvLipOrLipvLR = caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne();
         return inCaseProgressionState(caseData)
-            && isLipVLipOrLRvLip;
+            && isLipVLipOrLRvLipOrLipvLR;
     }
 
     @Override
