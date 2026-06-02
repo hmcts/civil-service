@@ -36,7 +36,9 @@ public class ClaimDetailsNotifiedTimeExtensionTransitionBuilder extends MidTrans
             .onlyWhen(ResponsePredicate.notificationAcknowledged, transitions)
 
             .moveTo(ALL_RESPONSES_RECEIVED, transitions)
-            .onlyWhen(ResponsePredicate.respondentTimeExtension.and(ResponsePredicate.allResponsesReceived), transitions)
+            .onlyWhen(ResponsePredicate.respondentTimeExtension
+                          .and(ResponsePredicate.allResponsesReceived)
+                          .and(not(DismissedPredicate.afterClaimNotifiedExtension)), transitions)
 
             .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.awaitingResponsesFullDefenceReceived.and(ResponsePredicate.respondentTimeExtension)
