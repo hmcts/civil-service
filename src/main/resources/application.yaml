@@ -619,9 +619,6 @@ http:
     maxPerRoute: ${HTTP_MAX_PER_ROUTE:10}
     maxTotal: ${HTTP_MAX_TOTAL:50}
     threshold: 15000
-    error-classifier:
-      enabled: ${HTTP_ERROR_CLASSIFIER_ENABLED:true}
-      logHeaders: ${HTTP_ERROR_CLASSIFIER_LOG_HEADERS:true}
 
 court-location:
   specified-claim:
