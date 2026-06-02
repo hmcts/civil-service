@@ -10,13 +10,13 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
-class CaseDismissedSearchServiceTest extends ElasticSearchServiceTest {
+class ClaimDetailsNotificationDeadlineSearchServiceTest extends ElasticSearchServiceTest {
 
     private String capturedTimeNow;
 
     @BeforeEach
     void setup() {
-        searchService = new CaseDismissedSearchService(coreCaseDataService) {
+        searchService = new ClaimDetailsNotificationDeadlineSearchService(coreCaseDataService) {
             @Override
             public Query query(int startIndex, String timeNow) {
                 capturedTimeNow = timeNow;
@@ -31,11 +31,8 @@ class CaseDismissedSearchServiceTest extends ElasticSearchServiceTest {
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.claimNotificationDeadline").lt(timeNow))
-                        .must(boolQuery().must(matchQuery("state", "CASE_ISSUED"))))
-            .should(boolQuery()
-                        .must(rangeQuery("data.claimDismissedDeadline").lt(timeNow))
-                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))));
+                        .must(rangeQuery("data.claimDetailsNotificationDeadline").lt(timeNow))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_CASE_DETAILS_NOTIFICATION"))));
 
         return new Query(query, List.of("reference"), fromValue);
     }
