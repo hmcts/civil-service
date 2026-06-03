@@ -114,12 +114,10 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
     public AcknowledgementOfClaimForm getTemplateDataForAcknowldgeClaim(CaseData caseData) {
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         LocalDate responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
-        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            if (isRespondent2Acknowledgement(caseData)) {
-                responseDeadline = ofNullable(caseData.getRespondent2ResponseDeadline())
-                    .orElse(caseData.getRespondent1ResponseDeadline())
-                    .toLocalDate();
-            }
+        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP && isRespondent2Acknowledgement(caseData)) {
+            responseDeadline = ofNullable(caseData.getRespondent2ResponseDeadline())
+                .orElse(caseData.getRespondent1ResponseDeadline())
+                .toLocalDate();
         }
         return new AcknowledgementOfClaimForm(
                 "[userImage:courtseal.PNG]",
