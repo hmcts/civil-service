@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N11;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N9_MULTIPARTY_SAME_SOL;
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.isRespondent2Acknowledgement;
 
 @Service
 @RequiredArgsConstructor
@@ -100,17 +101,11 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
 
         }
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
-                && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+            if (isRespondent2Acknowledgement(caseData)) {
                 respondentParties.remove(0);
-            } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
-                && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                if (caseData.getRespondent2AcknowledgeNotificationDate()
-                    .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
-                    respondentParties.remove(0);
-                } else {
-                    respondentParties.remove(1);
-                }
+            } else if (caseData.getRespondent1AcknowledgeNotificationDate() != null
+                || caseData.getRespondent2AcknowledgeNotificationDate() != null) {
+                respondentParties.remove(1);
             }
         }
         return respondentParties;
@@ -120,17 +115,10 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         LocalDate responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
-                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                responseDeadline = caseData.getRespondent2ResponseDeadline().toLocalDate();
-            } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
-                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                if (caseData.getRespondent2AcknowledgeNotificationDate()
-                        .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
-                    responseDeadline = caseData.getRespondent2ResponseDeadline().toLocalDate();
-                } else {
-                    responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
-                }
+            if (isRespondent2Acknowledgement(caseData)) {
+                responseDeadline = ofNullable(caseData.getRespondent2ResponseDeadline())
+                    .orElse(caseData.getRespondent1ResponseDeadline())
+                    .toLocalDate();
             }
         }
         return new AcknowledgementOfClaimForm(
