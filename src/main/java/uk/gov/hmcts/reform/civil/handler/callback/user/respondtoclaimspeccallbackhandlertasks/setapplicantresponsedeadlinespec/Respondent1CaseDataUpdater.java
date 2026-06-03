@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 
@@ -18,6 +19,7 @@ public class Respondent1CaseDataUpdater implements SetApplicantResponseDeadlineC
 
     private static final int RESPONSE_CLAIM_SPEC_DEADLINE_EXTENSION_MONTHS = 36;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final Time time;
 
     @Override
     public void update(CaseData caseData) {
@@ -40,6 +42,8 @@ public class Respondent1CaseDataUpdater implements SetApplicantResponseDeadlineC
             updatedRespondent1 = caseData.getRespondent1();
             updatedRespondent1.setFlags(caseData.getRespondent1Copy().getFlags());
             caseData.setRespondent1(updatedRespondent1);
+            log.info("Setting setRespondent1ResponseDate caseId: {}", caseData.getCcdCaseReference());
+            caseData.setRespondent1ResponseDate(time.now());
         }
 
         log.info("Setting respondent1Copy to null and updating claimDismissedDeadline for caseId: {}", caseData.getCcdCaseReference());
