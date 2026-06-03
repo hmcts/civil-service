@@ -12,8 +12,8 @@ public class ClaimDetailsNotificationDeadlineExternalTaskListener {
     private static final String TOPIC = "CLAIM_DETAILS_NOTIFICATION_DEADLINE";
 
     @Autowired
-    private ClaimDetailsNotificationDeadlineExternalTaskListener(ClaimDetailsNotificationDeadlineHandler handler,
-                                                                ExternalTaskClient client) {
+    ClaimDetailsNotificationDeadlineExternalTaskListener(ClaimDetailsNotificationDeadlineHandler handler,
+                                                        ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);
         subscriptionBuilder.handler(handler).open();
     }
