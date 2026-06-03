@@ -31,7 +31,7 @@ class UploadDocumentWithDescriptionRetrieverTest {
     }
 
     @Test
-    void getDocumentDateTimeShouldReturnCreatedDateTime() {
+    void getDocumentDateTimeShouldReturnCreatedDatetime() {
         Document document = new Document().setDocumentFileName("a.pdf");
         Element<DocumentWithDescription> el = element(new DocumentWithDescription(document, "x", created, "u"));
 
