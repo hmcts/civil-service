@@ -43,8 +43,6 @@ public class Respondent2CaseDataUpdater implements SetApplicantResponseDeadlineC
             caseData.getRespondent2().setPrimaryAddress(caseData.getRespondent2Copy().getPrimaryAddress());
             caseData.getRespondent2().setFlags(caseData.getRespondent2Copy().getFlags());
             caseData.setRespondent2Copy(null);
-            log.info("Updating setRespondent2ResponseDate for caseId: {}", caseData.getCcdCaseReference());
-            caseData.setRespondent2ResponseDate(responseDate);
             Party respondent2DetailsForTab = new Party();
             respondent2DetailsForTab.setPartyID(caseData.getRespondent2().getPartyID());
             respondent2DetailsForTab.setType(caseData.getRespondent2().getType());

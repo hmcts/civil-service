@@ -139,9 +139,9 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
 
     private void handleSingleRespondentRepresentation(CallbackParams callbackParams, CaseData caseData,
                                                       LocalDateTime responseDate) {
-        //caseData.setRespondent2ResponseDate(responseDate);
+        caseData.setRespondent2ResponseDate(responseDate);
         caseData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
-        if (caseData.getRespondent1ResponseDate() != null || caseData.getRespondent2ResponseDate() != null) {
+        if (caseData.getRespondent1ResponseDate() != null) {
             LocalDateTime applicant1ResponseDeadline = getApplicant1ResponseDeadline(responseDate);
             caseData
                 .setApplicant1ResponseDeadline(applicant1ResponseDeadline);
