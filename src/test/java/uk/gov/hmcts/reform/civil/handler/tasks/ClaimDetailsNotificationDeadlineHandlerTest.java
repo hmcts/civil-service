@@ -134,7 +134,7 @@ class ClaimDetailsNotificationDeadlineHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NullPointerException(errorMessage))
-            .when(applicationEventPublisher).publishEvent(eq(new DismissClaimEvent(caseId)));
+            .when(applicationEventPublisher).publishEvent(new DismissClaimEvent(caseId));
 
         handler.execute(mockTask, externalTaskService);
 
