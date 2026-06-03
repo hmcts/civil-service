@@ -41,10 +41,6 @@ public class SecurityConfiguration {
         "/testing-support/**"
     };
 
-    private static final String PERMISSIONS_POLICY =
-        "accelerometer=(), camera=(), geolocation=(), gyroscope=(), "
-            + "microphone=(), payment=(), usb=()";
-
     private final RequestAuthorizer<User> userRequestAuthorizer;
     private final AuthenticationManager authenticationManager;
 
@@ -71,7 +67,6 @@ public class SecurityConfiguration {
                 headers.contentTypeOptions(Customizer.withDefaults());
                 headers.frameOptions(frame -> frame.sameOrigin());
                 headers.referrerPolicy(rp -> rp.policy(ReferrerPolicy.NO_REFERRER));
-                headers.permissionsPolicy(pp -> pp.policy(PERMISSIONS_POLICY));
                 headers.httpStrictTransportSecurity(hsts -> hsts
                     .includeSubDomains(true)
                     .maxAgeInSeconds(31536000));
