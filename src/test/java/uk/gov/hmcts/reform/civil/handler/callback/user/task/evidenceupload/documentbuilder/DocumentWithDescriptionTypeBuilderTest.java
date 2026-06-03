@@ -32,7 +32,7 @@ class DocumentWithDescriptionTypeBuilderTest {
 
         assertThat(copy.getDocument()).isNull();
         assertThat(copy.getDocumentDescription()).isEqualTo("notes");
-        assertThat(copy.getCreatedDateTime()).isEqualTo(created);
+        assertThat(copy.getCreatedDatetime()).isEqualTo(created);
         assertThat(copy.getCreatedBy()).isEqualTo("creator");
     }
 
@@ -52,16 +52,16 @@ class DocumentWithDescriptionTypeBuilderTest {
         assertThat(copy.getDocument().getCategoryID()).isEqualTo("targetCategory");
         assertThat(copy.getDocument().getDocumentUrl()).isEqualTo("http://a");
         assertThat(copy.getDocument().getDocumentFileName()).isEqualTo("f.pdf");
-        assertThat(copy.getCreatedDateTime()).isEqualTo(created);
+        assertThat(copy.getCreatedDatetime()).isEqualTo(created);
     }
 
     @Test
-    void buildElementTypeWithDocumentCopyShouldUseNowWhenCreatedDateTimeNull() {
+    void buildElementTypeWithDocumentCopyShouldUseNowWhenCreatedDatetimeNull() {
         Document doc = new Document().setDocumentFileName("x.pdf");
         DocumentWithDescription from = new DocumentWithDescription(doc, null, null, null);
 
         DocumentWithDescription copy = builder.buildElementTypeWithDocumentCopy(from, "c");
 
-        assertThat(copy.getCreatedDateTime()).isNotNull();
+        assertThat(copy.getCreatedDatetime()).isNotNull();
     }
 }

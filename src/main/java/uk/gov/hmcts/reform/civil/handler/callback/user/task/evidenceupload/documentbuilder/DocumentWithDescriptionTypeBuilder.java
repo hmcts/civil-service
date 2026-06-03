@@ -28,7 +28,7 @@ public class DocumentWithDescriptionTypeBuilder implements DocumentTypeBuilder<D
         return new DocumentWithDescription(
             copiedDocument,
             fromValue.getDocumentDescription(),
-            fromValue.getCreatedDateTime() != null ? fromValue.getCreatedDateTime() : LocalDateTime.now(),
+            fromValue.getCreatedDatetime() != null ? fromValue.getCreatedDatetime() : LocalDateTime.now(),
             fromValue.getCreatedBy()
         );
     }

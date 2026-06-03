@@ -19,7 +19,7 @@ public class DocumentWithDescription {
 
     private String documentDescription;
 
-    private LocalDateTime createdDateTime = LocalDateTime.now(ZoneId.of("Europe/London"));
+    private LocalDateTime createdDatetime = LocalDateTime.now(ZoneId.of("Europe/London"));
     private String createdBy;
 }
 

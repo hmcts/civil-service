@@ -17,7 +17,7 @@ public class UploadDocumentWithDescriptionRetriever implements UploadDocumentRet
 
     @Override
     public LocalDateTime getDocumentDateTime(Element<DocumentWithDescription> element) {
-        return element.getValue().getCreatedDateTime();
+        return element.getValue().getCreatedDatetime();
     }
 }
 
