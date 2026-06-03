@@ -242,7 +242,6 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             caseData.setChangeLanguagePreference(changeLanguagePreference);
             caseData.setApplicant1Represented(NO);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-            stubUploadDocumentResponse();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -266,7 +265,6 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
             caseData.setCaseDataLiP(caseDataLiP);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-            stubUploadDocumentResponse();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -286,7 +284,6 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             caseData.setApplicant1Represented(NO);
             caseData.setGeneralApplications(wrapElements(new GeneralApplication()));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-            stubUploadDocumentResponse();
 
             handler.handle(params);
 
