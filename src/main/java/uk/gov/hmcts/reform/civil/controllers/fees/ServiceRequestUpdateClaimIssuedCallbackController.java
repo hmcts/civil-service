@@ -34,6 +34,7 @@ public class ServiceRequestUpdateClaimIssuedCallbackController {
     public void serviceRequestUpdate(@RequestHeader("ServiceAuthorization") String s2sToken,
                                      @RequestBody ServiceRequestUpdateDto serviceRequestUpdateDto) {
         try {
+            log.info("API has been called by 'Ways to pay'");
             if (authorisationService.isServiceAuthorized(s2sToken)) {
                 requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.CLAIMISSUED.name());
             } else {
