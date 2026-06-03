@@ -88,7 +88,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @EnumSource(value = YesOrNo.class, names = {"YES", "NO"})
         void shouldPopulateIfRTLRadioDisplay(YesOrNo value) {
-            //Given: Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given: Casedata in ALL_FINAL_ORDERS_ISSUED State
             when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoIsRegisteredWithRTL(value);
@@ -111,7 +111,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @EnumSource(value = YesOrNo.class, names = {"YES", "NO"})
         void shouldPopulateIfRTLRadioDisplayForDJ() {
-            //Given: Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given: Casedata in ALL_FINAL_ORDERS_ISSUED State
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
@@ -146,7 +146,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_Instalment_WITH_RTL_YES_TO_YES() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State and RTL is Yes in active judgment
+            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State and RTL is Yes in active judgment
             when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
@@ -209,7 +209,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_Immediately_RTL_NO_TO_YES() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
             when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
@@ -254,7 +254,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_By_Date_RTL_NO_TO_NO() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
             when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();

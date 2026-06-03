@@ -97,7 +97,7 @@ class DefendantNocClaimantDashboardServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
         caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
-        caseData.setPreviousCCDState(CaseState.All_FINAL_ORDERS_ISSUED);
+        caseData.setPreviousCCDState(CaseState.ALL_FINAL_ORDERS_ISSUED);
         caseData.setActiveJudgment(judgmentDetails);
         caseData.setHearingFeePaymentDetails(paymentDetails);
 
@@ -123,7 +123,7 @@ class DefendantNocClaimantDashboardServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
         caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
-        caseData.setPreviousCCDState(CaseState.All_FINAL_ORDERS_ISSUED);
+        caseData.setPreviousCCDState(CaseState.ALL_FINAL_ORDERS_ISSUED);
         caseData.setHearingFeePaymentDetails(paymentDetails);
 
         service.notifyClaimant(caseData, AUTH_TOKEN);

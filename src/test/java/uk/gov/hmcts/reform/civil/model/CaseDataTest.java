@@ -215,7 +215,7 @@ class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip()
-                                                                          .setHasAgreedFreeMediation(MediationDecision.Yes)))
+                                                                          .setHasAgreedFreeMediation(MediationDecision.YES)))
             .build();
         //When
         boolean result = caseData.hasClaimantAgreedToFreeMediation();
@@ -239,7 +239,7 @@ class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip()
-                                                                          .setHasAgreedFreeMediation(MediationDecision.No)))
+                                                                          .setHasAgreedFreeMediation(MediationDecision.NO)))
             .build();
         //When
         boolean result = caseData.hasClaimantAgreedToFreeMediation();

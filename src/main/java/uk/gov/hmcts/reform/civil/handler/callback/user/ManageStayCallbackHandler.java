@@ -50,7 +50,7 @@ public class ManageStayCallbackHandler extends CallbackHandler {
         CaseState.HEARING_READINESS.name(), CaseState.CASE_PROGRESSION,
         CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.name(), CaseState.CASE_PROGRESSION,
         CaseState.DECISION_OUTCOME.name(), CaseState.CASE_PROGRESSION,
-        CaseState.All_FINAL_ORDERS_ISSUED.name(), CaseState.CASE_PROGRESSION
+        CaseState.ALL_FINAL_ORDERS_ISSUED.name(), CaseState.CASE_PROGRESSION
     );
 
     private final ObjectMapper mapper;

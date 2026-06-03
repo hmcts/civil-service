@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 @FeignClient(name = "fees-api", url = "${fees.api.url}")
 public interface FeesApiClient {
 
-    String baseUrl = "/fees-register/fees";
+    String BASE_URL = "/fees-register/fees";
 
-    @GetMapping(baseUrl + "/lookup"
+    @GetMapping(BASE_URL + "/lookup"
         + "?service={service}"
         + "&jurisdiction1={jurisdiction1}"
         + "&jurisdiction2={jurisdiction2}"
@@ -32,7 +32,7 @@ public interface FeesApiClient {
         @PathVariable("amount") BigDecimal amount
     );
 
-    @GetMapping(baseUrl + "/lookup"
+    @GetMapping(BASE_URL + "/lookup"
         + "?service={service}"
         + "&jurisdiction1={jurisdiction1}"
         + "&jurisdiction2={jurisdiction2}"
@@ -49,7 +49,7 @@ public interface FeesApiClient {
         @PathVariable("keyword") String keyword
     );
 
-    @GetMapping(baseUrl + "/lookup"
+    @GetMapping(BASE_URL + "/lookup"
         + "?service={service}"
         + "&jurisdiction1={jurisdiction1}"
         + "&jurisdiction2={jurisdiction2}"
@@ -66,7 +66,7 @@ public interface FeesApiClient {
         @PathVariable("amount") BigDecimal amount
     );
 
-    @GetMapping(baseUrl
+    @GetMapping(BASE_URL
         + "?service={service}"
         + "&jurisdiction1={jurisdiction1}"
         + "&jurisdiction2={jurisdiction2}"

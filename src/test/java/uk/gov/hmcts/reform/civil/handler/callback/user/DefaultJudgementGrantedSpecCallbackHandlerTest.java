@@ -61,7 +61,7 @@ class DefaultJudgementGrantedSpecCallbackHandlerTest extends BaseCallbackHandler
             assertThat(updatedData.getActiveJudgment().getRtlState()).isEqualTo(JudgmentRTLStatus.ISSUED.getRtlState());
             assertThat(updatedData.getActiveJudgment().getIsRegisterWithRTL()).isEqualTo(YES);
             assertThat(updatedData.getJoIsLiveJudgmentExists()).isEqualTo(YES);
-            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getState()).isEqualTo(CaseState.ALL_FINAL_ORDERS_ISSUED.name());
         }
 
         @Test

@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRaiseQuery;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.QUERY_MANAGEMENT_RAISE_QUERY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CLOSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
@@ -45,7 +45,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.migrateAllQueries;
 @RequiredArgsConstructor
 public class RaiseQueryCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(queryManagementRaiseQuery);
+    private static final List<CaseEvent> EVENTS = List.of(QUERY_MANAGEMENT_RAISE_QUERY);
 
     protected final ObjectMapper objectMapper;
     protected final UserService userService;
@@ -121,7 +121,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         caseData.setQueries(caseQueriesCollection);
         caseData.setQmLatestQuery(buildLatestQuery(latestCaseMessage, caseData, roles));
         clearOldQueryCollections(caseData);
-        caseData.setBusinessProcess(BusinessProcess.ready(queryManagementRaiseQuery));
+        caseData.setBusinessProcess(BusinessProcess.ready(QUERY_MANAGEMENT_RAISE_QUERY));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

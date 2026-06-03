@@ -170,6 +170,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
             && featureToggleService.isJudgmentOnlineLive()
             && caseData.getActiveJudgment() != null
             && JudgmentType.JUDGMENT_BY_ADMISSION.equals(caseData.getActiveJudgment().getType())
-            && caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED;
+            && caseData.getCcdState() == CaseState.ALL_FINAL_ORDERS_ISSUED;
     }
 }

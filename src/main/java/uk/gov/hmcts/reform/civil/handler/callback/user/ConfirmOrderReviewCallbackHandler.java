@@ -168,7 +168,7 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
             caseData.setEnableUploadEvent(shouldEvidenceUploadEventBeAvailable(caseData));
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
-                .state(CaseState.All_FINAL_ORDERS_ISSUED.toString())
+                .state(CaseState.ALL_FINAL_ORDERS_ISSUED.toString())
                 .build();
         }
         caseData.setEnableUploadEvent(YesOrNo.YES);

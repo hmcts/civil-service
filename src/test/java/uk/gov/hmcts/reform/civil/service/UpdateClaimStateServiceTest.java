@@ -132,7 +132,7 @@ class UpdateClaimStateServiceTest {
     void shouldUpdateCaseStateToInMediation_WhenSmallClaimCarmEnabled1v1() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
-        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.NO);
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
         CaseData caseData =
@@ -151,7 +151,7 @@ class UpdateClaimStateServiceTest {
     void shouldUpdateCaseStateToJudicialReferral_WhenSmallClaimCarmNotEnabled() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         ClaimantMediationLip claimantMediationLip2 = new ClaimantMediationLip();
-        claimantMediationLip2.setHasAgreedFreeMediation(MediationDecision.No);
+        claimantMediationLip2.setHasAgreedFreeMediation(MediationDecision.NO);
         CaseDataLiP caseDataLiP2 = new CaseDataLiP();
         caseDataLiP2.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip2);
         CaseData caseData =
@@ -172,7 +172,7 @@ class UpdateClaimStateServiceTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         ClaimantMediationLip claimantMediationLip3 = new ClaimantMediationLip();
-        claimantMediationLip3.setHasAgreedFreeMediation(MediationDecision.No);
+        claimantMediationLip3.setHasAgreedFreeMediation(MediationDecision.NO);
         CaseDataLiP caseDataLiP3 = new CaseDataLiP();
         caseDataLiP3.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip3);
         CaseData caseData = CaseDataBuilder.builder()
@@ -193,7 +193,7 @@ class UpdateClaimStateServiceTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         ClaimantMediationLip claimantMediationLip4 = new ClaimantMediationLip();
-        claimantMediationLip4.setHasAgreedFreeMediation(MediationDecision.No);
+        claimantMediationLip4.setHasAgreedFreeMediation(MediationDecision.NO);
         CaseDataLiP caseDataLiP4 = new CaseDataLiP();
         caseDataLiP4.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip4);
         CaseData caseData = CaseDataBuilder.builder()
@@ -214,7 +214,7 @@ class UpdateClaimStateServiceTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         ClaimantMediationLip claimantMediationLip5 = new ClaimantMediationLip();
-        claimantMediationLip5.setHasAgreedFreeMediation(MediationDecision.No);
+        claimantMediationLip5.setHasAgreedFreeMediation(MediationDecision.NO);
         CaseDataLiP caseDataLiP5 = new CaseDataLiP();
         caseDataLiP5.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip5);
         CaseData caseData =
@@ -251,7 +251,7 @@ class UpdateClaimStateServiceTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         ClaimantMediationLip claimantMediationLip6 = new ClaimantMediationLip();
-        claimantMediationLip6.setHasAgreedFreeMediation(MediationDecision.No);
+        claimantMediationLip6.setHasAgreedFreeMediation(MediationDecision.NO);
         CaseDataLiP caseDataLiP6 = new CaseDataLiP();
         caseDataLiP6.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip6);
         CaseData caseData =
@@ -284,7 +284,7 @@ class UpdateClaimStateServiceTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         ClaimantMediationLip claimantMediationLip7 = new ClaimantMediationLip();
-        claimantMediationLip7.setHasAgreedFreeMediation(MediationDecision.Yes);
+        claimantMediationLip7.setHasAgreedFreeMediation(MediationDecision.YES);
         CaseDataLiP caseDataLiP7 = new CaseDataLiP();
         caseDataLiP7.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip7);
         CaseData caseData = CaseDataBuilder.builder()
@@ -304,7 +304,7 @@ class UpdateClaimStateServiceTest {
     void shouldNotChangeCaseState_whenHaveFullAdmissionFromRespondent() {
         //Given
         ClaimantMediationLip claimantMediationLip8 = new ClaimantMediationLip();
-        claimantMediationLip8.setHasAgreedFreeMediation(MediationDecision.Yes);
+        claimantMediationLip8.setHasAgreedFreeMediation(MediationDecision.YES);
         CaseDataLiP caseDataLiP8 = new CaseDataLiP();
         caseDataLiP8.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip8);
         CaseData caseData = CaseDataBuilder.builder()
@@ -343,7 +343,7 @@ class UpdateClaimStateServiceTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         ClaimantMediationLip claimantMediationLip9 = new ClaimantMediationLip();
-        claimantMediationLip9.setHasAgreedFreeMediation(MediationDecision.No);
+        claimantMediationLip9.setHasAgreedFreeMediation(MediationDecision.NO);
         CaseDataLiP caseDataLiP9 = new CaseDataLiP();
         caseDataLiP9.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip9);
         Party applicant1 = new Party();
@@ -524,6 +524,6 @@ class UpdateClaimStateServiceTest {
         caseData.setCcjPaymentDetails(ccjPaymentDetails);
         String actualState = service.setUpCaseState(caseData);
 
-        assertEquals(CaseState.All_FINAL_ORDERS_ISSUED.name(), actualState);
+        assertEquals(CaseState.ALL_FINAL_ORDERS_ISSUED.name(), actualState);
     }
 }

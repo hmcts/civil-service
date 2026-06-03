@@ -65,7 +65,7 @@ public class DefaultJudgementGrantedSpecCallbackHandler extends CallbackHandler 
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updateCaseData(caseData).toMap(objectMapper))
-            .state(CaseState.All_FINAL_ORDERS_ISSUED.name())
+            .state(CaseState.ALL_FINAL_ORDERS_ISSUED.name())
             .build();
     }
 

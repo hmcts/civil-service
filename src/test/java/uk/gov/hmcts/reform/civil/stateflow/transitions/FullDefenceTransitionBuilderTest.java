@@ -456,7 +456,7 @@ public class FullDefenceTransitionBuilderTest {
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(new CaseDataLiP()
                              .setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip()
-                                                                          .setHasAgreedFreeMediation(MediationDecision.Yes)))
+                                                                          .setHasAgreedFreeMediation(MediationDecision.YES)))
             .build();
         boolean result = MediationPredicate.allAgreedToLrMediationSpec.test(caseData);
         assertFalse(result);

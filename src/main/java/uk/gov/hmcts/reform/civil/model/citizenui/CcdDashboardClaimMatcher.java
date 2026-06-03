@@ -98,7 +98,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isOrderMade() {
-        return (caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED
+        return (caseData.getCcdState() == CaseState.ALL_FINAL_ORDERS_ISSUED
             || caseData.getCcdState() == CaseState.CASE_PROGRESSION)
             && getTimeOfLastNonSDOOrder().isPresent();
     }
@@ -106,7 +106,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     @Override
     public Optional<LocalDateTime> getTimeOfLastNonSDOOrder() {
         if (caseData.getCcdState() == CaseState.CASE_PROGRESSION
-            || caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
+            || caseData.getCcdState() == CaseState.ALL_FINAL_ORDERS_ISSUED) {
             return getTimeOfMostRecentEventOfType(EnumSet.of(
                 CaseEvent.COURT_OFFICER_ORDER,
                 CaseEvent.GENERATE_DIRECTIONS_ORDER

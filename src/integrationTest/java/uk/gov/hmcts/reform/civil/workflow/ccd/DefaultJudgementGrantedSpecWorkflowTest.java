@@ -24,7 +24,7 @@ public class DefaultJudgementGrantedSpecWorkflowTest extends WorkflowIntegration
             .aboutToSubmit()
             .then(result -> {
                 assertThat(result.response().getErrors()).isNullOrEmpty();
-                assertThat(result.response().getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                assertThat(result.response().getState()).isEqualTo(CaseState.ALL_FINAL_ORDERS_ISSUED.name());
 
                 CaseData updatedCaseData = result.caseData();
                 assertThat(updatedCaseData.getActiveJudgment().getState()).isEqualTo(JudgmentState.ISSUED);

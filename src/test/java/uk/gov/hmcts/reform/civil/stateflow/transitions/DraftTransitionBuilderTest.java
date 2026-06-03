@@ -333,7 +333,7 @@ public class DraftTransitionBuilderTest {
             .respondent1Represented(NO)
             .specRespondent1Represented(NO)
             .applicant1Represented(NO)
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
             .activeJudgment(new JudgmentDetails()
                                 .setType(JudgmentType.JUDGMENT_BY_ADMISSION))
             .build();

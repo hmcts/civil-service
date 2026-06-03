@@ -208,7 +208,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.ALL_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
@@ -4629,7 +4629,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atAllFinalOrdersIssuedCheck() {
         atStateHearingFeeDuePaid();
-        ccdState = All_FINAL_ORDERS_ISSUED;
+        ccdState = ALL_FINAL_ORDERS_ISSUED;
         hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
         hearingDuration = MINUTES_120;
         return this;
@@ -5307,7 +5307,7 @@ public class CaseDataBuilder {
         caseDataLiP = new CaseDataLiP()
             .setApplicant1ClaimMediationSpecRequiredLip(
                 new ClaimantMediationLip()
-                    .setHasAgreedFreeMediation(MediationDecision.Yes));
+                    .setHasAgreedFreeMediation(MediationDecision.YES));
 
         mediation = new Mediation().setUnsuccessfulMediationReason("Unsuccessful");
 
@@ -5320,7 +5320,7 @@ public class CaseDataBuilder {
         caseDataLiP = new CaseDataLiP()
             .setApplicant1ClaimMediationSpecRequiredLip(
                 new ClaimantMediationLip()
-                    .setHasAgreedFreeMediation(MediationDecision.Yes));
+                    .setHasAgreedFreeMediation(MediationDecision.YES));
 
         mediation = new Mediation().setMediationUnsuccessfulReasonsMultiSelect(
             List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE));
@@ -5340,7 +5340,7 @@ public class CaseDataBuilder {
         caseDataLiP = new CaseDataLiP()
             .setApplicant1ClaimMediationSpecRequiredLip(
                 new ClaimantMediationLip()
-                    .setHasAgreedFreeMediation(MediationDecision.Yes));
+                    .setHasAgreedFreeMediation(MediationDecision.YES));
 
         mediation = new Mediation().setMediationSuccessful(new MediationSuccessful().setMediationSettlementAgreedAt(now())
                 .setMediationAgreement(new MediationAgreementDocument().setName("mediation")
@@ -6123,7 +6123,7 @@ public class CaseDataBuilder {
 
     public CaseData buildJudmentOnlineCaseDataWithPaymentByInstalment() {
         return build().toBuilder()
-            .ccdState(All_FINAL_ORDERS_ISSUED)
+            .ccdState(ALL_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .respondent1(new PartyBuilder().individual().build())
             .joInstalmentDetails(new JudgmentInstalmentDetails()
@@ -6140,7 +6140,7 @@ public class CaseDataBuilder {
 
     public CaseData buildJudgmentOnlineCaseDataWithDeterminationMeans() {
         return build().toBuilder()
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
             .respondent1(new PartyBuilder().individual().build())
             .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
             .joInstalmentDetails(new JudgmentInstalmentDetails()
@@ -6156,13 +6156,13 @@ public class CaseDataBuilder {
 
     public CaseData buildJudmentOnlineCaseDataWithConfirmationForReferToJudgeDefenceReceived() {
         return build().toBuilder()
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
             .confirmReferToJudgeDefenceReceived(List.of(ConfirmationToggle.CONFIRM)).build();
     }
 
     public CaseData buildJudmentOnlineCaseDataWithPaymentImmediately() {
         return build().toBuilder()
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
@@ -6183,7 +6183,7 @@ public class CaseDataBuilder {
         oldAddress.setPostTown("Line 1 test again for more than 35 characters");
 
         return build().toBuilder()
-            .ccdState(All_FINAL_ORDERS_ISSUED)
+            .ccdState(ALL_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
@@ -6206,7 +6206,7 @@ public class CaseDataBuilder {
 
     public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate() {
         return build().toBuilder()
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
             .respondent1(new PartyBuilder().organisation().build())
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
@@ -6222,7 +6222,7 @@ public class CaseDataBuilder {
 
     public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party() {
         return build().toBuilder()
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
             .respondent1(new PartyBuilder().organisation().build())
             .addRespondent2(YES)
             .respondent2(new PartyBuilder().individual().build())
@@ -6244,7 +6244,7 @@ public class CaseDataBuilder {
         paidInFull.setConfirmFullPaymentMade(List.of("CONFIRMED"));
 
         return build().toBuilder()
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
             .respondent1(new PartyBuilder().soleTrader().build())
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(paidInFull)
@@ -6261,7 +6261,7 @@ public class CaseDataBuilder {
         paidInFull.setConfirmFullPaymentMade(List.of("CONFIRMED"));
 
         return build().toBuilder()
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
             .respondent1(new PartyBuilder().soleTrader().build())
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(paidInFull)

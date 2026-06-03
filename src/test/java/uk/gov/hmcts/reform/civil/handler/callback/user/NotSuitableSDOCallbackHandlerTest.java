@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOT_SUITABLE_SDO;
 
 @SpringBootTest(classes = {
     NotSuitableSDOCallbackHandler.class,
@@ -186,7 +186,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
-                .containsOnly(NotSuitable_SDO.name(), "READY");
+                .containsOnly(NOT_SUITABLE_SDO.name(), "READY");
 
         }
 
@@ -210,7 +210,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
-                .containsOnly(NotSuitable_SDO.name(), "READY");
+                .containsOnly(NOT_SUITABLE_SDO.name(), "READY");
 
         }
 
@@ -291,6 +291,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(NotSuitable_SDO);
+        assertThat(handler.handledEvents()).contains(NOT_SUITABLE_SDO);
     }
 }

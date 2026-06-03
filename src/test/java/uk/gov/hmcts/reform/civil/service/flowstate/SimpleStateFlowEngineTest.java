@@ -4103,7 +4103,7 @@ class SimpleStateFlowEngineTest {
             caseData.setResponseClaimMediationSpecRequired(YES);
             caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
             ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
-            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.Yes);
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.YES);
             CaseDataLiP caseDataLiP = new CaseDataLiP();
             caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
             caseData.setCaseDataLiP(caseDataLiP);
@@ -4133,7 +4133,7 @@ class SimpleStateFlowEngineTest {
             caseData.setResponseClaimMediationSpecRequired(YES);
             caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
             ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
-            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.NO);
             CaseDataLiP caseDataLiP = new CaseDataLiP();
             caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
             caseData.setCaseDataLiP(caseDataLiP);
@@ -4710,7 +4710,7 @@ class SimpleStateFlowEngineTest {
             caseData.setClaimNotificationDeadline(LocalDateTime.now());
             caseData.setRespondent1ResponseDate(LocalDateTime.now());
             ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
-            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.NO);
             CaseDataLiP caseDataLiP = new CaseDataLiP();
             caseDataLiP.setRespondentSignSettlementAgreement(YES);
             caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
@@ -4719,7 +4719,7 @@ class SimpleStateFlowEngineTest {
             caseData.setClaimNotificationDate(LocalDateTime.now());
             caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
             caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(YES);
-            caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+            caseData.setCcdState(CaseState.ALL_FINAL_ORDERS_ISSUED);
             caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YES);
 
             // When
@@ -4783,7 +4783,7 @@ class SimpleStateFlowEngineTest {
             caseData.setClaimNotificationDeadline(LocalDateTime.now());
             caseData.setRespondent1ResponseDate(LocalDateTime.now());
             ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
-            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.NO);
             CaseDataLiP caseDataLiP = new CaseDataLiP();
             caseDataLiP.setRespondentSignSettlementAgreement(YES);
             caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
@@ -4791,7 +4791,7 @@ class SimpleStateFlowEngineTest {
             caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
             caseData.setClaimNotificationDate(LocalDateTime.now());
             caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
-            caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+            caseData.setCcdState(CaseState.ALL_FINAL_ORDERS_ISSUED);
             caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YES);
 
             // When

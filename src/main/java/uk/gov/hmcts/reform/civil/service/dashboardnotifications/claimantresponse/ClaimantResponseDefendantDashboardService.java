@@ -136,7 +136,7 @@ public class ClaimantResponseDefendantDashboardService extends ClaimantResponseD
         return caseDataLip.filter(caseDataLiP -> caseData.isRespondentResponseFullDefence()
             && (isNull(caseDataLiP.getApplicant1ClaimMediationSpecRequiredLip())
             || (caseDataLiP.getApplicant1ClaimMediationSpecRequiredLip()
-            .getHasAgreedFreeMediation().equals(MediationDecision.No)))).isPresent();
+            .getHasAgreedFreeMediation().equals(MediationDecision.NO)))).isPresent();
     }
 
     private boolean isCourtDecisionRejected(CaseData caseData) {

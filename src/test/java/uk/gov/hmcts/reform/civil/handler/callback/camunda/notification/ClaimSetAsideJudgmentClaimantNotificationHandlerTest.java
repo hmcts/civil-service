@@ -143,7 +143,7 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
                 .applicant1Represented(YesOrNo.NO)
                 .legacyCaseReference("000DC001")
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
                 .build();
 
             CallbackParams params = new CallbackParams()

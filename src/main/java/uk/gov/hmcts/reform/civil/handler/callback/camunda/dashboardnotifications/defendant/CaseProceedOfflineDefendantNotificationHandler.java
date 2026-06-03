@@ -39,7 +39,7 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
         CaseState.HEARING_READINESS,
         CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING,
         CaseState.DECISION_OUTCOME,
-        CaseState.All_FINAL_ORDERS_ISSUED
+        CaseState.ALL_FINAL_ORDERS_ISSUED
     );
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationCaseProceedOffline";
     public static final String GA = "Applications";

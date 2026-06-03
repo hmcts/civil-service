@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.ALL_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT;
@@ -169,7 +169,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
             caseData.setRespondent1Represented(YesOrNo.NO);
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setCcdCaseReference(1234L);
-            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
+            caseData.setPreviousCCDState(ALL_FINAL_ORDERS_ISSUED);
 
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -197,7 +197,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
             caseData.setRespondent1Represented(YesOrNo.NO);
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setCcdCaseReference(1234L);
-            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
+            caseData.setPreviousCCDState(ALL_FINAL_ORDERS_ISSUED);
 
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -231,7 +231,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
             caseData.setRespondent1Represented(YesOrNo.YES);
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setCcdCaseReference(1234L);
-            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
+            caseData.setPreviousCCDState(ALL_FINAL_ORDERS_ISSUED);
 
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -261,7 +261,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
             caseData.setRespondent1Represented(YesOrNo.YES);
             caseData.setApplicant1Represented(YesOrNo.YES);
             caseData.setCcdCaseReference(1234L);
-            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
+            caseData.setPreviousCCDState(ALL_FINAL_ORDERS_ISSUED);
 
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();

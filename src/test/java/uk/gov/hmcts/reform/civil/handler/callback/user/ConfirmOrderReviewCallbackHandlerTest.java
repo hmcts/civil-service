@@ -192,7 +192,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             } else {
                 assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
             }
-            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getState()).isEqualTo(CaseState.ALL_FINAL_ORDERS_ISSUED.name());
         }
 
         @ParameterizedTest
@@ -212,7 +212,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             } else {
                 assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
             }
-            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getState()).isEqualTo(CaseState.ALL_FINAL_ORDERS_ISSUED.name());
         }
 
         @ParameterizedTest

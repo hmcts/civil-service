@@ -23,7 +23,7 @@ public abstract class CaseProceedOfflineDashboardService extends DashboardScenar
         CaseState.HEARING_READINESS,
         CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING,
         CaseState.DECISION_OUTCOME,
-        CaseState.All_FINAL_ORDERS_ISSUED
+        CaseState.ALL_FINAL_ORDERS_ISSUED
     );
     protected static final String GA_CATEGORY = "Applications";
 

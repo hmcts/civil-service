@@ -37,7 +37,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRaiseQuery;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.QUERY_MANAGEMENT_RAISE_QUERY;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -74,7 +74,7 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     public void handleEventsReturnsTheExpectedCallbackEvents() {
-        assertThat(handler.handledEvents()).containsOnly(queryManagementRaiseQuery);
+        assertThat(handler.handledEvents()).containsOnly(QUERY_MANAGEMENT_RAISE_QUERY);
     }
 
     @BeforeEach

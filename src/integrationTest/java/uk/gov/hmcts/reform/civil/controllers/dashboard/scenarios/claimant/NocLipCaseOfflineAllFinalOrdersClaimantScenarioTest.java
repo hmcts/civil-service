@@ -5,7 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.ALL_FINAL_ORDERS_ISSUED;
 
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -46,7 +46,7 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .previousCCDState(All_FINAL_ORDERS_ISSUED)
+            .previousCCDState(ALL_FINAL_ORDERS_ISSUED)
             .applicant1Represented(YesOrNo.NO)
             .activeJudgment(activeJudgment)
             .build();
@@ -81,7 +81,7 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
             .of(ABOUT_TO_SUBMIT, caseData)
             .request(CallbackRequest.builder().eventId(
                 CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name())
-                         .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build())
+                         .caseDetails(CaseDetails.builder().state(ALL_FINAL_ORDERS_ISSUED.toString()).build()).build())
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .build();
     }

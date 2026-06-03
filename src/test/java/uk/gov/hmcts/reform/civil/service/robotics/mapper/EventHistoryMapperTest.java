@@ -10406,7 +10406,7 @@ class EventHistoryMapperTest {
 
             given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+            caseData.setCcdState(CaseState.ALL_FINAL_ORDERS_ISSUED);
             caseData.setTotalClaimAmount(new BigDecimal(1000));
             caseData.setRepaymentSuggestion("100");
             caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
@@ -10879,7 +10879,7 @@ class EventHistoryMapperTest {
             caseData.setCaseDataLiP(
                     new CaseDataLiP()
                             .setApplicant1ClaimMediationSpecRequiredLip(
-                                    new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.Yes)));
+                                    new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.YES)));
             caseData.setAddRespondent2(NO);
             caseData.setApplicant1DQ(createApplicant1DQWithCourt(preferredCourt));
             caseData.setRespondent1DQ(createRespondent1DQWithCourt(preferredCourt));
@@ -10946,7 +10946,7 @@ class EventHistoryMapperTest {
             caseData.setCaseDataLiP(
                     new CaseDataLiP()
                             .setApplicant1ClaimMediationSpecRequiredLip(
-                                    new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.Yes)));
+                                    new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.YES)));
             caseData.setApplicant1DQ(createApplicant1DQWithCourt(preferredCourt));
             caseData.setRespondent1DQ(createRespondent1DQWithCourt(preferredCourt));
             caseData.setRespondToClaim(
@@ -11035,7 +11035,7 @@ class EventHistoryMapperTest {
             caseData.setCaseDataLiP(
                     new CaseDataLiP()
                             .setApplicant1ClaimMediationSpecRequiredLip(
-                                    new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.Yes)));
+                                    new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.YES)));
             caseData.setApplicant1DQ(createApplicant1DQWithCourt(preferredCourt));
             caseData.setRespondent1DQ(createRespondent1DQWithCourt(preferredCourt));
             caseData.setRespondToClaim(
@@ -11499,7 +11499,7 @@ class EventHistoryMapperTest {
             caseData.setRespondToClaimAdmitPartLRspec(paymentDetails);
             caseData.setTotalInterest(BigDecimal.ZERO);
             caseData.setApplicant1ResponseDate(LocalDateTime.now());
-            caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+            caseData.setCcdState(CaseState.ALL_FINAL_ORDERS_ISSUED);
             caseData.setJoJudgementByAdmissionIssueDate(now);
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);

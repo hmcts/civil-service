@@ -459,7 +459,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
-        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.NO);
 
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);

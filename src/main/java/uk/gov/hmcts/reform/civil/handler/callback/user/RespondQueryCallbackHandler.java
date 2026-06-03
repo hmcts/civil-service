@@ -20,7 +20,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespondQuery;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.QUERY_MANAGEMENT_RESPOND_QUERY;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.clearOldQueryCollections;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.logMigrationSuccess;
@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.migrateAllQueries;
 @RequiredArgsConstructor
 public class RespondQueryCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(queryManagementRespondQuery);
+    private static final List<CaseEvent> EVENTS = List.of(QUERY_MANAGEMENT_RESPOND_QUERY);
 
     private final ObjectMapper mapper;
     private final AssignCategoryId assignCategoryId;
@@ -64,7 +64,7 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         assignCategoryIdToCaseworkerAttachments(latestCaseMessage, assignCategoryId);
         clearOldQueryCollections(caseData);
 
-        caseData.setBusinessProcess(BusinessProcess.ready(queryManagementRespondQuery));
+        caseData.setBusinessProcess(BusinessProcess.ready(QUERY_MANAGEMENT_RESPOND_QUERY));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))
             .build();

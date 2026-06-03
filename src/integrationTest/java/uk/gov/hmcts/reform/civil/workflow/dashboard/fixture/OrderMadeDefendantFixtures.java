@@ -17,7 +17,7 @@ public final class OrderMadeDefendantFixtures {
     public static CaseData caseData() {
         return CaseDataTemplates.load(ORDER_MADE_DEFENDANT, template -> {
             CaseDataTemplates.set(template, "ccdCaseReference", CASE_ID);
-            CaseDataTemplates.set(template, "ccdState", CaseState.All_FINAL_ORDERS_ISSUED);
+            CaseDataTemplates.set(template, "ccdState", CaseState.ALL_FINAL_ORDERS_ISSUED);
             CaseDataTemplates.set(template, "claimsTrack", ClaimsTrack.FAST_TRACK);
             CaseDataTemplates.set(template, "drawDirectionsOrderRequired", YesOrNo.NO);
             CaseDataTemplates.set(template, "trialReadyRespondent1", null);

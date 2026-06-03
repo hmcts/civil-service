@@ -35,7 +35,7 @@ public class UpdateClaimStateService {
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
             return CaseState.CASE_STAYED.name();
         } else if (hasJudgmentByAdmission(updatedData, featureToggleService.isJudgmentOnlineLive())) {
-            return CaseState.All_FINAL_ORDERS_ISSUED.name();
+            return CaseState.ALL_FINAL_ORDERS_ISSUED.name();
         } else if (isProceedsInHeritageSystemAllowed(updatedData)) {
             return CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
         } else {

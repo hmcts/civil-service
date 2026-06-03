@@ -405,7 +405,7 @@ class ClaimantResponseDefendantDashboardServiceTest {
     void shouldRecordScenarioForJudicialReferralFullDefenceNoMediation() {
 
         ClaimantMediationLip mediationLip = new ClaimantMediationLip();
-        mediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        mediationLip.setHasAgreedFreeMediation(MediationDecision.NO);
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(mediationLip);
 
@@ -712,7 +712,7 @@ class ClaimantResponseDefendantDashboardServiceTest {
         respondToClaim.setHowMuchWasPaid(BigDecimal.ONE);
 
         ClaimantMediationLip mediationLip = new ClaimantMediationLip();
-        mediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        mediationLip.setHasAgreedFreeMediation(MediationDecision.NO);
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(mediationLip);
 
@@ -740,7 +740,7 @@ class ClaimantResponseDefendantDashboardServiceTest {
     void shouldRecordScenarioForJudicialReferralPartAdmitRejectsClaimantMediation() {
 
         ClaimantMediationLip mediationLip = new ClaimantMediationLip();
-        mediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        mediationLip.setHasAgreedFreeMediation(MediationDecision.NO);
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(mediationLip);
 
@@ -766,7 +766,7 @@ class ClaimantResponseDefendantDashboardServiceTest {
     @Test
     void shouldNotRecordJudicialReferralScenarioWhenNotFullDefenceForMediationCheck() {
         ClaimantMediationLip mediationLip = new ClaimantMediationLip();
-        mediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        mediationLip.setHasAgreedFreeMediation(MediationDecision.NO);
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(mediationLip);
 
@@ -787,7 +787,7 @@ class ClaimantResponseDefendantDashboardServiceTest {
     @Test
     void shouldNotRecordJudicialReferralScenarioWhenClaimantAgreedMediation() {
         ClaimantMediationLip mediationLip = new ClaimantMediationLip();
-        mediationLip.setHasAgreedFreeMediation(MediationDecision.Yes);
+        mediationLip.setHasAgreedFreeMediation(MediationDecision.YES);
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(mediationLip);
 

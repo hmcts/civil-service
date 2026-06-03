@@ -52,7 +52,7 @@ class ApplicationsProceedOfflineNotificationServiceTest {
     @Test
     void shouldSkipWhenCaseNotOffline() {
 
-        CaseData nonProceed = baseCaseData().toBuilder().ccdState(CaseState.All_FINAL_ORDERS_ISSUED).build();
+        CaseData nonProceed = baseCaseData().toBuilder().ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED).build();
 
         service.notifyClaimant(nonProceed, "token");
         service.notifyDefendant(nonProceed, "token");

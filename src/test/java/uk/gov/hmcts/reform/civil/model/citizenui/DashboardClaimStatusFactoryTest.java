@@ -695,7 +695,7 @@ class DashboardClaimStatusFactoryTest {
         orderList.add(new Element<CaseDocument>().setValue(document));
         CaseData caseData = previous.toBuilder()
             .finalOrderDocumentCollection(orderList)
-            .ccdState(orderType == OrderType.DIRECTIONS_ORDER_ALL ? CaseState.All_FINAL_ORDERS_ISSUED
+            .ccdState(orderType == OrderType.DIRECTIONS_ORDER_ALL ? CaseState.ALL_FINAL_ORDERS_ISSUED
                           : CaseState.CASE_PROGRESSION)
             .build();
         checkStatus(caseData, eventHistory,
@@ -883,7 +883,7 @@ class DashboardClaimStatusFactoryTest {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
         eventHistory.add(CaseEventDetail.builder().id("GENERATE_DIRECTIONS_ORDER").createdDate(LocalDateTime.now()).build());
         CaseData caseData = CaseData.builder()
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
             .preTranslationDocuments(List.of(element(new CaseDocument().setDocumentType(DocumentType.HEARING_FORM)))).build();
 
         DashboardClaimStatus claimantStatus = claimStatusFactory.getDashboardClaimStatus(

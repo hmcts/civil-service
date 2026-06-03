@@ -144,7 +144,7 @@ class MediationEventStrategyTest {
 
     private CaseDataBuilder baseCaseDataBuilder(CaseCategory category) {
         ClaimantMediationLip lip = new ClaimantMediationLip();
-        lip.setHasAgreedFreeMediation(MediationDecision.Yes);
+        lip.setHasAgreedFreeMediation(MediationDecision.YES);
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(lip);
 
@@ -155,7 +155,7 @@ class MediationEventStrategyTest {
 
     private CaseDataLiP createCaseDataLiP() {
         ClaimantMediationLip lip = new ClaimantMediationLip();
-        lip.setHasAgreedFreeMediation(MediationDecision.Yes);
+        lip.setHasAgreedFreeMediation(MediationDecision.YES);
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(lip);
         return caseDataLiP;
