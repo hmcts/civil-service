@@ -43,21 +43,29 @@ public class UpdateWaCourtLocationsService {
             // is set by DEFENDANT_RESPONSE_SPEC/CUI. WA listing locations will be evaluated when
             // the respondent/claimant responds or at SDO time. For UNSPEC this is unusual since
             // allocatedTrack is set at CREATE_CLAIM.
+            // We still refresh the case management location summary tab so the transferred court is
+            // shown even before the track is known (e.g. TRANSFER_ONLINE_CASE before defendant response).
             log.info("Claim track not yet set for case {} (caseAccessCategory={}); "
                      + "skipping WA listing location update — will be evaluated on later event",
                      caseData.getCcdCaseReference(), caseData.getCaseAccessCategory());
+            // Best-effort refresh of the summary tab so the transferred court is shown; never fail the
+            // event if the location is absent or not in reference data (preserves the safe early return).
+            if (caseData.getCaseManagementLocation() != null
+                && caseData.getCaseManagementLocation().getBaseLocation() != null) {
+                try {
+                    updateCaseManagementLocationTab(caseData, locationRefDataList);
+                } catch (IllegalArgumentException e) {
+                    log.info("Could not refresh case management location tab for case {}; "
+                             + "leaving it unchanged. Reason: {}",
+                             caseData.getCcdCaseReference(), e.getMessage());
+                }
+            }
             return;
         }
         if ("FAST_CLAIM".equals(claimTrack) || "SMALL_CLAIM".equals(claimTrack)) {
             // when track is small or fast do not evaluate DMN, and also if claim was changed to small or fast
             // remove any previously evaluated and populate locations from taskManagementLocations
-            LocationRefData caseManagementLocationName = courtLocationDetails(
-                locationRefDataList,
-                caseData.getCaseManagementLocation().getBaseLocation(),
-                "CML location"
-            );
-            caseData.setCaseManagementLocationTab(new TaskManagementLocationTab()
-                                                      .setCaseManagementLocation(caseManagementLocationName.getSiteName()));
+            updateCaseManagementLocationTab(caseData, locationRefDataList);
             caseData.setTaskManagementLocations(null);
             return;
         }
@@ -129,16 +137,24 @@ public class UpdateWaCourtLocationsService {
             tabContent.setCcmcListingLocation(caseData.getTaskManagementLocations().getCcmcListingLocation().getLocationName());
         }
 
+        updateCaseManagementLocationTab(caseData, locationRefDataList);
+
+        caseData.setTaskManagementLocationsTab(tabContent);
+    }
+
+    /**
+     * Refreshes the case management location summary tab from the current case management location.
+     * Kept independent of the listing-location (WA/DMN) evaluation so the tab reflects the latest
+     * court even when the claim track is not yet known and listing locations cannot be evaluated.
+     */
+    private void updateCaseManagementLocationTab(CaseData caseData, List<LocationRefData> locationRefDataList) {
         LocationRefData caseManagementLocationName = courtLocationDetails(
             locationRefDataList,
             caseData.getCaseManagementLocation().getBaseLocation(),
             "CML location"
         );
-
         caseData.setCaseManagementLocationTab(new TaskManagementLocationTab()
                                                   .setCaseManagementLocation(caseManagementLocationName.getSiteName()));
-
-        caseData.setTaskManagementLocationsTab(tabContent);
     }
 
     private LocationRefData courtLocationDetails(List<LocationRefData> locationRefDataList, String court, String courtType) {
