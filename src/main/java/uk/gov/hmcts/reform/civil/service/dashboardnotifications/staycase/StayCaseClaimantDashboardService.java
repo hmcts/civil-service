@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class StayCaseClaimantDashboardService extends DashboardScenarioService {
 
@@ -39,11 +41,14 @@ public class StayCaseClaimantDashboardService extends DashboardScenarioService {
 
     @Override
     public String getScenario(CaseData caseData) {
-        if (featureToggleService.isJudgmentBufferEnabled()
-            && YesOrNo.YES.equals(caseData.getIsJoRequested())) {
-            return SCENARIO_AAA6_CASE_STAYED_JR_CANCELLED_CLAIMANT.getScenario();
-        }
         return SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT.getScenario();
+    }
+
+    @Override
+    protected Map<String, Boolean> getScenarios(CaseData caseData) {
+        boolean isPreviouslyJudgmentRequested = featureToggleService.isJudgmentBufferEnabled()
+            && YesOrNo.YES.equals(caseData.getIsJoRequested());
+        return Map.of(SCENARIO_AAA6_CASE_STAYED_JR_CANCELLED_CLAIMANT.getScenario(), isPreviouslyJudgmentRequested);
     }
 
     @Override
