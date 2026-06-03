@@ -131,33 +131,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             );
         }
 
-        @Test
-        void shouldRecordScenario_whenLipVLRCase() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
-            caseData.setRespondent1Represented(YesOrNo.YES);
-            caseData.setApplicant1Represented(YesOrNo.NO);
-            caseData.setCcdCaseReference(12890L);
-            caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
-
-            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build())
-                .build();
-
-            handler.handle(callbackParams);
-
-            // Then
-            verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                new ScenarioRequestParams(scenarioParams)
-            );
-        }
 
         @Test
         void shouldRecordScenario_whenLRvLipCase() {

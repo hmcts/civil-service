@@ -115,8 +115,8 @@ class CaseProceedOfflineDefendantScenarioServiceTest {
                 .build();
 
         assertThat(service.shouldRecordScenarioInCaseProgression(lipvLipCase)).isTrue();
-        assertThat(service.shouldRecordScenarioInCaseProgression(lipvLrCase)).isTrue();
         assertThat(service.shouldRecordScenarioInCaseProgression(lrvLipCase)).isTrue();
+        assertThat(service.shouldRecordScenarioInCaseProgression(lipvLrCase)).isFalse();
         assertThat(service.shouldRecordScenarioInCaseProgression(nonLipCase)).isFalse();
     }
 }

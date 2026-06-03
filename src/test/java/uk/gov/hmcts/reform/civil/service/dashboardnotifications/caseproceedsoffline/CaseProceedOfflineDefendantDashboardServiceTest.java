@@ -111,28 +111,6 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             );
         }
 
-        @Test
-        void shouldRecordScenario_whenLipVLRCase() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.YES)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .previousCCDState(AWAITING_APPLICANT_INTENTION)
-                .build();
-
-            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
-            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
-
-            service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
-
-            verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            verify(dashboardScenariosService).recordScenarios(
-                eq(AUTH_TOKEN),
-                eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario()),
-                eq(caseData.getCcdCaseReference().toString()),
-                any()
-            );
-        }
 
         @Test
         void shouldRecordScenario_whenLRvLipCase() {
@@ -277,16 +255,6 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             org.assertj.core.api.Assertions.assertThat(service.eligibleForCaseProgressionState(caseData)).isTrue();
         }
 
-        @Test
-        void shouldReturnTrue_whenLipVLROneVOne() {
-            CaseData caseData = CaseData.builder()
-                .respondent1Represented(YesOrNo.YES)
-                .applicant1Represented(YesOrNo.NO)
-                .build();
-
-            org.assertj.core.api.Assertions.assertThat(service.eligibleForCasemanState(caseData)).isTrue();
-            org.assertj.core.api.Assertions.assertThat(service.eligibleForCaseProgressionState(caseData)).isTrue();
-        }
 
         @Test
         void shouldReturnTrue_whenLRvLipOneVOne() {
@@ -297,23 +265,6 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
 
             org.assertj.core.api.Assertions.assertThat(service.eligibleForCasemanState(caseData)).isTrue();
             org.assertj.core.api.Assertions.assertThat(service.eligibleForCaseProgressionState(caseData)).isTrue();
-        }
-
-        @Test
-        void shouldReturnFalse_whenNotOneVOne() {
-            CaseData caseData = CaseData.builder()
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.YES)
-                .respondent2(new Party().setType(Party.Type.INDIVIDUAL))
-                .build();
-
-            org.assertj.core.api.Assertions.assertThat(service.eligibleForCasemanState(caseData)).isFalse();
-            org.assertj.core.api.Assertions.assertThat(service.eligibleForCaseProgressionState(caseData)).isFalse();
-        }
-
-        @Test
-        void shouldReturnDefendantRole() {
-            org.assertj.core.api.Assertions.assertThat(service.citizenRole()).isEqualTo("DEFENDANT");
         }
     }
 

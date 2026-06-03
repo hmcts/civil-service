@@ -47,12 +47,12 @@ public class CaseProceedOfflineDefendantDashboardService extends CaseProceedOffl
 
     @Override
     protected boolean eligibleForCasemanState(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne();
+        return caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne();
     }
 
     @Override
     protected boolean eligibleForCaseProgressionState(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne();
+        return caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne();
     }
 
     @Override
