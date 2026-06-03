@@ -111,7 +111,6 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             );
         }
 
-
         @Test
         void shouldRecordScenario_whenLRvLipCase() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
@@ -254,7 +253,6 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             org.assertj.core.api.Assertions.assertThat(service.eligibleForCasemanState(caseData)).isTrue();
             org.assertj.core.api.Assertions.assertThat(service.eligibleForCaseProgressionState(caseData)).isTrue();
         }
-
 
         @Test
         void shouldReturnTrue_whenLRvLipOneVOne() {

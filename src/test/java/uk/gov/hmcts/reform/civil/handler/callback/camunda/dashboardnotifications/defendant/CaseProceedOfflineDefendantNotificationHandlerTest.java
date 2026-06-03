@@ -131,7 +131,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             );
         }
 
-
         @Test
         void shouldRecordScenario_whenLRvLipCase() {
             // Given
