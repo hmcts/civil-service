@@ -38,7 +38,7 @@ Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 s
 Generated business rules from flowstate predicates in
 - Composed & Atomic predicate rules: [business-rules.md](docs/business-rules.md)
 
-## Email notification catalogue.
+## Email notification catalogue
 
 Every Camunda notifier, the parties it contacts, the Gov.Notify templates it uses, and the BPMN/CCD entry points are tracked in [`docs/email-notifications.md`](docs/email-notifications.md). The table is generated automatically by `scripts/generate_email_notifications_table.py`, which walks the notifier/aggregator/generator hierarchy, reads template IDs from `src/main/resources/application.yaml`, and links the referencing BPMN files from `src/main/resources/camunda`.
 
