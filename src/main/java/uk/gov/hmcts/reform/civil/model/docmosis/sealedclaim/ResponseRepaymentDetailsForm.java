@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Slf4j
 public record ResponseRepaymentDetailsForm(String amountToPay,
@@ -219,7 +220,8 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
 
     private static void partAdmissionData(CaseData caseData, ResponseRepaymentDetailsFormData data) {
         addDetailsOnWhyClaimIsRejected(caseData, data);
-        if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES || caseData.getSpecDefenceAdmitted2Required() == YesOrNo.YES) {
+        if (YES.equals(caseData.getIsRespondent1()) && caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES
+            || YES.equals(caseData.getIsRespondent2()) && caseData.getSpecDefenceAdmitted2Required() == YesOrNo.YES) {
             alreadyPaid(caseData, data);
         } else {
             BigDecimal amountInPennies =
