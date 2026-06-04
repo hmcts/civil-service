@@ -23,16 +23,20 @@ import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.*;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.AWAITING_ACTUALS;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
@@ -51,11 +55,11 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
     private static final List<String> UPDATE_HEARING_DATE_STATUSES = List.of(LISTED.name(), AWAITING_ACTUALS.name());
     private static final List<String> CLEAR_HEARING_DATE_STATUSES = List.of(COMPLETED.name(), CANCELLED.name(), ADJOURNED.name());
-    static final CaseState[] ILA_HEARING_STATES = {
+    static final Set<CaseState> ILA_HEARING_STATES = EnumSet.of(
         HEARING_READINESS,
         PREPARE_FOR_HEARING_CONDUCT_HEARING,
         DECISION_OUTCOME
-    };
+    );
 
     private final SystemUpdateUserConfiguration userConfig;
     private final UserService userService;
@@ -119,10 +123,8 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder().data(data);
 
         CaseState caseCcdState = caseData.getCcdState();
-        if (CANCELLED.name().contains(latestHearing.getHmcStatus())) {
-            if (Arrays.asList(ILA_HEARING_STATES).contains(caseCcdState)) {
-                responseBuilder.state(CASE_PROGRESSION.name());
-            }
+        if (CANCELLED.name().equals(latestHearing.getHmcStatus()) && ILA_HEARING_STATES.contains(caseCcdState)) {
+            responseBuilder.state(CASE_PROGRESSION.name());
         }
 
         return responseBuilder.build();

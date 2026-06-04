@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.NextHearingDetails;
@@ -34,6 +36,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
@@ -484,6 +488,65 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
                 assertNull(updatedData.getNextHearingDetails());
+            }
+
+            @ParameterizedTest(name = "when the case state is {0}")
+            @EnumSource(
+                value = CaseState.class,
+                names = {"HEARING_READINESS", "PREPARE_FOR_HEARING_CONDUCT_HEARING", "DECISION_OUTCOME"})
+            void shouldMoveCaseToCaseProgression_whenLatestHearingCancelledAndCurrentStateIsIlaHearingState(CaseState state) {
+                LocalDateTime hearingStartTime = TODAY.plusHours(10);
+                LocalDateTime requestedDateTime = TODAY.plusHours(9);
+
+                CaseData caseData = CaseDataBuilder.builder().build().setCcdState(state);
+                String hearingId = "12345";
+
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
+                        hearing("11111", LISTED, requestedDateTime.minusDays(1), List.of(hearingStartTime)),
+                        hearing(hearingId, CANCELLED, requestedDateTime, List.of(hearingStartTime))
+                    ));
+
+                when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
+
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseEvent.UpdateNextHearingInfo,
+                    ABOUT_TO_START
+                );
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertEquals(CASE_PROGRESSION.name(), response.getState());
+            }
+
+            @Test
+            void shouldNotMoveCaseToCaseProgression_whenLatestHearingCancelledAndCurrentStateIsNotIlaHearingState() {
+                LocalDateTime hearingStartTime = TODAY.plusHours(10);
+                LocalDateTime requestedDateTime = TODAY.plusHours(9);
+
+                CaseData caseData = CaseDataBuilder.builder().build().setCcdState(CASE_ISSUED);
+                String hearingId = "12345";
+
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
+                        hearing("11111", LISTED, requestedDateTime.minusDays(1), List.of(hearingStartTime)),
+                        hearing(hearingId, CANCELLED, requestedDateTime, List.of(hearingStartTime))
+                    ));
+
+                when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
+
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseEvent.UpdateNextHearingInfo,
+                    ABOUT_TO_START
+                );
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertNull(response.getState());
             }
         }
     }
