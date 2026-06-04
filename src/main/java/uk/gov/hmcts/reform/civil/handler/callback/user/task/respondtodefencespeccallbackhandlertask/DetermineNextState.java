@@ -70,6 +70,13 @@ public class DetermineNextState extends CallbackHandler {
             || caseData.isFastTrackClaim());
     }
 
+    private static boolean isLrVlrPartAdmitRejected(CaseData caseData) {
+        return caseData.isPartAdmitClaimSpec()
+            && caseData.isClaimantNotSettlePartAdmitClaim()
+            && YesOrNo.YES.equals(caseData.getApplicant1Represented())
+            && YesOrNo.YES.equals(caseData.getRespondent1Represented());
+    }
+
     @Override
     protected Map<String, Callback> callbacks() {
         return callbackMap;
@@ -104,14 +111,16 @@ public class DetermineNextState extends CallbackHandler {
             log.info("Pin in Post enabled for Case: {}", caseData.getCcdCaseReference());
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
-            } else if (isDefenceAdmitPayImmediately(caseData)) {
-                nextState = getNextState(caseData);
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             } else if (caseData.isPartAdmitClaimSettled()) {
                 nextState = CaseState.CASE_SETTLED.name();
+            } else if (isLrVlrPartAdmitRejected(caseData)) {
+                nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (isClaimNotSettled(caseData)) {
                 nextState = CaseState.JUDICIAL_REFERRAL.name();
+            } else if (isDefenceAdmitPayImmediately(caseData)) {
+                nextState = getNextState(caseData);
             } else if (isLipVLipOneVOne(caseData)) {
                 nextState = CaseState.CASE_STAYED.name();
             }
@@ -154,14 +163,16 @@ public class DetermineNextState extends CallbackHandler {
                 Pair<String, BusinessProcess> result = handleAcceptedRepaymentPlan(caseData, businessProcess);
                 nextState = result.getLeft();
                 businessProcess = result.getRight();
-            } else if (isDefenceAdmitPayImmediately(caseData)) {
-                nextState = getNextState(caseData);
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
+            } else if (isLrVlrPartAdmitRejected(caseData)) {
+                nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (isClaimNotSettled(caseData)) {
                 nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (caseData.isPartAdmitClaimSettled()) {
                 nextState = CaseState.CASE_SETTLED.name();
+            } else if (isDefenceAdmitPayImmediately(caseData)) {
+                nextState = getNextState(caseData);
             } else if (isLipVLipOneVOne(caseData)) {
                 nextState = CaseState.CASE_STAYED.name();
             }

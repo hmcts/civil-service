@@ -468,7 +468,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldSetAwaitingApplicantIntentionWhenApplicantWantToProceedImmediatePaymentPlanFor1V1() {
+    void shouldSetStateJudicialReferralWhenLrVlrClaimantRejectsPartAdmitImmediatePaymentFor1V1() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1AcceptAdmitAmountPaidSpec(NO)
@@ -483,7 +483,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    "", businessProcess);
         assertNotNull(resultState);
-        assertEquals(All_FINAL_ORDERS_ISSUED.name(), resultState);
+        assertEquals(JUDICIAL_REFERRAL.name(), resultState);
     }
 
     private CallbackParams callbackParams(CaseData caseData) {
