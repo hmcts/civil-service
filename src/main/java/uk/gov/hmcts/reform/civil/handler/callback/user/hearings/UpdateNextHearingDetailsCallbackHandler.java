@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.NextHearingDetails;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.*;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.AWAITING_ACTUALS;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
@@ -48,6 +51,11 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
     private static final List<String> UPDATE_HEARING_DATE_STATUSES = List.of(LISTED.name(), AWAITING_ACTUALS.name());
     private static final List<String> CLEAR_HEARING_DATE_STATUSES = List.of(COMPLETED.name(), CANCELLED.name(), ADJOURNED.name());
+    static final CaseState[] ILA_HEARING_STATES = {
+        HEARING_READINESS,
+        PREPARE_FOR_HEARING_CONDUCT_HEARING,
+        DECISION_OUTCOME
+    };
 
     private final SystemUpdateUserConfiguration userConfig;
     private final UserService userService;
@@ -107,7 +115,17 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
             }
         }
 
-        return AboutToStartOrSubmitCallbackResponse.builder().data(data).build();
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
+            AboutToStartOrSubmitCallbackResponse.builder().data(data);
+
+        CaseState caseCcdState = caseData.getCcdState();
+        if (CANCELLED.name().contains(latestHearing.getHmcStatus())) {
+            if (Arrays.asList(ILA_HEARING_STATES).contains(caseCcdState)) {
+                responseBuilder.state(CASE_PROGRESSION.name());
+            }
+        }
+
+        return responseBuilder.build();
     }
 
     private HearingsResponse getHearings(Long caseId) {
