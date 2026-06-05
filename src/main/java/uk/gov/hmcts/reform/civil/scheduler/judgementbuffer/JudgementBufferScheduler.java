@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.JudgementBufferExpiredSearchService;
 
+import java.util.stream.Collectors;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -40,7 +42,7 @@ public class JudgementBufferScheduler implements CivilScheduler {
             log.info("Running {} scheduler", SCHEDULER_NAME);
             scheduledTaskRunner.run(
                 new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-                searchService::getCases,
+                () -> searchService.getCases(),
                 judgementBufferScheduledTask
             );
         }

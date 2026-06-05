@@ -7,9 +7,12 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -22,34 +25,34 @@ public class ScheduledTaskProcessor {
     private int circuitBreakerThreshold;
 
     public ScheduledTaskOutcome performProcessing(ScheduledTaskEventConfiguration eventConfig,
-                                                 Consumer<CaseDetails> scheduledTask,
-                                                 Set<CaseDetails> cases) {
-        List<Long> succeededCases = new ArrayList<>();
-        List<Long> failedCases = new ArrayList<>();
-        int consecutiveFailures = 0;
-        boolean abortedEarly = false;
-        String abortReason = "";
+                                                  Consumer<CaseDetails> scheduledTask,
+                                                  Stream<CaseDetails> cases) {
+        List<Long> succeededCases = Collections.synchronizedList(new ArrayList<>());
+        List<Long> failedCases = Collections.synchronizedList(new ArrayList<>());
+        AtomicInteger consecutiveFailures = new AtomicInteger(0);
+        StringBuilder abortReason = new StringBuilder();
 
-        for (CaseDetails caseDetails : cases) {
+        boolean completed = cases.sequential().allMatch(caseDetails -> {
             Long caseId = caseDetails.getId();
             try {
                 scheduledTask.accept(caseDetails);
                 eventTracker.caseProcessedEvent(eventConfig, caseId);
                 succeededCases.add(caseId);
-                consecutiveFailures = 0;
+                consecutiveFailures.set(0);
             } catch (Exception e) {
                 failedCases.add(caseId);
                 eventTracker.caseFailedEvent(eventConfig, caseId, e);
                 log.error("Error processing case {}: {}", caseId, e.getMessage(), e);
-                consecutiveFailures++;
+                int failures = consecutiveFailures.incrementAndGet();
 
-                if (consecutiveFailures >= circuitBreakerThreshold) {
-                    abortedEarly = true;
-                    abortReason = e.getMessage();
-                    break;
+                if (failures >= circuitBreakerThreshold) {
+                    abortReason.append(Objects.toString(e.getMessage(), e.getClass().getSimpleName()));
+                    return false;
                 }
             }
-        }
-        return new ScheduledTaskOutcome(succeededCases, failedCases, abortedEarly, abortReason);
+            return true;
+        });
+
+        return new ScheduledTaskOutcome(succeededCases, failedCases, !completed, abortReason.toString());
     }
 }

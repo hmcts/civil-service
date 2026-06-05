@@ -14,12 +14,15 @@ import uk.gov.hmcts.reform.civil.service.search.ElasticSearchService;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ScheduledTaskRunnerTest {
@@ -45,7 +48,7 @@ class ScheduledTaskRunnerTest {
         RuntimeException exception = new RuntimeException("Search failed");
         when(searchService.getCases()).thenThrow(exception);
 
-        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
+        scheduledTaskRunner.run(eventConfig, () -> searchService.getCases() != null ? searchService.getCases().stream() : null, scheduledTask);
 
         verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq("Search failed"));
         verifyNoMoreInteractions(scheduledTask);
@@ -56,11 +59,10 @@ class ScheduledTaskRunnerTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         when(searchService.getCases()).thenReturn(null);
 
-        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
+        scheduledTaskRunner.run(eventConfig, () -> searchService.getCases() != null ? searchService.getCases().stream() : null, scheduledTask);
 
-        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig), eq(0));
-        verify(scheduledEventTracker).jobCompletedNoCasesEvent(eq(eventConfig));
-        verifyNoMoreInteractions(scheduledTask);
+        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig));
+        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), any(Stream.class));
     }
 
     @Test
@@ -72,14 +74,12 @@ class ScheduledTaskRunnerTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(1L), List.of(), false, "");
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(cases)))
+        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), any(Stream.class)))
             .thenReturn(outcome);
 
-        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
+        scheduledTaskRunner.run(eventConfig, () -> searchService.getCases().stream(), scheduledTask);
 
-        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig), eq(1));
-        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), eq(cases));
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases.size()), eq(1), eq(0));
+        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), any(Stream.class));
     }
 
     @Test
@@ -94,12 +94,12 @@ class ScheduledTaskRunnerTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(), List.of(1L, 2L), true, "Error 2");
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(cases)))
+        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), any(Stream.class)))
             .thenReturn(outcome);
 
-        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
+        scheduledTaskRunner.run(eventConfig, () -> searchService.getCases().stream(), scheduledTask);
 
-        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq(cases.size()), eq(0), eq(2), eq("Error 2"));
+        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq(0), eq(2), eq("Error 2"));
     }
 
     @Test
@@ -113,11 +113,11 @@ class ScheduledTaskRunnerTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(2L), List.of(1L, 3L), false, "");
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(cases)))
+        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), any(Stream.class)))
             .thenReturn(outcome);
 
-        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
+        scheduledTaskRunner.run(eventConfig, () -> searchService.getCases().stream(), scheduledTask);
 
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases.size()), eq(1), eq(2));
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(1), eq(2));
     }
 }

@@ -12,10 +12,12 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,7 +41,7 @@ class ScheduledTaskProcessorTest {
         CaseDetails case3 = CaseDetailsBuilder.builder().id(3L).build();
         Set<CaseDetails> cases = new LinkedHashSet<>(List.of(case1, case2, case3));
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, cases);
+        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, cases.stream());
 
         assertThat(outcome).isNotNull();
         assertThat(outcome.succeededCases().size()).isEqualTo(3);
@@ -54,6 +56,20 @@ class ScheduledTaskProcessorTest {
         verify(scheduledEventTracker).caseProcessedEvent(eventConfig, case2.getId());
         verify(scheduledEventTracker).caseProcessedEvent(eventConfig, case3.getId());
         verifyNoMoreInteractions(scheduledEventTracker);
+    }
+
+    @Test
+    void shouldNotProcess_whenNoCases() {
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
+
+        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, Stream.empty());
+
+        assertThat(outcome).isNotNull();
+        assertThat(outcome.succeededCases().size()).isEqualTo(0);
+        assertThat(outcome.failedCases().size()).isEqualTo(0);
+
+        verifyNoInteractions(scheduledTask);
+        verifyNoInteractions(scheduledEventTracker);
     }
 
     @Test
@@ -74,7 +90,7 @@ class ScheduledTaskProcessorTest {
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, cases);
+        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, cases.stream());
 
         assertThat(outcome.abortedEarly()).isTrue();
         assertThat(outcome.abortReason()).isEqualTo("Error 2");
