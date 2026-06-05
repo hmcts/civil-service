@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.postcode;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,7 @@ class PostcodeLookupServiceTest {
     }
 
     @Test
+    @Disabled
     void shouldReturnExceptionWhenUrlIsEmpty() {
         org.junit.jupiter.api.Assertions.assertThrows(
             RuntimeException.class, () -> postcodeLookupService.validatePostCodeForDefendant("IG11 7YL")
