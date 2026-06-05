@@ -12,7 +12,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -96,10 +95,9 @@ public class PostcodeLookupService {
                 LOG.info("Postcode lookup failed with status {}", responseStatus.value());
             }
 
-        } catch (HttpStatusCodeException e) {
-            LOG.error("Postcode lookup failed with status {}", e.getStatusCode().value(), e);
         } catch (Exception e) {
-            LOG.error("Postcode lookup failed", e);
+            LOG.error("Postcode Lookup Failed - ", e.getMessage());
+            throw new RuntimeException(e);
         }
         return countryName;
     }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.postcode;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import static org.mockito.Mockito.when;
 
@@ -59,7 +59,7 @@ class PostcodeLookupServiceTest {
     }
 
     @Test
-    void shouldReturnFalseWhenLookupFails() {
+    void shouldWrapExceptionWhenLookupFails() {
         mockConfiguration();
         when(restTemplate.exchange(
             ArgumentMatchers.anyString(),
@@ -68,12 +68,11 @@ class PostcodeLookupServiceTest {
             ArgumentMatchers.<Class<String>>any()
         )).thenThrow(new RuntimeException("Boom"));
 
-        assertThat(postcodeLookupService.validatePostCodeForDefendant("IG11 7YL"))
-            .isFalse();
+        assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant("IG11 7YL"))
+            .isInstanceOf(RuntimeException.class);
     }
 
     @Test
-    @Disabled
     void shouldReturnExceptionWhenUrlIsEmpty() {
         org.junit.jupiter.api.Assertions.assertThrows(
             RuntimeException.class, () -> postcodeLookupService.validatePostCodeForDefendant("IG11 7YL")

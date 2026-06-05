@@ -347,7 +347,6 @@ def setPreviewUrls(String product, String component) {
     env.PREVIEW_ROLE_ASSIGNMENT_URL = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
     env.PREVIEW_GENAPP_LRD_URL = "http://rd-location-ref-api-aat.service.core-compute-aat.internal"
     env.PREVIEW_RTL_API_URL = wiremockUrl
-    env.PREVIEW_OS_POSTCODE_LOOKUP_URL = "https://api.os.uk/search/names/v1/find"
     env.PREVIEW_SENDGRID_HOST = ""
     env.PREVIEW_SENDGRID_TEST = "false"
   } else {
@@ -363,7 +362,6 @@ def setPreviewUrls(String product, String component) {
     env.PREVIEW_ROLE_ASSIGNMENT_URL = wiremockUrl
     env.PREVIEW_GENAPP_LRD_URL = wiremockUrl
     env.PREVIEW_RTL_API_URL = wiremockUrl
-    env.PREVIEW_OS_POSTCODE_LOOKUP_URL = "${wiremockUrl}/search/names/v1/find"
     env.PREVIEW_SENDGRID_HOST = "${previewServiceName}-wiremock"
     env.PREVIEW_SENDGRID_TEST = "true"
   }
