@@ -1,0 +1,24 @@
+{
+  "name": "Ordnance Survey - Postcode Lookup (legacy opennames path)",
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/opennames/v1/find",
+    "queryParameters": {
+      "query": {
+        "matches": ".+\\+localtype=postcode"
+      },
+      "maxresults": {
+        "equalTo": "1"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "transformers": ["response-template"],
+    "body": "{\"results\":[{\"GAZETTEER_ENTRY\":{\"NAME1\":\"{{regexExtract request.query.query '([^+]+)'}}\",\"COUNTRY\":\"England\"}}]}"
+  }
+}
