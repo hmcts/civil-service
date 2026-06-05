@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0d4bcaj" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0">
+  <bpmn:process id="INFORM_AGREED_EXTENSION_DATE_SPEC_PROCESS_ID" name="Inform agreed extension date spec process" isExecutable="true" camunda:historyTimeToLive="P90D">
+    <bpmn:startEvent id="StartEvent_1" name="Start">
+      <bpmn:outgoing>Flow_0cbpb7a</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1hupx5h" messageRef="Message_1b64xfv" />
+    </bpmn:startEvent>
+    <bpmn:callActivity id="Activity_023yrjd" name="Start Business Process" calledElement="StartBusinessProcess">
+      <bpmn:extensionElements>
+        <camunda:in variables="all" />
+        <camunda:out variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0cbpb7a</bpmn:incoming>
+      <bpmn:outgoing>Flow_048ejpl</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="Event_0e26gjw">
+      <bpmn:incoming>Flow_0c23og9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:boundaryEvent id="Event_0qm6nf4" name="Abort" attachedToRef="Activity_023yrjd">
+      <bpmn:outgoing>Flow_0c23og9</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_02pyvny" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0c23og9" sourceRef="Event_0qm6nf4" targetRef="Event_0e26gjw" />
+    <bpmn:sequenceFlow id="Flow_0cbpb7a" sourceRef="StartEvent_1" targetRef="Activity_023yrjd" />
+    <bpmn:serviceTask id="InformAgreedExtensionDateSpecNotifier" name="Notify parties agreed extension date" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent"> NOTIFY_EVENT</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0c0hafe</bpmn:incoming>
+      <bpmn:outgoing>Flow_0hfj7kg</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:callActivity id="Activity_1i1bcz2" name="End Business Process" calledElement="EndBusinessProcess">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="variables" value="all" />
+        </camunda:properties>
+        <camunda:in variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0vv2014</bpmn:incoming>
+      <bpmn:incoming>Flow_17jbi90</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qyhi90</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="Event_1520zkg">
+      <bpmn:incoming>Flow_0qyhi90</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0qyhi90" sourceRef="Activity_1i1bcz2" targetRef="Event_1520zkg" />
+    <bpmn:serviceTask id="NotifyRoboticsOnContinuousFeed" name="Notify RPA on Continuous Feed" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">NOTIFY_RPA_ON_CONTINUOUS_FEED</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0hfj7kg</bpmn:incoming>
+      <bpmn:outgoing>Flow_1fq1z2b</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1fq1z2b" sourceRef="NotifyRoboticsOnContinuousFeed" targetRef="GenerateDashboardNotificationsInformAgreedExtensionDateSpec" />
+    <bpmn:exclusiveGateway id="Gateway_071odlr">
+      <bpmn:incoming>Flow_048ejpl</bpmn:incoming>
+      <bpmn:outgoing>Flow_1iazwc3</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0c0hafe</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_048ejpl" sourceRef="Activity_023yrjd" targetRef="Gateway_071odlr" />
+    <bpmn:serviceTask id="ExtendResponseDeadlineNotifier" name="Notify parties new response deadline" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">NOTIFY_EVENT</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1iazwc3</bpmn:incoming>
+      <bpmn:outgoing>Flow_1sncddg</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1sncddg" sourceRef="ExtendResponseDeadlineNotifier" targetRef="Gateway_19wnyjh" />
+    <bpmn:sequenceFlow id="Flow_1iazwc3" name="A respondent not represented or a respondent not registered" sourceRef="Gateway_071odlr" targetRef="ExtendResponseDeadlineNotifier">
+      <bpmn:documentation>${(!empty flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; flowFlags.UNREPRESENTED_DEFENDANT_ONE)}</bpmn:documentation>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(!empty flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; flowFlags.UNREPRESENTED_DEFENDANT_ONE)}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="GenerateDashboardNotificationsInformAgreedExtensionDateSpec" name="Generate Dashboard Notifications" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1fq1z2b</bpmn:incoming>
+      <bpmn:incoming>Flow_0zjhzd8</bpmn:incoming>
+      <bpmn:outgoing>Flow_17jbi90</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_19wnyjh">
+      <bpmn:incoming>Flow_1sncddg</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zjhzd8</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0vv2014</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0zjhzd8" name="Dashboard Service Enabled" sourceRef="Gateway_19wnyjh" targetRef="GenerateDashboardNotificationsInformAgreedExtensionDateSpec">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.DASHBOARD_SERVICE_ENABLED &amp;&amp; flowFlags.DASHBOARD_SERVICE_ENABLED}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0vv2014" name="Dashboard Service Disabled" sourceRef="Gateway_19wnyjh" targetRef="Activity_1i1bcz2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${empty flowFlags.DASHBOARD_SERVICE_ENABLED || !flowFlags.DASHBOARD_SERVICE_ENABLED}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_17jbi90" sourceRef="GenerateDashboardNotificationsInformAgreedExtensionDateSpec" targetRef="Activity_1i1bcz2" />
+    <bpmn:sequenceFlow id="Flow_0c0hafe" sourceRef="Gateway_071odlr" targetRef="InformAgreedExtensionDateSpecNotifier">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(empty flowFlags.UNREPRESENTED_DEFENDANT_ONE || !flowFlags.UNREPRESENTED_DEFENDANT_ONE)}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0hfj7kg" sourceRef="InformAgreedExtensionDateSpecNotifier" targetRef="NotifyRoboticsOnContinuousFeed" />
+  </bpmn:process>
+  <bpmn:message id="Message_1b64xfv" name="INFORM_AGREED_EXTENSION_DATE_SPEC" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="INFORM_AGREED_EXTENSION_DATE_SPEC_PROCESS_ID">
+      <bpmndi:BPMNShape id="Event_0m7mqgu_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="192" y="362" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="198" y="405" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_023yrjd_di" bpmnElement="Activity_023yrjd">
+        <dc:Bounds x="270" y="337" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0e26gjw_di" bpmnElement="Event_0e26gjw">
+        <dc:Bounds x="302" y="249" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1i1bcz2_di" bpmnElement="Activity_1i1bcz2">
+        <dc:Bounds x="1380" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1520zkg_di" bpmnElement="Event_1520zkg">
+        <dc:Bounds x="1552" y="522" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1c8qve3_di" bpmnElement="NotifyRoboticsOnContinuousFeed">
+        <dc:Bounds x="1100" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_071odlr_di" bpmnElement="Gateway_071odlr" isMarkerVisible="true">
+        <dc:Bounds x="475" y="352" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_11yfr6j" bpmnElement="GenerateDashboardNotificationsInformAgreedExtensionDateSpec">
+        <dc:Bounds x="1235" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_19wnyjh_di" bpmnElement="Gateway_19wnyjh" isMarkerVisible="true">
+        <dc:Bounds x="1260" y="215" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_06srgux_di" bpmnElement="ExtendResponseDeadlineNotifier">
+        <dc:Bounds x="850" y="100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0cx0xe8_di" bpmnElement="InformAgreedExtensionDateSpecNotifier">
+        <dc:Bounds x="850" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0qm6nf4_di" bpmnElement="Event_0qm6nf4">
+        <dc:Bounds x="302" y="319" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="336" y="300" width="27" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0c23og9_di" bpmnElement="Flow_0c23og9">
+        <di:waypoint x="320" y="319" />
+        <di:waypoint x="320" y="285" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0cbpb7a_di" bpmnElement="Flow_0cbpb7a">
+        <di:waypoint x="228" y="380" />
+        <di:waypoint x="270" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qyhi90_di" bpmnElement="Flow_0qyhi90">
+        <di:waypoint x="1480" y="540" />
+        <di:waypoint x="1552" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fq1z2b_di" bpmnElement="Flow_1fq1z2b">
+        <di:waypoint x="1200" y="540" />
+        <di:waypoint x="1235" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_048ejpl_di" bpmnElement="Flow_048ejpl">
+        <di:waypoint x="370" y="377" />
+        <di:waypoint x="475" y="377" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0c0hafe_di" bpmnElement="Flow_0c0hafe">
+        <di:waypoint x="500" y="402" />
+        <di:waypoint x="500" y="540" />
+        <di:waypoint x="850" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1sncddg_di" bpmnElement="Flow_1sncddg">
+        <di:waypoint x="950" y="140" />
+        <di:waypoint x="1285" y="140" />
+        <di:waypoint x="1285" y="215" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1iazwc3_di" bpmnElement="Flow_1iazwc3">
+        <di:waypoint x="500" y="352" />
+        <di:waypoint x="500" y="140" />
+        <di:waypoint x="850" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="605" y="83" width="84" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zjhzd8_di" bpmnElement="Flow_0zjhzd8">
+        <di:waypoint x="1285" y="265" />
+        <di:waypoint x="1285" y="500" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1204" y="290" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vv2014_di" bpmnElement="Flow_0vv2014">
+        <di:waypoint x="1310" y="240" />
+        <di:waypoint x="1430" y="240" />
+        <di:waypoint x="1430" y="500" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1313" y="206" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17jbi90_di" bpmnElement="Flow_17jbi90">
+        <di:waypoint x="1335" y="540" />
+        <di:waypoint x="1380" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0hfj7kg_di" bpmnElement="Flow_0hfj7kg">
+        <di:waypoint x="950" y="540" />
+        <di:waypoint x="1100" y="540" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

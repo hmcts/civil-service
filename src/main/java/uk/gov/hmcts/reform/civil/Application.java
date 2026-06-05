@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import uk.gov.hmcts.reform.civil.config.feign.GlobalFeignConfiguration;
 
 @SpringBootApplication
 @EnableCamundaRestClient
@@ -15,12 +16,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
     "uk.gov.hmcts.reform.idam.client",
     "uk.gov.hmcts.reform.civil",
     "uk.gov.hmcts.reform.civil.prd",
-    "uk.gov.hmcts.reform.ccd.document.am",
     "uk.gov.hmcts.reform.civil.ras",
-    "uk.gov.hmcts.reform.cmc",
     "uk.gov.hmcts.reform.civil.crd",
+    "uk.gov.hmcts.reform.ccd.document.am",
+    "uk.gov.hmcts.reform.ccd.client",
+    "uk.gov.hmcts.reform.cmc",
     "uk.gov.hmcts.reform.hmc"
-})
+}, defaultConfiguration =  GlobalFeignConfiguration.class)
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application {
 

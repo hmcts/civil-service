@@ -68,6 +68,7 @@ public class RequestReconsiderationGeneratorService {
             .setWrittenByJudge(isJudge)
             .setCurrentDate(LocalDate.now())
             .setJudgeName(judgeName)
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setCaseNumber(caseData.getLegacyCaseReference())
             .setApplicant1(caseData.getApplicant1())
             .setHasApplicant2(

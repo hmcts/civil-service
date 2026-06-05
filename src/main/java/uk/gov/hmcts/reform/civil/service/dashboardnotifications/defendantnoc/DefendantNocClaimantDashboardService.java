@@ -59,12 +59,12 @@ public class DefendantNocClaimantDashboardService extends DashboardScenarioServi
 
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
-        return featureToggleService.isLipVLipEnabled() && isProceedingOffline(caseData);
+        return isProceedingOffline(caseData);
     }
 
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
-        if (!featureToggleService.isLipVLipEnabled() || !isProceedingOffline(caseData)) {
+        if (!isProceedingOffline(caseData)) {
             return Map.of();
         }
 
