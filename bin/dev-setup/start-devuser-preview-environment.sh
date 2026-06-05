@@ -25,6 +25,7 @@ PREVIEW_CLAIM_STORE_URL=http://cmc-claim-store-aat.service.core-compute-aat.inte
 PREVIEW_ROLE_ASSIGNMENT_URL=http://am-role-assignment-service-aat.service.core-compute-aat.internal
 PREVIEW_GENAPP_LRD_URL=http://rd-location-ref-api-aat.service.core-compute-aat.internal
 PREVIEW_RTL_API_URL=http://localhost:4000
+PREVIEW_OS_POSTCODE_LOOKUP_URL=https://api.os.uk/search/names/v1/find
 PREVIEW_SENDGRID_HOST=
 PREVIEW_SENDGRID_TEST=false
 EOF
