@@ -589,8 +589,8 @@ sendgrid:
   test: ${SENDGRID_TEST:false}
 
 os-postcode-lookup:
-  url: https://api.os.uk/search/names/v1/find
-  key: ${OS_POSTCODE_LOOKUP_API_KEY:}
+  url: ${OS_POSTCODE_LOOKUP_URL:https://api.os.uk/search/names/v1/find}
+  key: ${OS_POSTCODE_LOOKUP_API_KEY:dummy-key}
   offline-mode: false
 
 print:

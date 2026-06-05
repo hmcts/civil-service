@@ -36,6 +36,7 @@ java:
     SENDGRID_HOST: ${PREVIEW_SENDGRID_HOST}
     RTL_API_URL: ${PREVIEW_RTL_API_URL}
     SENDGRID_TEST: ${PREVIEW_SENDGRID_TEST}
+    OS_POSTCODE_LOOKUP_URL: ${PREVIEW_OS_POSTCODE_LOOKUP_URL}
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
@@ -514,5 +515,55 @@ wiremockMappings:
           "Content-Type": "application/vnd.spring-boot.actuator.v3+json"
         },
         "body": "{\"status\":\"UP\"}"
+      }
+    }
+  postcode-lookup.json: |
+    {
+      "name": "Ordnance Survey - Postcode Lookup",
+      "priority": 1,
+      "request": {
+        "method": "GET",
+        "urlPath": "/search/names/v1/find",
+        "queryParameters": {
+          "query": {
+            "matches": ".+\\+localtype=postcode"
+          },
+          "maxresults": {
+            "equalTo": "1"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "transformers": ["response-template"],
+        "body": "{\"results\":[{\"GAZETTEER_ENTRY\":{\"NAME1\":\"{{regexExtract request.query.query '([^+]+)'}}\",\"COUNTRY\":\"England\"}}]}"
+      }
+    }
+  postcode-lookup-legacy.json: |
+    {
+      "name": "Ordnance Survey - Postcode Lookup (legacy opennames path)",
+      "priority": 1,
+      "request": {
+        "method": "GET",
+        "urlPath": "/opennames/v1/find",
+        "queryParameters": {
+          "query": {
+            "matches": ".+\\+localtype=postcode"
+          },
+          "maxresults": {
+            "equalTo": "1"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "transformers": ["response-template"],
+        "body": "{\"results\":[{\"GAZETTEER_ENTRY\":{\"NAME1\":\"{{regexExtract request.query.query '([^+]+)'}}\",\"COUNTRY\":\"England\"}}]}"
       }
     }
