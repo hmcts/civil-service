@@ -3,13 +3,10 @@
   "priority": 1,
   "request": {
     "method": "GET",
-    "urlPath": "/opennames/v1/find",
+    "urlPathPattern": "/opennames/v1/find",
     "queryParameters": {
       "query": {
-        "matches": ".+\\+localtype=postcode"
-      },
-      "maxresults": {
-        "equalTo": "1"
+        "matches": "(?i).*(\\+|%2B)localtype=postcode"
       }
     }
   },

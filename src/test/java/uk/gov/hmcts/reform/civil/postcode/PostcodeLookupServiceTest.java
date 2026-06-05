@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import static org.mockito.Mockito.when;
 
@@ -59,7 +58,7 @@ class PostcodeLookupServiceTest {
     }
 
     @Test
-    void shouldWrapExceptionWhenLookupFails() {
+    void shouldReturnFalseWhenLookupFails() {
         mockConfiguration();
         when(restTemplate.exchange(
             ArgumentMatchers.anyString(),
@@ -68,8 +67,8 @@ class PostcodeLookupServiceTest {
             ArgumentMatchers.<Class<String>>any()
         )).thenThrow(new RuntimeException("Boom"));
 
-        assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant("IG11 7YL"))
-            .isInstanceOf(RuntimeException.class);
+        assertThat(postcodeLookupService.validatePostCodeForDefendant("IG11 7YL"))
+            .isFalse();
     }
 
     @Test

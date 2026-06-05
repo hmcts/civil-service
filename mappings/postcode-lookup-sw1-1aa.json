@@ -1,0 +1,29 @@
+{
+  "name": "Ordnance Survey - Postcode Lookup SW1 1AA",
+  "priority": 0,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/search/names/v1/find",
+    "queryParameters": {
+      "query": {
+        "matches": "(?i)SW11AA.*localtype=postcode"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "results": [
+        {
+          "GAZETTEER_ENTRY": {
+            "NAME1": "SW1 1AA",
+            "COUNTRY": "England"
+          }
+        }
+      ]
+    }
+  }
+}
