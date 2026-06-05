@@ -335,7 +335,6 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
             handler.handle(params);
 
             // Then
-            // Primary scenario should NOT be recorded
             verify(dashboardScenariosService, org.mockito.Mockito.never()).recordScenarios(
                 eq("BEARER_TOKEN"),
                 eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario()),
@@ -343,7 +342,6 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                 any(ScenarioRequestParams.class)
             );
 
-            // Additional scenarios might still be recorded
             verify(dashboardScenariosService).recordScenarios(
                 eq("BEARER_TOKEN"),
                 eq(SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario()),
