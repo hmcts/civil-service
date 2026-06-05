@@ -36,7 +36,6 @@ java:
     SENDGRID_HOST: ${PREVIEW_SENDGRID_HOST}
     RTL_API_URL: ${PREVIEW_RTL_API_URL}
     SENDGRID_TEST: ${PREVIEW_SENDGRID_TEST}
-    OS_POSTCODE_LOOKUP_URL: ${PREVIEW_OS_POSTCODE_LOOKUP_URL}
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
@@ -515,32 +514,5 @@ wiremockMappings:
           "Content-Type": "application/vnd.spring-boot.actuator.v3+json"
         },
         "body": "{\"status\":\"UP\"}"
-      }
-    }
-  postcode-lookup-find.json: |
-    {
-      "name": "Ordnance Survey Postcode Lookup - Find",
-      "request": {
-        "method": "GET",
-        "urlPath": "/search/names/v1/find",
-        "queryParameters": {
-          "query": {
-            "matches": "^[A-Z0-9]+(\\+|%20| )localtype=postcode$"
-          },
-          "maxresults": {
-            "equalTo": "1"
-          },
-          "key": {
-            "matches": ".+"
-          }
-        }
-      },
-      "response": {
-        "status": 200,
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "transformers": ["response-template"],
-        "body": "{\"results\":[{\"GAZETTEER_ENTRY\":{\"NAME1\":\"{{regexExtract request.query.query '^[A-Z0-9]+'}}\",\"COUNTRY\":\"England\"}}]}"
       }
     }
