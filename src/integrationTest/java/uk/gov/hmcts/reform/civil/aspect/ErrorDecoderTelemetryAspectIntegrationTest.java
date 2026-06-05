@@ -62,7 +62,7 @@ class ErrorDecoderTelemetryAspectIntegrationTest {
                 && "GET".equals(properties.get("httpMethod"))
                 && "504".equals(properties.get("status"))
                 && "true".equals(properties.get("retryable"))
-                && "0".equals(properties.get("retryAfter"))
+                && "none".equals(properties.get("retryAfter"))
                 && "IllegalStateException".equals(properties.get("defaultException"))),
             isNull()
         );
