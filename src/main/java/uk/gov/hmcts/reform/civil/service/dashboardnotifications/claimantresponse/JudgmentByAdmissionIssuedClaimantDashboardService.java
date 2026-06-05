@@ -32,11 +32,6 @@ public class JudgmentByAdmissionIssuedClaimantDashboardService extends Dashboard
         return null;
     }
 
-    @Override
-    protected boolean shouldRecordScenario(CaseData caseData) {
-        return true;
-    }
-
     private boolean isJudgmentOrderIssued(CaseData caseData) {
         return caseData.isApplicantLiP()
             && isActiveJudgmentExist(caseData)

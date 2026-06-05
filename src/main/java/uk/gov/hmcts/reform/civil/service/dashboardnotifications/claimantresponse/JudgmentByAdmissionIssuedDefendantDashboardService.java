@@ -37,11 +37,6 @@ public class JudgmentByAdmissionIssuedDefendantDashboardService extends Dashboar
         return null;
     }
 
-    @Override
-    protected boolean shouldRecordScenario(CaseData caseData) {
-        return true;
-    }
-
     private boolean isJudgmentOrderIssued(CaseData caseData) {
         if (caseData.isLRvLipOneVOne() && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null) {
             return true;
