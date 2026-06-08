@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter;
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
@@ -32,8 +33,8 @@ public class SecurityConfiguration {
 
     private static final String[] AUTH_WHITELIST = {
         "/",
-        "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**",
-        "/health", "/env", "/health/**", "/status/health",
+        "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**",
+        "/health", "/health/**", "/status/health",
         "/loggers/**", "/assignment/**", "/service-request-update",
         "/service-request-update-claim-issued",
         "/fees/claim/calculate-interest",
@@ -62,6 +63,15 @@ public class SecurityConfiguration {
     @SuppressWarnings("java:S4502")
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthCheckerUserOnlyFilter<User> authCheckerUserOnlyFilter) throws Exception {
         http
+            .headers(headers -> {
+                headers.contentTypeOptions(Customizer.withDefaults());
+                headers.frameOptions(frame -> frame.sameOrigin());
+                headers.referrerPolicy(rp -> rp.policy(ReferrerPolicy.NO_REFERRER));
+                headers.httpStrictTransportSecurity(hsts -> hsts
+                    .includeSubDomains(true)
+                    .maxAgeInSeconds(31536000));
+                headers.cacheControl(Customizer.withDefaults());
+            })
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .csrf(csrf -> csrf.disable())
             .formLogin(form -> form.disable())
