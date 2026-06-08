@@ -38,7 +38,7 @@ public abstract class MigrationTask<T extends CaseReference> {
         }
 
         try {
-            CaseState cs = CaseState.valueOf(state.toUpperCase());
+            CaseState cs = CaseState.valueOf(state);
             return Optional.of(cs.name());
         } catch (IllegalArgumentException e) {
             // State not recognized in the enum
