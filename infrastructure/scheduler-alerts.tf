@@ -48,12 +48,12 @@ module "scheduler-aborted-alerts" {
       AIQ
 
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has aborted."
-  frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
-  time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
-  severity_level             = 3
+  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 30))
+  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 60))
+  severity_level             = "3"
   action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "GreaterThan"
-  trigger_threshold          = 0
+  trigger_threshold          = "0"
   common_tags                = var.common_tags
 }
 
@@ -71,20 +71,21 @@ module "scheduler-high-failure-rate-alerts" {
   app_insights_query = <<-AIQ
       customEvents
         | where name in ("${each.key}JobCompleted", "${each.key}JobAborted")
-        | extend cases = toint(tostring(properties.totalCases))
-        | extend failed = toint(tostring(properties.failedCases))
-        | where isnotnull(cases) and cases > 0
+        | extend cases = toint(column_ifexists('properties.totalCases', 0))
+        | extend failed = toint(column_ifexists('properties.failedCases', 0))
+        | where cases > 0
         | extend failureRate = failed * 1.0 / cases
+        | project timestamp, name, cases, failed, failureRate
         | where failureRate > 0.2
       AIQ
 
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has a high failure rate."
-  frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
-  time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
-  severity_level             = 3
+  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 30))
+  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 60))
+  severity_level             = "3"
   action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "GreaterThan"
-  trigger_threshold          = 0
+  trigger_threshold          = "0"
   common_tags                = var.common_tags
 }
 
@@ -106,11 +107,11 @@ module "scheduler-job-not-run-alerts" {
       AIQ
 
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has not run in the last ${var.job_not_run_threshold} hours."
-  frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
-  time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
-  severity_level             = 3
+  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 30))
+  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 60))
+  severity_level             = "3"
   action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "LessThan"
-  trigger_threshold          = 1
+  trigger_threshold          = "1"
   common_tags                = var.common_tags
 }

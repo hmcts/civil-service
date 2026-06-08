@@ -18,7 +18,9 @@ public class ScheduledEventTracker {
             eventConfig.getJobStartedEvent(),
             Map.of(
                 "schedulerName", eventConfig.getSchedulerName(),
-                "totalCases", String.valueOf(casesSize)
+                "totalCases", String.valueOf(casesSize),
+                "succeededCases", String.valueOf(0),
+                "failedCases", String.valueOf(0)
             )
         );
     }
@@ -66,7 +68,9 @@ public class ScheduledEventTracker {
             eventConfig.getJobCompletedEvent(),
             Map.of(
                 "schedulerName", eventConfig.getSchedulerName(),
-                "totalCases", String.valueOf(0)
+                "totalCases", String.valueOf(0),
+                "succeededCases", String.valueOf(0),
+                "failedCases", String.valueOf(0)
             )
         );
     }
@@ -93,6 +97,9 @@ public class ScheduledEventTracker {
             eventConfig.getJobAbortedEvent(),
             Map.of(
                 "schedulerName", eventConfig.getSchedulerName(),
+                "totalCases", String.valueOf(0),
+                "succeededCases", String.valueOf(0),
+                "failedCases", String.valueOf(0),
                 "abortReason", reason != null ? reason : "Unknown"
             )
         );
