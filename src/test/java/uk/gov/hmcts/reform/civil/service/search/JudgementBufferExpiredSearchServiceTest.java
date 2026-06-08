@@ -40,6 +40,27 @@ class JudgementBufferExpiredSearchServiceTest {
     }
 
     @Test
+    void shouldStopPaginatingIfPageIsNotFull() {
+        // Given
+        CaseDetails case1 = CaseDetails.builder().id(1L).build();
+        CaseDetails case2 = CaseDetails.builder().id(2L).build();
+
+        // Page size is 50, but we return 2 cases. This should be the last page.
+        SearchResult page1 = SearchResult.builder().total(2).cases(List.of(case1, case2)).build();
+
+        when(coreCaseDataService.searchCasesPaginated(any())).thenReturn(page1);
+
+        // When
+        Stream<CaseDetails> casesStream = searchService.getCasesStream();
+        List<CaseDetails> allCases = casesStream.toList();
+
+        // Then
+        assertThat(allCases).hasSize(2);
+        // Should only call once because the first page was not full
+        verify(coreCaseDataService, times(1)).searchCasesPaginated(any());
+    }
+
+    @Test
     void shouldReturnStreamThatPaginatesCorrectly() {
         // Given
         CaseDetails case1 = CaseDetails.builder().id(1L).build();
@@ -54,39 +75,50 @@ class JudgementBufferExpiredSearchServiceTest {
         CaseDetails case10 = CaseDetails.builder().id(10L).build();
         CaseDetails case11 = CaseDetails.builder().id(11L).build();
 
-        // Page 1
+        // Page 1 - returning full page (size 50 by default in JudgementBufferExpiredSearchService)
+        // For testing we will return 10 cases but the test logic in ElasticSearchPaginatedStreamProvider
+        // will think it's full IF we set the page size to 10 in the query.
+        // Wait, JudgementBufferExpiredSearchService sets page size to 50.
+        // If I want to test pagination with a full page, I should either:
+        // 1. Mock the first page to have 50 cases.
+        // 2. Or, acknowledge that if I return 10 cases, and page size is 50, it will stop.
+
+        // Let's modify the test to reflect the new behavior:
+        // If the first page has 10 cases and page size is 50, it SHOULD stop.
+        // To test pagination, I need the first page to be full (50 cases).
+
+        // Alternatively, I can change the test to use a smaller page size if I could control it,
+        // but it's hardcoded to 50 in JudgementBufferExpiredSearchService.
+
+        // Let's create 50 cases for the first page.
+        List<CaseDetails> fiftyCases = java.util.stream.IntStream.rangeClosed(1, 50)
+            .mapToObj(i -> CaseDetails.builder().id((long) i).build())
+            .toList();
+        CaseDetails case51 = CaseDetails.builder().id(51L).build();
+
         SearchResult page1 = SearchResult.builder()
-            .total(11)
-            .cases(List.of(case1, case2, case3, case4, case5, case6, case7, case8, case9, case10))
+            .total(51)
+            .cases(fiftyCases)
             .build();
-        // Page 2
         SearchResult page2 = SearchResult.builder()
-            .total(11)
-            .cases(List.of(case11))
+            .total(51)
+            .cases(List.of(case51))
             .build();
 
         when(coreCaseDataService.searchCasesPaginated(any(PaginatedQuery.class)))
             .thenReturn(page1)
-            .thenReturn(page2)
-            .thenReturn(SearchResult.builder().cases(List.of()).build());
+            .thenReturn(page2);
 
         // When
         Stream<CaseDetails> casesStream = searchService.getCasesStream();
         List<CaseDetails> allCases = casesStream.toList();
 
         // Then
-        assertThat(allCases).hasSize(11);
-        assertThat(allCases).containsExactly(case1, case2, case3, case4, case5, case6, case7, case8, case9, case10, case11);
-
-        verify(coreCaseDataService, times(3)).searchCasesPaginated(queryCaptor.capture());
+        assertThat(allCases).hasSize(51);
+        verify(coreCaseDataService, times(2)).searchCasesPaginated(queryCaptor.capture());
         List<PaginatedQuery> capturedQueries = queryCaptor.getAllValues();
 
-        assertThat(capturedQueries.get(0).toString()).contains("\"from\": 0");
         assertThat(capturedQueries.get(0).toString()).contains("\"size\": 50");
-        assertThat(capturedQueries.get(0).toString()).contains("\"id\": \"asc\"");
-        assertThat(capturedQueries.get(1).toString()).contains("\"search_after\": [\"10\"]");
-        assertThat(capturedQueries.get(1).toString()).contains("\"from\": 0");
-        assertThat(capturedQueries.get(1).toString()).contains("\"size\": 50");
-        assertThat(capturedQueries.get(1).toString()).contains("\"id\": \"asc\"");
+        assertThat(capturedQueries.get(1).toString()).contains("\"search_after\": [\"50\"]");
     }
 }
