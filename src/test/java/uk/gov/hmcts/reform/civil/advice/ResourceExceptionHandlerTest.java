@@ -240,17 +240,22 @@ public class ResourceExceptionHandlerTest {
         CallbackErrorResponse expected = new CallbackErrorResponse();
         expected.setCallbackErrors(List.of("error one", "error two"));
         expected.setCallbackWarnings(List.of("warn one"));
+        expected.setException("uk.gov.hmcts.ccd.endpoint.exceptions.ApiException");
+        expected.setError("Unprocessable Entity");
+        expected.setMessage("Unable to proceed because there are one or more callback Errors or Warnings");
         byte[] body = objectMapper.writeValueAsBytes(expected);
 
         testTemplate(
-            "CallbackErrorResponse(callbackErrors=[error one, error two], callbackWarnings=[warn one])",
+            "CallbackErrorResponse(exception=uk.gov.hmcts.ccd.endpoint.exceptions.ApiException, status=null, " +
+                "error=Unprocessable Entity, message=Unable to proceed because there are one or more callback " +
+                "Errors or Warnings, details=null, callbackErrors=[error one, error two], callbackWarnings=[warn one])",
             handler.unprocessableEntity(new FeignException.UnprocessableEntity(
                 "unprocessable",
                 Mockito.mock(feign.Request.class),
                 body,
                 Collections.emptyMap()
             ), contentCachingRequestWrapper),
-            HttpStatus.UNPROCESSABLE_ENTITY
+            HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
 
@@ -266,14 +271,14 @@ public class ResourceExceptionHandlerTest {
             """; // missing closing brace
 
         testTemplate(
-            "CallbackErrorResponse(callbackErrors=[Unable to parse error response], callbackWarnings=null)",
+            "CallbackErrorResponse(exception=null, status=null, error=null, message=null, details=null, callbackErrors=[Unable to parse error response], callbackWarnings=null)",
             handler.unprocessableEntity(new FeignException.UnprocessableEntity(
                 "unprocessable",
                 Mockito.mock(feign.Request.class),
                 invalidJson.getBytes(StandardCharsets.UTF_8),
                 Collections.emptyMap()
             ), contentCachingRequestWrapper),
-            HttpStatus.UNPROCESSABLE_ENTITY
+            HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
 

@@ -93,7 +93,7 @@ public class ResourceExceptionHandler {
             errorResponse.setCallbackErrors(List.of("Unable to parse error response"));
 
             return ResponseEntity
-                .unprocessableEntity()
+                .internalServerError()
                 .headers(new HttpHeaders())
                 .body(errorResponse);
         }
@@ -101,8 +101,9 @@ public class ResourceExceptionHandler {
         String errorMessage = "Unprocessable Entity error with message: %s for case %s run by user %s";
         log.info(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
+        log.info("Unprocessable Entity {} ", errorResponse.toString());
         return ResponseEntity
-            .unprocessableEntity()
+            .internalServerError()
             .headers(new HttpHeaders())
             .body(errorResponse);
     }

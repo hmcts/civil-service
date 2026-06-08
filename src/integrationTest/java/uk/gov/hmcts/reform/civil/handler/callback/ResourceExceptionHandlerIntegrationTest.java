@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.testing;
+package uk.gov.hmcts.reform.civil.handler.callback;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.CallbackErrorResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
@@ -44,6 +44,9 @@ public class ResourceExceptionHandlerIntegrationTest extends BaseIntegrationTest
         // given
         CallbackErrorResponse callbackErrorResponse = new CallbackErrorResponse();
         callbackErrorResponse.setCallbackErrors(List.of("Validation failed"));
+        callbackErrorResponse.setException("uk.gov.hmcts.ccd.endpoint.exceptions.ApiException");
+        callbackErrorResponse.setError("Unprocessable Entity");
+        callbackErrorResponse.setMessage("Unable to proceed because there are one or more callback Errors or Warnings");
 
         String errorJson = objectMapper.writeValueAsString(callbackErrorResponse);
 
@@ -58,9 +61,13 @@ public class ResourceExceptionHandlerIntegrationTest extends BaseIntegrationTest
                             .header(HttpHeaders.AUTHORIZATION, "Bearer token")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(eventDto)))
-            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().is5xxServerError())
             .andExpect(jsonPath("$.callbackErrors[0]")
-                           .value("Validation failed"));
+                           .value("Validation failed"))
+            .andExpect(jsonPath("$.error")
+                           .value("Unprocessable Entity"))
+            .andExpect(jsonPath("$.message")
+                           .value("Unable to proceed because there are one or more callback Errors or Warnings"));
     }
 
     @Test
@@ -80,7 +87,7 @@ public class ResourceExceptionHandlerIntegrationTest extends BaseIntegrationTest
                             .header(HttpHeaders.AUTHORIZATION, "Bearer token")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(eventDto)))
-            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().is5xxServerError())
             .andExpect(jsonPath("$.callbackErrors[0]")
                            .value("Unable to parse error response"));
     }
