@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
-import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.List;
@@ -68,20 +67,26 @@ class JudgementBufferExpiredSearchServiceTest {
 
         when(coreCaseDataService.searchCasesPaginated(any(PaginatedQuery.class)))
             .thenReturn(page1)
-            .thenReturn(page2);
+            .thenReturn(page2)
+            .thenReturn(SearchResult.builder().cases(List.of()).build());
 
         // When
-        Stream<CaseDetails> casesStream = searchService.getCases();
+        Stream<CaseDetails> casesStream = searchService.getCasesStream();
         List<CaseDetails> allCases = casesStream.toList();
 
         // Then
         assertThat(allCases).hasSize(11);
         assertThat(allCases).containsExactly(case1, case2, case3, case4, case5, case6, case7, case8, case9, case10, case11);
 
-        verify(coreCaseDataService, times(2)).searchCasesPaginated(queryCaptor.capture());
+        verify(coreCaseDataService, times(3)).searchCasesPaginated(queryCaptor.capture());
         List<PaginatedQuery> capturedQueries = queryCaptor.getAllValues();
 
         assertThat(capturedQueries.get(0).toString()).contains("\"from\": 0");
+        assertThat(capturedQueries.get(0).toString()).contains("\"size\": 50");
+        assertThat(capturedQueries.get(0).toString()).contains("\"id\": \"asc\"");
         assertThat(capturedQueries.get(1).toString()).contains("\"search_after\": [\"10\"]");
+        assertThat(capturedQueries.get(1).toString()).contains("\"from\": 0");
+        assertThat(capturedQueries.get(1).toString()).contains("\"size\": 50");
+        assertThat(capturedQueries.get(1).toString()).contains("\"id\": \"asc\"");
     }
 }

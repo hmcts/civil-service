@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.model.search;
 
+import lombok.Getter;
 import org.elasticsearch.index.query.QueryBuilder;
 import java.util.List;
 
 import static net.minidev.json.JSONValue.toJSONString;
 
+@Getter
 public class PaginatedQuery {
 
     private final QueryBuilder queryBuilder;
@@ -12,14 +14,23 @@ public class PaginatedQuery {
     private final int startIndex;
     private final boolean initialSearch;
     private final String searchAfterValue;
+    private final int pageSize;
+    private final String sortField;
 
     public PaginatedQuery(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex,
                           boolean initialSearch, String searchAfterValue) {
+        this(queryBuilder, dataToReturn, startIndex, initialSearch, searchAfterValue, 10, "reference.keyword");
+    }
+
+    public PaginatedQuery(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex,
+                          boolean initialSearch, String searchAfterValue, int pageSize, String sortField) {
         this.queryBuilder = queryBuilder;
         this.dataToReturn = dataToReturn;
         this.startIndex = startIndex;
         this.initialSearch = initialSearch;
         this.searchAfterValue = searchAfterValue;
+        this.pageSize = pageSize;
+        this.sortField = sortField;
     }
 
     @Override
@@ -35,11 +46,11 @@ public class PaginatedQuery {
         return "{"
             + "\"query\": " + queryBuilder.toString() + ", "
             + "\"_source\": " + toJSONString(dataToReturn) + ", "
-            + " \"size\": 10,"
-            + "\"from\": " + startIndex + ","
+            + " \"size\": " + pageSize + ","
+            + "\"from\": " + (searchAfterValue != null ? 0 : startIndex) + ","
             + "\"sort\": ["
             + "{"
-            + "\"reference.keyword\": \"asc\""
+            + "\"" + sortField + "\": \"asc\""
             + "            }"
             + "          ]";
     }
