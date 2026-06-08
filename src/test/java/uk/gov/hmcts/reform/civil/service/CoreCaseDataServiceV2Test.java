@@ -49,8 +49,6 @@ class CoreCaseDataServiceV2Test {
     @Mock
     private AuthTokenGenerator authTokenGenerator;
     @Mock
-    private FeatureToggleService featureToggleService;
-    @Mock
     private LocationReferenceDataService locationReferenceDataService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -69,7 +67,6 @@ class CoreCaseDataServiceV2Test {
                                           authTokenGenerator,
                                           caseDetailsConverter,
                                           userService,
-                                          featureToggleService,
                                           locationReferenceDataService);
         clearInvocations(authTokenGenerator, userService);
         when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);

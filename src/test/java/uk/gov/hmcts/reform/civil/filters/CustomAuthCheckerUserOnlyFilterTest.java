@@ -54,10 +54,10 @@ class CustomAuthCheckerUserOnlyFilterTest {
     @Test
     void testIsWhitelistedWithWildcardMatchAndSinglePath() {
         // Test if the path is whitelisted with a wildcard pattern for single-level paths
-        when(mockRequest.getRequestURI()).thenReturn("/swagger-resources/docs");
+        when(mockRequest.getRequestURI()).thenReturn("/swagger-ui/index.html");
 
-        // Check if /swagger-resources/** is whitelisted
-        assertTrue(filter.isWhitelisted(mockRequest.getRequestURI()), "/swagger-resources/docs should be in the whitelist");
+        // Check if /swagger-ui/** is whitelisted
+        assertTrue(filter.isWhitelisted(mockRequest.getRequestURI()), "/swagger-ui/index.html should be in the whitelist");
     }
 
     @Test

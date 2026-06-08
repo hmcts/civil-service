@@ -2,6 +2,7 @@
 
 @Library("Infrastructure@DTSPO-30107-jenkins-agents")
 
+import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
 
@@ -12,9 +13,11 @@ properties([
 def type = "java"
 def product = "civil"
 def component = "service"
-def camundaBranch = "master"
 def dmnBranch = "master"
 def wiremockMappingsBranch = "master"
+def branchesToSync = ['demo', 'perftest', 'ithc']
+
+AppPipelineConfig pipelineConf
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
@@ -64,9 +67,38 @@ def secrets = [
     secret('aac-manage-case-s2s-secret', 'MANAGE_CASE_S2S_KEY'),
     secret('notify-mca-api-key-secret', 'NOTIFY_MCA_API_KEY')
   ],
+  'civil-prod': [
+    secret('microservicekey-civil-service', 'S2S_SECRET_PROD')
+  ],
 ]
 
+def secretsOtherenv = [
+  'civil-${env}': [
+    secret('microservicekey-civil-service', 'S2S_SECRET'),
+  ]
+]
+
+def uploadBpmnDiagrams(String env) {
+  dir("${WORKSPACE}/bin/camunda") {
+    sh """
+      eval \$(./variables/load-${env}-environment-variables.sh)
+      ./import-bpmn-diagram.sh ${WORKSPACE} ${env}
+    """
+  }
+}
+
+def createBpmnGithubRelease() {
+  sh """
+    ./bin/camunda/create-github-release.sh
+  """
+}
+
 withPipeline(type, product, component) {
+  pipelineConf = config
+  disableLegacyDeployment()
+  enableAksStagingDeployment()
+  syncBranchesWithMaster(branchesToSync)
+
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
   env.EM_CCD_ORCHESTRATOR_URL = 'http://em-ccd-orchestrator-aat.service.core-compute-aat.internal'
   env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
@@ -76,7 +108,6 @@ withPipeline(type, product, component) {
   env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
   env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
   env.BEFTA_S2S_CLIENT_ID = "ccd_data"
-  env.CAMUNDA_DEFINITION_BRANCH = camundaBranch
   env.DMN_DEFINITION_BRANCH = dmnBranch
   env.WIREMOCK_MAPPINGS_BRANCH = wiremockMappingsBranch
   env.UNASSIGN_CASES = true
@@ -114,6 +145,32 @@ withPipeline(type, product, component) {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
   }
 
+  onDemo {
+    env.ENVIRONMENT = "demo"
+    loadVaultSecrets(secretsOtherenv)
+  }
+
+  onPerftest {
+    env.ENVIRONMENT = "perftest"
+    loadVaultSecrets(secretsOtherenv)
+  }
+
+  onIthc {
+    env.ENVIRONMENT = "ithc"
+    loadVaultSecrets(secretsOtherenv)
+  }
+
+  afterSuccess('checkout') {
+    def subscription = 'nonprod'
+    if (env.ENVIRONMENT in ['ithc', 'demo', 'perftest']) {
+      withSubscription(subscription) {
+        withTeamSecrets(pipelineConf, env.ENVIRONMENT) {
+          uploadBpmnDiagrams(env.ENVIRONMENT)
+        }
+      }
+    }
+  }
+
   afterAlways('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/jacoco/**'
   }
@@ -140,6 +197,12 @@ withPipeline(type, product, component) {
 
   afterAlways('smoketest:aat') {
     archiveSmokeTestResults()
+  }
+
+  afterSuccess('functionalTest:aat') {
+    createBpmnGithubRelease()
+    uploadBpmnDiagrams('aat')
+    uploadBpmnDiagrams('prod')
   }
 
   afterAlways('functionalTest:aat') {
