@@ -19,6 +19,7 @@ public class ErrorDecoderTelemetryAspect {
 
     @Around("execution(* feign.codec.ErrorDecoder.decode(String, feign.Response)) && args(methodKey, response)")
     public Object trackErrorDecoderTelemetry(ProceedingJoinPoint joinPoint, String methodKey, Response response) throws Throwable {
+        log.info("## Feign error decoder invoked for TelemetryAspect method: {}", methodKey);
         if (telemetryService == null) {
             return joinPoint.proceed();
         }

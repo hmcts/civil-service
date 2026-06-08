@@ -53,8 +53,8 @@ public class HttpClientFeignConfiguration {
     private CloseableHttpClient getHttpClient(PoolingHttpClientConnectionManager connectionManager) {
         RequestConfig config = RequestConfig.custom()
             .setConnectTimeout(connectTimeout)
-            .setConnectionRequestTimeout(requestTimeout)
-            .setSocketTimeout(readTimeout).build();
+            .setConnectionRequestTimeout(50)
+            .setSocketTimeout(1000).build();
 
         return org.apache.http.impl.client.HttpClientBuilder.create()
             .useSystemProperties()

@@ -696,6 +696,9 @@ feign:
         loggerLevel: full
       document-management-metadata-download-api:
         loggerLevel: full
+  startup:
+    logging:
+      enabled: true
 
 docStore:
   doc:
