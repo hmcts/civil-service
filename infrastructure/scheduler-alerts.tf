@@ -73,6 +73,7 @@ module "scheduler-high-failure-rate-alerts" {
         | where name in ("${each.key}JobCompleted", "${each.key}JobAborted")
         | extend cases = toint(tostring(properties.totalCases))
         | extend failed = toint(tostring(properties.failedCases))
+        | where isnotnull(cases) and cases > 0
         | extend failureRate = failed * 1.0 / cases
         | where failureRate > 0.2
       AIQ
