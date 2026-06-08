@@ -24,6 +24,8 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 @RequiredArgsConstructor
 public class JudgementBufferExpiredSearchService {
 
+    public static final int PAGE_SIZE = 50;
+
     private final ElasticSearchPaginatedStreamProvider elasticSearchPaginatedStreamProvider;
 
     public Set<CaseDetails> getCases() {
@@ -47,8 +49,7 @@ public class JudgementBufferExpiredSearchService {
             0,
             searchAfterValue == null,
             searchAfterValue,
-            50,
-            "id"
+            PAGE_SIZE
         );
     }
 

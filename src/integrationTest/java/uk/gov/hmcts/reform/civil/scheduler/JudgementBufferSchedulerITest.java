@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.scheduler;
 
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +23,11 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.IntStream.rangeClosed;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.service.search.JudgementBufferExpiredSearchService.PAGE_SIZE;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
@@ -38,7 +37,6 @@ import static org.mockito.Mockito.when;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JudgementBufferSchedulerITest {
 
-    private static final int PAGE_SIZE = 50;
     private static final Long CASE_ID = 123L;
 
     @Autowired
@@ -63,7 +61,8 @@ public class JudgementBufferSchedulerITest {
     void shouldExecuteJudgementBufferScheduler() {
         // Given
         String caseIdString = CASE_ID.toString();
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateJudgmentRequested().id(CASE_ID).build();
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateJudgmentRequested().id(CASE_ID)
+            .build();
         SearchResult page1 = SearchResult.builder().total(1).cases(List.of(caseDetails)).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().eventId(caseIdString).caseDetails(
             caseDetails).build();

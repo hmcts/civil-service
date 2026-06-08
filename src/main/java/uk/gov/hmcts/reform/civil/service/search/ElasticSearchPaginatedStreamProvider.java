@@ -70,6 +70,13 @@ public class ElasticSearchPaginatedStreamProvider {
             currentCases = searchResult != null && searchResult.getCases() != null
                 ? searchResult.getCases()
                 : Collections.emptyList();
+
+            if (searchResult != null && currentCases.size() > searchResult.getTotal()) {
+                log.warn("Search result total ({}) is less than the number of cases returned ({}). "
+                             + "This may indicate an inconsistency in the search results.",
+                         searchResult.getTotal(), currentCases.size());
+            }
+
             currentCaseIndex = 0;
             hasMorePages = currentCases.size() == paginatedQuery.getPageSize();
 

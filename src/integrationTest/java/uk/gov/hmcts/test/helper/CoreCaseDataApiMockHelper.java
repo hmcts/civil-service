@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -44,7 +43,6 @@ public class CoreCaseDataApiMockHelper {
         when(authTokenGenerator.generate()).thenReturn(GENERATED_TOKEN);
     }
 
-
     public void mockElasticSearchResultPaginated(SearchResult searchResult, SearchResult... nextSearchResults) {
         when(coreCaseDataApi.searchCases(any(), any(), any(), any()))
             .thenReturn(searchResult, nextSearchResults);
@@ -74,7 +72,6 @@ public class CoreCaseDataApiMockHelper {
         )).thenReturn(startEventResponse);
     }
 
-
     public void mockSubmitEvent(String caseIdString, CaseDetails caseDetails) {
         when(coreCaseDataApi.submitEventForCaseWorker(
             eq(ACCESS_TOKEN),
@@ -99,11 +96,6 @@ public class CoreCaseDataApiMockHelper {
             eq(true),
             any(CaseDataContent.class)
         )).thenReturn(caseDetails);
-    }
-
-
-    public void verifySubmitEvent() {
-        verifySubmitEvent(1);
     }
 
     public void verifySubmitEvent(int expectedCount) {

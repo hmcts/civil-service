@@ -18,19 +18,14 @@ public class PaginatedQuery {
     private final String sortField;
 
     public PaginatedQuery(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex,
-                          boolean initialSearch, String searchAfterValue) {
-        this(queryBuilder, dataToReturn, startIndex, initialSearch, searchAfterValue, 10, "reference.keyword");
-    }
-
-    public PaginatedQuery(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex,
-                          boolean initialSearch, String searchAfterValue, int pageSize, String sortField) {
+                          boolean initialSearch, String searchAfterValue, int pageSize) {
         this.queryBuilder = queryBuilder;
         this.dataToReturn = dataToReturn;
         this.startIndex = startIndex;
         this.initialSearch = initialSearch;
         this.searchAfterValue = searchAfterValue;
         this.pageSize = pageSize;
-        this.sortField = sortField;
+        this.sortField = "reference.keyword";
     }
 
     @Override

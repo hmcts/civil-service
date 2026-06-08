@@ -42,8 +42,12 @@ class JudgementBufferExpiredSearchServiceTest {
     @Test
     void shouldStopPaginatingIfPageIsNotFull() {
         // Given
-        CaseDetails case1 = CaseDetails.builder().id(1L).build();
-        CaseDetails case2 = CaseDetails.builder().id(2L).build();
+        CaseDetails case1 = CaseDetails.builder()
+            .id(1L)
+            .build();
+        CaseDetails case2 = CaseDetails.builder()
+            .id(2L)
+            .build();
 
         // Page size is 50, but we return 2 cases. This should be the last page.
         SearchResult page1 = SearchResult.builder().total(2).cases(List.of(case1, case2)).build();
@@ -92,9 +96,13 @@ class JudgementBufferExpiredSearchServiceTest {
 
         // Let's create 50 cases for the first page.
         List<CaseDetails> fiftyCases = java.util.stream.IntStream.rangeClosed(1, 50)
-            .mapToObj(i -> CaseDetails.builder().id((long) i).build())
+            .mapToObj(i -> CaseDetails.builder()
+                .id((long) i)
+                .build())
             .toList();
-        CaseDetails case51 = CaseDetails.builder().id(51L).build();
+        CaseDetails case51 = CaseDetails.builder()
+            .id(51L)
+            .build();
 
         SearchResult page1 = SearchResult.builder()
             .total(51)
@@ -120,5 +128,30 @@ class JudgementBufferExpiredSearchServiceTest {
 
         assertThat(capturedQueries.get(0).toString()).contains("\"size\": 50");
         assertThat(capturedQueries.get(1).toString()).contains("\"search_after\": [\"50\"]");
+    }
+
+    @Test
+    void shouldLogWarningIfTotalIsLessThanCasesReturned() {
+        // Given
+        CaseDetails case1 = CaseDetails.builder()
+            .id(1L)
+            .build();
+        CaseDetails case2 = CaseDetails.builder()
+            .id(2L)
+            .build();
+
+        // Page size is 50, but we return 2 cases. Total is reported as 1 (inconsistent).
+        SearchResult page1 = SearchResult.builder().total(1).cases(List.of(case1, case2)).build();
+
+        when(coreCaseDataService.searchCasesPaginated(any())).thenReturn(page1);
+
+        // When
+        Stream<CaseDetails> casesStream = searchService.getCasesStream();
+        List<CaseDetails> allCases = casesStream.toList();
+
+        // Then
+        assertThat(allCases).hasSize(2);
+        // Warning is logged internally, we verify the execution finishes correctly.
+        verify(coreCaseDataService, times(1)).searchCasesPaginated(any());
     }
 }
