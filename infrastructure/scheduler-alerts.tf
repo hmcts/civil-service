@@ -97,15 +97,15 @@ module "scheduler-job-not-run-alerts" {
   resourcegroup_name = local.resource_group_name
 
   alert_name = "${each.key}JobNotRun"
-  alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has not run in the last 26 hours."
+  alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has not run in the last ${var.job_not_run_threshold} hours."
 
   app_insights_query = <<-AIQ
       customEvents
         | where name == "${each.key}JobStarted"
-        | where timestamp > ago(26h)
+        | where timestamp > ago(${var.job_not_run_threshold}h)
       AIQ
 
-  custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has not run in the last 26 hours."
+  custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has not run in the last ${var.job_not_run_threshold} hours."
   frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
   time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
   severity_level             = 3

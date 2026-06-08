@@ -15,3 +15,5 @@ monitor_scheduler_alerts = {
     action_group = "demo-civil-service-slack-alert"
   }
 }
+
+job_not_run_threshold = 1

@@ -74,3 +74,9 @@ variable "civil_service_alert_slack_email_secret_name" {
   description = "The name of the Key Vault secret containing the slack email group"
   default     = null
 }
+
+variable "job_not_run_threshold" {
+  type        = number
+  description = "The threshold in hours for the scheduler job not run alert"
+  default     = 26
+}
