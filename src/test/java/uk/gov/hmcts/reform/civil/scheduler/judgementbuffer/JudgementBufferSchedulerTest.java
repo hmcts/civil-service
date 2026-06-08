@@ -10,8 +10,9 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguratio
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.JudgementBufferExpiredSearchService;
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
-import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -40,17 +41,17 @@ class JudgementBufferSchedulerTest {
     @Nested
     class Execute {
 
-        @SuppressWarnings("unchecked")
         @Test
         void shouldRunTaskRunner_whenSchedulerIsEnabledAndFeatureToggleIsEnabled() {
-            ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(scheduler.getName());
             when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+            when(searchService.getSearchResults()).thenReturn(new ElasticSearchResult(0, Stream.empty()));
 
             scheduler.runScheduledTask();
 
+            ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(scheduler.getName());
             verify(scheduledTaskRunner).run(
                 eq(expectedConfig),
-                any(Supplier.class),
+                any(ElasticSearchResult.class),
                 eq(judgementBufferScheduledTask)
             );
         }

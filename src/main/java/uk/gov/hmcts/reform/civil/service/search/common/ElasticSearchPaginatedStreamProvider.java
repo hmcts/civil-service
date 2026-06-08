@@ -1,10 +1,9 @@
-package uk.gov.hmcts.reform.civil.service.search;
+package uk.gov.hmcts.reform.civil.service.search.common;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -30,7 +29,25 @@ public class ElasticSearchPaginatedStreamProvider {
 
     public Stream<CaseDetails> getPaginatedStream(Function<String, PaginatedQuery> queryFunction,
                                                   Function<CaseDetails, String> sortKeyExtractor) {
-        return StreamSupport.stream(new ElasticSearchSpliterator(queryFunction, sortKeyExtractor), false);
+        return StreamSupport.stream(new ElasticSearchSpliterator(queryFunction, sortKeyExtractor, null), false);
+    }
+
+    public ElasticSearchResult getPaginatedSearchResult(Function<String, PaginatedQuery> queryFunction) {
+        return getPaginatedSearchResult(queryFunction, caseDetails -> caseDetails.getId().toString());
+    }
+
+    public ElasticSearchResult getPaginatedSearchResult(Function<String, PaginatedQuery> queryFunction,
+                                                        Function<CaseDetails, String> sortKeyExtractor) {
+        PaginatedQuery initialQuery = queryFunction.apply(null);
+        uk.gov.hmcts.reform.ccd.client.model.SearchResult searchResult = coreCaseDataService.searchCasesPaginated(initialQuery);
+
+        int total = searchResult != null ? searchResult.getTotal() : 0;
+        Stream<CaseDetails> stream = StreamSupport.stream(
+            new ElasticSearchSpliterator(queryFunction, sortKeyExtractor, searchResult),
+            false
+        );
+
+        return new ElasticSearchResult(total, stream);
     }
 
     private class ElasticSearchSpliterator extends Spliterators.AbstractSpliterator<CaseDetails> {
@@ -42,10 +59,24 @@ public class ElasticSearchPaginatedStreamProvider {
         private boolean hasMorePages = true;
 
         protected ElasticSearchSpliterator(Function<String, PaginatedQuery> queryFunction,
-                                         Function<CaseDetails, String> sortKeyExtractor) {
+                                           Function<CaseDetails, String> sortKeyExtractor,
+                                           uk.gov.hmcts.reform.ccd.client.model.SearchResult initialSearchResult) {
             super(Long.MAX_VALUE, Spliterator.ORDERED);
             this.queryFunction = queryFunction;
             this.sortKeyExtractor = sortKeyExtractor;
+
+            if (initialSearchResult != null) {
+                currentCases = initialSearchResult.getCases() != null
+                    ? initialSearchResult.getCases()
+                    : Collections.emptyList();
+
+                if (!currentCases.isEmpty()) {
+                    searchAfterValue = sortKeyExtractor.apply(currentCases.getLast());
+                }
+
+                PaginatedQuery paginatedQuery = queryFunction.apply(null);
+                hasMorePages = currentCases.size() >= paginatedQuery.getPageSize();
+            }
         }
 
         @Override
@@ -57,7 +88,6 @@ public class ElasticSearchPaginatedStreamProvider {
             }
 
             CaseDetails caseDetails = currentCases.get(currentCaseIndex++);
-            searchAfterValue = sortKeyExtractor.apply(caseDetails);
             action.accept(caseDetails);
             return true;
         }
@@ -65,7 +95,7 @@ public class ElasticSearchPaginatedStreamProvider {
         private boolean fetchNextPage() {
             log.debug("Fetching next page of cases with searchAfterValue: {}", searchAfterValue);
             PaginatedQuery paginatedQuery = queryFunction.apply(searchAfterValue);
-            SearchResult searchResult = coreCaseDataService.searchCasesPaginated(paginatedQuery);
+            uk.gov.hmcts.reform.ccd.client.model.SearchResult searchResult = coreCaseDataService.searchCasesPaginated(paginatedQuery);
 
             currentCases = searchResult != null && searchResult.getCases() != null
                 ? searchResult.getCases()
@@ -78,7 +108,7 @@ public class ElasticSearchPaginatedStreamProvider {
             }
 
             currentCaseIndex = 0;
-            hasMorePages = currentCases.size() == paginatedQuery.getPageSize();
+            hasMorePages = currentCases.size() >= paginatedQuery.getPageSize();
 
             if (currentCases.isEmpty()) {
                 log.debug("No more cases found, stopping pagination.");

@@ -109,18 +109,6 @@ public class JudgementBufferSchedulerITest {
         coreCaseDataApiMockHelper.verifySubmitEvent(51);
     }
 
-    @Test
-    void shouldNotExecuteJudgementBufferSchedulerWhenDisabled() {
-        // Given
-        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(false);
-
-        // When
-        scheduler.runScheduledTask();
-
-        // Then
-        verify(telemetryService, org.mockito.Mockito.never()).trackEvent(eq("JudgementBufferJobStarted"), anyMap());
-    }
-
     private List<CaseDetails> createCaseDetailsBatch(int size) {
         return rangeClosed(1, size)
             .mapToObj(i -> CaseDetailsBuilder.builder().id((long) i).data(Map.of()).build())

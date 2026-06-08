@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,13 +27,14 @@ public class ScheduledTaskProcessor {
 
     public ScheduledTaskOutcome performProcessing(ScheduledTaskEventConfiguration eventConfig,
                                                   Consumer<CaseDetails> scheduledTask,
-                                                  Stream<CaseDetails> cases) {
+                                                  ElasticSearchResult searchResult) {
         List<Long> succeededCases = Collections.synchronizedList(new ArrayList<>());
         List<Long> failedCases = Collections.synchronizedList(new ArrayList<>());
         AtomicInteger consecutiveFailures = new AtomicInteger(0);
         StringBuilder abortReason = new StringBuilder();
+        Stream<CaseDetails> sequentialStream = searchResult.caseDetailsStream().sequential();
 
-        boolean completed = cases.sequential().allMatch(caseDetails -> {
+        boolean completed = sequentialStream.allMatch(caseDetails -> {
             Long caseId = caseDetails.getId();
             try {
                 scheduledTask.accept(caseDetails);

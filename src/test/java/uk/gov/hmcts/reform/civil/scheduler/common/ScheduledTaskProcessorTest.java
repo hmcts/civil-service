@@ -9,6 +9,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
+
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,8 +42,9 @@ class ScheduledTaskProcessorTest {
         CaseDetails case2 = CaseDetailsBuilder.builder().id(2L).build();
         CaseDetails case3 = CaseDetailsBuilder.builder().id(3L).build();
         Set<CaseDetails> cases = new LinkedHashSet<>(List.of(case1, case2, case3));
+        ElasticSearchResult searchResult = new ElasticSearchResult(3, cases.stream());
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, cases.stream());
+        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
         assertThat(outcome).isNotNull();
         assertThat(outcome.succeededCases().size()).isEqualTo(3);
@@ -62,7 +65,7 @@ class ScheduledTaskProcessorTest {
     void shouldNotProcess_whenNoCases() {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, Stream.empty());
+        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, new ElasticSearchResult(0, Stream.empty()));
 
         assertThat(outcome).isNotNull();
         assertThat(outcome.succeededCases().size()).isEqualTo(0);
@@ -89,8 +92,9 @@ class ScheduledTaskProcessorTest {
         doThrow(error2).when(scheduledTask).accept(case2);
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
+        ElasticSearchResult searchResult = new ElasticSearchResult(4, cases.stream());
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, cases.stream());
+        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
         assertThat(outcome.abortedEarly()).isTrue();
         assertThat(outcome.abortReason()).isEqualTo("Error 2");

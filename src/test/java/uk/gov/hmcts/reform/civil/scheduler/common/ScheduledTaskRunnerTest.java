@@ -10,10 +10,9 @@ import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.search.ElasticSearchService;
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -22,7 +21,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ScheduledTaskRunnerTest {
@@ -45,79 +43,89 @@ class ScheduledTaskRunnerTest {
     @Test
     void shouldAbort_whenCaseRetrievalFails() {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
-        RuntimeException exception = new RuntimeException("Search failed");
-        when(searchService.getCases()).thenThrow(exception);
 
-        scheduledTaskRunner.run(eventConfig, () -> searchService.getCases() != null ? searchService.getCases().stream() : null, scheduledTask);
+        scheduledTaskRunner.run(eventConfig, null, scheduledTask);
 
-        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq("Search failed"));
+        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq("SearchResult cannot be null"));
         verifyNoMoreInteractions(scheduledTask);
     }
 
     @Test
-    void shouldHandleNullCases_whenCaseRetrievalReturnsNull() {
+    void shouldHandleZeroCases_whenTotalResultsIsZero() {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
-        when(searchService.getCases()).thenReturn(null);
+        ElasticSearchResult searchResult = new ElasticSearchResult(0, Stream.empty());
 
-        scheduledTaskRunner.run(eventConfig, () -> searchService.getCases() != null ? searchService.getCases().stream() : null, scheduledTask);
+        scheduledTaskRunner.run(eventConfig, searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig));
-        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), any(Stream.class));
+        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig), eq(0));
+        verify(scheduledEventTracker).jobCompletedNoCasesEvent(eq(eventConfig));
+        verifyNoMoreInteractions(scheduledTaskProcessor);
+    }
+
+    @Test
+    void shouldHandleCases_whenCaseRetrievalIsSuccessful() {
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
+        ElasticSearchResult searchResult = new ElasticSearchResult(1, Stream.of(case1));
+        ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(1L), List.of(), false, "");
+
+        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult)))
+            .thenReturn(outcome);
+
+        scheduledTaskRunner.run(eventConfig, searchResult, scheduledTask);
+
+        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig), eq(1));
+        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult));
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(1), eq(1), eq(0));
     }
 
     @Test
     void shouldRunProcessor_whenCasesPresent() {
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
-        Set<CaseDetails> cases = new LinkedHashSet<>(List.of(case1));
-        when(searchService.getCases()).thenReturn(cases);
+        ElasticSearchResult searchResult = new ElasticSearchResult(1, Stream.of(case1));
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(1L), List.of(), false, "");
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), any(Stream.class)))
+        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), any(ElasticSearchResult.class)))
             .thenReturn(outcome);
 
-        scheduledTaskRunner.run(eventConfig, () -> searchService.getCases().stream(), scheduledTask);
+        scheduledTaskRunner.run(eventConfig, searchResult, scheduledTask);
 
-        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), any(Stream.class));
+        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), any(ElasticSearchResult.class));
     }
 
     @Test
     void shouldAbortEarly_whenConsecutiveFailuresThresholdReached() {
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         CaseDetails case2 = CaseDetailsBuilder.builder().id(2L).build();
-        CaseDetails case3 = CaseDetailsBuilder.builder().id(3L).build();
-        CaseDetails case4 = CaseDetailsBuilder.builder().id(4L).build();
-        Set<CaseDetails> cases = new LinkedHashSet<>(List.of(case1, case2, case3, case4));
-        when(searchService.getCases()).thenReturn(cases);
+        ElasticSearchResult searchResult = new ElasticSearchResult(2, Stream.of(case1, case2));
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(), List.of(1L, 2L), true, "Error 2");
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), any(Stream.class)))
+        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), any(ElasticSearchResult.class)))
             .thenReturn(outcome);
 
-        scheduledTaskRunner.run(eventConfig, () -> searchService.getCases().stream(), scheduledTask);
+        scheduledTaskRunner.run(eventConfig, searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq(0), eq(2), eq("Error 2"));
+        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq(2), eq(0), eq(2), eq("Error 2"));
     }
 
     @Test
     void shouldNotAbortEarly_whenFailuresAreNotConsecutive() {
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         CaseDetails case2 = CaseDetailsBuilder.builder().id(2L).build();
-        CaseDetails case3 = CaseDetailsBuilder.builder().id(3L).build();
-        Set<CaseDetails> cases = new LinkedHashSet<>(List.of(case1, case2, case3));
-        when(searchService.getCases()).thenReturn(cases);
+        ElasticSearchResult searchResult = new ElasticSearchResult(2, Stream.of(case1, case2));
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
-        ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(2L), List.of(1L, 3L), false, "");
+        ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(1L), List.of(2L), false, "");
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), any(Stream.class)))
+        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), any(ElasticSearchResult.class)))
             .thenReturn(outcome);
 
-        scheduledTaskRunner.run(eventConfig, () -> searchService.getCases().stream(), scheduledTask);
+        scheduledTaskRunner.run(eventConfig, searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(1), eq(2));
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(2), eq(1), eq(1));
     }
 }

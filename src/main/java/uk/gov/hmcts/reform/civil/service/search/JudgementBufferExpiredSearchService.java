@@ -3,16 +3,15 @@ package uk.gov.hmcts.reform.civil.service.search;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchPaginatedStreamProvider;
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
@@ -28,14 +27,10 @@ public class JudgementBufferExpiredSearchService {
 
     private final ElasticSearchPaginatedStreamProvider elasticSearchPaginatedStreamProvider;
 
-    public Set<CaseDetails> getCases() {
-        return getCasesStream().collect(java.util.stream.Collectors.toSet());
-    }
-
-    public Stream<CaseDetails> getCasesStream() {
+    public ElasticSearchResult getSearchResults() {
         String timeNow = ZonedDateTime.now(ZoneOffset.UTC).toString();
 
-        return elasticSearchPaginatedStreamProvider.getPaginatedStream(
+        return elasticSearchPaginatedStreamProvider.getPaginatedSearchResult(
             searchAfterValue -> query(timeNow, searchAfterValue)
         );
     }

@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchPaginatedStreamProvider;
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -55,7 +57,8 @@ class JudgementBufferExpiredSearchServiceTest {
         when(coreCaseDataService.searchCasesPaginated(any())).thenReturn(page1);
 
         // When
-        Stream<CaseDetails> casesStream = searchService.getCasesStream();
+        ElasticSearchResult searchResult = searchService.getSearchResults();
+        Stream<CaseDetails> casesStream = searchResult.caseDetailsStream();
         List<CaseDetails> allCases = casesStream.toList();
 
         // Then
@@ -118,7 +121,8 @@ class JudgementBufferExpiredSearchServiceTest {
             .thenReturn(page2);
 
         // When
-        Stream<CaseDetails> casesStream = searchService.getCasesStream();
+        ElasticSearchResult searchResult = searchService.getSearchResults();
+        Stream<CaseDetails> casesStream = searchResult.caseDetailsStream();
         List<CaseDetails> allCases = casesStream.toList();
 
         // Then
@@ -146,7 +150,8 @@ class JudgementBufferExpiredSearchServiceTest {
         when(coreCaseDataService.searchCasesPaginated(any())).thenReturn(page1);
 
         // When
-        Stream<CaseDetails> casesStream = searchService.getCasesStream();
+        ElasticSearchResult searchResult = searchService.getSearchResults();
+        Stream<CaseDetails> casesStream = searchResult.caseDetailsStream();
         List<CaseDetails> allCases = casesStream.toList();
 
         // Then
