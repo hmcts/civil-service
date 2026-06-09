@@ -8,9 +8,7 @@ data "azurerm_key_vault_secret" "civil-service-alert-slack-email" {
 locals {
   # Retrieves the Slack email address from Key Vault if the secret exists, otherwise defaults to null
   civil_service_alert_slack_email = length(data.azurerm_key_vault_secret.civil-service-alert-slack-email) > 0 ? data.azurerm_key_vault_secret.civil-service-alert-slack-email[0].value : null
-  # Filters the monitor_scheduler_alerts map to only include alerts that are explicitly enabled (defaults to false)
-  enabled_scheduler_alerts = { for k, v in var.monitor_scheduler_alerts : k => v if try(v.enabled, false) }
-  resource_group_name      = "civil-service-${var.env}"
+  resource_group_name             = "civil-service-${var.env}"
 }
 
 resource "azurerm_monitor_action_group" "civil-service-action-group" {
@@ -31,9 +29,10 @@ resource "azurerm_monitor_action_group" "civil-service-action-group" {
 }
 
 module "scheduler-aborted-alerts" {
-  for_each = local.enabled_scheduler_alerts
+  for_each = var.monitor_scheduler_alerts
   source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
+  enabled  = tostring(try(each.value.enabled, false))
 
   app_insights_name  = module.application_insights.name
   resourcegroup_name = local.resource_group_name
@@ -48,19 +47,20 @@ module "scheduler-aborted-alerts" {
       AIQ
 
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has aborted."
-  frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
-  time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
-  severity_level             = 3
+  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 30))
+  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 60))
+  severity_level             = "2"
   action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "GreaterThan"
-  trigger_threshold          = 0
+  trigger_threshold          = "0"
   common_tags                = var.common_tags
 }
 
 module "scheduler-high-failure-rate-alerts" {
-  for_each = local.enabled_scheduler_alerts
+  for_each = var.monitor_scheduler_alerts
   source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
+  enabled  = tostring(try(each.value.enabled, false))
 
   app_insights_name  = module.application_insights.name
   resourcegroup_name = local.resource_group_name
@@ -71,27 +71,29 @@ module "scheduler-high-failure-rate-alerts" {
   app_insights_query = <<-AIQ
       customEvents
         | where name in ("${each.key}JobCompleted", "${each.key}JobAborted")
-        | extend cases = toint(tostring(properties.totalCases))
-        | extend failed = toint(tostring(properties.failedCases))
-        | where isnotnull(cases) and cases > 0
+        | extend cases = toint(column_ifexists('properties.totalCases', 0))
+        | extend failed = toint(column_ifexists('properties.failedCases', 0))
+        | where cases > 0
         | extend failureRate = failed * 1.0 / cases
+        | project timestamp, name, cases, failed, failureRate
         | where failureRate > 0.2
       AIQ
 
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has a high failure rate."
-  frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
-  time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
-  severity_level             = 3
+  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 30))
+  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 60))
+  severity_level             = "1"
   action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "GreaterThan"
-  trigger_threshold          = 0
+  trigger_threshold          = "0"
   common_tags                = var.common_tags
 }
 
 module "scheduler-job-not-run-alerts" {
-  for_each = local.enabled_scheduler_alerts
+  for_each = var.monitor_scheduler_alerts
   source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
+  enabled  = tostring(try(each.value.enabled, false))
 
   app_insights_name  = module.application_insights.name
   resourcegroup_name = local.resource_group_name
@@ -106,11 +108,11 @@ module "scheduler-job-not-run-alerts" {
       AIQ
 
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has not run in the last ${var.job_not_run_threshold} hours."
-  frequency_in_minutes       = try(each.value.frequency_in_minutes, 30)
-  time_window_in_minutes     = try(each.value.time_window_in_minutes, 30)
-  severity_level             = 3
+  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 30))
+  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 60))
+  severity_level             = "2"
   action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "LessThan"
-  trigger_threshold          = 1
+  trigger_threshold          = "1"
   common_tags                = var.common_tags
 }
