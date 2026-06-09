@@ -35,7 +35,6 @@ import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -77,15 +76,13 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private UpdateFromGACaseEventTaskHandler handler;
 
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-        handler = new UpdateFromGACaseEventTaskHandler(coreCaseDataService, caseDetailsConverter, objectMapper, featureToggleService);
+        handler = new UpdateFromGACaseEventTaskHandler(coreCaseDataService, caseDetailsConverter, objectMapper);
     }
 
     @Test

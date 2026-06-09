@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -69,8 +68,6 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
     private ExternalTask mockTask;
     @InjectMocks
     private WaitCivilDocUpdatedTaskHandler waitCivilDocUpdatedTaskHandler;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private GeneralApplicationCaseData gaCaseData;
     private GeneralApplicationCaseData civilCaseDataEmpty;

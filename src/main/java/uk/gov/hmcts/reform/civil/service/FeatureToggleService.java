@@ -140,10 +140,6 @@ public class FeatureToggleService {
         return true;
     }
 
-    public boolean isGaForWelshEnabled() {
-        return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
-    }
-
     public boolean isWelshEnabledForMainCase() {
         return featureToggleApi.isFeatureEnabled("enableWelshForMainCase");
     }

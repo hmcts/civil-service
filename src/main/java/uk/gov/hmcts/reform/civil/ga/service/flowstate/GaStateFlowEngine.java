@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
 import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -43,7 +42,6 @@ import static uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowState.Main.PR
 public class GaStateFlowEngine {
 
     private final CaseDetailsConverter caseDetailsConverter;
-    private final FeatureToggleService featureToggleService;
 
     public GaStateFlow build() {
         return GaStateFlowBuilder.<GaFlowState.Main>flow(FLOW_NAME)
@@ -65,7 +63,7 @@ public class GaStateFlowEngine {
                         flags.put(FlowFlag.VARY_JUDGE_GA_BY_RESP.name(), isVaryJudgementAppByResp.test(c));
                         flags.put(
                             FlowFlag.WELSH_ENABLED.name(),
-                            featureToggleService.isGaForWelshEnabled() && isWelshApplicant.test(c)
+                            isWelshApplicant.test(c)
                         );
                     })
             .state(PROCEED_GENERAL_APPLICATION)
@@ -77,7 +75,7 @@ public class GaStateFlowEngine {
                         flags.put(FlowFlag.VARY_JUDGE_GA_BY_RESP.name(), isVaryJudgementAppByResp.test(c));
                         flags.put(
                             FlowFlag.WELSH_ENABLED_FOR_JUDGE_DECISION.name(),
-                            featureToggleService.isGaForWelshEnabled() && isWelshJudgeDecision.test(c)
+                            isWelshJudgeDecision.test(c)
                         );
                     })
             .state(APPLICATION_SUBMITTED_JUDICIAL_DECISION)

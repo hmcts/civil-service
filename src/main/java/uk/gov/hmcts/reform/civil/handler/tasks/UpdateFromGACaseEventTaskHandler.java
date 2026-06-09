@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
@@ -60,7 +59,6 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -119,7 +117,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
             updateDocCollection(output, generalAppCaseData, "gaRespondDoc", civilCaseData, "gaRespondDoc");
             generalAppCaseData = mergeBundle(generalAppCaseData);
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaAddl");
-            if (featureToggleService.isGaForWelshEnabled() && (civilCaseData.isClaimantBilingual() || civilCaseData.isRespondentResponseBilingual())) {
+            if (civilCaseData.isClaimantBilingual() || civilCaseData.isRespondentResponseBilingual()) {
                 if (generalAppCaseData.getParentClaimantIsApplicant() == YES) {
                     updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsApplicant", civilCaseData, "gaAddlDocClaimant");
                 } else {

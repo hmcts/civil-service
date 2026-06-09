@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -43,7 +42,6 @@ public class WaitCivilDocUpdatedTaskHandler extends BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final GaForLipService gaForLipService;
     private final ObjectMapper mapper;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -109,8 +107,7 @@ public class WaitCivilDocUpdatedTaskHandler extends BaseExternalTaskHandler {
                 }
             }
 
-            if (featureToggleService.isGaForWelshEnabled()
-                && (gaCaseData.isApplicantBilingual() || gaCaseData.isRespondentBilingual())
+            if ((gaCaseData.isApplicantBilingual() || gaCaseData.isRespondentBilingual())
                 && updatedDocuments.size() > 1) {
                 List<Element<CaseDocument>> translatedAppDocument = updatedDocuments.stream()
                     .filter(gaDocElement -> gaDocElement.getValue().getDocumentName()

@@ -68,7 +68,6 @@ public class InitiateGeneralApplicationService {
     public static final int GA_CLAIM_DEADLINE_EXTENSION_MONTHS = 36;
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
-    private final FeatureToggleService featureToggleService;
     private final CaseAssignmentApi caseAssignmentApi;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
     private final UserService userService;
@@ -139,8 +138,7 @@ public class InitiateGeneralApplicationService {
 
     private LocalDateTime calculateDeadline(CaseData caseData, GeneralApplication applicationBuilder) {
         // Skip deadline calculation for Welsh bilingual cases
-        if (featureToggleService.isGaForWelshEnabled()
-                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
             log.info("Skipping deadline calculation for Welsh bilingual case: {}", caseData.getCcdCaseReference());
             return null;
         }
@@ -411,8 +409,7 @@ public class InitiateGeneralApplicationService {
 
     private void setBusinessProcess(CaseData caseData, UserDetails userDetails, GeneralApplication applicationBuilder) {
         LocalDateTime deadline = null;
-        if (!(featureToggleService.isGaForWelshEnabled()
-                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()))) {
+        if (!(caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             int numberOfDeadlineDays = 5;
             deadline = deadlinesCalculator.calculateApplicantResponseDeadline(LocalDateTime.now(), numberOfDeadlineDays);
         }
