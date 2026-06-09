@@ -49,7 +49,7 @@ module "scheduler-aborted-alerts" {
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has aborted."
   frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 30))
   time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 60))
-  severity_level             = "3"
+  severity_level             = "2"
   action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "GreaterThan"
   trigger_threshold          = "0"
@@ -82,7 +82,7 @@ module "scheduler-high-failure-rate-alerts" {
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has a high failure rate."
   frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 30))
   time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 60))
-  severity_level             = "3"
+  severity_level             = "1"
   action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "GreaterThan"
   trigger_threshold          = "0"
@@ -110,7 +110,7 @@ module "scheduler-job-not-run-alerts" {
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has not run in the last ${var.job_not_run_threshold} hours."
   frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 30))
   time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 60))
-  severity_level             = "3"
+  severity_level             = "2"
   action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "LessThan"
   trigger_threshold          = "1"
