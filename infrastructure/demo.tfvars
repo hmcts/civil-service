@@ -11,9 +11,9 @@ monitor_action_group = {
 
 monitor_scheduler_alerts = {
   "JudgementBuffer" = {
-    enabled      = false
+    enabled      = true
     action_group = "demo-civil-service-slack-alert"
   }
 }
 
-job_not_run_threshold = 1
+job_not_run_threshold = 26
