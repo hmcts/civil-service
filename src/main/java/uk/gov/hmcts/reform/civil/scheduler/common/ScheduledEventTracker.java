@@ -10,6 +10,20 @@ import java.util.Map;
 @AllArgsConstructor
 public class ScheduledEventTracker {
 
+    private static final String SCHEDULER_NAME = "schedulerName";
+    private static final String TOTAL_CASES = "totalCases";
+    private static final String SUCCEEDED_CASES = "succeededCases";
+    private static final String FAILED_CASES = "failedCases";
+    private static final String ABORT_REASON = "abortReason";
+    private static final String UNKNOWN = "Unknown";
+    private static final String ZERO = String.valueOf(0);
+    private static final String FAILURE = "FAILURE";
+    private static final String SUCCESS = "SUCCESS";
+    private static final String CASE_ID = "caseId";
+    private static final String STATUS = "status";
+    private static final String ERROR = "error";
+    private static final String ERROR_CATEGORY = "errorCategory";
+
     private final ErrorCategorizer errorCategorizer;
     private final TelemetryService telemetryService;
 
@@ -17,10 +31,10 @@ public class ScheduledEventTracker {
         telemetryService.trackEvent(
             eventConfig.getJobStartedEvent(),
             Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "totalCases", String.valueOf(casesSize),
-                "succeededCases", String.valueOf(0),
-                "failedCases", String.valueOf(0)
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                TOTAL_CASES, String.valueOf(casesSize),
+                SUCCEEDED_CASES, ZERO,
+                FAILED_CASES, ZERO
             )
         );
     }
@@ -29,9 +43,9 @@ public class ScheduledEventTracker {
         telemetryService.trackEvent(
             eventConfig.getCaseProcessedEvent(),
             Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "caseId", String.valueOf(caseId),
-                "status", "SUCCESS"
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                CASE_ID, String.valueOf(caseId),
+                STATUS, SUCCESS
             )
         );
     }
@@ -39,11 +53,11 @@ public class ScheduledEventTracker {
     public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, Long caseId, Exception e) {
         telemetryService.trackEvent(
             eventConfig.getCaseFailedEvent(), Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "caseId", String.valueOf(caseId),
-                "status", "FAILURE",
-                "error", e.getMessage(),
-                "errorCategory", errorCategorizer.categorizeError(e)
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                CASE_ID, String.valueOf(caseId),
+                STATUS, FAILURE,
+                ERROR, e.getMessage(),
+                ERROR_CATEGORY, errorCategorizer.categorizeError(e)
             )
         );
     }
@@ -55,10 +69,10 @@ public class ScheduledEventTracker {
         telemetryService.trackEvent(
             eventConfig.getJobCompletedEvent(),
             Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "totalCases", String.valueOf(totalCases),
-                "succeededCases", String.valueOf(succeededCases),
-                "failedCases", String.valueOf(failedCases)
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                TOTAL_CASES, String.valueOf(totalCases),
+                SUCCEEDED_CASES, String.valueOf(succeededCases),
+                FAILED_CASES, String.valueOf(failedCases)
             )
         );
     }
@@ -67,10 +81,10 @@ public class ScheduledEventTracker {
         telemetryService.trackEvent(
             eventConfig.getJobCompletedEvent(),
             Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "totalCases", String.valueOf(0),
-                "succeededCases", String.valueOf(0),
-                "failedCases", String.valueOf(0)
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                TOTAL_CASES, ZERO,
+                SUCCEEDED_CASES, ZERO,
+                FAILED_CASES, ZERO
             )
         );
     }
@@ -83,11 +97,11 @@ public class ScheduledEventTracker {
         telemetryService.trackEvent(
             eventConfig.getJobAbortedEvent(),
             Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "totalCases", String.valueOf(totalCases),
-                "succeededCases", String.valueOf(succeededCases),
-                "failedCases", String.valueOf(failedCases),
-                "abortReason", reason != null ? reason : "Unknown"
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                TOTAL_CASES, String.valueOf(totalCases),
+                SUCCEEDED_CASES, String.valueOf(succeededCases),
+                FAILED_CASES, String.valueOf(failedCases),
+                ABORT_REASON, reason != null ? reason : UNKNOWN
             )
         );
     }
@@ -96,11 +110,11 @@ public class ScheduledEventTracker {
         telemetryService.trackEvent(
             eventConfig.getJobAbortedEvent(),
             Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "totalCases", String.valueOf(0),
-                "succeededCases", String.valueOf(0),
-                "failedCases", String.valueOf(0),
-                "abortReason", reason != null ? reason : "Unknown"
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                TOTAL_CASES, ZERO,
+                SUCCEEDED_CASES, ZERO,
+                FAILED_CASES, ZERO,
+                ABORT_REASON, reason != null ? reason : UNKNOWN
             )
         );
     }
