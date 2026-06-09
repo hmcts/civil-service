@@ -149,9 +149,8 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
             data.setPayBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
                 .setAmountToPay(totalClaimAmount + "")
                 .setWhyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-        } else if (caseData.getRespondToClaimAdmitPartLRspec2() != null && caseData.getRespondToClaimAdmitPartLRspec2().getWhenWillThisAmountBePaid() != null) {
+        } else {
             data.setAmountToPay(totalClaimAmount + "")
-                .setPayBy(caseData.getRespondToClaimAdmitPartLRspec2().getWhenWillThisAmountBePaid())
                 .setWhyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
         }
     }
