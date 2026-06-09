@@ -8,7 +8,7 @@ data "azurerm_key_vault_secret" "civil-service-alert-slack-email" {
 locals {
   # Retrieves the Slack email address from Key Vault if the secret exists, otherwise defaults to null
   civil_service_alert_slack_email = length(data.azurerm_key_vault_secret.civil-service-alert-slack-email) > 0 ? data.azurerm_key_vault_secret.civil-service-alert-slack-email[0].value : null
-  resource_group_name      = "civil-service-${var.env}"
+  resource_group_name             = "civil-service-${var.env}"
 }
 
 resource "azurerm_monitor_action_group" "civil-service-action-group" {
