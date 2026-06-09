@@ -67,7 +67,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
                 default -> data.setWhyReject(null);
             }
         } else if (caseData.getRespondent2ClaimResponseTypeForSpec() != null && useRespondent2(caseData)) {
-            data.setHowToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            data.setHowToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
             data.setResponseType(caseData.getRespondent2ClaimResponseTypeForSpec());
             switch (caseData.getRespondent2ClaimResponseTypeForSpec()) {
                 case FULL_ADMISSION -> addRepaymentMethodLip(caseData, data, getTotalClaimAmountWithInterest(caseData), admittedAmount);
@@ -80,7 +80,6 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
 
         return data
             .setWhyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec())
-            .setResponseType(caseData.getRespondent1ClaimResponseTypeForSpec())
             .setMediation(caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES)
             .toForm();
     }
@@ -99,7 +98,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
                 default -> data.setWhyReject(null);
             }
         } else if (caseData.getRespondent2ClaimResponseTypeForSpec() != null && useRespondent2(caseData)) {
-            data.setHowToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            data.setHowToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
             data.setResponseType(caseData.getRespondent2ClaimResponseTypeForSpec());
             switch (caseData.getRespondent2ClaimResponseTypeForSpec()) {
                 case FULL_ADMISSION -> addRepaymentMethod(caseData, data, getTotalClaimAmountWithInterest(caseData));
