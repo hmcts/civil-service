@@ -364,7 +364,6 @@ def sonarExclusions = [
   "**/handler/migration/MigrateCaseQueriesTask.java",
   "**/handler/migration/FixDashboardParamsTextTask.java",
   "**/handler/callback/user/RespondQueryCallbackHandler.java",
-  "**/service/servicebus/CcdCaseEventsExecutor.java",
   "**/tasklisteners/MigrateCasesTaskListener.java",
   "**/migration/MigrationTask.java",
   "**/migration/CustomRequestScopeAttr.java",
