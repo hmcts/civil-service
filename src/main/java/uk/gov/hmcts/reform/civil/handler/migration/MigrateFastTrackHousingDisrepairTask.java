@@ -15,21 +15,6 @@ public class MigrateFastTrackHousingDisrepairTask extends MigrationTask<CaseRefe
     }
 
     @Override
-    protected String getTaskName() {
-        return "MigrateFastTrackHousingDisrepairTask";
-    }
-
-    @Override
-    protected String getEventSummary() {
-        return "Migrate to new fastTrack housing disrepair via migration task";
-    }
-
-    @Override
-    protected String getEventDescription() {
-        return "This task migrates new fastTrack housing disrepair on the case";
-    }
-
-    @Override
     protected CaseData migrateCaseData(CaseData caseData, CaseReference caseReference) {
         log.info("Migrating new fastTrack housing disrepair for case reference: {}", caseReference.getCaseReference());
 
@@ -46,5 +31,20 @@ public class MigrateFastTrackHousingDisrepairTask extends MigrationTask<CaseRefe
 
         caseData.setFastTrackHousingDisrepair(fastTrackHousingDisrepairNew);
         return caseData;
+    }
+
+    @Override
+    protected String getTaskName() {
+        return "MigrateFastTrackHousingDisrepairTask";
+    }
+
+    @Override
+    protected String getEventSummary() {
+        return "Migrate to new fastTrack housing disrepair via migration task";
+    }
+
+    @Override
+    protected String getEventDescription() {
+        return "This task migrates new fastTrack housing disrepair on the case";
     }
 }

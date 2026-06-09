@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 
 import java.time.LocalDate;
+import java.time.Month;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,8 +44,8 @@ class MigrateTrialHousingDisrepairTaskTest {
 
     @Test
     void shouldMigrateLegacyTrialHousingDisrepairFields() {
-        LocalDate firstReportDate = LocalDate.of(2026, 1, 15);
-        LocalDate jointStatementDate = LocalDate.of(2026, 2, 20);
+        LocalDate firstReportDate = LocalDate.of(2026, Month.of(1), 15);
+        LocalDate jointStatementDate = LocalDate.of(2026, Month.of(2), 20);
         TrialHousingDisrepair existingTrialHousingDisrepair = new TrialHousingDisrepair();
         existingTrialHousingDisrepair.setInput1("Legacy clause A");
         existingTrialHousingDisrepair.setInput2("Legacy clause B");

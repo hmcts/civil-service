@@ -15,21 +15,6 @@ public class MigrateTrialHousingDisrepairTask extends MigrationTask<CaseReferenc
     }
 
     @Override
-    protected String getTaskName() {
-        return "MigrateTrialHousingDisrepairTask";
-    }
-
-    @Override
-    protected String getEventSummary() {
-        return "Migrate to trail housing disrepair via migration task";
-    }
-
-    @Override
-    protected String getEventDescription() {
-        return "This task migrates trail housing disrepair on the case";
-    }
-
-    @Override
     protected CaseData migrateCaseData(CaseData caseData, CaseReference caseReference) {
         log.info("Migrating to new trail housing disrepair for case reference: {}", caseReference.getCaseReference());
 
@@ -46,5 +31,20 @@ public class MigrateTrialHousingDisrepairTask extends MigrationTask<CaseReferenc
 
         caseData.setTrialHousingDisrepair(trialHousingDisrepairNew);
         return caseData;
+    }
+
+    @Override
+    protected String getTaskName() {
+        return "MigrateTrialHousingDisrepairTask";
+    }
+
+    @Override
+    protected String getEventSummary() {
+        return "Migrate to trail housing disrepair via migration task";
+    }
+
+    @Override
+    protected String getEventDescription() {
+        return "This task migrates trail housing disrepair on the case";
     }
 }
