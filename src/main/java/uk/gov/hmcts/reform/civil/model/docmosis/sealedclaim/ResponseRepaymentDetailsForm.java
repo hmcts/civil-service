@@ -149,15 +149,23 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
             data.setPayBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
                 .setAmountToPay(totalClaimAmount + "")
                 .setWhyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-        } else {
+        } else if (caseData.getRespondToClaimAdmitPartLRspec2() != null && caseData.getRespondToClaimAdmitPartLRspec2().getWhenWillThisAmountBePaid() != null) {
             data.setAmountToPay(totalClaimAmount + "")
+                .setPayBy(caseData.getRespondToClaimAdmitPartLRspec2().getWhenWillThisAmountBePaid())
                 .setWhyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
         }
     }
 
     private static void addPayByDatePayImmediately(ResponseRepaymentDetailsFormData data, BigDecimal totalClaimAmount, CaseData caseData) {
-        LocalDate whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(
-            RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
+        LocalDate whenWillThisAmountBePaid = null;
+        if (YES.equals(caseData.getIsRespondent1()) && caseData.getRespondToClaimAdmitPartLRspec() != null) {
+            whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(
+                RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
+        }
+        if (YES.equals(caseData.getIsRespondent2()) && caseData.getRespondToClaimAdmitPartLRspec2() != null) {
+            whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec2()).map(
+                RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
+        }
         if (whenWillThisAmountBePaid == null) {
             log.info("When will this amount be paid is not set.");
         }
