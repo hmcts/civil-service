@@ -13,7 +13,7 @@ locals {
 
 resource "azurerm_monitor_action_group" "civil-service-action-group" {
   for_each            = var.monitor_action_group
-  name                = each.key
+  name                = "${each.key}-${var.env}"
   resource_group_name = local.resource_group_name
   short_name          = try(each.value.short_name, null)
   tags                = var.common_tags
@@ -37,7 +37,7 @@ module "scheduler-aborted-alerts" {
   app_insights_name  = module.application_insights.name
   resourcegroup_name = local.resource_group_name
 
-  alert_name = "${each.key}JobAborted"
+  alert_name = "${each.key}JobAbortedAlert-${var.env}"
   alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has aborted."
 
   app_insights_query = <<-AIQ
@@ -65,7 +65,7 @@ module "scheduler-high-failure-rate-alerts" {
   app_insights_name  = module.application_insights.name
   resourcegroup_name = local.resource_group_name
 
-  alert_name = "${each.key}HighFailureRate"
+  alert_name = "${each.key}HighFailureRateAlert-${var.env}"
   alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has a high failure rate."
 
   app_insights_query = <<-AIQ
@@ -98,7 +98,7 @@ module "scheduler-job-not-run-alerts" {
   app_insights_name  = module.application_insights.name
   resourcegroup_name = local.resource_group_name
 
-  alert_name = "${each.key}JobNotRun"
+  alert_name = "${each.key}JobNotRunAlert-${var.env}"
   alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has not run in the last ${var.job_not_run_threshold} hours."
 
   app_insights_query = <<-AIQ
