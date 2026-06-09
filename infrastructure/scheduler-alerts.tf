@@ -37,7 +37,7 @@ module "scheduler-aborted-alerts" {
   app_insights_name  = module.application_insights.name
   resourcegroup_name = local.resource_group_name
 
-  alert_name = "${each.key}JobAborted"
+  alert_name = "${each.key}JobAbortedAlert"
   alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has aborted."
 
   app_insights_query = <<-AIQ
@@ -65,7 +65,7 @@ module "scheduler-high-failure-rate-alerts" {
   app_insights_name  = module.application_insights.name
   resourcegroup_name = local.resource_group_name
 
-  alert_name = "${each.key}HighFailureRate"
+  alert_name = "${each.key}HighFailureRateAlert"
   alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has a high failure rate."
 
   app_insights_query = <<-AIQ
@@ -98,7 +98,7 @@ module "scheduler-job-not-run-alerts" {
   app_insights_name  = module.application_insights.name
   resourcegroup_name = local.resource_group_name
 
-  alert_name = "${each.key}JobNotRun"
+  alert_name = "${each.key}JobNotRunAlert"
   alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has not run in the last ${var.job_not_run_threshold} hours."
 
   app_insights_query = <<-AIQ
