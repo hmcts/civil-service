@@ -72,9 +72,15 @@ public class DetermineNextState extends CallbackHandler {
 
     private static boolean isLrVlrPartAdmitRejected(CaseData caseData) {
         return caseData.isPartAdmitClaimSpec()
-            && caseData.isClaimantNotSettlePartAdmitClaim()
-            && YesOrNo.YES.equals(caseData.getApplicant1Represented())
-            && YesOrNo.YES.equals(caseData.getRespondent1Represented());
+            && !caseData.isPartAdmitClaimSettled()
+            && isLrVlrRepresented(caseData)
+            && (caseData.isClaimantNotSettlePartAdmitClaim()
+            || caseData.hasApplicantRejectedRepaymentPlan());
+    }
+
+    private static boolean isLrVlrRepresented(CaseData caseData) {
+        return YesOrNo.YES.equals(caseData.getApplicant1Represented())
+            || YesOrNo.YES.equals(caseData.getRespondent1Represented());
     }
 
     @Override
@@ -111,12 +117,12 @@ public class DetermineNextState extends CallbackHandler {
             log.info("Pin in Post enabled for Case: {}", caseData.getCcdCaseReference());
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
+            } else if (isLrVlrPartAdmitRejected(caseData)) {
+                nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             } else if (caseData.isPartAdmitClaimSettled()) {
                 nextState = CaseState.CASE_SETTLED.name();
-            } else if (isLrVlrPartAdmitRejected(caseData)) {
-                nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (isClaimNotSettled(caseData)) {
                 nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (isDefenceAdmitPayImmediately(caseData)) {
@@ -163,10 +169,10 @@ public class DetermineNextState extends CallbackHandler {
                 Pair<String, BusinessProcess> result = handleAcceptedRepaymentPlan(caseData, businessProcess);
                 nextState = result.getLeft();
                 businessProcess = result.getRight();
-            } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
-                nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             } else if (isLrVlrPartAdmitRejected(caseData)) {
                 nextState = CaseState.JUDICIAL_REFERRAL.name();
+            } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
+                nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             } else if (isClaimNotSettled(caseData)) {
                 nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (caseData.isPartAdmitClaimSettled()) {
@@ -222,6 +228,9 @@ public class DetermineNextState extends CallbackHandler {
         if ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
             || (caseData.isPartAdmitImmediatePaymentClaimSettled())) {
             return AWAITING_APPLICANT_INTENTION.name();
+        }
+        if (isLrVlrPartAdmitRejected(caseData)) {
+            return CaseState.JUDICIAL_REFERRAL.name();
         }
         return CaseState.All_FINAL_ORDERS_ISSUED.name();
     }
