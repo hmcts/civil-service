@@ -8,8 +8,6 @@ data "azurerm_key_vault_secret" "civil-service-alert-slack-email" {
 locals {
   # Retrieves the Slack email address from Key Vault if the secret exists, otherwise defaults to null
   civil_service_alert_slack_email = length(data.azurerm_key_vault_secret.civil-service-alert-slack-email) > 0 ? data.azurerm_key_vault_secret.civil-service-alert-slack-email[0].value : null
-  # Filters the monitor_scheduler_alerts map to only include alerts that are explicitly enabled (defaults to false)
-  enabled_scheduler_alerts = { for k, v in var.monitor_scheduler_alerts : k => v if try(v.enabled, false) }
   resource_group_name      = "civil-service-${var.env}"
 }
 
@@ -31,9 +29,10 @@ resource "azurerm_monitor_action_group" "civil-service-action-group" {
 }
 
 module "scheduler-aborted-alerts" {
-  for_each = local.enabled_scheduler_alerts
+  for_each = var.monitor_scheduler_alerts
   source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
+  enabled  = tostring(try(each.value.enabled, false))
 
   app_insights_name  = module.application_insights.name
   resourcegroup_name = local.resource_group_name
@@ -58,9 +57,10 @@ module "scheduler-aborted-alerts" {
 }
 
 module "scheduler-high-failure-rate-alerts" {
-  for_each = local.enabled_scheduler_alerts
+  for_each = var.monitor_scheduler_alerts
   source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
+  enabled  = tostring(try(each.value.enabled, false))
 
   app_insights_name  = module.application_insights.name
   resourcegroup_name = local.resource_group_name
@@ -90,9 +90,10 @@ module "scheduler-high-failure-rate-alerts" {
 }
 
 module "scheduler-job-not-run-alerts" {
-  for_each = local.enabled_scheduler_alerts
+  for_each = var.monitor_scheduler_alerts
   source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
+  enabled  = tostring(try(each.value.enabled, false))
 
   app_insights_name  = module.application_insights.name
   resourcegroup_name = local.resource_group_name
