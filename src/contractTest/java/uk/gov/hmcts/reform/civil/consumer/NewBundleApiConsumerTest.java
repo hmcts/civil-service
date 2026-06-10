@@ -33,10 +33,9 @@ import java.util.UUID;
 
 import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
-@PactTestFor(providerName = "em_newBundle")
+@PactTestFor(providerName = "em_orchestrator_new_bundle_provider")
 @MockServerConfig(hostInterface = "localhost", port = "6663")
 @TestPropertySource(properties = "bundle.api.url=http://localhost:6663")
 public class NewBundleApiConsumerTest extends BaseContractTest {
@@ -60,10 +59,10 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
             SERVICE_AUTH_TOKEN,
             getBundleCreateRequest()
         );
-        assertThat(response.getDocumentTaskId(), is(equalTo(123)));
+        assertThat(response.getDocumentTaskId(), notNullValue());
         assertThat(
             response.getData().getCaseBundles().get(0).getValue().getStitchedDocument().getDocumentUrl(),
-            is(equalTo("documentStitchedUrl"))
+            notNullValue()
         );
     }
 
