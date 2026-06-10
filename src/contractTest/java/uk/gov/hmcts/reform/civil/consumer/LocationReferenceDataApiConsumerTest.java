@@ -82,20 +82,22 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
             .path(ENDPOINT)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
+            .matchQuery("court_type_id", "\\d+", CIVIL_COURT_TYPE_ID)
             .matchQuery("location_type", ".+", LOCATION_TYPE)
             .matchQuery("service_code", SERVICE_ID_REGEX, serviceId)
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildLocationRefDataResponseBody())
+            .body(buildLocationRefDataResponseBody(serviceId))
             .status(HttpStatus.SC_OK)
             .toPact();
     }
 
-    static DslPart buildLocationRefDataResponseBody() {
+    static DslPart buildLocationRefDataResponseBody(String serviceId) {
         return newJsonArray(response ->
                                 response
                                     .object(locationRefData -> locationRefData
                                         .stringType("court_venue_id", "12345")
+                                        .stringType("service_code", serviceId)
                                         .stringType("epimms_id", "epimmsIdTest123")
                                         .stringType("site_name", "siteNameTest123")
                                         .stringType("region_id", "regionIdTest123")
