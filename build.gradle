@@ -349,6 +349,7 @@ def sonarExclusions = [
   "**/config/HttpClientRestConfiguration.java",
   "**/config/HttpClientFeignConfiguration.java",
   "**/config/HttpClientFeignConfigurationTest.java",
+  "**/config/feign/FeignStartupLogger.java",
   "**/aspect/ErrorDecoderTelemetryAspect.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java",
