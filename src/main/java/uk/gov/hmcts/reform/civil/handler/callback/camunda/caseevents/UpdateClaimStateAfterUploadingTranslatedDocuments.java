@@ -50,7 +50,7 @@ public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackH
     }
 
     private boolean isBilingualForLipVsLip(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && caseData.isClaimantBilingual();
+        return caseData.isLipvLipOneVOne() && (caseData.isClaimantBilingual() || caseData.isClaimantWelsh());
     }
 
     private String setClaimState(CaseData caseData) {

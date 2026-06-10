@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -141,13 +143,14 @@ class UpdateClaimStateAfterUploadingTranslatedDocumentsTest extends BaseCallback
         verifyNoInteractions(updateClaimStateService);
     }
 
-    @Test
-    void shouldNotUpdateClaimState_WhenClaimantIsNotBilingual() {
+    @ParameterizedTest
+    @ValueSource(strings = {"WELSH", "ENGLISH"})
+    void shouldNotUpdateClaimState_WhenClaimantIsNotBilingual(String language) {
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1Represented(NO)
             .respondent1Represented(NO)
-            .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
+            .claimantBilingualLanguagePreference(language)
             .build();
         caseData.setCcdState(CaseState.CASE_ISSUED);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -157,7 +160,7 @@ class UpdateClaimStateAfterUploadingTranslatedDocumentsTest extends BaseCallback
 
         // then
         assertThat(response.getErrors()).isNull();
-        assertThat(response.getState()).isEqualTo(CaseState.CASE_ISSUED.name());
+        assertThat(response.getState()).isEqualTo(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
         verifyNoInteractions(updateClaimStateService);
     }
 
