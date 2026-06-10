@@ -67,19 +67,6 @@ class GAResponseDeadlineTaskHandlerTest {
 
     private GAResponseDeadlineTaskHandler gaResponseDeadlineTaskHandler;
 
-    @BeforeEach
-    void setUp() {
-        EventProperties eventProperties = new EventProperties();
-        eventProperties.setRetryCount(3);
-        gaResponseDeadlineTaskHandler = new GAResponseDeadlineTaskHandler(
-            new ExternalTaskCompletionService(),
-            eventProperties,
-            caseSearchService,
-            coreCaseDataService,
-            caseDetailsConverter
-        );
-    }
-
     private CaseDetails caseDetails1;
     private CaseDetails caseDetails2;
     private CaseDetails caseDetails3;
@@ -98,6 +85,7 @@ class GAResponseDeadlineTaskHandlerTest {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         gaResponseDeadlineTaskHandler = new GAResponseDeadlineTaskHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             caseSearchService,
             coreCaseDataService,

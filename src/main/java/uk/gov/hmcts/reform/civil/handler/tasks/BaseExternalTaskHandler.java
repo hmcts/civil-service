@@ -193,7 +193,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
     private long calculateExponentialBackoff(int maxRetries, int remainingRetries) {
         if (remainingRetries > 0 && remainingRetries <= maxRetries) {
             long lock = eventProperties.getLockDuration();
-            long delay = eventProperties.getDispatchDelay();
+            long delay = eventProperties.getBackoffDelay();
             long maxBackoff = calculateEffectiveBackoff(maxRetries, lock, delay);
             double retryExponent = (double) maxRetries - remainingRetries;
             double multiplier = Math.pow(2D, retryExponent);
