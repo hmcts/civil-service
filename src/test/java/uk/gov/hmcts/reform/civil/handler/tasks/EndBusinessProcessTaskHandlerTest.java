@@ -23,13 +23,14 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS;
-import static uk.gov.hmcts.reform.civil.handler.tasks.EndBusinessProcessTaskHandler.NOT_RETRYABLE_MESSAGE;
 
 @ExtendWith(MockitoExtension.class)
 class EndBusinessProcessTaskHandlerTest {
@@ -86,12 +87,12 @@ class EndBusinessProcessTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CASE_ID, END_BUSINESS_PROCESS);
         verify(coreCaseDataService, never()).submitUpdate(CASE_ID, caseDataContentWithFinishedStatus);
-        verify(externalTaskService).handleFailure(
-            eq(mockExternalTask),
-            eq(NOT_RETRYABLE_MESSAGE),
+        verify(externalTaskService, never()).handleFailure(
+            any(ExternalTask.class),
             anyString(),
-            eq(0),
-            eq(1000L)
+            anyString(),
+            anyInt(),
+            anyLong()
         );
     }
 
