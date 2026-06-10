@@ -6,6 +6,7 @@ Civil CCD Callback Service.
 ### Contents:
 
 - [StateFlow diagrams](#stateflow-diagrams)
+- [Scheduled jobs](#scheduled-jobs)
 - [Database schema diagram](#database-schema-diagram)
 - [Building and deploying application](#building-and-deploying-the-application)
 - [Pact or contract testing](#pact-or-contract-testing)
@@ -39,7 +40,7 @@ Generated business rules from flowstate predicates in
 
 ## Email notification catalogue
 
-Every Camunda notifier, the parties it contacts, the Gov.Notify templates it uses, and the BPMN/CCD entry points are tracked in [`docs/email-notifications.md`](docs/email-notifications.md). The table is generated automatically by `scripts/generate_email_notifications_table.py`, which walks the notifier/aggregator/generator hierarchy, reads template IDs from `src/main/resources/application.yaml`, and links the referencing BPMN files from the neighbouring [`civil-camunda-bpmn-definition`](https://github.com/hmcts/civil-camunda-bpmn-definition) repository.
+Every Camunda notifier, the parties it contacts, the Gov.Notify templates it uses, and the BPMN/CCD entry points are tracked in [`docs/email-notifications.md`](docs/email-notifications.md). The table is generated automatically by `scripts/generate_email_notifications_table.py`, which walks the notifier/aggregator/generator hierarchy, reads template IDs from `src/main/resources/application.yaml`, and links the referencing BPMN files from `src/main/resources/camunda`.
 
 The same data is published via GitHub Pages at https://hmcts.github.io/civil-service/email-notifications.html, so after commits land on `master` the interactive table is available to anyone with repo access.
 
@@ -47,7 +48,7 @@ The same data is published via GitHub Pages at https://hmcts.github.io/civil-ser
 <summary>How to regenerate `docs/email-notifications.md`</summary>
 
 ```bash
-scripts/generate_email_notifications_table.py --bpmn-root ../civil-camunda-bpmn-definition
+scripts/generate_email_notifications_table.py --bpmn-root src/main/resources
 ```
 
 Need to focus on a single CCD event (or a handful)? Pass one or more `--ccd-event` filters to keep only rows whose
@@ -55,7 +56,7 @@ CCD event column contains the provided substring, e.g.
 
 ```bash
 scripts/generate_email_notifications_table.py \
-  --bpmn-root ../civil-camunda-bpmn-definition \
+  --bpmn-root src/main/resources \
   --ccd-event DEFENDANT_RESPONSE_SPEC
 ```
 
@@ -66,6 +67,47 @@ to skip generating it.
 The `Verify email notification documentation` GitHub Action executes the same script on every push to `master` and fails if the committed markdown is out of date, so commits should always include any changes produced by the command above.
 
 </details>
+
+## Scheduled jobs
+
+The project defines a set of timer-driven Camunda processes that keep cases moving without manual input. The table below lists each job, the external topic it drives, the cadence (Quartz cron expression, UTC), and the high-level responsibility.
+
+<!-- SCHEDULED_JOBS_TABLE_START -->
+| Job | Purpose | Camunda topic(s) | Schedule (cron, UTC) | When it runs |
+| --- | --- | --- | --- | --- |
+| Bundle creation scheduler | Builds bundles for eligible hearings each evening. | `BUNDLE_CREATION_CHECK` | `0 0 21 * * ?` | Daily at 21:00 |
+| Case dismissed scheduler | Automatically dismisses claims that have missed their deadlines. | `CASE_DISMISSED` | `0 5 16 * * ?` | Daily at 16:05 |
+| Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | `MOVE_TO_DECISION_OUTCOME` | `0 0 0 * * ?` | Daily at 00:00 |
+| Defendant response deadline check scheduler | Sweeps for defendants whose response deadline elapsed and triggers enforcement. | `DEFENDANT_RESPONSE_DEADLINE_CHECK` | `0 1 16 * * ?` | Daily at 16:01 |
+| Evidence upload scheduler | Prompts parties to upload evidence when deadlines are approaching. | `EVIDENCE_UPLOAD_CHECK` | `0 30 17 * * ?` | Daily at 17:30 |
+| Full admit pay immediately no payment scheduler | Escalates full-admit cases where an immediate payment was promised but not received. | `FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
+| GA doc upload notify scheduler | Sends notifications when GA supporting documents are uploaded. | `GADocUploadNotifyScheduler` | `0 0 23 * * ?` | Daily at 23:00 |
+| GA order made scheduler | Publishes GA order-made events to downstream services each afternoon. | `GAOrderMadeScheduler` | `0 15 16 ? * * *` | Daily at 16:15 |
+| GA response deadline processor | Processes GA response deadlines, judge revisits and respondent checks. | `GAResponseDeadlineProcessor`<br>`GAJudgeRevisitProcessor`<br>`GARespondentResponseCheckScheduler` | `0 15 17 * * ?` | Daily at 17:15 |
+| GA unless order scheduler | Enforces GA Unless Orders once the compliance deadline passes. | `GAUnlessOrderScheduler` | `0 0 16 ? * * *` | Daily at 16:00 |
+| Generate CSV and send to MMT scheduler | Produces nightly CSV/JSON exports for the mediation service (MMT). | `GenerateCsvAndSendToMmt`<br>`GenerateJsonAndSendToMmt` | `0 0 1 ? * * *` | Daily at 01:00 |
+| Hearing cvp link scheduler | Issues CVP/remote hearing links on a daily cadence. | `HEARING_CVP_LINK` | `0 0 0 ? * * *` | Daily at 00:00 |
+| Hearing fee check scheduler | Checks for unpaid hearing fees and raises the necessary follow-up tasks. | `HEARING_FEE_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
+| Incident retry scheduler | Retries failed external incident tasks each night. | `INCIDENT_RETRY_EVENT` | `0 1 23 * * ?` | Daily at 23:01 |
+| Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `MANAGE_STAY_WA_TASK_SCHEDULER` | `0 0 1 ? * * *` | Daily at 01:00 |
+| Migrate cases scheduler | Reserved cron to re-run large case migration batches. | `MIGRATE_CASES_EVENTS` | `0 0 0 1 * ? 2080` | First day of each month until 2080 at 00:00 |
+| Notify claim deadline scheduler | Notifies parties about upcoming claim deadlines, prior to dismissal. | `CASE_DISMISSED` | `0 5 0 * * ?` | Daily at 00:05 |
+| Order Review Obligation check scheduler | Checks order review obligations and triggers outstanding actions. | `ORDER_REVIEW_OBLIGATION_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
+| Polling event emitter scheduler | Emits polling events across the day so downstream pollers stay in sync. | `POLLING_EVENT_EMITTER` | `0 0 8-20 * * ?` | Hourly at the top of the hour from 08:00–20:00 |
+| Proof of debt scheduler | Generates proof-of-debt artefacts for COSC-linked general applications. | `CoscApplicationProcessor` | `0 0 16 * * ?` | Daily at 16:00 |
+| Request for reconsideration notification check scheduler | Ensures reconsideration notifications are sent when conditions are met. | `REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
+| Retrigger cases scheduler | One-off cron to retrigger case updates as part of the 2026 migration plan. | `RETRIGGER_CASES_EVENTS` | `0 0 0 1 * ? 2026` | First day of each month until 2026 at 00:00 |
+| Settlement no response from defendant scheduler | Moves settlement agreements forward when the defendant failed to respond. | `SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
+| Spec automated hearing notice scheduler | Builds automated hearing notices for Spec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
+| Take case offline scheduler | Transitions cases that must move off digital rails. | `TAKE_CASE_OFFLINE` | `0 5 16 * * ?` | Daily at 16:05 |
+| Trial ready check scheduler | Verifies trial readiness status for outstanding cases. | `TRIAL_READY_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
+| Trial ready notification scheduler | Sends notifications when trial readiness has been confirmed. | `TRIAL_READY_NOTIFICATION_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
+| Unspec automated hearing notice scheduler | Builds automated hearing notices for Unspec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
+| Update General application Case management Location | Future-dated cron to re-sync GA case management locations. | `RETRIGGER_GA_UPDATE_CMLOCATION_EVENTS` | `0 0 0 1 * ? 2046` | First day of each month until 2046 at 00:00 |
+| Update location | Future-dated cron to re-sync the main case location. | `RETRIGGER_UPDATE_LOCATION_EVENTS` | `0 0 0 1 * ? 2046` | First day of each month until 2046 at 00:00 |
+<!-- SCHEDULED_JOBS_TABLE_END -->
+
+Run `python3 bin/update-scheduled-jobs-table.py` whenever a BPMN scheduler is added or updated so the table stays in sync. The script reads every BPMN timer, merges in the human-readable descriptions held in `config/scheduled-jobs.json`, and rewrites the table between the markers above. If you add a new scheduler (or change the purpose of an existing one), update the JSON file first so the generated table has meaningful text. The `Verify scheduled jobs table` GitHub Action reruns this script on `master` and fails if `README.md` would change.
 
 ## Database schema diagram
 
@@ -78,7 +120,8 @@ The dashboard database schema diagram is generated by statically analysing the F
 The project is dependent on other Civil repositories:
 
 - [civil-ccd-definition](https://github.com/hmcts/civil-ccd-definition)
-- [civil-camunda-bpmn-definition](https://github.com/hmcts/civil-camunda-bpmn-definition)
+
+Camunda BPMN definitions are included in this repository under `src/main/resources/camunda/`.
 
 To set up complete local environment for Civil check [civil-sdk](https://github.com/hmcts/civil-sdk)
 
@@ -278,10 +321,10 @@ Note: be sure to have Docker running
 ```shell
 ./bin/dev-setup/start-devuser-preview-environment.sh
 ```
-You can optionally specify branches for CCD definitions, Camunda BPMN definitions and WA DMN definitions like below or leave them blank to use master.
+You can optionally specify branches for CCD definitions and WA DMN definitions like below or leave them blank to use master.
 
 ```shell
-./bin/dev-setup/start-devuser-preview-environment.sh ccdBranchName camundaBranchName dmnBranchName
+./bin/dev-setup/start-devuser-preview-environment.sh ccdBranchName dmnBranchName
 ```
 If you want to clean up the environment just run:
 

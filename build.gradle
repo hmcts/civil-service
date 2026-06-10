@@ -196,12 +196,11 @@ def pullLatestCivilCcdDefinitions = tasks.register('pullLatestCivilCcdDefinition
   }
 }
 
-def pullLatestCivilCamundaDefinitions = tasks.register('pullLatestCivilCamundaDefinitions', Exec) {
-  description = 'Pulls the civil Camunda BPMN definition repository branch needed for data setup.'
+def pullLatestCivilCamundaDefinitions = tasks.register('pullLatestCivilCamundaDefinitions', Copy) {
+  description = 'Stages the in-repo Camunda BPMN definitions for data setup.'
   onlyIf { isHighLevelDataSetupEnvironment() && isCamundaImportEnabled() }
-  doFirst {
-    commandLine './bin/pull-latest-camunda-files.sh', dataSetupBranch('CAMUNDA_DEFINITION_BRANCH')
-  }
+  from 'src/main/resources/camunda'
+  into 'camunda'
 }
 
 def pullLatestCivilWaDmnDefinitions = tasks.register('pullLatestCivilWaDmnDefinitions', Exec) {
@@ -347,8 +346,10 @@ def sonarExclusions = [
   "**/utils/**",
   "**/filters/**",
   "**/model/hearingvalues/**",
-  "**/config/HttpClientFeignConfigurationTest.java",
   "**/config/HttpClientRestConfiguration.java",
+  "**/config/HttpClientFeignConfiguration.java",
+  "**/config/HttpClientFeignConfigurationTest.java",
+  "**/aspect/ErrorDecoderTelemetryAspect.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java",
   "**/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java",
@@ -362,7 +363,6 @@ def sonarExclusions = [
   "**/handler/migration/MigrateCaseQueriesTask.java",
   "**/handler/migration/FixDashboardParamsTextTask.java",
   "**/handler/callback/user/RespondQueryCallbackHandler.java",
-  "**/service/servicebus/CcdCaseEventsExecutor.java",
   "**/tasklisteners/MigrateCasesTaskListener.java",
   "**/migration/MigrationTask.java",
   "**/migration/CustomRequestScopeAttr.java",
@@ -573,6 +573,7 @@ dependencies {
   testImplementation "org.testcontainers:postgresql:${versions.testcontainers}"
   testImplementation "org.testcontainers:junit-jupiter:${versions.testcontainers}"
   testImplementation "com.h2database:h2:2.4.240"
+  testImplementation "org.camunda.bpm:camunda-engine:${versions.camunda}"
 
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.17'
   contractTestImplementation 'au.com.dius.pact.provider:junit5:4.6.17'

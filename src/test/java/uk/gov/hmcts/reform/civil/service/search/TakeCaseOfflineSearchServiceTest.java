@@ -10,6 +10,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.mockito.Mockito.mock;
@@ -42,13 +43,38 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
             .should(boolQuery()
                         .must(rangeQuery("data.applicant1ResponseDeadline").lt(timeNow))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION")))
-                        .mustNot(matchQuery("data.isMintiLipCase", "Yes")))
+                        .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
+                        .must(((TakeCaseOfflineSearchService) searchService).haveNoOngoingBusinessProcess()))
             .should(boolQuery()
                         .must(rangeQuery("data.addLegalRepDeadlineRes1").lt(timeNow))
-                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT")))
+                        .must(((TakeCaseOfflineSearchService) searchService).haveNoOngoingBusinessProcess()))
             .should(boolQuery()
                         .must(rangeQuery("data.addLegalRepDeadlineRes2").lt(timeNow))
-                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))));
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT")))
+                        .must(((TakeCaseOfflineSearchService) searchService).haveNoOngoingBusinessProcess()));
+
+        return new Query(query, List.of("reference"), fromValue);
+    }
+
+    private Query buildWelshEnabledQuery(int fromValue) {
+        String timeNow = capturedTimeNow != null ? capturedTimeNow : "now";
+        BoolQueryBuilder query = boolQuery()
+            .minimumShouldMatch(1)
+            .should(boolQuery()
+                        .must(rangeQuery("data.applicant1ResponseDeadline").lt(timeNow))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION")))
+                        .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
+                        .mustNot(existsQuery("data.applicant1ResponseDate"))
+                        .must(((TakeCaseOfflineSearchService) searchService).haveNoOngoingBusinessProcess()))
+            .should(boolQuery()
+                        .must(rangeQuery("data.addLegalRepDeadlineRes1").lt(timeNow))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT")))
+                        .must(((TakeCaseOfflineSearchService) searchService).haveNoOngoingBusinessProcess()))
+            .should(boolQuery()
+                        .must(rangeQuery("data.addLegalRepDeadlineRes2").lt(timeNow))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT")))
+                        .must(((TakeCaseOfflineSearchService) searchService).haveNoOngoingBusinessProcess()));
 
         return new Query(query, List.of("reference"), fromValue);
     }
@@ -75,5 +101,14 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
         assertThat(query.toString()).contains("\"from\": 0");
         assertThat(query.toString()).contains("\"_source\": [\"reference\"]");
         assertThat(query.toString()).contains("\"query\"");
+        assertThat(query).usingRecursiveComparison().isEqualTo(buildWelshEnabledQuery(0));
+    }
+
+    @Test
+    void haveNoOngoingBusinessProcess_shouldBuildQueryWithStatusFinished() {
+        BoolQueryBuilder query = ((TakeCaseOfflineSearchService) searchService).haveNoOngoingBusinessProcess();
+
+        assertThat(query.toString()).contains("data.businessProcess.status");
+        assertThat(query.toString()).contains("FINISHED");
     }
 }

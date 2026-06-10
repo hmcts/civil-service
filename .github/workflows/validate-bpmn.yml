@@ -1,0 +1,36 @@
+name: Check bpmn processes have been linted
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
+
+jobs:
+  lint:
+    if: "!contains(github.event.pull_request.head.ref, 'renovate') && !contains(github.event.pull_request.head.ref, 'dependabot')"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Check processes have name
+      uses: mikefarah/yq@0f4fb8d35ec1a939d78dd6862f494d19ec589f19 # v4.52.5
+      with:
+        cmd: >
+          for file in src/main/resources/camunda/*.bpmn;
+          do
+            if ! yq -oy -e -p xml '.["bpmn:definitions"]["bpmn:process"]["+@name"]' "$file";
+            then
+              echo "Process $file does not have a name" >&2;
+              exit 1;
+            fi;
+          done
+
+    - name: Check BPMN processes have camunda:historyTimeToLive
+      run: |
+        export missing_files=$(grep -L 'historyTimeToLive' src/main/resources/camunda/*.bpmn)
+        if [ -n "$missing_files" ]; then
+          echo "The following BPMN files are missing 'historyTimeToLive':" >&2;
+          echo "$missing_files" >&2;
+          exit 1;
+        fi
