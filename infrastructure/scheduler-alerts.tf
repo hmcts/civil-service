@@ -48,8 +48,8 @@ module "scheduler-aborted-alerts" {
       AIQ
 
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has aborted."
-  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 30))
-  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 60))
+  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 60))
+  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 120))
   severity_level             = "2"
   action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "GreaterThan"
@@ -81,8 +81,8 @@ module "scheduler-high-failure-rate-alerts" {
       AIQ
 
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has a high failure rate."
-  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 30))
-  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 60))
+  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 60))
+  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 120))
   severity_level             = "1"
   action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "GreaterThan"
@@ -109,8 +109,8 @@ module "scheduler-job-not-run-alerts" {
       AIQ
 
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has not run in the last ${var.job_not_run_threshold} hours."
-  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 30))
-  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 60))
+  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 60))
+  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 120))
   severity_level             = "2"
   action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
   trigger_threshold_operator = "LessThan"
