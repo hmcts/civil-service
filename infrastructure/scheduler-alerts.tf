@@ -43,7 +43,8 @@ module "scheduler-aborted-alerts" {
   app_insights_query = <<-AIQ
       customEvents
         | where name == "${each.key}JobAborted"
-        | project timestamp, name, properties.abortReason
+        | extend abortReason = tostring(column_ifexists('properties.abortReason', 'Unknown'))
+        | project timestamp, name, abortReason
       AIQ
 
   custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has aborted."
