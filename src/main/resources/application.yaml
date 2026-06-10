@@ -56,6 +56,18 @@ spring:
     table: schema_version
     baseline-on-migrate: true
 
+scheduler:
+  circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
+  lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
+  lockAtMostFor: ${LOCK_AT_MOST_FOR:PT5M}
+  defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT10M}
+  judgementBuffer:
+    cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 2 * * *}
+    enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:false}
+  defendantResponse:
+    cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
+    enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
@@ -221,7 +233,6 @@ civil:
 core_case_data:
   api:
     url: ${CORE_CASE_DATA_API_URL:http://localhost:4452}
-    readTimeout: ${REST_TEMPLATE_TIMEOUT:30000}
 role-assignment-service:
   api:
     url: ${ROLE_ASSIGNMENT_URL:http://localhost:4096}
@@ -602,7 +613,12 @@ bundle:
 
 http:
   client:
-    readTimeout: ${REST_TEMPLATE_TIMEOUT:30000}
+    connectTimeout: ${HTTP_CONNECT_TIMEOUT:5000}
+    requestTimeout: ${HTTP_REQUEST_TIMEOUT:10000}
+    readTimeout: ${HTTP_READ_TIMEOUT:30000}
+    maxPerRoute: ${HTTP_MAX_PER_ROUTE:10}
+    maxTotal: ${HTTP_MAX_TOTAL:50}
+    threshold: 15000
 
 court-location:
   specified-claim:
@@ -653,9 +669,11 @@ appinsights-connection-string: ${APPLICATIONINSIGHTS_CONNECTION_STRING:}
 
 async:
   handler:
-    corePoolSize: ${ASYNC_HANDLER_CORE_POOL_SIZE:7}
-    maxPoolSize: ${ASYNC_HANDLER_MAX_POOL_SIZE:42}
-    queueCapacity: ${ASYNC_HANDLER_QUEUE_CAPACITY:10}
+    corePoolSize: ${ASYNC_HANDLER_CORE_POOL_SIZE:25}
+    maxPoolSize: ${ASYNC_HANDLER_MAX_POOL_SIZE:50}
+    queueCapacity: ${ASYNC_HANDLER_QUEUE_CAPACITY:500}
+    lock-duration: ${ASYNC_HANDLER_LOCK_DURATION:1980000}
+    event-dispatch-delay: ${ASYNC_HANDLER_EVENT_DISPATCH_DELAY:1800}
 
 feign:
   client:

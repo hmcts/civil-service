@@ -112,7 +112,6 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test
@@ -401,7 +400,6 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldRecordScenarioInSdoLegalAdviser_whenInvoked() {
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setOrderSDODocumentDJCollection(List.of(
                 ElementUtils.element(new CaseDocument().setDocumentLink(

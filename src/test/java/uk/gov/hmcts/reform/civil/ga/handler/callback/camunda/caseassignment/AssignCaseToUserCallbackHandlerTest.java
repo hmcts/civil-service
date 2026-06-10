@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.caseassignment;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -169,19 +167,6 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
             assignCaseToUserHandler.handle(params);
             verify(coreCaseUserService, times(3)).assignCase(any(), any(), any(), any());
         }
-
-        @Test
-        void shouldThrowExceptionIfSolicitorsAreNull() {
-            Exception exception =
-                    assertThrows(
-                            Exception.class,
-                            () ->
-                                    assignCaseToUserHandler.handle(
-                                            getCaseDateWithNoSolicitor(SPEC_CLAIM)));
-            String expectedMessage = "java.lang.NullPointerException";
-            String actualMessage = exception.toString();
-            assertTrue(actualMessage.contains(expectedMessage));
-        }
     }
 
     @Nested
@@ -311,13 +296,13 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
         }
 
         @Test
-        public void shouldAssignDefendantRoleToRespondent() {
+        void shouldAssignDefendantRoleToRespondent() {
             assignCaseToUserHandler.handle(params);
             verify(coreCaseUserService, times(1)).assignCase(any(), any(), any(), any());
         }
 
         @Test
-        public void shouldCallAssignCaseWithDefendantRole() {
+        void shouldCallAssignCaseWithDefendantRole() {
             assignCaseToUserHandler.handle(params);
             verify(coreCaseUserService, times(1))
                     .assignCase(

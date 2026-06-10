@@ -23,7 +23,7 @@ DASHBOARD_SCENARIOS_PATH = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civi
 TEMPLATE_DIR = RESOURCE_ROOT / 'notification-templates'
 RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-service/master/"
 TEMPLATE_VIEWER_PATH = "dashboard-template.html"
-DIAGRAM_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/"
+DIAGRAM_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/"
 DOCMOSIS_TEMPLATE_BASE_URL = "https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/"
 DOCMOSIS_TEMPLATE_PROD_URL = "https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Prod/"
 
@@ -59,6 +59,9 @@ DOCMOSIS_TEMPLATE_RE = re.compile(r"DocmosisTemplates\.([A-Z0-9_]+)")
 DOCMOSIS_STATIC_IMPORT_RE = re.compile(r"import\s+static\s+[^;]*DocmosisTemplates\.([A-Z0-9_]+);")
 DOCMOSIS_TITLE_PREFIX_RE = re.compile(r"^(?:%s[_-]*)+")
 DOCMOSIS_TITLE_SUFFIX_RE = re.compile(r"([_-]*%s)+(?=\.pdf$|$)")
+BUSINESS_PROCESS_READY_RE = re.compile(r"BusinessProcess\s*\.\s*ready\s*\(\s*(?:[A-Za-z0-9_]+\.)?([A-Z][A-Z0-9_]+)\s*\)")
+SET_CAMUNDA_EVENT_ENUM_RE = re.compile(r"setCamundaEvent\s*\(\s*(?:[A-Za-z0-9_]+\.)?([A-Z][A-Z0-9_]+)\s*\.\s*name\s*\(\s*\)\s*\)")
+CAMUNDA_EVENT_BUILDER_RE = re.compile(r"\.camundaEvent\s*\(\s*(?:[A-Za-z0-9_]+\.)?([A-Z][A-Z0-9_]+)\s*\.\s*name\s*\(\s*\)\s*\)")
 
 BASE_PARTY_DESC = {
     "AppSolOneEmailDTOGenerator": "Applicant solicitor (LR)",
@@ -88,7 +91,7 @@ class JavaClass:
         pattern = re.compile(rf"(?:public|protected)\s+{re.escape(class_name)}\s*\((.*?)\)\s*\{{", re.S)
         match = pattern.search(self.text)
         if not match:
-            return []
+            return self._lombok_constructor_params()
         params_block = match.group(1).strip()
         if not params_block:
             return []
@@ -105,6 +108,27 @@ class JavaClass:
                 depth = max(depth - 1, 0)
         if current:
             params.append(''.join(current).strip())
+        return params
+
+    def _lombok_constructor_params(self) -> List[str]:
+        has_all_args = re.search(r"@AllArgsConstructor\b", self.text) is not None
+        has_required_args = re.search(r"@RequiredArgsConstructor\b", self.text) is not None
+        if not (has_all_args or has_required_args):
+            return []
+        params = []
+        for match in re.finditer(
+            r"(?P<mods>(?:(?:private|protected|public|static|final|transient|volatile)\s+)+)"
+            r"(?P<type>[A-Za-z0-9_<>,\s]+?)\s+(?P<name>\w+)\s*(?:=|;)",
+            self.text
+        ):
+            mods = match.group('mods')
+            if 'static' in mods:
+                continue
+            if has_required_args and not has_all_args and 'final' not in mods:
+                continue
+            type_str = match.group('type').strip()
+            name = match.group('name')
+            params.append(f"{type_str} {name}")
         return params
 
 
@@ -285,16 +309,19 @@ def load_helper_templates(index: SourceIndex, class_name: str, method: str, cach
     if not java_class:
         cache[cache_key] = set()
         return set()
-    pattern = re.compile(rf"(?:public|protected|private)\s+[^{{]*{re.escape(method)}\s*\([^)]*\)\s*\{{", re.S)
-    match = pattern.search(java_class.text)
-    if not match:
+    pattern = re.compile(rf"(?:public|protected|private)\s+[^{{;]*\b{re.escape(method)}\s*\([^)]*\)[^{{;]*\{{", re.S)
+    templates: Set[str] = set()
+    found_any = False
+    for match in pattern.finditer(java_class.text):
+        found_any = True
+        body = extract_block(java_class.text, match.end() - 1)
+        templates.update(NOTIFICATION_GETTER_RE.findall(body))
+        for inner in re.findall(r"\b([a-z][A-Za-z0-9_]*)\s*\(", body):
+            if inner != method:
+                templates.update(load_helper_templates(index, class_name, inner, cache, seen))
+    if not found_any:
         cache[cache_key] = set()
         return set()
-    body = extract_block(java_class.text, match.end() - 1)
-    templates = set(NOTIFICATION_GETTER_RE.findall(body))
-    for inner in re.findall(r"(get[A-Za-z0-9_]+)\s*\(", body):
-        if inner != method:
-            templates.update(load_helper_templates(index, class_name, inner, cache, seen))
     cache[cache_key] = templates
     return templates
 
@@ -312,7 +339,7 @@ def collect_templates(index: SourceIndex, class_name: str, notifications: Dict[s
     templates = set(NOTIFICATION_GETTER_RE.findall(java_class.text))
     helper_fields = {name: field_type.split('<')[-1].replace('>', '') for field_type, name in FIELD_DEF_RE.findall(java_class.text)}
     helper_cache = {}
-    for var_name, method in re.findall(r"(\w+)\.(get[A-Za-z0-9_]+)\s*\(", java_class.text):
+    for var_name, method in re.findall(r"(\w+)\.([a-z][A-Za-z0-9_]*)\s*\(", java_class.text):
         helper_class = helper_fields.get(var_name)
         if helper_class:
             templates.update(load_helper_templates(index, helper_class, method, helper_cache, set()))
@@ -439,17 +466,16 @@ def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
     notification_data_cache: Dict[str, bool] = {}
     callback_handler_cache: Dict[str, bool] = {}
     for class_name, java_class in index.classes.items():
-        if '/handler/callback/camunda/notification/' not in str(java_class.path):
-            continue
         if re.search(r'abstract\s+class\s+' + re.escape(class_name), java_class.text):
             continue
         if not extends_callback_handler(index, class_name, callback_handler_cache):
             continue
-        if not extends_notification_data(index, class_name, notification_data_cache):
+        templates = collect_templates(index, class_name, notifications)
+        is_notification_data = extends_notification_data(index, class_name, notification_data_cache)
+        if not is_notification_data and not templates:
             continue
         events = extract_case_events_including_base(index, class_name)
         task_ids = extract_task_ids_including_base(index, class_name) or ['UNKNOWN']
-        templates = collect_templates(index, class_name, notifications)
         if not templates:
             templates = [{"id": None, "name": None}]
         party = infer_party_from_class(java_class)
@@ -479,6 +505,71 @@ def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
                     "ccd_events": ccd_display or ['—'],
                     "ccd_event_ids": ccd_ids
                 })
+    discovered_classes = {row['handler'] for row in rows}
+    rows.extend(_collect_helper_service_rows(
+        index, notifications, discovered_classes,
+        service_tasks, case_event_map, start_events, start_event_labels, start_event_file_map
+    ))
+    return rows
+
+
+def _collect_helper_service_rows(index, notifications, discovered_classes,
+                                 service_tasks, case_event_map, start_events, start_event_labels, start_event_file_map):
+    rows = []
+    case_event_ref_re = re.compile(r"CaseEvent\.([A-Z][A-Z0-9_]+)")
+    for class_name, java_class in index.classes.items():
+        if class_name in discovered_classes:
+            continue
+        if 'implements NotificationData' not in java_class.text:
+            continue
+        if 'extends CallbackHandler' in java_class.text or 'extends Notifier' in java_class.text:
+            continue
+        templates = collect_templates(index, class_name, notifications)
+        if not templates:
+            continue
+        events: List[str] = []
+        seen_events: Set[str] = set()
+        for caller_name, caller in index.classes.items():
+            if caller_name == class_name:
+                continue
+            if class_name not in caller.text:
+                continue
+            for ev in case_event_ref_re.findall(caller.text):
+                if ev not in seen_events:
+                    seen_events.add(ev)
+                    events.append(ev)
+        bpmn_files: List[str] = []
+        ccd_display: List[str] = []
+        ccd_ids: List[str] = []
+        for ev in events:
+            files, displays, ids = lookup_bpmn(ev, service_tasks, start_events, start_event_labels)
+            for f in files:
+                if f not in bpmn_files:
+                    bpmn_files.append(f)
+            for d in displays:
+                if d not in ccd_display:
+                    ccd_display.append(d)
+            for i in ids:
+                if i not in ccd_ids:
+                    ccd_ids.append(i)
+        bpmn_files, ccd_display, ccd_ids = augment_with_case_events(
+            events, case_event_map, start_events, start_event_labels, start_event_file_map,
+            bpmn_files, ccd_display, ccd_ids, include_events=True
+        )
+        party = infer_party_from_class(java_class)
+        for tpl in templates:
+            rows.append({
+                "event": class_name,
+                "handler": class_name,
+                "aggregator": '—',
+                "party": party,
+                "generator": class_name,
+                "template_id": tpl['id'] or '—',
+                "template_name": tpl.get('name'),
+                "bpmn_files": bpmn_files or ['—'],
+                "ccd_events": ccd_display or ['—'],
+                "ccd_event_ids": ccd_ids
+            })
     return rows
 
 
@@ -848,6 +939,136 @@ def build_class_dependency_map(index: SourceIndex) -> Dict[str, Set[str]]:
         field_map = field_types_including_base(index, class_name)
         deps[class_name] = set(param_map.values()) | set(field_map.values())
     return deps
+
+
+def build_subclass_map(index: SourceIndex) -> Dict[str, Set[str]]:
+    mapping: Dict[str, Set[str]] = {}
+    for class_name, java_class in index.classes.items():
+        base = java_class.base_class()
+        if base:
+            mapping.setdefault(base, set()).add(class_name)
+    return mapping
+
+
+def build_reverse_dependency_map(index: SourceIndex) -> Dict[str, Set[str]]:
+    reverse: Dict[str, Set[str]] = {}
+    for class_name, java_class in index.classes.items():
+        params = constructor_param_map(java_class, class_name)
+        fields = field_types(java_class)
+        for type_name in set(params.values()) | set(fields.values()):
+            if type_name and type_name in index.classes and type_name != class_name:
+                reverse.setdefault(type_name, set()).add(class_name)
+    return reverse
+
+
+SUPER_EVENTS_LIST_RE = re.compile(
+    r"(?:List\.of|Collections\.singletonList|singletonList|Arrays\.asList|asList|of)\s*\((?P<body>[^()]*)\)"
+)
+EVENTS_FIELD_RE = re.compile(
+    r"\b(?:final|static)\s+(?:final|static)?\s*List<\s*CaseEvent\s*>\s+(?:[A-Za-z0-9_]*EVENTS|[A-Za-z0-9_]*events)\s*=\s*"
+    r"(?:List\.of|Collections\.singletonList|singletonList|Arrays\.asList|asList|of)\s*\((?P<body>[^()]*)\)\s*;",
+    re.S
+)
+CASE_EVENT_REF_RE = re.compile(r"(?:CaseEvent\.)?([A-Z][A-Z0-9_]+)")
+
+
+def extract_case_events_from_super_call(java_class: JavaClass, class_name: str) -> List[str]:
+    pattern = re.compile(rf"(?:public|protected)\s+{re.escape(class_name)}\s*\([^)]*\)\s*\{{", re.S)
+    match = pattern.search(java_class.text)
+    if not match:
+        return []
+    body = extract_block(java_class.text, match.end() - 1)
+    super_match = re.search(r"super\s*\((?P<args>.*?)\)\s*;", body, re.S)
+    if not super_match:
+        return []
+    args = super_match.group('args')
+    events: List[str] = []
+    for list_match in SUPER_EVENTS_LIST_RE.finditer(args):
+        for token in split_arguments(list_match.group('body')):
+            token = token.strip()
+            if not token:
+                continue
+            ref = CASE_EVENT_REF_RE.fullmatch(token.split('.')[-1])
+            if ref:
+                events.append(ref.group(1))
+    return events
+
+
+def extract_case_events_from_field(java_class: JavaClass) -> List[str]:
+    events: List[str] = []
+    for match in EVENTS_FIELD_RE.finditer(java_class.text):
+        for token in split_arguments(match.group('body')):
+            token = token.strip()
+            if not token:
+                continue
+            ref = CASE_EVENT_REF_RE.fullmatch(token.split('.')[-1])
+            if ref:
+                events.append(ref.group(1))
+    return events
+
+
+def extract_case_events_thoroughly(index: SourceIndex, class_name: str) -> List[str]:
+    events = list(extract_case_events_including_base(index, class_name))
+    java_class = index.get(class_name)
+    if java_class:
+        for ev in extract_case_events_from_super_call(java_class, class_name):
+            if ev not in events:
+                events.append(ev)
+        for ev in extract_case_events_from_field(java_class):
+            if ev not in events:
+                events.append(ev)
+    return events
+
+
+def index_business_process_origins(index: SourceIndex) -> Dict[str, Set[str]]:
+    """Map BPMN message names (set via BusinessProcess.ready / camundaEvent) to the
+    originating user-facing CCD events whose handlers ultimately fire them."""
+    direct_messages: Dict[str, Set[str]] = {}
+    for class_name, java_class in index.classes.items():
+        messages: Set[str] = set()
+        messages.update(BUSINESS_PROCESS_READY_RE.findall(java_class.text))
+        messages.update(SET_CAMUNDA_EVENT_ENUM_RE.findall(java_class.text))
+        messages.update(CAMUNDA_EVENT_BUILDER_RE.findall(java_class.text))
+        if messages:
+            direct_messages[class_name] = messages
+
+    subclass_map = build_subclass_map(index)
+    reverse_deps = build_reverse_dependency_map(index)
+    callback_handler_cache: Dict[str, bool] = {}
+    origins: Dict[str, Set[str]] = {}
+
+    def collect_originating_events(start_class: str) -> Set[str]:
+        events: Set[str] = set()
+        seen: Set[str] = set()
+        queue: List[str] = [start_class]
+        while queue:
+            current = queue.pop(0)
+            if current in seen:
+                continue
+            seen.add(current)
+            java_class = index.get(current)
+            if not java_class:
+                continue
+            is_abstract = bool(re.search(r'abstract\s+class\s+' + re.escape(current), java_class.text))
+            if not is_abstract and extends_callback_handler(index, current, callback_handler_cache):
+                for ev in extract_case_events_thoroughly(index, current):
+                    if ev:
+                        events.add(ev)
+            for sub in subclass_map.get(current, set()):
+                if sub not in seen:
+                    queue.append(sub)
+            for caller in reverse_deps.get(current, set()):
+                if caller not in seen:
+                    queue.append(caller)
+        return events
+
+    for class_name, messages in direct_messages.items():
+        events = collect_originating_events(class_name)
+        if not events:
+            continue
+        for message in messages:
+            origins.setdefault(message, set()).update(events)
+    return origins
 
 
 def build_interface_implementations(index: SourceIndex) -> Dict[str, Set[str]]:
@@ -1410,6 +1631,30 @@ def combine_rows(email_rows: List[Dict[str, object]],
     return combined
 
 
+def augment_rows_with_originating_events(rows: List[Dict[str, object]],
+                                         origins: Dict[str, Set[str]]) -> List[Dict[str, object]]:
+    if not origins:
+        return rows
+    for row in rows:
+        ids: List[str] = list(row.get('ccd_event_ids') or [])
+        labels: List[str] = list(row.get('ccd_events') or [])
+        seen_ids = set(ids)
+        added = []
+        for trigger_id in list(ids):
+            for origin in sorted(origins.get(trigger_id, set())):
+                if origin in seen_ids:
+                    continue
+                seen_ids.add(origin)
+                added.append(origin)
+        if added:
+            ids.extend(added)
+            for origin in added:
+                labels.append(origin)
+            row['ccd_event_ids'] = ids
+            row['ccd_events'] = labels
+    return rows
+
+
 def normalize_ccd_event_labels(rows: List[Dict[str, object]], ccd_event_names: Dict[str, str]) -> List[Dict[str, object]]:
     if not ccd_event_names:
         return rows
@@ -1630,8 +1875,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     default_ccd_root = (REPO_ROOT / '..' / 'civil-ccd-definition' / 'ccd-definition').resolve()
     default_ga_root = (REPO_ROOT / '..' / 'civil-general-apps-ccd-definition' / 'ga-ccd-definition').resolve()
     parser = argparse.ArgumentParser(description="Generate docs/email-notifications.md")
-    parser.add_argument('--bpmn-root', default=str((REPO_ROOT / '..' / 'civil-camunda-bpmn-definition').resolve()),
-                        help='Path to civil-camunda-bpmn-definition project (default: sibling directory).')
+    parser.add_argument('--bpmn-root', default=str((REPO_ROOT / 'src' / 'main' / 'resources').resolve()),
+                        help='Path to directory containing camunda/ BPMN files (default: src/main/resources).')
     parser.add_argument('--ccd-definition-root',
                         default=str(default_ccd_root) if default_ccd_root.exists() else '',
                         help='Path to civil-ccd-definition/ccd-definition (default: sibling directory if present).')
@@ -1675,6 +1920,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     docmosis_rows = build_docmosis_rows(index, service_tasks, start_events, start_event_labels, case_event_map,
                                         start_event_file_map, docmosis_template_map, ccd_event_names)
     combined_rows = combine_rows(email_rows, dashboard_rows, docmosis_rows)
+    business_process_origins = index_business_process_origins(index)
+    combined_rows = augment_rows_with_originating_events(combined_rows, business_process_origins)
     combined_rows = normalize_ccd_event_labels(combined_rows, ccd_event_names)
     filtered_rows = filter_rows_by_ccd_event(combined_rows, args.ccd_event_filters)
     markdown_parts = ["# Notification matrix", render_combined_markdown(filtered_rows, args.notify_service_id)]

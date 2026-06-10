@@ -1,9 +1,10 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
-  devcpuRequests: 500m
-  devmemoryRequests: 2048Mi
-  devmemoryLimits: 4096Mi
+  devcpuRequests: 50m
+  devcpuLimits: 500m
+  devmemoryRequests: 1536Mi
+  devmemoryLimits: 2048Mi
   environment:
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
@@ -123,7 +124,7 @@ java:
         enabled: false
       resources:
         requests:
-          cpu: 500m
+          cpu: 50m
       initdb:
         scripts:
           init.sql: |
@@ -151,14 +152,14 @@ xui-webapp:
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctsprod.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
-    memoryRequests: 2Gi
-    cpuRequests: 2000m
-    memoryLimits: 4Gi
-    cpuLimits: 3500m
-    devmemoryRequests: 6Gi
-    devcpuRequests: 2000m
-    devmemoryLimits: 8Gi
-    devcpuLimits: 4500m
+    memoryRequests: 512Mi
+    cpuRequests: 50m
+    memoryLimits: 1Gi
+    cpuLimits: 500m
+    devmemoryRequests: 512Mi
+    devcpuRequests: 50m
+    devmemoryLimits: 1Gi
+    devcpuLimits: 500m
     environment:
       FEATURE_ACCESS_MANAGEMENT_ENABLED: true
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
@@ -220,7 +221,8 @@ ccd:
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
-      devcpuRequests: 500m
+      devcpuRequests: 50m
+      devcpuLimits: 500m
       devmemoryRequests: 4096Mi
       devmemoryLimits: 8192Mi
       autoscaling:
@@ -256,9 +258,9 @@ ccd:
   ccd-definition-store-api:
     java:
       imagePullPolicy: Always
-      devcpuRequests: 500m
-      devmemoryRequests: 4096Mi
-      devmemoryLimits: 8192Mi
+      devcpuRequests: 50m
+      devmemoryRequests: 4Gi
+      devmemoryLimits: 4Gi
       environment:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_DB_OPTIONS: "?stringtype=unspecified"
@@ -285,9 +287,9 @@ camunda-bpm:
     disableKeyVaults: true
     releaseNameOverride: ${SERVICE_NAME}-camunda
     ingressHost: camunda-${SERVICE_FQDN}
-    devcpuRequests: 500m
+    devcpuRequests: 50m
     devmemoryRequests: 1024Mi
-    devcpuLimits: 1
+    devcpuLimits: 500m
     devmemoryLimits: 1Gi
     environment:
       CAMUNDA_API_AUTH_ENABLED: false
@@ -307,6 +309,7 @@ aac-manage-case-assignment:
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
     image: hmctsprod.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: manage-case-assignment-${SERVICE_NAME}.preview.platform.hmcts.net
+    devcpuRequests: 50m
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net

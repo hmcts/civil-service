@@ -47,7 +47,6 @@ class SdoFastTrackTemplateServiceTest {
         when(templateFieldService.getMethodVideoConferenceHearingLabel(caseData)).thenReturn("defendant");
         when(templateFieldService.getAllocationSummary(caseData)).thenReturn("allocation text");
         when(templateFieldService.getHearingTimeLabel(caseData)).thenReturn("4 hours");
-        when(templateFieldService.getTrialBundleTypeText(caseData)).thenReturn("bundle text");
 
         LocationRefData location = new LocationRefData();
         location.setEpimmsId("123");
@@ -56,6 +55,7 @@ class SdoFastTrackTemplateServiceTest {
 
         SdoDocumentFormFast result = service.buildTemplate(caseData, "Judge Judy", true, "token");
 
+        assertThat(result.getCcdCaseReference()).isEqualTo("1594901956117591");
         assertThat(result.getJudgeName()).isEqualTo("Judge Judy");
         assertThat(result.isWrittenByJudge()).isTrue();
         assertThat(result.isFastTrackWelshLanguageToggle()).isTrue();

@@ -76,7 +76,7 @@ public class PostClaimantLipJbaLetterHandler extends CallbackHandler {
             List<String> recipients = List.of(caseData.getApplicant1().getPartyName());
             bulkPrintService.printLetter(
                 claimantDjLetterBinary, caseData.getLegacyCaseReference(),
-                caseData.getLegacyCaseReference(), JBA_LETTER_REF, recipients, bulkPrintFileNames
+                caseData.getCcdCaseReference().toString(), JBA_LETTER_REF, recipients, bulkPrintFileNames
             );
         }
 

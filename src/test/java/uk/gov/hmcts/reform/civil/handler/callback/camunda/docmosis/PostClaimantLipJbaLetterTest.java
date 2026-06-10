@@ -94,7 +94,7 @@ class PostClaimantLipJbaLetterTest {
         verify(bulkPrintService).printLetter(
             "PDF".getBytes(),
             "001MC001",
-            "001MC001",
+            "1",
             "claimant_jba_letter",
             List.of("Mr. John Rambo"),
             List.of("dj.pdf", "default_judgment_cover_letter.pdf")

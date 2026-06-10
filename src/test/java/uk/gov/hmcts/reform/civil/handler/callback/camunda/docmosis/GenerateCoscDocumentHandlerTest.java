@@ -140,6 +140,9 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData())
             .extracting("coSCApplicationStatus")
             .isEqualTo("PROCESSED");
+        assertThat(response.getData())
+            .extracting("joDefendantMarkedPaidInFullIssueDate")
+            .isNotNull();
         List<?> documentsList = (List<?>) response.getData().get("systemGeneratedCaseDocuments");
         assertThat(documentsList)
             .extracting("value")

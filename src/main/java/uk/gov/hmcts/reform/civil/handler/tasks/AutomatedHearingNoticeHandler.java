@@ -10,6 +10,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
@@ -32,6 +33,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
     private final HearingsService hearingsService;
     private final RuntimeService runtimeService;
     private final ObjectMapper mapper;
+    private final AsyncHandlerProperties asyncHandlerProperties;
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -41,8 +43,9 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         HearingNoticeSchedulerVars schedulerVars = mapper.convertValue(externalTask.getAllVariables(), HearingNoticeSchedulerVars.class);
         List<String> dispatchedHearingIds = getDispatchedHearingIds(schedulerVars);
         UnNotifiedHearingResponse unnotifiedHearings = getUnnotifiedHearings(schedulerVars.getServiceId());
-
         log.info("Found [{}] unnotified hearings, {}", unnotifiedHearings.getTotalFound(), unnotifiedHearings.getHearingIds());
+
+        long effectiveDelay = calculateEffectiveDelay(unnotifiedHearings.getTotalFound(), asyncHandlerProperties.getLockDuration(), asyncHandlerProperties.getEventDispatchDelay());
 
         unnotifiedHearings.getHearingIds()
             .stream()
@@ -50,6 +53,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
             .forEach(hearingId -> {
                 applicationEventPublisher.publishEvent(new HearingNoticeSchedulerTaskEvent(hearingId));
                 dispatchedHearingIds.add(hearingId);
+                throttle(effectiveDelay);
             });
 
         runtimeService.setVariables(
@@ -68,6 +72,8 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
 
+        log.info("Trying to complete external task '{}' with processInstanceId '{}'",
+                 topicName, processInstanceId);
         try {
             externalTaskService.complete(externalTask, getVariableMap(data));
 

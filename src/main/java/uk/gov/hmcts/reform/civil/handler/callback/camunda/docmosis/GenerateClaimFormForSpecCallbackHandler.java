@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
@@ -49,7 +48,6 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private final DeadlinesCalculator deadlinesCalculator;
     private final CivilStitchService civilStitchService;
     private final AssignCategoryId assignCategoryId;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -70,17 +68,18 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         Long caseId = caseData.getCcdCaseReference();
         log.info("Generating claim form for spec claim for caseId {}", caseId);
-        if (featureToggleService.isLipVLipEnabled() && caseData.isApplicantNotRepresented()) {
+        if (caseData.isApplicantNotRepresented()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
         }
 
         LocalDate issueDate = time.now().toLocalDate();
-        LocalDateTime respondent1RespDeadline = deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(issueDate);
-        log.info("Respondent1RespDeadline is {} for caseId {} in caseData", respondent1RespDeadline, caseId);
+        LocalDateTime respondentRespDeadline = deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(issueDate);
+        log.info("respondentRespDeadline is {} for caseId {} in caseData", respondentRespDeadline, caseId);
         caseData.setIssueDate(issueDate);
-        caseData.setRespondent1ResponseDeadline(respondent1RespDeadline);
-        caseData.setNextDeadline(respondent1RespDeadline.toLocalDate());
+        caseData.setRespondent1ResponseDeadline(respondentRespDeadline);
+        caseData.setRespondent2ResponseDeadline(respondentRespDeadline);
+        caseData.setNextDeadline(respondentRespDeadline.toLocalDate());
         caseData.setClaimDismissedDate(null);
         CaseDocument sealedClaim = sealedClaimFormGeneratorForSpec.generate(
             caseData,
