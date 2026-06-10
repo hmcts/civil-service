@@ -215,4 +215,55 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
 
         assertThat(templateData.getRespondent1LiPCorrespondenceAddress()).isEqualTo(correspondenceAddress);
     }
+
+    @Test
+    void shouldGenerateTemplateDataForFatTrack() {
+        //Given
+        FixedRecoverableCosts fixedRecoverableCosts = new FixedRecoverableCosts()
+            .setIsSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
+            .setComplexityBandingAgreed(YesOrNo.YES)
+            .setBand(ComplexityBand.BAND_1)
+            .setReasons("reasons");
+        given(caseData.getApplicant1()).willReturn(new Party()
+                                                       .setPartyName("app1")
+                                                       .setType(Party.Type.COMPANY));
+        given(caseData.getRespondent1()).willReturn(new Party()
+                                                        .setPartyName("res1")
+                                                        .setType(Party.Type.COMPANY));
+        given(caseData.getResponseClaimTrack()).willReturn(AllocatedTrack.FAST_CLAIM.name());
+        given(caseData.getRespondent1DQ()).willReturn(new Respondent1DQ()
+                                                          .setRespondent1DQFixedRecoverableCostsIntermediate(
+                                                              fixedRecoverableCosts)
+                                                          .setSpecRespondent1DQDisclosureOfElectronicDocuments(
+                                                              new DisclosureOfElectronicDocuments()
+                                                                  .setReachedAgreement(YesOrNo.YES)
+                                                          )
+                                                          .setSpecRespondent1DQDisclosureOfNonElectronicDocuments(
+                                                              new DisclosureOfNonElectronicDocuments()
+                                                                  .setBespokeDirections("directions")
+                                                          )
+                                                          .setRespondent1DQClaimantDocumentsToBeConsidered(
+                                                              new DocumentsToBeConsidered()
+                                                                  .setHasDocumentsToBeConsidered(YesOrNo.YES)
+                                                                  .setDetails("details")));
+        DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
+        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(any(CaseData.class), anyString()))
+            .thenReturn(form);
+        //When
+        DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, AUTH);
+
+        //Then
+        assertThat(templateData.getAllocatedTrack()).isEqualTo("FAST_CLAIM");
+        assertThat(templateData.getFixedRecoverableCosts()).isEqualTo(FixedRecoverableCostsSection.from(fixedRecoverableCosts));
+        assertThat(templateData.getDisclosureOfElectronicDocuments()).isEqualTo(new DisclosureOfElectronicDocuments()
+                                                                                    .setReachedAgreement(YesOrNo.YES));
+        assertThat(templateData.getDisclosureOfNonElectronicDocuments()).isEqualTo(new DisclosureOfNonElectronicDocuments()
+                                                                                       .setBespokeDirections("directions"));
+        assertThat(templateData.getDocumentsToBeConsidered()).isEqualTo(new DocumentsToBeConsideredSection(
+            YesOrNo.YES,
+            "details",
+            "Claimants documents to be considered",
+            "Are there any documents the claimants have that you want the court to consider?"
+        ));
+    }
 }
