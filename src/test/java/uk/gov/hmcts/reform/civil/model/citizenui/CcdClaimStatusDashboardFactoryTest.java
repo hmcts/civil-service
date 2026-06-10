@@ -124,6 +124,50 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
+    void given_defendantEligibleForCCJAndJudgmentBufferEnabled_whenGetStatus_thenReturnJudgmentBufferEligibleForCCJStatus() {
+        CaseData claim = CaseData.builder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .respondent1ResponseDeadline(LocalDate.now().minusDays(1).atTime(16, 0, 0))
+            .build();
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService, Collections.emptyList()));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.JUDGMENT_BUFFER_ELIGIBLE);
+    }
+
+    @Test
+    void given_claimantEligibleForCCJ_whenGetStatus_thenReturnExistingEligibleForCCJStatus() {
+        CaseData claim = CaseData.builder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .respondent1ResponseDeadline(LocalDate.now().minusDays(1).atTime(16, 0, 0))
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            claim, featureToggleService, Collections.emptyList()));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.ELIGIBLE_FOR_CCJ);
+    }
+
+    @Test
+    void given_defaultJudgmentDocumentExistsAndJudgmentBufferEnabled_whenGetStatus_thenReturnDefaultJudgmentIssuedStatus() {
+        CaseData claim = CaseData.builder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .respondent1ResponseDeadline(LocalDate.now().minusDays(1).atTime(16, 0, 0))
+            .defaultJudgmentDocuments(List.of(
+                new Element<CaseDocument>().setValue(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
+                                                         .setCreatedDatetime(LocalDateTime.now()))))
+            .build();
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService, Collections.emptyList()));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_ISSUED);
+    }
+
+    @Test
     void given_isEligibleForCCJ_whenGetStatus_thenReturnDefaultJudgementStatus() {
         CaseData claim = CaseData.builder()
             .ccdState(All_FINAL_ORDERS_ISSUED)
