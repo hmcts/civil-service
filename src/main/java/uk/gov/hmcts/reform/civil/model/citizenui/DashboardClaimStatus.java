@@ -228,6 +228,9 @@ public enum DashboardClaimStatus {
     CLAIMANT_ACCEPTED_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionAccepted
     ),
+    JUDGMENT_BUFFER_ELIGIBLE(
+        Claim::isJudgmentBufferEligible
+    ),
     ELIGIBLE_FOR_CCJ(
         Claim::isEligibleForCCJ
     ),

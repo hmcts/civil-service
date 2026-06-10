@@ -24,6 +24,8 @@ public interface Claim {
 
     boolean isEligibleForCCJ();
 
+    boolean isJudgmentBufferEligible();
+
     boolean claimantConfirmedDefendantPaid();
 
     boolean isSettled();
