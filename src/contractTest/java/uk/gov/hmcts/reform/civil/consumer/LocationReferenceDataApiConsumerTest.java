@@ -24,12 +24,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@PactTestFor(providerName = "referenceData_location_civil_service")
+@PactTestFor(providerName = "referenceData_location")
 @MockServerConfig(hostInterface = "localhost", port = "6669")
 public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/refdata/location/court-venues";
-    private static final String COURT_TYPE_ID = "12345";
+    private static final String COURT_TYPE_ID = "10";
+    private static final String LOCATION_TYPE = "Court";
 
     @Autowired
     private LocationReferenceDataApiClient locationReferenceDataApiClient;
@@ -47,7 +48,7 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
             SERVICE_AUTH_TOKEN,
             AUTHORIZATION_TOKEN,
             COURT_TYPE_ID,
-            "locationType"
+            LOCATION_TYPE
         );
         assertThat(
             response.get(0).getRegion(),
@@ -63,7 +64,7 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
             .matchQuery("court_type_id", "\\d+", COURT_TYPE_ID)
-            .matchQuery("location_type", "locationType", "locationType")
+            .matchQuery("location_type", ".+", LOCATION_TYPE)
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(buildLocationRefDataResponseBody())
