@@ -23,7 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@PactTestFor(providerName = "referenceData_location_civil_service")
+@PactTestFor(providerName = "referenceData_location")
 @MockServerConfig(hostInterface = "localhost", port = "6669")
 public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
 
@@ -32,7 +32,7 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
     private static final String CIVIL_COURT_TYPE_ID = "10";
     private static final String CIVIL_UN_SPEC_SERVICE_ID = "AAA7";
     private static final String SERVICE_ID_REGEX = "AAA6|AAA7";
-    private static final String LOCATION_TYPE = "locationType";
+    private static final String LOCATION_TYPE = "Court";
 
     @Autowired
     private LocationReferenceDataApiClient locationReferenceDataApiClient;
@@ -82,7 +82,7 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
             .path(ENDPOINT)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
-            .matchQuery("location_type", LOCATION_TYPE, LOCATION_TYPE)
+            .matchQuery("location_type", ".+", LOCATION_TYPE)
             .matchQuery("service_code", SERVICE_ID_REGEX, serviceId)
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)

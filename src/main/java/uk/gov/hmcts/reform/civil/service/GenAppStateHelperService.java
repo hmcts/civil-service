@@ -176,6 +176,7 @@ public class GenAppStateHelperService {
                                               RequiredState gaFlow) {
         if (gaDetails != null
                 && gaDetails.getCaseLink() != null
+                && gaDetails.getCaseState() != null
                 && isLive(gaDetails.getCaseState())) {
             long caseId = parseLong(gaDetails.getCaseLink().getCaseReference());
             return isGeneralApplicationCaseStatusUpdated(caseId, generalApplicationMap, gaFlow);
@@ -188,6 +189,7 @@ public class GenAppStateHelperService {
                                               RequiredState gaFlow) {
         if (gaDetailsRespondentSol != null
                 && gaDetailsRespondentSol.getCaseLink() != null
+                && gaDetailsRespondentSol.getCaseState() != null
                 && isLive(gaDetailsRespondentSol.getCaseState())) {
             long caseId = parseLong(gaDetailsRespondentSol.getCaseLink().getCaseReference());
             return isGeneralApplicationCaseStatusUpdated(caseId, generalApplicationMap, gaFlow);
