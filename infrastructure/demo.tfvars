@@ -16,4 +16,4 @@ monitor_scheduler_alerts = {
   }
 }
 
-job_not_run_threshold = 1
+job_not_run_threshold = 26
