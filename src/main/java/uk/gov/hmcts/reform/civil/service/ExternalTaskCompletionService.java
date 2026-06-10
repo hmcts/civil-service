@@ -27,10 +27,10 @@ public class ExternalTaskCompletionService {
         retryFor = CompleteTaskException.class,
         noRetryFor = NotRetryableException.class,
         notRecoverable = {NotRetryableException.class},
-        maxAttemptsExpression = "${external-task-completion.retry.max-attempts:3}",
+        maxAttemptsExpression = "${external-task-completion.retry.max-attempts:4}",
         backoff = @Backoff(
-            delayExpression = "${external-task-completion.retry.delay:60000}",
-            multiplierExpression = "${external-task-completion.retry.multiplier:15}"
+            delayExpression = "${external-task-completion.retry.delay:30000}",
+            multiplierExpression = "${external-task-completion.retry.multiplier:5}"
         )
     )
     public void completeTask(BaseExternalTaskHandler handler,
