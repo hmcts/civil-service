@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_GA_LANGUAGE_UPDATE;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.WELSH;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.DEFENDANT;
 
@@ -112,7 +113,7 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
             triggerGaEvent(callbackParams);
         }
 
-        if (ENGLISH.equals(preferredLanguage)) {
+        if (ENGLISH.equals(preferredLanguage) || WELSH.equals(preferredLanguage)) {
             return uploadTranslatedDocumentStrategyFactory.getUploadTranslatedDocumentStrategy(callbackParams.getVersion())
                 .uploadDocument(callbackParams);
         }

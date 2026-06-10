@@ -284,8 +284,13 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             caseData.setApplicant1Represented(NO);
             caseData.setGeneralApplications(wrapElements(new GeneralApplication()));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            stubUploadDocumentResponse();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
 
-            handler.handle(params);
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("WELSH");
+            assertThat(updatedCaseData.getClaimantLanguagePreferenceDisplay()).isEqualTo(WELSH);
 
             verify(helperService).triggerEvent(caseData, TRIGGER_GA_LANGUAGE_UPDATE);
         }

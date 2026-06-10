@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -60,14 +62,16 @@ class GeneratePipLetterHandlerTest {
         assertThat(events).containsExactlyInAnyOrder(CaseEvent.GENERATE_PIP_LETTER);
     }
 
-    @Test
-    void shouldGenerateAndPrintLetterSuccessfully() {
+    @ParameterizedTest
+    @ValueSource(strings = {"WELSH", "ENGLISH"})
+    void shouldGenerateAndPrintLetterSuccessfully(String language) {
         when(time.now()).thenReturn(LocalDateTime.now());
         when(pipLetterGenerator.downloadLetter(any(CaseData.class), any(String.class), anyList()))
                 .thenReturn(new byte[]{1, 2, 3, 4});
 
         CaseData caseData = CaseData.builder()
                 .legacyCaseReference("12345")
+                .claimantBilingualLanguagePreference(language)
                 .ccdCaseReference(12345L)
                 .respondent1(new Party().setPartyName("Test Respondent").setType(Party.Type.COMPANY))
                 .respondent1Represented(YesOrNo.NO)
