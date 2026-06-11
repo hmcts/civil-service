@@ -182,6 +182,30 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
+    void given_judgmentRequestedAndBufferEnabled_whenGetStatus_thenReturnDefaultJudgementRequested() {
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+        CaseData claim = CaseData.builder()
+            .ccdState(CaseState.JUDGMENT_REQUESTED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            claim, featureToggleService, Collections.emptyList()));
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_REQUESTED);
+    }
+
+    @Test
+    void given_judgmentRequestedAndBufferDisabled_whenGetStatus_thenReturnNoStatus() {
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(false);
+        CaseData claim = CaseData.builder()
+            .ccdState(CaseState.JUDGMENT_REQUESTED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            claim, featureToggleService, Collections.emptyList()));
+        assertThat(status).isEqualTo(DashboardClaimStatus.NO_STATUS);
+    }
+
+    @Test
     void given_hasResponseDueToday_whenGetStatus_thenReturnResponseDueNow() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDeadline(LocalDate.now().atTime(10, 0, 0))
