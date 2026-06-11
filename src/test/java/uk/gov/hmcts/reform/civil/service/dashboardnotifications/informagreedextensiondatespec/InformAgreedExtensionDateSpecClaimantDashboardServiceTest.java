@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_JR_CANCELLED_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 class InformAgreedExtensionDateSpecClaimantDashboardServiceTest {
@@ -30,12 +32,18 @@ class InformAgreedExtensionDateSpecClaimantDashboardServiceTest {
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private InformAgreedExtensionDateSpecClaimantDashboardService service;
 
     @BeforeEach
     void setUp() {
-        service = new InformAgreedExtensionDateSpecClaimantDashboardService(dashboardScenariosService, mapper);
+        service = new InformAgreedExtensionDateSpecClaimantDashboardService(
+            dashboardScenariosService,
+            mapper,
+            featureToggleService
+        );
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
     }
 
@@ -45,6 +53,46 @@ class InformAgreedExtensionDateSpecClaimantDashboardServiceTest {
             .ccdCaseReference(1234L)
             .applicant1Represented(YesOrNo.NO)
             .build();
+
+        service.notifyInformAgreedExtensionDateSpec(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldRecordJudgmentRequestedCancelledScenarioWhenJoRequested() {
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+        caseData.setIsJoRequested(YesOrNo.YES);
+
+        service.notifyInformAgreedExtensionDateSpec(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_JR_CANCELLED_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldNotRecordJudgmentRequestedCancelledScenarioWhenJoNotRequested() {
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+        caseData.setIsJoRequested(YesOrNo.NO);
 
         service.notifyInformAgreedExtensionDateSpec(caseData, AUTH_TOKEN);
 
