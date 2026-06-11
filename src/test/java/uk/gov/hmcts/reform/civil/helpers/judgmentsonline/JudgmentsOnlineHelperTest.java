@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
@@ -36,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineH
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getMoneyValue;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getPartialPayment;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isDefaultJudgmentRequested;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isNonDivergentForDJ;
 
 public class JudgmentsOnlineHelperTest {
@@ -87,6 +89,25 @@ public class JudgmentsOnlineHelperTest {
             .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("John Smith")))
             .build();
         assertThat(isNonDivergentForDJ(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldIdentifyDefaultJudgmentRequestedState() {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.JUDGMENT_REQUESTED)
+            .build();
+
+        assertThat(isDefaultJudgmentRequested(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseWhenDefaultJudgmentNotRequested() {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .build();
+
+        assertThat(isDefaultJudgmentRequested(caseData)).isFalse();
+        assertThat(isDefaultJudgmentRequested(null)).isFalse();
     }
 
     @Test
