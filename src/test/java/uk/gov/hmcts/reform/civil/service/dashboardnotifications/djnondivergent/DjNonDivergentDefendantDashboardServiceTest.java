@@ -1,21 +1,25 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.djnondivergent;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT;
@@ -29,17 +33,16 @@ class DjNonDivergentDefendantDashboardServiceTest {
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private FeatureToggleService toggleService;
 
     @InjectMocks
     private DjNonDivergentDefendantDashboardService service;
 
-    @BeforeEach
-    void setup() {
-        when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
-    }
-
     @Test
     void shouldRecordScenarioWhenDefendantIsLip() {
+        when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
+
         CaseData caseData = new CaseDataBuilder()
             .atStateClaimIssued()
             .respondent1Represented(YesOrNo.NO)
@@ -53,5 +56,27 @@ class DjNonDivergentDefendantDashboardServiceTest {
             "1594901956117591",
             new ScenarioRequestParams(new HashMap<>())
         );
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenBufferEnabledAndCaseInJudgmentRequestedState() {
+        when(toggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.isRespondent1LiP()).thenReturn(true);
+        when(caseData.getCcdState()).thenReturn(CaseState.JUDGMENT_REQUESTED);
+
+        assertFalse(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenarioWhenBufferDisabledAndCaseInJudgmentRequestedState() {
+        when(toggleService.isJudgmentBufferEnabled()).thenReturn(false);
+
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.isRespondent1LiP()).thenReturn(true);
+        when(caseData.getCcdState()).thenReturn(CaseState.JUDGMENT_REQUESTED);
+
+        assertTrue(service.shouldRecordScenario(caseData));
     }
 }

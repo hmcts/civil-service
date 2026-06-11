@@ -46,3 +46,37 @@ variable "ccd_service_bus_filter_rule" {
   default     = "jurisdiction_id IN ('CIVIL','civil')"
   description = "SQL filter rule for CCD Events Service Bus Subscription"
 }
+
+#================================================================================================
+# Monitor Variables
+#================================================================================================
+variable "monitor_action_group" {
+  type = map(object({
+    short_name = optional(string)
+  }))
+  default     = {}
+  description = "Map of monitor action groups to create"
+}
+
+variable "monitor_scheduler_alerts" {
+  type = map(object({
+    frequency_in_minutes   = optional(number)
+    time_window_in_minutes = optional(number)
+    enabled                = optional(bool)
+    action_group           = string
+  }))
+  default     = {}
+  description = "Map of scheduler alerts to create, with action_group mapping"
+}
+
+variable "civil_service_alert_slack_email_secret_name" {
+  type        = string
+  description = "The name of the Key Vault secret containing the slack email group"
+  default     = null
+}
+
+variable "job_not_run_threshold" {
+  type        = number
+  description = "The threshold in hours for the scheduler job not run alert"
+  default     = 26
+}
