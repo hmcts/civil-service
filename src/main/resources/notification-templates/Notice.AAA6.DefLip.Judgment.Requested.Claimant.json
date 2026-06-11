@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.DefLip.Judgment.Requested.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "The CCJ has been requested",
+  "titleCy": "Mae’r CCJ wedi cael ei geisio",
+  "descriptionEn": "<p class=\"govuk-body\">A judgment against the defendant has been requested. \nYou will be notified when this judgment is granted.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae cais am ddyfarniad yn erbyn y diffynnydd wedi’i wneud. Byddwch yn cael gwybod pan roddir y dyfarniad hwn.</p>"
+}
