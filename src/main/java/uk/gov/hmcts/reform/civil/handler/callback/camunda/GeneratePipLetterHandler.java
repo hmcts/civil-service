@@ -96,6 +96,6 @@ public class GeneratePipLetterHandler extends CallbackHandler {
     }
 
     private boolean isBilingualForLipvsLip(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && (caseData.isClaimantBilingual() || caseData.isClaimantWelsh());
+        return caseData.isLipvLipOneVOne() && caseData.isClaimantBilingual();
     }
 }

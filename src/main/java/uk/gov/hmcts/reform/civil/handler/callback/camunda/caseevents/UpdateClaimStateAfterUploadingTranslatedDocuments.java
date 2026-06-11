@@ -42,15 +42,11 @@ public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackH
 
         caseData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
         caseData.setPreviousCCDState(caseData.getCcdState());
-        String changeToState = isBilingualForLipVsLip(caseData) ? setClaimState(caseData) : caseData.getCcdState().name();
+        String changeToState = setClaimState(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .state(changeToState)
             .build();
-    }
-
-    private boolean isBilingualForLipVsLip(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && (caseData.isClaimantBilingual() || caseData.isClaimantWelsh());
     }
 
     private String setClaimState(CaseData caseData) {

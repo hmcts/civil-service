@@ -594,12 +594,6 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     }
 
     @JsonIgnore
-    public boolean isClaimantWelsh() {
-        return null != claimantBilingualLanguagePreference
-            && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.WELSH.toString());
-    }
-
-    @JsonIgnore
     public boolean isFullDefenceNotPaid() {
         return NO.equals(getApplicant1FullDefenceConfirmAmountPaidSpec());
     }
