@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_REQUESTED_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -202,8 +203,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
 
         caseData.setDefendantDetailsSpec(DynamicList.fromList(listData,
-                                                                  null,
-                                                                  this::getPartNameForLabel, respondent1Name, false
+                                                              null,
+                                                              this::getPartNameForLabel, respondent1Name, false
         ));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -520,9 +521,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                 activeJudgment,
                 true
             ));
-            caseData.setJoDJCreatedDate(time.now());
         }
 
+        caseData.setJoDJCreatedDate(time.now());
         caseData.setTotalInterest(interestCalculator.calculateInterest(caseData));
         caseData.setClaimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
             DEFAULT_JUDGEMENT_SPEC_DEADLINE_EXTENSION_MONTHS,
@@ -532,10 +533,13 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         boolean isNonDivergentForDJ = JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
 
-        if (isNonDivergentForDJ && isJudgementBufferEnabledForCase(caseData)) {
+        if (isNonDivergentForDJ
+            && isJudgementBufferEnabledForCase(caseData)) {
             nextState = CaseState.JUDGMENT_REQUESTED.name();
             caseData.setIsJoRequested(YesOrNo.YES);
-        } else if (isNonDivergentForDJ && featureToggleService.isJudgmentOnlineLive()) {
+            caseData.setBusinessProcess(BusinessProcess.ready(JUDGMENT_REQUESTED_SPEC));
+        } else if (isNonDivergentForDJ
+            && featureToggleService.isJudgmentOnlineLive()) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else {
@@ -572,6 +576,4 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             this.overallTotal = overallTotal;
         }
     }
-
 }
-

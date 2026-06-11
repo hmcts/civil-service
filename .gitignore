@@ -49,3 +49,4 @@ infrastructure/override.tf
 /pacts/
 dashboard-notifications/bin
 .vscode
+.env.local
