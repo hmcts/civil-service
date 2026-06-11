@@ -140,6 +140,8 @@ public interface Claim {
 
     boolean isDefaultJudgementIssued();
 
+    boolean isDefaultJudgementRequested();
+
     boolean decisionMadeDocumentsAreInTranslation();
 
     default boolean isCaseDismissed() {

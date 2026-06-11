@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
@@ -330,5 +331,10 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && caseData.getPreTranslationDocuments().stream().anyMatch(
                 element -> element.getValue().getDocumentType() == DocumentType.HEARING_FORM
         );
+    }
+
+    public boolean isDefaultJudgementRequested() {
+        return featureToggleService.isJudgmentBufferEnabled()
+            && JudgmentsOnlineHelper.isDefaultJudgmentRequested(caseData);
     }
 }
