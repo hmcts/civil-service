@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.dq.Language.BOTH;
 
 @ExtendWith(MockitoExtension.class)
 class DjNonDivergentApplicantLipEmailDTOGeneratorTest {
@@ -21,10 +22,21 @@ class DjNonDivergentApplicantLipEmailDTOGeneratorTest {
     private DjNonDivergentApplicantLipEmailDTOGenerator emailDTOGenerator;
 
     @Test
-    void shouldReturnCorrectEmailTemplateId() {
+    void shouldReturnCorrectEmailTemplateIdWhenBilingual() {
+        CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference(BOTH.toString()).build();
+        String expectedTemplateId = "notify-lip-update-template-bilingual";
+        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(expectedTemplateId);
+
+        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
+
+        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+    }
+
+    @Test
+    void shouldReturnCorrectEmailTemplateIdWhenNotBilingual() {
         CaseData caseData = CaseData.builder().build();
-        String expectedTemplateId = "notify-update-template";
-        when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(expectedTemplateId);
+        String expectedTemplateId = "notify-lip-update-template";
+        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
