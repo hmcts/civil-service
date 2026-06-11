@@ -23,7 +23,9 @@ public class DjNonDivergentDefendant1LipEmailDTOGenerator extends DefendantEmail
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyUpdateTemplate();
+        return caseData.isRespondentResponseBilingual()
+            ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
+            : notificationsProperties.getNotifyLipUpdateTemplate();
     }
 
     @Override
