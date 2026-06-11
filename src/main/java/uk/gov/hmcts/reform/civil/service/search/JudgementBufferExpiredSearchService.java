@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.search;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
@@ -23,9 +24,10 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 @RequiredArgsConstructor
 public class JudgementBufferExpiredSearchService {
 
-    public static final int PAGE_SIZE = 50;
-
     private final ElasticSearchPaginatedStreamProvider elasticSearchPaginatedStreamProvider;
+
+    @Value("${search.judgementBuffer.pageSize:50}")
+    private int pageSize;
 
     public ElasticSearchResult getSearchResults() {
         String timeNow = ZonedDateTime.now(ZoneOffset.UTC).toString();
@@ -44,7 +46,7 @@ public class JudgementBufferExpiredSearchService {
             0,
             searchAfterValue == null,
             searchAfterValue,
-            PAGE_SIZE
+            pageSize
         );
     }
 

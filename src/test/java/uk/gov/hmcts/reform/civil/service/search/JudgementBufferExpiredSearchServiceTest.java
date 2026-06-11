@@ -39,6 +39,7 @@ class JudgementBufferExpiredSearchServiceTest {
     void setup() {
         elasticSearchPaginatedStreamProvider = new ElasticSearchPaginatedStreamProvider(coreCaseDataService);
         searchService = new JudgementBufferExpiredSearchService(elasticSearchPaginatedStreamProvider);
+        org.springframework.test.util.ReflectionTestUtils.setField(searchService, "pageSize", 50);
     }
 
     @Test

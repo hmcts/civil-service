@@ -27,12 +27,12 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.service.search.JudgementBufferExpiredSearchService.PAGE_SIZE;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=JudgementBufferSchedulerITest",
-    "scheduler.judgementBuffer.enabled=true"
+    "scheduler.judgementBuffer.enabled=true",
+    "search.judgementbuffer.pageSize=50"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JudgementBufferSchedulerITest {
@@ -84,7 +84,7 @@ public class JudgementBufferSchedulerITest {
     void shouldExecuteJudgementBufferSchedulerWithPagination() {
         // Given
         // Create 50 cases for the first page to test pagination
-        List<CaseDetails> page1Cases = createCaseDetailsBatch(PAGE_SIZE);
+        List<CaseDetails> page1Cases = createCaseDetailsBatch(50);
         CaseDetails case51 = CaseDetailsBuilder.builder().id(51L).data(Map.of()).build();
 
         SearchResult page1 = SearchResult.builder().total(51).cases(page1Cases).build();
