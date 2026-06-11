@@ -17,10 +17,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +42,6 @@ class GeneratePipLetterHandlerTest {
     @Mock
     private BulkPrintService bulkPrintService;
 
-    @Mock
-    private Time time;
-
     @InjectMocks
     private GeneratePipLetterHandler generatePipLetter;
 
@@ -65,7 +60,6 @@ class GeneratePipLetterHandlerTest {
 
     @Test
     void shouldGenerateAndPrintLetterSuccessfully() {
-        when(time.now()).thenReturn(LocalDateTime.now());
         when(pipLetterGenerator.downloadLetter(any(CaseData.class), any(String.class), anyList()))
                 .thenReturn(new byte[]{1, 2, 3, 4});
 
@@ -97,7 +91,6 @@ class GeneratePipLetterHandlerTest {
     @ParameterizedTest
     @ValueSource(strings = {"WELSH", "ENGLISH", "BOTH"})
     void shouldGenerateAndPrintLetterSuccessfullyWhenBothPartiesAreLip(String language) {
-        when(time.now()).thenReturn(LocalDateTime.now());
         when(pipLetterGenerator.downloadLetter(any(CaseData.class), any(String.class), anyList()))
             .thenReturn(new byte[]{1, 2, 3, 4});
 

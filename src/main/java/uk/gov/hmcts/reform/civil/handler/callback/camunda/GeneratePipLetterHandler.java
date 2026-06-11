@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
 import java.time.LocalDateTime;
@@ -37,7 +36,6 @@ public class GeneratePipLetterHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final PiPLetterGenerator pipLetterGenerator;
     private final BulkPrintService bulkPrintService;
-    private final Time time;
     private static final List<CaseEvent> EVENTS = List.of(GENERATE_PIP_LETTER);
 
     @Override
@@ -59,9 +57,8 @@ public class GeneratePipLetterHandler extends CallbackHandler {
 
     private CallbackResponse generatePipLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime claimNotificationDate = time.now();
         final CaseData.CaseDataBuilder<?, ?> caseDataBuilder =
-                caseData.toBuilder().claimNotificationDate(claimNotificationDate);
+                caseData.toBuilder().claimNotificationDate(LocalDateTime.now());
 
         if (caseData.isRespondent1LiP()) {
             generateAndPrintPipLetter(callbackParams);

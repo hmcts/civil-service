@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -31,16 +32,24 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AF
 @ExtendWith(MockitoExtension.class)
 public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
     private UpdateClaimStateAfterUploadingTranslatedDocuments handler;
-    @Mock
-    private ObjectMapper objectMapper;
     @Mock
     private UpdateClaimStateService updateClaimStateService;
     @Mock
     private ToggleConfiguration toggleConfiguration;
 
     public static final String TASK_ID = "updateClaimStateAfterTranslateDocumentUploadedID";
+
+    @BeforeEach
+    void setUp() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        handler = new UpdateClaimStateAfterUploadingTranslatedDocuments(
+            objectMapper,
+            updateClaimStateService,
+            toggleConfiguration
+        );
+    }
 
     @Test
     void shouldReturnCorrectActivityId_whenRequested() {
@@ -54,6 +63,7 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
     void shouldRunAboutToSubmitSuccessfully() {
         // given
         CaseData caseData = lipVLipBilingualCaseData(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+        when(toggleConfiguration.getFeatureToggle()).thenReturn("WA 4");
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -63,6 +73,9 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
         // then
         assertThat(response.getErrors()).isNull();
         assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
+        assertThat(response.getData())
+            .extracting("featureToggleWA", "previousCCDState")
+            .containsExactly("WA 4", CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
     }
 
     @Test
@@ -85,6 +98,56 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
     }
 
     @Test
+    void shouldNotUpdateClaimState_WhenCaseIsNotLipVLip() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+            .claimantBilingualLanguagePreference(Language.BOTH.name())
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.NO)
+            .build()
+            .toBuilder()
+            .ccdState(CaseState.CASE_ISSUED)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getState()).isNull();
+        assertThat(response.getData())
+            .extracting("previousCCDState")
+            .isEqualTo(CaseState.CASE_ISSUED.name());
+        verifyNoInteractions(updateClaimStateService);
+    }
+
+    @Test
+    void shouldNotUpdateClaimState_WhenClaimantLanguagePreferenceIsNotBoth() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+            .claimantBilingualLanguagePreference(Language.ENGLISH.name())
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build()
+            .toBuilder()
+            .ccdState(CaseState.CASE_ISSUED)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getState()).isNull();
+        assertThat(response.getData())
+            .extracting("previousCCDState")
+            .isEqualTo(CaseState.CASE_ISSUED.name());
+        verifyNoInteractions(updateClaimStateService);
+    }
+
+    @Test
     void shouldUpdateClaimState_WhenAwaitingApplicantIntentionClaimState() {
         // given
         CaseData caseData = lipVLipBilingualCaseData(CaseState.AWAITING_APPLICANT_INTENTION);
@@ -97,6 +160,21 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
         assertThat(response.getErrors()).isNull();
         assertThat(response.getState()).isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
         verify(updateClaimStateService, times(1)).setUpCaseState(caseData);
+    }
+
+    @Test
+    void shouldKeepCurrentClaimState_WhenNoTranslatedDocumentStateTransitionApplies() {
+        // given
+        CaseData caseData = lipVLipBilingualCaseData(CaseState.JUDICIAL_REFERRAL);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getState()).isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
+        verifyNoInteractions(updateClaimStateService);
     }
 
     @Test
