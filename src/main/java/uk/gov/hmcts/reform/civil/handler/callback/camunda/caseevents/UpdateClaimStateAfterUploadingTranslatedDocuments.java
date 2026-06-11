@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
@@ -42,11 +43,21 @@ public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackH
 
         caseData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
         caseData.setPreviousCCDState(caseData.getCcdState());
+        if (!isLipvLipWithClaimantLanguageBoth(caseData)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
         String changeToState = setClaimState(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .state(changeToState)
             .build();
+    }
+
+    private boolean isLipvLipWithClaimantLanguageBoth(CaseData caseData) {
+        return caseData.isLipvLipOneVOne()
+            && Language.BOTH.name().equalsIgnoreCase(caseData.getClaimantBilingualLanguagePreference());
     }
 
     private String setClaimState(CaseData caseData) {

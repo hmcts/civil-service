@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -52,7 +53,7 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
     @Test
     void shouldRunAboutToSubmitSuccessfully() {
         // given
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v1BilingualFlagSet().build();
+        CaseData caseData = lipVLipBilingualCaseData(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -73,8 +74,7 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
     @Test
     void shouldUpdateClaimState_WhenClaimStateIsClaimIssued() {
         // given
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCcdState(CaseState.CASE_ISSUED);
+        CaseData caseData = lipVLipBilingualCaseData(CaseState.CASE_ISSUED);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // when
         var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
@@ -87,8 +87,7 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
     @Test
     void shouldUpdateClaimState_WhenAwaitingApplicantIntentionClaimState() {
         // given
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        CaseData caseData = lipVLipBilingualCaseData(CaseState.AWAITING_APPLICANT_INTENTION);
         when(updateClaimStateService.setUpCaseState(caseData)).thenReturn(JUDICIAL_REFERRAL.name());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // when
@@ -103,8 +102,7 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
     @Test
     void shouldNotUpdateClaimState_WhenClaimantSignedSettlementAgreement() {
         // given
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        CaseData caseData = lipVLipBilingualCaseData(CaseState.AWAITING_APPLICANT_INTENTION);
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
         CaseDataLiP caseDataLiP = new CaseDataLiP();
@@ -118,5 +116,16 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
         assertThat(response.getErrors()).isNull();
         assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
         verifyNoInteractions(updateClaimStateService);
+    }
+
+    private CaseData lipVLipBilingualCaseData(CaseState ccdState) {
+        return CaseDataBuilder.builder()
+            .claimantBilingualLanguagePreference(Language.BOTH.name())
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build()
+            .toBuilder()
+            .ccdState(ccdState)
+            .build();
     }
 }

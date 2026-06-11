@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -89,13 +90,14 @@ public class GeneratePipLetterHandler extends CallbackHandler {
     }
 
     private String setClaimState(CaseData caseData) {
-        if (!isBilingualForLipvsLip(caseData)) {
-            return CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
+        if (isLipvLipWithClaimantLanguageBoth(caseData)) {
+            return caseData.getCcdState().name();
         }
-        return caseData.getCcdState().name();
+        return CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
     }
 
-    private boolean isBilingualForLipvsLip(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && caseData.isClaimantBilingual();
+    private boolean isLipvLipWithClaimantLanguageBoth(CaseData caseData) {
+        return caseData.isLipvLipOneVOne()
+            && Language.BOTH.name().equalsIgnoreCase(caseData.getClaimantBilingualLanguagePreference());
     }
 }
