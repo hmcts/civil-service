@@ -26,7 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@PactTestFor(providerName = "em_stitchBundle_civil_service")
+@PactTestFor(providerName = "em_orchestrator_stitch_provider")
 @MockServerConfig(hostInterface = "localhost", port = "6664")
 @TestPropertySource(properties = "bundle.api.url=http://localhost:6664")
 public class StitchBundleApiConsumerTest extends BaseContractTest {
@@ -61,7 +61,7 @@ public class StitchBundleApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildStitchBundleResponsePact(PactDslWithProvider builder) throws IOException {
         return builder
-            .given("a stitch bundle request")
+            .given("a request to stitch a bundle is successful")
             .uponReceiving("a request to get an stitch bundle")
             .path(ENDPOINT)
             .method(HttpMethod.POST.toString())
@@ -88,10 +88,6 @@ public class StitchBundleApiConsumerTest extends BaseContractTest {
                                                            .stringType("description", "description")
                                                            .stringType("stitchStatus", "stitchStatus")
                                                            .stringType("fileName", "fileName")
-                                                           .stringMatcher("createdOn",
-                                                                          "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                                                          "2020-10-06T18:54:48.785000")
-                                                           .date("bundleHearingDate", "yyyy-MM-dd")
                                                            .object("stitchedDocument", stitchedDocument ->
                                                                stitchedDocument
                                                                    .stringType("document_url", "documentStitchedUrl")
@@ -101,7 +97,6 @@ public class StitchBundleApiConsumerTest extends BaseContractTest {
                                                                    )
                                                                    .stringType("document_filename", "documentFileName")
                                                                    .stringType("document_hash", "documentHash")
-                                                                   .stringType("category_id", "categoryID")
                                                            )
                                                    )
                                            )

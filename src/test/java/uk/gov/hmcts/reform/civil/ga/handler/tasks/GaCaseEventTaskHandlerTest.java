@@ -40,6 +40,7 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -76,6 +77,8 @@ class GaCaseEventTaskHandlerTest {
     @BeforeEach
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
+        lenient().when(mockTask.getActivityId()).thenReturn("activityId");
+        lenient().when(mockTask.getProcessInstanceId()).thenReturn("processInstanceId");
     }
 
     @Nested
@@ -179,6 +182,44 @@ class GaCaseEventTaskHandlerTest {
                 eq(2),
                 eq(300000L)
             );
+        }
+
+        @Test
+        void shouldNotSubmitUpdate_whenEventAlreadyProcessed() {
+            GaStateFlow stateFlow = mock(GaStateFlow.class);
+            State state = mock(State.class);
+            when(state.getName()).thenReturn("MAIN.DRAFT");
+            when(stateFlow.getState()).thenReturn(state);
+            when(stateFlow.getFlags()).thenReturn(Map.of());
+            when(gaStateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(stateFlow);
+
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.STARTED)
+                                     .setProcessInstanceId("processInstanceId")
+                                     .setActivityId("activityId"))
+                .build();
+            GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.STARTED)
+                                     .setProcessInstanceId("processInstanceId")
+                                     .setActivityId("activityId"))
+                .build();
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any(CaseDetails.class))).thenReturn(gaCaseData);
+            when(coreCaseDataService.startUpdate(CASE_ID, INITIATE_GENERAL_APPLICATION))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(BaseExternalTaskHandler.FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
+            verify(coreCaseDataService).startUpdate(CASE_ID, INITIATE_GENERAL_APPLICATION);
+            verify(coreCaseDataService, never()).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(mockTask, variables);
         }
     }
 }

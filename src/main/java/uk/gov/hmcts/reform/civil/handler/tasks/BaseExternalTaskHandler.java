@@ -117,7 +117,6 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      */
     void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
         int maxRetries = getMaxAttempts();
-        log.info("maxRetries {}", maxRetries);
         int remainingRetries = externalTask.getRetries() == null ? maxRetries : externalTask.getRetries();
         log.info(
             "Handle failure externalTask.getRetries() is null ?? '{}' processInstanceId: '{}' " +
@@ -128,7 +127,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
             externalTask.getRetries(),
             maxRetries
         );
-        log.error("Error occured {} remainingRetries {}", e.getMessage(), remainingRetries, e);
+
         externalTaskService.handleFailure(
             externalTask,
             e.getMessage(),
