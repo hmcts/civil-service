@@ -138,11 +138,6 @@ class PaymentStatusRetryServiceTest {
     @Test
     void shouldSkipCreateClaimAfterPayment_whenCaseAlreadyIssuedUsingCardPaymentResponse() {
         CaseDetails caseDetails = mock(CaseDetails.class);
-        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
-            .setStatus("success")
-            .setPaymentReference("ref")
-            .setErrorCode("err")
-            .setErrorDescription("desc");
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
@@ -152,6 +147,12 @@ class PaymentStatusRetryServiceTest {
         when(caseData.isLipvLROneVOne()).thenReturn(false);
         when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.UNSPEC_CLAIM);
         when(caseData.getCcdState()).thenReturn(CASE_ISSUED);
+
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setStatus("success")
+            .setPaymentReference("ref")
+            .setErrorCode("err")
+            .setErrorDescription("desc");
 
         service.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), response);
 
