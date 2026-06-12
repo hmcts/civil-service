@@ -228,4 +228,9 @@ public class CmcClaimTest {
         //Then
         assertThat(signed).isTrue();
     }
+
+    @Test
+    void shouldReturnFalseForDefaultJudgementRequested() {
+        assertThat(new CmcClaim().isDefaultJudgementRequested()).isFalse();
+    }
 }
