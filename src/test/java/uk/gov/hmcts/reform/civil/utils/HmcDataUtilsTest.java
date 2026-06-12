@@ -119,7 +119,53 @@ class HmcDataUtilsTest {
     }
 
     @Test
-    void hearingDataChanged_WhenHearingDataChanged_ReturnsTrue() {
+    void isAlreadyNotifiedResponse_WhenSameVersionAndSameOrNewerResponseDate_ReturnsTrue() {
+        LocalDateTime responseDateTime = LocalDateTime.now();
+        PartiesNotifiedResponse partiesNotified = new PartiesNotifiedResponse()
+            .setRequestVersion(1)
+            .setResponseReceivedDateTime(responseDateTime);
+
+        assertTrue(HmcDataUtils.isAlreadyNotifiedResponse(partiesNotified, 1, responseDateTime));
+    }
+
+    @Test
+    void isAlreadyNotifiedResponse_WhenNotifiedResponseIsOlder_ReturnsFalse() {
+        LocalDateTime responseDateTime = LocalDateTime.now();
+        PartiesNotifiedResponse partiesNotified = new PartiesNotifiedResponse()
+            .setRequestVersion(1)
+            .setResponseReceivedDateTime(responseDateTime.minusDays(1));
+
+        assertFalse(HmcDataUtils.isAlreadyNotifiedResponse(partiesNotified, 1, responseDateTime));
+    }
+
+    @Test
+    void isAlreadyNotifiedResponse_WhenRequestVersionDoesNotMatch_ReturnsFalse() {
+        LocalDateTime responseDateTime = LocalDateTime.now();
+        PartiesNotifiedResponse partiesNotified = new PartiesNotifiedResponse()
+            .setRequestVersion(1)
+            .setResponseReceivedDateTime(responseDateTime);
+
+        assertFalse(HmcDataUtils.isAlreadyNotifiedResponse(partiesNotified, 2, responseDateTime));
+    }
+
+    @Test
+    void hasAlreadyNotifiedResponse_WhenMatchingResponseExists_ReturnsTrue() {
+        LocalDateTime responseDateTime = LocalDateTime.now();
+        PartiesNotifiedResponses partiesNotified = new PartiesNotifiedResponses()
+            .setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setRequestVersion(1)
+                    .setResponseReceivedDateTime(responseDateTime.minusDays(1)),
+                new PartiesNotifiedResponse()
+                    .setRequestVersion(2)
+                    .setResponseReceivedDateTime(responseDateTime)
+            ));
+
+        assertTrue(HmcDataUtils.hasAlreadyNotifiedResponse(partiesNotified, 2, responseDateTime));
+    }
+
+    @Test
+    void requiresNewHearingNotice_WhenHearingScheduleChanged_ReturnsTrue() {
         HearingGetResponse hearing = new HearingGetResponse()
             .setHearingResponse(
                 new HearingResponse().setHearingDaySchedule(
@@ -144,13 +190,13 @@ class HmcDataUtilsTest {
                                      .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))))
                              .setHearingLocation("Venue A"));
 
-        boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
+        boolean result = HmcDataUtils.requiresNewHearingNotice(partiesNotified, hearing);
 
         assertTrue(result);
     }
 
     @Test
-    void hearingDataChanged_WhenHearingDataChanged_ReturnsTrueExtraDay() {
+    void requiresNewHearingNotice_WhenHearingHasExtraDay_ReturnsTrue() {
         HearingGetResponse hearing = new HearingGetResponse()
             .setHearingResponse(
                 new HearingResponse().setHearingDaySchedule(
@@ -170,13 +216,13 @@ class HmcDataUtilsTest {
                                                .setHearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))))
                              .setHearingLocation("Venue A"));
 
-        boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
+        boolean result = HmcDataUtils.requiresNewHearingNotice(partiesNotified, hearing);
 
         assertTrue(result);
     }
 
     @Test
-    void hearingDataChanged_WhenHearingDataNotChanged_ReturnsFalse() {
+    void requiresNewHearingNotice_WhenHearingScheduleHasNotChanged_ReturnsFalse() {
         HearingGetResponse hearing = new HearingGetResponse()
             .setHearingResponse(
                 new HearingResponse().setHearingDaySchedule(
@@ -193,32 +239,32 @@ class HmcDataUtilsTest {
                                                .setHearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))))
                              .setHearingLocation("Venue A"));
 
-        boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
+        boolean result = HmcDataUtils.requiresNewHearingNotice(partiesNotified, hearing);
 
         assertFalse(result);
     }
 
     @Test
-    void hearingDataChanged_WhenPartiesNotifiedIsNull_ReturnsTrue() {
+    void requiresNewHearingNotice_WhenPartiesNotifiedIsNull_ReturnsTrue() {
         HearingGetResponse hearing = new HearingGetResponse();
 
-        boolean result = HmcDataUtils.hearingDataChanged(null, hearing);
+        boolean result = HmcDataUtils.requiresNewHearingNotice(null, hearing);
 
         assertTrue(result);
     }
 
     @Test
-    void hearingDataChanged_WhenPartiesNotifiedServiceDataIsNull_ReturnsTrue() {
+    void requiresNewHearingNotice_WhenPartiesNotifiedServiceDataIsNull_ReturnsTrue() {
         HearingGetResponse hearing = new HearingGetResponse();
         PartiesNotifiedResponse partiesNotified = new PartiesNotifiedResponse();
 
-        boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
+        boolean result = HmcDataUtils.requiresNewHearingNotice(partiesNotified, hearing);
 
         assertTrue(result);
     }
 
     @Test
-    void hearingDataChanged_WhenHearingLocationIsNull_ReturnsTrue() {
+    void requiresNewHearingNotice_WhenHearingLocationIsNull_ReturnsTrue() {
         HearingGetResponse hearing = new HearingGetResponse()
             .setHearingResponse(new uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse()
                                  .setHearingDaySchedule(List.of(new uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule()
@@ -232,7 +278,7 @@ class HmcDataUtilsTest {
                                                .setHearingEndDateTime(LocalDateTime.now().plusHours(1))))
                              .setHearingLocation(null)); // NULL location
 
-        boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
+        boolean result = HmcDataUtils.requiresNewHearingNotice(partiesNotified, hearing);
 
         assertTrue(result);
     }

@@ -88,31 +88,30 @@ public class HearingNoticeSchedulerEventHandler {
         PartiesNotifiedServiceData notifiedServiceData = (notifiedResponse != null && notifiedResponse.getServiceData() != null)
             ? notifiedResponse.getServiceData() : new PartiesNotifiedServiceData();
 
-        boolean hearingDataChanged = HmcDataUtils.hearingDataChanged(notifiedResponse, hearing);
+        boolean requiresNewHearingNotice = HmcDataUtils.requiresNewHearingNotice(notifiedResponse, hearing);
+        boolean alreadyNotified = HmcDataUtils.isAlreadyNotifiedResponse(
+            notifiedResponse, hearingVersion, hearingRxDateTime);
         log.info(
-            "Hearing [{}] requested Version [{}], response RxDate [{}], notified Version [{}], notified RxDate [{}], hearing data changed [{}].",
+            "Hearing [{}] requested Version [{}], response RxDate [{}], notified Version [{}], notified RxDate [{}], "
+                + "requires new hearing notice [{}], already notified [{}].",
             hearingId,
             hearingVersion,
             hearingRxDateTime,
             notifiedVersion,
             notifiedRxDateTime,
-            hearingDataChanged
+            requiresNewHearingNotice,
+            alreadyNotified
         );
 
-        if (!hearingDataChanged) {
-            // HMC already has a record that matches the current schedule of the hearing
-            if (notifiedVersion == null || notifiedVersion < hearingVersion) {
-                try {
-                    log.info("Updating parties notified for unchanged hearing [{}] from version [{}] to [{}].",
-                             hearingId, notifiedVersion, hearingVersion);
-                    // Acknowledge and mark hearing as "processed" for current version
-                    notifyHmc(hearingId, hearing, notifiedServiceData);
-                } catch (Exception ex) {
-                    log.warn("HMC update failed for unchanged hearing [{}] from version [{}] to [{}]. Reason: {}",
-                        hearingId, notifiedVersion, hearingVersion, ex.getMessage()
-                    );
-                }
-            }
+        if (!requiresNewHearingNotice) {
+            acknowledgeUnchangedHearingIfNeeded(
+                hearingId, hearing, hearingVersion, hearingRxDateTime, notifiedServiceData, alreadyNotified);
+            return;
+        }
+
+        if (alreadyNotified) {
+            log.info("Skipping hearing id: [{}] already notified for this version [{}]",
+                     hearingId, hearingVersion);
             return;
         }
 
@@ -129,15 +128,37 @@ public class HearingNoticeSchedulerEventHandler {
             return;
         }
 
-        if (notifiedRxDateTime != null && hearingRxDateTime != null && !notifiedRxDateTime.isBefore(hearingRxDateTime)) {
-            log.info("Skipping hearing id: [{}] already notified for this version [{}]",
-                     hearingId, hearingVersion);
-            return;
-        }
-
         log.info("Updating parties notified for changed hearing [{}].", hearingId);
         // Acknowledge and mark a hearing as "processed" in HMC without generating a notice
         notifyHmc(hearingId, hearing, notifiedServiceData);
+    }
+
+    private void acknowledgeUnchangedHearingIfNeeded(String hearingId, HearingGetResponse hearing, int hearingVersion,
+                                                     LocalDateTime hearingRxDateTime,
+                                                     PartiesNotifiedServiceData notifiedServiceData,
+                                                     boolean alreadyNotified) {
+        if (alreadyNotified) {
+            return;
+        }
+
+        try {
+            log.info(
+                "Updating parties notified for unchanged hearing [{}], version [{}], response RxDate [{}].",
+                hearingId,
+                hearingVersion,
+                hearingRxDateTime
+            );
+            // Acknowledge and mark the current HMC hearing response as "processed".
+            notifyHmc(hearingId, hearing, notifiedServiceData);
+        } catch (Exception ex) {
+            log.warn(
+                "HMC update failed for unchanged hearing [{}], version [{}], response RxDate [{}]. Reason: {}",
+                hearingId,
+                hearingVersion,
+                hearingRxDateTime,
+                ex.getMessage()
+            );
+        }
     }
 
     private static boolean isAllowedState(String state, String caseReferene) {

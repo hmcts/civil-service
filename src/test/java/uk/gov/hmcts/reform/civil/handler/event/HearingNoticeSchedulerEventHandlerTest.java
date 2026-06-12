@@ -344,6 +344,62 @@ class HearingNoticeSchedulerEventHandlerTest {
     }
 
     @Test
+    void shouldNotDispatchCamundaMessage_whenChangedHearingIsAlreadyNotifiedForCurrentResponse() {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
+            createHearing(ListAssistCaseStatus.LISTED));
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
+            new PartiesNotifiedResponses().setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setRequestVersion(VERSION)
+                    .setResponseReceivedDateTime(RECEIVED_DATETIME)
+                    .setServiceData(new PartiesNotifiedServiceData()
+                        .setDays(List.of(new HearingDay()
+                            .setHearingStartDateTime(HEARING_DATE.plusDays(1))
+                            .setHearingEndDateTime(HEARING_DATE.plusDays(1).plusHours(1))))
+                        .setHearingLocation(VENUE_ID)))));
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(hearingsService, times(0)).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
+        verify(runtimeService, times(0)).createMessageCorrelation(any());
+        verifyNoInteractions(messageCorrelationBuilder);
+    }
+
+    @Test
+    void shouldAcknowledgeHearing_whenHearingDataMatchesAndSameVersionHasNewerResponseDate() {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
+            createHearing(ListAssistCaseStatus.LISTED));
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
+            new PartiesNotifiedResponses().setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setRequestVersion(VERSION)
+                    .setResponseReceivedDateTime(RECEIVED_DATETIME.minusDays(1))
+                    .setServiceData(new PartiesNotifiedServiceData()
+                        .setDays(List.of(new HearingDay()
+                            .setHearingStartDateTime(HEARING_DATE)
+                            .setHearingEndDateTime(HEARING_DATE.plusHours(1))))
+                        .setHearingLocation(VENUE_ID)))));
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(hearingsService, times(1)).updatePartiesNotifiedResponse(
+            AUTH_TOKEN,
+            HEARING_ID,
+            VERSION,
+            RECEIVED_DATETIME,
+            new PartiesNotified().setServiceData(
+                new PartiesNotifiedServiceData()
+                    .setDays(List.of(new HearingDay()
+                        .setHearingStartDateTime(HEARING_DATE)
+                        .setHearingEndDateTime(HEARING_DATE.plusHours(1))))
+                    .setHearingLocation(VENUE_ID)
+            )
+        );
+        verify(runtimeService, times(0)).createMessageCorrelation(any());
+        verifyNoInteractions(messageCorrelationBuilder);
+    }
+
+    @Test
     void shouldAcknowledgeHearing_whenHearingDataMatchesAndNotificationVersionIsOlder() {
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(ListAssistCaseStatus.LISTED));
@@ -422,6 +478,7 @@ class HearingNoticeSchedulerEventHandlerTest {
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
             new PartiesNotifiedResponses().setResponses(List.of(
                 new PartiesNotifiedResponse()
+                    .setRequestVersion(VERSION)
                     .setResponseReceivedDateTime(RECEIVED_DATETIME)
                     .setServiceData(new PartiesNotifiedServiceData()
                         .setDays(List.of(new HearingDay()
