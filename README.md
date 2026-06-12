@@ -25,7 +25,7 @@ Visual snapshots of the automated journey logic are generated from the live Stat
 #### Awaiting Defence & Divergence
 ![Defence Waiting & Divergence](docs/response_flow.svg)
 
-#### Post-Response Outcomes & Settlement
+#### Post-Response Outcomes & Settlement.
 ![Post-Response Outcomes & Settlement](docs/post_response.svg)
 
 Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 scripts/export_stateflow_transitions.py`. If you need the narrative in text form, see `docs/stateflow_transition_catalogue.md` or the structured `docs/stateflow/transition_catalogue.json`.
