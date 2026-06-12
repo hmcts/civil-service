@@ -5,6 +5,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
@@ -148,6 +151,48 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
     }
 
     @Test
+    void shouldNotUpdateClaimState_WhenClaimantLanguagePreferenceIsNotBothAndRespondentLanguageIsBoth() {
+        // given
+        CaseData caseData = lipVLipCaseDataWithLanguagePreferences(
+            CaseState.CASE_ISSUED,
+            Language.ENGLISH,
+            Language.BOTH
+        );
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getState()).isNull();
+        assertThat(response.getData())
+            .extracting("previousCCDState")
+            .isEqualTo(CaseState.CASE_ISSUED.name());
+        verifyNoInteractions(updateClaimStateService);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Language.class, names = {"ENGLISH", "WELSH"})
+    void shouldUpdateClaimState_WhenClaimantLanguagePreferenceIsNotBothAndRespondentLanguageIsNotBoth(Language language) {
+        // given
+        CaseData caseData = lipVLipCaseDataWithLanguagePreferences(
+            CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+            language,
+            language
+        );
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
+        verifyNoInteractions(updateClaimStateService);
+    }
+
+    @Test
     void shouldUpdateClaimState_WhenAwaitingApplicantIntentionClaimState() {
         // given
         CaseData caseData = lipVLipBilingualCaseData(CaseState.AWAITING_APPLICANT_INTENTION);
@@ -201,6 +246,24 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
             .claimantBilingualLanguagePreference(Language.BOTH.name())
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
+            .build()
+            .toBuilder()
+            .ccdState(ccdState)
+            .build();
+    }
+
+    private CaseData lipVLipCaseDataWithLanguagePreferences(
+        CaseState ccdState,
+        Language claimantLanguage,
+        Language respondentLanguage
+    ) {
+        return CaseDataBuilder.builder()
+            .claimantBilingualLanguagePreference(claimantLanguage.name())
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(
+                new RespondentLiPResponse().setRespondent1ResponseLanguage(respondentLanguage.name())
+            ))
             .build()
             .toBuilder()
             .ccdState(ccdState)
