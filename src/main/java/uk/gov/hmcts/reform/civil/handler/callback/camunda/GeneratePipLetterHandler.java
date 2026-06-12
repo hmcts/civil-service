@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +59,7 @@ public class GeneratePipLetterHandler extends CallbackHandler {
     private CallbackResponse generatePipLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         final CaseData.CaseDataBuilder<?, ?> caseDataBuilder =
-                caseData.toBuilder().claimNotificationDate(LocalDateTime.now());
+                caseData.toBuilder().claimNotificationDate(LocalDateTime.now(ZoneId.of("Europe/London")));
 
         if (caseData.isRespondent1LiP()) {
             generateAndPrintPipLetter(callbackParams);
