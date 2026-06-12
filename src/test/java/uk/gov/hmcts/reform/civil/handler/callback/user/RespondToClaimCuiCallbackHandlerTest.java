@@ -128,36 +128,10 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             now = LocalDateTime.now();
+            ReflectionTestUtils.setField(handler, "caseFlagsLoggingEnabled", false);
             given(time.now()).willReturn(now);
             given(deadlinesCalculator.calculateApplicantResponseDeadline(any())).willReturn(respondToDeadline);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        }
-
-        @Test
-        void shouldUpdateBusinessProcessAndClaimStatus_whenDefendantResponseLangIsEnglish() {
-            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
-            respondentLiPResponse.setRespondent1ResponseLanguage("ENGLISH");
-            CaseDataLiP caseDataLiP = new CaseDataLiP();
-            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .totalClaimAmount(BigDecimal.valueOf(5000))
-                .caseDataLip(caseDataLiP)
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent")
-                .isEqualTo(DEFENDANT_RESPONSE_CUI.name());
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("status")
-                .isEqualTo("READY");
-            assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         }
 
         @Test
@@ -221,6 +195,33 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(caseData.getRepaymentSuggestion()).isNull();
             assertThat(caseData.getRepaymentSummaryObject()).isNull();
             assertThat(caseData.getShowOldDJFixedCostsScreen()).isNull();
+        }
+
+        @Test
+        void shouldUpdateBusinessProcessAndClaimStatus_whenDefendantResponseLangIsEnglish() {
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("ENGLISH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .totalClaimAmount(BigDecimal.valueOf(5000))
+                .caseDataLip(caseDataLiP)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(DEFENDANT_RESPONSE_CUI.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
+            assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         }
 
         @Test
@@ -290,10 +291,10 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             UnavailableDate unavailableDate = new UnavailableDate();
             unavailableDate.setDate(LocalDate.of(2024, 2, 1));
             unavailableDate.setDateAdded(LocalDate.of(
-                    2024,
-                    1,
-                    1
-                ));
+                2024,
+                1,
+                1
+            ));
             unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
             Hearing hearing = new Hearing();
             hearing.setHearingLength(ONE_DAY);
@@ -450,11 +451,11 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             "ENGLISH, WELSH, ENGLISH, false, false",
             "WELSH, WELSH, WELSH, false, false"
         })
-            void shouldMoveToAwaitingApplicantResponse_whenNoTranslations(String claimantBilingualPreference,
-                                                                          String defendantBilingualPreference,
-                                                                          String defendantDocumentLanguage,
-                                                                          boolean toggleEnabled,
-                                                                          boolean changeState) {
+        void shouldMoveToAwaitingApplicantResponse_whenNoTranslations(String claimantBilingualPreference,
+                                                                      String defendantBilingualPreference,
+                                                                      String defendantDocumentLanguage,
+                                                                      boolean toggleEnabled,
+                                                                      boolean changeState) {
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(toggleEnabled);
             RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
             respondentLiPResponse.setRespondent1ResponseLanguage(defendantBilingualPreference);
@@ -554,4 +555,5 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(WELSH);
         }
     }
+
 }

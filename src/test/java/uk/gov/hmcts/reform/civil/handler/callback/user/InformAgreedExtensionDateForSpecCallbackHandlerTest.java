@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -44,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -375,6 +377,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+            assertThat(response.getState()).isEqualTo(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
         }
 
         @Test
@@ -400,6 +403,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
                 .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME))
                 .containsEntry("nextDeadline", nextDeadline.toLocalDate().format(ISO_DATE));
+            assertThat(response.getState()).isEqualTo(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
         }
 
         @Test
@@ -427,6 +431,47 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+            assertThat(response.getState()).isEqualTo(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
+        }
+
+        @Test
+        void shouldClearJoCaseDataWhenJudgmentBufferEnabledAndJoRequested() {
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(toggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilderSpec.builder().atStateClaim1v2SameSolicitorTimeExtension()
+                .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
+                .build();
+            caseData.setIsJoRequested(YES);
+            caseData.setJoRepaymentSummaryObject("summary");
+            caseData.setJoIsDisplayInJudgmentTab(YES);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(caseData.getJoRepaymentSummaryObject()).isNull();
+            assertThat(caseData.getJoIsDisplayInJudgmentTab()).isNull();
+            assertThat(response.getState()).isEqualTo(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
+        }
+
+        @Test
+        void shouldNotClearJoCaseDataWhenJoNotRequested() {
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(toggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilderSpec.builder().atStateClaim1v2SameSolicitorTimeExtension()
+                .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
+                .build();
+            caseData.setIsJoRequested(NO);
+            caseData.setJoRepaymentSummaryObject("summary");
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+
+            assertThat(caseData.getJoRepaymentSummaryObject()).isEqualTo("summary");
+            verify(toggleService).isJudgmentBufferEnabled();
         }
     }
 
