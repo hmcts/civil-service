@@ -34,9 +34,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.APPLICATION;
 
 @ExtendWith(MockitoExtension.class)
@@ -115,6 +117,46 @@ class PaymentStatusRetryServiceTest {
         service.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), response);
 
         verify(coreCaseDataService).submitUpdate(eq(CASE_ID.toString()), any());
+    }
+
+    @Test
+    void shouldSkipCreateClaimAfterPayment_whenCaseAlreadyIssuedUsingCaseData() {
+        when(caseData.isLipvLipOneVOne()).thenReturn(false);
+        when(caseData.isLipvLROneVOne()).thenReturn(false);
+        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.UNSPEC_CLAIM);
+        when(caseData.getCcdState()).thenReturn(CASE_ISSUED);
+
+        service.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), caseData);
+
+        verifyNoInteractions(coreCaseDataService);
+        assertThat(listAppender.list).hasSize(1);
+        assertThat(listAppender.list.getFirst().getLevel()).isEqualTo(Level.INFO);
+        assertThat(listAppender.list.getFirst().getFormattedMessage())
+            .contains("Skipping CREATE_CLAIM_AFTER_PAYMENT for case 123 because claim issue has already completed");
+    }
+
+    @Test
+    void shouldSkipCreateClaimAfterPayment_whenCaseAlreadyIssuedUsingCardPaymentResponse() {
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setStatus("success")
+            .setPaymentReference("ref")
+            .setErrorCode("err")
+            .setErrorDescription("desc");
+
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(caseData.getClaimIssuedPaymentDetails()).thenReturn(null);
+        when(caseData.setClaimIssuedPaymentDetails(any())).thenReturn(caseData);
+        when(caseData.isLipvLipOneVOne()).thenReturn(false);
+        when(caseData.isLipvLROneVOne()).thenReturn(false);
+        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.UNSPEC_CLAIM);
+        when(caseData.getCcdState()).thenReturn(CASE_ISSUED);
+
+        service.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), response);
+
+        verify(coreCaseDataService).getCase(CASE_ID);
+        verifyNoMoreInteractions(coreCaseDataService);
     }
 
     @Test
@@ -282,4 +324,3 @@ class PaymentStatusRetryServiceTest {
             .contains("Payment status update failed after retries for case 12345 and fee type CLAIMISSUED. Status: FAILED, ErrorCode: ERR123");
     }
 }
-
