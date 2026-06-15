@@ -7,8 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -18,6 +20,7 @@ import java.util.HashMap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFISLIP_JUDGMENT_REQUESTED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +32,8 @@ class DjNonDivergentClaimantDashboardServiceTest {
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private FeatureToggleService toggleService;
 
     @InjectMocks
     private DjNonDivergentClaimantDashboardService service;
@@ -44,6 +49,46 @@ class DjNonDivergentClaimantDashboardServiceTest {
             .applicant1Represented(YesOrNo.NO)
             .atStateClaimIssued()
             .build();
+
+        service.notifyDjNonDivergent(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT.getScenario(),
+            "1594901956117591",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+    }
+
+    @Test
+    void shouldRecordJudgmentRequestedScenarioWhenBufferEnabledAndCaseInJudgmentRequestedState() {
+        when(toggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        CaseData caseData = new CaseDataBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .atStateClaimIssued()
+            .build();
+        caseData.setCcdState(CaseState.JUDGMENT_REQUESTED);
+
+        service.notifyDjNonDivergent(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_DEFISLIP_JUDGMENT_REQUESTED_CLAIMANT.getScenario(),
+            "1594901956117591",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+    }
+
+    @Test
+    void shouldRecordDefaultScenarioWhenBufferDisabledAndCaseInJudgmentRequestedState() {
+        when(toggleService.isJudgmentBufferEnabled()).thenReturn(false);
+
+        CaseData caseData = new CaseDataBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .atStateClaimIssued()
+            .build();
+        caseData.setCcdState(CaseState.JUDGMENT_REQUESTED);
 
         service.notifyDjNonDivergent(caseData, AUTH_TOKEN);
 
