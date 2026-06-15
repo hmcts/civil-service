@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.civil.client.DocmosisApiClient;
 import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -60,6 +61,7 @@ import static uk.gov.hmcts.reform.civil.utils.ResourceReader.readString;
 
 @SpringBootTest(classes = {
     ClaimFormService.class,
+    JacksonConfiguration.class,
     JacksonAutoConfiguration.class})
 public class DocumentControllerTest extends BaseIntegrationTest {
 
