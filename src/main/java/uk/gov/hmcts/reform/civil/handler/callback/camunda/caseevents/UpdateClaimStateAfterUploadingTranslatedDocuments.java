@@ -66,8 +66,8 @@ public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackH
     private boolean isRespondentLanguageBothOrLanguageNotSet(CaseData caseData) {
         CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
         if (caseDataLiP != null && caseDataLiP.getRespondent1LiPResponse() != null) {
-            return caseData.isRespondent1LiP()
-                && Language.BOTH.name().equalsIgnoreCase(caseDataLiP.getRespondent1LiPResponse().getRespondent1ResponseLanguage());
+            return (caseDataLiP.getRespondent1LiPResponse().getRespondent1ResponseLanguage() == null || caseData.isRespondent1LiP()
+                && Language.BOTH.name().equalsIgnoreCase(caseDataLiP.getRespondent1LiPResponse().getRespondent1ResponseLanguage()));
         }
         return true;
     }

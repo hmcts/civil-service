@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AFTER_DOC_UPLOADED;
 
 @ExtendWith(MockitoExtension.class)
-public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCallbackHandlerTest {
+class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCallbackHandlerTest {
 
     private UpdateClaimStateAfterUploadingTranslatedDocuments handler;
     @Mock
@@ -172,6 +172,28 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
         verifyNoInteractions(updateClaimStateService);
     }
 
+    @Test
+    void shouldNotUpdateClaimState_WhenClaimantLanguagePreferenceIsNotBothAndRespondentLanguageIsNotSet() {
+        // given
+        CaseData caseData = lipVLipCaseDataWithLanguagePreferences(
+            CaseState.CASE_ISSUED,
+            Language.ENGLISH,
+            null
+        );
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getState()).isNull();
+        assertThat(response.getData())
+            .extracting("previousCCDState")
+            .isEqualTo(CaseState.CASE_ISSUED.name());
+        verifyNoInteractions(updateClaimStateService);
+    }
+
     @ParameterizedTest
     @EnumSource(value = Language.class, names = {"ENGLISH", "WELSH"})
     void shouldUpdateClaimState_WhenClaimantLanguagePreferenceIsNotBothAndRespondentLanguageIsNotBoth(Language language) {
@@ -262,7 +284,9 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(
-                new RespondentLiPResponse().setRespondent1ResponseLanguage(respondentLanguage.name())
+                new RespondentLiPResponse().setRespondent1ResponseLanguage(
+                    respondentLanguage == null ? null : respondentLanguage.name()
+                )
             ))
             .build()
             .toBuilder()
