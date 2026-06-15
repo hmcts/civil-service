@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.civil.config;
 
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
@@ -11,7 +10,8 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import org.springframework.context.annotation.Primary;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -29,29 +29,19 @@ public class JacksonConfiguration {
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jsonDateTimeFormatCustomizer() {
         return builder -> {
-            builder.modulesToInstall(javaTimeModule(), new Jdk8Module(), new ParameterNamesModule());
+            builder.modulesToInstall(JavaTimeModule.class, Jdk8Module.class, ParameterNamesModule.class);
             builder.simpleDateFormat(DATE_TIME_FORMAT);
             builder.serializers(
                 new LocalDateSerializer(DATE_FORMATTER),
                 new LocalDateTimeSerializer(DATE_TIME_FORMATTER)
             );
-            builder.mixIn(Document.class, DocumentMixin.class);
-            builder.mixIn(Document.DocumentBuilder.class, DocumentBuilderMixin.class);
+            builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         };
     }
 
-    private static Module javaTimeModule() {
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(new LocalDateSerializer(DATE_FORMATTER));
-        javaTimeModule.addSerializer(new LocalDateTimeSerializer(DATE_TIME_FORMATTER));
-        return javaTimeModule;
-    }
-
-    @JsonDeserialize(builder = Document.DocumentBuilder.class)
-    private abstract static class DocumentMixin {
-    }
-
-    @JsonPOJOBuilder(withPrefix = "")
-    private abstract static class DocumentBuilderMixin {
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
+        return builder.build();
     }
 }
