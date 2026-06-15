@@ -72,10 +72,11 @@ public class ElasticSearchPaginatedStreamProvider {
 
                 if (!currentCases.isEmpty()) {
                     searchAfterValue = sortKeyExtractor.apply(currentCases.getLast());
+                    PaginatedQuery paginatedQuery = queryFunction.apply(null);
+                    hasMorePages = currentCases.size() >= paginatedQuery.getPageSize();
+                } else {
+                    hasMorePages = false;
                 }
-
-                PaginatedQuery paginatedQuery = queryFunction.apply(null);
-                hasMorePages = currentCases.size() >= paginatedQuery.getPageSize();
             }
         }
 
@@ -124,6 +125,7 @@ public class ElasticSearchPaginatedStreamProvider {
                 return false;
             }
 
+            this.searchAfterValue = nextSearchAfterValue;
             log.debug("Fetched {} cases. More pages available: {}", currentCases.size(), hasMorePages);
             return true;
         }
