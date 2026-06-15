@@ -4,7 +4,6 @@ module "servicebus-subscription" {
   name                = "hmc-to-civil-subscription-${var.env}"
   namespace_id        = "hmc-servicebus-${var.env}"
   topic_name          = "hmc-to-cft-${var.env}"
-  resource_group_name = "hmc-shared-${var.env}"
 }
 
 resource "azurerm_servicebus_subscription_rule" "topic_filter_rule_civil" {
