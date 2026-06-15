@@ -7,12 +7,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -40,8 +41,27 @@ public class JacksonConfiguration {
     }
 
     @Bean
-    @Primary
-    public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
-        return builder.build();
+    public BeanPostProcessor objectMapperPostProcessor() {
+        return new BeanPostProcessor() {
+            @Override
+            public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+                if (bean instanceof ObjectMapper objectMapper) {
+                    configureObjectMapper(objectMapper);
+                }
+                return bean;
+            }
+        };
+    }
+
+    private static void configureObjectMapper(ObjectMapper objectMapper) {
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(new LocalDateSerializer(DATE_FORMATTER));
+        javaTimeModule.addSerializer(new LocalDateTimeSerializer(DATE_TIME_FORMATTER));
+
+        objectMapper.registerModule(javaTimeModule);
+        objectMapper.registerModule(new Jdk8Module());
+        objectMapper.registerModule(new ParameterNamesModule());
+        objectMapper.setDateFormat(new SimpleDateFormat(DATE_TIME_FORMAT, Locale.UK));
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 }
