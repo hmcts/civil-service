@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
@@ -206,6 +207,42 @@ class HearingNoticeHmcGeneratorTest {
             .setPartiesAttendingByTelephone("Jenny Harper");
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldGenerateHearingNoticeHmc_1v1_withLitigationFriend() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+            )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+            )
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("John").setLastName("Smith"))
+            .respondent1LitigationFriend(new LitigationFriend().setFirstName("Jane").setLastName("Doe"))
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
+
+        assertEquals("Mr. John Rambo (by his litigation friend John Smith) ", actual.getClaimant());
+        assertEquals("Mr. Sole Trader T/A Sole Trader co (by his litigation friend Jane Doe) ", actual.getDefendant());
     }
 
     @ParameterizedTest

@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 
 import java.time.LocalDate;
@@ -91,16 +92,22 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             .setCreationDateWelshText(isWelsh ? formatDateInWelsh(creationDate, true) : null)
             .setHearingType(getHearingTypeContentText(caseData, hearing, isWelsh))
             .setHearingTypePluralWelsh(isWelsh ? getPluralHearingTypeTextWelsh(caseData, hearing) : null)
-            .setClaimant(caseData.getApplicant1().getPartyName())
+            .setClaimant(PartyUtils.getPartyNameWithLitigiousFriend(caseData.getApplicant1(),
+                                                                   caseData.getApplicant1LitigationFriend()))
             .setClaimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
-            .setClaimant2(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
+            .setClaimant2(nonNull(caseData.getApplicant2())
+                              ? PartyUtils.getPartyNameWithLitigiousFriend(caseData.getApplicant2(),
+                                                                           caseData.getApplicant2LitigationFriend()) : null)
             .setClaimant2Reference(nonNull(caseData.getApplicant2())
                     && nonNull(caseData.getSolicitorReferences()) ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
-            .setDefendant(caseData.getRespondent1().getPartyName())
+            .setDefendant(PartyUtils.getPartyNameWithLitigiousFriend(caseData.getRespondent1(),
+                                                                     caseData.getRespondent1LitigationFriend()))
             .setDefendantReference(nonNull(caseData.getSolicitorReferences())
                                     ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
-            .setDefendant2(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
+            .setDefendant2(nonNull(caseData.getRespondent2())
+                               ? PartyUtils.getPartyNameWithLitigiousFriend(caseData.getRespondent2(),
+                                                                            caseData.getRespondent2LitigationFriend()) : null)
             .setDefendant2Reference(caseData.getRespondentSolicitor2Reference())
             .setHearingDays(getHearingDaysText(hearing, isWelsh))
             .setTotalHearingDuration(getTotalHearingDurationText(hearing, isWelsh))
