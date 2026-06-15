@@ -1,14 +1,10 @@
 #HMC to Hearings API
-data "azurerm_servicebus_namespace" "hmc_servicebus_namespace" {
-  name                = "hmc-servicebus-${var.env}"
-  resource_group_name = "hmc-shared-${var.env}"
-}
-
 module "servicebus-subscription" {
-  source       = "git@github.com:hmcts/terraform-module-servicebus-subscription?ref=4.x"
-  name         = "hmc-to-civil-subscription-${var.env}"
-  namespace_id = data.azurerm_servicebus_namespace.hmc_servicebus_namespace.id
-  topic_name   = "hmc-to-cft-${var.env}"
+  source              = "git@github.com:hmcts/terraform-module-servicebus-subscription?ref=DTSPO-18682"
+  name                = "hmc-to-civil-subscription-${var.env}"
+  namespace_name      = "hmc-servicebus-${var.env}"
+  topic_name          = "hmc-to-cft-${var.env}"
+  resource_group_name = "hmc-shared-${var.env}"
 }
 
 resource "azurerm_servicebus_subscription_rule" "topic_filter_rule_civil" {
