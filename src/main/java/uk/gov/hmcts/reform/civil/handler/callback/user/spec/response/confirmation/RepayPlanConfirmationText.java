@@ -26,8 +26,12 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
 
         if (!RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
             caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            && !RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired2())
             || !EnumSet.of(RespondentResponseTypeSpec.FULL_ADMISSION, RespondentResponseTypeSpec.PART_ADMISSION)
             .contains(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && !EnumSet.of(RespondentResponseTypeSpec.FULL_ADMISSION, RespondentResponseTypeSpec.PART_ADMISSION)
+            .contains(caseData.getRespondent2ClaimResponseTypeForSpec())
         ) {
             return Optional.empty();
         }
