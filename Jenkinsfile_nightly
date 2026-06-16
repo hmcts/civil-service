@@ -248,64 +248,64 @@ withNightlyPipeline(type, product, component) {
       yarnBuilder.yarn('install-dependencies')
 
       if(!runPrevFailedAndNotExecutedTestFiles) {
-        // stage('Playwright test setup') {
-        //   try {
-        //     yarnBuilder.yarn('test:playwright:setup:install')
-        //     if(playwrightRunSetup) {
-        //       yarnBuilder.yarn('test:playwright:setup:civil-service-nightly:ci')
-        //     }
-        //   } catch (Exception error) {
-        //     if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
-        //       flowInterrupted = true
-        //     }
-        //     if(playwrightRunSetup) {
-        //       playwrightSetupPassed=false
-        //     }
-        //     unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
-        //   } finally {
-        //     if(playwrightRunSetup) {
-        //       yarnBuilder.yarn('test:playwright:bootstrap:generate-report')
-        //     }
-        //   }
-        // }
+        stage('Playwright test setup') {
+          try {
+            yarnBuilder.yarn('test:playwright:setup:install')
+            if(playwrightRunSetup) {
+              yarnBuilder.yarn('test:playwright:setup:civil-service-nightly:ci')
+            }
+          } catch (Exception error) {
+            if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
+              flowInterrupted = true
+            }
+            if(playwrightRunSetup) {
+              playwrightSetupPassed=false
+            }
+            unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
+          } finally {
+            if(playwrightRunSetup) {
+              yarnBuilder.yarn('test:playwright:bootstrap:generate-report')
+            }
+          }
+        }
 
-        // stage('Playwright full functional test') {
-        //   try {
-        //     if(flowInterrupted) {
-        //       throw new org.jenkinsci.plugins.workflow.steps.FlowInterruptedException()
-        //     }
-        //     if(playwrightSetupPassed) {
-        //       yarnBuilder.yarn('test:playwright:civil-service-nightly:ci')
-        //     }
-        //   } catch (Exception error) {
-        //     if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
-        //       flowInterrupted = true
-        //     }
-        //     unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
-        //   } finally {
-        //     if(playwrightSetupPassed) {
-        //       copyPreviousHistory('allure-functional-history', 'playwright-allure-functional-results');
-        //       sh 'cp playwright-categories.json playwright-allure-functional-results/categories.json'
-        //       yarnBuilder.yarn('test:playwright:functional:generate-report')
-        //       publishFunctionalReport()
-        //     }
-        //   }
-        // }
+        stage('Playwright full functional test') {
+          try {
+            if(flowInterrupted) {
+              throw new org.jenkinsci.plugins.workflow.steps.FlowInterruptedException()
+            }
+            if(playwrightSetupPassed) {
+              yarnBuilder.yarn('test:playwright:civil-service-nightly:ci')
+            }
+          } catch (Exception error) {
+            if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
+              flowInterrupted = true
+            }
+            unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
+          } finally {
+            if(playwrightSetupPassed) {
+              copyPreviousHistory('allure-functional-history', 'playwright-allure-functional-results');
+              sh 'cp playwright-categories.json playwright-allure-functional-results/categories.json'
+              yarnBuilder.yarn('test:playwright:functional:generate-report')
+              publishFunctionalReport()
+            }
+          }
+        }
 
-        // if(playwrightRunSetup) {
-        //   stage('Playwright test teardown') {
-        //     try {
-        //       yarnBuilder.yarn('test:playwright:teardown:civil-service-nightly:ci')
-        //     } catch (Exception error) {
-        //       unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
-        //     } finally {
-        //       copyPreviousHistory('allure-bootstrap-history', 'playwright-allure-bootstrap-results');
-        //       sh 'cp playwright-categories.json playwright-allure-bootstrap-results/categories.json'
-        //       yarnBuilder.yarn('test:playwright:bootstrap:generate-report')
-        //       publishBootstrapReport()
-        //     }
-        //   }
-        // }
+        if(playwrightRunSetup) {
+          stage('Playwright test teardown') {
+            try {
+              yarnBuilder.yarn('test:playwright:teardown:civil-service-nightly:ci')
+            } catch (Exception error) {
+              unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
+            } finally {
+              copyPreviousHistory('allure-bootstrap-history', 'playwright-allure-bootstrap-results');
+              sh 'cp playwright-categories.json playwright-allure-bootstrap-results/categories.json'
+              yarnBuilder.yarn('test:playwright:bootstrap:generate-report')
+              publishBootstrapReport()
+            }
+          }
+        }
 
         enableFortifyScan()
 
