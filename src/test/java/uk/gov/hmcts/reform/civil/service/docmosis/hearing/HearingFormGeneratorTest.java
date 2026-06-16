@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
@@ -44,6 +45,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -163,7 +165,7 @@ class HearingFormGeneratorTest {
     }
 
     @Test
-    void shouldGetTemplateData_withLitigationFriend() {
+    void shouldGetTemplateData_withLitigationFriend_asMinor() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .totalClaimAmount(new BigDecimal(2000))
@@ -174,14 +176,40 @@ class HearingFormGeneratorTest {
             .hearingDuration(HearingDuration.DAY_1)
             .caseManagementLocation(caseManagementLocation)
             .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(10)))
             .applicant1LitigationFriend(new LitigationFriend().setFirstName("John").setLastName("Smith"))
+            .respondent1(new PartyBuilder().soleTrader().build()
+                             .setSoleTraderDateOfBirth(LocalDate.now().minusYears(10)))
             .respondent1LitigationFriend(new LitigationFriend().setFirstName("Jane").setLastName("Doe"))
             .build();
 
         var actual = generator.getTemplateData(caseData, BEARER_TOKEN);
 
         assertThat(actual.getClaimant()).isEqualTo("Mr. John Rambo represented by John Smith (litigation friend)");
-        assertThat(actual.getDefendant()).isEqualTo("Mr. Sole Trader T/A Sole Trader co represented by Jane Doe (litigation friend)");
+        assertThat(actual.getDefendant()).isEqualTo("Mr. Sole Trader T/A Sole Trader co");
+    }
+
+    @Test
+    void shouldGetTemplateData_withLitigationFriend_notMinor() {
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .caseManagementLocation(caseManagementLocation)
+            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("John").setLastName("Smith"))
+            .build();
+
+        var actual = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+        assertThat(actual.getClaimant()).isEqualTo("Mr. John Rambo");
     }
 
     @Test

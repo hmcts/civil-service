@@ -134,6 +134,13 @@ public class PartyUtils {
         };
     }
 
+    public static boolean isMinor(Party party) {
+        return Optional.ofNullable(party)
+            .flatMap(PartyUtils::getDateOfBirth)
+            .map(dob -> dob.isAfter(LocalDate.now().minusYears(18)))
+            .orElse(false);
+    }
+
     public static String getPartyNameWithLitigiousFriend(Party party, LitigationFriend litigationFriend) {
         return getPartyNameWithLitigiousFriend(party, litigationFriend, false);
     }

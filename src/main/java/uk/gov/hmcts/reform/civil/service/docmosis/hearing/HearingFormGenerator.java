@@ -86,12 +86,13 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .setLegacyCaseNumber(caseData.getLegacyCaseReference())
             .setCaseNumber(caseData.getCcdCaseReference().toString())
             .setCreationDate(getDateFormatted(LocalDate.now()))
-            .setClaimant(PartyUtils.getPartyNameWithLitigiousFriend(caseData.getApplicant1(),
-                                                                   caseData.getApplicant1LitigationFriend()))
+            .setClaimant(PartyUtils.isMinor(caseData.getApplicant1())
+                             ? PartyUtils.getPartyNameWithLitigiousFriend(caseData.getApplicant1(),
+                                                                          caseData.getApplicant1LitigationFriend())
+                             : caseData.getApplicant1().getPartyName())
             .setClaimantReference(checkReference(caseData)
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
-            .setDefendant(PartyUtils.getPartyNameWithLitigiousFriend(caseData.getRespondent1(),
-                                                                     caseData.getRespondent1LitigationFriend()))
+            .setDefendant(caseData.getRespondent1().getPartyName())
             .setDefendantReference(checkReference(caseData)
                                     ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
             .setHearingDate(getDateFormatted(caseData.getHearingDate()))
@@ -106,11 +107,12 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .setClaimant2exists(nonNull(caseData.getApplicant2()))
             .setDefendant2exists(nonNull(caseData.getRespondent2()))
             .setClaimant2(nonNull(caseData.getApplicant2())
-                              ? PartyUtils.getPartyNameWithLitigiousFriend(caseData.getApplicant2(),
-                                                                           caseData.getApplicant2LitigationFriend()) : null)
+                              ? (PartyUtils.isMinor(caseData.getApplicant2())
+                                 ? PartyUtils.getPartyNameWithLitigiousFriend(caseData.getApplicant2(),
+                                                                              caseData.getApplicant2LitigationFriend())
+                                 : caseData.getApplicant2().getPartyName()) : null)
             .setDefendant2(nonNull(caseData.getRespondent2())
-                               ? PartyUtils.getPartyNameWithLitigiousFriend(caseData.getRespondent2(),
-                                                                            caseData.getRespondent2LitigationFriend()) : null)
+                               ? caseData.getRespondent2().getPartyName() : null)
             .setClaimant2Reference(checkReference(caseData)
                                     ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
             .setDefendant2Reference(checkReference(caseData)
