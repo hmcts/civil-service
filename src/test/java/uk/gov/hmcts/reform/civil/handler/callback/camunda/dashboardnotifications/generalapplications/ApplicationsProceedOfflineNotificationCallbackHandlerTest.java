@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -34,7 +33,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -60,8 +58,6 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
     private DashboardNotificationService dashboardNotificationService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService toggleService;
     private static final String CLAIMANT = "Claimant";
     private static final String DEFENDANT = "Defendant";
 
@@ -70,19 +66,6 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
 
         @BeforeEach
         void setup() {
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-        }
-
-        @Test
-        void shouldNotCallRecordScenario_whenLipVLipIsDisabled() {
-            when(toggleService.isLipVLipEnabled()).thenReturn(false);
-
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-                .build();
-
-            handler.handle(callbackParams);
-            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test

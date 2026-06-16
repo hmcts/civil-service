@@ -219,8 +219,7 @@ class GaHearingFormGeneratorTest {
     @Test
     void test_getFileName() {
         String name = generator.getFileName(HEARING_APPLICATION);
-        assertThat(name).startsWith("Application_Hearing_Notice_");
-        assertThat(name).endsWith(".pdf");
+        assertThat(name).startsWith("Application_Hearing_Notice_").endsWith(".pdf");
     }
 
     @Test

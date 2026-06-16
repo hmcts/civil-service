@@ -49,7 +49,6 @@ import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjAuthorisationFieldService;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjBundleFieldService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjDirectionsToggleService;
 import uk.gov.hmcts.reform.civil.service.dj.DjCreditHireDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjBuildingDisputeDirectionsService;
@@ -124,7 +123,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_COUNT_LIMIT_NOTE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_PREFIX;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_SUFFIX_DJ;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ;
@@ -163,7 +161,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
     DjConfirmationTask.class,
     DjLocationAndToggleService.class,
     DjAuthorisationFieldService.class,
-    DjBundleFieldService.class,
     DjDirectionsToggleService.class,
     DjDisposalDirectionsService.class,
     DjSpecialistDirectionsService.class,
@@ -223,7 +220,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getData().get("applicantVRespondentText"))
-                .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+                .isEqualTo("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co");
         }
 
         @Test
@@ -236,7 +233,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getData().get("applicantVRespondentText"))
-                .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
+                .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader T/A Sole Trader co");
         }
 
         @Test
@@ -250,7 +247,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getData().get("applicantVRespondentText"))
-                .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
+                .isEqualTo("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co and Mr. John Rambo");
         }
 
     }
@@ -369,9 +366,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(DISPOSAL_FINAL_HEARING_LISTING_DJ);
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingDJ").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());
-
-            assertThat(response.getData()).extracting("disposalHearingBundleDJ").extracting("input")
-                .isEqualTo(DISPOSAL_BUNDLE_REQUIREMENT);
 
             assertThat(response.getData()).extracting("disposalHearingNotesDJ").extracting("input")
                 .isEqualTo(ORDER_WITHOUT_HEARING_UPLOAD_TO_PORTAL_DJ);
@@ -584,13 +578,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingOrderMadeWithoutHearingDJ").extracting("input")
                 .isEqualTo(String.format("%s %s.",
                     ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE,
-                    date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))));
+                    nextWorkingDayDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))));
 
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").extracting("input")
                 .isEqualTo(DISPOSAL_FINAL_HEARING_LISTING_DJ);
 
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").extracting("date")
-                .isEqualTo(LocalDate.now().plusWeeks(16).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
 
             assertThat(response.getData()).extracting("trialHearingTimeDJ").extracting("helpText1")
                 .isEqualTo("If either party considers that the time estimate is insufficient, "
@@ -1114,7 +1108,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked1v1() {
             String body = "The directions order has been sent to: %n%n ## Claimant 1 %n%n Mr. John Rambo%n%n "
-                + "## Defendant 1 %n%n Mr. Sole Trader";
+                + "## Defendant 1 %n%n Mr. Sole Trader T/A Sole Trader co";
             String header = "# Your order has been issued %n%n ## Claim number %n%n # 000DC001";
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment().build();

@@ -117,7 +117,6 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      */
     void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
         int maxRetries = getMaxAttempts();
-        log.info("maxRetries {}", maxRetries);
         int remainingRetries = externalTask.getRetries() == null ? maxRetries : externalTask.getRetries();
         log.info(
             "Handle failure externalTask.getRetries() is null ?? '{}' processInstanceId: '{}' " +
@@ -128,7 +127,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
             externalTask.getRetries(),
             maxRetries
         );
-        log.error("Error occured {} remainingRetries {}", e.getMessage(), remainingRetries, e);
+
         externalTaskService.handleFailure(
             externalTask,
             e.getMessage(),
@@ -188,6 +187,27 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      */
     protected VariableMap getVariableMap(ExternalTaskData data) {
         return null;
+    }
+
+    protected long calculateEffectiveDelay(long totalFound, long lock, long delay) {
+        if (totalFound <= 25) {
+            // skip for small batches
+            return 0;
+        }
+        long maxExecutionTimeMs = (long) (lock * 0.8);
+        long maxDelay = maxExecutionTimeMs / totalFound;
+        return Math.min(maxDelay, delay);
+    }
+
+    protected void throttle(long delay) {
+        if (delay == 0) {
+            return;
+        }
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     /**

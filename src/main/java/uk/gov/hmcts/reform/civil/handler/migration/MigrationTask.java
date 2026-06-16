@@ -4,6 +4,8 @@ import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public abstract class MigrationTask<T extends CaseReference> {
@@ -22,6 +24,10 @@ public abstract class MigrationTask<T extends CaseReference> {
 
     protected abstract CaseData migrateCaseData(CaseData caseData, T caseReference);
 
+    protected List<String> getFieldsToNullify() {
+        return Collections.emptyList();
+    }
+
     protected Class<T> getType() {
         return type;
     }
@@ -32,7 +38,7 @@ public abstract class MigrationTask<T extends CaseReference> {
         }
 
         try {
-            CaseState cs = CaseState.valueOf(state.toUpperCase());
+            CaseState cs = CaseState.valueOf(state);
             return Optional.of(cs.name());
         } catch (IllegalArgumentException e) {
             // State not recognized in the enum

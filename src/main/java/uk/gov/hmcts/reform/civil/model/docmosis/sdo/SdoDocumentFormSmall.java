@@ -38,6 +38,7 @@ import java.util.List;
 public class SdoDocumentFormSmall implements MappableObject {
 
     private String judgeName;
+    private String ccdCaseReference;
     private String caseNumber;
     private LocalDate currentDate;
     private ClaimsTrack claimsTrack;

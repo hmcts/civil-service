@@ -116,6 +116,11 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
+    public boolean isJudgmentBufferEligible() {
+        return false;
+    }
+
+    @Override
     public boolean claimantConfirmedDefendantPaid() {
         return caseData.getRespondent1CourtOrderPayment() != null && caseData.respondent1PaidInFull();
     }
@@ -147,10 +152,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isPaperResponse() {
-        if (!featureToggleService.isLipVLipEnabled()) {
-            return false;
-        }
-
         return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
             && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
     }

@@ -102,7 +102,7 @@ public class JudgmentPaidOnlineMapperTest {
         assertEquals(JudgmentState.CANCELLED, caseData.getActiveJudgment().getState());
         assertNull(caseData.getHistoricJudgment());
 
-        assertEquals("Mr. Sole Trader", caseData.getJoDefendantName1());
+        assertEquals("Mr. Sole Trader T/A Sole Trader co", caseData.getJoDefendantName1());
         assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, caseData.getJoPaymentPlanSelected());
 
     }

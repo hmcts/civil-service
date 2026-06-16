@@ -115,7 +115,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
@@ -214,6 +213,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
@@ -548,7 +548,6 @@ public class CaseDataBuilder {
     private DynamicList hearingMethodValuesTrialHearingDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
-    private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
     private LocalDate hearingDueDate;
@@ -712,6 +711,9 @@ public class CaseDataBuilder {
     private LocalDate nextDeadline;
 
     private CaseQueriesCollection queries;
+
+    private LocalDateTime joDJCreatedDate;
+    private YesOrNo isJoRequested;
 
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
@@ -2810,7 +2812,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssued1v2AndOneDefendantDefaultJudgment() {
-        defendantDetails = new DynamicList().setValue(new DynamicListElement().setLabel("Mr. Sole Trader"));
+        defendantDetails = new DynamicList().setValue(new DynamicListElement().setLabel("Mr. Sole Trader T/A Sole Trader co"));
         return this;
     }
 
@@ -3081,10 +3083,6 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedDisposalHearingInPerson() {
-        disposalHearingBundleDJ = new DisposalHearingBundleDJ()
-            .setInput("The claimant must lodge at court at least 7 "
-                + "days before the disposal")
-            .setType(List.of(DisposalHearingBundleType.DOCUMENTS));
         disposalHearingFinalDisposalHearingDJ = new DisposalHearingFinalDisposalHearingDJ()
             .setInput(DISPOSAL_FINAL_HEARING_LISTING_DJ)
             .setDate(LocalDate.now().plusWeeks(16))
@@ -3429,6 +3427,24 @@ public class CaseDataBuilder {
         respondent2OrgRegistered = null;
         respondent2Represented = null;
         addRespondent2 = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateJudgmentRequested() {
+        atStateClaimNotified();
+        claimDetailsNotificationDate = claimNotificationDate.minusDays(10);
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = LocalDateTime.now().minusDays(3);
+        joDJCreatedDate = LocalDateTime.now().minusHours(49);
+        isJoRequested = YesOrNo.YES;
+        ccdState = JUDGMENT_REQUESTED;
+        respondent1ResponseDate = null;
+        takenOfflineDate = null;
+        respondent2OrgRegistered = null;
+        respondent2Represented = null;
+        addRespondent2 = null;
+        paymentTypeSelection = DJPaymentTypeSelection.IMMEDIATELY;
+        totalClaimAmount = BigDecimal.valueOf(1010);
         return this;
     }
 
@@ -7681,7 +7697,6 @@ public class CaseDataBuilder {
             .hearingMethodValuesTrialHearingDJ(hearingMethodValuesTrialHearingDJ)
             .disposalHearingMethodDJ(disposalHearingMethodDJ)
             .trialHearingMethodInPersonDJ(trialHearingMethodInPersonDJ)
-            .disposalHearingBundleDJ(disposalHearingBundleDJ)
             .disposalHearingFinalDisposalHearingDJ(disposalHearingFinalDisposalHearingDJ)
             .trialHearingTrialDJ(trialHearingTrialDJ)
             .disposalHearingJudgesRecitalDJ(disposalHearingJudgesRecitalDJ)

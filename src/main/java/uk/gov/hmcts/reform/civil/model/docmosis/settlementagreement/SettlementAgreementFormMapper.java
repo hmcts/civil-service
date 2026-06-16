@@ -46,6 +46,7 @@ public class SettlementAgreementFormMapper {
         return new SettlementAgreementForm()
             .setClaimant(claimant)
             .setDefendant(defendant)
+            .setCcdReferenceNumber(caseData.getCcdCaseReference().toString())
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
             .setTotalClaimAmount(getClaimAmount(caseData))
             .setSettlementAgreedDate(getSettlementDate(caseData))

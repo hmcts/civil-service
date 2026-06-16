@@ -98,7 +98,6 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked_spec_lip() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("spec-lip-template-id");
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -121,7 +120,6 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
         @Test
         void shouldNotifyLiPRespondent_whenInvoked_spec_lip() {
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(RESPONDENT_EMAIL_TEMPLATE);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -150,7 +148,6 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
         @Test
         void shouldNotifyLiPRespondent_whenInvoked_spec_lip_response_in_bilingual() {
             when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn(BILINGUAL_RESPONDENT_EMAIL_TEMPLATE);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -206,7 +203,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
             Map<String, String> properties = new HashMap<>(addCommonProperties());
             properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
             properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Mr. Sole Trader");
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Mr. Sole Trader T/A Sole Trader co");
             properties.put(CASEMAN_REF, "000DC001");
             return properties;
         }

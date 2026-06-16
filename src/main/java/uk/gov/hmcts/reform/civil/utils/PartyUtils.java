@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -38,59 +39,55 @@ import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
+@Slf4j
 public class PartyUtils {
+
+    private static final String SPACE = " ";
+    private static final String TRADING_AS = " T/A %s";
+    private static final String BY_HIS_LITIGATION_FRIEND = "%s (by his litigation friend %s %s) ";
 
     private PartyUtils() {
         //NO-OP
     }
 
     public static String getPartyNameBasedOnType(Party party, boolean omitTitle) {
-        switch (party.getType()) {
-            case COMPANY:
-                return party.getCompanyName();
-            case INDIVIDUAL:
-                return getIndividualName(party, omitTitle);
-            case SOLE_TRADER:
-                return getSoleTraderName(party, omitTitle);
-            case ORGANISATION:
-                return party.getOrganisationName();
-            default:
-                throw new IllegalArgumentException("Invalid Party type in " + party);
+        return getPartyNameBasedOnType(party, omitTitle, null);
+    }
+
+    public static String getPartyNameBasedOnType(Party party, boolean omitTitle, LitigationFriend litigationFriend) {
+        if (party == null) {
+            log.error("Invalid Party, Party is null or empty.");
+            return null;
         }
+        return switch (party.getType()) {
+            case COMPANY -> party.getCompanyName();
+            case INDIVIDUAL -> ofNullable(litigationFriend)
+                .map(lf -> getIndividualName(party) + " L/F " + lf.getFirstName() + " " + lf.getLastName())
+                .orElse(getIndividualName(party, omitTitle));
+            case SOLE_TRADER -> buildSoleTraderName(party, omitTitle);
+            case ORGANISATION -> party.getOrganisationName();
+            default -> throw new IllegalArgumentException("Invalid Party type in " + party);
+        };
     }
 
     public static String getPartyNameBasedOnType(Party party) {
         return getPartyNameBasedOnType(party, false);
     }
 
-    private static String getTitle(String title) {
-        return StringUtils.isBlank(title) ? "" : title + " ";
-    }
-
-    public static Optional<LocalDate> getDateOfBirth(Party party) {
-        switch (party.getType()) {
-            case INDIVIDUAL:
-                return ofNullable(party.getIndividualDateOfBirth());
-            case SOLE_TRADER:
-                return ofNullable(party.getSoleTraderDateOfBirth());
-            case COMPANY, ORGANISATION:
-            default:
-                return Optional.empty();
-        }
-    }
-
     public static String getLitigiousPartyName(Party party, LitigationFriend litigationFriend) {
-        return switch (party.getType()) {
-            case COMPANY -> party.getCompanyName();
-            case ORGANISATION -> party.getOrganisationName();
-            case INDIVIDUAL -> ofNullable(litigationFriend)
-                .map(lf -> getIndividualName(party) + " L/F " + lf.getFirstName() + " " + lf.getLastName())
-                .orElse(getIndividualName(party));
-            case SOLE_TRADER -> ofNullable(party.getSoleTraderTradingAs())
-                .map(ta -> getSoleTraderName(party) + " T/A " + ta)
-                .orElse(getSoleTraderName(party));
-            default -> throw new IllegalArgumentException("Invalid Party type in " + party);
-        };
+        return getPartyNameBasedOnType(party, false, litigationFriend);
+    }
+
+    private static String buildSoleTraderName(Party party, boolean omitTitle) {
+        return ofNullable(buildSoleTraderAs(party))
+            .map(ta -> getSoleTraderName(party, omitTitle) + ta)
+            .orElse(getSoleTraderName(party, omitTitle));
+    }
+
+    private static String buildSoleTraderAs(Party party) {
+        return ofNullable(party.getSoleTraderTradingAs())
+            .map(ta -> String.format(TRADING_AS,  ta))
+            .orElse(null);
     }
 
     public static String getApplicant1NameWithLitigiousFriend(CaseData caseData) {
@@ -125,6 +122,18 @@ public class PartyUtils {
         return getPartyNameWithLitigiousFriend(caseData.getRespondent2(), caseData.getRespondent2LitigationFriend(), upperCase);
     }
 
+    private static String getTitle(String title) {
+        return StringUtils.isBlank(title) ? "" : title + " ";
+    }
+
+    public static Optional<LocalDate> getDateOfBirth(Party party) {
+        return switch (party.getType()) {
+            case INDIVIDUAL -> ofNullable(party.getIndividualDateOfBirth());
+            case SOLE_TRADER -> ofNullable(party.getSoleTraderDateOfBirth());
+            default -> Optional.empty();
+        };
+    }
+
     public static String getPartyNameWithLitigiousFriend(Party party, LitigationFriend litigationFriend) {
         return getPartyNameWithLitigiousFriend(party, litigationFriend, false);
     }
@@ -133,22 +142,24 @@ public class PartyUtils {
         String partyName = ofNullable(party).map(Party::getPartyName).map(name -> upperCase ? name.toUpperCase() : name).orElse(null);
         if (partyName != null) {
             return ofNullable(litigationFriend)
-                .map(lf ->  partyName + " (by his litigation friend " + lf.getFirstName() + " " + lf.getLastName() + ")")
+                .map(friend -> buildPartyNameWithLitigationFriend(partyName, friend))
                 .orElse(partyName);
         }
+        log.error("Party name is null for party {}", party);
         return null;
     }
 
-    private static String getSoleTraderName(Party party, boolean omitTitle) {
-        return (omitTitle ? "" : getTitle(party.getSoleTraderTitle()))
-            + party.getSoleTraderFirstName()
-            + " "
-            + party.getSoleTraderLastName()
-            ;
+    private static String buildPartyNameWithLitigationFriend(String partyName, LitigationFriend litigationFriend) {
+        return String.format(BY_HIS_LITIGATION_FRIEND, partyName, litigationFriend.getFirstName(), litigationFriend.getLastName());
     }
 
-    private static String getSoleTraderName(Party party) {
-        return getSoleTraderName(party, false);
+    private static String getSoleTraderName(Party party, boolean omitTitle) {
+
+        final String titlePrefix = omitTitle ? "" : getTitle(party.getSoleTraderTitle());
+        final String firstName = ofNullable(party.getSoleTraderFirstName()).orElse(SPACE);
+        final String lastName = ofNullable(party.getSoleTraderLastName()).orElse(SPACE);
+        return titlePrefix + firstName + SPACE + lastName;
+
     }
 
     private static String getIndividualName(Party party, boolean omitTitle) {
@@ -173,7 +184,7 @@ public class PartyUtils {
 
         stringBuilder.append(buildClaimantReference(caseData));
 
-        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
+        ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
             .ifPresent(ref -> {
                 if (!stringBuilder.isEmpty()) {
                     stringBuilder.append("\n");
@@ -196,7 +207,7 @@ public class PartyUtils {
         SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
         StringBuilder stringBuilder = new StringBuilder();
 
-        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
+        ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
             .ifPresent(ref -> {
                 stringBuilder.append("Claimant reference: ");
                 stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
@@ -218,7 +229,7 @@ public class PartyUtils {
         SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
         StringBuilder stringBuilder = new StringBuilder();
 
-        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
+        ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
             .ifPresent(ref -> stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference()));
 
         return stringBuilder.toString();
@@ -229,12 +240,12 @@ public class PartyUtils {
         StringBuilder stringBuilder = new StringBuilder();
 
         if (!isRespondentSolicitorNumber2) {
-            Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
+            ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
                 .ifPresent(ref -> stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference()));
         }
 
         if (isRespondentSolicitorNumber2) {
-            Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor2Reference)
+            ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor2Reference)
                 .ifPresent(ref -> stringBuilder.append(solicitorReferences.getRespondentSolicitor2Reference()));
         }
         return stringBuilder.toString();
@@ -262,10 +273,10 @@ public class PartyUtils {
     public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (caseData.getRespondent1().equals(respondent)) {
-                return Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
+                return ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                     .map(RespondentResponseTypeSpec::translate).orElse(null);
             } else {
-                return Optional.ofNullable(caseData.getRespondent2ClaimResponseTypeForSpec())
+                return ofNullable(caseData.getRespondent2ClaimResponseTypeForSpec())
                     .map(RespondentResponseTypeSpec::translate).orElse(null);
             }
         } else {
