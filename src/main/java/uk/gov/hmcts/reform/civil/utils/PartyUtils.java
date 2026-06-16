@@ -152,12 +152,14 @@ public class PartyUtils {
                 .map(friend -> buildPartyNameWithLitigationFriend(partyName, friend))
                 .orElse(partyName);
         }
-        log.error("Party name is null for party {}", party);
-        return null;
+        return partyName;
     }
 
     private static String buildPartyNameWithLitigationFriend(String partyName, LitigationFriend litigationFriend) {
-        return String.format(BY_HIS_LITIGATION_FRIEND, partyName, litigationFriend.getFirstName(), litigationFriend.getLastName());
+        if (litigationFriend != null && litigationFriend.getFirstName() != null && litigationFriend.getLastName() != null) {
+            return String.format(BY_HIS_LITIGATION_FRIEND, partyName, litigationFriend.getFirstName(), litigationFriend.getLastName());
+        }
+        return partyName;
     }
 
     private static String getSoleTraderName(Party party, boolean omitTitle) {
