@@ -286,6 +286,111 @@ class HearingNoticeHmcGeneratorTest {
         assertEquals("Mr. John Rambo", actual.getClaimant());
     }
 
+    @Test
+    void shouldGenerateHearingNoticeHmc_1v1_applicant1_notMinor_withLitigationFriend() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+            )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("John").setLastName("Smith"))
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
+
+        assertEquals("Mr. John Rambo", actual.getClaimant());
+    }
+
+    @Test
+    void shouldGenerateHearingNoticeHmc_1v2_withApplicant2_asMinor() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+            )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant2(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(10)))
+            .applicant2LitigationFriend(new LitigationFriend().setFirstName("Bob").setLastName("Friend"))
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
+
+        assertEquals("Mr. John Rambo", actual.getClaimant());
+        assertEquals("Mr. John Rambo represented by Bob Friend (litigation friend)", actual.getClaimant2());
+    }
+
+    @Test
+    void shouldGenerateHearingNoticeHmc_1v2_withApplicant2_notMinor() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+            )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant2(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant2LitigationFriend(new LitigationFriend().setFirstName("Bob").setLastName("Friend"))
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
+
+        assertEquals("Mr. John Rambo", actual.getClaimant());
+        assertEquals("Mr. John Rambo", actual.getClaimant2());
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldOnlyIgnoreFeeDetails_1v1_whenHearingFeeHasBeenPaidThroughHwFAndCPToggleEnabled() {

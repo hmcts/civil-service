@@ -213,6 +213,78 @@ class HearingFormGeneratorTest {
     }
 
     @Test
+    void shouldGetTemplateData_applicant1_notMinor_withLitigationFriend() {
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .caseManagementLocation(caseManagementLocation)
+            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("John").setLastName("Smith"))
+            .build();
+
+        var actual = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+        assertThat(actual.getClaimant()).isEqualTo("Mr. John Rambo");
+    }
+
+    @Test
+    void shouldGetTemplateData_1v2_withApplicant2_asMinor() {
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .caseManagementLocation(caseManagementLocation)
+            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant2(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(10)))
+            .applicant2LitigationFriend(new LitigationFriend().setFirstName("Bob").setLastName("Friend"))
+            .build();
+
+        var actual = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+        assertThat(actual.getClaimant()).isEqualTo("Mr. John Rambo");
+        assertThat(actual.getClaimant2()).isEqualTo("Mr. John Rambo represented by Bob Friend (litigation friend)");
+    }
+
+    @Test
+    void shouldGetTemplateData_1v2_withApplicant2_notMinor() {
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .caseManagementLocation(caseManagementLocation)
+            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant2(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant2LitigationFriend(new LitigationFriend().setFirstName("Bob").setLastName("Friend"))
+            .build();
+
+        var actual = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+        assertThat(actual.getClaimant()).isEqualTo("Mr. John Rambo");
+        assertThat(actual.getClaimant2()).isEqualTo("Mr. John Rambo");
+    }
+
+    @Test
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_fast_track_ahn() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_TRIAL_AHN)))
             .thenReturn(new DocmosisDocument(HEARING_TRIAL_AHN.getDocumentTitle(), bytes));
