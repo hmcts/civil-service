@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -308,6 +309,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .size(72552)
             .mimeType("application/pdf")
             .originalDocumentName("TEST_DOCUMENT_1.pdf")
+            .createdOn(new Date())
             .createdBy("15")
             .lastModifiedBy("15")
             .links(links)
