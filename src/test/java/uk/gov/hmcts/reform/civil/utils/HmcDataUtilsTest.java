@@ -67,6 +67,24 @@ class HmcDataUtilsTest {
     }
 
     @Test
+    void getLatestPartiesNotifiedResponse_WhenResponsesHaveNullDates_ReturnsLatestDatedResponse() {
+        LocalDateTime now = LocalDateTime.now();
+        var expected = new PartiesNotifiedResponse()
+            .setResponseReceivedDateTime(now)
+            .setRequestVersion(2);
+
+        PartiesNotifiedResponses partiesNotified = new PartiesNotifiedResponses()
+            .setResponses(List.of(
+                new PartiesNotifiedResponse().setRequestVersion(1),
+                expected
+            ));
+
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
     void getLatestPartiesNotifiedResponse_WhenNonEmptyList_ReturnsLatestResponse() {
         LocalDateTime now = LocalDateTime.now();
 
@@ -97,6 +115,25 @@ class HmcDataUtilsTest {
         PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingResponseForRequestVersion(partiesNotified, 1);
 
         assertNull(result);
+    }
+
+    @Test
+    void getHearingResponseForRequestVersion_WhenResponsesHaveNullVersionOrDate_ReturnsLatestMatchingDatedResponse() {
+        LocalDateTime now = LocalDateTime.now();
+        var expected = new PartiesNotifiedResponse()
+            .setRequestVersion(3)
+            .setResponseReceivedDateTime(now);
+
+        PartiesNotifiedResponses partiesNotified = new PartiesNotifiedResponses()
+            .setResponses(List.of(
+                new PartiesNotifiedResponse().setResponseReceivedDateTime(now.plusDays(1)),
+                new PartiesNotifiedResponse().setRequestVersion(3),
+                expected
+            ));
+
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingResponseForRequestVersion(partiesNotified, 3);
+
+        assertEquals(expected, result);
     }
 
     @Test

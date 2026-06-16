@@ -318,7 +318,7 @@ class HearingNoticeSchedulerEventHandlerTest {
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(ListAssistCaseStatus.LISTED));
         // responseReceivedDateTime == RECEIVED_DATETIME: HMC has already accepted the notification
-        // for the current hearing version; data (days + venue) is unchanged → guard fires
+        // for the current hearing version; data (days + venue) is unchanged, so the guard fires.
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
             new PartiesNotifiedResponses().setResponses(List.of(
                 new PartiesNotifiedResponse()
@@ -464,14 +464,14 @@ class HearingNoticeSchedulerEventHandlerTest {
         when(hearingsService.getHearingResponse(anyString(), anyString()))
             .thenThrow(new RuntimeException("HMC unavailable"));
 
-        // handle() must not propagate the exception — the catch block should absorb it
+        // handle() must not propagate the exception; the catch block should absorb it.
         assertDoesNotThrow(() -> handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID)));
     }
 
     @Test
     void shouldSkipPartiesNotifiedPut_whenListedDisallowedCaseAlreadyNotifiedForCurrentVersion() {
         // Hearing data has CHANGED (different days than the stored notification) so we won't
-        // return at the "not changed" guard on line 85 — but HMC already has a record with
+        // return at the "not changed" guard, but HMC already has a record with
         // responseReceivedDateTime == hmcReceivedDateTime, so the fail-fast guard fires.
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(ListAssistCaseStatus.LISTED));

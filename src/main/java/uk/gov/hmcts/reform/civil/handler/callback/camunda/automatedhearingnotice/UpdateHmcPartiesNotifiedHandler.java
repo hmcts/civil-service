@@ -74,7 +74,7 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         LocalDateTime receivedDateTime = camundaVariables.getResponseDateTime();
 
         if (hmcAlreadyHasNotification(hearingId, requestVersion, receivedDateTime)) {
-            log.info("Skipping partiesNotified PUT — already notified for caseId {}, hearingId {}, requestVersion {}",
+            log.info("Skipping partiesNotified PUT - already notified for caseId {}, hearingId {}, requestVersion {}",
                      ccdCaseReference, hearingId, requestVersion);
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }

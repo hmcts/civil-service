@@ -104,8 +104,10 @@ public class HearingNoticeSchedulerEventHandler {
         );
 
         if (!requiresNewHearingNotice) {
-            acknowledgeUnchangedHearingIfNeeded(
-                hearingId, hearing, hearingVersion, hearingRxDateTime, notifiedServiceData, alreadyNotified);
+            if (!alreadyNotified) {
+                acknowledgeUnchangedHearing(
+                    hearingId, hearing, hearingVersion, hearingRxDateTime, notifiedServiceData);
+            }
             return;
         }
 
@@ -133,14 +135,9 @@ public class HearingNoticeSchedulerEventHandler {
         notifyHmc(hearingId, hearing, notifiedServiceData);
     }
 
-    private void acknowledgeUnchangedHearingIfNeeded(String hearingId, HearingGetResponse hearing, int hearingVersion,
-                                                     LocalDateTime hearingRxDateTime,
-                                                     PartiesNotifiedServiceData notifiedServiceData,
-                                                     boolean alreadyNotified) {
-        if (alreadyNotified) {
-            return;
-        }
-
+    private void acknowledgeUnchangedHearing(String hearingId, HearingGetResponse hearing, int hearingVersion,
+                                             LocalDateTime hearingRxDateTime,
+                                             PartiesNotifiedServiceData notifiedServiceData) {
         try {
             log.info(
                 "Updating parties notified for unchanged hearing [{}], version [{}], response RxDate [{}].",
