@@ -103,17 +103,15 @@ public class HearingNoticeSchedulerEventHandler {
             alreadyNotified
         );
 
-        if (!requiresNewHearingNotice) {
-            if (!alreadyNotified) {
-                acknowledgeUnchangedHearing(
-                    hearingId, hearing, hearingVersion, hearingRxDateTime, notifiedServiceData);
-            }
-            return;
-        }
-
         if (alreadyNotified) {
             log.info("Skipping hearing id: [{}] already notified for this version [{}]",
                      hearingId, hearingVersion);
+            return;
+        }
+
+        if (!requiresNewHearingNotice) {
+            acknowledgeUnchangedHearing(
+                hearingId, hearing, hearingVersion, hearingRxDateTime, notifiedServiceData);
             return;
         }
 
