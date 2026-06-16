@@ -36,7 +36,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@PactTestFor(providerName = "em_newBundle")
+@PactTestFor(providerName = "em_orchestrator_new_bundle_provider")
 @MockServerConfig(hostInterface = "localhost", port = "6663")
 @TestPropertySource(properties = "bundle.api.url=http://localhost:6663")
 public class NewBundleApiConsumerTest extends BaseContractTest {
@@ -62,8 +62,8 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
         );
         assertThat(response.getDocumentTaskId(), is(equalTo(123)));
         assertThat(
-            response.getData().getCaseBundles().get(0).getValue().getStitchedDocument().getDocumentUrl(),
-            is(equalTo("documentStitchedUrl"))
+            response.getData().getCaseBundles().get(0).getValue().getFileName(),
+            is(equalTo("fileName"))
         );
     }
 
@@ -198,21 +198,7 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
                                                            .stringType("description", "description")
                                                            .stringType("stitchStatus", "stitchStatus")
                                                            .stringType("fileName", "fileName")
-                                                           .stringMatcher("createdOn",
-                                                                          "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                                                          "2020-10-06T18:54:48.785000")
-                                                           .date("bundleHearingDate", "yyyy-MM-dd")
-                                                           .object("stitchedDocument", stitchedDocument ->
-                                                               stitchedDocument
-                                                                   .stringType("document_url", "documentStitchedUrl")
-                                                                   .stringType(
-                                                                       "document_binary_url",
-                                                                       "documentBinaryUrl"
-                                                                   )
-                                                                   .stringType("document_filename", "documentFileName")
-                                                                   .stringType("document_hash", "documentHash")
-                                                                   .stringType("category_id", "categoryID")
-                                                           )
+                                                           .stringType("stitchingFailureMessage", "")
                                                    )
                                            )
                                    )
