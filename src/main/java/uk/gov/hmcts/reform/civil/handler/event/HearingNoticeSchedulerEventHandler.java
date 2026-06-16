@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.ListAssistCaseStatus;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
@@ -82,15 +83,16 @@ public class HearingNoticeSchedulerEventHandler {
             return;
         }
 
-        PartiesNotifiedResponse notifiedResponse = getLatestPartiesNotifiedResponse(hearingId);
+        PartiesNotifiedResponses partiesNotified = getPartiesNotifiedResponses(hearingId);
+        PartiesNotifiedResponse notifiedResponse = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
         Integer notifiedVersion = notifiedResponse != null ? notifiedResponse.getRequestVersion() : null;
         LocalDateTime notifiedRxDateTime = notifiedResponse != null ? notifiedResponse.getResponseReceivedDateTime() : null;
         PartiesNotifiedServiceData notifiedServiceData = (notifiedResponse != null && notifiedResponse.getServiceData() != null)
             ? notifiedResponse.getServiceData() : new PartiesNotifiedServiceData();
 
         boolean requiresNewHearingNotice = HmcDataUtils.requiresNewHearingNotice(notifiedResponse, hearing);
-        boolean alreadyNotified = HmcDataUtils.isAlreadyNotifiedResponse(
-            notifiedResponse, hearingVersion, hearingRxDateTime);
+        boolean alreadyNotified = HmcDataUtils.hasAlreadyNotifiedResponse(
+            partiesNotified, hearingVersion, hearingRxDateTime);
         log.info(
             "Hearing [{}] requested Version [{}], response RxDate [{}], notified Version [{}], notified RxDate [{}], "
                 + "requires new hearing notice [{}], already notified [{}].",
@@ -156,12 +158,12 @@ public class HearingNoticeSchedulerEventHandler {
         }
     }
 
-    private static boolean isAllowedState(String state, String caseReferene) {
+    private static boolean isAllowedState(String state, String caseReference) {
         try {
             CaseState caseState = CaseState.valueOf(state);
             return !Arrays.asList(DISALLOWED_CASE_STATES).contains(caseState);
         } catch (IllegalArgumentException e) {
-            log.info("Case state is not a valid one {} ", caseReferene);
+            log.info("Case state is not a valid one {} ", caseReference);
             return false;
         }
     }
@@ -192,9 +194,8 @@ public class HearingNoticeSchedulerEventHandler {
         );
     }
 
-    private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId) {
-        var partiesNotified = hearingsService.getPartiesNotifiedResponses(
+    private PartiesNotifiedResponses getPartiesNotifiedResponses(String hearingId) {
+        return hearingsService.getPartiesNotifiedResponses(
             getSystemUpdateUser().getUserToken(), hearingId);
-        return HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
     }
 }
