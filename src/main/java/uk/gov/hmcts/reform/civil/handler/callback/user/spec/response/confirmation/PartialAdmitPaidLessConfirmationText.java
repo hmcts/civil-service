@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -17,13 +18,12 @@ public class PartialAdmitPaidLessConfirmationText implements RespondToClaimConfi
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        if ((!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && !RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
-            || (NO.equals(caseData.getSpecDefenceAdmittedRequired())
-            && NO.equals(caseData.getSpecDefenceAdmitted2Required()))) {
+        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
             return Optional.empty();
         }
-        BigDecimal howMuchWasPaid = (caseData.getResponseToClaim() != null ? caseData.getResponseToClaim().getHowMuchWasPaid() : null);
+        BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+            .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
 
         if (howMuchWasPaid == null || totalClaimAmount == null) {

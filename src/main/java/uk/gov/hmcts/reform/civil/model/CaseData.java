@@ -738,48 +738,35 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isPayBySetDate() {
-        return (defenceAdmitPartPaymentTimeRouteRequired != null
-            && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            || (getDefenceAdmitPartPaymentTimeRouteRequired2() != null
-            && getDefenceAdmitPartPaymentTimeRouteRequired2() == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        return defenceAdmitPartPaymentTimeRouteRequired != null
+            && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
     }
 
     @JsonIgnore
     public boolean isPayByInstallment() {
-        return (defenceAdmitPartPaymentTimeRouteRequired != null
+        return defenceAdmitPartPaymentTimeRouteRequired != null
             && defenceAdmitPartPaymentTimeRouteRequired
-            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-            || (getDefenceAdmitPartPaymentTimeRouteRequired2() != null
-            && getDefenceAdmitPartPaymentTimeRouteRequired2()
-            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
     }
 
     @JsonIgnore
     public boolean isPayImmediately() {
-        return (getDefenceAdmitPartPaymentTimeRouteRequired2() != null
-            && getDefenceAdmitPartPaymentTimeRouteRequired2()
-            == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            || (RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(getDefenceAdmitPartPaymentTimeRouteRequired()));
+        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 
     @JsonIgnore
     public boolean hasDefendantPaidTheAmountClaimed() {
         return SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
-            .equals(getDefenceRouteRequired()) || SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
-                .equals(getDefenceRouteRequired2());
+            .equals(getDefenceRouteRequired());
     }
 
     @JsonIgnore
     public boolean isPaidFullAmount() {
         RespondToClaim localRespondToClaim = null;
-        if (FULL_DEFENCE == getRespondent1ClaimResponseTypeForSpec()) {
+        if (getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
             localRespondToClaim = getRespondToClaim();
-        } else if (PART_ADMISSION == getRespondent1ClaimResponseTypeForSpec()) {
+        } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
             localRespondToClaim = getRespondToAdmittedClaim();
-        } else if (PART_ADMISSION == getRespondent2ClaimResponseTypeForSpec()) {
-            localRespondToClaim = getRespondToAdmittedClaim2();
-        } else if (FULL_DEFENCE == getRespondent2ClaimResponseTypeForSpec()) {
-            localRespondToClaim = getRespondToClaim2();
         }
 
         return ofNullable(localRespondToClaim)
@@ -791,8 +778,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isClaimBeingDisputed() {
         return SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
-            .equals(getDefenceRouteRequired()) || SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
-                .equals(getDefenceRouteRequired2());
+            .equals(getDefenceRouteRequired());
     }
 
     @JsonIgnore
@@ -1241,27 +1227,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public RespondToClaim getResponseToClaim() {
-        // Prefer respondent-specific admitted-claim when the relevant respondent flag is explicitly set to YES,
-        // but return null as it should always set either Respondent 1 or Respondent 2 values.
-        if (YES.equals(getIsRespondent1())) {
-            if (getRespondToAdmittedClaim() != null) {
-                return getRespondToAdmittedClaim();
-            }
-            if (getRespondToClaim() != null) {
-                return getRespondToClaim();
-            }
-        }
-
-        if (YES.equals(getIsRespondent2())) {
-            if (getRespondToAdmittedClaim2() != null) {
-                return getRespondToAdmittedClaim2();
-            }
-            if (getRespondToClaim2() != null) {
-                return getRespondToClaim2();
-            }
-        }
-
-        return null;
+        return getRespondToAdmittedClaim() != null ? getRespondToAdmittedClaim() : getRespondToClaim();
     }
 
     @JsonIgnore
