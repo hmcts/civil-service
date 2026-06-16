@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -27,9 +28,10 @@ public class JacksonConfiguration {
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jsonDateTimeFormatCustomizer() {
         return builder -> {
-            builder.modules(javaTimeModule());
             builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
             builder.simpleDateFormat(DATE_TIME_FORMAT);
+            builder.serializers(new LocalDateSerializer(DATE_FORMATTER));
+            builder.serializers(new LocalDateTimeSerializer(DATE_TIME_FORMATTER));
         };
     }
 
@@ -47,6 +49,7 @@ public class JacksonConfiguration {
     }
 
     private static void configureObjectMapper(ObjectMapper objectMapper) {
+        objectMapper.registerModule(new Jdk8Module());
         objectMapper.registerModule(javaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.setDateFormat(new SimpleDateFormat(DATE_TIME_FORMAT, Locale.UK));
