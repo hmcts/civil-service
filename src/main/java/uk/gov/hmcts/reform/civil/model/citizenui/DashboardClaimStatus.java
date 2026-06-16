@@ -171,6 +171,9 @@ public enum DashboardClaimStatus {
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
+    DEFAULT_JUDGEMENT_REQUESTED(
+        Claim::isDefaultJudgementRequested
+    ),
     DEFAULT_JUDGEMENT(
         Claim::isClaimantDefaultJudgement
     ),
@@ -224,6 +227,9 @@ public enum DashboardClaimStatus {
     ),
     CLAIMANT_ACCEPTED_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionAccepted
+    ),
+    JUDGMENT_BUFFER_ELIGIBLE(
+        Claim::isJudgmentBufferEligible
     ),
     ELIGIBLE_FOR_CCJ(
         Claim::isEligibleForCCJ
