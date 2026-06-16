@@ -168,6 +168,12 @@ public class CmcClaim implements Claim {
 
     @Override
     @JsonIgnore
+    public boolean isJudgmentBufferEligible() {
+        return false;
+    }
+
+    @Override
+    @JsonIgnore
     public boolean claimantConfirmedDefendantPaid() {
         return moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null;
     }
