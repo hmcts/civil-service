@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -85,10 +86,12 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .setLegacyCaseNumber(caseData.getLegacyCaseReference())
             .setCaseNumber(caseData.getCcdCaseReference().toString())
             .setCreationDate(getDateFormatted(LocalDate.now()))
-            .setClaimant(caseData.getApplicant1().getPartyName())
+            .setClaimant(PartyUtils.getPartyNameWithLitigiousFriend(caseData.getApplicant1(),
+                                                                   caseData.getApplicant1LitigationFriend()))
             .setClaimantReference(checkReference(caseData)
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
-            .setDefendant(caseData.getRespondent1().getPartyName())
+            .setDefendant(PartyUtils.getPartyNameWithLitigiousFriend(caseData.getRespondent1(),
+                                                                     caseData.getRespondent1LitigationFriend()))
             .setDefendantReference(checkReference(caseData)
                                     ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
             .setHearingDate(getDateFormatted(caseData.getHearingDate()))
@@ -102,8 +105,12 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .setAdditionalText(caseData.getHearingNoticeListOther())
             .setClaimant2exists(nonNull(caseData.getApplicant2()))
             .setDefendant2exists(nonNull(caseData.getRespondent2()))
-            .setClaimant2(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
-            .setDefendant2(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
+            .setClaimant2(nonNull(caseData.getApplicant2())
+                              ? PartyUtils.getPartyNameWithLitigiousFriend(caseData.getApplicant2(),
+                                                                           caseData.getApplicant2LitigationFriend()) : null)
+            .setDefendant2(nonNull(caseData.getRespondent2())
+                               ? PartyUtils.getPartyNameWithLitigiousFriend(caseData.getRespondent2(),
+                                                                            caseData.getRespondent2LitigationFriend()) : null)
             .setClaimant2Reference(checkReference(caseData)
                                     ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
             .setDefendant2Reference(checkReference(caseData)

@@ -241,8 +241,8 @@ class HearingNoticeHmcGeneratorTest {
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
                                                             HEARING_NOTICE_HMC);
 
-        assertEquals("Mr. John Rambo (by his litigation friend John Smith) ", actual.getClaimant());
-        assertEquals("Mr. Sole Trader T/A Sole Trader co (by his litigation friend Jane Doe) ", actual.getDefendant());
+        assertEquals("Mr. John Rambo represented by John Smith (litigation friend)", actual.getClaimant());
+        assertEquals("Mr. Sole Trader T/A Sole Trader co represented by Jane Doe (litigation friend)", actual.getDefendant());
     }
 
     @ParameterizedTest

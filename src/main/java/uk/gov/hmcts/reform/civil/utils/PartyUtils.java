@@ -44,7 +44,7 @@ public class PartyUtils {
 
     private static final String SPACE = " ";
     private static final String TRADING_AS = " T/A %s";
-    private static final String BY_HIS_LITIGATION_FRIEND = "%s (by his litigation friend %s %s) ";
+    private static final String BY_HIS_LITIGATION_FRIEND = "%s represented by %s %s (litigation friend)";
 
     private PartyUtils() {
         //NO-OP
