@@ -43,7 +43,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CANCEL_DOC_TRANSLATION_TASK;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CANCEL_DOCUMENT_TRANSLATION_TASK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_GA_LANGUAGE_UPDATE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
@@ -98,7 +98,7 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
 
     private void stubStartUpdateCaseData(CaseData startEventCaseData) {
         CaseDetails caseDetails = CaseDetails.builder().build();
-        when(coreCaseDataService.startUpdate("123", CANCEL_DOC_TRANSLATION_TASK))
+        when(coreCaseDataService.startUpdate("123", CANCEL_DOCUMENT_TRANSLATION_TASK))
             .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(startEventCaseData);
     }
@@ -405,9 +405,9 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
-            verify(coreCaseDataService).startUpdate("123", CANCEL_DOC_TRANSLATION_TASK);
+            verify(coreCaseDataService).startUpdate("123", CANCEL_DOCUMENT_TRANSLATION_TASK);
             verify(caseDetailsConverter).toCaseData(any(CaseDetails.class));
-            verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOC_TRANSLATION_TASK);
+            verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOCUMENT_TRANSLATION_TASK);
         }
 
         @Test
@@ -422,7 +422,7 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
-            verify(coreCaseDataService, never()).triggerEvent(anyLong(), eq(CANCEL_DOC_TRANSLATION_TASK));
+            verify(coreCaseDataService, never()).triggerEvent(anyLong(), eq(CANCEL_DOCUMENT_TRANSLATION_TASK));
         }
 
         @Test
@@ -437,9 +437,9 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
-            verify(coreCaseDataService).startUpdate("123", CANCEL_DOC_TRANSLATION_TASK);
+            verify(coreCaseDataService).startUpdate("123", CANCEL_DOCUMENT_TRANSLATION_TASK);
             verify(caseDetailsConverter).toCaseData(any(CaseDetails.class));
-            verify(coreCaseDataService, never()).triggerEvent(anyLong(), eq(CANCEL_DOC_TRANSLATION_TASK));
+            verify(coreCaseDataService, never()).triggerEvent(anyLong(), eq(CANCEL_DOCUMENT_TRANSLATION_TASK));
         }
 
         @Test
@@ -454,9 +454,9 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
-            verify(coreCaseDataService).startUpdate("123", CANCEL_DOC_TRANSLATION_TASK);
+            verify(coreCaseDataService).startUpdate("123", CANCEL_DOCUMENT_TRANSLATION_TASK);
             verify(caseDetailsConverter).toCaseData(any(CaseDetails.class));
-            verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOC_TRANSLATION_TASK);
+            verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOCUMENT_TRANSLATION_TASK);
         }
 
         @Test
@@ -471,7 +471,7 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
-            verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOC_TRANSLATION_TASK);
+            verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOCUMENT_TRANSLATION_TASK);
         }
 
         @Test
@@ -488,7 +488,7 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
-            verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOC_TRANSLATION_TASK);
+            verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOCUMENT_TRANSLATION_TASK);
         }
 
         @Test
@@ -503,9 +503,9 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
-            verify(coreCaseDataService).startUpdate("123", CANCEL_DOC_TRANSLATION_TASK);
+            verify(coreCaseDataService).startUpdate("123", CANCEL_DOCUMENT_TRANSLATION_TASK);
             verify(caseDetailsConverter).toCaseData(any(CaseDetails.class));
-            verify(coreCaseDataService, never()).triggerEvent(anyLong(), eq(CANCEL_DOC_TRANSLATION_TASK));
+            verify(coreCaseDataService, never()).triggerEvent(anyLong(), eq(CANCEL_DOCUMENT_TRANSLATION_TASK));
         }
     }
 }

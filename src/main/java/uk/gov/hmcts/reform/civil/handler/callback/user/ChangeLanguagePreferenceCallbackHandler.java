@@ -34,7 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CANCEL_DOC_TRANSLATION_TASK;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CANCEL_DOCUMENT_TRANSLATION_TASK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_GA_LANGUAGE_UPDATE;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH;
@@ -162,7 +162,9 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
     private CallbackResponse cancelWATaskIfPreferredLanguageIsEnglish(CallbackParams callbackParams) {
         final CaseData caseData = callbackParams.getCaseData();
         Long caseId = caseData.getCcdCaseReference();
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId.toString(), CANCEL_DOC_TRANSLATION_TASK);
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId.toString(),
+                                                                                CANCEL_DOCUMENT_TRANSLATION_TASK
+        );
         CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         UserType userType = getUserType(Optional.ofNullable(caseData.getChangeLanguagePreference()));
 
@@ -174,7 +176,7 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
         }
 
         if (shouldCancelWaTask) {
-            coreCaseDataService.triggerEvent(caseId, CANCEL_DOC_TRANSLATION_TASK);
+            coreCaseDataService.triggerEvent(caseId, CANCEL_DOCUMENT_TRANSLATION_TASK);
         }
         return SubmittedCallbackResponse.builder().build();
     }
