@@ -738,10 +738,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isPayBySetDate() {
-        return (defenceAdmitPartPaymentTimeRouteRequired != null
-            && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            || (getDefenceAdmitPartPaymentTimeRouteRequired2() != null
-            && getDefenceAdmitPartPaymentTimeRouteRequired2() == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        return defenceAdmitPartPaymentTimeRouteRequired != null
+            && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
     }
 
     @JsonIgnore

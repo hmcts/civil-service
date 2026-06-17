@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -23,7 +24,9 @@ public class PartialAdmitPaidLessConfirmationText implements RespondToClaimConfi
             && NO.equals(caseData.getSpecDefenceAdmitted2Required()))) {
             return Optional.empty();
         }
-        BigDecimal howMuchWasPaid = (caseData.getResponseToClaim() != null ? caseData.getResponseToClaim().getHowMuchWasPaid() : null);
+        BigDecimal howMuchWasPaid = (caseData.getResponseToClaim() != null ? caseData.getResponseToClaim().getHowMuchWasPaid() :
+            Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+            .map(RespondToClaim::getHowMuchWasPaid).orElse(null));
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
 
         if (howMuchWasPaid == null || totalClaimAmount == null) {
