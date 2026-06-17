@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -31,6 +32,7 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
+    private final ObjectMapper objectMapper;
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -94,7 +96,22 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
     }
 
     private boolean isHearingFeePaid(PaymentDetails hearingFeePaymentDetails, CaseData caseData) {
-        return isSuccessfulPaymentBeforeDueDate(hearingFeePaymentDetails, caseData) || caseData.hearingFeePaymentDoneWithHWF();
+        log.info(
+            "Checking isHearingFeePaid: caseId={}, hearingHelpFeesReferenceNumber={}, "
+                + "feePaymentOutcomeDetails={}, hwfFullRemissionGrantedForHearingFee={}, "
+                + "caseDataObject={}, caseDataMap={}",
+            caseData.getCcdCaseReference(),
+            caseData.getHearingHelpFeesReferenceNumber(),
+            caseData.getFeePaymentOutcomeDetails(),
+            caseData.getFeePaymentOutcomeDetails() == null
+                ? null
+                : caseData.getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee(),
+            caseData,
+            caseData.toMap(objectMapper)
+        );
+
+        return isSuccessfulPaymentBeforeDueDate(hearingFeePaymentDetails, caseData)
+            || caseData.hearingFeePaymentDoneWithHWF();
     }
 
     private boolean isSuccessfulPaymentBeforeDueDate(PaymentDetails hearingFeePaymentDetails, CaseData caseData) {

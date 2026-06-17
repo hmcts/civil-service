@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,6 +62,9 @@ class HearingFeeDueHandlerTest {
 
     @Mock
     private FeatureToggleService featureToggleService;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @InjectMocks
     private HearingFeeDueHandler handler;
