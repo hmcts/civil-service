@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -65,6 +66,10 @@ public class LIPClaimSettledCallbackHandler extends CallbackHandler {
         CaseData caseDataUpdated = callbackParams.getCaseData();
         caseDataUpdated.setPreviousCCDState(caseDataUpdated.getCcdState());
         caseDataUpdated.setBusinessProcess(BusinessProcess.ready(LIP_CLAIM_SETTLED));
+        if (featureToggleService.isJudgmentBufferEnabled()
+            && CaseState.JUDGMENT_REQUESTED.equals(caseDataUpdated.getCcdState())) {
+            JudgmentsOnlineHelper.clearJOCaseData(caseDataUpdated);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
             .build();
