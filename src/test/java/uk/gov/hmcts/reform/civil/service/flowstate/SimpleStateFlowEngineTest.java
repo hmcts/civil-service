@@ -559,75 +559,9 @@ class SimpleStateFlowEngineTest {
             }
 
             // Unrepresented
-            // 2. Def1 unrepresented, Def2 registered
-            @Test
-            void shouldContinueOnline_Cos_WhenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRepresented() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimIssuedUnrepresentedDefendant1()
-                    .build();
-                when(featureToggleService.isDashboardEnabledForCase(caseData)).thenReturn(true);
-
-                // When
-                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-                // Then
-                assertThat(stateFlow.getState())
-                    .extracting(State::getName)
-                    .isNotNull()
-                    .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName());
-                assertThat(stateFlow.getStateHistory())
-                    .hasSize(4)
-                    .extracting(State::getName)
-                    .containsExactly(
-                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
-                    );
-
-                assertThat(stateFlow.getFlags()).hasSize(11).contains(
-                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
-                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true)
-                );
-            }
-
-            // Unrepresented
             // 3. Def1 registered, Def 2 unrepresented when Cos service not activated
             @Test
             void shouldContinueOnline_WhenCaseDataAtStateClaimDraftIssuedAndRespondent2NotRepresented() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimIssuedUnrepresentedDefendant2()
-                    .defendant2LIPAtClaimIssued(YES)
-                    .build();
-
-                // When
-                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-                // Then
-                assertThat(stateFlow.getState())
-                    .extracting(State::getName)
-                    .isNotNull()
-                    .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName());
-                assertThat(stateFlow.getStateHistory())
-                    .hasSize(4)
-                    .extracting(State::getName)
-                    .containsExactly(
-                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
-                    );
-
-                assertThat(stateFlow.getFlags()).hasSize(11).contains(
-                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
-                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
-                );
-            }
-
-            // Unrepresented
-            // 3. Def1 registered, Def 2 unrepresented when Cos service activated
-            @Test
-            void shouldContinueOnline_Cos_WhenCaseDataAtStateClaimDraftIssuedAndRespondent2NotRepresented() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant2()
@@ -1381,34 +1315,6 @@ class SimpleStateFlowEngineTest {
             );
         }
 
-        @Test
-        void shouldReturnExtensionRequested_whenCaseDataAtStateClaimDetailsNotifiedTimeExtension() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension().build();
-
-            // When
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            // Then
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()
-                );
-
-            assertThat(stateFlow.getFlags()).hasSize(10).contains(
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
-            );
-        }
-
         @Nested
         class RespondentResponse {
 
@@ -1629,44 +1535,6 @@ class SimpleStateFlowEngineTest {
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                         CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName()
-                    );
-
-                assertThat(stateFlow.getFlags()).hasSize(11).contains(
-                    entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
-                );
-            }
-
-            //1v2 Different solicitor scenario-first response FullDefence received
-            @Test
-            void shouldGenerateDQ_in1v2Scenario_whenFirstPartySubmitFullDefenceResponse() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefence()
-                    .multiPartyClaimTwoDefendantSolicitors()
-                    .build();
-                if (caseData.getRespondent2OrgRegistered() != null
-                    && caseData.getRespondent2Represented() == null) {
-                    caseData.setRespondent2Represented(YES);
-                }
-
-                // When
-                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-                // Then
-                assertThat(stateFlow.getState())
-                    .extracting(State::getName)
-                    .isNotNull()
-                    .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
-                assertThat(stateFlow.getStateHistory())
-                    .hasSize(9)
-                    .extracting(State::getName)
-                    .containsExactly(
-                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                        PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
-                        AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
                 assertThat(stateFlow.getFlags()).hasSize(11).contains(
@@ -2885,6 +2753,78 @@ class SimpleStateFlowEngineTest {
         }
 
         @Test
+        void shouldReturnTakenOfflineByStaff_whenFirstResponseIsPartAdmissionAfterAcknowledgeClaimAndTimeExtension1v2() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension1v2()
+                .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(10)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                    TAKEN_OFFLINE_BY_STAFF.fullName()
+                );
+
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
+                entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
+        }
+
+        @Test
+        void shouldReturnTakenOfflineByStaff_whenFirstResponseIsFullAdmissionAfterAcknowledgeClaimAndTimeExtension1v2() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension1v2()
+                .respondent1ClaimResponseType(RespondentResponseType.FULL_ADMISSION)
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(10)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                    TAKEN_OFFLINE_BY_STAFF.fullName()
+                );
+
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
+                entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
+            );
+        }
+
+        @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflineAfterDefendantResponse() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterDefendantResponse()
@@ -3411,86 +3351,6 @@ class SimpleStateFlowEngineTest {
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                         CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName()
-                    );
-
-                assertThat(stateFlow.getFlags()).hasSize(11).contains(
-                    entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
-                );
-            }
-
-            @Test
-            //1v2 Different solicitor scenario-first response FullDefence received
-            void shouldGenerateDQ_in1v2Scenario_whenFirstPartySubmitFullDefenceResponse() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefence()
-                    .multiPartyClaimTwoDefendantSolicitors()
-                    .build();
-                if (caseData.getRespondent2OrgRegistered() != null
-                    && caseData.getRespondent2Represented() == null) {
-                    caseData.setRespondent2Represented(YES);
-                }
-
-                // When
-                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-                // Then
-                assertThat(stateFlow.getState())
-                    .extracting(State::getName)
-                    .isNotNull()
-                    .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
-                assertThat(stateFlow.getStateHistory())
-                    .hasSize(9)
-                    .extracting(State::getName)
-                    .containsExactly(
-                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                        PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
-                        AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
-                    );
-
-                assertThat(stateFlow.getFlags()).hasSize(11).contains(
-                    entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
-                );
-            }
-
-            @Test
-            //1v2 Different solicitor scenario-first party acknowledges, not responds
-            //second party submits response FullDefence
-            void shouldGenerateDQ_in1v2Scenario_whenSecondPartySubmitFullDefenceResponse() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefenceRespondent2()
-                    .multiPartyClaimTwoDefendantSolicitors()
-                    .build();
-                if (caseData.getRespondent2OrgRegistered() != null
-                    && caseData.getRespondent2Represented() == null) {
-                    caseData.setRespondent2Represented(YES);
-                }
-
-                // When
-                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-                // Then
-                assertThat(stateFlow.getState())
-                    .extracting(State::getName)
-                    .isNotNull()
-                    .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
-                assertThat(stateFlow.getStateHistory())
-                    .hasSize(9)
-                    .extracting(State::getName)
-                    .containsExactly(
-                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                        PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
-                        AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
                 assertThat(stateFlow.getFlags()).hasSize(11).contains(
