@@ -15,7 +15,9 @@ public class FullAdmitAlreadyPaidConfirmationText implements RespondToClaimConfi
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || !YesOrNo.YES.equals(caseData.getSpecDefenceFullAdmittedRequired())) {
+            && !RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            || !YesOrNo.YES.equals(caseData.getSpecDefenceFullAdmittedRequired())
+            && !YesOrNo.YES.equals(caseData.getSpecDefenceFullAdmitted2Required())) {
             return Optional.empty();
         }
 
