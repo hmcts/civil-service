@@ -26,6 +26,14 @@ spring:
     cache-names: userInfoCache, accessTokenCache
     caffeine:
       spec: expireAfterWrite=3600s
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      ssl:
+        enabled: ${REDIS_SSL_ENABLED:false}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
   jpa:
     properties:
       hibernate.query.mutation_strategy: org.hibernate.query.sqm.mutation.internal.inline.InlineMutationStrategy
@@ -937,3 +945,10 @@ court_location_dmn:
 
 stitch-bundle:
   wait-time-in-milliseconds: ${WAIT_TIME_IN_MILLISECONDS:3000}
+
+case-user-roles-cache:
+  enabled: ${CASE_USER_ROLES_CACHE_ENABLED:true}
+  ttl-seconds: ${CASE_USER_ROLES_CACHE_TTL:30}
+  negative-ttl-seconds: ${CASE_USER_ROLES_CACHE_NEGATIVE_TTL:10}
+  key-prefix: "civil:v1:case-user-roles"
+  caffeine-max-size: 10000
