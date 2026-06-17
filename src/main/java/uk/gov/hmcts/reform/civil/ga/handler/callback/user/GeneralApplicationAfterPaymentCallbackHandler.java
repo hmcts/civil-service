@@ -18,7 +18,9 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDe
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.service.GeneralAppsDeadlinesCalculator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_COSC_APPLICATION_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @Slf4j
 @Service
@@ -35,8 +38,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPL
 public class GeneralApplicationAfterPaymentCallbackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = singletonList(INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT);
+    private static final int GA_RESPONSE_DEADLINE_DAYS = 4;
     private final ObjectMapper objectMapper;
     private final GaForLipService gaForLipService;
+    private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -64,6 +69,8 @@ public class GeneralApplicationAfterPaymentCallbackHandler extends CallbackHandl
             return getCallbackResponse(caseDataBuilder);
         }
 
+        resetRespondentResponseDeadline(caseData, caseDataBuilder);
+
         if (caseData.getGeneralAppType().getTypes().contains(
             GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
             caseDataBuilder.businessProcess(BusinessProcess
@@ -82,6 +89,24 @@ public class GeneralApplicationAfterPaymentCallbackHandler extends CallbackHandl
         }
 
         return getCallbackResponse(caseDataBuilder);
+    }
+
+    private void resetRespondentResponseDeadline(GeneralApplicationCaseData caseData,
+                                                 GeneralApplicationCaseData caseDataBuilder) {
+        if (caseData.getGeneralAppNotificationDeadlineDate() == null) {
+            return;
+        }
+
+        LocalDateTime deadline = deadlinesCalculator.calculateApplicantResponseDeadlineWithWeekendCheck(
+            LocalDateTime.now(), GA_RESPONSE_DEADLINE_DAYS
+        );
+        caseDataBuilder.generalAppNotificationDeadlineDate(deadline);
+        caseDataBuilder.respondentResponseDeadlineChecked(NO);
+        log.info(
+            "General application respondent response deadline reset after payment for caseId: {} to {}",
+            caseData.getCcdCaseReference(),
+            deadline
+        );
     }
 
     private CallbackResponse getCallbackResponse(GeneralApplicationCaseData caseDataBuilder) {
