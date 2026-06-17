@@ -6,13 +6,14 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
+/**
+ * Runner for scheduled tasks that coordinates between event tracking, searching and processing.
+ * This component is prototype-scoped to ensure isolated state per scheduler instance.
+ */
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @RequiredArgsConstructor
@@ -22,51 +23,85 @@ public class ScheduledTaskRunner {
     private final ScheduledEventTracker eventTracker;
     private final ScheduledTaskProcessor scheduledTaskProcessor;
 
+    /**
+     * Executes the scheduled task for cases found in the search result.
+     * Handles null search results and empty search results by logging and tracking events appropriately.
+     *
+     * @param eventConfig   the event configuration
+     * @param searchResult  the result of the elastic search
+     * @param scheduledTask the task to be performed on each case
+     */
     public void run(ScheduledTaskEventConfiguration eventConfig,
-                    Supplier<Set<CaseDetails>> caseDetailsSupplier,
+                    ElasticSearchResult searchResult,
                     Consumer<CaseDetails> scheduledTask) {
 
-        final Set<CaseDetails> cases;
-        try {
-            cases = Optional.ofNullable(caseDetailsSupplier.get())
-                .orElse(Collections.emptySet());
-        } catch (Exception e) {
-            eventTracker.jobAbortedEvent(eventConfig, e.getMessage());
-            log.error("Scheduled task aborted due to error during case retrieval: {}", eventConfig.getSchedulerName(), e);
+        if (searchResult == null) {
+            eventTracker.jobAbortedEvent(eventConfig, "SearchResult cannot be null");
+            log.error(
+                "Scheduled task aborted due to SearchResult being null: {}",
+                eventConfig.getSchedulerName()
+            );
             return;
         }
 
-        if (cases.isEmpty()) {
+        if (searchResult.isEmpty()) {
             eventTracker.jobStartedEvent(eventConfig, 0);
             eventTracker.jobCompletedNoCasesEvent(eventConfig);
             log.info("Scheduled task completed: {}, totalCases: 0", eventConfig.getSchedulerName());
-        } else {
-            processCaseDetails(eventConfig, scheduledTask, cases);
+            return;
         }
+
+        processCaseDetails(eventConfig, scheduledTask, searchResult);
     }
 
-    private void processCaseDetails(ScheduledTaskEventConfiguration eventConfig, Consumer<CaseDetails> scheduledTask, Set<CaseDetails> cases) {
-        eventTracker.jobStartedEvent(eventConfig, cases.size());
-        log.info("Running scheduled task: {}, totalCases: {}", eventConfig.getSchedulerName(), cases.size());
+    /**
+     * Orchestrates the processing of case details by delegating to {@link ScheduledTaskProcessor}.
+     * Tracks the start, completion, or early abortion of the job.
+     *
+     * @param eventConfig   the event configuration
+     * @param scheduledTask the task to be performed on each case
+     * @param searchResult  the result of the elastic search containing the stream of cases
+     */
+    private void processCaseDetails(ScheduledTaskEventConfiguration eventConfig,
+                                    Consumer<CaseDetails> scheduledTask,
+                                    ElasticSearchResult searchResult) {
+        int totalCases = searchResult.totalResults();
+        eventTracker.jobStartedEvent(eventConfig, totalCases);
+        log.info("Running scheduled task: {}, totalCases: {}", eventConfig.getSchedulerName(), totalCases);
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, cases);
+        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(
+            eventConfig,
+            scheduledTask,
+            searchResult
+        );
 
         if (outcome.abortedEarly()) {
-            eventTracker.jobAbortedEvent(eventConfig, cases.size(), outcome.succeededCases().size(), outcome.failedCases().size(), outcome.abortReason());
+            eventTracker.jobAbortedEvent(
+                eventConfig,
+                totalCases,
+                outcome.succeededCases().size(),
+                outcome.failedCases().size(),
+                outcome.abortReason()
+            );
             log.info(
                 "Scheduled task aborted: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortReason: {}",
                 eventConfig.getSchedulerName(),
-                cases.size(),
+                totalCases,
                 outcome.succeededCases().size(),
                 outcome.failedCases().size(),
                 outcome.abortReason()
             );
         } else {
-            eventTracker.jobCompletedEvent(eventConfig, cases.size(), outcome.succeededCases().size(), outcome.failedCases().size());
+            eventTracker.jobCompletedEvent(
+                eventConfig,
+                totalCases,
+                outcome.succeededCases().size(),
+                outcome.failedCases().size()
+            );
             log.info(
                 "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}",
                 eventConfig.getSchedulerName(),
-                cases.size(),
+                totalCases,
                 outcome.succeededCases().size(),
                 outcome.failedCases().size()
             );
