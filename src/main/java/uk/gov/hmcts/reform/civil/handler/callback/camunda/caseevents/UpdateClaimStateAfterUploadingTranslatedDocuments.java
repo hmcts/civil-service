@@ -11,9 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
 import java.util.Collections;
@@ -44,32 +42,11 @@ public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackH
 
         caseData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
         caseData.setPreviousCCDState(caseData.getCcdState());
-
-        boolean respondentLanguage = isRespondentLanguageBothOrLanguageNotSet(caseData);
-        if (!isLipLipWithClaimantLanguageBoth(caseData) && respondentLanguage) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseData.toMap(objectMapper))
-                .build();
-        }
         String changeToState = setClaimState(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .state(changeToState)
             .build();
-    }
-
-    private boolean isLipLipWithClaimantLanguageBoth(CaseData caseData) {
-        return caseData.isLipvLipOneVOne()
-            && Language.BOTH.name().equalsIgnoreCase(caseData.getClaimantBilingualLanguagePreference());
-    }
-
-    private boolean isRespondentLanguageBothOrLanguageNotSet(CaseData caseData) {
-        CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
-        if (caseDataLiP != null && caseDataLiP.getRespondent1LiPResponse() != null) {
-            return (caseDataLiP.getRespondent1LiPResponse().getRespondent1ResponseLanguage() == null || caseData.isRespondent1LiP()
-                && Language.BOTH.name().equalsIgnoreCase(caseDataLiP.getRespondent1LiPResponse().getRespondent1ResponseLanguage()));
-        }
-        return true;
     }
 
     private String setClaimState(CaseData caseData) {

@@ -2,20 +2,26 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentStrategyFactory;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.UserType;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.util.ArrayList;
@@ -28,10 +34,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CANCEL_DOC_TRANSLATION_TASK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_GA_LANGUAGE_UPDATE;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH;
-import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.WELSH;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.DEFENDANT;
 
@@ -49,11 +55,13 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final GenAppStateHelperService helperService;
+    private final CoreCaseDataService coreCaseDataService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_START), this::nullFieldsForNewSubmission,
                                                              callbackKey(MID, VALIDATE_LANGUAGE_PREFERENCE), this::validateChangeLanguagePreference,
                                                              callbackKey(ABOUT_TO_SUBMIT), this::changeLanguagePreference,
-                                                             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
+                                                             callbackKey(SUBMITTED), this::cancelWATaskIfPreferredLanguageIsEnglish);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -78,9 +86,9 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
     private CallbackResponse validateChangeLanguagePreference(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
-        UserType userType = Optional.ofNullable(caseData.getChangeLanguagePreference())
-            .map(ChangeLanguagePreference::getUserType)
-            .orElseThrow(() -> new IllegalArgumentException("User type not found"));
+
+        UserType userType = getUserType(Optional.ofNullable(caseData.getChangeLanguagePreference()));
+
         if ((userType == CLAIMANT && !caseData.isApplicantLiP()) || (userType == DEFENDANT && !caseData.isRespondent1LiP())) {
             errors.add(SELECTED_PARTY_LIP_REQUIRED);
         } else if (userType == DEFENDANT && (caseData.getCaseDataLiP() == null || caseData.getCaseDataLiP().getRespondent1LiPResponse() == null)) {
@@ -101,25 +109,30 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
             case WELSH -> "WELSH";
             case ENGLISH_AND_WELSH -> "BOTH";
         };
-        UserType userType = Optional.of(caseData.getChangeLanguagePreference())
-            .map(ChangeLanguagePreference::getUserType)
-            .orElseThrow(() -> new IllegalArgumentException("User type not found"));
-        switch (userType) {
-            case CLAIMANT -> setClaimantBilingualLanguagePreference(caseData, preferredLanguage, revisedBilingualPreference);
-            case DEFENDANT -> setRespondentResponseBilingualLanguagePreference(caseData, preferredLanguage, revisedBilingualPreference);
-            default -> throw new IllegalArgumentException("Unexpected user type");
+
+        UserType userType = getUserType(Optional.of(caseData.getChangeLanguagePreference()));
+
+        if (CLAIMANT.equals(userType)) {
+            setClaimantBilingualLanguagePreference(caseData, preferredLanguage, revisedBilingualPreference);
+        } else {
+            setRespondentResponseBilingualLanguagePreference(caseData, preferredLanguage, revisedBilingualPreference);
         }
         if (Objects.nonNull(caseData.getGeneralApplications())) {
             triggerGaEvent(callbackParams);
         }
 
-        if (ENGLISH.equals(preferredLanguage) || WELSH.equals(preferredLanguage)) {
+        if (ENGLISH.equals(preferredLanguage)) {
             return uploadTranslatedDocumentStrategyFactory.getUploadTranslatedDocumentStrategy(callbackParams.getVersion())
                 .uploadDocument(callbackParams);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
+    }
+
+    private @NonNull UserType getUserType(Optional<ChangeLanguagePreference> caseData) {
+        return caseData.map(ChangeLanguagePreference::getUserType)
+            .orElseThrow(() -> new IllegalArgumentException("User type not found"));
     }
 
     private void setClaimantBilingualLanguagePreference(CaseData caseData,
@@ -145,4 +158,37 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         helperService.triggerEvent(caseData, TRIGGER_GA_LANGUAGE_UPDATE);
     }
+
+    private CallbackResponse cancelWATaskIfPreferredLanguageIsEnglish(CallbackParams callbackParams) {
+        final CaseData caseData = callbackParams.getCaseData();
+        Long caseId = caseData.getCcdCaseReference();
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId.toString(), CANCEL_DOC_TRANSLATION_TASK);
+        CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+        UserType userType = getUserType(Optional.ofNullable(caseData.getChangeLanguagePreference()));
+
+        boolean shouldCancelWaTask;
+        if (CLAIMANT.equals(userType)) {
+            shouldCancelWaTask = isClaimantLanguageSetToEnglish(startEventData);
+        } else {
+            shouldCancelWaTask = isRespondentLanguageSetToEnglish(startEventData);
+        }
+
+        if (shouldCancelWaTask) {
+            coreCaseDataService.triggerEvent(caseId, CANCEL_DOC_TRANSLATION_TASK);
+        }
+        return SubmittedCallbackResponse.builder().build();
+    }
+
+    private boolean isClaimantLanguageSetToEnglish(CaseData caseData) {
+        return caseData.isLipvLipOneVOne() && Language.ENGLISH.name().equals(caseData.getClaimantBilingualLanguagePreference());
+    }
+
+    private boolean isRespondentLanguageSetToEnglish(CaseData caseData) {
+        CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
+        if (caseDataLiP != null && caseDataLiP.getRespondent1LiPResponse() != null) {
+            return Language.ENGLISH.name().equalsIgnoreCase(caseDataLiP.getRespondent1LiPResponse().getRespondent1ResponseLanguage());
+        }
+        return true;
+    }
+
 }
