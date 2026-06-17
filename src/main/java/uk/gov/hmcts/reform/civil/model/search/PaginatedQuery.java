@@ -1,11 +1,18 @@
 package uk.gov.hmcts.reform.civil.model.search;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import org.elasticsearch.index.query.QueryBuilder;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-import static net.minidev.json.JSONValue.toJSONString;
-
+/**
+ * Encapsulates an ElasticSearch query designed for pagination.
+ * Handles the inclusion of 'search_after' values and the construction of the JSON query string.
+ */
 @Getter
 public class PaginatedQuery {
 
@@ -17,47 +24,48 @@ public class PaginatedQuery {
     private final int pageSize;
     private final String sortField;
 
-    public PaginatedQuery(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex,
-                          boolean initialSearch, String searchAfterValue, int pageSize) {
+    /**
+     * Constructs a new PaginatedQuery.
+     *
+     * @param queryBuilder the ES QueryBuilder containing the search criteria
+     * @param dataToReturn list of fields to return in the '_source' section
+     * @param startIndex the starting index (only used for initial searches when not using search_after)
+     * @param pageToken the token containing the 'search_after' value
+     * @param pageSize the number of results to return
+     */
+    public PaginatedQuery(QueryBuilder queryBuilder, List<String> dataToReturn,
+                          int startIndex, PageToken pageToken, int pageSize) {
         this.queryBuilder = queryBuilder;
         this.dataToReturn = dataToReturn;
         this.startIndex = startIndex;
-        this.initialSearch = initialSearch;
-        this.searchAfterValue = searchAfterValue;
+        this.initialSearch = pageToken.isInitial();
+        this.searchAfterValue = pageToken.getValue().orElse(null);
         this.pageSize = pageSize;
         this.sortField = "reference.keyword";
     }
 
-    @Override
-    public String toString() {
-        if (initialSearch || (searchAfterValue == null && startIndex == 0)) {
-            return getInitialQuery();
-        } else {
-            return getSubsequentQuery();
+    /**
+     * Generates the JSON query string to be sent to ElasticSearch.
+     *
+     * @param objectMapper the Jackson ObjectMapper to use for serialization
+     * @return the JSON string representation of the query
+     */
+    public String getJsonString(ObjectMapper objectMapper) {
+        try {
+            Map<String, Object> query = new LinkedHashMap<>();
+            query.put("query", objectMapper.readTree(queryBuilder.toString()));
+            query.put("_source", dataToReturn);
+            query.put("size", pageSize);
+            query.put("from", searchAfterValue != null ? 0 : startIndex);
+            query.put("sort", Collections.singletonList(Collections.singletonMap(sortField, "asc")));
+
+            if (!initialSearch && searchAfterValue != null) {
+                query.put("search_after", Collections.singletonList(searchAfterValue));
+            }
+
+            return objectMapper.writeValueAsString(query);
+        } catch (Exception e) {
+            throw new RuntimeException("Error serializing PaginatedQuery to JSON", e);
         }
     }
-
-    private String getStartQuery() {
-        return "{"
-            + "\"query\": " + queryBuilder.toString() + ", "
-            + "\"_source\": " + toJSONString(dataToReturn) + ", "
-            + " \"size\": " + pageSize + ","
-            + "\"from\": " + (searchAfterValue != null ? 0 : startIndex) + ","
-            + "\"sort\": ["
-            + "{"
-            + "\"" + sortField + "\": \"asc\""
-            + "            }"
-            + "          ]";
-    }
-
-    private String getInitialQuery() {
-        return getStartQuery() + END_QUERY;
-    }
-
-    private String getSubsequentQuery() {
-        return getStartQuery() + "," + String.format(SEARCH_AFTER, searchAfterValue) + END_QUERY;
-    }
-
-    private static final String END_QUERY = "\n}";
-    private static final String SEARCH_AFTER = "\"search_after\": [\"%s\"]";
 }

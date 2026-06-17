@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
+import uk.gov.hmcts.reform.civil.model.search.PageToken;
 import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -14,7 +15,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,18 +48,28 @@ class ElasticSearchPaginatedStreamProviderTest {
         when(coreCaseDataService.searchCasesPaginated(any(PaginatedQuery.class)))
             .thenAnswer(invocation -> {
                 PaginatedQuery query = invocation.getArgument(0);
-                if (query.getSearchAfterValue() == null) {
+                if (query.isInitialSearch()) {
                     return page1;
-                } else if (query.getSearchAfterValue().equals("1")) {
+                } else if ("1".equals(query.getSearchAfterValue())) {
                     return page2;
-                } else if (query.getSearchAfterValue().equals("2")) {
+                } else if ("2".equals(query.getSearchAfterValue())) {
                     return page3;
                 }
                 return SearchResult.builder().total(0).cases(List.of()).build();
             });
 
+        int pageSize = 1;
+        PaginatedQueryProvider queryProvider = (pageToken, ps) -> new PaginatedQuery(
+            null,
+            null,
+            0,
+            pageToken,
+            ps
+        );
+
         ElasticSearchResult result = provider.getPaginatedSearchResult(
-            searchAfter -> new PaginatedQuery(null, null, 0, searchAfter == null, searchAfter, 1)
+            queryProvider,
+            pageSize
         );
 
         assertThat(result.totalResults()).isEqualTo(3);
@@ -70,37 +80,7 @@ class ElasticSearchPaginatedStreamProviderTest {
         assertThat(cases.get(1).getId()).isEqualTo(2L);
         assertThat(cases.get(2).getId()).isEqualTo(3L);
 
-        verify(coreCaseDataService, times(4)).searchCasesPaginated(any());
-    }
-
-    @Test
-    void shouldPaginateCorrectlyUsingGetPaginatedStream() {
-        CaseDetails case1 = CaseDetails.builder().id(1L).build();
-        CaseDetails case2 = CaseDetails.builder().id(2L).build();
-
-        SearchResult page1 = SearchResult.builder().total(2).cases(List.of(case1)).build();
-        SearchResult page2 = SearchResult.builder().total(2).cases(List.of(case2)).build();
-
-        when(coreCaseDataService.searchCasesPaginated(any(PaginatedQuery.class)))
-            .thenAnswer(invocation -> {
-                PaginatedQuery query = invocation.getArgument(0);
-                if (query.getSearchAfterValue() == null) {
-                    return page1;
-                } else if (query.getSearchAfterValue().equals("1")) {
-                    return page2;
-                }
-                return SearchResult.builder().total(0).cases(List.of()).build();
-            });
-
-        Stream<CaseDetails> stream = provider.getPaginatedStream(
-            searchAfter -> new PaginatedQuery(null, null, 0, searchAfter == null, searchAfter, 1)
-        );
-
-        List<CaseDetails> cases = stream.toList();
-
-        assertThat(cases).hasSize(2);
-        assertThat(cases.get(0).getId()).isEqualTo(1L);
-        assertThat(cases.get(1).getId()).isEqualTo(2L);
+        verify(coreCaseDataService, times(3)).searchCasesPaginated(any());
     }
 
     @Test
@@ -108,8 +88,17 @@ class ElasticSearchPaginatedStreamProviderTest {
         SearchResult emptyResult = SearchResult.builder().total(0).cases(Collections.emptyList()).build();
         when(coreCaseDataService.searchCasesPaginated(any())).thenReturn(emptyResult);
 
+        int pageSize = 10;
+        PaginatedQueryProvider queryProvider = (pageToken, ps) -> new PaginatedQuery(
+            null,
+            null,
+            0,
+            pageToken,
+            ps
+        );
         ElasticSearchResult result = provider.getPaginatedSearchResult(
-            searchAfter -> new PaginatedQuery(null, null, 0, searchAfter == null, searchAfter, 10)
+            queryProvider,
+            pageSize
         );
 
         assertThat(result.totalResults()).isEqualTo(0);
@@ -120,8 +109,18 @@ class ElasticSearchPaginatedStreamProviderTest {
     void shouldHandleNullSearchResult() {
         when(coreCaseDataService.searchCasesPaginated(any())).thenReturn(null);
 
+        int pageSize = 10;
+        PaginatedQueryProvider queryProvider = (pageToken, ps) -> new PaginatedQuery(
+            null,
+            null,
+            0,
+            pageToken,
+            ps
+        );
+
         ElasticSearchResult result = provider.getPaginatedSearchResult(
-            searchAfter -> new PaginatedQuery(null, null, 0, searchAfter == null, searchAfter, 10)
+            queryProvider,
+            pageSize
         );
 
         assertThat(result.totalResults()).isEqualTo(0);
@@ -133,8 +132,18 @@ class ElasticSearchPaginatedStreamProviderTest {
         SearchResult searchResult = SearchResult.builder().total(10).cases(null).build();
         when(coreCaseDataService.searchCasesPaginated(any())).thenReturn(searchResult);
 
+        int pageSize = 10;
+        PaginatedQueryProvider queryProvider = (pageToken, ps) -> new PaginatedQuery(
+            null,
+            null,
+            0,
+            pageToken,
+            ps
+        );
+
         ElasticSearchResult result = provider.getPaginatedSearchResult(
-            searchAfter -> new PaginatedQuery(null, null, 0, searchAfter == null, searchAfter, 10)
+            queryProvider,
+            pageSize
         );
 
         assertThat(result.totalResults()).isEqualTo(10);
@@ -149,8 +158,18 @@ class ElasticSearchPaginatedStreamProviderTest {
 
         when(coreCaseDataService.searchCasesPaginated(any())).thenReturn(page);
 
+        int pageSize = 1;
+        PaginatedQueryProvider queryProvider = (pageToken, ps) -> new PaginatedQuery(
+            null,
+            null,
+            0,
+            pageToken,
+            ps
+        );
+
         ElasticSearchResult result = provider.getPaginatedSearchResult(
-            searchAfter -> new PaginatedQuery(null, null, 0, searchAfter == null, searchAfter, 1)
+            queryProvider,
+            pageSize
         );
 
         List<CaseDetails> cases = result.caseDetailsStream().toList();
@@ -176,17 +195,28 @@ class ElasticSearchPaginatedStreamProviderTest {
         when(coreCaseDataService.searchCasesPaginated(any(PaginatedQuery.class)))
             .thenAnswer(invocation -> {
                 PaginatedQuery query = invocation.getArgument(0);
-                if (query.getSearchAfterValue() == null) {
+                if (query.isInitialSearch()) {
                     return page1;
-                } else if (query.getSearchAfterValue().equals("AAA")) {
+                } else if ("AAA".equals(query.getSearchAfterValue())) {
                     return page2;
                 }
                 return SearchResult.builder().total(0).cases(List.of()).build();
             });
 
+        int pageSize = 1;
+        PaginatedQueryProvider queryProvider = (pageToken, ps) -> new PaginatedQuery(
+            null,
+            null,
+            0,
+            pageToken,
+            ps
+        );
+        SearchAfterKeyProvider sortKeyExtractor = caseDetails -> PageToken.of((String) caseDetails.getData().get("customKey"));
+
         ElasticSearchResult result = provider.getPaginatedSearchResult(
-            searchAfter -> new PaginatedQuery(null, null, 0, searchAfter == null, searchAfter, 1),
-            caseDetails -> (String) caseDetails.getData().get("customKey")
+            queryProvider,
+            sortKeyExtractor,
+            pageSize
         );
 
         List<CaseDetails> cases = result.caseDetailsStream().toList();

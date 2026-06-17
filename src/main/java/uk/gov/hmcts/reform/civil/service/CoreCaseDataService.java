@@ -200,7 +200,7 @@ public class CoreCaseDataService {
 
     public SearchResult searchCasesPaginated(PaginatedQuery paginatedQuery) {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        String searchString = paginatedQuery.toString();
+        String searchString = paginatedQuery.getJsonString(mapper);
         log.info("Searching Elasticsearch with paginated query: " + searchString);
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
     }
