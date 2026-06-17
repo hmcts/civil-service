@@ -61,7 +61,7 @@ public class ResourceExceptionHandlerIntegrationTest extends BaseIntegrationTest
                             .header(HttpHeaders.AUTHORIZATION, "Bearer token")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(eventDto)))
-            .andExpect(status().is5xxServerError())
+            .andExpect(status().isUnprocessableEntity())
             .andExpect(jsonPath("$.callbackErrors[0]")
                            .value("Validation failed"))
             .andExpect(jsonPath("$.error")

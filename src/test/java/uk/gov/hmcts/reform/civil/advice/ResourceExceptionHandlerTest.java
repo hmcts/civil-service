@@ -255,7 +255,7 @@ public class ResourceExceptionHandlerTest {
                 body,
                 Collections.emptyMap()
             ), contentCachingRequestWrapper),
-            HttpStatus.INTERNAL_SERVER_ERROR
+            HttpStatus.UNPROCESSABLE_ENTITY
         );
     }
 
@@ -280,6 +280,33 @@ public class ResourceExceptionHandlerTest {
             ), contentCachingRequestWrapper),
             HttpStatus.INTERNAL_SERVER_ERROR
         );
+    }
+
+    @Test
+    void shouldDeserializeDetailsObject_whenFeign422BodyContainsDetails() {
+        String json = """
+            {
+              "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ApiException",
+              "error": "Unprocessable Entity",
+              "message": "Unable to proceed because there are one or more callback Errors or Warnings",
+              "details": { "field": "caseId", "reason": "required" },
+              "callbackErrors": ["error one"]
+            }
+            """;
+
+        ResponseEntity<?> response = handler.unprocessableEntity(new FeignException.UnprocessableEntity(
+            "unprocessable",
+            Mockito.mock(feign.Request.class),
+            json.getBytes(StandardCharsets.UTF_8),
+            Collections.emptyMap()
+        ), contentCachingRequestWrapper);
+
+        assertThat(response.getStatusCode()).isSameAs(HttpStatus.UNPROCESSABLE_ENTITY);
+        assertThat(response.getBody()).isInstanceOf(CallbackErrorResponse.class);
+        CallbackErrorResponse body = (CallbackErrorResponse) response.getBody();
+        assertThat(body.getDetails()).isNotNull();
+        assertThat(body.getDetails().toString()).contains("caseId").contains("required");
+        assertThat(body.getCallbackErrors()).containsExactly("error one");
     }
 
     private <E extends Throwable> void testTemplate(

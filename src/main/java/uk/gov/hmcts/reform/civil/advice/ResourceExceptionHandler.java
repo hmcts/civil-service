@@ -103,7 +103,7 @@ public class ResourceExceptionHandler {
                                          getUserId(contentCachingRequestWrapper)));
         log.info("Unprocessable Entity {} ", errorResponse.toString());
         return ResponseEntity
-            .internalServerError()
+            .status(HttpStatus.UNPROCESSABLE_ENTITY)
             .headers(new HttpHeaders())
             .body(errorResponse);
     }
