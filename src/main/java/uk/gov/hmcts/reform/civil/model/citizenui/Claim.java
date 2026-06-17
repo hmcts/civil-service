@@ -24,6 +24,8 @@ public interface Claim {
 
     boolean isEligibleForCCJ();
 
+    boolean isJudgmentBufferEligible();
+
     boolean claimantConfirmedDefendantPaid();
 
     boolean isSettled();
@@ -135,6 +137,8 @@ public interface Claim {
     boolean isCaseStruckOut();
 
     boolean isDefaultJudgementIssued();
+
+    boolean isDefaultJudgementRequested();
 
     boolean decisionMadeDocumentsAreInTranslation();
 
