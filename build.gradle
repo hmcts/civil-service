@@ -698,6 +698,8 @@ tasks.withType(Test).configureEach { t ->
   jvmArgs '-XX:ReservedCodeCacheSize=512m'
   // Temurin 21.0.7 occasionally crashes in C2 (BoolNode::Ideal SIGSEGV); stay on C1 until upstream fix.
   jvmArgs "-XX:TieredStopAtLevel=1"
+  // Docker Desktop 29 (Engine API 1.54) rejects docker-java's older default API version.
+  systemProperty 'api.version', System.getProperty('api.version', '1.40')
 
   testLogging {
     exceptionFormat = 'full'
