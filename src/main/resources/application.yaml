@@ -68,6 +68,10 @@ scheduler:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
 
+search:
+  judgementBuffer:
+    pageSize: ${SEARCH_PAGE_SIZE_JUDGEMENT_BUFFER:50}
+
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
