@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.GeneralAppsDeadlinesCalculator;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,6 +40,7 @@ public class GeneralApplicationAfterPaymentCallbackHandler extends CallbackHandl
 
     private static final List<CaseEvent> EVENTS = singletonList(INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT);
     private static final int GA_RESPONSE_DEADLINE_DAYS = 4;
+    private static final ZoneId UK_ZONE_ID = ZoneId.of("Europe/London");
     private final ObjectMapper objectMapper;
     private final GaForLipService gaForLipService;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
@@ -98,7 +100,7 @@ public class GeneralApplicationAfterPaymentCallbackHandler extends CallbackHandl
         }
 
         LocalDateTime deadline = deadlinesCalculator.calculateApplicantResponseDeadlineWithWeekendCheck(
-            LocalDateTime.now(), GA_RESPONSE_DEADLINE_DAYS
+            LocalDateTime.now(UK_ZONE_ID), GA_RESPONSE_DEADLINE_DAYS
         );
         caseDataBuilder.generalAppNotificationDeadlineDate(deadline);
         caseDataBuilder.respondentResponseDeadlineChecked(NO);

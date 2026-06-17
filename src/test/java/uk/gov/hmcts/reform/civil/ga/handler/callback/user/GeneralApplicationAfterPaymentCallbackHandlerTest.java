@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CUSTOMER_REFE
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,17 +47,19 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.GeneralAppsDeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class GeneralApplicationAfterPaymentCallbackHandlerTest
         extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Spy private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+    @Spy private ObjectMapper objectMapper = new ObjectMapper()
+        .findAndRegisterModules()
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @InjectMocks private GeneralApplicationAfterPaymentCallbackHandler handler;
 
@@ -95,8 +98,8 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest
 
     @Test
     void shouldResetRespondentResponseDeadlineAfterSuccessfulPayment() {
-        LocalDateTime oldDeadline = LocalDateTime.of(2026, 3, 30, 16, 0);
-        LocalDateTime expectedDeadline = LocalDateTime.of(2026, 4, 20, 16, 0);
+        LocalDateTime oldDeadline = LocalDateTime.of(2026, Month.MARCH, 30, 16, 0);
+        LocalDateTime expectedDeadline = LocalDateTime.of(2026, Month.APRIL, 20, 16, 0);
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(NO, YES)
             .copy()
             .generalAppNotificationDeadlineDate(oldDeadline)
