@@ -203,7 +203,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
         RespondToClaim respondToClaim = caseData.getResponseToClaim();
         if (respondToClaim == null) {
             //This will be set when Lip vs Lip, 1v1 case
-            respondToClaim = caseData.getRespondToAdmittedClaim();
+            respondToClaim = caseData.getRespondToAdmittedClaim() != null ? caseData.getRespondToAdmittedClaim() : caseData.getRespondToClaim();
         }
         if (respondToClaim != null) {
             String howMuchWasPaidAsString = MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "";
