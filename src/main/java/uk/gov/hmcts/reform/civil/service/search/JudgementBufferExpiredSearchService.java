@@ -1,12 +1,16 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.model.search.Query;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchPaginatedStreamProvider;
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -17,28 +21,43 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 @Service
 @Slf4j
-public class JudgementBufferExpiredSearchService extends ElasticSearchService {
+@RequiredArgsConstructor
+public class JudgementBufferExpiredSearchService {
 
-    public JudgementBufferExpiredSearchService(CoreCaseDataService coreCaseDataService) {
-        super(coreCaseDataService);
+    private final ElasticSearchPaginatedStreamProvider elasticSearchPaginatedStreamProvider;
+
+    @Value("${search.judgementBuffer.pageSize:50}")
+    private int pageSize;
+
+    public ElasticSearchResult getSearchResults() {
+        String timeNow = ZonedDateTime.now(ZoneOffset.UTC).toString();
+
+        return elasticSearchPaginatedStreamProvider.getPaginatedSearchResult(
+            searchAfterValue -> query(timeNow, searchAfterValue)
+        );
     }
 
-    @Override
-    public Query query(int startIndex, String timeNow) {
-        log.info("Call to JudgementBufferExpiredSearchService query with index {} and timeNow {}", startIndex, timeNow);
+    private PaginatedQuery query(String timeNow, String searchAfterValue) {
+        log.info("Call to JudgementBufferExpiredSearchService query with timeNow {}", timeNow);
         ZonedDateTime timeMinus48Hours = ZonedDateTime.parse(timeNow).minusHours(48);
-        return new Query(
-            boolQuery()
-                .minimumShouldMatch(1)
-                .should(boolQuery()
-                            .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48Hours))
-                            .must(beState(CaseState.JUDGMENT_REQUESTED))
-                            .must(haveNoOngoingBusinessProcess())
-                ),
+        return new PaginatedQuery(
+            generateSearchForExpiredJudgments(timeMinus48Hours),
             List.of("reference"),
-            startIndex,
-            true
+            0,
+            searchAfterValue == null,
+            searchAfterValue,
+            pageSize
         );
+    }
+
+    private BoolQueryBuilder generateSearchForExpiredJudgments(ZonedDateTime timeMinus48Hours) {
+        return boolQuery()
+            .minimumShouldMatch(1)
+            .should(boolQuery()
+                        .must(rangeQuery("data.joDJCreatedDate").lte(timeMinus48Hours))
+                        .must(beState(CaseState.JUDGMENT_REQUESTED))
+                        .must(haveNoOngoingBusinessProcess())
+            );
     }
 
     public BoolQueryBuilder beState(CaseState state) {
