@@ -9,14 +9,11 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.service.search.ElasticSearchService;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -24,9 +21,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ScheduledTaskRunnerTest {
-
-    @Mock
-    private ElasticSearchService searchService;
 
     @Mock
     private ScheduledTask scheduledTask;
@@ -46,7 +40,7 @@ class ScheduledTaskRunnerTest {
 
         scheduledTaskRunner.run(eventConfig, null, scheduledTask);
 
-        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq("SearchResult cannot be null"));
+        verify(scheduledEventTracker).jobAbortedEvent(eventConfig, "SearchResult cannot be null");
         verifyNoMoreInteractions(scheduledTask);
     }
 
@@ -57,8 +51,8 @@ class ScheduledTaskRunnerTest {
 
         scheduledTaskRunner.run(eventConfig, searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig), eq(0));
-        verify(scheduledEventTracker).jobCompletedNoCasesEvent(eq(eventConfig));
+        verify(scheduledEventTracker).jobStartedEvent(eventConfig, 0);
+        verify(scheduledEventTracker).jobCompletedNoCasesEvent(eventConfig);
         verifyNoMoreInteractions(scheduledTaskProcessor);
     }
 
@@ -69,14 +63,14 @@ class ScheduledTaskRunnerTest {
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
         ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(1L), List.of(), false, "");
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult)))
+        when(scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult))
             .thenReturn(outcome);
 
         scheduledTaskRunner.run(eventConfig, searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig), eq(1));
-        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult));
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(1), eq(1), eq(0));
+        verify(scheduledEventTracker).jobStartedEvent(eventConfig, 1);
+        verify(scheduledTaskProcessor).performProcessing(eventConfig, scheduledTask, searchResult);
+        verify(scheduledEventTracker).jobCompletedEvent(eventConfig, 1, 1, 0);
     }
 
     @Test
@@ -87,12 +81,12 @@ class ScheduledTaskRunnerTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(1L), List.of(), false, "");
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), any(ElasticSearchResult.class)))
+        when(scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult))
             .thenReturn(outcome);
 
         scheduledTaskRunner.run(eventConfig, searchResult, scheduledTask);
 
-        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), any(ElasticSearchResult.class));
+        verify(scheduledTaskProcessor).performProcessing(eventConfig, scheduledTask, searchResult);
     }
 
     @Test
@@ -104,12 +98,12 @@ class ScheduledTaskRunnerTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(), List.of(1L, 2L), true, "Error 2");
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), any(ElasticSearchResult.class)))
+        when(scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult))
             .thenReturn(outcome);
 
         scheduledTaskRunner.run(eventConfig, searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq(2), eq(0), eq(2), eq("Error 2"));
+        verify(scheduledEventTracker).jobAbortedEvent(eventConfig, 2, 0, 2, "Error 2");
     }
 
     @Test
@@ -121,11 +115,11 @@ class ScheduledTaskRunnerTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(1L), List.of(2L), false, "");
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), any(ElasticSearchResult.class)))
+        when(scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult))
             .thenReturn(outcome);
 
         scheduledTaskRunner.run(eventConfig, searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(2), eq(1), eq(1));
+        verify(scheduledEventTracker).jobCompletedEvent(eventConfig, 2, 1, 1);
     }
 }

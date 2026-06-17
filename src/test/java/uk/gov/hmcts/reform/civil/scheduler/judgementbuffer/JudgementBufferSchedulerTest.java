@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
 import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -51,9 +50,9 @@ class JudgementBufferSchedulerTest {
             scheduler.runScheduledTask();
 
             verify(scheduledTaskRunner).run(
-                eq(expectedConfig),
-                eq(elasticSearchResult),
-                eq(judgementBufferScheduledTask)
+                expectedConfig,
+                elasticSearchResult,
+                judgementBufferScheduledTask
             );
         }
 

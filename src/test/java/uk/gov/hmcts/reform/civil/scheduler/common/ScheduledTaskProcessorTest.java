@@ -71,8 +71,8 @@ class ScheduledTaskProcessorTest {
         ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, new ElasticSearchResult(Stream.empty(), 0));
 
         assertThat(outcome).isNotNull();
-        assertThat(outcome.succeededCases().size()).isEqualTo(0);
-        assertThat(outcome.failedCases().size()).isEqualTo(0);
+        assertThat(outcome.succeededCases()).isEmpty();
+        assertThat(outcome.failedCases()).isEmpty();
 
         verifyNoInteractions(scheduledTask);
         verifyNoInteractions(scheduledEventTracker);
@@ -129,7 +129,7 @@ class ScheduledTaskProcessorTest {
         doThrow(error3).when(scheduledTask).accept(argThat(c -> c != null && c.getId().equals(103L)));
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
-        ElasticSearchResult searchResult = new ElasticSearchResult(cases.stream().sequential(), 3);
+        ElasticSearchResult searchResult = new ElasticSearchResult(cases.stream(), 3);
 
         ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
