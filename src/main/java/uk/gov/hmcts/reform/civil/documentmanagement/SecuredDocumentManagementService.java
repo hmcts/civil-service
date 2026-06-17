@@ -52,7 +52,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     private final CaseDocumentClientApi caseDocumentClientApi;
     private final Tika tika;
 
-    @Retryable(retryFor = {DocumentDownloadException.class},
+    @Retryable(retryFor = {DocumentUploadException.class},
         maxAttempts = 5,
         backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
@@ -104,7 +104,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         }
     }
 
-    @Retryable(retryFor = {DocumentDownloadException.class},
+    @Retryable(retryFor = {DocumentUploadException.class},
         maxAttempts = 5,
         backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
@@ -156,7 +156,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         }
 
     }
-    
+
     @Retryable(retryFor = {DocumentDownloadException.class},
         maxAttempts = 5,
         backoff = @Backoff(delay = 1000, multiplier = 2))
