@@ -77,7 +77,7 @@ class ScenarioConfigLoaderTest {
 
         Set<CaseEvent> events = loader.getNoOngoingBPAllowedEvents(NO_ONGOING_BP_ALLOWED_EVENTS_FILE);
 
-        assertThat(events).doesNotContain(
+        assertThat(events).isNotEmpty().doesNotContain(
             CaseEvent.ADD_CASE_NOTE,
             CaseEvent.AMEND_RESTITCH_BUNDLE,
             CaseEvent.CREATE_BUNDLE,
