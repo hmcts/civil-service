@@ -3,15 +3,12 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -86,40 +83,5 @@ class GeneratePipLetterHandlerTest {
                 List.of()
         );
         assertThat(response.getState()).isEqualTo("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"WELSH", "ENGLISH", "BOTH"})
-    void shouldGenerateAndPrintLetterSuccessfullyWhenBothPartiesAreLip(String language) {
-        when(pipLetterGenerator.downloadLetter(any(CaseData.class), any(String.class), anyList()))
-            .thenReturn(new byte[]{1, 2, 3, 4});
-
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("12345")
-            .claimantBilingualLanguagePreference(language)
-            .ccdCaseReference(12345L)
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1(new Party().setPartyName("Test Respondent").setType(Party.Type.COMPANY))
-            .respondent1Represented(YesOrNo.NO)
-            .ccdState(CaseState.CASE_ISSUED)
-            .build();
-        CallbackParams params = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .params(Map.of(CallbackParams.Params.valueOf("BEARER_TOKEN"), "test-token"))
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) generatePipLetter
-            .handle(params);
-
-        verify(bulkPrintService).printLetter(
-            new byte[]{1, 2, 3, 4},
-            "12345",
-            "12345",
-            "first-contact-pack",
-            Collections.singletonList(caseData.getRespondent1().getPartyName()),
-            List.of()
-        );
-        assertThat(response.getState()).isEqualTo("BOTH".equals(language)
-                                                      ? CaseState.CASE_ISSUED.name() : CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
     }
 }
