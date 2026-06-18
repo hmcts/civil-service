@@ -59,8 +59,8 @@ spring:
 scheduler:
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
-  lockAtMostFor: ${LOCK_AT_MOST_FOR:PT5M}
-  defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT10M}
+  lockAtMostFor: ${LOCK_AT_MOST_FOR:PT30M}
+  defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT30M}
   judgementBuffer:
     cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 2 * * *}
     enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:false}
