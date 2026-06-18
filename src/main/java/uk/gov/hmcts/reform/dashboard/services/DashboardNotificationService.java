@@ -31,6 +31,7 @@ import static java.util.Objects.nonNull;
 public class DashboardNotificationService {
 
     private static final Set<String> CASE_STAY_TEMPLATES = Set.of(
+        "Notice.AAA6.JR.Cancelled.Case.Stayed.Claimant",
         "Notice.AAA6.CP.Case.Stayed.Claimant",
         "Notice.AAA6.CP.Case.Stayed.Defendant"
     );
