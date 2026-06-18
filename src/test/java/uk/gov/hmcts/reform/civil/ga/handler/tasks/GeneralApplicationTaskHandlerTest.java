@@ -9,13 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -32,7 +32,9 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LINK_GENERAL_APPLICATION_CASE_TO_PARENT_CASE;
@@ -62,7 +64,6 @@ public class GeneralApplicationTaskHandlerTest extends GeneralApplicationBaseCal
     @Mock
     private GaStateFlow mockedStateFlow;
 
-    @InjectMocks
     private GeneralApplicationTaskHandler generalApplicationTaskHandler;
 
     @Spy
@@ -72,10 +73,19 @@ public class GeneralApplicationTaskHandlerTest extends GeneralApplicationBaseCal
 
     @BeforeEach
     void init() {
-        when(mockTask.getTopicName()).thenReturn("test");
-        when(mockTask.getActivityId()).thenReturn("activityId");
-        when(mockedStateFlow.getState()).thenReturn(State.from("PENDING"));
-        when(stateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(mockedStateFlow);
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        generalApplicationTaskHandler = new GeneralApplicationTaskHandler(
+            eventProperties,
+            coreCaseDataService,
+            caseDetailsConverter,
+            objectMapper,
+            stateFlowEngine
+        );
+        lenient().when(mockTask.getTopicName()).thenReturn("test");
+        lenient().when(mockTask.getActivityId()).thenReturn("activityId");
+        lenient().when(mockedStateFlow.getState()).thenReturn(State.from("PENDING"));
+        lenient().when(stateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(mockedStateFlow);
     }
 
     @Nested
@@ -157,5 +167,10 @@ public class GeneralApplicationTaskHandlerTest extends GeneralApplicationBaseCal
 
             verify(coreCaseDataService).submitGaUpdate(GA_CASE_ID, caseDataContent);
         }
+    }
+
+    @Test
+    void shouldOnlyAttemptOnce() {
+        assertEquals(1, generalApplicationTaskHandler.getMaxAttempts());
     }
 }
