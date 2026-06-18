@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,7 +26,10 @@ class RetriggerUpdateCaseMgmtLocationDataHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new RetriggerUpdateCaseMgmtLocationDataHandler(coreCaseDataService);
+        handler = new RetriggerUpdateCaseMgmtLocationDataHandler(
+            new EventProperties(),
+            coreCaseDataService
+        );
     }
 
     @Test
