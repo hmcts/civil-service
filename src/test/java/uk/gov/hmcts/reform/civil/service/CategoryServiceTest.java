@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.crd.client.ListOfValuesApi;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.exceptions.RetryableCategoryException;
 
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import static feign.Request.HttpMethod.GET;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -43,6 +45,12 @@ class CategoryServiceTest {
         "forbidden message",
         Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
         "forbidden response body".getBytes(UTF_8),
+        Map.of());
+
+    private final FeignException gatewayTimeoutException = new FeignException.GatewayTimeout(
+        "gateway timeout message",
+        Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+        "gateway timeout response body".getBytes(UTF_8),
         Map.of());
 
     private final CategorySearchResult categorySearchResult = new CategorySearchResult();
@@ -92,6 +100,27 @@ class CategoryServiceTest {
         var category = categoryService.findCategoryByCategoryIdAndServiceId(AUTH_TOKEN_UNAUTHORISED, CATEGORY_ID, SERVICE_ID);
         verify(listOfValuesApi).findCategoryByCategoryIdAndServiceId(CATEGORY_ID, SERVICE_ID, AUTH_TOKEN_UNAUTHORISED,
                                                                      authTokenGenerator.generate());
+        assertThat(category).isEmpty();
+    }
+
+    @Test
+    void shouldThrowRetryableCategoryException_whenGatewayTimeoutThrown() {
+        given(listOfValuesApi.findCategoryByCategoryIdAndServiceId(any(), any(), any(), any()))
+            .willThrow(gatewayTimeoutException);
+
+        assertThatThrownBy(() -> categoryService.findCategoryByCategoryIdAndServiceId(
+            AUTH_TOKEN,
+            CATEGORY_ID,
+            SERVICE_ID
+        ))
+            .isInstanceOf(RetryableCategoryException.class)
+            .hasCause(gatewayTimeoutException);
+    }
+
+    @Test
+    void shouldReturnEmptyOptional_whenRecoveringRetryableCategoryException() {
+        var category = categoryService.recover(new RetryableCategoryException("retry exhausted"));
+
         assertThat(category).isEmpty();
     }
 }

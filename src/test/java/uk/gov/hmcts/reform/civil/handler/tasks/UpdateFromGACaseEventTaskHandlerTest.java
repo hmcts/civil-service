@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
@@ -85,7 +86,13 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-        handler = new UpdateFromGACaseEventTaskHandler(coreCaseDataService, caseDetailsConverter, objectMapper, featureToggleService);
+        handler = new UpdateFromGACaseEventTaskHandler(
+            new EventProperties(),
+            coreCaseDataService,
+            caseDetailsConverter,
+            objectMapper,
+            featureToggleService
+        );
     }
 
     @Test
