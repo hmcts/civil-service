@@ -289,6 +289,5 @@ class ExternalTaskCompletionServiceIT {
             }
             return nextExternalTaskData;
         }
-
     }
 }

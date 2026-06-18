@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import java.util.Objects;
 
 /**
- * Interface for standard implementation of task handler that is invoked for each fetched and locked task.
+ * Interface for a standard implementation of a task handler that is invoked for each fetched and locked task.
  */
 @SuppressWarnings({"java:S6813", "java:S1874"})
 public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
