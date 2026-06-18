@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
 
-@RequiredArgsConstructor
 @Component
 public class DashboardNotificationTaskHandler extends BaseExternalTaskHandler {
 
@@ -41,6 +40,30 @@ public class DashboardNotificationTaskHandler extends BaseExternalTaskHandler {
     private final DashboardNotificationDispatcher dashboardNotificationDispatcher;
     private final SystemUpdateUserConfiguration userConfig;
     private final UserService userService;
+
+    protected DashboardNotificationTaskHandler(
+        EventProperties eventProperties,
+        CoreCaseDataService coreCaseDataService,
+        GaCoreCaseDataService gaCoreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper,
+        IStateFlowEngine stateFlowEngine,
+        GaStateFlowEngine gaStateFlowEngine,
+        DashboardNotificationDispatcher dashboardNotificationDispatcher,
+        SystemUpdateUserConfiguration userConfig,
+        UserService userService
+    ) {
+        super(eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.gaCoreCaseDataService = gaCoreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+        this.stateFlowEngine = stateFlowEngine;
+        this.gaStateFlowEngine = gaStateFlowEngine;
+        this.dashboardNotificationDispatcher = dashboardNotificationDispatcher;
+        this.userConfig = userConfig;
+        this.userService = userService;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
