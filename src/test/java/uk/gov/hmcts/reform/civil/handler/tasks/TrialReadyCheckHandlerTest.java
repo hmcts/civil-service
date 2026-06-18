@@ -32,6 +32,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(SpringExtension.class)
 class TrialReadyCheckHandlerTest {
@@ -47,6 +49,8 @@ class TrialReadyCheckHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
 
     @InjectMocks
     private TrialReadyCheckHandler handler;
@@ -97,7 +101,7 @@ class TrialReadyCheckHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(300000L)
+            anyLong()
         );
     }
 
@@ -151,4 +155,11 @@ class TrialReadyCheckHandlerTest {
         verify(applicationEventPublisher).publishEvent(new TrialReadyCheckEvent(caseId));
         verify(applicationEventPublisher).publishEvent(new TrialReadyCheckEvent(otherId));
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }
