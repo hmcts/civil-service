@@ -85,7 +85,6 @@ class GAJudgeRevisitTaskHandlerTest {
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(
         ObjectMapperFactory.instance());
 
-    @InjectMocks
     private GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
 
     private CaseDetails caseDetailsDirectionOrder;

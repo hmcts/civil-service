@@ -44,6 +44,8 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
                                                 MediationCsvServiceFactory mediationCsvServiceFactory,
                                                 MediationCSVEmailConfiguration mediationCSVEmailConfiguration1) {
         super(
+            externalTaskCompletionService,
+            eventProperties,
             caseSearchService,
             coreCaseDataService,
             caseDetailsConverter,

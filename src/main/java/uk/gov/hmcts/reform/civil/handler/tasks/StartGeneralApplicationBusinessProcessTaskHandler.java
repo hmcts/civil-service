@@ -39,6 +39,21 @@ public class StartGeneralApplicationBusinessProcessTaskHandler extends BaseExter
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
 
+    public StartGeneralApplicationBusinessProcessTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper,
+        IStateFlowEngine stateFlowEngine
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+        this.stateFlowEngine = stateFlowEngine;
+    }
+
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         CaseData caseData = startGeneralApplicationBusinessProcess(externalTask);

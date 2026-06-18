@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_SCHEDULER_CHECK_STAY_ORDER_DEADLINE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.ORDER_MADE;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_FROM_SANCTIONS;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT;
 
@@ -61,16 +60,12 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
     @Spy private ObjectMapper mapper = ObjectMapperFactory.instance();
 
     private CaseDetails caseDetailsWithTodayDeadlineNotProcessed;
-    //private CaseDetails caseDetailsWithTodayDeadlineReliefFromSanctionOrder;
     private CaseDetails caseDetailsWithDeadlineCrossedNotProcessed;
-    //private CaseDetails caseDetailsWithDeadlineCrossedProcessed;
 
     private CaseDetails caseDetailsWithNoDeadline;
     private CaseDetails caseDetailsWithFutureDeadline;
     private GeneralApplicationCaseData caseDataWithDeadlineCrossedNotProcessed;
     private GeneralApplicationCaseData caseDataWithTodayDeadlineNotProcessed;
-    //private GeneralApplicationCaseData caseDataWithTodayDeadlineReliefFromSanctionOrder;
-    //private GeneralApplicationCaseData caseDataWithDeadlineCrossedProcessed;
     private GeneralApplicationCaseData caseDataWithNoDeadline;
     private GeneralApplicationCaseData caseDataWithFutureDeadline;
 
@@ -96,20 +91,10 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
         caseDataWithTodayDeadlineNotProcessed =
             getCaseData(1L, STAY_THE_CLAIM, deadLineToday, YesOrNo.NO);
 
-        //caseDetailsWithTodayDeadlineReliefFromSanctionOrder =
-        //    getCaseDetails(2L, RELIEF_FROM_SANCTIONS, deadLineToday, YesOrNo.NO);
-        //caseDataWithTodayDeadlineReliefFromSanctionOrder =
-        //    getCaseData(2L, RELIEF_FROM_SANCTIONS, deadLineToday, YesOrNo.NO);
-
         caseDetailsWithDeadlineCrossedNotProcessed =
             getCaseDetails(3L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.NO);
         caseDataWithDeadlineCrossedNotProcessed =
             getCaseData(3L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.NO);
-
-        //caseDetailsWithDeadlineCrossedProcessed =
-        //    getCaseDetails(4L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.YES);
-        //caseDataWithDeadlineCrossedProcessed =
-        //    getCaseData(4L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.YES);
 
         caseDetailsWithNoDeadline = getCaseDetails(5L, STAY_THE_CLAIM, null, YesOrNo.NO);
         caseDataWithNoDeadline = getCaseData(5L, STAY_THE_CLAIM, null, YesOrNo.NO);

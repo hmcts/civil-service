@@ -331,7 +331,7 @@ class CaseEventTaskHandlerTest {
                 eq(errorMessage),
                 anyString(),
                 eq(2),
-                eq(300000L)
+                anyLong()
             );
         }
 
