@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
@@ -15,9 +14,6 @@ import uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils;
 
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CollectorUtils.toSingleton;
 
 @Service
@@ -34,20 +30,33 @@ public class CaseCategoriesService {
 
     public CaseCategoryModel getCaseCategoriesFor(CategoryType categoryType, CaseData caseData, String authToken) {
         String hmctsServiceID = HmctsServiceIDUtils.getHmctsServiceID(caseData, paymentsConfiguration);
+        String allocatedTrack = getClaimTrack(caseData);
+        if (allocatedTrack == null) {
+            log.info(
+                "No claim track found for category search caseNumber={}, hmctsServiceID={}, categoryType={}",
+                caseData.getCcdCaseReference(), hmctsServiceID, categoryType
+            );
+            return null;
+        }
+
         Optional<CategorySearchResult> caseTypeResult = categoryService.findCategoryByCategoryIdAndServiceId(
             authToken,
             categoryType.getStringValueForQuery(),
             hmctsServiceID
         );
 
-        String allocatedTrack = getClaimTrack(caseData);
         String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, allocatedTrack);
-        log.info("Searching for category caseNumber={}, hmctsServiceID={}, allocatedTrack={}, categoryKey={}, categoryType={}",
-                 caseData.getCcdCaseReference(), hmctsServiceID, allocatedTrack, categoryKey, categoryType);
+        log.info(
+            "Searching for category caseNumber={}, hmctsServiceID={}, allocatedTrack={}, categoryKey={}, categoryType={}",
+            caseData.getCcdCaseReference(), hmctsServiceID, allocatedTrack, categoryKey, categoryType
+        );
 
         if (caseTypeResult.isPresent()) {
             CategorySearchResult categorySearchResult = caseTypeResult.get();
-            log.info("CategorySearchResult found with {} categories", categorySearchResult.getCategories() == null ? null : categorySearchResult.getCategories().size());
+            log.info(
+                "CategorySearchResult found with {} categories",
+                categorySearchResult.getCategories() == null ? null : categorySearchResult.getCategories().size()
+            );
 
             Category categoryResult = categorySearchResult.getCategories().stream().filter(c -> c.getKey().equals(
                 categoryKey)).collect(toSingleton());
@@ -59,6 +68,11 @@ public class CaseCategoriesService {
             caseCategoryModel.setCategoryValue(categoryResult.getKey());
             return caseCategoryModel;
         }
+
+        log.info(
+            "No CategorySearchResult found caseNumber={}, categoryType={}, categoryId={}, hmctsServiceID={}",
+            caseData.getCcdCaseReference(), categoryType, categoryType.getStringValueForQuery(), hmctsServiceID
+        );
         return null;
     }
 
@@ -72,19 +86,8 @@ public class CaseCategoriesService {
     }
 
     private String getClaimTrack(CaseData caseData) {
-        if (YES.equals(caseData.getFinalOrderAllocateToTrack())
-            && caseData.getFinalOrderTrackAllocation() != null) {
-            return caseData.getFinalOrderTrackAllocation().name();
-        }
-
-        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return caseData.getAllocatedTrack() != null ? caseData.getAllocatedTrack().name() : null;
-        } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return caseData.getResponseClaimTrack() != null
-                ? caseData.getResponseClaimTrack()
-                : AllocatedTrack.SMALL_CLAIM.name();
-        }
-
-        return null;
+        return caseData.getAllocatedTrack() != null
+            ? caseData.getAllocatedTrack().toString()
+            : caseData.getResponseClaimTrack();
     }
 }
