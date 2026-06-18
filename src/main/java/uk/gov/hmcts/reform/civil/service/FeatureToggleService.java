@@ -121,6 +121,7 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
     }
 
+    // if deleting this, also handle isQMPdfGeneratorEnabled() below
     public boolean isPublicQueryManagementEnabled(CaseData caseData) {
         if (LipPredicate.caseContainsLiP.test(caseData)) {
             return isLipQueryManagementEnabled(caseData);
