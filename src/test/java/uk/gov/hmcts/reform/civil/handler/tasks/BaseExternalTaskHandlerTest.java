@@ -10,8 +10,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -27,14 +29,21 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BaseExternalTaskHandlerTest {
 
+    private static final long LOCK_DURATION = 2000L;
+    private static final int RETRY_COUNT = 3;
+    private static final int BACKOFF_DELAY = 500;
+    private static final int DISPATCH_DELAY = 200;
+
     @Mock
     private ExternalTask externalTask;
+
     @Mock
     private ExternalTaskService externalTaskService;
 
@@ -42,35 +51,12 @@ class BaseExternalTaskHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new TestBaseExternalTaskHandler();
-    }
-
-    private static class TestBaseExternalTaskHandler extends BaseExternalTaskHandler {
-        private ExternalTaskData externalTaskData;
-        private Exception exceptionToThrow;
-
-        @Override
-        protected ExternalTaskData handleTask(ExternalTask externalTask) {
-            if (exceptionToThrow != null) {
-                if (exceptionToThrow instanceof RuntimeException) {
-                    throw (RuntimeException) exceptionToThrow;
-                }
-                throw new RuntimeException(exceptionToThrow);
-            }
-            return externalTaskData;
-        }
-
-        public void setExceptionToThrow(Exception exceptionToThrow) {
-            this.exceptionToThrow = exceptionToThrow;
-        }
-
-        @Override
-        protected VariableMap getVariableMap(ExternalTaskData data) {
-            if (data != null) {
-                return Variables.createVariables().putValue("data", "some data");
-            }
-            return null;
-        }
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setLockDuration(LOCK_DURATION);
+        eventProperties.setRetryCount(RETRY_COUNT);
+        eventProperties.setBackoffDelay(BACKOFF_DELAY);
+        eventProperties.setDispatchDelay(DISPATCH_DELAY);
+        handler = new TestBaseExternalTaskHandler(eventProperties);
     }
 
     @Nested
@@ -227,25 +213,6 @@ class BaseExternalTaskHandlerTest {
     }
 
     @Nested
-    class CalculateEffectiveDelay {
-
-        @Test
-        void shouldReturnZero_whenTotalFoundIsSmall() {
-            assertThat(handler.calculateEffectiveDelay(25, 1000, 100)).isZero();
-        }
-
-        @Test
-        void shouldReturnCalculatedDelay_whenTotalFoundIsLarge() {
-            assertThat(handler.calculateEffectiveDelay(50, 1000, 100)).isEqualTo(16);
-        }
-
-        @Test
-        void shouldReturnDelay_whenMaxDelayIsGreater() {
-            assertThat(handler.calculateEffectiveDelay(50, 10000, 100)).isEqualTo(100);
-        }
-    }
-
-    @Nested
     class Throttle {
 
         @Test
@@ -253,6 +220,112 @@ class BaseExternalTaskHandlerTest {
             Thread.currentThread().interrupt();
             handler.throttle(100);
             assertThat(Thread.interrupted()).isTrue();
+        }
+    }
+
+    @Nested
+    class HelperMethods {
+
+        @Test
+        void shouldReturnNullVariableMapByDefault() {
+            VariableMap variables = Variables.createVariables().putValue("key", "value");
+            ExternalTaskData data = new ExternalTaskData().setVariables(variables);
+
+            assertThat(handler.getVariableMap(data)).isNull();
+            assertThat(handler.getVariableMap(null)).isNull();
+        }
+
+        @Test
+        void shouldIdentifyAlreadyProcessedEvent() {
+            String processInstanceId = "proc-id";
+            String activityId = "act-id";
+            BusinessProcess businessProcess = new BusinessProcess()
+                .setProcessInstanceId(processInstanceId)
+                .setActivityId(activityId);
+
+            when(externalTask.getProcessInstanceId()).thenReturn(processInstanceId);
+            when(externalTask.getActivityId()).thenReturn(activityId);
+
+            assertThat(handler.isEventAlreadyProcessed(externalTask, businessProcess)).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalseWhenBusinessProcessDoesNotMatch() {
+            BusinessProcess businessProcess = new BusinessProcess()
+                .setProcessInstanceId("other-id")
+                .setActivityId("other-act");
+
+            when(externalTask.getProcessInstanceId()).thenReturn("proc-id");
+
+            assertThat(handler.isEventAlreadyProcessed(externalTask, null)).isFalse();
+            assertThat(handler.isEventAlreadyProcessed(externalTask, businessProcess)).isFalse();
+        }
+
+        @Test
+        void shouldUseConfiguredBackoffWhenHandlingTaskFailure() {
+            when(externalTask.getRetries()).thenReturn(2);
+
+            handler.handleFailure(externalTask, externalTaskService, new RuntimeException("boom"));
+
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                eq("boom"),
+                anyString(),
+                eq(1),
+                eq(456L)
+            );
+        }
+
+        @Test
+        void totalRetriesShouldNotExceedLockDuration() {
+
+            when(externalTask.getRetries()).thenReturn(3, 2, 1);
+
+            handler.handleFailure(externalTask, externalTaskService, new RuntimeException("boom"));
+            handler.handleFailure(externalTask, externalTaskService, new RuntimeException("boom"));
+            handler.handleFailure(externalTask, externalTaskService, new RuntimeException("boom"));
+
+            ArgumentCaptor<Long> retryTimeoutCaptor = ArgumentCaptor.forClass(Long.class);
+
+            verify(externalTaskService, times(3)).handleFailure(
+                eq(externalTask),
+                eq("boom"),
+                anyString(),
+                anyInt(),
+                retryTimeoutCaptor.capture()
+            );
+
+            long totalRetryTimeout = retryTimeoutCaptor.getAllValues()
+                .stream()
+                .mapToLong(Long::longValue)
+                .sum();
+
+            assertThat(totalRetryTimeout).isLessThanOrEqualTo((long) (LOCK_DURATION * 0.8));
+        }
+
+    }
+
+    private static class TestBaseExternalTaskHandler extends BaseExternalTaskHandler {
+        private ExternalTaskData externalTaskData;
+        private Exception exceptionToThrow;
+
+        protected TestBaseExternalTaskHandler(EventProperties eventProperties) {
+            super(eventProperties);
+        }
+
+        @Override
+        protected ExternalTaskData handleTask(ExternalTask externalTask) {
+            if (exceptionToThrow != null) {
+                if (exceptionToThrow instanceof RuntimeException) {
+                    throw (RuntimeException) exceptionToThrow;
+                }
+                throw new RuntimeException(exceptionToThrow);
+            }
+            return externalTaskData;
+        }
+
+        public void setExceptionToThrow(Exception exceptionToThrow) {
+            this.exceptionToThrow = exceptionToThrow;
         }
     }
 }

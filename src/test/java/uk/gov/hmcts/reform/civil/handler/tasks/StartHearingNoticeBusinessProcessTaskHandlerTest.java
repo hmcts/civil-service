@@ -46,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.BUSINESS_PROCESS;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(MockitoExtension.class)
 class StartHearingNoticeBusinessProcessTaskHandlerTest {
@@ -68,6 +69,9 @@ class StartHearingNoticeBusinessProcessTaskHandlerTest {
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
     @InjectMocks
     private StartHearingNoticeBusinessProcessTaskHandler handler;
 
@@ -148,4 +152,11 @@ class StartHearingNoticeBusinessProcessTaskHandlerTest {
             .setStatus(started)
             .setProcessInstanceId(processInstanceId);
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }
