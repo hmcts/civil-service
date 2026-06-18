@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -10,7 +9,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
-import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
@@ -22,9 +20,9 @@ import uk.gov.hmcts.reform.hmc.service.HearingsService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
 
@@ -33,9 +31,26 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
     private final HearingsService hearingsService;
     private final RuntimeService runtimeService;
     private final ObjectMapper mapper;
-    private final AsyncHandlerProperties asyncHandlerProperties;
 
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    public AutomatedHearingNoticeHandler(
+        EventProperties eventProperties,
+        UserService userService,
+        SystemUpdateUserConfiguration userConfig,
+        HearingsService hearingsService,
+        RuntimeService runtimeService,
+        ObjectMapper mapper,
+        ApplicationEventPublisher applicationEventPublisher
+    ) {
+        super(eventProperties);
+        this.userService = userService;
+        this.userConfig = userConfig;
+        this.hearingsService = hearingsService;
+        this.runtimeService = runtimeService;
+        this.mapper = mapper;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -43,9 +58,8 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         HearingNoticeSchedulerVars schedulerVars = mapper.convertValue(externalTask.getAllVariables(), HearingNoticeSchedulerVars.class);
         List<String> dispatchedHearingIds = getDispatchedHearingIds(schedulerVars);
         UnNotifiedHearingResponse unnotifiedHearings = getUnnotifiedHearings(schedulerVars.getServiceId());
-        log.info("Found [{}] unnotified hearings, {}", unnotifiedHearings.getTotalFound(), unnotifiedHearings.getHearingIds());
-
-        long effectiveDelay = calculateEffectiveDelay(unnotifiedHearings.getTotalFound(), asyncHandlerProperties.getLockDuration(), asyncHandlerProperties.getEventDispatchDelay());
+        log.info("Job '{}' found {} dispatched unnotified hearing(s) with ids {}",
+                 externalTask.getTopicName(), unnotifiedHearings.getTotalFound(), unnotifiedHearings.getHearingIds());
 
         unnotifiedHearings.getHearingIds()
             .stream()
@@ -53,7 +67,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
             .forEach(hearingId -> {
                 applicationEventPublisher.publishEvent(new HearingNoticeSchedulerTaskEvent(hearingId));
                 dispatchedHearingIds.add(hearingId);
-                throttle(effectiveDelay);
+                throttle(unnotifiedHearings.getTotalFound());
             });
 
         runtimeService.setVariables(

@@ -10,11 +10,12 @@ import uk.gov.hmcts.reform.civil.handler.tasks.BundleCreationTriggerHandler;
 public class BundleCreationTriggerHandlerExternalTaskListener {
 
     private static final String TOPIC = "BUNDLE_CREATION_CHECK";
+    public static final long LOCK_DURATION = 600000L;
 
     @Autowired
     private BundleCreationTriggerHandlerExternalTaskListener(BundleCreationTriggerHandler  bundleCreationTriggerHandler,
                                                            ExternalTaskClient client) {
-        TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC).lockDuration(600000);
+        TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC).lockDuration(LOCK_DURATION);
         subscriptionBuilder.handler(bundleCreationTriggerHandler).open();
     }
 }

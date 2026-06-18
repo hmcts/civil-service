@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
@@ -18,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import static java.util.Optional.ofNullable;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 /**
  * Handles the external camunda task for updating contact information.
@@ -26,13 +26,24 @@ import static java.util.Optional.ofNullable;
  * when the MANAGE_CONTACT_INFORMATION user event was submitted. This is used to populate the summary and description of
  * when triggering the given caseEvent via core case data service.
  */
-@RequiredArgsConstructor
 @Component
 public class ContactInformationUpdatedTaskHandler extends BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+
+    public ContactInformationUpdatedTaskHandler(
+        EventProperties eventProperties,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper
+    ) {
+        super(eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -50,6 +61,11 @@ public class ContactInformationUpdatedTaskHandler extends BaseExternalTaskHandle
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
+    }
+
+    @Override
+    public int getMaxAttempts() {
+        return 1;
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse, ExternalTask externalTask) {

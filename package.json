@@ -11,11 +11,11 @@
     "bpmn-to-image": "0.10.0"
   },
   "devDependencies": {
-    "puppeteer": "^24.34.0"
+    "puppeteer": "24.43.1"
   },
   "overrides": {
     "basic-ftp": "5.3.1",
     "ip-address": "10.1.1",
-    "ws": "8.20.1"
+    "ws": "8.21.0"
   }
 }
