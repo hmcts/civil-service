@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Configuration
 @EnableRetry
@@ -19,25 +19,25 @@ public class ExternalTaskListenerConfiguration {
 
     private final String baseUrl;
     private final AuthTokenGenerator authTokenGenerator;
-    private final AsyncHandlerProperties asyncHandlerProperties;
+    private final EventProperties eventProperties;
 
     @Autowired
     public ExternalTaskListenerConfiguration(@Value("${feign.client.config.processInstance.url}") String baseUrl,
                                              AuthTokenGenerator authTokenGenerator,
-                                             AsyncHandlerProperties asyncHandlerProperties) {
+                                             EventProperties eventProperties) {
         this.baseUrl = baseUrl;
         this.authTokenGenerator = authTokenGenerator;
-        this.asyncHandlerProperties = asyncHandlerProperties;
+        this.eventProperties = eventProperties;
     }
 
     @Bean
     public ExternalTaskClient client() {
         return ExternalTaskClient.create()
             .addInterceptor(new ServiceAuthProvider())
-            .asyncResponseTimeout(29000)
+            .asyncResponseTimeout(eventProperties.getResponseTimeout())
             .maxTasks(1)
             .backoffStrategy(new ExponentialBackoffStrategy(0, 0, 0))
-            .lockDuration(asyncHandlerProperties.getLockDuration()) //wait for some time to finish task before it gets picked by another client
+            .lockDuration(eventProperties.getLockDuration()) //wait for some time to finish task before it gets picked by another client
             .baseUrl(baseUrl)
             .build();
     }
