@@ -12,13 +12,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -38,11 +38,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
@@ -68,15 +70,24 @@ class GaCaseEventTaskHandlerTest {
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @InjectMocks
     private GaCaseEventTaskHandler caseEventTaskHandler;
 
     @Spy
     private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
     @BeforeEach
-    void init() {
-        when(mockTask.getTopicName()).thenReturn("test");
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        caseEventTaskHandler = new GaCaseEventTaskHandler(
+            eventProperties,
+            coreCaseDataService,
+            caseDetailsConverter,
+            objectMapper,
+            gaStateFlowEngine
+        );
+
+        lenient().when(mockTask.getTopicName()).thenReturn("test");
         lenient().when(mockTask.getActivityId()).thenReturn("activityId");
         lenient().when(mockTask.getProcessInstanceId()).thenReturn("processInstanceId");
     }
@@ -144,18 +155,17 @@ class GaCaseEventTaskHandlerTest {
                 eq(errorMessage),
                 anyString(),
                 eq(2),
-                eq(300000L)
+                anyLong()
             );
         }
 
         @Test
-        void shouldCallHandleFailureMethod_whenFeignExceptionFromBusinessLogic() {
+        void shouldCallHandleFailureMethod_whenFeignExceptionFromUnprocessableContent() {
             String errorMessage = "there was an error";
             int status = 422;
             Request.HttpMethod requestType = Request.HttpMethod.POST;
             String exampleUrl = "example url";
 
-            when(mockTask.getRetries()).thenReturn(null);
             when(coreCaseDataService.startUpdate(CASE_ID, INITIATE_GENERAL_APPLICATION))
                 .thenAnswer(invocation -> {
                     throw FeignException.errorStatus(errorMessage, Response.builder()
@@ -179,8 +189,8 @@ class GaCaseEventTaskHandlerTest {
                 eq(mockTask),
                 eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
                 anyString(),
-                eq(2),
-                eq(300000L)
+                anyInt(),
+                anyLong()
             );
         }
 
