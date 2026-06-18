@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import feign.FeignException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -11,25 +10,32 @@ import org.slf4j.LoggerFactory;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
+import uk.gov.hmcts.reform.civil.helpers.ExternalTaskExceptionHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 
-import java.util.Arrays;
 import java.util.Objects;
-
-import static uk.gov.hmcts.reform.civil.helpers.ExponentialRetryTimeoutHelper.calculateExponentialRetryTimeout;
 
 /**
  * Interface for standard implementation of task handler that is invoked for each fetched and locked task.
  */
+@SuppressWarnings({"java:S6813", "java:S1874"})
 public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
 
     public static final String FLOW_STATE = "flowState";
     public static final String FLOW_FLAGS = "flowFlags";
+    public static final int SMALL_BATCH = 25;
 
-    protected Logger log = LoggerFactory.getLogger(BaseExternalTaskHandler.class);
+    protected final Logger log = LoggerFactory.getLogger(BaseExternalTaskHandler.class);
+
+    private final EventProperties eventProperties;
+
+    protected BaseExternalTaskHandler(EventProperties eventProperties) {
+        this.eventProperties = eventProperties;
+    }
 
     /**
      * Executed for each fetched and locked task.
@@ -72,8 +78,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
         }
     }
 
-    //Total possible waiting time 16 minutes - if changing this, change lockDuration in ExternalTaskListenerConfiguration
-    @Retryable(value = CompleteTaskException.class, maxAttempts = 3, backoff = @Backoff(delay = 60000, multiplier = 15))
+    @Retryable(value = CompleteTaskException.class, backoff = @Backoff(delay = 60000, multiplier = 15))
     protected void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService, ExternalTaskData data) throws CompleteTaskException {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
@@ -109,106 +114,53 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
     }
 
     /**
-     * Called when an exception arises from the {@link BaseExternalTaskHandler handleTask(externalTask)} method.
-     *
-     * @param externalTask        the external task to be handled.
-     * @param externalTaskService to interact with fetched and locked tasks.
-     * @param e                   the exception thrown by business logic.
-     */
-    void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
-        int maxRetries = getMaxAttempts();
-        log.info("maxRetries {}", maxRetries);
-        int remainingRetries = externalTask.getRetries() == null ? maxRetries : externalTask.getRetries();
-        log.info(
-            "Handle failure externalTask.getRetries() is null ?? '{}' processInstanceId: '{}' " +
-                "remainingRetries value : '{}' externalTask.getRetries() value: '{}' maxRetries: '{}'",
-            externalTask.getRetries() == null,
-            externalTask.getProcessInstanceId() != null ? externalTask.getProcessInstanceId() : "Instance id is null",
-            remainingRetries,
-            externalTask.getRetries(),
-            maxRetries
-        );
-        log.error("Error occured {} remainingRetries {}", e.getMessage(), remainingRetries, e);
-        externalTaskService.handleFailure(
-            externalTask,
-            e.getMessage(),
-            getStackTrace(e),
-            remainingRetries - 1,
-            //Total possible waiting time 15 minutes - if changing this, change lockDuration in ExternalTaskListenerConfiguration
-            calculateExponentialRetryTimeout(5 * 60 * 1000, maxRetries, remainingRetries)
-        );
-    }
-
-    /**
      * Called when an exception arises and retry is not required from the {@link BaseExternalTaskHandler handleTask(externalTask)} method.
      *
      * @param externalTask        the external task to be handled.
      * @param externalTaskService to interact with fetched and locked tasks.
      * @param e                   the exception thrown by business logic.
      */
-    void handleFailureNotRetryable(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
-        int remainingRetries = 0;
-        log.info(
-            "No Retryable Handle failure processInstanceId: '{}' ",
-            externalTask.getProcessInstanceId() != null ? externalTask.getProcessInstanceId() : "Instance id is null"
-        );
-
+    void handleFailureNotRetryable(ExternalTask externalTask, ExternalTaskService externalTaskService, Throwable e) {
+        log.info("Handle task failure Not Retryable, processInstanceId: '{}' ", externalTask.getProcessInstanceId());
         externalTaskService.handleFailure(
             externalTask,
             e.getMessage(),
-            getStackTrace(e),
-            remainingRetries,
+            ExternalTaskExceptionHelper.getStackTrace(e),
+            0,
             1000L
         );
     }
 
-    private String getStackTrace(Throwable throwable) {
-        if (throwable instanceof FeignException feignexception) {
-            return feignexception.contentUTF8();
-        }
-        String stackTraceMsg = Arrays.toString(throwable.getStackTrace());
-        log.error("StackTrace {} ", stackTraceMsg);
-        return stackTraceMsg;
+    /**
+     * Called when an exception arises from the {@link BaseExternalTaskHandler handleTask(externalTask)} method.
+     *
+     * @param externalTask        the external task to be handled.
+     * @param externalTaskService to interact with fetched and locked tasks.
+     * @param e                   the exception thrown by business logic.
+     */
+    void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Throwable e) {
+        log.info("Handle task failure Retryable, processInstanceId: '{}' ", externalTask.getProcessInstanceId());
+        int maxRetries = getMaxAttempts();
+        Integer extRetries = externalTask.getRetries();
+        int remainingRetries = extRetries != null ? extRetries : maxRetries;
+        log.debug("External task retries: '{}', max: '{}' remaining: '{}'", extRetries, maxRetries, remainingRetries);
+
+        externalTaskService.handleFailure(
+            externalTask,
+            e.getMessage(),
+            ExternalTaskExceptionHelper.getStackTrace(e),
+            remainingRetries - 1,
+            calculateExponentialBackoff(maxRetries, remainingRetries)
+        );
     }
 
-    /**
-     * Defines the number of attempts for a given external task.
-     *
-     * @return the number of attempts for an external task.
-     */
-    protected int getMaxAttempts() {
-        return 3;
-    }
-
-    /**
-     * Defines a Map of variables to be added to an external task on completion.
-     * By default this is null, override to add values.
-     *
-     * @return the variables to add to the external task.
-     */
-    protected VariableMap getVariableMap(ExternalTaskData data) {
+    @SuppressWarnings("java:S1168")
+    public VariableMap getVariableMap(ExternalTaskData data) {
         return null;
     }
 
-    protected long calculateEffectiveDelay(long totalFound, long lock, long delay) {
-        if (totalFound <= 25) {
-            // skip for small batches
-            return 0;
-        }
-        long maxExecutionTimeMs = (long) (lock * 0.8);
-        long maxDelay = maxExecutionTimeMs / totalFound;
-        return Math.min(maxDelay, delay);
-    }
-
-    protected void throttle(long delay) {
-        if (delay == 0) {
-            return;
-        }
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+    protected int getMaxAttempts() {
+        return eventProperties.getRetryCount();
     }
 
     /**
@@ -217,4 +169,94 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      * @param externalTask the external task to be handled.
      */
     protected abstract ExternalTaskData handleTask(ExternalTask externalTask);
+
+    protected void throttle(long count) {
+        long delay = eventProperties.getDispatchDelay();
+        throttle(count, delay);
+    }
+
+    protected void throttle(long count, long delay) {
+        long lock = eventProperties.getLockDuration();
+        throttle(count, delay, lock);
+    }
+
+    protected void throttle(long count, long delay, long lock) {
+        long effectiveDelay = calculateEffectiveDelay(count, lock, delay);
+        if (effectiveDelay == 0) {
+            return;
+        }
+        try {
+            Thread.sleep(effectiveDelay);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /**
+     * Calculates the effective delay for a batch processing task based on the total found items,
+     * the lock duration, and the desired delay. Ensures the delay does not surpass the maximum
+     * permissible delay derived from the lock duration and batch size.
+     *
+     * @param count the total number of items found in the batch; if less than or equal to 25, no delay is applied.
+     * @param lock  the duration for which the task is locked in milliseconds.
+     * @param delay the desired delay in milliseconds between task executions.
+     * @return the calculated effective delay in milliseconds. Returns 0 if count is less than or equal to 25.
+     */
+    private long calculateEffectiveDelay(long count, long lock, long delay) {
+        if (count <= 1 || delay <= 0 || lock <= 0) {
+            // skip no-op or invalid delays
+            return 0;
+        }
+
+        if (count <= SMALL_BATCH && delay < 2000L) {
+            // skip for small & fast batches
+            return 0;
+        }
+
+        long maxExecutionTimeMs = (long) (lock * 0.8);
+        long maxDelay = maxExecutionTimeMs / count;
+        return Math.min(maxDelay, delay);
+    }
+
+    /**
+     * Calculates the current retry timeout value based on the remaining number of retries.
+     *
+     * @param maxRetries     the total number of times to retry. For a default Camunda external task this is 3.
+     * @param remainingRetries the number of remaining retries. This will be the retries associated with the
+     *                         external task {@link  org.camunda.bpm.client.task.ExternalTask}
+     * @return a long value for retry timeout.
+     */
+    private long calculateExponentialBackoff(int maxRetries, int remainingRetries) {
+        if (remainingRetries > 0 && remainingRetries <= maxRetries) {
+            long lock = eventProperties.getLockDuration();
+            long delay = eventProperties.getBackoffDelay();
+            long maxBackoff = calculateEffectiveBackoff(maxRetries, lock, delay);
+            double retryExponent = (double) maxRetries - remainingRetries;
+            double multiplier = Math.pow(2D, retryExponent);
+            return Math.round(maxBackoff * multiplier);
+        }
+        return 0L;
+    }
+
+    /**
+     * Calculates the effective backoff delay based on the maximum number of retries, lock duration,
+     * and specified delay. Ensures the delay does not exceed the maximum permissible delay
+     * as determined by the lock duration and retry count.
+     *
+     * @param maxRetries the maximum number of retry attempts allowed; must be greater than 0.
+     * @param lock       the duration for which the task is locked in milliseconds.
+     * @param delay      the desired delay in milliseconds between retries.
+     * @return the calculated effective backoff delay in milliseconds. Returns 0 if maxRetries is less than or equal to 0.
+     */
+    private long calculateEffectiveBackoff(int maxRetries, long lock, long delay) {
+        if (maxRetries <= 0) {
+            return 0L;
+        }
+        // Total possible waiting time 33 minutes max (retry 1 + 2 + 3) as of 2026
+        long maxExecutionTimeMs = (long) (lock * 0.8);
+        long denominator = Math.round(Math.pow(2D, maxRetries) - 1D);
+        long maxDelay = maxExecutionTimeMs / denominator;
+        return Math.min(maxDelay, delay);
+    }
+
 }

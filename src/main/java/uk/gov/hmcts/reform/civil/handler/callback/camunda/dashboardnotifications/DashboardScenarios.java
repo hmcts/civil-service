@@ -67,7 +67,9 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT("Scenario.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant"),
     SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT("Scenario.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT("Scenario.AAA6.DefResponse.MoreTimeRequested.Claimant"),
+    SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_JR_CANCELLED_CLAIMANT("Scenario.AAA6.DefResponse.MoreTimeRequested.JR.Cancelled.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_JUDGMENT_REQUESTED_CANCELLED_CLAIMANT("Scenario.AAA6.DefResponse.JR.Cancelled.Claimant"),
+    SCENARIO_AAA6_DEFISLIP_JUDGMENT_REQUESTED_CLAIMANT("Scenario.AAA6.DefIsLip.Judgment.Requested.Claimant"),
     SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT("Scenario.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT("Scenario.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant"),
     SCENARIO_AAA6_CLAIMANT_MEDIATION_SUCCESSFUL("Scenario.AAA6.MediationSuccessful.CARM.Claimant"),
@@ -300,7 +302,9 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_DEFENDANT("Scenario.AAA6.GeneralApplication.ViewApplicationActionNeeded.Defendant"),
     SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT("Scenario.AAA6.GeneralApplication.ViewApplicationInProgress.Defendant"),
     SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_APPLICANT("Scenario.AAA6.GeneralApps.TranslatedDocumentUploaded.Applicant"),
-    SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_RESPONDENT("Scenario.AAA6.GeneralApps.TranslatedDocumentUploaded.Respondent");
+    SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_RESPONDENT("Scenario.AAA6.GeneralApps.TranslatedDocumentUploaded.Respondent"),
+    SCENARIO_AAA6_CASE_SETTLED_JR_CANCELLED_CLAIMANT("Scenario.Notice.AAA6.JR.Cancelled.Case.Settled.Claimant"),
+    SCENARIO_AAA6_CASE_STAYED_JR_CANCELLED_CLAIMANT("Scenario.Notice.AAA6.JR.Cancelled.Case.Stayed.Claimant");
 
     private final String scenario;
 

@@ -50,13 +50,19 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
             .moveTo(AWAITING_RESPONSES_FULL_ADMIT_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.notificationAcknowledged
                 .and(ResponsePredicate.respondentTimeExtension)
-                .and(ResponsePredicate.awaitingResponsesFullAdmitReceived), transitions)
+                .and(ResponsePredicate.awaitingResponsesFullAdmitReceived)
+                .and(
+                    not(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedAckExtension))
+                ), transitions)
 
             .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.notificationAcknowledged
                 .and(ResponsePredicate.respondentTimeExtension)
                 .and(not(DismissedPredicate.afterClaimAcknowledgedExtension))
-                .and(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived), transitions)
+                .and(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived)
+                .and(
+                    not(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedAckExtension))
+                ), transitions)
 
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedAckExtension), transitions)

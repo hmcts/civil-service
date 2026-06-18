@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.aspect;
 
-import com.microsoft.applicationinsights.TelemetryClient;
 import feign.Request;
 import feign.Response;
 import feign.codec.ErrorDecoder;
@@ -13,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.civil.service.FeignErrorTelemetryService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -20,22 +20,23 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = ErrorDecoderTelemetryAspectIntegrationTest.TestConfig.class)
-@SuppressWarnings("java:S6813")
+@SuppressWarnings({"java:S6813", "java:S5960"})
 class ErrorDecoderTelemetryAspectIntegrationTest {
 
+    public static final String METHOD_KEY = "TestClient#getAnything";
+    public static final String DECODED = "decoded";
+
     @MockBean
-    private TelemetryClient telemetryClient;
+    private FeignErrorTelemetryService telemetryService;
 
     @Autowired
     private ErrorDecoder errorDecoder;
 
     @Test
-    @SuppressWarnings("java:S5960")
     void shouldTrackTelemetryWhenSpringManagedErrorDecoderDecodesResponse() {
         Request request = Request.create(
             Request.HttpMethod.GET,
@@ -51,20 +52,16 @@ class ErrorDecoderTelemetryAspectIntegrationTest {
             .headers(Collections.emptyMap())
             .build();
 
-        Exception result = errorDecoder.decode("TestClient#getSomething", response);
+        Exception result = errorDecoder.decode(METHOD_KEY, response);
 
         assertThat(result)
             .isInstanceOf(IllegalStateException.class)
-            .hasMessage("decoded");
-        verify(telemetryClient).trackEvent(
-            eq("httpclient.feign.error.classified"),
-            argThat(properties -> "TestClient#getSomething".equals(properties.get("methodKey"))
-                && "GET".equals(properties.get("httpMethod"))
-                && "504".equals(properties.get("status"))
-                && "true".equals(properties.get("retryable"))
-                && "none".equals(properties.get("retryAfter"))
-                && "IllegalStateException".equals(properties.get("defaultException"))),
-            isNull()
+            .hasMessage(DECODED);
+        verify(telemetryService).trackErrorClassification(
+            eq(METHOD_KEY),
+            eq(response),
+            argThat(throwable -> throwable instanceof IllegalStateException
+                && DECODED.equals(throwable.getMessage()))
         );
     }
 
@@ -75,7 +72,8 @@ class ErrorDecoderTelemetryAspectIntegrationTest {
 
         @Bean
         ErrorDecoder errorDecoder() {
-            return (methodKey, response) -> new IllegalStateException("decoded");
+            return (methodKey, response) -> new IllegalStateException(DECODED);
         }
     }
+
 }

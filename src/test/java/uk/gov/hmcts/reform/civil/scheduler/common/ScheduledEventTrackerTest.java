@@ -40,7 +40,9 @@ class ScheduledEventTrackerTest {
             eq("TestSchedulerJobStarted"),
             eq(Map.of(
                 "schedulerName", "TestScheduler",
-                "totalCases", "10"
+                "totalCases", "10",
+                "succeededCases", "0",
+                "failedCases", "0"
             ))
         );
     }
@@ -133,7 +135,9 @@ class ScheduledEventTrackerTest {
             eq("TestSchedulerJobCompleted"),
             eq(Map.of(
                 "schedulerName", "TestScheduler",
-                "totalCases", "0"
+                "totalCases", "0",
+                "succeededCases", "0",
+                "failedCases", "0"
             ))
         );
     }
@@ -146,6 +150,9 @@ class ScheduledEventTrackerTest {
             eq("TestSchedulerJobAborted"),
             eq(Map.of(
                 "schedulerName", "TestScheduler",
+                "totalCases", "0",
+                "succeededCases", "0",
+                "failedCases", "0",
                 "abortReason", "Error reason"
             ))
         );
@@ -159,6 +166,9 @@ class ScheduledEventTrackerTest {
             eq("TestSchedulerJobAborted"),
             eq(Map.of(
                 "schedulerName", "TestScheduler",
+                "totalCases", "0",
+                "succeededCases", "0",
+                "failedCases", "0",
                 "abortReason", "Unknown"
             ))
         );
