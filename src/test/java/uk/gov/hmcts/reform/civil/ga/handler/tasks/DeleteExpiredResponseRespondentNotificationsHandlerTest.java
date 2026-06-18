@@ -5,11 +5,11 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.ga.event.DeleteExpiredResponseRespondentNotificationsEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.search.DeleteExpiredResponseRespondentNotificationSearchService;
@@ -37,11 +37,17 @@ class DeleteExpiredResponseRespondentNotificationsHandlerTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
-    @InjectMocks
     private DeleteExpiredResponseRespondentNotificationsHandler handler;
 
     @BeforeEach
     void init() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        handler = new DeleteExpiredResponseRespondentNotificationsHandler(
+            eventProperties,
+            applicationEventPublisher,
+            searchService
+        );
         when(mockTask.getTopicName()).thenReturn("test");
     }
 

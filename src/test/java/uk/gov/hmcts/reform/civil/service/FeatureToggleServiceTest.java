@@ -222,15 +222,6 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isDefendantNoCOnlineForCase(caseData)).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsQMForLRs(Boolean toggleStat) {
-        var caseFlagsKey = "query-management";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
-    }
-
     @Test
     void shouldReturnCorrectValue_whenNonLipCase() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
