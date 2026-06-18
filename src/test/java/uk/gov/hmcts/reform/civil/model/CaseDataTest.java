@@ -1418,6 +1418,77 @@ class CaseDataTest {
         }
 
         @Test
+        void shouldReturnTrueIfHearingFeePaymentDoneWithHWFForAppRepresentedParties() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingHelpFeesReferenceNumber("hwf-ref")
+                .feePaymentOutcomeDetails(
+                    new FeePaymentOutcomeDetails()
+                        .setHwfFullRemissionGrantedForHearingFee(YES))
+                .respondent1Represented(YES)
+                .build();
+            //When
+            boolean hearingFeePaymentDoneWithHWF = caseData.hearingFeePaymentDoneWithHWF();
+            //Then
+            assertTrue(hearingFeePaymentDoneWithHWF);
+        }
+
+        @Test
+        void shouldReturnTrueIfHearingFeePaymentDoneWithHWFForRespRepresentedParties() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingHelpFeesReferenceNumber("hwf-ref")
+                .feePaymentOutcomeDetails(
+                    new FeePaymentOutcomeDetails()
+                        .setHwfFullRemissionGrantedForHearingFee(YES))
+                .applicant1Represented(YES)
+                .build();
+            //When
+            boolean hearingFeePaymentDoneWithHWF = caseData.hearingFeePaymentDoneWithHWF();
+            //Then
+            assertTrue(hearingFeePaymentDoneWithHWF);
+        }
+
+        @Test
+        void shouldReturnFalseIfHearingFeeHWFReferenceIsMissing() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .feePaymentOutcomeDetails(
+                    new FeePaymentOutcomeDetails()
+                        .setHwfFullRemissionGrantedForHearingFee(YES))
+                .build();
+            //When
+            boolean hearingFeePaymentDoneWithHWF = caseData.hearingFeePaymentDoneWithHWF();
+            //Then
+            assertFalse(hearingFeePaymentDoneWithHWF);
+        }
+
+        @Test
+        void shouldReturnFalseIfHearingFeeHWFOutcomeDetailsAreMissing() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingHelpFeesReferenceNumber("hwf-ref")
+                .build();
+            //When
+            boolean hearingFeePaymentDoneWithHWF = caseData.hearingFeePaymentDoneWithHWF();
+            //Then
+            assertFalse(hearingFeePaymentDoneWithHWF);
+        }
+
+        @Test
+        void shouldReturnFalseIfHearingFeeHWFRemissionOutcomeIsMissing() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingHelpFeesReferenceNumber("hwf-ref")
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails())
+                .build();
+            //When
+            boolean hearingFeePaymentDoneWithHWF = caseData.hearingFeePaymentDoneWithHWF();
+            //Then
+            assertFalse(hearingFeePaymentDoneWithHWF);
+        }
+
+        @Test
         void shouldReturnFalseIfHearingPaymentIsNotSuccess() {
             //Given
             CaseData caseData = CaseData.builder()
@@ -1571,4 +1642,3 @@ class CaseDataTest {
         assertNull(caseData.getRespondent1PartyEmail());
     }
 }
-
