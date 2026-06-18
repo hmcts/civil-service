@@ -36,7 +36,9 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS_LR_ADMISSION_BULK;
@@ -164,12 +166,13 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private void handlePayments(CaseData caseData, SealedClaimResponseFormForSpec form) {
-        RespondToClaim respondToClaim = caseData.getResponseToClaim();
-        if (respondToClaim != null) {
-            form.setPoundsPaid(MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()).toString())
-                .setPaymentDate(respondToClaim.getWhenWasThisAmountPaid())
-                .setPaymentMethod(getPaymentMethod(respondToClaim));
-        }
+        Stream.of(caseData.getRespondToClaim(), caseData.getRespondToAdmittedClaim())
+            .filter(Objects::nonNull)
+            .findFirst()
+            .ifPresent(response -> form
+                .setPoundsPaid(MonetaryConversions.penniesToPounds(response.getHowMuchWasPaid()).toString())
+                .setPaymentDate(response.getWhenWasThisAmountPaid())
+                .setPaymentMethod(getPaymentMethod(response)));
     }
 
     private void addRepaymentPlanDetails(SealedClaimResponseFormForSpec form, CaseData caseData) {

@@ -9,13 +9,13 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -67,7 +67,6 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
     private GaForLipService gaForLipService;
     @Mock
     private ExternalTask mockTask;
-    @InjectMocks
     private WaitCivilDocUpdatedTaskHandler waitCivilDocUpdatedTaskHandler;
     @Mock
     private FeatureToggleService featureToggleService;
@@ -80,6 +79,16 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
 
     @BeforeEach
     void init() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        waitCivilDocUpdatedTaskHandler = new WaitCivilDocUpdatedTaskHandler(
+            eventProperties,
+            coreCaseDataService,
+            caseDetailsConverter,
+            gaForLipService,
+            mapper,
+            featureToggleService
+        );
         CaseDocument caseDocumentNow = new CaseDocument().setDocumentName("current")
                 .setDocumentLink(new Document().setDocumentUrl("url")
                         .setDocumentFileName("filename").setDocumentHash("hash")

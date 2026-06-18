@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -33,6 +34,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(SpringExtension.class)
 class AutomatedHearingNoticeHandlerTest {
@@ -66,6 +69,8 @@ class AutomatedHearingNoticeHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
 
     @InjectMocks
     private AutomatedHearingNoticeHandler handler;
@@ -219,8 +224,19 @@ class AutomatedHearingNoticeHandlerTest {
         verify(externalTaskService).complete(mockTask, null);
     }
 
+    @Test
+    void shouldOnlyAttemptOnce() {
+        assertEquals(1, handler.getMaxAttempts());
+    }
+
     private UnNotifiedHearingResponse createUnnotifiedHearings(List<String> hearingIds) {
         return new UnNotifiedHearingResponse(hearingIds, (long) hearingIds.size());
+    }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
     }
 
 }

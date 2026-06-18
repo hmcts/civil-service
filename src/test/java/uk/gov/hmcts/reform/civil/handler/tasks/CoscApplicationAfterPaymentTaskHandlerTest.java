@@ -38,8 +38,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHECK_PAID_IN_FULL_SCHED_DEADLINE;
@@ -50,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FL
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_BY_DATE;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(MockitoExtension.class)
 public class CoscApplicationAfterPaymentTaskHandlerTest {
@@ -73,6 +76,8 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
     private ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(mapper);
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
 
     @InjectMocks
     private CoscApplicationAfterPaymentTaskHandler handler;
@@ -88,11 +93,11 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
         variables.putValue(JUDGMENT_MARK_PAID_FULL, false);
         variables.putValue(IS_CLAIMANT_LR, false);
 
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(new StateFlowDTO()
-                                                                               .setFlags(Map.of())
-                                                                               .setStateHistory(
-                                                                                   List.of(State.from("MAIN.DRAFT")))
-                                                                               .setState(State.from("MAIN.DRAFT")));
+        lenient().when(stateFlowEngine.getStateFlow(any(CaseData.class)))
+            .thenReturn(new StateFlowDTO()
+                            .setFlags(Map.of())
+                            .setStateHistory(List.of(State.from("MAIN.DRAFT")))
+                            .setState(State.from("MAIN.DRAFT")));
     }
 
     @ParameterizedTest
@@ -233,5 +238,16 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
         verify(externalTaskService).complete(mockExternalTask, variables);
     }
-}
 
+    @Test
+    void shouldOnlyAttemptOnce() {
+        assertEquals(1, handler.getMaxAttempts());
+    }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
+}

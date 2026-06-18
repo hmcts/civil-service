@@ -458,8 +458,7 @@ public class FullDefenceTransitionBuilderTest {
                              .setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip()
                                                                           .setHasAgreedFreeMediation(MediationDecision.Yes)))
             .build();
-        boolean result = MediationPredicate.allAgreedToLrMediationSpec.test(caseData);
-        assertFalse(result);
+        assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));
     }
 
     @Test

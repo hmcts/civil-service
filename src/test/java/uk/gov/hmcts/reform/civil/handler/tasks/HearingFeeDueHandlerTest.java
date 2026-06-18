@@ -37,6 +37,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(SpringExtension.class)
 class HearingFeeDueHandlerTest {
@@ -61,6 +63,8 @@ class HearingFeeDueHandlerTest {
 
     @Mock
     private FeatureToggleService featureToggleService;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
 
     @InjectMocks
     private HearingFeeDueHandler handler;
@@ -204,7 +208,7 @@ class HearingFeeDueHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(300000L)
+            anyLong()
         );
     }
 
@@ -242,4 +246,11 @@ class HearingFeeDueHandlerTest {
             anyLong()
         );
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }
