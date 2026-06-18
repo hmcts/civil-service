@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
 public abstract class GenerateMediationFileAndTransferTaskHandler extends BaseExternalTaskHandler {
@@ -27,11 +28,14 @@ public abstract class GenerateMediationFileAndTransferTaskHandler extends BaseEx
     protected static final String SUBJECT = "OCMC Mediation Data";
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-    protected GenerateMediationFileAndTransferTaskHandler(MediationCasesSearchService caseSearchService,
-                                                          CoreCaseDataService coreCaseDataService,
-                                                          CaseDetailsConverter caseDetailsConverter,
-                                                          SendGridClient sendGridClient,
-                                                          MediationCSVEmailConfiguration mediationCSVEmailConfiguration) {
+    protected GenerateMediationFileAndTransferTaskHandler(
+        EventProperties eventProperties,
+        MediationCasesSearchService caseSearchService,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        SendGridClient sendGridClient,
+        MediationCSVEmailConfiguration mediationCSVEmailConfiguration) {
+        super(eventProperties);
         this.caseSearchService = caseSearchService;
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
