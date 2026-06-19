@@ -33,12 +33,18 @@
     {
       "matchPackageNames": [
         "com.github.hmcts:auth-checker-lib",
-        "com.github.hmcts:payments-java-client",
+        "com.github.hmcts:payments-java-client"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
+    },
+    {
+      "matchPackageNames": [
         "org.camunda.bpm:camunda-engine-rest-core",
         "org.camunda.bpm:camunda-external-task-client"
       ],
-      "matchUpdateTypes": ["minor", "patch"],
-      "enabled": false
+      "groupName": "Camunda updates",
+      "groupSlug": "camunda",
+      "automerge": true,
     },
     {
       "matchUpdateTypes": ["minor", "patch"],
