@@ -15,8 +15,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -224,5 +226,78 @@ class ElasticSearchPaginatedStreamProviderTest {
         assertThat(cases).hasSize(2);
         assertThat(cases.get(0).getId()).isEqualTo(1L);
         assertThat(cases.get(1).getId()).isEqualTo(2L);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenInitialSearchFails() {
+        when(coreCaseDataService.searchCasesPaginated(any())).thenThrow(new RuntimeException("API Error"));
+
+        int pageSize = 10;
+        PaginatedQueryProvider queryProvider = (pageToken, ps) -> new PaginatedQuery(
+            null,
+            null,
+            0,
+            pageToken,
+            ps
+        );
+
+        assertThatThrownBy(() -> provider.getPaginatedSearchResult(queryProvider, pageSize))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("Failed to fetch initial page from ElasticSearch");
+    }
+
+    @Test
+    void shouldHandleExceptionDuringBackgroundPagination() {
+        CaseDetails case1 = CaseDetails.builder().id(1L).build();
+        SearchResult page1 = SearchResult.builder().total(2).cases(List.of(case1)).build();
+
+        when(coreCaseDataService.searchCasesPaginated(any(PaginatedQuery.class)))
+            .thenAnswer(invocation -> {
+                PaginatedQuery query = invocation.getArgument(0);
+                if (query.isInitialSearch()) {
+                    return page1;
+                }
+                throw new RuntimeException("Background API Error");
+            });
+
+        int pageSize = 1;
+        PaginatedQueryProvider queryProvider = (pageToken, ps) -> new PaginatedQuery(
+            null,
+            null,
+            0,
+            pageToken,
+            ps
+        );
+
+        ElasticSearchResult result = provider.getPaginatedSearchResult(queryProvider, pageSize);
+        List<CaseDetails> cases = result.caseDetailsStream().toList();
+
+        // Should return first page cases and then stop
+        assertThat(cases).hasSize(1);
+        assertThat(cases.get(0).getId()).isEqualTo(1L);
+        verify(coreCaseDataService, times(2)).searchCasesPaginated(any());
+    }
+
+    @Test
+    void shouldCallOnCloseHandlerWhenStreamIsClosed() {
+        SearchResult searchResult = SearchResult.builder().total(0).cases(Collections.emptyList()).build();
+        when(coreCaseDataService.searchCasesPaginated(any())).thenReturn(searchResult);
+
+        int pageSize = 10;
+        PaginatedQueryProvider queryProvider = (pageToken, ps) -> new PaginatedQuery(
+            null,
+            null,
+            0,
+            pageToken,
+            ps
+        );
+
+        ElasticSearchResult result = provider.getPaginatedSearchResult(queryProvider, pageSize);
+        boolean[] closed = {false};
+        try (Stream<CaseDetails> stream = result.caseDetailsStream()) {
+            stream.onClose(() -> closed[0] = true);
+        }
+
+        assertThat(closed[0]).isTrue();
     }
 }
