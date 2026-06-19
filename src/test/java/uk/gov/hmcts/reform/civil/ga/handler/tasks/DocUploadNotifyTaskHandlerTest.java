@@ -2,12 +2,13 @@ package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.search.GaEvidenceUploadNotificationSearchService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -40,8 +42,19 @@ public class DocUploadNotifyTaskHandlerTest {
     @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @InjectMocks
     private DocUploadNotifyTaskHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        handler = new DocUploadNotifyTaskHandler(
+            eventProperties,
+            searchService,
+            coreCaseDataService,
+            caseDetailsConverter
+        );
+    }
 
     @Test
     void shouldNotSendMessageAndTriggerGaEvent_whenZeroCasesFound() {
@@ -71,5 +84,10 @@ public class DocUploadNotifyTaskHandlerTest {
             Map.of()
         );
         verify(externalTaskService).complete(any(), any());
+    }
+
+    @Test
+    void shouldOnlyAttemptOnce() {
+        assertEquals(1, handler.getMaxAttempts());
     }
 }
