@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocume
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.UserType;
@@ -23,16 +25,21 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_GA_LANGUAGE_UPDATE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH;
@@ -40,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguag
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.WELSH;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.DEFENDANT;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -116,6 +124,16 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
 
         CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedCaseData.getChangeLanguagePreference()).isNull();
+    }
+
+    @Test
+    void shouldReturnEmptyResponse_WhenSubmitted() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+
+        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+        assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
     }
 
     @Nested
@@ -307,6 +325,32 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("WELSH");
             assertThat(updatedCaseData.getClaimantLanguagePreferenceDisplay()).isEqualTo(WELSH);
             verifyNoInteractions(uploadTranslatedDocumentStrategyFactory);
+        }
+
+        @Test
+        void shouldNotTriggerGaLanguageUpdate_WhenGeneralApplicationsAreEmpty() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT, WELSH));
+            caseData.setApplicant1Represented(NO);
+            caseData.setGeneralApplications(List.of());
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(helperService);
+        }
+
+        @Test
+        void shouldTriggerGaLanguageUpdate_WhenGeneralApplicationsExist() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT, WELSH));
+            caseData.setApplicant1Represented(NO);
+            caseData.setGeneralApplications(wrapElements(new GeneralApplication()));
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(helperService).triggerEvent(caseData, TRIGGER_GA_LANGUAGE_UPDATE);
         }
 
         @Test
