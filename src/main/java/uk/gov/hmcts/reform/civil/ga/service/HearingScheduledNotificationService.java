@@ -99,14 +99,12 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
                                   String recipient,
                                   String template,
                                   String gaLipType) throws NotificationException {
-        try {
-            notificationService.sendMail(recipient,  template,
-                                         addPropertiesByType(caseData, mainCaseData, gaLipType),
-                                         String.format(REFERENCE_TEMPLATE_HEARING,
-                                                       caseData.getGeneralAppParentCaseLink().getCaseReference()));
-        } catch (NotificationException e) {
-            throw new NotificationException(e);
-        }
+        notificationService.sendMail(
+            recipient,
+            template,
+            addPropertiesByType(caseData, mainCaseData, gaLipType),
+            String.format(REFERENCE_TEMPLATE_HEARING, caseData.getGeneralAppParentCaseLink().getCaseReference())
+        );
     }
 
     public GeneralApplicationCaseData sendNotificationForClaimant(GeneralApplicationCaseData caseData) throws NotificationException {
@@ -117,11 +115,17 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
 
         caseData = solicitorEmailValidation.validateSolicitorEmail(civilCaseData, caseData);
 
-        sendNotification(caseData, civilCaseData, caseData.getGeneralAppApplnSolicitor().getEmail(),
+        GASolicitorDetailsGAspec claimantSolicitor = caseData.getGeneralAppApplnSolicitor();
+        if (claimantSolicitor ==  null) {
+            log.warn("Failed to Send hearing scheduled notification for claimant solicitor for Case ID: {}", caseData.getCcdCaseReference());
+            return caseData;
+        }
+
+        sendNotification(caseData, civilCaseData, claimantSolicitor.getEmail(),
                          gaForLipService.isLipApp(caseData)
                              ? getLiPApplicantTemplates(caseData)
                              : notificationProperties.getHearingNoticeTemplate(), APPLICANT);
-        log.info("Sending hearing scheduled notification for claimant for Case ID: {}", caseData.getCcdCaseReference());
+        log.info("Sending hearing scheduled notification for claimant solicitor for Case ID: {}", caseData.getCcdCaseReference());
 
         return caseData;
     }
@@ -142,27 +146,30 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
 
     public GeneralApplicationCaseData sendNotificationForDefendant(GeneralApplicationCaseData caseData) throws NotificationException {
 
-        GeneralApplicationCaseData civilCaseData = caseDetailsConverter
-            .toGeneralApplicationCaseData(coreCaseDataService
-                            .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
+        GeneralApplicationCaseData civilCaseData = caseDetailsConverter.toGeneralApplicationCaseData(
+            coreCaseDataService.getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
 
         caseData = solicitorEmailValidation.validateSolicitorEmail(civilCaseData, caseData);
 
-        List<Element<GASolicitorDetailsGAspec>> respondentSolicitor = caseData
-            .getGeneralAppRespondentSolicitors();
+        List<Element<GASolicitorDetailsGAspec>> respondentSolicitor = caseData.getGeneralAppRespondentSolicitors();
+        if (respondentSolicitor ==  null || respondentSolicitor.isEmpty()) {
+            log.warn("Failed to Send hearing scheduled notification for respondent solicitor for Case ID: {}", caseData.getCcdCaseReference());
+            return caseData;
+        }
+
         GeneralApplicationCaseData updatedCaseData = caseData;
-        respondentSolicitor.forEach((respondent) -> sendNotification(
+        respondentSolicitor.forEach(respondent -> sendNotification(
             updatedCaseData,
             civilCaseData,
             respondent.getValue().getEmail(), gaForLipService.isLipResp(updatedCaseData)
-                ? getLiPRespondentTemplate(civilCaseData, updatedCaseData)
+                ? getLiPRespondentTemplate(updatedCaseData)
                 : notificationProperties.getHearingNoticeTemplate(), RESPONDENT));
 
-        log.info("Sending hearing scheduled notification for respondent for Case ID: {}", caseData.getCcdCaseReference());
+        log.info("Sending hearing scheduled notification for respondent solicitor for Case ID: {}", caseData.getCcdCaseReference());
         return caseData;
     }
 
-    private String getLiPRespondentTemplate(GeneralApplicationCaseData civilCaseData, GeneralApplicationCaseData caseData) {
+    private String getLiPRespondentTemplate(GeneralApplicationCaseData caseData) {
         return caseData.isRespondentBilingual()
             ? notificationProperties.getLipGeneralAppRespondentEmailTemplateInWelsh()
             : notificationProperties.getLipGeneralAppRespondentEmailTemplate();
