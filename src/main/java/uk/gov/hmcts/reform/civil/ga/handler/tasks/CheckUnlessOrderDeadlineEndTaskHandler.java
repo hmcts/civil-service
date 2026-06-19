@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -24,9 +23,9 @@ import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_SCHEDULER_CHECK_UNLESS_ORDER_DEADLINE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.ORDER_MADE;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.UNLESS_ORDER;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 @ConditionalOnExpression("${judge.revisit.unlessOrder.event.emitter.enabled:true}")
 public class CheckUnlessOrderDeadlineEndTaskHandler extends BaseExternalTaskHandler {
@@ -37,6 +36,20 @@ public class CheckUnlessOrderDeadlineEndTaskHandler extends BaseExternalTaskHand
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+
+    public CheckUnlessOrderDeadlineEndTaskHandler(
+        EventProperties eventProperties,
+        CaseStateSearchService caseSearchService,
+        GaCoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper
+    ) {
+        super(eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -84,4 +97,5 @@ public class CheckUnlessOrderDeadlineEndTaskHandler extends BaseExternalTaskHand
     private Map<String, Object> getUpdatedCaseDataMapper(GeneralApplicationCaseData caseData) {
         return caseData.toMap(mapper);
     }
+
 }

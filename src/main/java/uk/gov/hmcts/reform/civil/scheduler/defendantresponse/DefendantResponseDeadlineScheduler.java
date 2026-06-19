@@ -37,7 +37,7 @@ public class DefendantResponseDeadlineScheduler implements CivilScheduler {
         log.info("Running {} scheduler", SCHEDULER_NAME);
         scheduledTaskRunner.run(
             new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-            searchService::getCases,
+            searchService.getElasticSearchResult(),
             defendantResponseDeadlineTask
         );
     }

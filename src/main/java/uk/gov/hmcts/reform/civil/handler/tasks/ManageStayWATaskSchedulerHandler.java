@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
@@ -8,19 +7,27 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.ManageStayWATaskEvent;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.ManageStayUpdateRequestedSearchService;
 
 import java.util.Set;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class ManageStayWATaskSchedulerHandler extends BaseExternalTaskHandler {
 
     private final ManageStayUpdateRequestedSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final FeatureToggleService featureToggleService;
+
+    public ManageStayWATaskSchedulerHandler(
+        EventProperties eventProperties,
+        ManageStayUpdateRequestedSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher
+    ) {
+        super(eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -41,4 +48,5 @@ public class ManageStayWATaskSchedulerHandler extends BaseExternalTaskHandler {
         });
         return new ExternalTaskData();
     }
+
 }

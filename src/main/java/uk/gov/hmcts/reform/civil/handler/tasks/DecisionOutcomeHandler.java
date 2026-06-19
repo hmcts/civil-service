@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
@@ -11,14 +10,24 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.search.DecisionOutcomeSearchService;
 
 import java.util.Set;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class DecisionOutcomeHandler extends BaseExternalTaskHandler {
 
     private final DecisionOutcomeSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    public DecisionOutcomeHandler(
+        EventProperties eventProperties,
+        DecisionOutcomeSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher
+    ) {
+        super(eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -29,10 +38,12 @@ public class DecisionOutcomeHandler extends BaseExternalTaskHandler {
             try {
                 log.info("Current case status '{}'", caseDetails.getState());
                 applicationEventPublisher.publishEvent(new DecisionOutcomeEvent(caseDetails.getId()));
+                throttle(cases.size());
             } catch (Exception e) {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
         return new ExternalTaskData();
     }
+
 }
