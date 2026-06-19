@@ -5,6 +5,7 @@ import feign.Client;
 import feign.Request;
 import feign.Response;
 import feign.httpclient.ApacheHttpClient;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -17,6 +18,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Configuration
 public class HttpClientFeignConfiguration {
 
@@ -34,6 +36,8 @@ public class HttpClientFeignConfiguration {
 
     @Bean
     public PoolingHttpClientConnectionManager connectionManager4() {
+        log.info("###### Creating Pooling Http Client Connection Manager ######");
+        log.info("Max Pre Route is {}, Max total is {}", maxPerRoute, maxTotal);
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(maxTotal);
         connectionManager.setDefaultMaxPerRoute(maxPerRoute);
@@ -51,6 +55,8 @@ public class HttpClientFeignConfiguration {
     }
 
     private CloseableHttpClient getHttpClient(PoolingHttpClientConnectionManager connectionManager) {
+        log.info("###### Creating HTTP client with connection pool ######");
+        log.info("Connection timeout is {}, Request timeout is {}, Read timeout is {}", connectTimeout, requestTimeout, readTimeout);
         RequestConfig config = RequestConfig.custom()
             .setConnectTimeout(connectTimeout)
             .setConnectionRequestTimeout(requestTimeout)
