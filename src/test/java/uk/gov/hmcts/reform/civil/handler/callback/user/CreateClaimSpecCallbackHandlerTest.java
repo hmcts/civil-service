@@ -106,6 +106,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -1300,6 +1301,18 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldReturnCaseDataWithoutInterestPreview_whenTotalClaimAmountIsNull() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "interest-calc");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedData.getCalculatedInterest()).isNull();
+            verifyNoInteractions(interestCalculator);
+        }
+
+        @Test
         void shouldDefaultInterestUntil_whenInterestFromIsSubmittedDate() {
             // Given
             SameRateInterestSelection sameRateSelection = new SameRateInterestSelection();
@@ -1409,6 +1422,17 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidSpecCalculateInterest {
+
+        @Test
+        void shouldReturnCaseDataWithoutInterestPreview_whenTotalClaimAmountIsNull() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "ClaimInterest");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedData.getCalculatedInterest()).isNull();
+        }
 
         @Test
         void shouldValidateClaimTimelineDate_whenPopulated() {
