@@ -496,7 +496,7 @@ dependencies {
   implementation "com.github.hmcts:send-letter-client:5.1.1"
   implementation "net.logstash.logback:logstash-logback-encoder:9.0"
   implementation "uk.gov.service.notify:notifications-java-client:6.0.0-RELEASE"
-  implementation "com.github.hmcts:ccd-case-document-am-client:1.60.0"
+  implementation "com.github.hmcts:ccd-case-document-am-client:1.59.2"
   implementation "com.sendgrid:sendgrid-java:4.10.3"
   implementation "org.projectlombok:lombok:${versions.lombok}"
   implementation "org.springframework.boot:spring-boot-starter-cache"
