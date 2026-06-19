@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
@@ -14,6 +15,9 @@ import uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils;
 
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CollectorUtils.toSingleton;
 
 @Service
@@ -39,40 +43,41 @@ public class CaseCategoriesService {
             return null;
         }
 
+        String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, allocatedTrack);
+        log.info("Searching for category allocatedTrack={}, categoryKey={}", allocatedTrack, categoryKey);
+
         Optional<CategorySearchResult> caseTypeResult = categoryService.findCategoryByCategoryIdAndServiceId(
             authToken,
             categoryType.getStringValueForQuery(),
             hmctsServiceID
         );
-
-        String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, allocatedTrack);
-        log.info(
-            "Searching for category caseNumber={}, hmctsServiceID={}, allocatedTrack={}, categoryKey={}, categoryType={}",
-            caseData.getCcdCaseReference(), hmctsServiceID, allocatedTrack, categoryKey, categoryType
-        );
-
         if (caseTypeResult.isPresent()) {
             CategorySearchResult categorySearchResult = caseTypeResult.get();
             log.info(
-                "CategorySearchResult found with {} categories",
-                categorySearchResult.getCategories() == null ? null : categorySearchResult.getCategories().size()
+                "CategorySearchResult found with {} categories: {}",
+                categorySearchResult.getCategories() == null ? null : categorySearchResult.getCategories().size(),
+                categorySearchResult.getCategories()
             );
 
-            Category categoryResult = categorySearchResult.getCategories().stream().filter(c -> c.getKey().equals(
-                categoryKey)).collect(toSingleton());
-            log.info("Category found: parentKey={}, key={}", categoryResult.getParentKey(), categoryResult.getKey());
+            try {
+                Category categoryResult = categorySearchResult.getCategories()
+                    .stream()
+                    .filter(c -> c.getKey().equals(categoryKey))
+                    .collect(toSingleton());
+                log.info("Category found: parentKey={}, key={}", categoryResult.getParentKey(), categoryResult.getKey());
 
-            CaseCategoryModel caseCategoryModel = new CaseCategoryModel();
-            caseCategoryModel.setCategoryParent(categoryResult.getParentKey());
-            caseCategoryModel.setCategoryType(getCategoryTypeFromResult(categoryResult));
-            caseCategoryModel.setCategoryValue(categoryResult.getKey());
-            return caseCategoryModel;
+                CaseCategoryModel caseCategoryModel = new CaseCategoryModel();
+                caseCategoryModel.setCategoryParent(categoryResult.getParentKey());
+                caseCategoryModel.setCategoryType(getCategoryTypeFromResult(categoryResult));
+                caseCategoryModel.setCategoryValue(categoryResult.getKey());
+                return caseCategoryModel;
+            } catch (IllegalStateException ex) {
+                log.warn("Category not found allocatedTrack={}, categoryKey={}, categoryType={}",
+                         allocatedTrack, categoryKey, categoryType);
+            }
         }
 
-        log.info(
-            "No CategorySearchResult found caseNumber={}, categoryType={}, categoryId={}, hmctsServiceID={}",
-            caseData.getCcdCaseReference(), categoryType, categoryType.getStringValueForQuery(), hmctsServiceID
-        );
+        log.info("No Search Result found for category allocatedTrack={}, categoryKey={}", allocatedTrack, categoryKey);
         return null;
     }
 
@@ -86,8 +91,19 @@ public class CaseCategoriesService {
     }
 
     private String getClaimTrack(CaseData caseData) {
-        return caseData.getAllocatedTrack() != null
-            ? caseData.getAllocatedTrack().toString()
-            : caseData.getResponseClaimTrack();
+        if (YES.equals(caseData.getFinalOrderAllocateToTrack())
+            && caseData.getFinalOrderTrackAllocation() != null) {
+            return caseData.getFinalOrderTrackAllocation().name();
+        }
+
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return caseData.getAllocatedTrack() != null ? caseData.getAllocatedTrack().name() : null;
+        } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return caseData.getResponseClaimTrack() != null
+                ? caseData.getResponseClaimTrack()
+                : AllocatedTrack.SMALL_CLAIM.name();
+        }
+
+        return null;
     }
 }
