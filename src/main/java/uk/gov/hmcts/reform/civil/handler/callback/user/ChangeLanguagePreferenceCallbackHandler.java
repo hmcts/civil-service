@@ -6,14 +6,11 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentStrategyFactory;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
@@ -55,7 +52,6 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final GenAppStateHelperService helperService;
     private final CoreCaseDataService coreCaseDataService;
-    private final CaseDetailsConverter caseDetailsConverter;
 
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_START), this::nullFieldsForNewSubmission,
                                                              callbackKey(MID, VALIDATE_LANGUAGE_PREFERENCE), this::validateChangeLanguagePreference,
@@ -121,7 +117,7 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
         }
 
         if (ENGLISH.equals(preferredLanguage)) {
-            cancelWATaskIfPreferredLanguageIsEnglish(caseData);
+            coreCaseDataService.triggerEvent(caseData.getCcdCaseReference(), CANCEL_DOCUMENT_TRANSLATION_TASK);
             return uploadTranslatedDocumentStrategyFactory.getUploadTranslatedDocumentStrategy(callbackParams.getVersion())
                 .uploadDocument(callbackParams);
         }
@@ -158,37 +154,4 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         helperService.triggerEvent(caseData, TRIGGER_GA_LANGUAGE_UPDATE);
     }
-
-    private void cancelWATaskIfPreferredLanguageIsEnglish(CaseData caseData) {
-        Long caseId = caseData.getCcdCaseReference();
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId.toString(),
-                                                                                CANCEL_DOCUMENT_TRANSLATION_TASK
-        );
-        CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-        UserType userType = getUserType(Optional.ofNullable(caseData.getChangeLanguagePreference()));
-
-        boolean shouldCancelWaTask;
-        if (CLAIMANT.equals(userType)) {
-            shouldCancelWaTask = isClaimantLanguageSetToEnglish(startEventData);
-        } else {
-            shouldCancelWaTask = isRespondentLanguageSetToEnglish(startEventData);
-        }
-
-        if (shouldCancelWaTask) {
-            coreCaseDataService.triggerEvent(caseId, CANCEL_DOCUMENT_TRANSLATION_TASK);
-        }
-    }
-
-    private boolean isClaimantLanguageSetToEnglish(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && Language.ENGLISH.name().equals(caseData.getClaimantBilingualLanguagePreference());
-    }
-
-    private boolean isRespondentLanguageSetToEnglish(CaseData caseData) {
-        CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
-        if (caseDataLiP != null && caseDataLiP.getRespondent1LiPResponse() != null) {
-            return Language.ENGLISH.name().equalsIgnoreCase(caseDataLiP.getRespondent1LiPResponse().getRespondent1ResponseLanguage());
-        }
-        return true;
-    }
-
 }
