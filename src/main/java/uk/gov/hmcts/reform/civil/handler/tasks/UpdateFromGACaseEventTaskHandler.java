@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -40,8 +39,8 @@ import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
-@RequiredArgsConstructor
 @Component
 @Slf4j
 public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
@@ -59,6 +58,20 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+
+    public UpdateFromGACaseEventTaskHandler(
+        EventProperties eventProperties,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper,
+        FeatureToggleService featureToggleService
+    ) {
+        super(eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+        this.featureToggleService = featureToggleService;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {

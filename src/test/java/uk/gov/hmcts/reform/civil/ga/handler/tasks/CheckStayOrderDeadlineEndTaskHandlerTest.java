@@ -19,12 +19,12 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -55,7 +55,7 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
 
     @Mock private GaCoreCaseDataService coreCaseDataService;
 
-    @InjectMocks private CheckStayOrderDeadlineEndTaskHandler gaOrderMadeTaskHandler;
+    private CheckStayOrderDeadlineEndTaskHandler gaOrderMadeTaskHandler;
 
     @Spy private ObjectMapper mapper = ObjectMapperFactory.instance();
 
@@ -78,7 +78,17 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
     private final LocalDate deadLineToday = LocalDate.now();
 
     @BeforeEach
-    void init() {
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        gaOrderMadeTaskHandler = new CheckStayOrderDeadlineEndTaskHandler(
+            eventProperties,
+            searchService,
+            coreCaseDataService,
+            caseDetailsConverter,
+            mapper
+        );
+
         caseDetailsWithTodayDeadlineNotProcessed =
                 getCaseDetails(1L, STAY_THE_CLAIM, deadLineToday, YesOrNo.NO);
         caseDataWithTodayDeadlineNotProcessed =
