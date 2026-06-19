@@ -31,9 +31,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(MockitoExtension.class)
 class GenerateCsvAndTransferHandlerTest {
+
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
 
     @InjectMocks
     private GenerateCsvAndTransferTaskHandler inMediationCsvHandler;
@@ -133,5 +138,12 @@ class GenerateCsvAndTransferHandlerTest {
                              .setPartyEmail("respondent@company.com"))
             .build();
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }
 

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
@@ -15,15 +14,27 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GA_EVIDENCE_UPLOAD_CHECK;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class DocUploadNotifyTaskHandler extends BaseExternalTaskHandler {
 
     private final GaEvidenceUploadNotificationSearchService caseSearchService;
     private final GaCoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+
+    public DocUploadNotifyTaskHandler(
+        EventProperties eventProperties,
+        GaEvidenceUploadNotificationSearchService caseSearchService,
+        GaCoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter
+    ) {
+        super(eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
