@@ -2383,8 +2383,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             // Then
-            assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("John Rambo v Sole Trader T/A Sole Trader co");
+            assertThat(response.getData())
+                .containsEntry("caseNameHmctsInternal", "John Rambo v Sole Trader T/A Sole Trader co");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
