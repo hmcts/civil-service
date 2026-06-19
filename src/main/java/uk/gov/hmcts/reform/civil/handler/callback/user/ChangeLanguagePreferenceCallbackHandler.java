@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -61,7 +60,7 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_START), this::nullFieldsForNewSubmission,
                                                              callbackKey(MID, VALIDATE_LANGUAGE_PREFERENCE), this::validateChangeLanguagePreference,
                                                              callbackKey(ABOUT_TO_SUBMIT), this::changeLanguagePreference,
-                                                             callbackKey(SUBMITTED), this::cancelWATaskIfPreferredLanguageIsEnglish);
+                                                             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -122,6 +121,7 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
         }
 
         if (ENGLISH.equals(preferredLanguage)) {
+            cancelWATaskIfPreferredLanguageIsEnglish(caseData);
             return uploadTranslatedDocumentStrategyFactory.getUploadTranslatedDocumentStrategy(callbackParams.getVersion())
                 .uploadDocument(callbackParams);
         }
@@ -159,8 +159,7 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
         helperService.triggerEvent(caseData, TRIGGER_GA_LANGUAGE_UPDATE);
     }
 
-    private CallbackResponse cancelWATaskIfPreferredLanguageIsEnglish(CallbackParams callbackParams) {
-        final CaseData caseData = callbackParams.getCaseData();
+    private void cancelWATaskIfPreferredLanguageIsEnglish(CaseData caseData) {
         Long caseId = caseData.getCcdCaseReference();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId.toString(),
                                                                                 CANCEL_DOCUMENT_TRANSLATION_TASK
@@ -178,7 +177,6 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
         if (shouldCancelWaTask) {
             coreCaseDataService.triggerEvent(caseId, CANCEL_DOCUMENT_TRANSLATION_TASK);
         }
-        return SubmittedCallbackResponse.builder().build();
     }
 
     private boolean isClaimantLanguageSetToEnglish(CaseData caseData) {

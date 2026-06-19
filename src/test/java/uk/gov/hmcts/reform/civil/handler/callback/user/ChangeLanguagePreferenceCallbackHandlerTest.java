@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -42,7 +41,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CANCEL_DOCUMENT_TRANSLATION_TASK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_GA_LANGUAGE_UPDATE;
@@ -110,9 +108,9 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
         return changeLanguagePreference;
     }
 
-    private CaseData claimantCaseData(String claimantLanguage, boolean lipVLip) {
+    private CaseData claimantCaseData(boolean lipVLip) {
         CaseData caseData = CaseDataBuilder.builder()
-            .claimantBilingualLanguagePreference(claimantLanguage)
+            .claimantBilingualLanguagePreference("ENGLISH")
             .build();
         caseData.setApplicant1Represented(lipVLip ? NO : null);
         caseData.setRespondent1Represented(NO);
@@ -310,13 +308,14 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldChangeClaimantLanguagePreferenceToEnglish() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().ccdCaseReference(123L).build();
             ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
             changeLanguagePreference.setUserType(CLAIMANT);
             changeLanguagePreference.setPreferredLanguage(ENGLISH);
             caseData.setChangeLanguagePreference(changeLanguagePreference);
             caseData.setApplicant1Represented(NO);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            stubStartUpdateCaseData(claimantCaseData(true));
             stubUploadDocumentResponse();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -391,7 +390,7 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
     }
 
     @Nested
-    class SubmittedCallback {
+    class CancelTranslationTaskOnAboutToSubmit {
 
         @Test
         void shouldTriggerCancelDocTranslationTask_WhenClaimantLanguageIsEnglish() {
@@ -399,12 +398,12 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
                 .ccdCaseReference(123L)
                 .build();
             caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT, ENGLISH));
-            stubStartUpdateCaseData(claimantCaseData("ENGLISH", true));
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            stubStartUpdateCaseData(claimantCaseData(true));
+            stubUploadDocumentResponse();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
-            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
             verify(coreCaseDataService).startUpdate("123", CANCEL_DOCUMENT_TRANSLATION_TASK);
             verify(caseDetailsConverter).toCaseData(any(CaseDetails.class));
             verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOCUMENT_TRANSLATION_TASK);
@@ -416,12 +415,12 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
                 .ccdCaseReference(123L)
                 .build();
             caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT, ENGLISH));
-            stubStartUpdateCaseData(claimantCaseData("ENGLISH", false));
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            stubStartUpdateCaseData(claimantCaseData(false));
+            stubUploadDocumentResponse();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
-            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
             verify(coreCaseDataService, never()).triggerEvent(anyLong(), eq(CANCEL_DOCUMENT_TRANSLATION_TASK));
         }
 
@@ -431,29 +430,24 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
                 .ccdCaseReference(123L)
                 .build();
             caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT, WELSH));
-            stubStartUpdateCaseData(claimantCaseData("WELSH", true));
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
-            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
-            verify(coreCaseDataService).startUpdate("123", CANCEL_DOCUMENT_TRANSLATION_TASK);
-            verify(caseDetailsConverter).toCaseData(any(CaseDetails.class));
-            verify(coreCaseDataService, never()).triggerEvent(anyLong(), eq(CANCEL_DOCUMENT_TRANSLATION_TASK));
+            verifyNoInteractions(coreCaseDataService, caseDetailsConverter);
         }
 
         @Test
         void shouldTriggerCancelDocTranslationTask_WhenRespondentLanguageIsEnglish() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .ccdCaseReference(123L)
-                .build();
+            CaseData caseData = respondentCaseData("WELSH");
+            caseData.setCcdCaseReference(123L);
             caseData.setChangeLanguagePreference(changeLanguagePreference(DEFENDANT, ENGLISH));
             stubStartUpdateCaseData(respondentCaseData("english"));
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            stubUploadDocumentResponse();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
-            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
             verify(coreCaseDataService).startUpdate("123", CANCEL_DOCUMENT_TRANSLATION_TASK);
             verify(caseDetailsConverter).toCaseData(any(CaseDetails.class));
             verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOCUMENT_TRANSLATION_TASK);
@@ -461,33 +455,31 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldTriggerCancelDocTranslationTask_WhenRespondentResponseIsMissing() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .ccdCaseReference(123L)
-                .build();
+            CaseData caseData = respondentCaseData("WELSH");
+            caseData.setCcdCaseReference(123L);
             caseData.setChangeLanguagePreference(changeLanguagePreference(DEFENDANT, ENGLISH));
             stubStartUpdateCaseData(CaseDataBuilder.builder().build());
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            stubUploadDocumentResponse();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
-            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
             verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOCUMENT_TRANSLATION_TASK);
         }
 
         @Test
         void shouldTriggerCancelDocTranslationTask_WhenRespondentLipDataIsMissing() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .ccdCaseReference(123L)
-                .build();
+            CaseData caseData = respondentCaseData("WELSH");
+            caseData.setCcdCaseReference(123L);
             caseData.setChangeLanguagePreference(changeLanguagePreference(DEFENDANT, ENGLISH));
             CaseData startEventCaseData = CaseDataBuilder.builder().build();
             startEventCaseData.setCaseDataLiP(new CaseDataLiP());
             stubStartUpdateCaseData(startEventCaseData);
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            stubUploadDocumentResponse();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
-            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
             verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOCUMENT_TRANSLATION_TASK);
         }
 
@@ -497,15 +489,14 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
                 .ccdCaseReference(123L)
                 .build();
             caseData.setChangeLanguagePreference(changeLanguagePreference(DEFENDANT, WELSH));
-            stubStartUpdateCaseData(respondentCaseData("WELSH"));
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(new RespondentLiPResponse());
+            caseData.setCaseDataLiP(caseDataLiP);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            handler.handle(params);
 
-            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
-            verify(coreCaseDataService).startUpdate("123", CANCEL_DOCUMENT_TRANSLATION_TASK);
-            verify(caseDetailsConverter).toCaseData(any(CaseDetails.class));
-            verify(coreCaseDataService, never()).triggerEvent(anyLong(), eq(CANCEL_DOCUMENT_TRANSLATION_TASK));
+            verifyNoInteractions(coreCaseDataService, caseDetailsConverter);
         }
     }
 }
