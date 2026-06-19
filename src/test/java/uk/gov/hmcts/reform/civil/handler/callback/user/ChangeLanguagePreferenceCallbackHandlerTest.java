@@ -16,28 +16,23 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocume
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.UserType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CANCEL_DOCUMENT_TRANSLATION_TASK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_GA_LANGUAGE_UPDATE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH;
@@ -45,7 +40,6 @@ import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguag
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.WELSH;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.DEFENDANT;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -59,8 +53,6 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
     private UploadTranslatedDocumentStrategy uploadTranslatedDocumentStrategy;
     @Mock
     private GenAppStateHelperService helperService;
-    @Mock
-    private CoreCaseDataService coreCaseDataService;
 
     @BeforeEach
     void setup() {
@@ -68,8 +60,7 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
         handler = new ChangeLanguagePreferenceCallbackHandler(
             uploadTranslatedDocumentStrategyFactory,
             mapper,
-            helperService,
-            coreCaseDataService
+            helperService
         );
     }
 
@@ -339,87 +330,6 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage()).isEqualTo("BOTH");
             assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(ENGLISH_AND_WELSH);
-        }
-
-        @Test
-        void shouldTriggerGaLanguageUpdateEvent_WhenCaseHasGeneralApplications() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
-            changeLanguagePreference.setUserType(CLAIMANT);
-            changeLanguagePreference.setPreferredLanguage(WELSH);
-            caseData.setChangeLanguagePreference(changeLanguagePreference);
-            caseData.setApplicant1Represented(NO);
-            caseData.setGeneralApplications(wrapElements(new GeneralApplication()));
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("WELSH");
-            assertThat(updatedCaseData.getClaimantLanguagePreferenceDisplay()).isEqualTo(WELSH);
-
-            verify(helperService).triggerEvent(caseData, TRIGGER_GA_LANGUAGE_UPDATE);
-            verifyNoInteractions(uploadTranslatedDocumentStrategyFactory);
-        }
-    }
-
-    @Nested
-    class CancelTranslationTaskOnAboutToSubmit {
-
-        @Test
-        void shouldTriggerCancelDocTranslationTask_WhenClaimantLanguageIsEnglish() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .ccdCaseReference(123L)
-                .build();
-            caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT, ENGLISH));
-            stubUploadDocumentResponse();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            handler.handle(params);
-
-            verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOCUMENT_TRANSLATION_TASK);
-        }
-
-        @Test
-        void shouldNotTriggerCancelDocTranslationTask_WhenClaimantLanguageIsWelsh() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .ccdCaseReference(123L)
-                .build();
-            caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT, WELSH));
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            handler.handle(params);
-
-            verifyNoInteractions(coreCaseDataService);
-        }
-
-        @Test
-        void shouldTriggerCancelDocTranslationTask_WhenRespondentLanguageIsEnglish() {
-            CaseData caseData = respondentCaseData();
-            caseData.setCcdCaseReference(123L);
-            caseData.setChangeLanguagePreference(changeLanguagePreference(DEFENDANT, ENGLISH));
-            stubUploadDocumentResponse();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            handler.handle(params);
-
-            verify(coreCaseDataService).triggerEvent(123L, CANCEL_DOCUMENT_TRANSLATION_TASK);
-        }
-
-        @Test
-        void shouldNotTriggerCancelDocTranslationTask_WhenRespondentLanguageIsWelsh() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .ccdCaseReference(123L)
-                .build();
-            caseData.setChangeLanguagePreference(changeLanguagePreference(DEFENDANT, WELSH));
-            CaseDataLiP caseDataLiP = new CaseDataLiP();
-            caseDataLiP.setRespondent1LiPResponse(new RespondentLiPResponse());
-            caseData.setCaseDataLiP(caseDataLiP);
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            handler.handle(params);
-
-            verifyNoInteractions(coreCaseDataService);
         }
     }
 }

@@ -14,23 +14,22 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocume
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.UserType;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CANCEL_DOCUMENT_TRANSLATION_TASK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_GA_LANGUAGE_UPDATE;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH;
@@ -51,7 +50,6 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final GenAppStateHelperService helperService;
-    private final CoreCaseDataService coreCaseDataService;
 
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_START), this::nullFieldsForNewSubmission,
                                                              callbackKey(MID, VALIDATE_LANGUAGE_PREFERENCE), this::validateChangeLanguagePreference,
@@ -112,12 +110,12 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
         } else {
             setRespondentResponseBilingualLanguagePreference(caseData, preferredLanguage, revisedBilingualPreference);
         }
-        if (Objects.nonNull(caseData.getGeneralApplications())) {
+        List<Element<GeneralApplication>> generalApplications = caseData.getGeneralApplications();
+        if (generalApplications != null && !generalApplications.isEmpty()) {
             triggerGaEvent(callbackParams);
         }
 
         if (ENGLISH.equals(preferredLanguage)) {
-            coreCaseDataService.triggerEvent(caseData.getCcdCaseReference(), CANCEL_DOCUMENT_TRANSLATION_TASK);
             return uploadTranslatedDocumentStrategyFactory.getUploadTranslatedDocumentStrategy(callbackParams.getVersion())
                 .uploadDocument(callbackParams);
         }

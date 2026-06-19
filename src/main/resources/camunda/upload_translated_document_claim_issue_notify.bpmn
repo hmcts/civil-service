@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_18h9iji" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.41.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_18h9iji" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.27.0">
   <bpmn:process id="UPLOAD_TRANSLATED_DOCUMENT_LIP_ID" name="Upload translated document lip" isExecutable="true" camunda:historyTimeToLive="P90D">
     <bpmn:startEvent id="StartEvent_1" name="Start">
       <bpmn:outgoing>Flow_0g2t112</bpmn:outgoing>
@@ -13,7 +13,8 @@
       <bpmn:extensionElements>
         <camunda:in variables="all" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_06n7vpx</bpmn:incoming>
+      <bpmn:incoming>Flow_0ag2v7z</bpmn:incoming>
+      <bpmn:incoming>Flow_10cigrj</bpmn:incoming>
       <bpmn:outgoing>Flow_0tgwl48</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:callActivity id="Activity_0gt1863" name="Start Business Process" calledElement="StartBusinessProcess">
@@ -93,7 +94,7 @@
       <bpmn:incoming>Flow_0hmh5a1</bpmn:incoming>
       <bpmn:outgoing>Flow_06n7vpx</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_06n7vpx" sourceRef="NotifyRoboticsOnContinuousFeed" targetRef="Activity_1cweuly" />
+    <bpmn:sequenceFlow id="Flow_06n7vpx" sourceRef="NotifyRoboticsOnContinuousFeed" targetRef="Gateway_0dvta59" />
     <bpmn:serviceTask id="GeneratePipLetter" name="Generate PIP letter" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -104,6 +105,27 @@
       <bpmn:outgoing>Flow_1vdehjc</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_1vdehjc" sourceRef="GeneratePipLetter" targetRef="updateClaimStateAfterTranslateDocumentUploadedID" />
+    <bpmn:exclusiveGateway id="Gateway_0dvta59">
+      <bpmn:incoming>Flow_06n7vpx</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ag2v7z</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1e3a1ar</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0ag2v7z" name="No" sourceRef="Gateway_0dvta59" targetRef="Activity_1cweuly">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isApplicantUploadTranslatedDocumentTaskRequiredCancellation==false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="cancelWATask" name="Cancel WA Upload Document Task" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">CANCEL_DOCUMENT_TRANSLATION_TASK</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1e3a1ar</bpmn:incoming>
+      <bpmn:outgoing>Flow_10cigrj</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1e3a1ar" name="Yes" sourceRef="Gateway_0dvta59" targetRef="cancelWATask">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isApplicantUploadTranslatedDocumentTaskRequiredCancellation==true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_10cigrj" sourceRef="cancelWATask" targetRef="Activity_1cweuly" />
   </bpmn:process>
   <bpmn:message id="Message_0ttrrz3" name="UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE" />
   <bpmn:error id="Error_1alq6sw" name="StartBusinessAbort" errorCode="ABORT" />
@@ -135,21 +157,28 @@
         <dc:Bounds x="980" y="167" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0vvj1l6_di" bpmnElement="GenerateDashboardNotificationsClaimIssue">
+        <dc:Bounds x="1120" y="167" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0fzi0zq_di" bpmnElement="NotifyRoboticsOnContinuousFeed">
+        <dc:Bounds x="1260" y="167" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1e8yusz" bpmnElement="GeneratePipLetter">
         <dc:Bounds x="830" y="167" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_07ek9xj_di" bpmnElement="Event_07ek9xj">
-        <dc:Bounds x="1562" y="189" width="36" height="36" />
+        <dc:Bounds x="1612" y="189" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_14sbez9_di" bpmnElement="Activity_1cweuly">
-        <dc:Bounds x="1400" y="167" width="100" height="80" />
+        <dc:Bounds x="1490" y="167" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0fzi0zq_di" bpmnElement="NotifyRoboticsOnContinuousFeed">
-        <dc:Bounds x="1260" y="167" width="100" height="80" />
+      <bpmndi:BPMNShape id="Gateway_0dvta59_di" bpmnElement="Gateway_0dvta59" isMarkerVisible="true">
+        <dc:Bounds x="1405" y="182" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0vvj1l6_di" bpmnElement="GenerateDashboardNotificationsClaimIssue">
-        <dc:Bounds x="1120" y="167" width="100" height="80" />
+      <bpmndi:BPMNShape id="BPMNShape_0g0dzfe" bpmnElement="cancelWATask">
+        <dc:Bounds x="1380" y="310" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1p3emre_di" bpmnElement="Event_1p3emre">
@@ -158,6 +187,10 @@
           <dc:Bounds x="297" y="130" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0tgwl48_di" bpmnElement="Flow_0tgwl48">
+        <di:waypoint x="1590" y="207" />
+        <di:waypoint x="1612" y="207" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_13dgz5v_di" bpmnElement="Flow_13dgz5v">
         <di:waypoint x="280" y="149" />
         <di:waypoint x="280" y="115" />
@@ -190,17 +223,33 @@
         <di:waypoint x="1220" y="207" />
         <di:waypoint x="1260" y="207" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06n7vpx_di" bpmnElement="Flow_06n7vpx">
+        <di:waypoint x="1360" y="207" />
+        <di:waypoint x="1405" y="207" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1vdehjc_di" bpmnElement="Flow_1vdehjc">
         <di:waypoint x="930" y="207" />
         <di:waypoint x="980" y="207" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0tgwl48_di" bpmnElement="Flow_0tgwl48">
-        <di:waypoint x="1500" y="207" />
-        <di:waypoint x="1562" y="207" />
+      <bpmndi:BPMNEdge id="Flow_0ag2v7z_di" bpmnElement="Flow_0ag2v7z">
+        <di:waypoint x="1455" y="207" />
+        <di:waypoint x="1490" y="207" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1465" y="189" width="15" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_06n7vpx_di" bpmnElement="Flow_06n7vpx">
-        <di:waypoint x="1360" y="207" />
-        <di:waypoint x="1400" y="207" />
+      <bpmndi:BPMNEdge id="Flow_1e3a1ar_di" bpmnElement="Flow_1e3a1ar">
+        <di:waypoint x="1430" y="232" />
+        <di:waypoint x="1430" y="310" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1436" y="268" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10cigrj_di" bpmnElement="Flow_10cigrj">
+        <di:waypoint x="1430" y="390" />
+        <di:waypoint x="1430" y="410" />
+        <di:waypoint x="1540" y="410" />
+        <di:waypoint x="1540" y="247" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
