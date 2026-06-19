@@ -32,14 +32,11 @@ class JudgementBufferExpiredSearchServiceTest {
 
     @Test
     void shouldCallStreamProviderWithCorrectParameters() {
-        // Given
         when(elasticSearchPaginatedStreamProvider.getPaginatedSearchResult(judgementBufferExpiredQueryProvider, 50))
             .thenReturn(elasticSearchResult);
 
-        // When
         ElasticSearchResult result = searchService.getElasticSearchResult();
 
-        // Then
         assertThat(result).isEqualTo(elasticSearchResult);
         verify(elasticSearchPaginatedStreamProvider).getPaginatedSearchResult(judgementBufferExpiredQueryProvider, 50);
     }
