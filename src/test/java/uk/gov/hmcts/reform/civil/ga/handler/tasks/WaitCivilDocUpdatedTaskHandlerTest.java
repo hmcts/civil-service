@@ -83,8 +83,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
             coreCaseDataService,
             caseDetailsConverter,
             gaForLipService,
-            mapper,
-            featureToggleService
+            mapper
         );
         CaseDocument caseDocumentNow = new CaseDocument().setDocumentName("current")
                 .setDocumentLink(new Document().setDocumentUrl("url")

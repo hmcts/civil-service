@@ -63,14 +63,12 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
-        ObjectMapper mapper,
-        FeatureToggleService featureToggleService
+        ObjectMapper mapper
     ) {
         super(eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.mapper = mapper;
-        this.featureToggleService = featureToggleService;
     }
 
     @Override

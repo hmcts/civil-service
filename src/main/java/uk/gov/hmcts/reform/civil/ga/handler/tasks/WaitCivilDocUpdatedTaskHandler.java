@@ -47,15 +47,13 @@ public class WaitCivilDocUpdatedTaskHandler extends BaseExternalTaskHandler {
         GaCoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
         GaForLipService gaForLipService,
-        ObjectMapper mapper,
-        FeatureToggleService featureToggleService
+        ObjectMapper mapper
     ) {
         super(eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.gaForLipService = gaForLipService;
         this.mapper = mapper;
-        this.featureToggleService = featureToggleService;
     }
 
     @Override

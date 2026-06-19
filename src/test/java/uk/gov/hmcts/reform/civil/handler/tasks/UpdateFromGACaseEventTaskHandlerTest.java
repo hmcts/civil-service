@@ -78,8 +78,6 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private UpdateFromGACaseEventTaskHandler handler;
 
@@ -90,8 +88,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             new EventProperties(),
             coreCaseDataService,
             caseDetailsConverter,
-            objectMapper,
-            featureToggleService
+            objectMapper
         );
     }
 
