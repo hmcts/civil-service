@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.HashMap;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_DAY;
 
 @Component
 public class Applicant1ClaimSettledParamsBuilder extends DashboardNotificationsParamsBuilder {

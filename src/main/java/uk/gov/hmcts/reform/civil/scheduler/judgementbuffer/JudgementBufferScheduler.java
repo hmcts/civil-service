@@ -40,7 +40,7 @@ public class JudgementBufferScheduler implements CivilScheduler {
             log.info("Running {} scheduler", SCHEDULER_NAME);
             scheduledTaskRunner.run(
                 new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-                searchService::getCases,
+                searchService.getElasticSearchResult(),
                 judgementBufferScheduledTask
             );
         }
