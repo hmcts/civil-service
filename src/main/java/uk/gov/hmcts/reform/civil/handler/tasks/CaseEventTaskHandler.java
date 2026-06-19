@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.CancelTaskUtil.cancelApplicantWaDocumentUploadTask;
 import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
 
 @Component
@@ -128,10 +129,6 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         variables.putValue("isApplicantUploadTranslatedDocumentTaskRequiredCancellation",
                            cancelApplicantWaDocumentUploadTask(data));
         return variables;
-    }
-
-    private Object cancelApplicantWaDocumentUploadTask(CaseData data) {
-        return data.isLipvLipOneVOne() && data.isClaimantBilingual();
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse,
