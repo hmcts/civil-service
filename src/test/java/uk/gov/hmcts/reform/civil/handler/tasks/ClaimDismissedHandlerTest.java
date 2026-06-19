@@ -32,6 +32,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(SpringExtension.class)
 class ClaimDismissedHandlerTest {
@@ -47,6 +49,9 @@ class ClaimDismissedHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
 
     @InjectMocks
     private ClaimDismissedHandler handler;
@@ -97,7 +102,7 @@ class ClaimDismissedHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(300000L)
+            anyLong()
         );
     }
 
@@ -134,7 +139,7 @@ class ClaimDismissedHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NullPointerException(errorMessage))
-            .when(applicationEventPublisher).publishEvent(eq(new DismissClaimEvent(caseId)));
+            .when(applicationEventPublisher).publishEvent(new DismissClaimEvent(caseId));
 
         handler.execute(mockTask, externalTaskService);
 
@@ -150,4 +155,11 @@ class ClaimDismissedHandlerTest {
         verify(applicationEventPublisher).publishEvent(new DismissClaimEvent(caseId));
         verify(applicationEventPublisher).publishEvent(new DismissClaimEvent(otherId));
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

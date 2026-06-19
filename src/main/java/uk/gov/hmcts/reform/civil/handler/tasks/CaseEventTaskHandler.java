@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -41,8 +40,8 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
-@RequiredArgsConstructor
 @Component
 public class CaseEventTaskHandler extends BaseExternalTaskHandler {
 
@@ -51,6 +50,22 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
     private final RoboticsEventTextFormatter textFormatter;
+
+    public CaseEventTaskHandler(
+        EventProperties eventProperties,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper,
+        IStateFlowEngine stateFlowEngine,
+        RoboticsEventTextFormatter textFormatter
+    ) {
+        super(eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+        this.stateFlowEngine = stateFlowEngine;
+        this.textFormatter = textFormatter;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -35,10 +34,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private record StuckCaseSummaryItem(String caseId, String incidentId, String processInstanceId, String failedActivityId) {
@@ -76,6 +75,24 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private final CaseTaskTrackingService caseTaskTrackingService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+
+    public IncidentRetryEventHandler(
+        EventProperties eventProperties,
+        CasesStuckCheckSearchService casesStuckCheckSearchService,
+        CamundaRuntimeApi camundaRuntimeApi,
+        AuthTokenGenerator authTokenGenerator,
+        CaseTaskTrackingService caseTaskTrackingService,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter
+    ) {
+        super(eventProperties);
+        this.casesStuckCheckSearchService = casesStuckCheckSearchService;
+        this.camundaRuntimeApi = camundaRuntimeApi;
+        this.authTokenGenerator = authTokenGenerator;
+        this.caseTaskTrackingService = caseTaskTrackingService;
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+    }
 
     private static final int MAX_THREADS = 10;
     private static final String CASE_ID_VARIABLE = "caseId";
