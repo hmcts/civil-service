@@ -11,7 +11,7 @@ public class WaTaskUtil {
     }
 
     public static boolean confirmIfStateChangeRequired(CaseData caseData) {
-        return !cancelApplicantWaDocumentUploadTask(caseData);
+        return cancelApplicantWaDocumentUploadTask(caseData);
     }
 
     public static boolean cancelApplicantWaDocumentUploadTask(CaseData caseData) {

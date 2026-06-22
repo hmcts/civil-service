@@ -25,6 +25,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_PIP_LETTER;
+import static uk.gov.hmcts.reform.civil.utils.WaTaskUtil.confirmIfStateChangeRequired;
 
 @Slf4j
 @Service
@@ -87,6 +88,9 @@ public class GeneratePipLetterHandler extends CallbackHandler {
     }
 
     private String setClaimState(CaseData caseData) {
+        if (ifClaimantLanguageChanged(caseData)) {
+            return caseData.getCcdState().name();
+        }
         if (!isBilingualForLipvsLip(caseData)) {
             return CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
         }
@@ -95,5 +99,9 @@ public class GeneratePipLetterHandler extends CallbackHandler {
 
     private boolean isBilingualForLipvsLip(CaseData caseData) {
         return caseData.isLipvLipOneVOne() && caseData.isClaimantBilingual();
+    }
+
+    private boolean ifClaimantLanguageChanged(CaseData caseData) {
+        return caseData.isLipvLipOneVOne() && confirmIfStateChangeRequired(caseData);
     }
 }
