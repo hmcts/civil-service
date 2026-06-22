@@ -18,27 +18,27 @@ class WaTaskUtilTest {
     class ConfirmIfStateChangeRequired {
 
         @Test
-        void shouldReturnFalse_whenCancelApplicantWaDocumentUploadTaskIsTrue() {
+        void shouldReturnTrue_whenCancelApplicantWaDocumentUploadTaskIsTrue() {
             CaseData data = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
                 .changeLanguagePreference(new ChangeLanguagePreference(null, PreferredLanguage.ENGLISH))
                 .build();
 
-            assertFalse(WaTaskUtil.confirmIfStateChangeRequired(data));
+            assertTrue(WaTaskUtil.confirmIfStateChangeRequired(data));
         }
 
         @ParameterizedTest
         @EnumSource(value = PreferredLanguage.class, mode = EnumSource.Mode.EXCLUDE, names = {"ENGLISH"}
         )
-        void shouldReturnTrue_whenCancelApplicantWaDocumentUploadTaskIsFalse(PreferredLanguage  preferredLanguage) {
+        void shouldReturnFalse_whenCancelApplicantWaDocumentUploadTaskIsFalse(PreferredLanguage  preferredLanguage) {
             CaseData data = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
                 .changeLanguagePreference(new ChangeLanguagePreference(null, preferredLanguage))
                 .build();
 
-            assertTrue(WaTaskUtil.confirmIfStateChangeRequired(data));
+            assertFalse(WaTaskUtil.confirmIfStateChangeRequired(data));
         }
     }
 
