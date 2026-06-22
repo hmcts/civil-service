@@ -33,9 +33,12 @@
     {
       "matchPackageNames": [
         "com.github.hmcts:auth-checker-lib",
-        "com.github.hmcts:payments-java-client"
+        "com.github.hmcts:payments-java-client",
+        "com.github.hmcts:ccd-case-document-am-client",
+        "com.github.hmcts:core-case-data-store-client"
       ],
       "matchUpdateTypes": ["minor", "patch"],
+      "description": "Restrict HMCTS library upgrades to minor/patch versions. Major versions may introduce incompatibilities with Spring Boot or other core dependencies (e.g., ccd-case-document-am-client v1.60.0 requires Spring Boot 4.0.6, incompatible with project's Spring Boot 3.3.7)"
     },
     {
       "matchPackageNames": [
@@ -44,7 +47,7 @@
       ],
       "groupName": "Camunda updates",
       "groupSlug": "camunda",
-      "automerge": true,
+      "automerge": true
     },
     {
       "matchUpdateTypes": ["minor", "patch"],

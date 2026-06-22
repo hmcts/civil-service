@@ -64,6 +64,7 @@ allprojects {
   dependencyCheck {
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
+    noUpdate = false
 
     analyzers.assemblyEnabled = false
     analyzers.retirejs.enabled = false
@@ -491,7 +492,7 @@ dependencies {
   implementation "com.microsoft.azure:applicationinsights-web:3.7.8"
   implementation "com.github.hmcts:befta-fw:9.2.7"
   implementation "commons-lang:commons-lang:2.6"
-  implementation "com.github.hmcts:core-case-data-store-client:5.3.0"
+  implementation "com.github.hmcts:core-case-data-store-client:5.2.0"
   implementation "com.github.hmcts:document-management-client:7.0.1"
   implementation "com.github.hmcts:send-letter-client:5.1.1"
   implementation "net.logstash.logback:logstash-logback-encoder:9.0"
