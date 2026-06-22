@@ -20,6 +20,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AFTER_DOC_UPLOADED;
+import static uk.gov.hmcts.reform.civil.utils.WaTaskUtil.confirmIfStateChangeRequired;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +43,7 @@ public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackH
 
         caseData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
         caseData.setPreviousCCDState(caseData.getCcdState());
-        String changeToState = setClaimState(caseData);
+        String changeToState = confirmIfStateChangeRequired(caseData) ? setClaimState(caseData) : caseData.getCcdState().name();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .state(changeToState)

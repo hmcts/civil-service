@@ -83,8 +83,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
-import static uk.gov.hmcts.reform.civil.utils.CancelTaskUtil.cancelApplicantWaDocumentUploadTask;
 import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
+import static uk.gov.hmcts.reform.civil.utils.WaTaskUtil.cancelApplicantWaDocumentUploadTask;
 
 @ExtendWith(MockitoExtension.class)
 class CaseEventTaskHandlerTest {

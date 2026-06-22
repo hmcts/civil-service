@@ -4,18 +4,22 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 
-public class CancelTaskUtil {
+public class WaTaskUtil {
 
-    private CancelTaskUtil() {
+    private WaTaskUtil() {
         //no op
     }
 
-    public static boolean cancelApplicantWaDocumentUploadTask(CaseData data) {
-        ChangeLanguagePreference changeLanguagePreference = data.getChangeLanguagePreference();
+    public static boolean confirmIfStateChangeRequired(CaseData caseData) {
+        return !cancelApplicantWaDocumentUploadTask(caseData);
+    }
+
+    public static boolean cancelApplicantWaDocumentUploadTask(CaseData caseData) {
+        ChangeLanguagePreference changeLanguagePreference = caseData.getChangeLanguagePreference();
         if (changeLanguagePreference == null || changeLanguagePreference.getPreferredLanguage() == null) {
             return false;
         }
         String preferredLanguage = changeLanguagePreference.getPreferredLanguage().name();
-        return data.isLipvLipOneVOne() && PreferredLanguage.ENGLISH.name().equals(preferredLanguage);
+        return caseData.isLipvLipOneVOne() && PreferredLanguage.ENGLISH.name().equals(preferredLanguage);
     }
 }

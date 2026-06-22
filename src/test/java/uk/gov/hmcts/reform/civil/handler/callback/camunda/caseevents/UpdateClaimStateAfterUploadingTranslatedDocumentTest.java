@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
@@ -85,6 +87,22 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
     }
 
     @Test
+    void shouldUpdateClaimState_WhenClaimStateIsClaimIssuedV2() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(CaseState.CASE_ISSUED);
+        caseData.setChangeLanguagePreference(
+            new ChangeLanguagePreference(null, PreferredLanguage.WELSH));
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getState()).isEqualTo(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
+    }
+
+    @Test
     void shouldUpdateClaimState_WhenAwaitingApplicantIntentionClaimState() {
         // given
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -98,6 +116,27 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
         assertThat(response.getErrors()).isNull();
         assertThat(response.getState()).isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
         verify(updateClaimStateService, times(1)).setUpCaseState(caseData);
+    }
+
+    @Test
+    void shouldNotUpdateClaimState_WhenApplicantWaDocumentUploadTaskIsCancelled() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setChangeLanguagePreference(
+            new ChangeLanguagePreference(null, PreferredLanguage.ENGLISH)
+        );
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
+        verifyNoInteractions(updateClaimStateService);
     }
 
     @Test

@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
@@ -10,7 +12,35 @@ import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CancelTaskUtilTest {
+class WaTaskUtilTest {
+
+    @Nested
+    class ConfirmIfStateChangeRequired {
+
+        @Test
+        void shouldReturnFalse_whenCancelApplicantWaDocumentUploadTaskIsTrue() {
+            CaseData data = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .changeLanguagePreference(new ChangeLanguagePreference(null, PreferredLanguage.ENGLISH))
+                .build();
+
+            assertFalse(WaTaskUtil.confirmIfStateChangeRequired(data));
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = PreferredLanguage.class, mode = EnumSource.Mode.EXCLUDE, names = {"ENGLISH"}
+        )
+        void shouldReturnTrue_whenCancelApplicantWaDocumentUploadTaskIsFalse(PreferredLanguage  preferredLanguage) {
+            CaseData data = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .changeLanguagePreference(new ChangeLanguagePreference(null, preferredLanguage))
+                .build();
+
+            assertTrue(WaTaskUtil.confirmIfStateChangeRequired(data));
+        }
+    }
 
     @Nested
     class CancelApplicantWaDocumentUploadTask {
@@ -23,7 +53,7 @@ class CancelTaskUtilTest {
                 .changeLanguagePreference(new ChangeLanguagePreference(null, PreferredLanguage.ENGLISH))
                 .build();
 
-            assertTrue(CancelTaskUtil.cancelApplicantWaDocumentUploadTask(data));
+            assertTrue(WaTaskUtil.cancelApplicantWaDocumentUploadTask(data));
         }
 
         @Test
@@ -33,7 +63,7 @@ class CancelTaskUtilTest {
                 .applicant1Represented(YesOrNo.NO)
                 .build();
 
-            assertFalse(CancelTaskUtil.cancelApplicantWaDocumentUploadTask(data));
+            assertFalse(WaTaskUtil.cancelApplicantWaDocumentUploadTask(data));
         }
 
         @Test
@@ -44,7 +74,7 @@ class CancelTaskUtilTest {
                 .changeLanguagePreference(new ChangeLanguagePreference(null, PreferredLanguage.WELSH))
                 .build();
 
-            assertFalse(CancelTaskUtil.cancelApplicantWaDocumentUploadTask(data));
+            assertFalse(WaTaskUtil.cancelApplicantWaDocumentUploadTask(data));
         }
 
         @Test
@@ -55,7 +85,7 @@ class CancelTaskUtilTest {
                 .changeLanguagePreference(new ChangeLanguagePreference(null, PreferredLanguage.ENGLISH))
                 .build();
 
-            assertFalse(CancelTaskUtil.cancelApplicantWaDocumentUploadTask(data));
+            assertFalse(WaTaskUtil.cancelApplicantWaDocumentUploadTask(data));
         }
     }
 }
