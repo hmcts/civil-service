@@ -60,8 +60,6 @@ class CaseUserRolesCacheServiceTest {
 
         objectMapper = new ObjectMapper();
 
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-
         cacheService = new CaseUserRolesCacheService(
             properties,
             featureToggleService,
@@ -73,6 +71,11 @@ class CaseUserRolesCacheServiceTest {
 
     @Nested
     class CacheHit {
+
+        @BeforeEach
+        void setUp() {
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        }
 
         @Test
         void shouldReturnCachedRoles_whenFoundInRedis() {
@@ -110,6 +113,11 @@ class CaseUserRolesCacheServiceTest {
     @Nested
     class CacheMiss {
 
+        @BeforeEach
+        void setUp() {
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        }
+
         @Test
         void shouldReturnEmpty_whenNotFoundInAnyStore() {
             when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
@@ -125,6 +133,11 @@ class CaseUserRolesCacheServiceTest {
 
     @Nested
     class CachePut {
+
+        @BeforeEach
+        void setUp() {
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        }
 
         @Test
         void shouldStoreRoles_withStandardTtl() {
@@ -144,6 +157,11 @@ class CaseUserRolesCacheServiceTest {
 
     @Nested
     class NegativeCache {
+
+        @BeforeEach
+        void setUp() {
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        }
 
         @Test
         void shouldCacheEmptyResults_withShorterTtl() {
@@ -202,6 +220,11 @@ class CaseUserRolesCacheServiceTest {
 
     @Nested
     class Invalidation {
+
+        @BeforeEach
+        void setUp() {
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        }
 
         @Test
         void shouldEvictSpecificKey() {
@@ -271,6 +294,11 @@ class CaseUserRolesCacheServiceTest {
     @Nested
     class RedisFallback {
 
+        @BeforeEach
+        void setUp() {
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        }
+
         @Test
         void shouldFallbackToCaffeine_whenRedisThrowsException() {
             when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
@@ -315,6 +343,11 @@ class CaseUserRolesCacheServiceTest {
 
     @Nested
     class ExceptionHandling {
+
+        @BeforeEach
+        void setUp() {
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        }
 
         @Test
         void shouldNotCacheOnRedisWriteFailure_butCaffeineStillWorks() {
