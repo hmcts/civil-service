@@ -36,8 +36,6 @@ public class HttpClientFeignConfiguration {
 
     @Bean
     public PoolingHttpClientConnectionManager connectionManager4() {
-        log.info("###### Creating Pooling Http Client Connection Manager ######");
-        log.info("Max Pre Route is {}, Max total is {}", maxPerRoute, maxTotal);
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(maxTotal);
         connectionManager.setDefaultMaxPerRoute(maxPerRoute);
@@ -55,8 +53,6 @@ public class HttpClientFeignConfiguration {
     }
 
     private CloseableHttpClient getHttpClient(PoolingHttpClientConnectionManager connectionManager) {
-        log.info("###### Creating HTTP client with connection pool ######");
-        log.info("Connection timeout is {}, Request timeout is {}, Read timeout is {}", connectTimeout, requestTimeout, readTimeout);
         RequestConfig config = RequestConfig.custom()
             .setConnectTimeout(connectTimeout)
             .setConnectionRequestTimeout(requestTimeout)
@@ -101,6 +97,11 @@ public class HttpClientFeignConfiguration {
             } catch (Exception e) {
                 service = UNKNOWN_SERVICE;
             }
+
+            log.info("####### Feign request {} connectTimeout={}, readTimeout={}",
+                     service,
+                     options.connectTimeoutMillis(),
+                     options.readTimeoutMillis());
 
             try {
                 Response response = delegate.execute(request, options);
