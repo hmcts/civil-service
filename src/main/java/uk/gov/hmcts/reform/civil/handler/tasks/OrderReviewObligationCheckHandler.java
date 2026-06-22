@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
@@ -13,14 +12,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.OrderReviewObligationSearchService;
 
 import java.time.LocalDate;
 import java.util.Set;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class OrderReviewObligationCheckHandler extends BaseExternalTaskHandler {
 
@@ -28,7 +26,20 @@ public class OrderReviewObligationCheckHandler extends BaseExternalTaskHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final FeatureToggleService featureToggleService;
+
+    public OrderReviewObligationCheckHandler(
+        EventProperties eventProperties,
+        OrderReviewObligationSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter
+    ) {
+        super(eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -52,4 +63,5 @@ public class OrderReviewObligationCheckHandler extends BaseExternalTaskHandler {
         });
         return new ExternalTaskData();
     }
+
 }

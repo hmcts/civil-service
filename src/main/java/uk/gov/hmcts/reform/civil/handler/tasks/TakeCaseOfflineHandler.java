@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
@@ -11,14 +10,24 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.search.TakeCaseOfflineSearchService;
 
 import java.util.Set;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class TakeCaseOfflineHandler extends BaseExternalTaskHandler {
 
     private final TakeCaseOfflineSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    public TakeCaseOfflineHandler(
+        EventProperties eventProperties,
+        TakeCaseOfflineSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher
+    ) {
+        super(eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -27,10 +36,10 @@ public class TakeCaseOfflineHandler extends BaseExternalTaskHandler {
 
         cases.forEach(caseDetails -> {
             try {
-                log.info("Started Taking case offline event caseId '{}'", caseDetails.getId());
-                log.info("Current case status '{}'", caseDetails.getState());
+                log.debug("Started Taking case offline event caseId '{}' status '{}'",
+                          caseDetails.getId(), caseDetails.getState());
                 applicationEventPublisher.publishEvent(new TakeCaseOfflineEvent(caseDetails.getId()));
-                log.info("Finished Taking case offline caseId '{}'", caseDetails.getId());
+                log.debug("Finished Taking case offline caseId '{}'", caseDetails.getId());
             } catch (Exception e) {
                 //Continue for other cases if there is some error in some cases, as we don't want
                 // to stop processing other valid cases because error happened in some.
@@ -41,4 +50,5 @@ public class TakeCaseOfflineHandler extends BaseExternalTaskHandler {
 
         return new ExternalTaskData();
     }
+
 }

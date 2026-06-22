@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -20,9 +19,9 @@ import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 
 import java.util.Map;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class ApplicationProcessCaseEventTaskHandler extends BaseExternalTaskHandler {
 
@@ -30,6 +29,20 @@ public class ApplicationProcessCaseEventTaskHandler extends BaseExternalTaskHand
     private final GaStateFlowEngine stateFlowEngine;
     private final GaCoreCaseDataService coreCaseDataService;
     private final ObjectMapper mapper;
+
+    public ApplicationProcessCaseEventTaskHandler(
+        EventProperties eventProperties,
+        CaseDetailsConverter caseDetailsConverter,
+        GaStateFlowEngine stateFlowEngine,
+        GaCoreCaseDataService coreCaseDataService,
+        ObjectMapper mapper
+    ) {
+        super(eventProperties);
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.stateFlowEngine = stateFlowEngine;
+        this.coreCaseDataService = coreCaseDataService;
+        this.mapper = mapper;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
