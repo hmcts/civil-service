@@ -294,13 +294,9 @@ class CaseUserRolesCacheServiceTest {
     @Nested
     class RedisFallback {
 
-        @BeforeEach
-        void setUp() {
-            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        }
-
         @Test
         void shouldFallbackToCaffeine_whenRedisThrowsException() {
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
             when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
                 .thenReturn(true);
 
