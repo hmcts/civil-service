@@ -56,6 +56,22 @@ spring:
     table: schema_version
     baseline-on-migrate: true
 
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: ${HTTP_CONNECT_TIMEOUT:5000}
+            readTimeout: ${HTTP_READ_TIMEOUT:30000}
+          core-case-data-api:
+            readTimeout: ${CORE_CASE_DATA_API_READ_TIMEOUT:25000} # ccd-data-store-api
+          ccd-access-data-store-api:
+            readTimeout: ${CASE_ACCESS_DATA_STORE_API_READ_TIMEOUT:25000} # ccd-data-store-api
+          cmc-claim-store:
+            readTimeout: ${CMC_CLAIM_STORE_API_READ_TIMEOUT:25000}
+          core-case-event-api:
+            readTimeout: ${CORE_CASE_EVENT_API_READ_TIMEOUT:25000}
+
 scheduler:
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
