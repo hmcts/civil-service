@@ -162,6 +162,50 @@ class UpdateHmcPartiesNotifiedHandlerTest {
     }
 
     @Test
+    void shouldCallUpdate_ifSameVersionHasOnlyOlderNotifiedResponse() {
+        CaseData caseData = sampleCaseData();
+        final CallbackParams params = buildParams(caseData);
+        HearingNoticeVariables variables = sampleCamundaVars();
+
+        when(camundaService.getProcessVariables(any())).thenReturn(variables);
+        stubUserService();
+        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
+            .thenReturn(new PartiesNotifiedResponses()
+                            .setResponses(List.of(
+                                new PartiesNotifiedResponse()
+                                    .setRequestVersion(10)
+                                    .setResponseReceivedDateTime(variables.getResponseDateTime().minusDays(1)))));
+
+        handler.handle(params);
+
+        verify(hearingsService).updatePartiesNotifiedResponse(
+            anyString(), eq("H123"), eq(10), eq(variables.getResponseDateTime()), any()
+        );
+    }
+
+    @Test
+    void shouldCallUpdate_ifOnlyDifferentVersionIsAlreadyNotified() {
+        CaseData caseData = sampleCaseData();
+        final CallbackParams params = buildParams(caseData);
+        HearingNoticeVariables variables = sampleCamundaVars();
+
+        when(camundaService.getProcessVariables(any())).thenReturn(variables);
+        stubUserService();
+        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
+            .thenReturn(new PartiesNotifiedResponses()
+                            .setResponses(List.of(
+                                new PartiesNotifiedResponse()
+                                    .setRequestVersion(9)
+                                    .setResponseReceivedDateTime(variables.getResponseDateTime()))));
+
+        handler.handle(params);
+
+        verify(hearingsService).updatePartiesNotifiedResponse(
+            anyString(), eq("H123"), eq(10), eq(variables.getResponseDateTime()), any()
+        );
+    }
+
+    @Test
     void shouldThrowException_ifNotNotifiedAndUpdateFails() {
         CaseData caseData = sampleCaseData();
         final CallbackParams params = buildParams(caseData);
