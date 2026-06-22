@@ -15,11 +15,15 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import static java.util.Set.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -349,7 +353,7 @@ class CaseUserRolesCacheServiceTest {
         void shouldNotCacheOnRedisWriteFailure_butCaffeineStillWorks() {
             when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
                 .thenReturn(true);
-            org.mockito.Mockito.doThrow(new RuntimeException("Redis write failed"))
+            doThrow(new RuntimeException("Redis write failed"))
                 .when(valueOperations).set(anyString(), anyString(), any(Duration.class));
 
             // Should not throw
@@ -361,6 +365,332 @@ class CaseUserRolesCacheServiceTest {
 
             assertThat(result).isPresent();
             verify(metrics).recordError(eq(CASE_ID), anyString());
+        }
+
+        @Test
+        void shouldHandleRedisEvictionFailure() {
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(true);
+            doThrow(new RuntimeException("Redis eviction failed"))
+                .when(redisTemplate).delete(anyString());
+
+            // Put then evict
+            cacheService.put(CASE_ID, USER_ID, ROLES);
+            cacheService.evict(CASE_ID, USER_ID);
+
+            // Should still record error
+            verify(metrics).recordError(eq(CASE_ID), anyString());
+        }
+
+        @Test
+        void shouldDeserializeErrorReturnsEmptyList() {
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(true);
+            when(valueOperations.get(anyString())).thenReturn("invalid json");
+
+            Optional<List<String>> result = cacheService.get(CASE_ID, USER_ID);
+
+            assertThat(result).isPresent();
+            assertThat(result.get()).isEmpty();
+        }
+    }
+
+    @Nested
+    class EvictAllForCase {
+
+        @Test
+        void shouldEvictAllKeysForCase() {
+            Set<String> keys = Set.of(
+                "civil:v1:case-user-roles:getUserCaseRoles:1234567890:user1",
+                "civil:v1:case-user-roles:getUserCaseRoles:1234567890:user2"
+            );
+            when(redisTemplate.keys(anyString())).thenReturn(keys);
+
+            cacheService.evictAllForCase(CASE_ID);
+
+            verify(redisTemplate).keys("civil:v1:case-user-roles:getUserCaseRoles:1234567890:*");
+            verify(redisTemplate).delete(keys);
+            verify(metrics).recordEviction(CASE_ID, "mutation");
+        }
+
+        @Test
+        void shouldEvictAllForCase_fromCaffeine() {
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(true);
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+            when(redisTemplate.keys(anyString())).thenReturn(of());
+
+            // Put multiple values for same case but different users
+            cacheService.put(CASE_ID, "user-1", ROLES);
+            cacheService.put(CASE_ID, "user-2", ROLES);
+
+            cacheService.evictAllForCase(CASE_ID);
+
+            verify(metrics).recordEviction(CASE_ID, "mutation");
+        }
+
+        @Test
+        void shouldHandleEvictAllForCase_whenRedisKeysReturnsNull() {
+            when(redisTemplate.keys(anyString())).thenReturn(null);
+
+            cacheService.evictAllForCase(CASE_ID);
+
+            verify(metrics).recordEviction(CASE_ID, "mutation");
+        }
+
+        @Test
+        void shouldHandleEvictAllForCase_whenRedisKeysReturnsEmpty() {
+            when(redisTemplate.keys(anyString())).thenReturn(of());
+
+            cacheService.evictAllForCase(CASE_ID);
+
+            verify(metrics).recordEviction(CASE_ID, "mutation");
+        }
+
+        @Test
+        void shouldHandleEvictAllForCase_whenRedisThrowsException() {
+            doThrow(new RuntimeException("Redis pattern search failed"))
+                .when(redisTemplate).keys(anyString());
+
+            cacheService.evictAllForCase(CASE_ID);
+
+            verify(metrics).recordError(eq(CASE_ID), anyString());
+        }
+    }
+
+    @Nested
+    class EvictionByPattern {
+
+        @BeforeEach
+        void setUp() {
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        }
+
+        @Test
+        void shouldEvictByPattern_fromRedis() {
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(true);
+
+            cacheService.put(CASE_ID, "user1", ROLES);
+
+            String expectedKey = KEY_PREFIX + ":getUserCaseRoles:" + CASE_ID + ":user1";
+            verify(valueOperations).set(
+                eq(expectedKey),
+                anyString(),
+                eq(Duration.ofSeconds(30))
+            );
+        }
+
+        @Test
+        void shouldHandleEvictionByPattern_whenRedisThrowsException() {
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(true);
+            doThrow(new RuntimeException("Redis pattern failed"))
+                .when(redisTemplate).keys(anyString());
+
+            cacheService.put(CASE_ID, USER_ID, ROLES);
+
+            String pattern = KEY_PREFIX + ":getUserCaseRoles:" + CASE_ID + ":*";
+            // Simulate pattern eviction through evictAllForCase
+            cacheService.evictAllForCase(CASE_ID);
+
+            verify(metrics).recordError(eq(CASE_ID), anyString());
+        }
+    }
+
+    @Nested
+    class CacheDisabledBehavior {
+
+        @Test
+        void shouldNotStoreInCaffeine_whenDisabled() {
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(false);
+
+            cacheService.put(CASE_ID, USER_ID, ROLES);
+            Optional<List<String>> result = cacheService.get(CASE_ID, USER_ID);
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void shouldNotStoreAndEvict_whenDisabled() {
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(false);
+
+            cacheService.put(CASE_ID, USER_ID, ROLES);
+            Optional<List<String>> result = cacheService.get(CASE_ID, USER_ID);
+
+            assertThat(result).isEmpty();
+            verify(metrics).recordDisabled();
+        }
+    }
+
+    @Nested
+    class BuildKeyMethod {
+
+        @Test
+        void shouldBuildKeyWithoutUserId() {
+            String key = cacheService.buildKey("getUserCaseRoles", CASE_ID, null);
+
+            assertThat(key).isEqualTo(KEY_PREFIX + ":getUserCaseRoles:" + CASE_ID);
+            assertThat(key).doesNotContain("null");
+        }
+
+        @Test
+        void shouldBuildKeyWithUserId() {
+            String key = cacheService.buildKey("getUserCaseRoles", CASE_ID, USER_ID);
+
+            assertThat(key).isEqualTo(KEY_PREFIX + ":getUserCaseRoles:" + CASE_ID + ":" + USER_ID);
+        }
+
+        @Test
+        void shouldBuildKeyWithDifferentMethods() {
+            String key1 = cacheService.buildKey("method1", CASE_ID, USER_ID);
+            String key2 = cacheService.buildKey("method2", CASE_ID, USER_ID);
+
+            assertThat(key1).contains("method1");
+            assertThat(key2).contains("method2");
+            assertThat(key1).isNotEqualTo(key2);
+        }
+    }
+
+    @Nested
+    class IsCacheEnabledMethod {
+
+        @Test
+        void shouldReturnTrueWhenFeatureEnabled() {
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(true);
+
+            boolean enabled = cacheService.isCacheEnabled();
+
+            assertThat(enabled).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalseWhenFeatureDisabled() {
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(false);
+
+            boolean enabled = cacheService.isCacheEnabled();
+
+            assertThat(enabled).isFalse();
+        }
+    }
+
+    @Nested
+    class RedisNotAvailableScenarios {
+
+        @Test
+        void shouldUseCaffeineForAllOperations_whenRedisUnavailable() {
+            CaseUserRolesCacheService caffeineOnlyService = new CaseUserRolesCacheService(
+                properties,
+                featureToggleService,
+                metrics,
+                objectMapper,
+                Optional.empty()
+            );
+
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(true);
+
+            // Put
+            caffeineOnlyService.put(CASE_ID, USER_ID, ROLES);
+
+            // Get
+            Optional<List<String>> result = caffeineOnlyService.get(CASE_ID, USER_ID);
+
+            assertThat(result).isPresent();
+            assertThat(result.get()).containsExactlyElementsOf(ROLES);
+
+            // Evict
+            caffeineOnlyService.evict(CASE_ID, USER_ID);
+            Optional<List<String>> resultAfterEviction = caffeineOnlyService.get(CASE_ID, USER_ID);
+
+            assertThat(resultAfterEviction).isEmpty();
+        }
+
+        @Test
+        void shouldNotInteractWithRedis_whenNotAvailable() {
+            CaseUserRolesCacheService caffeineOnlyService = new CaseUserRolesCacheService(
+                properties,
+                featureToggleService,
+                metrics,
+                objectMapper,
+                Optional.empty()
+            );
+
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(true);
+
+            caffeineOnlyService.put(CASE_ID, USER_ID, ROLES);
+            caffeineOnlyService.get(CASE_ID, USER_ID);
+            caffeineOnlyService.evict(CASE_ID, USER_ID);
+
+            verifyNoInteractions(redisTemplate);
+        }
+    }
+
+    @Nested
+    class EdgeCases {
+
+        @BeforeEach
+        void setUp() {
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        }
+
+        @Test
+        void shouldHandleVeryLargeRolesList() {
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(true);
+
+            List<String> largeRolesList = java.util.stream.IntStream.range(0, 1000)
+                .mapToObj(i -> "ROLE_" + i)
+                .toList();
+
+            cacheService.put(CASE_ID, USER_ID, largeRolesList);
+
+            String expectedKey = KEY_PREFIX + ":getUserCaseRoles:" + CASE_ID + ":" + USER_ID;
+            verify(valueOperations).set(
+                eq(expectedKey),
+                anyString(),
+                eq(Duration.ofSeconds(30))
+            );
+        }
+
+        @Test
+        void shouldHandleMultipleConsecutivePutOperations() {
+            when(featureToggleService.isFeatureEnabled(CaseUserRolesCacheService.KILL_SWITCH_FLAG))
+                .thenReturn(true);
+
+            List<String> rolesV1 = List.of("ROLE1");
+            List<String> rolesV2 = List.of("ROLE1", "ROLE2");
+            List<String> rolesV3 = List.of("ROLE1", "ROLE2", "ROLE3");
+
+            cacheService.put(CASE_ID, USER_ID, rolesV1);
+            cacheService.put(CASE_ID, USER_ID, rolesV2);
+            cacheService.put(CASE_ID, USER_ID, rolesV3);
+
+            verify(valueOperations, org.mockito.Mockito.times(3)).set(
+                anyString(),
+                anyString(),
+                eq(Duration.ofSeconds(30))
+            );
+        }
+    }
+
+    @Nested
+    class SpecialCharactersAndEdgeCases {
+
+        @Test
+        void shouldHandleSpecialCharactersInCaseIdAndUserId() {
+            String specialCaseId = "case-123_456:789";
+            String specialUserId = "user@domain.com";
+
+            String key = cacheService.buildKey("getUserCaseRoles", specialCaseId, specialUserId);
+
+            assertThat(key).contains(specialCaseId);
+            assertThat(key).contains(specialUserId);
         }
     }
 }
