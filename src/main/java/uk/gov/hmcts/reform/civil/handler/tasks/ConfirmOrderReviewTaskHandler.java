@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
@@ -24,18 +23,30 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 /**
  * Handles the external camunda task for updating contact information.
  * This task handler retrieves caseId and caseEvent from the external task variables and the businessProcess
  */
-@RequiredArgsConstructor
 @Component
 public class ConfirmOrderReviewTaskHandler extends BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+
+    public ConfirmOrderReviewTaskHandler(
+        EventProperties eventProperties,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper
+    ) {
+        super(eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -53,6 +64,11 @@ public class ConfirmOrderReviewTaskHandler extends BaseExternalTaskHandler {
         } catch (ValueMapperException | IllegalArgumentException ex) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", ex);
         }
+    }
+
+    @Override
+    public int getMaxAttempts() {
+        return 1;
     }
 
     private ExternalTaskInput parseExternalTaskVariables(ExternalTask externalTask) {

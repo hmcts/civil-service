@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.ObligationReason;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -35,6 +36,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -64,8 +66,12 @@ class ConfirmOrderReviewTaskHandlerTest {
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
-        caseEventTaskHandler = new ConfirmOrderReviewTaskHandler(coreCaseDataService, caseDetailsConverter,
-                                                                        objectMapper);
+        caseEventTaskHandler = new ConfirmOrderReviewTaskHandler(
+            new EventProperties(),
+            coreCaseDataService,
+            caseDetailsConverter,
+            objectMapper
+        );
     }
 
     @BeforeEach
@@ -75,8 +81,8 @@ class ConfirmOrderReviewTaskHandlerTest {
             "caseEvent", UPDATE_CONFIRM_REVIEW_ORDER_EVENT.name()
         );
 
-        when(mockTask.getAllVariables()).thenReturn(variables);
-        when(mockTask.getTopicName()).thenReturn("test");
+        lenient().when(mockTask.getAllVariables()).thenReturn(variables);
+        lenient().when(mockTask.getTopicName()).thenReturn("test");
     }
 
     @Test
@@ -160,5 +166,10 @@ class ConfirmOrderReviewTaskHandlerTest {
             .handleFailure(eq(mockTask), eq("The caseId was not provided"),
                            anyString(), anyInt(), anyLong()
             );
+    }
+
+    @Test
+    void shouldOnlyAttemptOnce() {
+        assertEquals(1, caseEventTaskHandler.getMaxAttempts());
     }
 }

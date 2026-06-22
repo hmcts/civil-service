@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.HearingScheduledNotificationService;
-import uk.gov.hmcts.reform.civil.notify.NotificationException;
 
 import java.util.List;
 import java.util.Map;
@@ -48,11 +47,7 @@ public class NotifyHearingNoticeClaimantHandler extends CallbackHandler implemen
 
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Notify hearing notice to claimant for case: {}", caseData.getCcdCaseReference());
-        try {
-            caseData = hearingScheduledNotificationService.sendNotificationForClaimant(caseData);
-        } catch (NotificationException notificationException) {
-            throw notificationException;
-        }
+        caseData = hearingScheduledNotificationService.sendNotificationForClaimant(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
