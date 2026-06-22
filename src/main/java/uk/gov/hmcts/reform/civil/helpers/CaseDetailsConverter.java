@@ -24,7 +24,6 @@ public class CaseDetailsConverter {
 
     public CaseDetailsConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
-        this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
     }
 
     public BaseCaseData toBaseCaseData(CaseDetails caseDetails) {

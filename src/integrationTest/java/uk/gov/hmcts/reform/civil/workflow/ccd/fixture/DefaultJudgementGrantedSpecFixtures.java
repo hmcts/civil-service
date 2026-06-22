@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.workflow.helper.CaseDataTemplates;
 
+import java.time.LocalDateTime;
+
 public final class DefaultJudgementGrantedSpecFixtures {
 
     private static final String CLAIM_ISSUED_TEMPLATE = "claim-issued";

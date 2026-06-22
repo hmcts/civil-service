@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -41,6 +42,7 @@ public final class CaseDataTemplates {
         try (InputStream inputStream = CaseDataTemplates.class
             .getResourceAsStream(TEMPLATES_CASE_DATA + fileName + ".json")) {
             ObjectNode template = loadTemplateNode(fileName, inputStream);
+            set(template, "submittedDate", LocalDateTime.now());
             mutator.accept(template);
             return MAPPER.treeToValue(template, targetClass);
         } catch (IOException e) {
