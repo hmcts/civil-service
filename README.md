@@ -2,9 +2,7 @@
 
 Civil CCD Callback Service.
 
-
 ### Contents:
-
 - [StateFlow diagrams](#stateflow-diagrams)
 - [Scheduled jobs](#scheduled-jobs)
 - [Database schema diagram](#database-schema-diagram)
