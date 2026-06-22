@@ -158,6 +158,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     }
 
     @Retryable(retryFor = {DocumentDownloadException.class},
+        noRetryFor = {InvalidDocumentLinkException.class},
         maxAttempts = 5,
         backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
@@ -188,6 +189,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 .map(ByteArrayResource.class::cast)
                 .map(ByteArrayResource::getByteArray)
                 .orElseThrow(RuntimeException::new);
+        } catch (DocumentDownloadException ex) {
+            throw ex;
         } catch (Exception ex) {
             log.error("Failed downloading document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
@@ -195,6 +198,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     }
 
     @Retryable(retryFor = {DocumentDownloadException.class},
+        noRetryFor = {InvalidDocumentLinkException.class},
         maxAttempts = 5,
         backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
@@ -223,6 +227,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
             return new DownloadedDocumentResponse(responseEntity.getBody(), documentMetadata.originalDocumentName,
                                                   tika.detect(documentMetadata.originalDocumentName));
+        } catch (DocumentDownloadException ex) {
+            throw ex;
         } catch (Exception ex) {
             log.error("Failed downloading document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
@@ -234,6 +240,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         log.info("Deleting document {}", documentPath);
         try {
             caseDocumentClientApi.deleteDocument(authorisation, authTokenGenerator.generate(), getDocumentIdFromSelfHref(documentPath), true);
+        } catch (DocumentDownloadException ex) {
+            throw ex;
         } catch (Exception ex) {
             log.error("Failed deleting document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
@@ -250,6 +258,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 getDocumentIdFromSelfHref(documentPath)
             );
 
+        } catch (DocumentDownloadException ex) {
+            throw ex;
         } catch (Exception ex) {
             log.error("Failed getting metadata for {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
@@ -257,6 +267,10 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     }
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {
+        if (selfHref == null || selfHref.length() < DOC_UUID_LENGTH) {
+            log.error("Invalid document link, cannot extract document id: {}", selfHref);
+            throw new InvalidDocumentLinkException(selfHref);
+        }
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
     }
 }
