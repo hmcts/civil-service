@@ -16,7 +16,7 @@ import java.time.Duration;
 
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "spring.data.redis.host", matchIfMissing = false)
+@ConditionalOnProperty(name = "spring.data.redis.enabled", havingValue = "true", matchIfMissing = true)
 public class RedisConfig {
 
     @Bean

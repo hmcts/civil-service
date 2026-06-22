@@ -34,6 +34,7 @@ spring:
         enabled: ${REDIS_SSL_ENABLED:false}
       password: ${REDIS_PASSWORD:}
       timeout: 2000ms
+      enabled: ${REDIS_ENABLED:true}
   jpa:
     properties:
       hibernate.query.mutation_strategy: org.hibernate.query.sqm.mutation.internal.inline.InlineMutationStrategy
