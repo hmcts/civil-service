@@ -327,6 +327,11 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
+    public boolean isDefaultJudgementGranted() {
+        return isDefaultJudgmentGrantedForDashboard();
+    }
+
+    @Override
     public boolean isPartialAdmissionAccepted() {
         return caseData.isPartAdmitClaimSpec() && caseData.isPartAdmitClaimNotSettled()
             && caseData.isPayImmediately() && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();
