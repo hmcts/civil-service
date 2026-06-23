@@ -80,3 +80,18 @@ variable "job_not_run_threshold" {
   description = "The threshold in hours for the scheduler job not run alert"
   default     = 26
 }
+
+variable "redis_sku_name" {
+  default     = "Basic"
+  description = "Redis SKU: Basic, Standard, or Premium"
+}
+
+variable "redis_family" {
+  default     = "C"
+  description = "Redis SKU family: C (Basic/Standard) or P (Premium)"
+}
+
+variable "redis_capacity" {
+  default     = "1"
+  description = "Redis cache size: 1-5"
+}

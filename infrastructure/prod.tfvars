@@ -5,3 +5,7 @@ custom_alerts_enabled = 1
 ccd_service_bus_status = "Disabled"
 
 ccd_service_bus_filter_rule = "jurisdiction_id IN ('IMPOSSIBLE_VALUE')"
+
+redis_sku_name = "Standard"
+redis_family   = "C"
+redis_capacity = "1"
