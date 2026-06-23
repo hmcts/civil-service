@@ -22,6 +22,8 @@ import java.util.Set;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(SpringExtension.class)
 class RequestForReconsiderationNotificationDeadlineHandlerTest {
@@ -43,6 +45,8 @@ class RequestForReconsiderationNotificationDeadlineHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
 
     @InjectMocks
     private RequestForReconsiderationNotificationDeadlineHandler handler;
@@ -69,4 +73,11 @@ class RequestForReconsiderationNotificationDeadlineHandlerTest {
         verify(applicationEventPublisher).publishEvent(new RequestForReconsiderationNotificationDeadlineEvent(caseId));
         verify(externalTaskService).complete(mockTask, null);
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

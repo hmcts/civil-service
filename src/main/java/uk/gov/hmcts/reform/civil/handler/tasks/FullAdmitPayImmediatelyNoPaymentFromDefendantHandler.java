@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,9 +16,9 @@ import java.util.Map;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class FullAdmitPayImmediatelyNoPaymentFromDefendantHandler extends BaseExternalTaskHandler {
 
@@ -27,6 +26,18 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantHandler extends BaseEx
     private final ApplicationEventPublisher applicationEventPublisher;
 
     private final CoreCaseDataService coreCaseDataService;
+
+    public FullAdmitPayImmediatelyNoPaymentFromDefendantHandler(
+        EventProperties eventProperties,
+        FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher,
+        CoreCaseDataService coreCaseDataService
+    ) {
+        super(eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.coreCaseDataService = coreCaseDataService;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -61,4 +72,5 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantHandler extends BaseEx
             eventDescription
         );
     }
+
 }

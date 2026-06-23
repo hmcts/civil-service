@@ -19,7 +19,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -31,20 +30,12 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
 
         if (!RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
-            && !RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired2())) {
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
             return Optional.empty();
         }
         LocalDate whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
             .orElse(null);
-
-        if (YES.equals(caseData.getIsRespondent2())) {
-            if (caseData.getRespondToClaimAdmitPartLRspec2() != null) {
-                whenBePaid = caseData.getRespondToClaimAdmitPartLRspec2().getWhenWillThisAmountBePaid();
-            }
-        }
 
         boolean isPartAdmitLRAdmissionBulk = checkLrAdmissionBulk(caseData, featureToggleService);
         BigDecimal claimOwingAmount = getClaimOwingAmount(caseData, isPartAdmitLRAdmissionBulk);

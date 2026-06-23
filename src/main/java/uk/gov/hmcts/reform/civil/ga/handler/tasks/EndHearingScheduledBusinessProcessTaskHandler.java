@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
@@ -19,15 +18,27 @@ import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_HEARING_SCHEDULED_PROCESS_GASPEC;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class EndHearingScheduledBusinessProcessTaskHandler extends BaseExternalTaskHandler {
 
     private final GaCoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+
+    public EndHearingScheduledBusinessProcessTaskHandler(
+        EventProperties eventProperties,
+        GaCoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper
+    ) {
+        super(eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
