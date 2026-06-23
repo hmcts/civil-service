@@ -70,9 +70,8 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].titleCy").value("Mae’r hawliad wedi’i setlo"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">The claimant has confirmed that this case was settled on 16 March 2024.</p>"
-                            + "<p class=\"govuk-body\">If you do not agree that the case is settled, please outline your objections"
-                            + " in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at {cmcCourtEmailId}</p>")
+                        "<p class=\"govuk-body\">Mae’r hawlydd wedi cadarnhau bod yr achos hwn wedi’i setlo ar 16 Mawrth 2024.</p>"
+                            + "<p class=\"govuk-body\">Os nad ydych yn cytuno bod yr achos wedi’i setlo, nodwch eich gwrthwynebiadau yn ysgrifenedig o fewn 19 diwrnod i’r dyddiad setlo, i’r Ganolfan Busnes Llys Sirol Gyffredinol gan ddefnyddio’r cyfeiriad e-bost yn {cmcCourtEmailId}</p>")
             );
     }
 }
