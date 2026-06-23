@@ -9,13 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -60,11 +60,23 @@ class GaSpecExternalCaseEventTaskHandlerTest {
     @Mock
     private GaStateFlowEngine gaStateFlowEngine;
 
-    @InjectMocks
     private GaSpecExternalCaseEventTaskHandler gaSpecCaseEventTaskHandler;
 
     @Spy
     private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+
+    @BeforeEach
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        gaSpecCaseEventTaskHandler = new GaSpecExternalCaseEventTaskHandler(
+            eventProperties,
+            coreCaseDataService,
+            caseDetailsConverter,
+            objectMapper,
+            gaStateFlowEngine
+        );
+    }
 
     @Nested
     class NotifyRespondent {

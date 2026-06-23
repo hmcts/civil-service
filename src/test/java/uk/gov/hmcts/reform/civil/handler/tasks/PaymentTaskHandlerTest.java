@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -43,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentTaskHandlerTest {
@@ -63,6 +65,9 @@ class PaymentTaskHandlerTest {
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
     @InjectMocks
     private PaymentTaskHandler paymentTaskHandler;
 
@@ -163,6 +168,11 @@ class PaymentTaskHandlerTest {
         }
     }
 
+    @Test
+    void shouldOnlyAttemptOnce() {
+        assertEquals(1, paymentTaskHandler.getMaxAttempts());
+    }
+
     private StateFlowDTO getStateFlowDTO() {
         return new StateFlowDTO()
             .setState(State.from("MAIN.CLAIM_SUBMITTED"))
@@ -182,4 +192,11 @@ class PaymentTaskHandlerTest {
             Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
         );
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }
