@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ class BundleCreationScheduledTaskTest {
     private static final String USERNAME = "system-user";
     private static final String PASSWORD = "password";
     private static final String ACCESS_TOKEN = "access-token";
-    private static final LocalDate HEARING_DATE = LocalDate.of(2026, 7, 1);
+    private static final LocalDate HEARING_DATE = LocalDate.of(2026, Month.JULY, 1);
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
@@ -126,6 +127,34 @@ class BundleCreationScheduledTaskTest {
 
         assertThat(task.isBundleCreatedForHearingDate(CASE_ID)).isFalse();
         verify(noCacheUserService, never()).getAccessToken(USERNAME, PASSWORD);
+    }
+
+    @Test
+    void shouldRestoreInterruptedFlagWhenThrottleIsInterrupted() {
+        task = new BundleCreationScheduledTask(
+            applicationEventPublisher,
+            caseDetailsConverter,
+            coreCaseDataService,
+            new SystemUpdateUserConfiguration(USERNAME, PASSWORD),
+            noCacheUserService,
+            1000
+        );
+        CaseData caseData = new CaseDataBuilder()
+            .hearingDate(HEARING_DATE)
+            .caseBundles(List.of())
+            .build();
+        mockCaseData(caseData);
+        when(noCacheUserService.getAccessToken(USERNAME, PASSWORD)).thenReturn(ACCESS_TOKEN);
+
+        try {
+            Thread.currentThread().interrupt();
+
+            task.accept(caseDetails);
+
+            assertThat(Thread.currentThread().isInterrupted()).isTrue();
+        } finally {
+            Thread.interrupted();
+        }
     }
 
     private void mockCaseData(CaseData caseData) {
