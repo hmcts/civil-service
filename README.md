@@ -447,6 +447,15 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
 | `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
 
+### BundleCreationScheduler
+
+The `BundleCreationScheduler` creates hearing bundles for eligible cases within the existing ten-day hearing window.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_BUNDLE_CREATION` |
+| `cronExpression` | When the scheduler runs. | `0 0 21 * * ?` (Daily at 9 PM) | `CRON_EXPRESSION_BUNDLE_CREATION` |
+
 #### Global Scheduler Settings
 
 | Setting | Description | Default | Environment Variable |
