@@ -81,17 +81,12 @@ variable "job_not_run_threshold" {
   default     = 26
 }
 
-variable "redis_sku_name" {
-  default     = "Basic"
-  description = "Redis SKU: Basic, Standard, or Premium"
+variable "managed_redis_sku" {
+  default     = "Balanced_B1"
+  description = "Azure Managed Redis SKU e.g. Balanced_B1, Balanced_B3, Balanced_B5"
 }
 
-variable "redis_family" {
-  default     = "C"
-  description = "Redis SKU family: C (Basic/Standard) or P (Premium)"
-}
-
-variable "redis_capacity" {
-  default     = "1"
-  description = "Redis cache size: 1-5"
+variable "private_dns_subscription_id" {
+  default     = "1baf5470-1c3e-40d3-a6f7-74bfdc18b7a1"
+  description = "Subscription ID for the private DNS zone used by managed redis"
 }

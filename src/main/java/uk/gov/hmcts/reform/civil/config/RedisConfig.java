@@ -23,7 +23,7 @@ public class RedisConfig {
     @Primary
     public LettuceConnectionFactory redisConnectionFactory(
         @Value("${spring.data.redis.host:localhost}") String host,
-        @Value("${spring.data.redis.port:6379}") int port,
+        @Value("${spring.data.redis.port:10000}") int port,
         @Value("${spring.data.redis.password:}") String password,
         @Value("${spring.data.redis.ssl.enabled:false}") boolean sslEnabled,
         @Value("${spring.data.redis.timeout:2000ms}") Duration timeout

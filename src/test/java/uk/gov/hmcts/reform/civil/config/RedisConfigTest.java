@@ -165,7 +165,7 @@ class RedisConfigTest {
     void shouldHandleAllConfigurationCombinations() {
         // Test various combinations of parameters
         String[] hosts = {"localhost", "redis.example.com"};
-        int[] ports = {6379, 6380, 6381};
+        int[] ports = {6379, 6380, 10000};
         String[] passwords = {"", null, "secure-pass"};
         boolean[] sslFlags = {true, false};
 

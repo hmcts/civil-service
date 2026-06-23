@@ -6,6 +6,4 @@ ccd_service_bus_status = "Disabled"
 
 ccd_service_bus_filter_rule = "jurisdiction_id IN ('IMPOSSIBLE_VALUE')"
 
-redis_sku_name = "Standard"
-redis_family   = "C"
-redis_capacity = "1"
+managed_redis_sku = "Balanced_B3"
