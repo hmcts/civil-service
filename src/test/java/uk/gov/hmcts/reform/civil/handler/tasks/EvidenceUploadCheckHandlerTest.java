@@ -33,6 +33,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(SpringExtension.class)
 class EvidenceUploadCheckHandlerTest {
@@ -48,6 +50,8 @@ class EvidenceUploadCheckHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
 
     @InjectMocks
     private EvidenceUploadCheckHandler handler;
@@ -107,7 +111,7 @@ class EvidenceUploadCheckHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(300000L)
+            anyLong()
         );
     }
 
@@ -168,4 +172,11 @@ class EvidenceUploadCheckHandlerTest {
         verify(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(caseId));
         verify(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(otherId));
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_DAY;
-
 @Component
 public class Respondent1SettlementAgreementParamsBuilder extends DashboardNotificationsParamsBuilder {
 
