@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -33,7 +34,7 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
         LocalDateTime respondent1SettlementDeadline = LocalDateTime.now().plusDays(7);
         CaseDataLiP caseDataLiP = new CaseDataLiP()
             .setApplicant1LiPResponse(new ClaimantLiPResponse()
-                                       .setApplicant1SignedSettlementAgreement(YesOrNo.YES));
+                                          .setApplicant1SignedSettlementAgreement(YesOrNo.YES));
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
             .toBuilder()
@@ -47,7 +48,7 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
             .respondToClaim(new RespondToClaim()
                                 .setHowMuchWasPaid(BigDecimal.valueOf(300000))
                                 .setWhenWasThisAmountPaid(LocalDate.of(2024, 3, 16))
-                                )
+            )
             .respondent1RespondToSettlementAgreementDeadline(respondent1SettlementDeadline)
             .build();
 
