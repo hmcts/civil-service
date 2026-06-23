@@ -294,20 +294,11 @@ def installSmokeTestDependencies = tasks.register('installSmokeTestDependencies'
   commandLine '/usr/bin/yarn', 'install', '--immutable', '--silent'
 }
 
-def installSmokeTestBrowser = tasks.register('installSmokeTestBrowser', Exec) {
-  description = 'Installs the browser needed to run smoke tests.'
-  dependsOn installSmokeTestDependencies
-  commandLine '/usr/bin/yarn', '--silent', 'playwright', 'install', 'chromium'
-}
-
 def runSmokeTests = tasks.register('runSmokeTests', Exec) {
   description = 'Runs smoke tests.'
-  dependsOn installSmokeTestBrowser
+  dependsOn installSmokeTestDependencies
   mustRunAfter awaitApplicationReadiness
-  environment 'MOCHAWESOME_REPORTFILENAME', 'civil-service-smoke'
-  environment 'REPORT_DIR', 'test-results/smokeTest'
-  environment 'REPORT_FILE', 'test-results/smokeTest/results.xml'
-  commandLine '/usr/bin/yarn', '--silent', 'exec', 'codeceptjs', 'run', '--grep', '@civil-service-smoke', '--reporter', 'mocha-multi', '--verbose'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:civil-service-smoke'
 }
 
 tasks.register('smoke') {
