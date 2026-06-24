@@ -22,7 +22,7 @@ public class HearingCvpLinkScheduledTask implements ScheduledTask {
         accept(caseDetails, 0);
     }
 
-    void accept(CaseDetails caseDetails, int totalCases) {
+    public void accept(CaseDetails caseDetails, int totalCases) {
         Long caseId = caseDetails.getId();
         log.info("HearingCvpLinkScheduledTask::accept case {}", caseId);
         applicationEventPublisher.publishEvent(new CvpJoinLinkEvent(caseId));

@@ -5,15 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
-import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.scheduler.hearingcvplink.HearingCvpLinkScheduledTask;
 import uk.gov.hmcts.reform.civil.scheduler.hearingcvplink.HearingCvpLinkScheduler;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
@@ -43,7 +42,7 @@ public class HearingCvpLinkSchedulerITest {
     private TelemetryService telemetryService;
 
     @MockBean
-    private ApplicationEventPublisher applicationEventPublisher;
+    private HearingCvpLinkScheduledTask hearingCvpLinkScheduledTask;
 
     @Autowired
     private CoreCaseDataApiMockHelper coreCaseDataApiMockHelper;
@@ -68,7 +67,7 @@ public class HearingCvpLinkSchedulerITest {
         scheduler.runScheduledTask();
 
         // Then
-        verify(applicationEventPublisher).publishEvent(new CvpJoinLinkEvent(CASE_ID));
+        verify(hearingCvpLinkScheduledTask).accept(searchCase, 1);
         verify(telemetryService).trackEvent(eq("HearingCvpLinkJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("HearingCvpLinkCaseProcessed"), anyMap());
         verify(telemetryService).trackEvent(eq("HearingCvpLinkJobCompleted"), anyMap());
