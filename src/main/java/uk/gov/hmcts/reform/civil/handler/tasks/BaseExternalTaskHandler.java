@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.helpers.ExternalTaskExceptionHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
-import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleService;
+import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleUtils;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import java.util.Objects;
@@ -145,7 +145,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
     }
 
     protected void throttle(long count, long delay, long lock) {
-        SchedulerThrottleService.throttle(count, delay, lock);
+        SchedulerThrottleUtils.throttle(count, delay, lock);
     }
 
     /**
