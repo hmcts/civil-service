@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTask;
-import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleService;
+import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleUtils;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 
@@ -63,7 +63,7 @@ public class BundleCreationScheduledTask implements ScheduledTask {
 
         String accessToken = noCacheUserService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseId, accessToken));
-        SchedulerThrottleService.throttle(totalCases, waitTime, LOCK_DURATION);
+        SchedulerThrottleUtils.throttle(totalCases, waitTime, LOCK_DURATION);
     }
 
     boolean isBundleCreatedForHearingDate(Long caseId) {

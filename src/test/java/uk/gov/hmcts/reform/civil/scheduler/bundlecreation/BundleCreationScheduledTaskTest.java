@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleService;
+import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleUtils;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 
@@ -149,12 +149,12 @@ class BundleCreationScheduledTaskTest {
         mockCaseData(caseData);
         when(noCacheUserService.getAccessToken(USERNAME, PASSWORD)).thenReturn(ACCESS_TOKEN);
 
-        try (MockedStatic<SchedulerThrottleService> schedulerThrottleService = mockStatic(
-            SchedulerThrottleService.class
+        try (MockedStatic<SchedulerThrottleUtils> schedulerThrottleUtils = mockStatic(
+            SchedulerThrottleUtils.class
         )) {
             task.accept(caseDetails, 5);
 
-            schedulerThrottleService.verify(() -> SchedulerThrottleService.throttle(5, 1000, 600000L));
+            schedulerThrottleUtils.verify(() -> SchedulerThrottleUtils.throttle(5, 1000, 600000L));
         }
     }
 
