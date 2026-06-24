@@ -30,6 +30,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(SpringExtension.class)
 class OrderReviewObligationCheckHandlerTest {
@@ -45,6 +47,8 @@ class OrderReviewObligationCheckHandlerTest {
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
 
     @InjectMocks
     private OrderReviewObligationCheckHandler handler;
@@ -141,4 +145,11 @@ class OrderReviewObligationCheckHandlerTest {
 
         verify(applicationEventPublisher, never()).publishEvent(any(OrderReviewObligationCheckEvent.class));
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

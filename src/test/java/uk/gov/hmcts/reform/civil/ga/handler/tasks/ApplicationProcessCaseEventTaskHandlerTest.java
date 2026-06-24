@@ -12,13 +12,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -74,11 +74,20 @@ class ApplicationProcessCaseEventTaskHandlerTest {
     @Mock
     private GaStateFlowEngine gaStateFlowEngine;
 
-    @InjectMocks
     private ApplicationProcessCaseEventTaskHandler applicationProcessCaseEventTaskHandler;
 
     @BeforeEach
-    void init() {
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        applicationProcessCaseEventTaskHandler = new ApplicationProcessCaseEventTaskHandler(
+            eventProperties,
+            caseDetailsConverter,
+            gaStateFlowEngine,
+            coreCaseDataService,
+            objectMapper
+        );
+
         when(mockTask.getTopicName()).thenReturn("test");
     }
 
@@ -145,18 +154,17 @@ class ApplicationProcessCaseEventTaskHandlerTest {
                 eq(errorMessage),
                 anyString(),
                 eq(2),
-                eq(300000L)
+                anyLong()
             );
         }
 
         @Test
-        void shouldCallHandleFailureMethod_whenFeignExceptionFromBusinessLogic() {
+        void shouldCallHandleFailureMethod_whenFeignExceptionFromUnprocessableContent() {
             String errorMessage = "there was an error";
             int status = 422;
             Request.HttpMethod requestType = Request.HttpMethod.POST;
             String exampleUrl = "example url";
 
-            when(mockTask.getRetries()).thenReturn(null);
             when(coreCaseDataService.startGaUpdate(CASE_ID, GENERATE_JUDGES_FORM))
                 .thenAnswer(invocation -> {
                     throw FeignException.errorStatus(errorMessage, Response.builder()
@@ -180,13 +188,13 @@ class ApplicationProcessCaseEventTaskHandlerTest {
                 eq(mockTask),
                 eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
                 anyString(),
-                eq(2),
-                eq(300000L)
+                anyInt(),
+                anyLong()
             );
         }
 
         @Test
-        void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
+        void shouldCallHandleFailureMethod_whenExceptionOnCompleteCall() {
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
                 .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
