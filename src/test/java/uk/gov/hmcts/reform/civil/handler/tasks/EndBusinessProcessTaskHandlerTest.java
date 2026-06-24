@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -53,8 +54,12 @@ class EndBusinessProcessTaskHandlerTest {
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
-        handler = new EndBusinessProcessTaskHandler(coreCaseDataService, caseDetailsConverter,
-                                                    objectMapper);
+        handler = new EndBusinessProcessTaskHandler(
+            new EventProperties(),
+            coreCaseDataService,
+            caseDetailsConverter,
+            objectMapper
+        );
     }
 
     @BeforeEach
