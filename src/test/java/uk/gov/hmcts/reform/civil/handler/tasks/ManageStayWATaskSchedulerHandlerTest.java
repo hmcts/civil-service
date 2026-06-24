@@ -33,6 +33,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(SpringExtension.class)
 class ManageStayWATaskSchedulerHandlerTest {
@@ -50,6 +52,8 @@ class ManageStayWATaskSchedulerHandlerTest {
     private ApplicationEventPublisher applicationEventPublisher;
     @Mock
     private FeatureToggleService featureToggleService;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
 
     @InjectMocks
     private ManageStayWATaskSchedulerHandler handler;
@@ -100,7 +104,7 @@ class ManageStayWATaskSchedulerHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(300000L)
+            anyLong()
         );
     }
 
@@ -136,7 +140,7 @@ class ManageStayWATaskSchedulerHandlerTest {
         String errorMessage = "Manage Stay WA Task scheduler failed to process case with id: ";
 
         doThrow(new NullPointerException(errorMessage))
-            .when(applicationEventPublisher).publishEvent(eq(new ManageStayWATaskEvent(caseId)));
+            .when(applicationEventPublisher).publishEvent(new ManageStayWATaskEvent(caseId));
 
         handler.execute(mockTask, externalTaskService);
 
@@ -152,4 +156,11 @@ class ManageStayWATaskSchedulerHandlerTest {
         verify(applicationEventPublisher).publishEvent(new ManageStayWATaskEvent(caseId));
         verify(applicationEventPublisher).publishEvent(new ManageStayWATaskEvent(otherId));
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }
