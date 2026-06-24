@@ -29,7 +29,6 @@ public class BundleCreationScheduledTask implements ScheduledTask {
     private final CoreCaseDataService coreCaseDataService;
     private final SystemUpdateUserConfiguration userConfig;
     private final NoCacheUserService noCacheUserService;
-    private final SchedulerThrottleService schedulerThrottleService;
     private final long waitTime;
 
     public BundleCreationScheduledTask(
@@ -38,7 +37,6 @@ public class BundleCreationScheduledTask implements ScheduledTask {
         CoreCaseDataService coreCaseDataService,
         SystemUpdateUserConfiguration userConfig,
         NoCacheUserService noCacheUserService,
-        SchedulerThrottleService schedulerThrottleService,
         @Value("${stitch-bundle.wait-time-in-milliseconds}") long waitTime
     ) {
         this.applicationEventPublisher = applicationEventPublisher;
@@ -46,7 +44,6 @@ public class BundleCreationScheduledTask implements ScheduledTask {
         this.coreCaseDataService = coreCaseDataService;
         this.userConfig = userConfig;
         this.noCacheUserService = noCacheUserService;
-        this.schedulerThrottleService = schedulerThrottleService;
         this.waitTime = waitTime;
     }
 
@@ -66,7 +63,7 @@ public class BundleCreationScheduledTask implements ScheduledTask {
 
         String accessToken = noCacheUserService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseId, accessToken));
-        schedulerThrottleService.throttle(totalCases, waitTime, LOCK_DURATION);
+        SchedulerThrottleService.throttle(totalCases, waitTime, LOCK_DURATION);
     }
 
     boolean isBundleCreatedForHearingDate(Long caseId) {

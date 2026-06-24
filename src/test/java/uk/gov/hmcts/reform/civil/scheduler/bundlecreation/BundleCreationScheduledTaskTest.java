@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.scheduler.bundlecreation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -48,8 +50,6 @@ class BundleCreationScheduledTaskTest {
     private CoreCaseDataService coreCaseDataService;
     @Mock
     private NoCacheUserService noCacheUserService;
-    @Mock
-    private SchedulerThrottleService schedulerThrottleService;
 
     private BundleCreationScheduledTask task;
     private CaseDetails caseDetails;
@@ -62,7 +62,6 @@ class BundleCreationScheduledTaskTest {
             coreCaseDataService,
             new SystemUpdateUserConfiguration(USERNAME, PASSWORD),
             noCacheUserService,
-            schedulerThrottleService,
             0
         );
         caseDetails = CaseDetails.builder().id(CASE_ID).data(Map.of()).build();
@@ -141,7 +140,6 @@ class BundleCreationScheduledTaskTest {
             coreCaseDataService,
             new SystemUpdateUserConfiguration(USERNAME, PASSWORD),
             noCacheUserService,
-            schedulerThrottleService,
             1000
         );
         CaseData caseData = new CaseDataBuilder()
@@ -151,9 +149,13 @@ class BundleCreationScheduledTaskTest {
         mockCaseData(caseData);
         when(noCacheUserService.getAccessToken(USERNAME, PASSWORD)).thenReturn(ACCESS_TOKEN);
 
-        task.accept(caseDetails, 5);
+        try (MockedStatic<SchedulerThrottleService> schedulerThrottleService = mockStatic(
+            SchedulerThrottleService.class
+        )) {
+            task.accept(caseDetails, 5);
 
-        verify(schedulerThrottleService).throttle(5, 1000, 600000L);
+            schedulerThrottleService.verify(() -> SchedulerThrottleService.throttle(5, 1000, 600000L));
+        }
     }
 
     private void mockCaseData(CaseData caseData) {
