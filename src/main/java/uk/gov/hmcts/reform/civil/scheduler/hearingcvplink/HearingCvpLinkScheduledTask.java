@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTask;
-import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleService;
+import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class HearingCvpLinkScheduledTask implements ScheduledTask {
         Long caseId = caseDetails.getId();
         log.info("HearingCvpLinkScheduledTask::accept case {}", caseId);
         applicationEventPublisher.publishEvent(new CvpJoinLinkEvent(caseId));
-        SchedulerThrottleService.throttle(
+        SchedulerThrottleUtils.throttle(
             totalCases,
             eventProperties.getDispatchDelay(),
             eventProperties.getLockDuration()

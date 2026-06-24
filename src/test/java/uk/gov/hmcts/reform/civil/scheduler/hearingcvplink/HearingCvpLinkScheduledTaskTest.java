@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
-import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleService;
+import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleUtils;
 
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
@@ -45,13 +45,13 @@ class HearingCvpLinkScheduledTaskTest {
         when(eventProperties.getDispatchDelay()).thenReturn(2000);
         when(eventProperties.getLockDuration()).thenReturn(600000L);
 
-        try (MockedStatic<SchedulerThrottleService> schedulerThrottleService = mockStatic(
-            SchedulerThrottleService.class
+        try (MockedStatic<SchedulerThrottleUtils> schedulerThrottleUtils = mockStatic(
+            SchedulerThrottleUtils.class
         )) {
             task.accept(caseDetails, 26);
 
             verify(applicationEventPublisher).publishEvent(new CvpJoinLinkEvent(caseId));
-            schedulerThrottleService.verify(() -> SchedulerThrottleService.throttle(26, 2000, 600000L));
+            schedulerThrottleUtils.verify(() -> SchedulerThrottleUtils.throttle(26, 2000, 600000L));
         }
     }
 }
