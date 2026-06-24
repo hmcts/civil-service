@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.scheduler.common;
 
-public class SchedulerThrottleService {
+public class SchedulerThrottleUtils {
 
     private static final int SMALL_BATCH = 25;
 
-    private SchedulerThrottleService() {
+    private SchedulerThrottleUtils() {
         // Utility class
     }
 
