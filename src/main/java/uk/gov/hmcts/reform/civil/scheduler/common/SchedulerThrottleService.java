@@ -1,27 +1,15 @@
 package uk.gov.hmcts.reform.civil.scheduler.common;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
-
-@Service
-@RequiredArgsConstructor
 public class SchedulerThrottleService {
 
     private static final int SMALL_BATCH = 25;
 
-    private final EventProperties eventProperties;
-
-    public void throttle(long count) {
-        throttle(count, eventProperties.getDispatchDelay());
-    }
-
-    public void throttle(long count, long delay) {
-        throttle(count, delay, eventProperties.getLockDuration());
+    private SchedulerThrottleService() {
+        // Utility class
     }
 
     @SuppressWarnings("java:S2142")
-    public void throttle(long count, long delay, long lock) {
+    public static void throttle(long count, long delay, long lock) {
         long effectiveDelay = calculateEffectiveDelay(count, lock, delay);
         if (effectiveDelay == 0) {
             return;
@@ -43,7 +31,7 @@ public class SchedulerThrottleService {
      * @param delay the desired delay in milliseconds between task executions.
      * @return the calculated effective delay in milliseconds.
      */
-    private long calculateEffectiveDelay(long count, long lock, long delay) {
+    static long calculateEffectiveDelay(long count, long lock, long delay) {
         if (count <= 1 || delay <= 0 || lock <= 0) {
             return 0;
         }
