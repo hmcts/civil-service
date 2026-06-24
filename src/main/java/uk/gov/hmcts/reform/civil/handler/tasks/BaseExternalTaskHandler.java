@@ -32,11 +32,9 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
     protected final Logger log = LoggerFactory.getLogger(BaseExternalTaskHandler.class);
 
     private final EventProperties eventProperties;
-    private final SchedulerThrottleService schedulerThrottleService;
 
     protected BaseExternalTaskHandler(EventProperties eventProperties) {
         this.eventProperties = eventProperties;
-        this.schedulerThrottleService = new SchedulerThrottleService(eventProperties);
     }
 
     /**
@@ -173,15 +171,17 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
     protected abstract ExternalTaskData handleTask(ExternalTask externalTask);
 
     protected void throttle(long count) {
-        schedulerThrottleService.throttle(count);
+        long delay = eventProperties.getDispatchDelay();
+        throttle(count, delay);
     }
 
     protected void throttle(long count, long delay) {
-        schedulerThrottleService.throttle(count, delay);
+        long lock = eventProperties.getLockDuration();
+        throttle(count, delay, lock);
     }
 
     protected void throttle(long count, long delay, long lock) {
-        schedulerThrottleService.throttle(count, delay, lock);
+        SchedulerThrottleService.throttle(count, delay, lock);
     }
 
     /**
