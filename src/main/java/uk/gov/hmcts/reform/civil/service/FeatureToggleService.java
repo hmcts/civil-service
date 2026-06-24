@@ -170,4 +170,8 @@ public class FeatureToggleService {
     public boolean isJudgmentBufferEnabled() {
         return featureToggleApi.isFeatureEnabled("judgment-buffer");
     }
+
+    public boolean isSpringSchedulerEnabled() {
+        return featureToggleApi.isFeatureEnabled("spring-scheduler-enabled");
+    }
 }
