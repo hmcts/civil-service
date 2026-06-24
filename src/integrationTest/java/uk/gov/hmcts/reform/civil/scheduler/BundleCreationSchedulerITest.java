@@ -67,7 +67,7 @@ public class BundleCreationSchedulerITest {
         scheduler.runScheduledTask();
 
         // Then
-        verify(bundleCreationScheduledTask).accept(searchCase);
+        verify(bundleCreationScheduledTask).accept(searchCase, 1);
         verify(telemetryService).trackEvent(eq("BundleCreationJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("BundleCreationCaseProcessed"), anyMap());
         verify(telemetryService).trackEvent(eq("BundleCreationJobCompleted"), anyMap());

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTask;
+import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 
@@ -21,11 +22,14 @@ import java.util.List;
 @Slf4j
 public class BundleCreationScheduledTask implements ScheduledTask {
 
+    private static final long LOCK_DURATION = 600000L;
+
     private final ApplicationEventPublisher applicationEventPublisher;
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
     private final SystemUpdateUserConfiguration userConfig;
     private final NoCacheUserService noCacheUserService;
+    private final SchedulerThrottleService schedulerThrottleService;
     private final long waitTime;
 
     public BundleCreationScheduledTask(
@@ -34,6 +38,7 @@ public class BundleCreationScheduledTask implements ScheduledTask {
         CoreCaseDataService coreCaseDataService,
         SystemUpdateUserConfiguration userConfig,
         NoCacheUserService noCacheUserService,
+        SchedulerThrottleService schedulerThrottleService,
         @Value("${stitch-bundle.wait-time-in-milliseconds}") long waitTime
     ) {
         this.applicationEventPublisher = applicationEventPublisher;
@@ -41,11 +46,16 @@ public class BundleCreationScheduledTask implements ScheduledTask {
         this.coreCaseDataService = coreCaseDataService;
         this.userConfig = userConfig;
         this.noCacheUserService = noCacheUserService;
+        this.schedulerThrottleService = schedulerThrottleService;
         this.waitTime = waitTime;
     }
 
     @Override
     public void accept(CaseDetails caseDetails) {
+        accept(caseDetails, 0);
+    }
+
+    public void accept(CaseDetails caseDetails, int totalCases) {
         Long caseId = caseDetails.getId();
         log.info("BundleCreationScheduledTask::accept case {}", caseId);
 
@@ -56,7 +66,7 @@ public class BundleCreationScheduledTask implements ScheduledTask {
 
         String accessToken = noCacheUserService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseId, accessToken));
-        throttle();
+        schedulerThrottleService.throttle(totalCases, waitTime, LOCK_DURATION);
     }
 
     boolean isBundleCreatedForHearingDate(Long caseId) {
@@ -74,15 +84,4 @@ public class BundleCreationScheduledTask implements ScheduledTask {
                 .isPresent());
     }
 
-    @SuppressWarnings("java:S2142")
-    private void throttle() {
-        if (waitTime <= 0) {
-            return;
-        }
-        try {
-            Thread.sleep(waitTime);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
 }

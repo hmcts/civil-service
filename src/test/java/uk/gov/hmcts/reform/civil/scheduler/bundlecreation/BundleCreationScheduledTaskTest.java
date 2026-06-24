@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 
@@ -47,6 +48,8 @@ class BundleCreationScheduledTaskTest {
     private CoreCaseDataService coreCaseDataService;
     @Mock
     private NoCacheUserService noCacheUserService;
+    @Mock
+    private SchedulerThrottleService schedulerThrottleService;
 
     private BundleCreationScheduledTask task;
     private CaseDetails caseDetails;
@@ -59,6 +62,7 @@ class BundleCreationScheduledTaskTest {
             coreCaseDataService,
             new SystemUpdateUserConfiguration(USERNAME, PASSWORD),
             noCacheUserService,
+            schedulerThrottleService,
             0
         );
         caseDetails = CaseDetails.builder().id(CASE_ID).data(Map.of()).build();
@@ -130,13 +134,14 @@ class BundleCreationScheduledTaskTest {
     }
 
     @Test
-    void shouldRestoreInterruptedFlagWhenThrottleIsInterrupted() {
+    void shouldThrottleUsingTotalCasesWhenBundleCreationEventIsPublished() {
         task = new BundleCreationScheduledTask(
             applicationEventPublisher,
             caseDetailsConverter,
             coreCaseDataService,
             new SystemUpdateUserConfiguration(USERNAME, PASSWORD),
             noCacheUserService,
+            schedulerThrottleService,
             1000
         );
         CaseData caseData = new CaseDataBuilder()
@@ -146,15 +151,9 @@ class BundleCreationScheduledTaskTest {
         mockCaseData(caseData);
         when(noCacheUserService.getAccessToken(USERNAME, PASSWORD)).thenReturn(ACCESS_TOKEN);
 
-        try {
-            Thread.currentThread().interrupt();
+        task.accept(caseDetails, 5);
 
-            task.accept(caseDetails);
-
-            assertThat(Thread.currentThread().isInterrupted()).isTrue();
-        } finally {
-            Thread.interrupted();
-        }
+        verify(schedulerThrottleService).throttle(5, 1000, 600000L);
     }
 
     private void mockCaseData(CaseData caseData) {
